@@ -7,11 +7,14 @@
 
     .form-description {
       margin-bottom: 10px;
+      font-style: italic;
     }
 
     .form-group {
+      padding-bottom: 10px;
       margin-bottom: 10px;
       line-height: 1.75em;
+      border-bottom: 1px solid #d8d8d8;
     }
 
     .form-group input[type=radio] {
@@ -36,13 +39,14 @@
 </head>
 
 <body>
-  <div id="load-status">Loading ...</div>
+  <div id="load-status">Loading &hellip;</div>
   <form id="options-form">
-    <h3>Default Sidebar State</h3>
+    <h3>Gmail Sidebar State</h3>
     <div class="form-description">
       This setting controls how the Esper sidebar is displayed in Gmail. You
-      can always minimize and maximize the sidebar on a per-thread basis.
-      Task notes will still be visible even if the sidebar is minimized.
+      can always minimize and maximize the sidebar on a per-thread basis unless
+      you choose not to display the sidebar at all. Task notes will still be
+      visible even if the sidebar is hidden.
     </div>
     <div class="form-group">
       <input type="radio" name="default-sidebar-state"
@@ -55,6 +59,38 @@
              id="default-sidebar-hide" />
       <label for="default-sidebar-hide">
         Minimize the sidebar by default.
+      </label>
+      <br />
+      <input type="radio" name="default-sidebar-state"
+             id="default-sidebar-none" />
+      <label for="default-sidebar-none">
+        Don't show the sidebar at all.
+      </label>
+    </div>
+
+    <h3>Google Calendar Sidebar State</h3>
+    <div class="form-description">
+      This setting controls how the Esper sidebar is displayed in Google
+      calendar. You can always minimize and maximize the sidebar on a
+      per-event basis unless you choose not to display the sidebar at all.
+    </div>
+    <div class="form-group">
+      <input type="radio" name="calendar-sidebar-state"
+             id="calendar-sidebar-show" />
+      <label for="calendar-sidebar-show">
+        Show the sidebar by default.
+      </label>
+      <br />
+      <input type="radio" name="calendar-sidebar-state"
+             id="calendar-sidebar-hide" />
+      <label for="calendar-sidebar-hide">
+        Minimize the sidebar by default.
+      </label>
+      <br />
+      <input type="radio" name="calendar-sidebar-state"
+             id="calendar-sidebar-none" />
+      <label for="calendar-sidebar-none">
+        Don't show the sidebar at all.
       </label>
     </div>
 
@@ -74,6 +110,25 @@
              id="compose-toolbar-hide" />
       <label for="compose-toolbar-hide">
         Disable Compose Toolbar
+      </label>
+    </div>
+
+    <h3>Copy Selection Button</h3>
+    <div class="form-description">
+      This shows a button that allows you to quickly copy text into
+      the Task Notes when you highlight text from an e-mail in Gmail.
+    </div>
+    <div class="form-group">
+      <input type="radio" name="copy-selection-state"
+             id="copy-selection-show" />
+      <label for="copy-selection-show">
+        Show Copy Selection Button
+      </label>
+      <br />
+      <input type="radio" name="copy-selection-state"
+             id="copy-selection-hide" />
+      <label for="copy-selection-hide">
+        Hide Copy Selection Button
       </label>
     </div>
 

@@ -1,4 +1,4 @@
-/// <reference path="../common/Analytics.ts" />
+/// <reference path="../common/Analytics.Chrome.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../common/Login.ts" />
@@ -23,9 +23,9 @@ module Esper.Auth {
 
   function getPageType() {
     if (pageType === undefined) {
-      if (/^https:\/\/mail.google.com\//.test(document.URL)) {
+      if (HostUrl.isGmail(document.URL)) {
         pageType = PageType.Gmail;
-      } else if (/^https:\/\/www.google.com\/calendar\//.test(document.URL)) {
+      } else if (HostUrl.isGcal(document.URL)) {
         pageType = PageType.Gcal;
       } else {
         pageType = PageType.Other;
@@ -73,18 +73,24 @@ module Esper.Auth {
     win.focus();
   }
 
-  function openWelcomeModal(account: Types.Account) {
+  export function openWelcomeModal(account: Types.Account,
+                                   hideProgressBar?: boolean,
+                                   hideFooter?: boolean) {
     var div = $('<div>').appendTo('body');
-    div.renderReact(Onboarding.OnboardingModal, account);
+    div.renderReact(Onboarding.OnboardingModal, {
+      account:   account,
+      hideProgressBar: hideProgressBar ? true : false,
+      hideFooter: hideFooter ? true : false
+    });
   }
 
   function obtainCredentials(googleAccountId, forceLogin) {
     EsperStorage.loadCredentials(
       googleAccountId,
       function(x: Types.Account) {
+        Login.setAccount(x);
         if (!x.declined || forceLogin) {
           if (x.credentials !== undefined) {
-            Login.setAccount(x);
             Login.getLoginInfo().always(Analytics.identify);
             sendCredentialsResponse(x);
           }
@@ -163,6 +169,7 @@ module Esper.Auth {
             request.value.googleAccountId,
             function() { Log.d("Removed credentials from storage"); }
           );
+          window.location.reload();
           break;
 
         case "ClearSyncStorage":
@@ -209,6 +216,7 @@ module Esper.Auth {
         for (var k in newStorage.accounts) {
           if (loginInProgressFor === k) {
             Login.setAccount(newStorage.accounts[k]);
+            Analytics.identify();
             Onboarding.handleLogin();
             Message.postToExtension(Message.Type.FocusOnSender);
             break;

@@ -5,8 +5,8 @@
 
 module Esper.LocSearch {
 
-  export function displayResults(team, locationBox, dropdown,
-                                 resultsDiv, query, prefs) {
+  export function displayResults(team, locationBox, dropdown, query, prefs) {
+    var resultsDiv = dropdown;
     resultsDiv.find(".esper-li").remove();
     var locs = Preferences.savedPlaces(prefs);
     var nums = Preferences.contactInfo(team, prefs);
@@ -39,13 +39,26 @@ module Esper.LocSearch {
       }
     });
 
-    if (hasResult) {
-      if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
-      dropdown.addClass("esper-open");
-    } else {
-      if (dropdown.hasClass("esper-open")) dropdown.toggle();
-      dropdown.removeClass("esper-open");
+    // With Bootstrap
+    if (locationBox.data("toggle") === "dropdown") {
+      if (!!hasResult !== !!dropdown.is(":visible")) {
+        locationBox.dropdown("toggle");
+      }
     }
+
+    // Old non-Bootstrap behavior
+    else {
+      if (hasResult) {
+        if (!(dropdown.hasClass("esper-open"))) dropdown.toggle();
+        dropdown.addClass("esper-open");
+      } else {
+        if (dropdown.hasClass("esper-open")) dropdown.toggle();
+        dropdown.removeClass("esper-open");
+      }
+    }
+
+    // Width adjustment after dropdown visibility change
+    dropdown.outerWidth(locationBox.outerWidth());
   }
 
 }

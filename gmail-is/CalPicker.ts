@@ -14,9 +14,6 @@ module Esper.CalPicker {
   // error.
   class HaltEventSave extends Error {}
 
-  // Who appears as the creator of events that we write to the calendar
-  var createdByEmail : string;
-
   // The team calendars whose events are currently displayed
   var showCalendars : { [calid : string] : string /* tz */ } = {};
 
@@ -46,15 +43,11 @@ module Esper.CalPicker {
     eventTitle : JQuery;
     eventLocation : JQuery;
     locationDropdown : JQuery;
-    locationSearchResults : JQuery;
     pickerSwitcher : JQuery;
-    createdBy : JQuery;
     execTzDiv : JQuery;
     guestTzDiv : JQuery;
-    guestNames : JQuery;
     viewCalInput : JQuery;
     viewCalDropdown : JQuery;
-    viewCalSection : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
   }
@@ -74,10 +67,11 @@ module Esper.CalPicker {
   function meetingTypeMenu() {
 '''
 <select #container class="esper-select">
-</div>
+  <option value="">Select Meeting Type</option>
+</select>
 '''
-    var types = ["other", "phone_call", "video_call", "breakfast",
-                 "brunch", "lunch", "coffee", "dinner", "drinks"];
+    var types = ["phone_call", "video_call", "breakfast",
+                 "brunch", "lunch", "coffee", "dinner", "drinks", "other"];
     types.forEach(function (type) {
 '''
 <option #option></option>
@@ -113,54 +107,57 @@ module Esper.CalPicker {
 <div #view>
   <div #calendarPickerContainer class="hide">
     <div #dateJumper class="esper-date-jumper" style="display: none"/>
-    <div class="esper-calendar-modal-event-settings esper-clearfix">
-      <div class="esper-event-settings-col">
-        <div>
-          <span class="esper-bold">Event title:</span>
-          <input #eventTitle type="text" size="24" class="esper-input"/>
+    <div class="esper-calendar-modal-event-settings esper-clearfix esper-bs">
+      <div class="container-fluid"><div class="row">
+        <div class="col-md-6 col-lg-4">
+          <div class="form-group">
+            <label for="esper-calpicker-title"
+              class="control-label">Event Title</label>
+            <input id="esper-calpicker-title"
+              #eventTitle type="text" class="form-control"/>
+          </div>
+          <div class="form-group">
+            <label for="esper-calpicker-location" class="control-label">Location</label>
+            <div class="dropdown">
+              <input id="esper-calpicker-location"
+                #eventLocation type="text" class="form-control"
+                data-toggle="dropdown" />
+              <ul #locationDropdown class="dropdown-menu" />
+            </div>
+          </div>
         </div>
-        <div style="margin-top: 8px">
-          <span class="esper-bold">Location:</span>
-          <input #eventLocation type="text" size="24" class="esper-input"/>
-          <ul #locationDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-            <div #locationSearchResults class="esper-dropdown-section"/>
-          </ul>
+        <div class="col-md-6 col-lg-4">
+          <div class="form-group">
+            <label for="esper-calpicker-calendars" class="control-label">
+              View Calendars</label>
+            <div class="dropdown">
+              <select #viewCalInput class="esper-select form-control"
+                      id="esper-calpicker-calendars"
+                      data-toggle="dropdown" />
+              <ul #viewCalDropdown class="dropdown-menu" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="esper-calpicker-save-to"
+              class="control-label">Save Events To</label>
+            <select id="esper-calpicker-save-to"
+              #pickerSwitcher class="esper-select form-control"/>
+          </div>
         </div>
-        <div>
-          <span class="esper-bold">Thread participants:</span>
-          <div style="margin-top: 8px" #guestNames/>
+        <div class="col-md-12 col-lg-4"><div class="row">
+          <div class="col-md-6 col-lg-12 form-group">
+            <label for="esper-calpicker-exec-tz"
+              class="control-label">Executive Timezone</label>
+            <div #execTzDiv />
+          </div>
+          <div class="col-md-6 col-lg-12 form-group">
+            <label for="esper-calpicker-guest-tz"
+              class="control-label">Guest Timezone</label>
+            <div #guestTzDiv />
+          </div>
         </div>
-        <div style="margin-top: 8px">
-          <span class="esper-bold">View calendars:</span>
-          <select #viewCalInput class="esper-select esper-click-safe"/>
-          <ul #viewCalDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn"
-              style="width: 50%">
-            <div #viewCalSection class="esper-dropdown-section"/>
-          </ul>
-        </div>
-      </div>
-      <div class="esper-event-settings-col">
-        <div>
-          <span class="esper-bold">Save events to:</span>
-          <select #pickerSwitcher class="esper-select"/>
-        </div>
-        <br/>
-        <div class="new-line">
-          <span class="esper-bold">Created by:</span>
-          <select #createdBy class="esper-select"/>
-        </div>
-        <br/>
-        <div class="new-line" #execTzDiv>
-          <span class="esper-bold">Executive timezone:</span>
-        </div>
-        <br/>
-        <div class="new-line" #guestTzDiv>
-          <span class="esper-bold">Guest timezone:</span>
-        </div>
-      </div>
-    </div>
+      </div></div>
+    </div></div>
     <div class="esper-modal-dialog esper-cal-picker-modal">
       <div class="esper-modal-content esper-cal-picker-modal">
         <div #calendarView class="esper-cal-picker-container"/>
@@ -195,10 +192,11 @@ module Esper.CalPicker {
     showZoneAbbr = zoneAbbr(showTimezone);
     guestZoneAbbr = zoneAbbr(guestTimezone);
 
+    eventLocation.dropdown();
     function searchLocation() {
       var query = eventLocation.val();
       LocSearch.displayResults(team, eventLocation, locationDropdown,
-                               locationSearchResults, query, prefs);
+                               query, prefs);
     }
     Util.afterTyping(eventLocation, 250, searchLocation);
     eventLocation.click(function() {
@@ -221,7 +219,6 @@ module Esper.CalPicker {
     });
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
-    Sidebar.customizeSelectArrow(createdBy);
     Sidebar.customizeSelectArrow(viewCalInput);
 
     for (var i = 0; i < calendars.length; i++) {
@@ -254,61 +251,64 @@ module Esper.CalPicker {
       viewCalInput.append("<option>" + curViewList.join(", ") + "</option>");
     }
     updateCalendarViewList();
+    viewCalInput.dropdown();
     viewCalInput.mousedown(function(e) {
       e.preventDefault();
-      viewCalDropdown.show();
-      viewCalDropdown.addClass("esper-open");
+      viewCalDropdown.outerWidth(viewCalInput.outerWidth());
+      viewCalInput.dropdown('toggle');
       Analytics.track(Analytics.Trackable.ClickCalendarPickerViewCalendar);
     });
     List.iter(calendars, function(cal, i) {
 '''
 <li #calendarCheckboxRow class="esper-calendar-checkbox esper-li esper-click-safe">
-  <input #calendarCheckbox type="checkbox" class="esper-click-safe"/>
-  <div style="display: inline" #calendarName class="esper-click-safe"/>
+  <span #fakeCheckbox class="fa fa-fw esper-fake-checkbox" />
+  <span #calendarName class="esper-fake-checkbox-text"/>
 </li>
 '''
+      var calColor = colorForCalendar(team, cal);
+      fakeCheckbox.css("background", calColor.background);
+      fakeCheckbox.css("color", calColor.foreground);
+
+      function isChecked() {
+        return fakeCheckbox.hasClass("fa-check");
+      }
+
+      function makeChecked(checked) {
+        if (checked) {
+          fakeCheckbox.addClass("fa-check");
+        } else {
+          fakeCheckbox.removeClass("fa-check");
+        }
+      }
+
       if (cal.calendar_default_view) {
-        calendarCheckbox.prop("checked", true);
+        makeChecked(true);
       }
       var abbr = zoneAbbr(cal.calendar_timezone);
       calendarCheckboxRow.click(function() {
-        calendarCheckbox.trigger("click");
+        fakeCheckbox.click();
       });
-      calendarCheckbox.click(function(e) {
+      fakeCheckbox.click(function(e) {
         e.stopPropagation();
-        if (this.checked) {
-          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
-        } else {
+        if (isChecked()) {
+          makeChecked(false);
           delete showCalendars[cal.google_cal_id];
+        } else {
+          makeChecked(true);
+          showCalendars[cal.google_cal_id] = cal.calendar_timezone;
         }
         calendarView.fullCalendar("refetchEvents");
         updateCalendarViewList();
       });
       calendarName.text(cal.calendar_title + " (" + abbr + ")");
       calendarCheckboxRow.data("tz", cal.calendar_timezone);
-      calendarCheckboxRow.appendTo(viewCalSection);
+      calendarCheckboxRow.appendTo(viewCalDropdown);
     });
 
-    var aliases = team.team_email_aliases;
-    createdBy.children().remove();
-    if (aliases.length === 0) {
-      $("<option>" + Login.myEmail() + "</option>").appendTo(createdBy);
-      createdBy.prop("disabled", true);
-      createdByEmail = Login.myEmail();
-    } else {
-      aliases.forEach(function(email : string, i) {
-        $("<option>" + email + "</option>").appendTo(createdBy);
-        if (i === 0) createdByEmail = email;
-      });
-      createdBy.change(function() {
-        createdByEmail = $(this).val();
-      });
-    }
-
     var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
+    execTz.attr("id", "esper-calpicker-exec-tz");
     var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
-    Sidebar.customizeSelectArrow(execTz);
-    Sidebar.customizeSelectArrow(guestTz);
+    guestTz.attr("id", "esper-calpicker-guest-tz");
 
     execTz.bind("typeahead:change", function() {
       var tz = Timezone.selectedTimezone(execTz);
@@ -333,14 +333,6 @@ module Esper.CalPicker {
     });
     guestTz.click(function() {
       Analytics.track(Analytics.Trackable.SelectCalendarPickerGuestTimezone);
-    });
-
-    CurrentThread.getParticipants().done(function(guests) {
-      var names = List.map(guests, function(guest) {
-        // With a fallback if the display name is not set:
-        return guest.display_name || guest.email;
-      });
-      guestNames.text(names.join(", "));
     });
 
     var pv = <PickerView> _view;
@@ -424,10 +416,9 @@ module Esper.CalPicker {
             List.find(team.team_calendars, function(cal : ApiT.Calendar) {
               return cal.google_cal_id === x.google_cal_id;
             });
-          if (/ Ghost$/.test(evCal.calendar_title)) {
-            ev["color"] = "#BCBEC0"; // @gray_30
-          }
-
+          var colors = colorForCalendar(team, evCal);
+          ev["color"] = colors.background;
+          ev["textColor"] = colors.foreground;
           return ev;
         });
       },
@@ -605,9 +596,9 @@ module Esper.CalPicker {
 
     calendarView.fullCalendar({
       header: {
-        left: 'prev,next today',
+        left: 'today prev,next',
         center: 'title',
-        right: 'month,agendaWeek,agendaDay'
+        right: 'agendaDay,agendaWeek,month'
       },
       height: calHeight,
       defaultView: 'agendaWeek',
@@ -658,7 +649,7 @@ module Esper.CalPicker {
     var menu = meetingTypeMenu();
     pickerView.view.find(".fc-left").append(menu);
     menu.change(function () {
-      meetingType = menu.val();
+      meetingType = menu.val() || "other";
       pickerView.calendarView.fullCalendar("refetchEvents");
     });
     menu.click(function() {
@@ -788,7 +779,7 @@ module Esper.CalPicker {
     // Wait for link
     var linkCalls = List.map(events, function(ev) {
       return Api.createTaskLinkedEvent(
-        createdByEmail,
+        Login.myEmail(),
         team.teamid,
         ev,
         task.taskid
@@ -971,7 +962,7 @@ module Esper.CalPicker {
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #calendar class="esper-calendar-grid"/>
+    <div #calendar class="esper-calendar-grid esper-scroll-target"/>
     <div class="esper-modal-footer esper-clearfix">
       <span #busySpinner class="esper-spinner"></span>
       <button #cancel class="esper-btn esper-btn-secondary">
@@ -1083,5 +1074,69 @@ module Esper.CalPicker {
 
   function hideCalPickerSpinner(): void {
     InThreadControls.setEventControlContainer($(`<span />`));
+  }
+
+  /*
+    Currently no way to get calendar colors from Google without backend changes,
+    so let's just use some pre-assigned colors based on the order in which
+    we get our list of calendars for the team.
+
+    Colors are pulled from Google Calendar and arranged in a way that ensures
+    at least some contrast between neighboring colors in the list.
+  */
+  var presetColors: string[] = [
+    "#9FE1E7",
+    "#FFAD46",
+    "#42D692",
+    "#9A9CFF",
+    "#FF7537",
+    "#92E1C0",
+    "#AC725E",
+    "#16A765",
+    "#D06B64",
+    "#B99AFF",
+    "#F83A22",
+    "#C2C2C2",
+    "#9FC6E7",
+    "#FBE983",
+    "#7BD148",
+    // "#CD74E6", -- This color is too close to our "active" calendar color
+    "#F691B2",
+    "#CABDBF",
+    "#4986E7",
+    "#FAD165",
+    "#B3DC6C",
+    "#A47AE2",
+    "#FA573C",
+    "#CCA6AC"
+  ];
+
+  interface eventColor {
+    background: string;
+    foreground: string;
+  }
+
+  function colorForCalendar(team: ApiT.Team, calendar: ApiT.Calendar)
+    : eventColor
+  {
+    var index = _.findIndex(team.team_calendars, function(teamCal) {
+      return teamCal.google_cal_id === calendar.google_cal_id;
+    });
+
+    // Ghost calendar check
+    if (/ Ghost$/.test(calendar.calendar_title)) {
+      return {
+        background: "#BCBEC0", // @gray_30
+        foreground: "333"
+      };
+    }
+
+    if (index < 0) {
+      index = 0;
+    }
+    return {
+      background: presetColors[index % presetColors.length],
+      foreground: "#333"
+    };
   }
 }

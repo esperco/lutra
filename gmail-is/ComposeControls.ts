@@ -170,7 +170,7 @@ module Esper.ComposeControls {
     function getTemplates() {
       CurrentThread.currentTeam.get().match({
         some: function(team) {
-          var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid;
+          var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid + "/templates/";
           customizeTemplates.click(function(e) {
             e.stopPropagation();
             window.open(noPrefsURL);

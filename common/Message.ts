@@ -9,7 +9,12 @@ module Esper.Message {
     // Request and push updates to Gmail ThreadState
     RequestThreadState,  // Request thread state from storage
     ThreadStateData,     // Data from storage
-    ThreadStateUpdate,    // Update from user to save to storage
+    ThreadStateUpdate,   // Update from user to save to storage
+
+    // Request and push updates to Gcal EventSidebarState
+    RequestEventState,  // Request from storage
+    EventStateData,     // Data from storage
+    EventStateUpdate,   // Updat from user to save to storage
 
     // Open Extension options page
     OpenExtensionOptions,
@@ -21,7 +26,11 @@ module Esper.Message {
     Track,
 
     // Post call from CS to IS that location hash has changed
-    LocationUpdate
+    LocationUpdate,
+
+    // Instruct CS to render Getting Started page on the
+    // onboarding modal again from IS
+    RenderGettingStarted
   }
 
   export interface Message {

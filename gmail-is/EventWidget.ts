@@ -176,13 +176,9 @@ module Esper.EventWidget {
                    esper-clickable esper-ev-disclose"/>
   <ul #dropdown class="esper-drop-ul esper-ev-dropdown">
     <div class="esper-dropdown-section">
-      <li #inviteGuests
-          class="esper-li">
-        Invite guests
-      </li>
       <li #chooseThisEvent
           class="esper-li">
-        Choose this event
+        Confirm Event
       </li>
       <li #editEvent
           class="esper-li">
@@ -197,7 +193,7 @@ module Esper.EventWidget {
         Unlink event
       </li>
       <li #deleteEvent
-          class="esper-li esper-danger">
+          class="esper-li">
         Delete event
       </li>
     </div>
@@ -223,14 +219,6 @@ module Esper.EventWidget {
       Analytics.track(Analytics.Trackable.ClickTaskTabEditEvent);;
     });
 
-    inviteGuests.click(function() {
-      CurrentThread.withPreferences(function(preferences) {
-        FinalizeEvent.inviteGuests(e, preferences);
-        Gmail.scrollToEventControl();
-      });
-      Analytics.track(Analytics.Trackable.ClickTaskTabInviteGuests);
-    });
-
     var reminderGuests = List.map(e.guests, function(guest) {
       var response;
       var x = guest.response.toLowerCase();
@@ -246,8 +234,7 @@ module Esper.EventWidget {
       return {
         name:  guest.display_name,
         email: guest.email,
-        response: response,
-        checked: false
+        response: response
       };
     });
     ReminderView.openReminderOnClick(reminder,
@@ -347,8 +334,8 @@ module Esper.EventWidget {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
+    startTime.text(XDate.utcToLocalTimeOnly(start));
+    endTime.text(XDate.utcToLocalTimeOnly(end));
 
     timezone.text(CalPicker.zoneAbbr(showTimezone));
 

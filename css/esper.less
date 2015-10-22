@@ -70,6 +70,10 @@
     border: 0;
   }
 
+  hr {
+    display: block;
+  }
+
   // Busy indicator
   .modal-footer .esper-spinner {
     float: left;
@@ -136,6 +140,48 @@
       font-weight: bold;
     }
   }
+
+  .list-group-item input[type="checkbox"] {
+    vertical-align: text-bottom;
+    margin-right: 5px;
+  }
+
+  // Use this for adjusting height of inline spans to be the same height as
+  // buttons and whatnot
+  .inline-form-text {
+    line-height: 34px;
+  }
+
+  label.inline-form-text {
+    margin-bottom: 0;
+  }
+
+  // Style Typeahead
+  .tt-hint, .tt-input {
+    .form-control;
+  }
+
+  .tt-hint[readonly] {
+    background: white;
+    color: #ccc;
+  }
+
+  .tt-menu {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: white;
+    width: 100%;
+  }
+
+  .tt-selectable {
+    cursor: pointer;
+    padding: 7px;
+  }
+
+  .tt-cursor, .tt-selectable:hover {
+    background: @purple;
+    color: white;
+  }
 }
 
 /* Imports in some other vendor CSS files, but only as applied to elements with
@@ -167,6 +213,25 @@
       padding: 12px 15px;
       min-height: 100px;
     }
+  }
+
+  // A checkbox in which to insert fontawesome checks
+  .esper-fake-checkbox {
+    display: block;
+    height: 1.28571429em;
+    line-height: 1.28571429em;
+    width: 1.28571429em;
+    border-radius: 5px;
+    margin-right: 7px;
+    float: left;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.16);
+  }
+
+  .esper-fake-checkbox-text {
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.28571429em;
   }
 }
 
@@ -336,7 +401,7 @@ ul.esper-drop-ul {
 li.esper-li, a.esper-a {
   display: block;
   position: relative;
-  padding: 7px 16px;
+  padding: 7px;
   color: black;
   line-height: 1;
   text-align: left;
@@ -383,7 +448,6 @@ a.esper-a:hover {
 
 select.esper-select {
   vertical-align: middle !important;
-  float: left;
   height: 32px;
   padding: 6px 20px 6px 9px;
   line-height: 1.2;
@@ -430,6 +494,9 @@ select.esper-select {
   background-color: white;
   width: 280px;
   border: 1px solid;
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 object.esper-svg { pointer-events: none; }
@@ -823,6 +890,27 @@ textarea.esper-input { resize: none; }
   }
 }
 
+/*** Esper Calendar Sidebar ***/
+
+.esper-cal-sidebar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 110px;
+  width: 300px;
+
+  // Set so this sits on top of every in Google Calendar except the very top
+  // One Google bar
+  z-index: 6;
+
+  // Override this in child elements to make them clickable
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
 /*** Esper Dock ***/
 
 .esper-dock-container {
@@ -859,6 +947,12 @@ textarea.esper-input { resize: none; }
   bottom: 36px;
   width: @sidebar_width + 14px;
   height: 7px;
+  opacity: 1;
+
+  transition: opacity 0.3s;
+  &.esper-hide {
+    opacity: 0;
+  }
 }
 
 .esper-dock-wrap-left {
@@ -955,6 +1049,14 @@ textarea.esper-input { resize: none; }
   margin: 0 20px 0 0;
 }
 
+.esper-dock .dropdown-menu {
+  width: @sidebar_width;
+
+  .esper-dropdown-footer {
+    padding: 3px 15px
+  }
+}
+
 .esper-team-checkmark {
   float: right;
   width: 12px;
@@ -1010,6 +1112,40 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   top: 8px;
   right: 21px;
   bottom: 0;
+
+  // Used for simple sidebar without tabs or anything else
+  &.esper-sidebar-simple {
+    padding: 10px 10px 36px 10px;
+    background: white;
+    border: 1px solid @google_border_gray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: top 0.3s;
+
+    // TODO: Refactor transition stuff into all sidebar code?
+    &.esper-hide {
+      top: 100%;
+    }
+
+    .esper-subheading {
+      font-weight: bold;
+      padding: 10px 0;
+      border-bottom: 1px solid @google_border_gray;
+      margin: 0 0 10px;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      .fa-refresh {
+        .esper-link;
+        float: right;
+      }
+    }
+  }
 }
 
 .esper-tab {
@@ -1199,6 +1335,11 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-bottom-left-radius: 3px;
 }
 
+.esper-subsection-footer {
+  border-top: 1px solid @google_border_gray;
+  padding: 10px 0;
+}
+
 .esper-save-notes {
   display: inline-block;
   vertical-align: middle;
@@ -1256,6 +1397,10 @@ li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
   border-top: none;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
+
+  .esper-section-content {
+    padding: 10px;
+  }
 }
 
 
@@ -1446,17 +1591,24 @@ ul.esper-availability-graph {
   &:hover { background: @purple_bg_hover; }
 }
 
-.esper-no-events,
-.esper-no-prefs,
-.esper-no-threads {
+.esper-no-content {
   padding: 50px 0;
   font-size: 16px;
   color: @gray_20;
   text-align: center;
+
+  .esper-settings-link {
+    font-size: 12px;
+    display: block;
+    margin-top: 10px;
+  }
 }
 
 .esper-events-list { padding: 0 10px; }
-.esper-events-list-loading { padding: 24px 0; }
+.esper-events-list-loading, .esper-sidebar-loading { padding: 24px 0; }
+.esper-label-list {
+  padding: 10px 10px 0;
+}
 
 .esper-ev {
   padding: 14px 0 16px 0;
@@ -1490,7 +1642,7 @@ ul.esper-availability-graph {
   }
 }
 
-.esper-centered-container {
+.esper-centered-container, .esper-ev-inline-container {
   position : relative;
 
   margin-top : 20px;
@@ -1501,12 +1653,14 @@ ul.esper-availability-graph {
   padding-right : 10px;
 
   border : 1px solid @border;
-}
 
-.esper-ev-inline-container {
-  .esper-centered-container;
-
-  max-width : 50em;
+  .esper-modal-header {
+    padding: 16px 6px;
+    height: auto;
+  }
+  .esper-modal-footer {
+    padding: 16px 6px;
+  }
 }
 
 .esper-reminder-options {
@@ -1578,7 +1732,7 @@ ul.esper-availability-graph {
 }
 
 .esper-ev-title {
-  font-weight: bold;
+  word-wrap: break-word;
   margin-left: 48px;
   padding: 3px 0 1px 0;
 }
@@ -1924,6 +2078,7 @@ ul.esper-ev-dropdown {
 
 .esper-event-control-container {
   border-top: 1px solid @google_border_gray;
+  margin-right: 14px; // To match task notes container
 
   &:empty {
     border-top: 0;
@@ -2003,9 +2158,8 @@ ul.esper-ev-dropdown {
 /** Linked threads **/
 
 .esper-thread-list {
-  display: list-item;
   margin: 0px;
-  padding: 6px 0px 6px 25px;
+  padding: 6px 0px 6px 10px;
 }
 
 .esper-thread-li {
@@ -2017,6 +2171,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-thread-link {
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2105,6 +2260,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-modal-header {
+  flex-grow: 0;
   height: 52px;
   padding: 16px 14px;
   font-size: 18px;
@@ -2122,6 +2278,7 @@ ul.esper-ev-dropdown {
 }
 
 .esper-modal-footer {
+  flex-grow: 0;
   padding: 20px 15px;
   text-align: right;
   border-top: 1px solid @gray_10;
@@ -2199,22 +2356,52 @@ textarea.esper-description-text {
   height: 200px;
 }
 
+.esper-reminder-btn {
+  margin-bottom: 8px;
+  width: 100%;
+}
+
 .esper-reminder-table {
+  font-size: 16px;
+  padding-left: 10px;
   width: 100%;
   td {
     vertical-align: top;
     padding-top: 20px;
   }
+  input[type="checkbox"] {
+    margin: 3px 5px 3px 0px;
+  }
+}
+
+.esper-reminder-recipients {
+  width: 100%;
+  font-size: 13px;
+  height: 54px;
+  padding: 8px;
 }
 
 .esper-reminder-text {
   width: 100%;
   font-size: 13px;
-  height : 4.2cm;
+  height : 128px;
+  padding: 8px;
+}
+
+.esper-active-reminders {
+  margin: 8px 0 8px 0;
+  .esper-close {
+    float: right;
+    font-size: 15px;
+    font-weight: bold;
+    color: @gray_60;
+  }
 }
 
 .esper-modal-default {
   .esper-modal;
+  display: flex;
+  flex-direction: column;
   @search_width: 640px;
   width: @search_width;
   margin-left: -@search_width/2;
@@ -2250,7 +2437,10 @@ textarea.esper-description-text {
   margin-left: -@search_width/2;
 }
 
-.esper-modal-content { padding: 10px; }
+.esper-modal-content {
+  padding: 10px;
+  overflow-y: auto; // Makes header and footer of modal sticky
+}
 
 .esper-search-modal-input {
   width: 100%;
@@ -2408,23 +2598,17 @@ textarea.esper-description-text {
   }
 }
 
-.esper-calendar-grid {
+.esper .esper-calendar-grid {
   .fc-toolbar { margin-bottom: 10px; }
   .esper-calendar-modal-event-settings {
-    padding: 10px;
+    padding: 5px;
     font-size: 13px;
     background: @gray_f8;
     border-bottom: 1px solid @gray_10;
-    .esper-event-settings-col {
-      float: left;
-      width: 50%;
-      span {
-        float: left;
-        margin: 8px 8px 0 0;
-      }
-      div.new-line { margin-top: 25px; }
-      select.esper-select, input.esper-input { width: 50%; }
-    }
+  }
+  .fc-toolbar .fc-state-active,
+  .fc-toolbar .ui-state-active {
+    z-index: 2;
   }
 }
 
@@ -2501,6 +2685,12 @@ textarea.esper-description-text {
   animation: scaleout 1.0s ease-in-out 0s infinite;
   &.esper-tab-header-spinner { display: block; }
   &.esper-list-spinner { display: block; }
+  &.esper-sidebar-spinner {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 35px auto;
+  }
   &.esper-inline-spinner {
     display: block;
     width: 75px;
@@ -2514,12 +2704,6 @@ textarea.esper-description-text {
   display: block;
   height: 32px;
   width: 32px;
-}
-
-.esper-sidebar-spinner {
-  margin: 25% auto 0;
-  width: 60px;
-  height: 60px;
 }
 
 .esper-tab-header-spinner {

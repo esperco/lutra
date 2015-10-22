@@ -185,7 +185,12 @@ module Esper.Gmail {
   /** Scrolls to the bottom of the thread to show the current event widget
    */
   export function scrollToEventControl(time?: number) {
-    scrollToJQElm(InThreadControls.getEventControlContainer(), time);
+    var elm = InThreadControls.getEventControlContainer();
+    var target = elm.find(".esper-scroll-target");
+    if (target.length) {
+      elm = target;
+    }
+    scrollToJQElm(elm.first(), time);
   }
 
   /** Scrolls to a jQuery-wrapped element */

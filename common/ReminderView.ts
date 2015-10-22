@@ -4,7 +4,6 @@ module Esper.ReminderView {
     email: string;
     name: string;
     response: GuestResponse;
-    checked: boolean;
   }
   interface ReminderState {
     enable: boolean;
@@ -12,47 +11,30 @@ module Esper.ReminderView {
     text: string;
     time: number;
     guests: ReminderGuest[];
+    emailList: string[];
   }
 
   var currentReminderState: ()=>ReminderState;
 
-  function renderGuest(guest) {
-'''
-<li #view>
-  <input type='checkbox' #check/>
-  <label #label/>
-</li>
-'''
-    var randomId = Util.randomString();
-    check.attr("id", randomId);
-    label.attr("for", randomId);
-
-    check.prop("checked", guest.checked);
-    check.change(function() {
-      guest.checked = check.is(":checked");
+  function changeRecipientsEvent(checkbox: JQuery,
+                                 recipients: JQuery,
+                                 guests: ReminderGuest[]) {
+    checkbox.change(function() {
+      if (guests == []) return;
+      var emails = recipients.val();
+      if ($(this).is(":checked"))
+        _.forEach(guests, function(guest: ReminderGuest) {
+          if (emails.search(/(^\s*$)|(,\s*$)/) != -1)
+            recipients.val(emails + guest.email + ", ");
+          else
+            recipients.val(emails + ", " + guest.email + ", ");
+        });
+      else
+        _.forEach(guests, function(guest: ReminderGuest) {
+          var regex = new RegExp(guest.email + ",? *", "i");
+          recipients.val(emails.replace(regex, ""));
+        });
     });
-
-    if (guest.name && guest.name.length > 0
-     && guest.name !== guest.email) {
-      label.text(guest.name + " <" + guest.email + ">");
-    } else {
-      label.text(guest.email);
-    }
-    return view;
-  }
-
-  function setupGuestGroup(groupView, groupCheck, groupList) {
-    if (groupList.is(":empty")) {
-      groupView.hide();
-    } else {
-      groupCheck.prop("checked", groupList.find("input:checkbox:not(:checked)")
-                                 .length <= 0);
-      groupCheck.change(function() {
-        var checkboxes = groupList.find("input:checkbox");
-        checkboxes.prop("checked", groupCheck.is(":checked"));
-        checkboxes.trigger("change");
-      });
-    }
   }
 
   function render(fromEmail, reminderState, eventTitle) {
@@ -69,26 +51,19 @@ module Esper.ReminderView {
   <tr>
     <td>To:</td>
     <td>
-      <div #yesGuests>
-        <input #yesCheck type='checkbox' id='yesCheck'/>
-        <label for='yesCheck'>Yes</label><br/>
-        <ul #yesGuestsList/>
-      </div>
-      <div #noGuests>
-        <input #noCheck type='checkbox' id='noCheck'/>
-        <label for='noCheck'>No</label><br/>
-        <ul #noGuestsList/>
-      </div>
-      <div #maybeGuests>
-        <input #maybeCheck type='checkbox' id='maybeCheck'/>
-        <label for='maybeCheck'>Maybe</label><br/>
-        <ul #maybeGuestsList/>
-      </div>
-      <div #noreplyGuests>
-        <input #noreplyCheck type='checkbox' id='noreplyCheck'/>
-        <label for='noreplyCheck'>Waiting for Reply</label><br/>
-        <ul #noreplyGuestsList/>
-      </div>
+      <input #yesCheckbox type='checkbox' id='yesCheck'/>
+      <label #yesLabel for='yesCheck'>Yes</label>
+      <br/>
+      <input #noCheckbox type='checkbox' id='noCheck'/>
+      <label #noLabel for='noCheck'>No</label>
+      <br/>
+      <input #maybeCheckbox type='checkbox' id='maybeCheck'/>
+      <label #maybeLabel for='maybeCheck'>Maybe</label>
+      <br/>
+      <input #noReplyCheckbox type='checkbox' id='noReplyCheck'/>
+      <label #noReplyLabel for='noReplyCheck'>Waiting for reply</label>
+      <br/>
+      <textarea #recipients class="esper-input esper-reminder-recipients" />
     </td>
   </tr>
   <tr>
@@ -112,8 +87,7 @@ module Esper.ReminderView {
   <tr>
     <td>Message:</td>
     <td>
-      <textarea #reminderField rows=24 class="esper-input esper-reminder-text">
-Hello,
+      <textarea #reminderField class="esper-input esper-reminder-text">Hello,
 
 This is a friendly reminder that you are scheduled for |event|. The details are below, please feel free to contact me if you have any questions regarding this meeting.
       </textarea>
@@ -134,6 +108,8 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   </tr>
 </table>
 '''
+    var yesGuestsList=[], noGuestsList=[], maybeGuestsList=[],
+      noReplyGuestsList=[];
 
     // viewFromEmail.text(fromEmail);
     bcc.prop("checked", reminderState.bccMe);
@@ -141,36 +117,30 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
     List.iter(reminderState.guests, function(guest:ReminderGuest) {
       switch (guest.response) {
       case GuestResponse.Yes:
-        yesGuestsList.append(renderGuest(guest));
+        yesGuestsList.push(guest);
         break;
       case GuestResponse.No:
-        noGuestsList.append(renderGuest(guest));
+        noGuestsList.push(guest);
         break;
       case GuestResponse.Maybe:
-        maybeGuestsList.append(renderGuest(guest));
+        maybeGuestsList.push(guest);
         break;
       case GuestResponse.WaitingForReply:
-        noreplyGuestsList.append(renderGuest(guest));
+        noReplyGuestsList.push(guest);
         break;
       }
     });
-    setupGuestGroup(    yesGuests,     yesCheck,     yesGuestsList);
-    setupGuestGroup(     noGuests,      noCheck,      noGuestsList);
-    setupGuestGroup(  maybeGuests,   maybeCheck,   maybeGuestsList);
-    setupGuestGroup(noreplyGuests, noreplyCheck, noreplyGuestsList);
+    changeRecipientsEvent(yesCheckbox, recipients, yesGuestsList);
+    changeRecipientsEvent(noCheckbox, recipients, noGuestsList);
+    changeRecipientsEvent(maybeCheckbox, recipients, maybeGuestsList);
+    changeRecipientsEvent(noReplyCheckbox, recipients, noReplyGuestsList);
 
-    if (reminderState.enable) {
-      var selTime = 172800;
-      selectTime.find("option").each(function(i, opt) {
-        var v = parseFloat(opt.getAttribute("value"));
-        if (reminderState.time <= v && v < selTime) {
-          selTime = v;
-        }
-      });
-      selectTime.val(String(selTime));
-    } else {
-      selectTime.val("-1");
-    }
+    yesLabel.text(yesLabel.text() + " (" + yesGuestsList.length + ")");
+    noLabel.text(noLabel.text() + " (" + noGuestsList.length + ")");
+    maybeLabel.text(maybeLabel.text() + " (" + maybeGuestsList.length + ")");
+    noReplyLabel.text(noReplyLabel.text() + " (" + noReplyGuestsList.length + ")");
+
+    selectTime.val("86400");
 
     if (reminderState.text) {
       reminderField.text(reminderState.text);
@@ -184,6 +154,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       reminderState.time = selTime;
       reminderState.bccMe = bcc.is(":checked");
       reminderState.text = reminderField.text();
+      reminderState.emailList = recipients.val().split(/\s*,\s*/);
       return reminderState;
     };
 
@@ -191,18 +162,23 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   }
 
   function openReminder(fromTeamId, fromEmail, calendarId, eventId,
-                        eventTitle, reminderState:ReminderState) {
+                        eventTitle, reminderState:ReminderState,
+                        onFinish?: () => void) {
     var dialog = Modal.okCancelDialog("Send timed reminder to guests",
       render(fromEmail, reminderState, eventTitle),
       function() {
         reminderState = currentReminderState();
         if (! reminderState.enable) {
-          Api.unsetReminderTime(eventId);
+          Api.unsetReminderTime(eventId).done(function() {
+            if (onFinish !== undefined) onFinish();
+          });
           return true;
         } else if (0 < reminderState.time) {
           Api.setReminderTime(fromTeamId, fromEmail,
                               calendarId, eventId,
-                              reminderState.time);
+                              reminderState.time).done(function() {
+            if (onFinish !== undefined) onFinish();
+          });
           if (reminderState.bccMe) {
             var bccReminder = {
               guest_email: fromEmail,
@@ -213,23 +189,22 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
           } else {
             Api.disableReminderForGuest(eventId, fromEmail);
           }
-          List.iter(reminderState.guests, function(guest) {
-            if (guest.checked) {
-              var guestReminder = {
-                guest_email: guest.email,
-                guest_name: guest.name,
-                reminder_message: reminderState.text
-              }
-              Api.enableReminderForGuest(eventId,
-                guestReminder.guest_email, guestReminder);
-            } else {
-              Api.disableReminderForGuest(eventId, guest.email);
+          _.forEach(reminderState.emailList, function(email) {
+            if (email === "") return;
+            var guestReminder = {
+              guest_email: email,
+              guest_name: _.result(
+                _.find(reminderState.guests, 'email', email), 'name', ""),
+              reminder_message: reminderState.text
             }
+            Api.enableReminderForGuest(eventId,
+              email, guestReminder);
           });
           return true;
         } else {
           return false;
         }
+        if (onFinish !== undefined) onFinish();
       },
       "Set reminder");
     $("body").append(dialog.view);
@@ -242,7 +217,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   }
 
   export function openReminderOnClick(button, calendarId, eventId, eventTitle,
-                                      guests) {
+                                      guests, onFinish?: () => void) {
     var teams = Login.myTeams();
     if (teams.length > 0) {
       Api.getReminders(calendarId, eventId).done(function(event_reminders) {
@@ -255,20 +230,17 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         var text = 0 < event_reminders.guest_reminders.length
                  ? event_reminders.guest_reminders[0].reminder_message
                  : null;
-        List.iter(guests, function(guest: ReminderGuest) {
-          guest.checked = List.exists(event_reminders.guest_reminders,
-                                      sameEmail(guest.email));
-        });
         var reminderState: ReminderState = {
           enable: enable,
           bccMe: List.exists(event_reminders.guest_reminders, sameEmail(email)),
           text: text,
           time: time,
-          guests: guests
+          guests: guests,
+          emailList: []
         };
         button.click(function() {
           openReminder(teamid, email, calendarId, eventId, eventTitle,
-                       reminderState);
+                       reminderState, onFinish);
           Analytics.track(Analytics.Trackable.ClickReminderButton);
         });
       });

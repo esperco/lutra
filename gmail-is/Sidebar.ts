@@ -339,23 +339,7 @@ module Esper.Sidebar {
 
     CurrentThread.currentTeam.get().match({
       some : function (team) {
-        Api.getCustomerStatus(team.teamid).done(function(customer) {
-          var sub = customer.status;
-
-          if (sub === "Past_due" || sub === "Canceled" ||
-              sub === "Unpaid" || sub === undefined) {
-            view.removeClass("esper-team-warning")
-                .addClass("esper-team-danger");
-          } else if (!isCorrectTeam) {
-            view.addClass("esper-team-warning")
-                .removeClass("esper-team-danger");
-          } else {
-            view.removeClass("esper-team-warning")
-                .removeClass("esper-team-danger");
-          }
-
-          insertDock();
-        });
+        insertDock(true);
       },
       none: function() {
         insertDock(false);
@@ -481,6 +465,13 @@ module Esper.Sidebar {
 
   /* We do something if we detect a new msg ID. */
   function maybeUpdateView() {
+    // Don't draw sidebar if opt out of displaying
+    var defaultState = ExtensionOptions.store.val();
+    if (defaultState && defaultState.defaultSidebarState ===
+        ExtensionOptions.SidebarOpts.NONE) {
+      return;
+    }
+
     function retry() {
       Log.d("Trying to display Esper sidebar...");
       var rootElement = insertEsperRoot();

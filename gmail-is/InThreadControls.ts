@@ -4,6 +4,8 @@
  */
 
 /// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../common/ExtensionOptions.Model.ts" />
+/// <reference path="./CurrentThread.ts" />
 
 module Esper.InThreadControls {
   export function getContainer() {
@@ -290,7 +292,11 @@ module Esper.InThreadControls {
       taskNotesKeyup(notes);
     });
 
-    enableHighlightToTaskNotes(editor, saveTaskNotes);
+    var options = ExtensionOptions.store.val();
+    if (options && options.showCopySelection ===
+        ExtensionOptions.CopySelectionOpts.SHOW) {
+      enableHighlightToTaskNotes(editor, saveTaskNotes);
+    }
 
     var timer: number;
     function taskNotesKeyup(notes) {
@@ -337,6 +343,10 @@ module Esper.InThreadControls {
     return container;
   }
 
+  function removeSelectionAction() {
+    $(".esper-selection-action").remove();
+  }
+
   /* Pop up a button when selecting text inside Gmail messages,
    * which copies the selection into the task notes box when clicked.
    */
@@ -346,9 +356,12 @@ module Esper.InThreadControls {
     var target = Gmail.messageTextSelector;
 
     container.off("mouseup", target);
-    container.mousedown(function() {
-      $(".esper-selection-action").remove();
-    });
+    container.mousedown(removeSelectionAction);
+
+    // Remove selection action on thread change
+    CurrentThread.threadId.watch(removeSelectionAction,
+      "InThreadControls.removeSelection");
+
     /* We need to use on() here, because we want this action to occur even for
      * messages that are inserted into the DOM after we bind this handler,
      * like when the user expands out the thread.
@@ -381,6 +394,7 @@ module Esper.InThreadControls {
           });
           actionDiv.append(button);
           $("body").append(actionDiv);
+          $("body").one("click", removeSelectionAction);
         }
       }
       /* Without this, window.getSelection() will still return the previous

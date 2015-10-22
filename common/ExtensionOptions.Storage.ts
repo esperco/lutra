@@ -13,7 +13,9 @@ module Esper.ExtensionOptions {
   // Default options for when option is not set
   var defaultOptions: Options = {
     defaultSidebarState: SidebarOpts.SHOW,
-    displayComposeControls: ComposeControlsOpts.SHOW
+    calendarSidebarState: SidebarOpts.SHOW,
+    displayComposeControls: ComposeControlsOpts.SHOW,
+    showCopySelection: CopySelectionOpts.SHOW
   };
 
   // Store all of our settings under a single key

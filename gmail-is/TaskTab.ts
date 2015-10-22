@@ -1,3 +1,5 @@
+/// <reference path="./TaskLabels.Gmail.tsx" />
+
 module Esper.TaskTab {
 
   var taskLabelCreate = "Create or Link to Other Task";
@@ -49,7 +51,7 @@ module Esper.TaskTab {
     linkedEvents: ApiT.TaskEvent[]
   ) {
 '''
-  <div #noEvents class="esper-no-events">No linked events</div>
+  <div #noEvents class="esper-no-content">No linked events</div>
   <div #eventsList class="esper-events-list"/>
 '''
     taskTab.refreshLinkedEvents.addClass("esper-disabled");
@@ -91,7 +93,7 @@ module Esper.TaskTab {
 
   function displayEmptyLinkedThreadsList(taskTab: TaskTabView) {
 '''
-<div #noThreads class="esper-no-threads"> No linked emails</div>
+<div #noThreads class="esper-no-content"> No linked emails</div>
 '''
     taskTab.linkedThreadsList.empty().append(noThreads);
   }
@@ -99,8 +101,8 @@ module Esper.TaskTab {
   export function displayLinkedThreadsList(task, threadId,
                                            taskTab: TaskTabView) {
 '''
-  <div #noThreads class="esper-no-threads">No linked emails</div>
-  <ol #threadsList class="esper-thread-list"/>
+  <div #noThreads class="esper-no-content">No linked emails</div>
+  <ul #threadsList class="esper-thread-list"/>
 '''
     taskTab.linkedThreadsList.children().remove();
 
@@ -146,7 +148,7 @@ module Esper.TaskTab {
       li.appendTo(threadsList);
     });
 
-    if (threadsList.children("li").length > 0) {
+    if (threadsList.children("li").length > 1) {
       taskTab.linkedThreadsList.append(threadsList);
     } else {
       displayEmptyLinkedThreadsList(taskTab);
@@ -260,6 +262,39 @@ module Esper.TaskTab {
         taskTab.linkedThreadsList.show();
       });
   }
+
+  /* Refresh workflow view, fetch task workflow progress and workflows from server */
+  function refreshWorkflowList(team, threadId, taskTab) {
+    taskTab.workflowSpinner.show();
+    taskTab.workflowHeader.hide();
+    Api.getTaskForThread(team.teamid, threadId, false, true).done(function(task) {
+      CurrentThread.setTask(task);
+      Api.getPreferences(team.teamid).done(function(prefs) {
+        if (task !== undefined) {
+          Api.listWorkflows(team.teamid).done(function(response) {
+            var newWorkflows = response.workflows;
+            displayWorkflow(team, prefs, newWorkflows, taskTab.noWorkflow,
+                taskTab.workflowSection, taskTab.workflowSelect, taskTab.workflowNotes,
+                taskTab.stepSelect, taskTab.stepNotes,
+                taskTab.checklistDiv, taskTab.checklist);
+            var progress = task.task_workflow_progress;
+            if (progress) {
+              if (taskTab.workflowSelect.val() !== progress.workflow_id) {
+                taskTab.workflowSelect.val(progress.workflow_id);
+                taskTab.workflowSelect.trigger("change");
+              }
+            }
+          }).always(function() {
+            taskTab.workflowSpinner.hide();
+            taskTab.workflowHeader.show();
+          });
+        } else {
+          taskTab.workflowSpinner.hide();
+          taskTab.workflowHeader.show();
+        }
+      });
+    });
+  };
 
   /* Refresh task progress, fetching task progress from the server. */
   export function refreshTaskProgressSelection(team, threadId, taskTab) {
@@ -480,6 +515,7 @@ module Esper.TaskTab {
   function displayWorkflow(team : ApiT.Team,
                            prefs : ApiT.Preferences,
                            workflows: ApiT.Workflow[],
+                           noWorkflow: JQuery,
                            workflowSection : JQuery,
                            workflowSelect : JQuery,
                            workflowNotes : JQuery,
@@ -490,18 +526,21 @@ module Esper.TaskTab {
     Sidebar.customizeSelectArrow(workflowSelect);
     Sidebar.customizeSelectArrow(stepSelect);
 
+    workflowSelect.children(".esper-wf").remove();
     List.iter(workflows, function(wf) {
-      $("<option value='" + wf.id + "'>" + wf.title + "</option>")
+      $("<option class='esper-wf' value='" + wf.id + "'>" +
+          wf.title + "</option>")
         .appendTo(workflowSelect);
     });
 
     var currentWorkflow : ApiT.Workflow;
     var currentProgress : ApiT.TaskWorkflowProgress;
 
-    workflowSelect.change(function() {
+    workflowSelect.unbind().change(function() {
       var chosen = $(this).val();
       CurrentThread.getTaskForThread().done(function(task) {
         if (chosen !== "header") {
+          noWorkflow.hide();
           var wf = List.find(workflows, function(wf) {
             return wf.id === chosen;
           });
@@ -541,6 +580,10 @@ module Esper.TaskTab {
           userTabContent.append(UserTab.viewOfUserTab(team).view);
 
           workflowSection.removeClass("esper-hide");
+        } else {
+          Api.deleteWorkflowProgress(team.teamid, task.taskid);
+          workflowSection.addClass("esper-hide");
+          noWorkflow.show();
         }
       });
     });
@@ -549,7 +592,7 @@ module Esper.TaskTab {
       Analytics.track(Analytics.Trackable.SelectTaskTabWorkflow);
     });
 
-    stepSelect.change(function() {
+    stepSelect.unbind().change(function() {
       var chosen = $(this).val();
       if (chosen !== "header") {
         var wf = currentWorkflow;
@@ -626,7 +669,6 @@ module Esper.TaskTab {
     headerContent: JQuery;
 
     taskProgressContainer: JQuery;
-    taskProgressSpinner: JQuery;
 
     linkedThreadsHeader: JQuery;
     showLinkedThreads: JQuery;
@@ -648,6 +690,14 @@ module Esper.TaskTab {
     linkedEventsContainer: JQuery;
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
+
+    taskLabelsHeader: JQuery;
+    showTaskLabels: JQuery;
+    refreshTaskLabels: JQuery;
+    refreshTaskLabelsIcon: JQuery;
+    taskLabelsSpinner: JQuery;
+    taskLabelsContainer: JQuery;
+    taskLabelsList: JQuery;
   }
 
   function meetingTypeDropdown(taskTitle : JQuery,
@@ -693,6 +743,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.hide();
       currentTaskTab.taskSpinner.show();
+      currentTaskTab.taskLabelsList.hide();
+      currentTaskTab.taskLabelsSpinner.show();
     }
   }
 
@@ -700,6 +752,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.show();
       currentTaskTab.taskSpinner.hide();
+      currentTaskTab.taskLabelsList.show();
+      currentTaskTab.taskLabelsSpinner.hide();
     }
   }
 
@@ -729,11 +783,7 @@ module Esper.TaskTab {
         <div class="esper-click-safe esper-drop-ul-divider"/>
         <div #taskSearchActions class="esper-dropdown-section"/>
       </ul>
-      <div #taskProgressContainer>
-        <div #taskProgressSpinner class="esper-events-list-loading">
-          <div class="esper-spinner esper-list-spinner"/>
-        </div>
-      </div>
+      <div #taskProgressContainer />
     </div>
   </div>
   <div class="esper-tab-overflow">
@@ -748,6 +798,7 @@ module Esper.TaskTab {
           <object #refreshLinkedThreadsIcon class="esper-svg"/>
         </div>
       </div>
+
       <div #linkedThreadsContainer class="esper-section-container">
         <div #linkEmails
         class="esper-section-actions esper-clearfix esper-open">
@@ -772,6 +823,7 @@ module Esper.TaskTab {
         <div #linkedThreadsList/>
       </div>
     </div>
+
     <div class="esper-section">
       <div #linkedEventsHeader
            class="esper-section-header esper-clearfix esper-open">
@@ -783,6 +835,7 @@ module Esper.TaskTab {
           <object #refreshLinkedEventsIcon class="esper-svg"/>
         </div>
       </div>
+
       <div #linkedEventsContainer class="esper-section-container">
         <div #linkActions
              class="esper-section-actions esper-clearfix esper-open">
@@ -808,27 +861,66 @@ module Esper.TaskTab {
       </div>
     </div>
 
-    <hr class="esper-hr"/>
-    <div class="esper-clearfix esper-workflow-gap esper-section">
-      <select #workflowSelect class="esper-select esper-select-fullwidth">
-        <option value="header">Select workflow...</option>
-      </select>
-    </div>
-    <div #workflowSection class="esper-section esper-hide">
-      <div class="esper-section-header esper-clearfix esper-open">
-        <span class="esper-bold" style="float:left">Workflow</span>
-      </div>
-      <div class="esper-section-container esper-section-notes">
-        <p #workflowNotes class="esper-text-notes"/>
-        <div class="esper-clearfix esper-workflow-gap">
-          <select #stepSelect class="esper-select esper-select-fullwidth">
-            <option value="header">Select step...</option>
-          </select>
+    <div class="esper-section">
+      <div #taskLabelsHeader
+           class="esper-section-header esper-clearfix esper-open">
+        <span #showTaskLabels
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Labels</span>
+        <div #refreshTaskLabels
+             class="esper-refresh esper-clickable">
+          <object #refreshTaskLabelsIcon class="esper-svg"/>
         </div>
-        <p #stepNotes class="esper-hide esper-text-notes"/>
-        <div #checklistDiv class="esper-hide">
-          <span class="esper-subheading">Checklist</span>
-          <div #checklist class="esper-workflow-checklist"/>
+      </div>
+      <div #taskLabelsContainer class="esper-section-container" >
+        <div #taskLabelsSpinner class="esper-events-list-loading" >
+          <div class="esper-spinner esper-list-spinner" />
+        </div>
+        <div #taskLabelsList class="esper-label-list">
+        </div>
+      </div>
+    </div>
+
+    <div class="esper-section">
+      <div class="esper-section-header esper-clearfix esper-open">
+        <span #showWorkflows
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Workflow</span>
+        <div #refreshWorkflow
+          class="esper-refresh esper-clickable">
+          <object #refreshWorkflowIcon class="esper-svg"/>
+        </div>
+      </div>
+      <div #workflowContainer class="esper-section-container">
+        <div #workflowHeader>
+          <div class="esper-section-selector esper-clearfix">
+            <select #workflowSelect class="esper-select esper-select-fullwidth">
+              <option value="header">Select Workflow &hellip;</option>
+            </select>
+          </div>
+          <div #workflowSection class="esper-section-content esper-hide">
+            <p #workflowNotes class="esper-text-notes"/>
+            <div class="esper-clearfix esper-workflow-gap">
+              <select #stepSelect class="esper-select esper-select-fullwidth">
+                <option value="header">Select Step &hellip;</option>
+              </select>
+            </div>
+            <p #stepNotes class="esper-hide esper-text-notes"/>
+            <div #checklistDiv class="esper-hide">
+              <span class="esper-subheading">Checklist</span>
+              <div #checklist class="esper-workflow-checklist"/>
+            </div>
+          </div>
+          <div #noWorkflow class="esper-section-content esper-no-content">
+            No workflow selected.
+
+            <a #workflowLink class="esper-settings-link"
+               target="_blank" href="https://app.esper.com">
+              Add new workflows on the Esper settings page.</a>
+          </div>
+        </div>
+        <div #workflowSpinner class="esper-events-list-loading">
+          <div class="esper-spinner esper-list-spinner"/>
         </div>
       </div>
     </div>
@@ -836,6 +928,9 @@ module Esper.TaskTab {
 </div>
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
+
+    workflowLink.attr("href", Conf.Api.url + "/#!/team-settings/" +
+      team.teamid + "/workflows");
 
     function updateTaskHeaders(task: ApiT.Task, isValid: boolean,
                                oldTask: ApiT.Task, oldIsValid: boolean) {
@@ -867,8 +962,10 @@ module Esper.TaskTab {
     createEmailIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEmailIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
+    refreshWorkflowIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
 
     displayLinkedEventsList(team, threadId, taskTabView, linkedEvents);
 
@@ -895,6 +992,13 @@ module Esper.TaskTab {
     };
     refreshLinkedEvents.click(refreshLinkedEventsAction);
 
+    refreshWorkflow.click(function() {
+      refreshWorkflowList(team, threadId, taskTabView)
+    });
+
+    // Load workflow now
+    refreshWorkflowList(team, threadId, taskTabView);
+
     showLinkedThreads.click(function() {
       Sidebar.toggleList(linkedThreadsContainer);
       if (showLinkedThreads.text() === "Hide") {
@@ -917,11 +1021,23 @@ module Esper.TaskTab {
       }
     });
 
+    showWorkflows.click(function() {
+        Sidebar.toggleList(workflowContainer);
+        if (showWorkflows.text() === "Hide") {
+            showWorkflows.text("Show");
+            workflowHeader.removeClass("esper-open");
+        } else {
+            showWorkflows.text("Hide");
+            workflowHeader.addClass("esper-open");
+        }
+    });
+
     createEvent.click(function() {
       CalPicker.createInline();
       Analytics.track(Analytics.Trackable.CreateTaskTabLinkedEvent);
     });
 
+    showTaskSpinner();
     var apiGetTask = autoTask ?
       Api.obtainTaskForThread
       : Api.getTaskForThread;
@@ -931,47 +1047,34 @@ module Esper.TaskTab {
       Api.getThreadDetails(threadId).done(function(deets) {
         var title = "";
         linkedThreadsSpinner.hide();
-        taskProgressSpinner.hide();
+        hideTaskSpinner();
 
-        Api.getPreferences(team.teamid).done(function(prefs) {
-          displayWorkflow(team, prefs, workflows,
-                          workflowSection, workflowSelect, workflowNotes,
-                          stepSelect, stepNotes,
-                          checklistDiv, checklist);
-
-          function showMTDrop() {
-            $("select.esper-meeting-type").remove();
-            taskTitle.hide();
-            taskCancel.hide();
-            taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
-          }
-          taskCancel.click(function() {
-            showMTDrop();
-            Analytics.track(Analytics.Trackable.CancelTaskTabTask);
-          });
-          if (task !== undefined) {
-            taskCaption.text(taskLabelExists);
-            title = task.task_title;
-            displayLinkedThreadsList(task, threadId, taskTabView);
-            displayTaskProgress(task, taskTabView);
-            if (task.task_meeting_type) {
-              selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
-            }
-
-            var progress = task.task_workflow_progress;
-            if (progress) {
-              workflowSelect.val(progress.workflow_id);
-              workflowSelect.trigger("change");
-            }
-          } else {
-            taskCaption.text(taskLabelCreate);
-            showMTDrop();
-            title = deets.subject;
-            if (title === undefined) title = "(no subject)";
-            displayEmptyLinkedThreadsList(taskTabView);
-          }
-          taskTitle.val(title);
+        function showMTDrop() {
+          $("select.esper-meeting-type").remove();
+          taskTitle.hide();
+          taskCancel.hide();
+          taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
+        }
+        taskCancel.click(function() {
+          showMTDrop();
+          Analytics.track(Analytics.Trackable.CancelTaskTabTask);
         });
+        if (task !== undefined) {
+          taskCaption.text(taskLabelExists);
+          title = task.task_title;
+          displayLinkedThreadsList(task, threadId, taskTabView);
+          displayTaskProgress(task, taskTabView);
+          if (task.task_meeting_type) {
+            selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+          }
+        } else {
+          taskCaption.text(taskLabelCreate);
+          showMTDrop();
+          title = deets.subject;
+          if (title === undefined) title = "(no subject)";
+          displayEmptyLinkedThreadsList(taskTabView);
+        }
+        taskTitle.val(title);
 
         Util.afterTyping(taskTitle, 250, function() {
           var query = taskTitle.val();
@@ -1052,6 +1155,29 @@ module Esper.TaskTab {
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
     });
+
+    /* Task Label Stuff */
+
+    taskLabelsList.renderReact(
+      React.createElement(TaskLabels.LabelListControl, {}));
+
+    showTaskLabels.click(function() {
+      Sidebar.toggleList(taskLabelsContainer);
+      if (showTaskLabels.text() === "Hide") {
+        showTaskLabels.text("Show");
+        taskLabelsHeader.removeClass("esper-open");
+      } else {
+        showTaskLabels.text("Hide");
+        taskLabelsHeader.addClass("esper-open");
+      }
+    });
+
+    refreshTaskLabels.click(function() {
+      CurrentThread.refreshTaskForThread(false);
+    });
+
+
+    /////
 
     var taskWatcherId = "TaskTab-task-watcher";
     CurrentThread.task.watch(function(task, valid) {

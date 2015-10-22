@@ -406,6 +406,18 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(newTask));
   }
 
+  export function getTaskListForEvent(eventid: string,
+                                      withEvents: boolean,
+                                      withThreads: boolean):
+  JQueryPromise<ApiT.Task[]> {
+    var url =
+      Conf.Api.url + "/api/event/task-list/" + string(Login.myUid())
+      + "/" + string(eventid)
+      + "?events=" + withEvents.toString()
+      + "&threads=" + withThreads.toString();
+    return JsonHttp.get(url).then(function(x) { return x.tasks; });
+  }
+
   export function obtainTaskForThread(teamid, threadid,
                                       withEvents: boolean,
                                       withThreads: boolean):
@@ -549,7 +561,7 @@ module Esper.Api {
                                 taskid: string,
                                 labels: string[]): JQueryPromise<void> {
     var url =
-      Conf.Api.url + "/api/task/labels/" + string(Login.myUid())
+      Conf.Api.url + "/api/task/label/" + string(Login.myUid())
       + "/" + string(teamid)
       + "/" + string(taskid);
     return JsonHttp.post(url, JSON.stringify({labels:labels}));
@@ -778,6 +790,16 @@ module Esper.Api {
       + "/" + string(teamid)
       + "/" + string(taskid);
     return JsonHttp.put(url, JSON.stringify(progress));
+  }
+
+  export function deleteWorkflowProgress(teamid: string, taskid: string)
+    : JQueryPromise<void>
+  {
+    var url =
+      Conf.Api.url + "/api/workflows/progress/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + string(taskid);
+    return JsonHttp.delete_(url);
   }
 
   /* Team creation */

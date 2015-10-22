@@ -147,76 +147,104 @@ module Esper.EventControls {
   export function eventEditWidget(event: ApiT.CalendarEvent,
                                   prefs: Option.T<CurrentThread.TeamAndPreferences>) {
 '''
-<div #container class="esper-ev-inline-container">
+<div #container class="esper-ev-inline-container esper-bs">
   <div #heading class="esper-modal-header">
     Edit Event Details
   </div>
-  <div class="esper-modal-content">
-    <div #titleRow class="esper-ev-modal-row esper-clearfix">
-      <div class="esper-ev-modal-left esper-bold">Title</div>
-        <div class="esper-ev-modal-right">
-          <input #pubTitle type="text" class="esper-input"/>
+  <div class="esper-modal-content container-fluid esper-scroll-target">
+    <div class="form-horizontal">
+      <div #titleRow class="form-group clearfix">
+        <label class="control-label col-sm-2" for="esper-event-title">
+          Title</label>
+        <div class="col-sm-10">
+          <input id="esper-event-title" #pubTitle type="text"
+            class="form-control" />
         </div>
       </div>
-      <div #whenRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">When</div>
-        <div class="esper-ev-modal-right">
-          <input #startDate type="date" class="esper-input"/>
-          <input #startTime type="time" class="esper-input"/>
-          to
-          <input #endDate type="date" class="esper-input"/>
-          <input #endTime type="time" class="esper-input"/>
+      <div #whenRow class="form-group clearfix">
+        <label class="control-label col-sm-2" for="esper-event-start-date">
+          When</label>
+        <div class="col-sm-10">
+          <div class="row">
+            <div class="col-lg-3 col-xs-6">
+              <input id="esper-event-start-date"
+               #startDate type="date" class="form-control"/>
+            </div>
+            <div class="col-lg-2 col-xs-5">
+              <input #startTime type="time" class="form-control"/>
+            </div>
+            <label class="col-lg-2 col-xs-1 inline-form-text text-center"
+              for="esper-event-end-date">
+              to
+            </label>
+            <div class="col-lg-3 col-xs-6">
+              <input #endDate type="date" id="esper-event-end-date"
+                class="form-control"/>
+            </div>
+            <div class="col-lg-2 col-xs-5">
+              <input #endTime type="time" class="form-control"/>
+            </div>
+          </div>
         </div>
       </div>
-      <div #whereRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Location</div>
-        <div class="esper-ev-modal-right">
-          <input #pubLocation type="text" class="esper-input"/>
-          <ul #locationDropdown
-              class="esper-drop-ul esper-task-search-dropdown esper-dropdown-btn">
-            <div #locationSearchResults class="esper-dropdown-section"/>
-          </ul>
+      <div #whereRow class="form-group clearfix">
+        <label class="control-label col-sm-2"
+          for="esper-event-location-dropdown">Location</label>
+        <div class="col-sm-10">
+          <div class="dropdown">
+            <input #pubLocation type="text" class="form-control"
+              data-toggle="dropdown" id="esper-event-location-dropdown" />
+            <ul #locationDropdown class="dropdown-menu" />
+          </div>
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Edited by</div>
-        <div class="esper-ev-modal-right">
-          <select #fromSelect class="esper-select"/>
-        </div>
-      </div>
-      <div #descriptionRow class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Description<br/>
-          <button #pickEmails class="esper-btn esper-btn-secondary">
+      <div #descriptionRow class="form-group clearfix">
+        <div class="col-sm-2 text-right">
+          <label for="esper-edit-event-description"
+                 class="control-label">Description</label>
+          <br /><br />
+          <button #pickEmails class="btn btn-secondary">
             Pick Emails
           </button>
         </div>
-        <div class="esper-ev-modal-right">
-          <textarea #pubDescription rows=8 cols=28 class="esper-input"/>
+        <div class="col-sm-10">
+          <textarea id="esper-edit-event-description" #pubDescription
+           rows=8 class="form-control" style="min-height:100px" />
         </div>
       </div>
-      <div class="esper-ev-modal-row esper-clearfix">
-        <div class="esper-ev-modal-left esper-bold">Guests</div>
-        <div class="esper-ev-modal-right">
-          <ul #viewPeopleInvolved/>
-          <br/>
-          <input #newGuestName class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Name"/>
-          <input #newGuestEmail class="esper-input esper-ev-modal-small"
-                 type="text" placeholder="Email"/>
-          <button #addGuest class="esper-btn esper-btn-secondary">
-            Add
-          </button>
+      <div class="form-group clearfix">
+        <label class="control-label col-sm-2">Guests</label>
+        <div class="col-sm-10">
+          <ul #noGuestsFound class="list-group">
+            <li class="list-group-item">No Guests Found</li>
+          </ul>
+          <ul #viewPeopleInvolved class="list-group" />
+          <div class="row clearfix">
+            <div class="col-sm-5">
+              <input #newGuestName class="form-control"
+               type="text" placeholder="Name" />
+            </div>
+            <div class="col-sm-5">
+              <input #newGuestEmail class="form-control"
+               type="text" placeholder="Email" />
+            </div>
+            <div class="col-sm-2">
+              <button #addGuest class="btn btn-secondary" style="width:100%">
+                Add
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="esper-modal-footer esper-clearfix">
-        <button #save class="esper-btn esper-btn-primary modal-primary">
-          Save
-        </button>
-        <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
-          Cancel
-        </button>
       </div>
     </div>
+  </div>
+  <div class="esper-modal-footer esper-clearfix">
+    <button #save class="btn btn-primary">
+      Save
+    </button>
+    <button #cancel class="btn btn-secondary">
+      Cancel
+    </button>
   </div>
 </div>
 '''
@@ -230,20 +258,12 @@ module Esper.EventControls {
         var team = allPrefs.team;
         var threadId = CurrentThread.threadId.get();
 
-        Sidebar.customizeSelectArrow(fromSelect);
-
         var newTitle = event.title || "Untitled event";
         pubTitle.val(newTitle);
 
-        var start = new Date(event.start.local);
-        startDate.val(XDate.dateValue(start));
-        startTime.val(XDate.timeOnly24Hours(start));
-        var end =
-          event.end ?
-          new Date(event.end.local) :
-          new Date(event.start.local);
-        endDate.val(XDate.dateValue(end));
-        endTime.val(XDate.timeOnly24Hours(end));
+        var calendar = List.find(team.team_calendars, function(cal) {
+          return cal.google_cal_id === event.google_cal_id;
+        });
 
         if (event.location) {
           var address = event.location.address;
@@ -253,16 +273,6 @@ module Esper.EventControls {
           }
 
           pubLocation.val(address);
-        }
-
-        var aliases = team.team_email_aliases;
-        if (aliases.length === 0) {
-          $("<option>" + Login.myEmail() + "</option>").appendTo(fromSelect);
-          fromSelect.prop("disabled", true);
-        } else {
-          aliases.forEach(function (email: string) {
-            $("<option>" + email + "</option>").appendTo(fromSelect);
-          });
         }
 
         var fileUpload = FileUpload.uploadWidget(function (fileInfos) {
@@ -301,9 +311,11 @@ module Esper.EventControls {
                                                       checked);
             viewPeopleInvolved.append(v);
           });
+          noGuestsFound.hide();
+          viewPeopleInvolved.show();
         } else {
-          viewPeopleInvolved
-            .append($("<li class='esper-gray'>No guests found</li>"));
+          noGuestsFound.show();
+          viewPeopleInvolved.hide();
         }
 
         addGuest.click(function() {
@@ -320,6 +332,8 @@ module Esper.EventControls {
           viewPeopleInvolved.append(v);
           newGuestName.val("");
           newGuestEmail.val("");
+          noGuestsFound.hide();
+          viewPeopleInvolved.show();
         });
 
         pubDescription.val(event.description);
@@ -344,84 +358,105 @@ module Esper.EventControls {
         function searchLocation() {
           var query = pubLocation.val();
           LocSearch.displayResults(team, pubLocation, locationDropdown,
-                                   locationSearchResults, query,
-                                   preferences);
+                                   query, preferences);
         }
         Util.afterTyping(pubLocation, 250, searchLocation);
         pubLocation.click(searchLocation);
 
         cancel.click(close);
-        save.click(function() {
-          var timezone = preferences.general.current_timezone;
 
-          //moment-tz apparently doesn't handle these timezones
-          if (timezone === "US/Eastern") timezone = "America/New_York";
-          else if (timezone === "US/Central") timezone = "America/Chicago";
-          else if (timezone === "US/Mountain") timezone = "America/Denver";
-          else if (timezone === "US/Pacific") timezone = "America/Los_Angeles";
+        CurrentThread.taskPrefs
+          .then(Option.unwrap<ApiT.TaskPreferences>
+            ("taskPrefs (in displayLinkedEventsList)"))
+          .done(function(tpref) {
+            var calTimezone = calendar.calendar_timezone;
+            var prefs = Teams.getTeamPreferences(team);
+            var showTimezone = PrefTimezone.execTimezone(prefs, tpref);
+            var start = XDate.ofString(Timezone.shiftTime(event.start.local,
+                                                          calTimezone,
+                                                          showTimezone));
+            var end = XDate.ofString(Timezone.shiftTime(event.end ? event.end.local : event.start.local,
+                                                        calTimezone,
+                                                        showTimezone));
 
-          var st = new Date(startDate.val() + " " + startTime.val() + "Z");
-          var ed = new Date(endDate.val() + " " + endTime.val() + "Z");
-          var timeDiff = ed.getTime() - st.getTime();
-          if (timeDiff < 0) {
-            alert("Error: That change would make the event end " +
-                  "before it starts!");
-            return; // exit click handler
-          }
-          var evStart: ApiT.CalendarTime = {
-            local: XDate.toString(st),
-            utc: (<any> moment).tz(XDate.toString(st).replace(/Z$/, ""), timezone).format()
-          };
-          var evEnd: ApiT.CalendarTime = {
-            local: XDate.toString(ed),
-            utc: (<any> moment).tz(XDate.toString(ed).replace(/Z$/, ""), timezone).format()
-          };
+            startDate.val(XDate.dateValue(start));
+            startTime.val(XDate.localTimeOnly24Hours(start));
+            endDate.val(XDate.dateValue(end));
+            endTime.val(XDate.localTimeOnly24Hours(end));
 
-          var location : ApiT.Location = {
-            title: "",
-            address: pubLocation.val(),
-            timezone: timezone
-          };
-          if (!location.address) location = null;
+            save.click(function() {
+              //moment-tz apparently doesn't handle these timezones
+              if (calTimezone === "US/Eastern") calTimezone = "America/New_York";
+              else if (calTimezone === "US/Central") calTimezone = "America/Chicago";
+              else if (calTimezone === "US/Mountain") calTimezone = "America/Denver";
+              else if (calTimezone === "US/Pacific") calTimezone = "America/Los_Angeles";
 
-          var guests = [];
-          for (var person in peopleInvolved) {
-            if (peopleInvolved.hasOwnProperty(person)) {
-              guests.push({
-                display_name : peopleInvolved[person] || null,
-                email        : person
-              });
-            }
-          }
+              var st = startDate.val() + " " + startTime.val() + "Z";
+              var ed = endDate.val() + " " + endTime.val() + "Z";
+              var timeDiff = new Date(ed).getTime() - new Date(st).getTime();
+              if (timeDiff < 0) {
+                alert("Error: That change would make the event end " +
+                      "before it starts!");
+                return; // exit click handler
+              }
+              var shiftSt = Timezone.shiftTime(st, showTimezone, calTimezone);
+              var shiftEd = Timezone.shiftTime(ed, showTimezone, calTimezone);
 
-          var e: ApiT.CalendarEventEdit = {
-            google_cal_id: event.google_cal_id,
-            start: evStart,
-            end: evEnd,
-            title: pubTitle.val(),
-            description: pubDescription.val(),
-            description_messageids: descriptionMessageids,
-            location: location,
-            all_day: event.all_day,
-            guests: guests,
-            recurrence: event.recurrence,
-            recurring_event_id: event.recurring_event_id
-          }
+              var evStart: ApiT.CalendarTime = {
+                local: shiftSt,
+                utc: (<any> moment).tz(shiftSt.replace(/Z$/, ""), calTimezone).format()
+              };
+              var evEnd: ApiT.CalendarTime = {
+                local: shiftEd,
+                utc: (<any> moment).tz(shiftEd.replace(/Z$/, ""), calTimezone).format()
+              };
 
-          var alias = fromSelect.val();
+              var location : ApiT.Location = {
+                title: "",
+                address: pubLocation.val(),
+                timezone: showTimezone
+              };
+              if (!location.address) location = null;
 
-          function finish() {
-            var taskTab = TaskTab.currentTaskTab;
-            TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-            close();
-          }
-          if (event.recurrence || event.recurring_event_id) {
-            changeRecurringEventModal(team, alias, event, e, timezone, finish);
-          } else {
-            Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-              .done(finish);
-          }
-        });
+              var guests = [];
+              for (var person in peopleInvolved) {
+                if (peopleInvolved.hasOwnProperty(person)) {
+                  guests.push({
+                    display_name : peopleInvolved[person] || null,
+                    email        : person
+                  });
+                }
+              }
+
+              var e: ApiT.CalendarEventEdit = {
+                google_cal_id: event.google_cal_id,
+                start: evStart,
+                end: evEnd,
+                title: pubTitle.val(),
+                description: pubDescription.val(),
+                description_messageids: descriptionMessageids,
+                location: location,
+                all_day: event.all_day,
+                guests: guests,
+                recurrence: event.recurrence,
+                recurring_event_id: event.recurring_event_id
+              }
+
+              var alias = Login.myEmail();
+
+              function finish() {
+                var taskTab = TaskTab.currentTaskTab;
+                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+                close();
+              }
+              if (event.recurrence || event.recurring_event_id) {
+                changeRecurringEventModal(team, alias, event, e, showTimezone, finish);
+              } else {
+                Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+                  .done(finish);
+              }
+            });
+          });
 
         return container;
       },

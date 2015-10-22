@@ -35,8 +35,8 @@ module Esper.Agenda {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
+    startTime.text(XDate.utcToLocalTimeOnly(start));
+    endTime.text(XDate.utcToLocalTimeOnly(end));
 
     if (!_.includes(filter, "time") && !_.includes(filter, "all"))
       time.hide();
@@ -330,7 +330,8 @@ module Esper.Agenda {
 
     var timezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
 
-    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone);
+    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone,
+      null);
     tzSel.removeClass("esper-select")
          .addClass("esper-agenda-timezone-select")
          .bind("typeahead:change", renderEvents);

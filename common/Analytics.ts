@@ -31,9 +31,17 @@ module Esper.Analytics {
     ClickMenuExtensionOptions,
     ClickMenuGetAgenda,
     ClickMenuGetHelp,
+    ClickMenuGetStarted,
     ClickMenuGetTaskList,
     ClickModalSendAgenda,
     ClickModalSendTaskList,
+    ClickOnboardingDisable,
+    ClickOnboardingLogin,    // This refers to the explicit button. The
+                             // only reason for the user to click this button
+                             // is if the auto-redirect failed.
+    ClickOnboardingCreateTeams,
+    ClickOnboardingFinish,
+    ClickOnboardingYouTube,
     ClickReminderButton,
     ClickSlidesBackButton,
     ClickSlidesNextButton,
@@ -60,6 +68,8 @@ module Esper.Analytics {
     MaximizeSidebarOptions,
     MinimizeSidebar,
     MinimizeSidebarOptions,
+    OnboardingModalOpen,         // This happens automatically
+    OnboardingLoginSuccess,      // Called after auto-login
     RenameTaskTabTask,
     SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,

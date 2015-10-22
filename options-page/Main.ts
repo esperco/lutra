@@ -60,8 +60,19 @@ module Esper.Main {
     var defaultSidebarState: ExtensionOptions.SidebarOpts;
     if ($('#default-sidebar-hide').prop("checked")) {
       defaultSidebarState = ExtensionOptions.SidebarOpts.HIDE;
-    } else {
+    } else if ($('#default-sidebar-show').prop("checked")) {
       defaultSidebarState = ExtensionOptions.SidebarOpts.SHOW;
+    } else {
+      defaultSidebarState = ExtensionOptions.SidebarOpts.NONE;
+    }
+
+    var calendarSidebarState: ExtensionOptions.SidebarOpts;
+    if ($('#calendar-sidebar-hide').prop("checked")) {
+      calendarSidebarState = ExtensionOptions.SidebarOpts.HIDE;
+    } else if ($('#calendar-sidebar-show').prop("checked")) {
+      calendarSidebarState = ExtensionOptions.SidebarOpts.SHOW;
+    } else {
+      calendarSidebarState = ExtensionOptions.SidebarOpts.NONE;
     }
 
     var displayComposeControls: ExtensionOptions.ComposeControlsOpts;
@@ -71,9 +82,18 @@ module Esper.Main {
       displayComposeControls = ExtensionOptions.ComposeControlsOpts.SHOW;
     }
 
+    var showCopySelection: ExtensionOptions.CopySelectionOpts;
+    if ($('#copy-selection-hide').prop("checked")) {
+      showCopySelection = ExtensionOptions.CopySelectionOpts.HIDE;
+    } else {
+      showCopySelection = ExtensionOptions.CopySelectionOpts.SHOW;
+    }
+
     var opts: ExtensionOptions.Options = {
       defaultSidebarState: defaultSidebarState,
-      displayComposeControls: displayComposeControls
+      calendarSidebarState: calendarSidebarState,
+      displayComposeControls: displayComposeControls,
+      showCopySelection: showCopySelection
     };
 
     ExtensionOptions.save(opts, function() {
@@ -88,17 +108,39 @@ module Esper.Main {
     setLoading(true);
     ExtensionOptions.load(function(opts) {
       if (opts.defaultSidebarState === ExtensionOptions.SidebarOpts.HIDE) {
-        $('#default-sidebar-hide').prop("checked", true)
-      } else { // show
+        $('#default-sidebar-hide').prop("checked", true);
+      }
+      else if (opts.defaultSidebarState === ExtensionOptions.SidebarOpts.SHOW) {
         $('#default-sidebar-show').prop("checked", true);
+      }
+      else { // none
+        $('#default-sidebar-none').prop("checked", true);
+      }
+
+      if (opts.calendarSidebarState === ExtensionOptions.SidebarOpts.HIDE) {
+        $('#calendar-sidebar-hide').prop("checked", true);
+      }
+      else if (opts.calendarSidebarState === ExtensionOptions.SidebarOpts.SHOW) {
+        $('#calendar-sidebar-show').prop("checked", true);
+      }
+      else { // none
+        $('#calendar-sidebar-none').prop("checked", true);
       }
 
       if (opts.displayComposeControls ===
           ExtensionOptions.ComposeControlsOpts.HIDE) {
-        $('#compose-toolbar-hide').prop("checked", true)
+        $('#compose-toolbar-hide').prop("checked", true);
       } else { // show
         $('#compose-toolbar-show').prop("checked", true);
       }
+
+      if (opts.showCopySelection ===
+          ExtensionOptions.CopySelectionOpts.HIDE) {
+        $('#copy-selection-hide').prop("checked", true);
+      } else {
+        $('#copy-selection-show').prop("checked", true);
+      }
+
       setLoading(false);
     });
   }

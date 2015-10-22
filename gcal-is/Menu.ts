@@ -196,15 +196,8 @@ module Esper.Menu {
       create();
     });
 
-    CurrentThread.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
-      team.match({
-        some : function (team) {
-          currentTeam.set(team);
-        },
-        none : function () {
-          // do nothing
-        }
-      });
-    });
+    CurrentEvent.teamStore.addChangeListener(function() {
+      currentTeam.set(CurrentEvent.teamStore.val());
+    })
   }
 }

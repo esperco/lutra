@@ -42,13 +42,19 @@ module Esper.TaskList {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.timeOnly(start));
-    endTime.text(XDate.timeOnly(end));
+    startTime.text(XDate.utcToLocalTimeOnly(start));
+    endTime.text(XDate.utcToLocalTimeOnly(end));
 
     var calendar = List.find(team.team_calendars, function(cal) {
       return cal.google_cal_id === e.google_cal_id;
     });
-    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
+
+    function zoneAbbr(zoneName) {
+      return /UTC$/.test(zoneName) || /GMT$/.test(zoneName) ?
+        "UTC" : // moment-tz can't handle it
+        (<any>moment).tz(moment(), zoneName).zoneAbbr();
+    }
+    timezone.text(zoneAbbr(calendar.calendar_timezone));
 
     if (e.title !== undefined) {
       title.text(e.title);

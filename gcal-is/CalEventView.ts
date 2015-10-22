@@ -177,6 +177,7 @@ module Esper.CalEventView {
 
   function updateView(fullEventId) {
     Gcal.waitForGuestsToLoad(function(guests) {
+      $(".esper-reminder-container").remove();
       var guestsState = [];
       guests.each(function() {
         var guest = $(this);
@@ -193,22 +194,49 @@ module Esper.CalEventView {
         var state: ReminderView.ReminderGuest = {
           email: guest.attr("title"),
           name: guest.find(".ep-gc-chip-text").text().replace(/.\*$/, ""),
-          response: response,
-          checked: false
+          response: response
         };
         guestsState.push(state);
       });
 '''
-<div #view class="reminder-button">
-  <button #reminderButton class="esper-btn esper-btn-primary">Reminder</button>
+<div #view class="esper-reminder-container">
+  <button #reminderButton class="esper-btn esper-btn-primary esper-reminder-btn">
+    Set Reminder
+  </button>
 </div>
 '''
       ReminderView.openReminderOnClick(reminderButton,
         fullEventId.calendarId, fullEventId.eventId,
         Gcal.Event.extractEventTitle(),
-        guestsState);
+        guestsState, updateReminderList);
       $(".reminder-button").remove();
       Gcal.findAnchorForReminderDropdown().append(view);
+      updateReminderList();
+    });
+  }
+
+  function updateReminderList() {
+    var fullEventId = currentEventId;
+    Api.getReminders(fullEventId.calendarId, fullEventId.eventId)
+       .done(function(event_reminders) {
+'''
+<div #reminder class="esper-active-reminders esper">
+<i class="fa fa-envelope-o"></i>
+<span #dateTime />
+<span #close class="esper-clickable esper-close" >×</span>
+</div>
+'''
+      $(".esper-active-reminders").remove();
+      if (event_reminders.reminder_time) {
+        var time = new Date(event_reminders.reminder_time);
+        dateTime.text(moment(time).format('DD MMM YYYY [at] h:mm a'));
+        close.click(function() {
+          Api.unsetReminderTime(fullEventId.eventId).done(function() {
+            reminder.remove();
+          });
+        });
+        $(".esper-reminder-container").append(reminder);
+      }
     });
   }
 
