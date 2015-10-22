@@ -29,13 +29,15 @@
  */
 
 /// <reference path="../common/Analytics.IS.ts" />
-/// <reference path="../common/CurrentTeam.ts" />
 module Esper.CurrentThread {
 
   /** The team that is detected for the current thread. I am not sure
    *  how robust the detection is, however!
    */
-  export var currentTeam = CurrentTeam.currentTeam;
+  export var currentTeam = new Esper.Watchable.C<Option.T<ApiT.Team>>(
+    function(team) { return team !== undefined && team !== null; },
+    Option.none<ApiT.Team>()
+  );
 
   /** The GMail threadId of the current thread. If there is no thread,
    *  this is undefined. You can check if there is an open thread with

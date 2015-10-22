@@ -4,7 +4,6 @@
 */
 
 /// <reference path="../common/Analytics.ts" />
-/// <reference path="../common/CurrentTeam.ts" />
 module Esper.Menu {
   /*
     The current team for the purpose of offering a default choice
@@ -197,15 +196,8 @@ module Esper.Menu {
       create();
     });
 
-    CurrentTeam.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
-      team.match({
-        some : function (team) {
-          currentTeam.set(team);
-        },
-        none : function () {
-          // do nothing
-        }
-      });
-    });
+    CurrentEvent.teamStore.addChangeListener(function() {
+      currentTeam.set(CurrentEvent.teamStore.val());
+    })
   }
 }
