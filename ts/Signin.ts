@@ -361,8 +361,9 @@ module Esper.Signin {
     if (optInviteCode !== undefined) {
       useInvite(optInviteCode);
     } else {
-      loginOrSignup(optEmail)
-        .done(function(ok) { // Logged in
+      var p = loginOrSignup(optEmail)
+      if (p) {
+        p.done(function(ok) { // Logged in
           if (ok) {
             var landingUrl = document.URL;
             whenDone = whenDone || function() { };
@@ -373,6 +374,9 @@ module Esper.Signin {
             }
           }
         });
+      } else {
+        Log.d("No login or signup promise - stopping");
+      }
     }
   };
 
