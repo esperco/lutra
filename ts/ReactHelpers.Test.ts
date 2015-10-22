@@ -13,14 +13,26 @@ module Esper.ReactHelpers {
 
   class TestComponent extends Component<{}, {}> {
     componentWillUnmount() {
-      if (listener) {
-        listener();
-      }
+      if (listener) { listener(); }
     }
 
     render() {
       return React.createElement("div", {className: "dog"}, [
-        React.createElement("div", { className: "cat" })
+        React.createElement("div", { className: "cat", key: "cat" })
+      ]);
+    }
+  }
+
+  var listener2: jasmine.Spy;
+
+  class TestComponent2 extends Component<{}, {}> {
+    componentWillUnmount() {
+      if (listener2) { listener2(); }
+    }
+
+    render() {
+      return React.createElement("div", { className: "fish" }, [
+        React.createElement("div", { className: "bird", key: "bird" })
       ]);
     }
   }
@@ -71,6 +83,50 @@ module Esper.ReactHelpers {
         it("should be able to get child element", function() {
           expect(this.component.find("div").attr("class")).toEqual("cat");
         });
+      });
+    });
+
+    describe("render same component into element in DOM twice", function() {
+      beforeEach(function() {
+        this.elm = $('<div class="top">');
+        sandbox.append(this.elm);
+        this.elm.renderReact(TestComponent, {});
+        this.elm.renderReact(TestComponent, {});
+      });
+
+      it("should not call componentWillUnmount prior to removal", function() {
+        expect(listener).not.toHaveBeenCalled();
+      });
+
+      it("should call componentWillUnmount when removed", function() {
+        this.elm.remove();
+        expect(listener).toHaveBeenCalled();
+      });
+    });
+
+    describe("render different component into element in DOM", function() {
+      beforeEach(function() {
+        this.listener2 = listener2 = jasmine.createSpy("listener");
+        this.elm = $('<div class="top">');
+        sandbox.append(this.elm);
+        this.elm.renderReact(TestComponent, {});
+        this.elm.renderReact(TestComponent2, {});
+      });
+
+      it("should call componentWillUnmount on prior component", function() {
+        expect(listener).toHaveBeenCalled();
+      });
+
+      it("should not call componentWillUnmount on current component prior " +
+         "to removal", function() {
+        expect(listener2).not.toHaveBeenCalled();
+      });
+
+      it("should not call each componentWillUnmount more than once on removal",
+          function() {
+        this.elm.remove();
+        expect(listener.calls.count()).toEqual(1);
+        expect(listener2.calls.count()).toEqual(1);
       });
     });
 
