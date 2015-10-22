@@ -35,7 +35,7 @@ module Esper.CurrentThread {
    *  how robust the detection is, however!
    */
   export var currentTeam = new Esper.Watchable.C<Option.T<ApiT.Team>>(
-    function (team) { return team !== undefined && team !== null; },
+    function(team) { return team !== undefined && team !== null; },
     Option.none<ApiT.Team>()
   );
 
