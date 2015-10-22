@@ -3,6 +3,8 @@
   including the agenda modal
 */
 
+/// <reference path="./Dropdown.tsx" />
+
 module Esper.Agenda {
 
   function renderEvent(team: ApiT.Team,
@@ -133,7 +135,14 @@ module Esper.Agenda {
         <i class="fa fa-calendar esper-calendar-icon"></i>
       </button>
       in
-      <span #timezoneDropdown />
+      <div #tzDropdown class="dropdown esper-dropdown">
+        <button #tzSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Timezone
+          <i class="fa fa-chevron-down"></i>
+        </button>
+        <div #tzSelect class="dropdown-menu esper-dropdown-select">
+        </div>
+      </div>
       timezone with
       <div #filterDropdown class="dropdown esper-dropdown">
         <button #filterSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -227,6 +236,7 @@ module Esper.Agenda {
 '''
     var teams = Login.myTeams();
     teamSelectToggle.dropdown();
+    tzSelectToggle.dropdown();
     filterSelectToggle.dropdown();
     recipientTextArea.val(Login.myEmail() + ", ");
 
@@ -235,6 +245,7 @@ module Esper.Agenda {
     function closeDropdowns() {
       teamDropdown.removeClass("open");
       filterDropdown.removeClass("open");
+      tzDropdown.removeClass("open");
     }
 
     function displayEventProperties(filter: string[]) {
@@ -328,13 +339,14 @@ module Esper.Agenda {
     timeFromDate.datepicker("widget").addClass("esper");
     timeUntilDate.datepicker("widget").addClass("esper");
 
-    var timezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
+    var currentTimezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
 
-    var tzSel = Timezone.appendTimezoneSelector(timezoneDropdown, timezone,
-      null);
-    tzSel.removeClass("esper-select")
-         .addClass("esper-agenda-timezone-select")
-         .bind("typeahead:change", renderEvents);
+    tzSelect.renderReact(Dropdown.Menu, {
+      dataEngine: Timezone.timezones,
+      initialData: Timezone.rawTimezoneValues,
+      selectedOption: Timezone.valueOfId[currentTimezone],
+      onSelect: renderEvents
+    });
 
     allTeams.find("label > input").change(function(e) {
       e.stopPropagation();
@@ -411,7 +423,7 @@ module Esper.Agenda {
     _.forEach(recipientEmails, addRecipientCheckboxes);
 
     Api.agendaRange(currentTeam.teamid,
-                    timezone,
+                    currentTimezone,
                     Math.floor(timeFromDate.datepicker("getDate").getTime() / 1000),
                     Math.floor(timeUntilDate.datepicker("getDate").getTime() / 1000 + 86399))
       .done(function(result) {
@@ -440,7 +452,7 @@ module Esper.Agenda {
       });
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
-      var tz = Timezone.selectedTimezone(tzSel);
+      var tz = Timezone.idOfValue[Dropdown.getSelectedOption()];
       _.forEach(teams, function(team: ApiT.Team) {
         Api.agendaRange(team.teamid,
                         tz,
@@ -465,17 +477,19 @@ module Esper.Agenda {
     modal.click(closeDropdowns);
     Util.preventClickPropagation(teamSelectToggle);
     Util.preventClickPropagation(filterSelectToggle);
+    Util.preventClickPropagation(tzSelectToggle);
 
     view.click(cancel);
     Util.preventClickPropagation(modal);
     Util.preventClickPropagation(teamDropdown);
     Util.preventClickPropagation(filterDropdown);
+    Util.preventClickPropagation(tzDropdown);
     closeButton.click(cancel);
     cancelButton.click(cancel);
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = Timezone.selectedTimezone(tzSel);
+      var tz = Timezone.idOfValue[Dropdown.getSelectedOption()];
       var format = htmlFormat.prop("checked");
       var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
