@@ -452,7 +452,8 @@ module Esper.Agenda {
       });
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
-      var tz = Timezone.idOfValue[Dropdown.getSelectedOption()];
+      var tzVal = (<Dropdown.Menu> tzSelect.reactComponent()).getSelectedOption();
+      var tz = Timezone.idOfValue[tzVal];
       _.forEach(teams, function(team: ApiT.Team) {
         Api.agendaRange(team.teamid,
                         tz,
@@ -489,7 +490,8 @@ module Esper.Agenda {
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = Timezone.idOfValue[Dropdown.getSelectedOption()];
+      var tzVal = (<Dropdown.Menu> tzSelect.reactComponent()).getSelectedOption();
+      var tz = Timezone.idOfValue[tzVal];
       var format = htmlFormat.prop("checked");
       var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
