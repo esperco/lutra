@@ -16,6 +16,14 @@
   @import "../marten/less/_custom_bootstrap";
   // TODO: Override certain Bootstrap settings like font-family
 
+  .form-control {
+    &.esper-gmail-search-result {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 422px;
+    }
+  }
   // Creates an arrow for dropdown menus
   .dropdown-arrow-top {
     &:before, &:after {

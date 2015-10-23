@@ -168,14 +168,13 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
-  export function emailSearch(teamid, teamCalendars, query):
-    JQueryPromise<ApiT.CalendarEventList> {
-    var cals = { google_cal_ids: calIds(teamCalendars) };
+  export function emailSearch(teamid, query):
+    JQueryPromise<ApiT.EmailThreadList> {
     var url =
-      Conf.Api.url + "/api/calendar/search/" + string(Login.myUid())
+      Conf.Api.url + "/api/thread/search/" + string(Login.myUid())
       + "/" + string(teamid)
       + "/" + encodeURIComponent(query);
-    return JsonHttp.post(url, JSON.stringify(cals));
+    return JsonHttp.get(url);
   }
 
   export function eventRange(teamid, teamCalendars,

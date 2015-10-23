@@ -174,9 +174,14 @@ module Esper.ApiT {
   }
 
   export interface EmailThread {
+    gmail_owner: string;
     gmail_thrid: string;
     subject: string;
     snippet: string;
+  }
+
+  export interface EmailThreadList {
+    threads: EmailThread[];
   }
 
   export interface EmailMessage {
