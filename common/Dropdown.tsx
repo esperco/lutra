@@ -107,6 +107,7 @@ module Esper.Dropdown {
       for (var i = 0; i < this.state.data.length; i++) {
         items.push(<Item
           id={"esper-dropdown-item" + i}
+          key={this.state.data[i]}
           text={this.state.data[i]}
           isChecked={this.state.checkedValue === this.state.data[i]}
           onSelect={this.props.onSelect}
@@ -123,6 +124,7 @@ module Esper.Dropdown {
 
   interface ItemProps {
     id: string,
+    key: string,
     text: string,
     isChecked: boolean,
     selectedOption: Model.StoreOne<string>,
