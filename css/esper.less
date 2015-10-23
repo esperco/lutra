@@ -374,11 +374,22 @@ ul.esper-drop-ul {
   display: inline-block;
 }
 
+.esper-dropdown-list {
+  display: inline-block;
+  max-height: 300px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+
 .esper-dropdown-select {
+  &.dropdown-menu {
+    padding: 5px;
+  }
   li label {
     cursor: pointer;
     width: 100%;
-    padding-left: 5px;
   }
 }
 
