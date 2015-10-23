@@ -38,7 +38,7 @@ module Esper.AccountTab {
     cancelBtn: JQuery;
   }
 
-  function renderInviteDialog(team, table): InviteDialog {
+  function renderInviteDialog(team): InviteDialog {
 '''
 <div #view class="invite-popover overlay-popover click-safe">
   <div class="overlay-popover-header click-safe">Add new assistant</div>
@@ -164,9 +164,14 @@ module Esper.AccountTab {
         (<any> statusContainer).tooltip(); // FIXME
       }
 
-      var hasRemoveLink = false;
-      if ((memberUid !== Login.me() || Login.isAdmin())
-          && List.mem(team.team_assistants, memberUid)) {
+      var hasRemoveLink = (
+        (memberUid !== Login.me()
+         || team.team_executive === Login.me()
+         || Login.isAdmin())
+        && List.mem(team.team_assistants, memberUid)
+      );
+
+      if (hasRemoveLink) {
 '''removeLinkView
 <span #removeSpan>
   <a #removeLink href="#" class="danger-link">Remove</a>
@@ -178,7 +183,6 @@ module Esper.AccountTab {
             .done(function() { refresh(); });
         });
 
-        hasRemoveLink = true;
         if (memberUid === Login.me())
           name.append($("<span class='semibold'> (Me)</span>"));
 
@@ -221,6 +225,7 @@ module Esper.AccountTab {
             .done(function() { refresh(); });
         });
       }
+
       table.append(row);
     });
   }
@@ -998,6 +1003,24 @@ module Esper.AccountTab {
     return view;
   }
 
+  export function renderMakeMeAssistant(team: ApiT.Team): JQuery {
+'''
+<div #view class="hide">
+  <a #link href="#" class="link">Make me an assistant</a>
+</div>
+'''
+    var uid = Login.me();
+    if (uid === team.team_executive
+        && ! List.mem(team.team_assistants, uid)) {
+      link.click(function() {
+        Api.addAssistant(team.teamid, uid)
+          .done(function() { refresh(); });
+      });
+      view.removeClass("hide");
+    }
+    return view;
+  }
+
   export function load(team : ApiT.Team, plans? : boolean, payment? : boolean) {
 '''
 <div #view>
@@ -1016,6 +1039,8 @@ module Esper.AccountTab {
        class="link popover-trigger click-safe"
        style="float:left">Add new assistant</a>
   </div>
+  <div #invitePopover/>
+  <div #makeMeAssistant/>
 </div>
 '''
     var emailIcon = $("<img class='svg-block invite-icon'/>")
@@ -1037,18 +1062,12 @@ module Esper.AccountTab {
           tableEmpty.show();
       });
 
-    var popover = renderInviteDialog(team, _view);
-    view.append(popover.view);
+    var popover = renderInviteDialog(team);
+    invitePopover.append(popover.view);
 
-    if (Login.isExecCustomer(team)) {
-      // Executives are getting confused by this and messing teams up
-      assistantsHeader.hide();
-      assistantsList.hide();
-      emailContainer.hide();
-      invite.hide();
-    } else {
-      invite.click(function() { Settings.togglePopover(popover); });
-    }
+    invite.click(function() { Settings.togglePopover(popover); });
+
+    makeMeAssistant.append(renderMakeMeAssistant(team));
 
     if (plans) showMembershipModal(team);
     if (payment) showPaymentModal("Change", team, null);

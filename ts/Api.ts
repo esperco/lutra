@@ -214,6 +214,23 @@ module Esper.Api {
                        + "/executive/" + memberUid, "");
   }
 
+  export function setPrimaryAssistant(teamid, uid):
+  JQueryPromise<ApiT.Team> {
+    return jsonHttpPut("/api/team-primary/" + string(Login.me())
+                       + "/" + string(teamid)
+                       + "/" + string(uid),
+                       "");
+  }
+
+  // restricted to admins and executive themselves
+  export function addAssistant(teamid, uid):
+  JQueryPromise<ApiT.Team> {
+    return jsonHttpPut("/api/team-assistant/" + string(Login.me())
+                       + "/" + string(teamid)
+                       + "/" + string(uid),
+                       "");
+  }
+
   export function removeAssistant(teamid, memberUid)
     : JQueryPromise<void>
   {
