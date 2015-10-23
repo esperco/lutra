@@ -50,13 +50,11 @@ module Esper.Analytics {
         previousId: getAnonId(),
         userId: uid
       });
-      deleteAnonId();
     }
 
     // Identify with some traits -- but only after flushing any anon calls
     // so we can mitigate chance of MixPanel race conditions
     analytics.flush(function() {
-
       ExtensionOptions.load(function(opts) {
         var optsFlattened: { [index: string]: string } = {};
         _.each(ExtensionOptions.enumToString(opts), function(v,k) {
@@ -85,6 +83,8 @@ module Esper.Analytics {
           }
         });
       });
+
+      deleteAnonId();
     });
   }
 
@@ -109,12 +109,13 @@ module Esper.Analytics {
           anonymous: true
         }
       });
+      analytics.flush();
     }
     return _anonId;
   }
 
   function deleteAnonId(): void {
-    delete _anonId;
+    _anonId = null;
   }
 
   function hasAnonId(): boolean {
@@ -124,7 +125,9 @@ module Esper.Analytics {
   export function track(event: Trackable, properties?: Object) {
     var eventName = Trackable[event];
     analytics.track({
-      userId: Login.myUid() || getAnonId(),
+      // Use anonId if we have one (it'll be cleared after alias is complete)
+      userId: hasAnonId() ? getAnonId() : Login.myUid() || getAnonId(),
+
       event: eventName,
       properties: properties || {}
     });
