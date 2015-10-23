@@ -136,7 +136,7 @@ module Esper.Agenda {
       <span #timezoneDropdown />
       timezone with
       <div #filterDropdown class="dropdown esper-dropdown">
-        <button #filterSelectToggle class="btn btn-default  dropdown-toggle" data-toggle="d ropdown">
+        <button #filterSelectToggle class="btn btn-default dropdown-toggle" data-toggle="dropdown">
           Everything
           <i class="fa fa-chevron-down"></i>
         </button>
