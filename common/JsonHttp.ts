@@ -19,7 +19,7 @@ module Esper.JsonHttp {
   }
 
   /* The version needs to be set by the application, e.g. stoat-1.2.3 */
-  var esperVersion: string;
+  export var esperVersion: string;
 
   function setHttpHeaders(path) {
     return function(jqXHR) {

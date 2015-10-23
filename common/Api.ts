@@ -814,4 +814,7 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify({ calendars: cals }));
   }
 
+  export function init() {
+    esperVersion = "stoat-" + Conf.version;
+  }
 }

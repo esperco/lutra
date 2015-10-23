@@ -121,6 +121,7 @@ module Esper.Init {
   export function init() {
     if (! alreadyInitialized) {
       Log.d("Init.init()");
+      Api.init();
       Gmail.init();
       CurrentThread.preInit();
       esperRootUrl = $("#esper-script").attr("data-root-url");
