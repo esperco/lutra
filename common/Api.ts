@@ -751,11 +751,11 @@ module Esper.Api {
     var query = "content_type=" + string(content_type);
     var url = Conf.Api.url + "/api/files/" + string(Login.myUid()) + "/"
                                            + string(filename) + "?"
-                                           + string(query);
-
-    // Doing a custom request because I'm sending the file directly
-    // without using JSON.
-    return JsonHttp.httpRequest("PUT", url, contents, "", false);
+                                           + query;
+    return JsonHttp.put(url, contents,
+                        "json", // usual response type
+                        "text/plain" // request's content-type (base64 data)
+                       );
   }
 
   export function listWorkflows(teamid)
