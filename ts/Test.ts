@@ -2,6 +2,10 @@
   Contains helpers for runnings tests using Marten's test runner, Jasmine,
   and React.
 */
+
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/react/react-global.d.ts" />
+
 module Esper.Test {
 
   // Returns the test frame object, wrapped in jQuery
