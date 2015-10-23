@@ -53,10 +53,6 @@ module Esper.Dropdown {
   }
 
   class SearchBar extends ReactHelpers.Component<{}, {}> {
-    constructor(props) {
-      super(props);
-    }
-
     handleKeyUp(e) {
       function setData(datum) {
         if (datum.length > 0)
@@ -116,13 +112,9 @@ module Esper.Dropdown {
 
   interface ItemState {
     checkedValue: string
-  }                                                                                                                                                          
+  }
 
   class Item extends ReactHelpers.Component<ItemProps, ItemState> {
-    constructor(props) {
-      super(props);
-    }
-
     getState() {
       return {
         checkedValue: selectedOption.val() || ""
@@ -133,17 +125,19 @@ module Esper.Dropdown {
       this.setSources([selectedOption]);
     }
 
-    selectTimezoneHandler(e) {
-      selectedOption.set(e.target.value);
-      if (onSelect !== undefined) onSelect();
+    onSelectTimezoneHandler(c) {
+      $(React.findDOMNode(c)).unbind().change(function(e) {
+        selectedOption.set(this.value);
+        if (onSelect !== undefined) onSelect();
+      });
     }
 
     render() {
       return (
-        <li>
+        <li onClick={(e) => {console.log(e);}}>
           <label htmlFor={this.props.id}>
             <input type="radio"
-              onChange={this.selectTimezoneHandler}
+              ref={(c) => this.onSelectTimezoneHandler(c)}
               checked={this.state.checkedValue === this.props.text}
               value={this.props.text}
               name="dropdown-list-item"
