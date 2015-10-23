@@ -52,6 +52,18 @@ module Esper.Log {
     // Add prefix tag
     args.unshift(prefix ? tag + " " + prefix : tag);
 
+    if (consoleFunc !== console.error && !Esper.PRODUCTION &&
+        console.trace) {
+      if (window.hasOwnProperty("chrome")) {
+        // Chrome's console.trace actually showsmessage in trace, so replace
+        // consoleFunc with trace
+        consoleFunc = console.trace;
+      } else {
+        // Add an extra trace message
+        (<any> console).trace("Tracing ...");
+      }
+    }
+
     // Log
     consoleFunc.apply(console, args);
   };
