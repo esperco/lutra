@@ -33,11 +33,14 @@ module Esper.ReactHelpers {
       // Call React clean-up on unbind
       var self = this;
       var unmounted = false;
-      this.off('destroyed');
-      this.bind('destroyed', function() {
-        React.unmountComponentAtNode(self.get(0));
-        unmounted = true;
-      });
+
+      if (! this.data("react-component")) {
+        this.off('destroyed');
+        this.bind('destroyed', function() {
+          React.unmountComponentAtNode(self.get(0));
+          unmounted = true;
+        });
+      }
 
       /*
         Throw error if parent node isn't in DOM when we render React element.
