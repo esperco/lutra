@@ -24,6 +24,7 @@
 /// <reference path="ParseUrl.ts"/>
 /// <reference path="Login.ts"/>
 /// <reference path="ApiT.ts"/>
+/// <reference path="JsonHttp.ts"/>
 /// <reference path="Api.ts"/>
 /// <reference path="CalPicker.ts"/>
 /// <reference path="Settings.ts"/>
