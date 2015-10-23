@@ -35,6 +35,7 @@ module Esper.Analytics {
 
   // If we have a UID, identify ourselves. Otherwise dis-associate
   export function identify() {
+    return; // Temporarily disabling analytics in Otter
     analytics.ready(function() {
       var me = Login.me();
       if (me) {
@@ -67,6 +68,7 @@ module Esper.Analytics {
 
   // Track which page you're on
   export function page(page: string, properties?: Object) {
+    return; // Temporarily disabling analytics in Otter
     properties = flatten(properties || {});
     properties['url'] = location.href; // So hash is included
 
@@ -110,6 +112,7 @@ module Esper.Analytics {
   };
 
   export function track(event: Trackable, properties?: Object) {
+    return; // Temporarily disabling analytics in otter;
     var eventName = Trackable[event];
     analytics.ready(function() {
       analytics.track(eventName, flatten(properties || {}));
