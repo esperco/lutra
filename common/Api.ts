@@ -599,7 +599,7 @@ module Esper.Api {
                    html_format: html_format,
                    recipients: recipients
                  };
-    return JsonHttp.post(url, JSON.stringify(params));  
+    return JsonHttp.post(url, JSON.stringify(params));
   }
 
   export function notifyTaskMessage(task, emails, snippet):
@@ -637,7 +637,8 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function sendEventInvites(teamid, fromEmail, guests, event: ApiT.CalendarEvent):
+  export function sendEventInvites(teamid, fromEmail, guests,
+                                   event: ApiT.CalendarEvent):
   JQueryPromise<void> {
     var url =
       Conf.Api.url + "/api/event/invite/" + string(Login.myUid())
@@ -668,7 +669,10 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
-  export function updateGoogleEvent(teamid, alias, eventid, event):
+  export function updateGoogleEvent(teamid: string,
+                                    alias: string,
+                                    eventid: string,
+                                    event: ApiT.CalendarEventEdit):
   JQueryPromise<void> {
     var url =
         Conf.Api.url + "/api/event/edit/" + string(Login.myUid())

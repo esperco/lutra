@@ -89,12 +89,8 @@ module Esper.Thread {
         });
 
         var team = teamEmails.team;
-        var amExecutive = team.team_executive === myUid;
-        var amAssistant = List.mem(team.team_assistants, myUid) && !amExecutive;
-          /*
-            We make sure to not select test teams where I'm both
-            executive and assistant.
-          */
+        var amExecutive = Team.isExecutive(myUid, team);
+        var amAssistant = Team.isAssistant(myUid, team);
 
         var selected =
           executive !== null && (assistant !== null || amAssistant);
