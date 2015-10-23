@@ -13,8 +13,8 @@ module Esper.GmailSearch {
     endTime: JQuery;
   }
 
-  function renderSearchResult(e: ApiT.EmailThread, linkedEvents,
-                              team: ApiT.Team, threadId: string, eventsTab, last) {
+  function renderSearchResult(e: ApiT.EmailThread, task: ApiT.Task,
+                              team: ApiT.Team, threadId: string, eventsTab) {
     Log.d("renderSearchResult()");
 '''
 <div #view class="esper-bs">
@@ -26,16 +26,31 @@ module Esper.GmailSearch {
   </div>
 </div>
 '''
-
+    var isChecked;
+    var searchThread = e.gmail_thrid;
     info.html("<b>" + e.subject + "</b> - " + e.snippet);
 
-    var url = window.location.origin + window.location.pathname + "#all/" + e.gmail_thrid;
+    var url = window.location.origin + window.location.pathname + "#all/" + searchThread;
     info.click(function(e) {
       window.open(url, '_blank');
     });
 
+    //check threads that are already linked
+    if (task !== undefined) {
+      List.iter(task.task_threads || [], function(thread: ApiT.EmailThread) {
+        if (thread.gmail_thrid === searchThread) {
+          (<HTMLInputElement>link[0]).checked = true;
+          isChecked = true;
+        }
+      });
+    }
+
     link.click(function(e) {
-      
+      if (isChecked) {
+        TaskTab.unlinkThread(task.task_teamid, task.taskid, searchThread);
+      } else {
+
+      }
     });
 
 
@@ -60,8 +75,9 @@ module Esper.GmailSearch {
         }
         searchView.spinner.show();
         searchView.noResults.hide();
-        Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-          .done(function(events) {
+        var task = CurrentThread.task.get();
+        Api.getTaskForThread(team.teamid, threadId, false, true)
+          .done(function(task) {
             Api.emailSearch(team.teamid, searchView.search.val())
               .done(function(results) {
                 console.error("STOP");
@@ -73,10 +89,10 @@ module Esper.GmailSearch {
                 searchView.spinner.hide();
 
                 results.threads.forEach(function(e) {
-                  if (i == (numResults - 1)) last = true;
-                  renderSearchResult(e, events, team, threadId, eventsTab, last)
-                    .appendTo(searchView.results);
-                  i++;
+                  if (threadId !== e.gmail_thrid) {
+                    renderSearchResult(e, task, team, threadId, eventsTab)
+                      .appendTo(searchView.results);
+                  }
                 });
 
                 if (results.threads.length === 0) {
@@ -147,7 +163,10 @@ module Esper.GmailSearch {
       "url(" + Init.esperRootUrl + "img/search.svg) no-repeat scroll"
     );
 
-    function closeModal() { view.remove(); }
+    function closeModal() {
+      TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+      view.remove();
+    }
     view.click(closeModal);
     Util.preventClickPropagation(modal);
     done.click(closeModal);

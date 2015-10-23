@@ -83,7 +83,7 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  function unlinkThread(teamid, taskid, threadId) {
+  export function unlinkThread(teamid, taskid, threadId) {
     return Api.unlinkThreadFromTask(teamid, threadId, taskid)
       .then(function() {
         /* force the creation of a task for the newly unlinked thread */
