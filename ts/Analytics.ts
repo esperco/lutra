@@ -35,8 +35,6 @@ module Esper.Analytics {
 
   // If we have a UID, identify ourselves. Otherwise dis-associate
   export function identify() {
-    (<any>console).trace("Identify!");
-
     analytics.ready(function() {
       var me = Login.me();
       if (me) {
@@ -62,7 +60,6 @@ module Esper.Analytics {
 
   // Clear tracking IDs
   export function reset() {
-    (<any>console).trace("reset!");
     var user = analytics.user();
     user.logout();
     user.reset();
