@@ -1,9 +1,10 @@
 /// <reference path="./Esper.ts" />
-/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="./Layout.tsx" />
+/// <reference path="./Route.tsx" />
 
 module Esper.Main {
   export function init() {
-    Log.d("Hello world");
+    Route.init();
   }
 }
 

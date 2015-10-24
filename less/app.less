@@ -1,1 +1,31 @@
+/* Bootstrap + overrides - consider moving overrides into footer */
 @import "../marten/less/_custom_bootstrap";
+@navbar-height: 50px;
+
+
+/* New variables */
+@footer-bg: #f8f8f8;
+
+
+/* Page-specific style imports and helper import */
+@import "./_helpers.less";
+@import "./_loading";
+@import "./_notFound";
+
+
+/* Basic Layout */
+body, .footer {
+  background: @footer-bg;
+}
+#esper-main{
+  background: @body-bg;
+  padding-top: @navbar-height + 10;
+  min-height: 70%;
+}
+.footer {
+  margin: 0 auto;
+  padding: @padding-large-vertical @padding-large-horizontal;
+  ul, li{
+    list-style-type: none;
+  }
+}

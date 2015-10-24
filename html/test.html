@@ -50,6 +50,26 @@
   </style>
 </head>
 <body>
+
+  <!--
+    Our test page loads the entire actual app.js used by the rest of the
+    site for unit-testing / integration-testing purposes. This means things
+    may bug out if certain DOM elements aren't present.
+
+    Don't use these for actual testing (use the test frame or use a unit
+    test that doesn't rely on the DOM), but let's leave these here so the
+    setup script doesn't crash.
+  -->
+  <div style="display:none">
+    <div id="esper-header"></div>
+    <div id="esper-main" class="container">
+      <div class="init-loading">
+        Loading &hellip;
+      </div>
+    </div>
+    <div id="esper-footer"></div>
+  </div>
+
   <div id="esper-test-frame-container">
     <button onclick="toggleTestFrame();">Test Frame</button>
     <iframe id="esper-test-frame" class="hide"></iframe>

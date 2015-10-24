@@ -1,0 +1,13 @@
+@import "./_helpers";
+
+#esper-loading {
+  .esper-full-screen;
+  background: @body-bg;
+
+  // Add .fade-out class to transition loading screen out
+  opacity: 1;
+  &.fade-out {
+    transition: opacity 0.6s ease-in-out;
+    opacity: 0;
+  }
+}

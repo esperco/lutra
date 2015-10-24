@@ -45,7 +45,7 @@ Esper = (function(esperObj) {
     EventEmitter: EventEmitter,
     moment:       moment,
     momentTz:     momentTz,
-    page:         page,
+    pageJs:       page,
     React:        react
   };
   for (var name in assignments) {

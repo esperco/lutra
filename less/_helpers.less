@@ -1,0 +1,23 @@
+/*
+  Helper classes -- NB: Use esper- prefix here in case we want to move these
+  out into Marten for reuse with Chrome extension
+*/
+
+.esper-simple-content {
+  margin: 50px auto;
+  max-width: 800px;
+}
+
+.esper-full-screen {
+  height: 100%;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  padding: 10px 10px 22%; // Nudge slightly higher
+
+  .esper-center {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
+}
