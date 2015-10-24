@@ -3,6 +3,8 @@ Stoat
 
 Esper extension for Google Chrome
 
+![Stoat](https://c1.staticflickr.com/5/4102/4787565311_e08c73a690_z.jpg)
+
 Setup
 =====
 
