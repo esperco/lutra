@@ -6,6 +6,7 @@
 /// <reference path="../typings/react/react-global.d.ts" />
 /// <reference path="./Emit.ts" />
 /// <reference path="./JQStore.ts" />
+/// <reference path="./Util.ts" />
 
 /*
   Re-open the jQuery interface and adds our prototype extension. This needs
