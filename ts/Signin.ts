@@ -387,7 +387,7 @@ module Esper.Signin {
             disabled for now.
      */
     Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
-    var loginCall = Api.noWarn(function() {
+    var loginCall = JsonHttp.noWarn(function() {
       return Api.loginOnce(uid, loginNonce)
     });
     loginCall
