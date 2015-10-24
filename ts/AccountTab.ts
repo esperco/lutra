@@ -382,7 +382,7 @@ module Esper.AccountTab {
         callback(response.error);
       } else {
         var stripeToken = response.id;
-        Api.noWarn(function() {
+        JsonHttp.noWarn(function() {
           return Api.addNewCard(teamid, stripeToken)
         }).then(
           function(card) {

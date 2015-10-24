@@ -6,6 +6,14 @@ module Esper.Login {
 
   export var data : any = {}; // FIXME
 
+  export function loggedIn(): boolean {
+    return data && data.uid;
+  }
+
+  export function getApiSecret(): string {
+    return data.api_secret;
+  }
+
   export function initLoginInfo() {
     var stored = Store.get("login");
 
@@ -95,32 +103,6 @@ module Esper.Login {
     location.reload();
     return false; // Allows us to use in forms or links directly and have the
                   // default browser action be suppressed
-  };
-
-  /*
-    Set HTTP headers for authentication, assuming the user is logged in.
-
-    The advantages over sending the api_secret as a cookie are:
-    - the secret is not sent to the server
-    - the signature expires, preventing replay attacks
-    - all clients use the same mechanism
-  */
-  export function setHttpHeaders(path) {
-    return function(jqXHR) {
-      if (data) {
-        var unixTime = Math.round(+new Date()/1000).toString();
-        var signature = (<any> window["CryptoJS"]).SHA1( // FIXME
-          unixTime
-            + ","
-            + path
-            + ","
-            + data.api_secret
-        );
-        jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
-        jqXHR.setRequestHeader("Esper-Path", path);
-        jqXHR.setRequestHeader("Esper-Signature", signature);
-      }
-    }
   };
 
   /* Utilities */
