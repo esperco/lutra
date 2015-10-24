@@ -401,11 +401,12 @@ module Esper.Api {
 
   /*** Scheduling ***/
 
-  export function getCalendarList(teamid)
-    : JQueryPromise<ApiT.Calendars>
-  {
-    var url = "api/calendar/list/" + string(Login.data.uid)
-                             + "/" + string(teamid);
+  export function getCalendarList(teamid?: string)
+    : JQueryPromise<ApiT.Calendars> {
+    var url = "api/calendar/list/" + string(Login.data.uid);
+    if (teamid) {
+      url += "/" + string(teamid);
+    }
     return jsonHttpGet(url);
   }
 

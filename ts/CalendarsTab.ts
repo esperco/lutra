@@ -120,7 +120,7 @@ module Esper.CalendarsTab {
       makeCalendarRow(team.teamid, cal).appendTo(teamCals);
     });
 
-    Api.getCalendarList(team.teamid).done(function(x) {
+    Api.getCalendarList().done(function(x) {
       List.iter(x.calendars, function(cal) {
         var alreadyShared = !!_.find(team.team_calendars,
           function(teamCal: ApiT.Calendar) {
