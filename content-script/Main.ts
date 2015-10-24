@@ -71,6 +71,7 @@ module Esper.Main {
       injectScript("gcal-is.js");
     }
 
+    Api.init();
     Analytics.init();
     Update.init();
     Auth.init();

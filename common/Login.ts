@@ -91,6 +91,10 @@ module Esper.Login {
     return watchableAccount.get();
   }
 
+  export function getApiSecret(): string {
+    return getAccount().credentials.apiSecret;
+  }
+
   function stringifyAccount(a: Types.Account) {
     if (!a) {
       return undefined;
