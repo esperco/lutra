@@ -3,6 +3,8 @@ Otter
 
 Web client for the assistant
 
+![Sea otter](https://c2.staticflickr.com/4/3851/14851601950_40d0b8b69d.jpg)
+
 Setup
 -----
 
