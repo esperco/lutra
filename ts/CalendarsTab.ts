@@ -11,8 +11,8 @@ module Esper.CalendarsTab {
 <tr #view class="esper-calendar-option">
   <td><input #viewBox type="checkbox" class="esper-cal-view"></td>
   <td><input #writeBox type="checkbox" class="esper-cal-write"></td>
+  <td><input #agendaBox type="checkbox" class="esper-cal-agenda"></td>
   <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
-  <td><input #agendaBox type= "checkbox" class="esper-cal-agenda"></td>
   <td #calName class="esper-cal-name"/>
   <td><a #csvButton href="#">
     <i class="fa fa-fw fa-cloud-download"></i> Export to CSV
@@ -106,8 +106,8 @@ module Esper.CalendarsTab {
     <tr>
       <th>View</th>
       <th>Write</th>
-      <th>Dupe</th>
       <th>Agenda</th>
+      <th>Guest Duplicates</th>
       <th></th>
       <th></th>
     </tr>
