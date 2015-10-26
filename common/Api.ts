@@ -171,7 +171,7 @@ module Esper.Api {
   export function emailSearch(teamid, query):
     JQueryPromise<ApiT.EmailThreadList> {
     var url =
-      Conf.Api.url + "/api/thread/search/" + string(Login.myUid())
+      Conf.Api.url + "/api/gmail/thread-search/" + string(Login.myUid())
       + "/" + string(teamid)
       + "/" + encodeURIComponent(query);
     return JsonHttp.get(url);
@@ -824,6 +824,6 @@ module Esper.Api {
   }
 
   export function init() {
-    esperVersion = "stoat-" + Conf.version;
+    JsonHttp.esperVersion = "stoat-" + Conf.version;
   }
 }

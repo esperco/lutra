@@ -181,7 +181,7 @@ module Esper.ApiT {
   }
 
   export interface EmailThreadList {
-    threads: EmailThread[];
+    items: EmailThread[];
   }
 
   export interface EmailMessage {

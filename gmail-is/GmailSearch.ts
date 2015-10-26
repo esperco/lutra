@@ -113,20 +113,20 @@ module Esper.GmailSearch {
               .done(function(results) {
                 console.error("STOP");
                 console.log(results);
-                var numResults = results.threads.length;
+                var numResults = results.items.length;
                 var i = 0;
                 var last = false;
 
                 searchView.spinner.hide();
 
-                results.threads.forEach(function(e) {
+                results.items.forEach(function(e) {
                   if (threadId !== e.gmail_thrid) {
                     renderSearchResult(e, task, team, threadId, eventsTab, userTab)
                       .appendTo(searchView.results);
                   }
                 });
 
-                if (results.threads.length === 0) {
+                if (results.items.length === 0) {
                   searchView.noResultsFeedback.text(searchView.search.val());
                   searchView.noResults.show();
                 } else {
