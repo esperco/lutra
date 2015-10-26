@@ -4,6 +4,9 @@
 
 /* Main modules */
 
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+
 /// <reference path="Test.ts"/>
 /// <reference path="List.ts"/>
 /// <reference path="Analytics.ts"/>
@@ -23,8 +26,6 @@
 /// <reference path="Store.ts"/>
 /// <reference path="ParseUrl.ts"/>
 /// <reference path="Login.ts"/>
-/// <reference path="ApiT.ts"/>
-/// <reference path="JsonHttp.ts"/>
 /// <reference path="Api.ts"/>
 /// <reference path="CalPicker.ts"/>
 /// <reference path="Settings.ts"/>

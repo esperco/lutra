@@ -2,14 +2,11 @@
   Various simple utilities
 */
 
+/// <reference path="../marten/ts/Util.ts" />
+
 module Esper.Util {
 
   var undef;
-
-  // Return a random alphanumeric string
-  export function randomString() {
-    return Math.random().toString(36).slice(2);
-  };
 
   export function isNotNull(x) {
     return x !== undef && x !== null;
@@ -113,19 +110,6 @@ module Esper.Util {
       focusOn.focus();
     }
   };
-
-  /* Decode a string encode in hexadecimal */
-  export function hexDecode(hex) {
-    var s = "";
-    for (var i = 0; i < hex.length; i += 2)
-      s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
-    return s;
-  }
-
-  export function validateEmailAddress(s: string) {
-    var re = /\S+@\S+\.\S+/;
-    return re.test(s);
-  }
 
   export var tests = [
     Test.expect(
