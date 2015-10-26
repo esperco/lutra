@@ -47,4 +47,17 @@ module Esper.Util {
       return list.shift();
     }
   }
+
+  export function validateEmailAddress(s: string) {
+    var re = /\S+@\S+\.\S+/;
+    return re.test(s);
+  }
+
+  /* Decode a string encode in hexadecimal */
+  export function hexDecode(hex) {
+    var s = "";
+    for (var i = 0; i < hex.length; i += 2)
+      s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return s;
+  }
 }
