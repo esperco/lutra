@@ -4,6 +4,7 @@
 
 /* Main modules */
 
+/// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/JsonHttp.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 
@@ -11,7 +12,6 @@
 /// <reference path="List.ts"/>
 /// <reference path="Analytics.ts"/>
 /// <reference path="Watchable.ts"/>
-/// <reference path="Log.ts"/>
 /// <reference path="Deferred.ts"/>
 /// <reference path="Promise.ts"/>
 /// <reference path="XDate.ts"/>
