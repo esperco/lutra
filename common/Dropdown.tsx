@@ -16,6 +16,7 @@ module Esper.Dropdown {
   }
 
   interface MenuProps {
+    id: string,
     dataEngine: Bloodhound<string>,
     initialData: string[],
     selectedOption: string,
@@ -43,7 +44,8 @@ module Esper.Dropdown {
           <SearchBar dataEngine={this.props.dataEngine}
             displayData={this.displayData} />
           <hr />
-          <List initialData={this.props.initialData}
+          <List id={this.props.id}
+            initialData={this.props.initialData}
             displayData={this.displayData}
             onSelect={this.props.onSelect}
             selectedOption={this.selectedOption} />
@@ -78,6 +80,7 @@ module Esper.Dropdown {
   }
 
   interface ListProps {
+    id: string,
     initialData: string[],
     displayData: Model.StoreOne<DataDisplay>,
     selectedOption: Model.StoreOne<string>,
@@ -106,8 +109,9 @@ module Esper.Dropdown {
       var items = [];
       for (var i = 0; i < this.state.data.length; i++) {
         items.push(<Item
-          id={"esper-dropdown-item" + i}
-          key={"esper-dropdown-item" + i}
+          id={"esper-" + this.props.id + "-dropdown-item" + i}
+          name={"esper-" + this.props.id + "-dropdown-list-items"}
+          key={this.state.data[i]}
           text={this.state.data[i]}
           isChecked={this.state.checkedValue === this.state.data[i]}
           onSelect={this.props.onSelect}
@@ -124,6 +128,7 @@ module Esper.Dropdown {
 
   interface ItemProps {
     id: string,
+    name: string,
     key: string,
     text: string,
     isChecked: boolean,
@@ -146,9 +151,9 @@ module Esper.Dropdown {
           <label htmlFor={this.props.id}>
             <input type="radio"
               ref={this.onSelectTimezoneHandler.bind(this)}
-              checked={this.props.isChecked}
+              defaultChecked={this.props.isChecked}
               value={this.props.text}
-              name="dropdown-list-item"
+              name={this.props.name}
               id={this.props.id} />
             {this.props.text}
           </label>

@@ -178,8 +178,7 @@ module Esper.Agenda {
           <span #tzValue>Timezone</span>
           <i class="fa fa-chevron-down"></i>
         </button>
-        <div #tzSelect class="dropdown-menu esper-dropdown-select">
-        </div>
+        <div #tzSelect class="dropdown-menu esper-dropdown-select" />
       </div>
       with
       <div #filterDropdown class="dropdown esper-dropdown">
@@ -340,17 +339,14 @@ module Esper.Agenda {
     timeUntilDate.datepicker("widget").addClass("esper");
 
     var currentTimezone = Teams.getTeamPreferences(currentTeam).general.current_timezone;
-    tzValue.text(Timezone.valueOfId[currentTimezone]);
-
-    tzSelect.renderReact(Dropdown.Menu, {
-      dataEngine: Timezone.timezones,
-      initialData: Timezone.rawTimezoneValues,
-      selectedOption: Timezone.valueOfId[currentTimezone],
-      onSelect: function() {
+    tzValue.text(Timezone.getValueFromId(currentTimezone));
+    Timezone.appendDropdownMenu(tzSelect,
+      "agenda-timezone",
+      currentTimezone,
+      function() {
         var tzVal = (<Dropdown.Menu> tzSelect.reactComponent()).getSelectedOption();
         tzValue.text(tzVal);
         renderEvents();
-      }
     });
 
     allTeams.find("label > input").change(function(e) {
@@ -457,7 +453,7 @@ module Esper.Agenda {
       });
       var f = timeFromDate.datepicker("getDate");
       var u = timeUntilDate.datepicker("getDate");
-      var tz = Timezone.idOfValue[tzValue.text()];
+      var tz = Timezone.getIdFromValue(tzValue.text());
       _.forEach(teams, function(team: ApiT.Team) {
         Api.agendaRange(team.teamid,
                         tz,
@@ -494,7 +490,7 @@ module Esper.Agenda {
     sendButton.click(function() {
       errorMessages.empty();
       var t = getCheckedValues(teamSelect);
-      var tz = Timezone.idOfValue[tzValue.text()];
+      var tz = Timezone.getIdFromValue(tzValue.text());
       var format = htmlFormat.prop("checked");
       var i = taskNotesFilter.find("label > input").prop("checked");
       var f = timeFromDate.datepicker("getDate");
