@@ -9,6 +9,7 @@
 /// <reference path="../marten/typings/chrome/chrome.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 
+/// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/JsonHttp.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 
@@ -21,7 +22,6 @@
 /// <reference path="../common/Watchable.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/XDate.ts" />
-/// <reference path="../common/Log.ts" />
 /// <reference path="../common/LRU.ts" />
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
