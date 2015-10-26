@@ -103,6 +103,7 @@ module Esper.ApiT {
     uid: string;
     api_secret: string;
     is_admin: boolean;
+    is_alias: boolean;
     is_nylas: boolean;
     email: string;
     teams: Team[];

@@ -54,7 +54,7 @@ module Esper.Util {
   }
 
   /* Decode a string encode in hexadecimal */
-  export function hexDecode(hex) {
+  export function hexDecode(hex: string) {
     var s = "";
     for (var i = 0; i < hex.length; i += 2)
       s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
