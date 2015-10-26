@@ -9,6 +9,9 @@
 /// <reference path="../marten/typings/chrome/chrome.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
@@ -26,8 +29,6 @@
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/ReminderView.ts" />
-/// <reference path="../common/JsonHttp.ts" />
-/// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/Analytics.IS.ts" />

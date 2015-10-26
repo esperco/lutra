@@ -132,4 +132,9 @@ module Esper.Analytics {
       properties: properties || {}
     });
   }
+
+  // Call before doing something that might cause analytics to not get sent
+  export function flush(cb: (err: Error) => void): void {
+    analytics.flush(cb);
+  }
 }

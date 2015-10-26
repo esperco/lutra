@@ -4,8 +4,10 @@
   as required by gmail.js.
 */
 
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+
 /// <reference path="../common/Esper.ts" />
-/// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Analytics.IS.ts" />
 /// <reference path="../common/HostUrl.ts" />
@@ -32,7 +34,6 @@
 /// <reference path="../common/Preferences.ts" />
 /// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/TaskPreferences.ts" />
-/// <reference path="../common/JsonHttp.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="../common/Timezone.ts" />

@@ -1,5 +1,5 @@
-/// <reference path="./JsonHttp.ts" />
-/// <reference path="./ApiT.ts" />
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="./Login.ts" />
 
 module Esper.Api {
@@ -815,6 +815,6 @@ module Esper.Api {
   }
 
   export function init() {
-    esperVersion = "stoat-" + Conf.version;
+    JsonHttp.esperVersion = "stoat-" + Conf.version;
   }
 }
