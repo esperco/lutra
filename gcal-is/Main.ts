@@ -33,6 +33,7 @@
 /// <reference path="../common/Analytics.IS.ts" />
 
 /// <reference path="../common/Option.ts" />
+/// <reference path="../common/Team.ts" />
 /// <reference path="../common/TaskList.ts" />
 /// <reference path="../common/Agenda.ts" />
 /// <reference path="../common/Timezone.ts" />

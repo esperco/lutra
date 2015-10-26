@@ -176,6 +176,7 @@ module Esper.Init {
   export function init() {
     if (! alreadyInitialized) {
       Log.d("Init.init()");
+      Api.init();
       esperRootUrl = $("#esper-script").attr("data-root-url");
       alreadyInitialized = true;
       listenForMessages();

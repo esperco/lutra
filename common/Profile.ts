@@ -17,8 +17,7 @@ module Esper.Profile {
 
   export function getTeamProfiles(team: ApiT.Team):
   JQueryPromise<ApiT.Profile[]> {
-    var teamMembers = List.copy(team.team_assistants);
-    teamMembers.push(team.team_executive);
+    var teamMembers = Team.members(team);
     var l =
       List.map(teamMembers, function(uid) {
         return get(uid, team.teamid);

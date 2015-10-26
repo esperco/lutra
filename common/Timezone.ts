@@ -330,12 +330,13 @@ module Esper.Timezone {
   interface Dictionary {
     [index: string]: string;
   }
-  var idOfValue: Dictionary;
-  var valueOfId: Dictionary;
-  var timezones: Bloodhound<string>;
+  export var idOfValue: Dictionary;
+  export var valueOfId: Dictionary;
+  export var timezones: Bloodhound<string>;
+  export var rawTimezoneValues: string[];
 
   export function init() {
-    var values: string[] = [];
+    rawTimezoneValues = [];
     valueOfId = {};
     idOfValue = {};
     List.iter(supportedTimezones, function(z) {
@@ -343,13 +344,13 @@ module Esper.Timezone {
       var offset = mom.format("Z"), abbr = mom.format("z");
       var value = "(GMT" + offset + ") " + z.name + " (" + abbr + ")";
 
-      values.push(value);
+      rawTimezoneValues.push(value);
       idOfValue[value] = z.id;
       valueOfId[z.id] = value;
     });
 
     timezones = new Esper.bloodhound({
-      local: function(){return values;},
+      local: function(){return rawTimezoneValues;},
       queryTokenizer: Esper.bloodhound.tokenizers.nonword,
       datumTokenizer: Esper.bloodhound.tokenizers.nonword
     });

@@ -14,6 +14,7 @@
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Lazy.ts" />
 /// <reference path="../common/Option.ts" />
+/// <reference path="../common/Team.ts" />
 /// <reference path="../common/EsperCache.ts" />
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Util.ts" />
