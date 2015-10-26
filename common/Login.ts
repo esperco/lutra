@@ -1,7 +1,5 @@
 /// <reference path="../marten/ts/ApiT.ts" />
-/// <reference path="./Watchable.ts" />
-/// <reference path="../marten/ts/Query.ts" />
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../marten/ts/Watchable.ts" />
 
 module Esper.Login {
   /* Cached UID and API secret and user ID.

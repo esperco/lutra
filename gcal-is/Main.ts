@@ -12,6 +12,7 @@
 /// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/JsonHttp.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../marten/ts/Watchable.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
@@ -19,7 +20,6 @@
 /// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
-/// <reference path="../common/Watchable.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/XDate.ts" />
 /// <reference path="../common/LRU.ts" />
