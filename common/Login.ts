@@ -1,5 +1,8 @@
+/// <reference path="../marten/typings/jquery/jquery.d.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="../marten/ts/Watchable.ts" />
+/// <reference path="../marten/ts/Login.ts" />
+/// <reference path="../common/Types.ts" />
 
 module Esper.Login {
   /* Cached UID and API secret and user ID.
@@ -81,16 +84,8 @@ module Esper.Login {
     undefined
   );
 
-  export function loggedIn() {
-    return watchableAccount.isValid();
-  }
-
   export function getAccount() {
     return watchableAccount.get();
-  }
-
-  export function getApiSecret(): string {
-    return getAccount().credentials.apiSecret;
   }
 
   function stringifyAccount(a: Types.Account) {
@@ -112,7 +107,10 @@ module Esper.Login {
       watchableAccount.set(account);
       watchableInfo.set(undefined);
       if (account && account.credentials) {
+        setCredentials(account.credentials.uid, account.credentials.apiSecret);
         getLoginInfo();
+      } else {
+        unsetCredentials();
       }
     }
   }
@@ -122,14 +120,6 @@ module Esper.Login {
       Log.d("We are logged in as " + myGoogleAccountId() + ".");
     } else {
       Log.d("We are not logged in");
-    }
-  }
-
-  export function myUid() {
-    if (loggedIn()) {
-      return getAccount().credentials.uid;
-    } else {
-      return;
     }
   }
 
