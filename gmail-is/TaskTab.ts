@@ -249,12 +249,14 @@ module Esper.TaskTab {
     taskTab.linkedThreadsList.hide();
     return Api.getTaskForThread(team.teamid, threadId, false, true)
       .done(function(task) {
-        displayLinkedThreadsList(task, threadId, taskTab);
-        if ((task.task_threads.length > 1 &&
-                  taskTab.showLinkedThreads.text() === "Show") ||
-                  (task.task_threads.length <= 1 &&
-                  taskTab.showLinkedThreads.text() === "Hide")) {
-          taskTab.showLinkedThreads.click();
+        if (task !== undefined) {
+          displayLinkedThreadsList(task, threadId, taskTab);
+          if ((task.task_threads.length > 1 &&
+                    taskTab.showLinkedThreads.text() === "Show") ||
+                    (task.task_threads.length <= 1 &&
+                    taskTab.showLinkedThreads.text() === "Hide")) {
+            taskTab.showLinkedThreads.click();
+          }
         }
       })
       .always(function() {
@@ -304,7 +306,7 @@ module Esper.TaskTab {
       });
   }
 
-  function selectMeetingTypeOnUserTab(meetingType : string,
+  export function selectMeetingTypeOnUserTab(meetingType : string,
                                       userTabContent : UserTab.UserTabView)
   : void {
     userTabContent.meetingSelector.find(".extra").remove();
@@ -1150,7 +1152,7 @@ module Esper.TaskTab {
 
     linkEmail.click(function() {
       var searchModal =
-        GmailSearch.viewOfSearchModal(team, threadId, taskTabView);
+        GmailSearch.viewOfSearchModal(team, threadId, taskTabView, userTabContent);
       $("body").append(searchModal.view);
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);

@@ -14,7 +14,7 @@ module Esper.GmailSearch {
   }
 
   function renderSearchResult(e: ApiT.EmailThread, task: ApiT.Task,
-                              team: ApiT.Team, threadId: string, eventsTab) {
+                              team: ApiT.Team, threadId: string, eventsTab, userTab) {
     Log.d("renderSearchResult()");
 '''
 <div #view class="esper-bs">
@@ -49,7 +49,37 @@ module Esper.GmailSearch {
       if (isChecked) {
         TaskTab.unlinkThread(task.task_teamid, task.taskid, searchThread);
       } else {
+        Api.getTaskForThread(team.teamid, searchThread, false, false)
+          .done(function(newTask) {
+            var newTaskId = newTask.taskid;
+            var currentTask = task;
+            var job;
+            if (currentTask !== undefined) {
+              job = Api.switchTaskForThread(team.teamid, threadId,
+                                            currentTask.taskid, newTaskId);
+              var meetingType = currentTask.task_meeting_type;
+              if (meetingType && !newTask.task_meeting_type) {
+                job.done(function() {
+                  return Api.setTaskMeetingType(newTaskId, meetingType);
+                });
+                newTask.task_meeting_type = meetingType;
+              }
+            } else {
+              job = Api.linkThreadToTask(team.teamid, threadId, newTaskId);
+            }
 
+            job.done(function() {
+              TaskTab.refreshTaskProgressSelection(team, threadId, eventsTab);
+              TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+              TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
+            });
+
+            CurrentThread.setTask(newTask);
+            eventsTab.taskTitle.val(newTask.task_title);
+            TaskTab.selectMeetingTypeOnUserTab(newTask.task_meeting_type,
+                                               userTab);
+            Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
+          });
       }
     });
 
@@ -60,7 +90,8 @@ module Esper.GmailSearch {
   function setupSearch(team: ApiT.Team,
                        threadId: string,
                        searchView: SearchView,
-                       eventsTab: TaskTab.TaskTabView) {
+                       eventsTab: TaskTab.TaskTabView,
+                       userTab) {
     Util.afterTyping(searchView.search, 250, function() {
       searchView.results.find(".esper-bs").remove();
       if (searchView.search.val().trim() === "") {
@@ -90,7 +121,7 @@ module Esper.GmailSearch {
 
                 results.threads.forEach(function(e) {
                   if (threadId !== e.gmail_thrid) {
-                    renderSearchResult(e, task, team, threadId, eventsTab)
+                    renderSearchResult(e, task, team, threadId, eventsTab, userTab)
                       .appendTo(searchView.results);
                   }
                 });
@@ -122,7 +153,8 @@ module Esper.GmailSearch {
   }
 
   export function viewOfSearchModal(team, threadId,
-                                  eventsTab: TaskTab.TaskTabView) {
+                                  eventsTab: TaskTab.TaskTabView,
+                                  userTabContents) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-search-modal esper-modal-flexbox">
@@ -156,7 +188,7 @@ module Esper.GmailSearch {
 '''
     var searchView = <SearchView> _view;
 
-    setupSearch(team, threadId, searchView, eventsTab);
+    setupSearch(team, threadId, searchView, eventsTab, userTabContents);
 
     search.css(
       "background",
