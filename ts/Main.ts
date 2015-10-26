@@ -56,7 +56,7 @@ module Esper.Main {
   function main() {
     Analytics.init();
     Svg.init();
-    Login.initLoginInfo();
+    Login.initCredentials();
     Route.setup();
     Status.init();
     Pay.init();
