@@ -2,6 +2,7 @@ In most cases, HoneyBadger doesn't care. In this case, this directory contains
 the files to run the front-end Esper website (including our jobs page,
 privacy policy, contact us, etc.)
 
+![Honey badger](https://c1.staticflickr.com/3/2814/9658682358_f52236c48c.jpg)
 
 Prerequisites
 -------------
