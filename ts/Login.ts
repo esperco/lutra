@@ -15,6 +15,7 @@ module Esper.Login {
   interface StoredCredentials {
     uid: string;
     api_secret: string;
+    email: string;
   }
 
   /*
@@ -67,7 +68,8 @@ module Esper.Login {
     setCredentials(data.uid, data.api_secret);
     var stored: StoredCredentials = {
       uid: data.uid,
-      api_secret: data.api_secret
+      api_secret: data.api_secret,
+      email: data.email
     };
     Store.set("login", stored);
     postCredentials();
