@@ -19,14 +19,14 @@ module Esper.Login {
   }
 
   export function myUid(): string {
-    return credentials.uid;
+    return credentials && credentials.uid;
   }
 
   // Alias to myUid used in Otter
   export var me = myUid;
 
   export function getApiSecret(): string {
-    return credentials.apiSecret;
+    return credentials && credentials.apiSecret;
   }
 
   export function setCredentials(uid: string, secret: string) {
