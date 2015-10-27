@@ -6,6 +6,8 @@
 */
 
 /// <reference path="../typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="./Log.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.JsonHttp {
@@ -25,8 +27,8 @@ module Esper.JsonHttp {
   /* The version needs to be set by the application, e.g. stoat-1.2.3 */
   export var esperVersion: string;
 
-  function setHttpHeaders(path) {
-    return function(jqXHR) {
+  function setHttpHeaders(path: string) {
+    return function(jqXHR: JQueryXHR) {
       if (Login.loggedIn()) {
         var unixTime = Math.round(Date.now()/1000).toString();
         var apiSecret = Login.getApiSecret();
@@ -85,7 +87,7 @@ module Esper.JsonHttp {
             truncatedBody);
     }
 
-    function logError(xhr, textStatus, err) {
+    function logError(xhr: JQueryXHR, textStatus: string, err: Error) {
       var details = {
         code: xhr.status,
         textStatus: textStatus,
@@ -142,8 +144,8 @@ module Esper.JsonHttp {
   /** Executes an HTTP request using our standard authentication and
    *  error handling and a JSON content type.
    */
-  function jsonHttp(method,
-                    path,
+  function jsonHttp(method: string,
+                    path: string,
                     body?: string,
                     dataType = "json",
                     contentType?: string) {
@@ -154,25 +156,25 @@ module Esper.JsonHttp {
     return httpRequest(method, path, body, dataType, contentType);
   }
 
-  export function get(path, dataType?: string) {
+  export function get(path: string, dataType?: string) {
     return jsonHttp("GET", path, null, dataType);
   }
 
-  export function post(path,
+  export function post(path: string,
                        body?: string,
                        dataType?: string,
                        contentType?: string) {
     return jsonHttp("POST", path, body, dataType, contentType);
   }
 
-  export function put(path,
+  export function put(path: string,
                       body?: string,
                       dataType?: string,
                       contentType?: string) {
     return jsonHttp("PUT", path, body, dataType, contentType);
   }
 
-  export function delete_(path, dataType?: string) {
+  export function delete_(path: string, dataType?: string) {
     return jsonHttp("DELETE", path, null, dataType);
   }
 
@@ -180,7 +182,7 @@ module Esper.JsonHttp {
     ["foo=123", "bar=abc"] -> "?foo=123&bar=abc"
     [] -> ""
   */
-  export function makeQuery(argArray) {
+  export function makeQuery(argArray: string[]) {
     var s = argArray.join("&");
     if (argArray.length > 0) {
       s = "?" + s;
@@ -190,7 +192,7 @@ module Esper.JsonHttp {
 
   // Calls a function, but API calls within that call don't have the error
   // banner popping up -- use for custom error handling.
-  export function noWarn(callable) {
+  export function noWarn(callable: () => JQueryPromise<any>) {
     suppressWarnings = true;
     let ret = callable();
     suppressWarnings = false;

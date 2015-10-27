@@ -132,6 +132,20 @@ type token_response = [
 ]
 */
 
+  export interface InviteCreateTeam {
+    from_uid: string;
+    from_name?: string;
+    from_email?: string;
+    personal_message?: string;
+    expires?: string;
+  }
+
+  export interface InviteJoinTeam extends InviteCreateTeam {
+    teamid: string;
+    role: string;
+    force_email?: string;
+  }
+
   export interface GoogleAuthInfo {
     has_token: boolean;
     is_assistant: boolean;
@@ -268,12 +282,12 @@ type token_response = [
   }
 
   export interface Preferences {
-    uid: string;
-    teamid: string;
-    workplaces: Workplace[];
-    transportation: string[];
+    uid?: string;
+    teamid?: string;
+    workplaces?: Workplace[];
+    transportation?: string[];
     meeting_types: MeetingTypes;
-    email_types?: EmailTypes;
+    email_types: EmailTypes;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
@@ -353,7 +367,7 @@ type token_response = [
 
   export interface HourMinute {
     hour : number; /* 0 to 23 */
-    minute: string;
+    minute: number;
   }
 
   export interface Availability {
@@ -378,7 +392,9 @@ type token_response = [
     enabled: boolean;
     recipients: string[];
     send_time: HourMinute;
-    day_of?: Boolean;
+    day_of?: boolean;
+    html_format?: boolean;
+    include_task_notes?: boolean;
   }
 
   export interface GeneralPrefs {
@@ -647,8 +663,8 @@ type token_response = [
     static no    = "no";
     static maybe = "maybe";
 
-    static next(current) {
-      var availabilities = ["yes", "no", "maybe"];
+    static next(current: string) {
+      var availabilities: string[] = ["yes", "no", "maybe"];
       var nextIndex = availabilities.indexOf(current) + 1;
 
       return availabilities[nextIndex % availabilities.length];
