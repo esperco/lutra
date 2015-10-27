@@ -891,7 +891,7 @@ module Esper.Api {
 
   export function getTaskPage(url: string):
   JQueryPromise<ApiT.TaskList> {
-    return JsonHttp.get(prefix + url);
+    return JsonHttp.get(url);
   }
 
   export function getTaskList(teamid: string,
