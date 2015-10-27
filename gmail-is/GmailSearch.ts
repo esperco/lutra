@@ -92,7 +92,6 @@ module Esper.GmailSearch {
                        eventsTab: TaskTab.TaskTabView,
                        userTab) {
     Util.afterTyping(searchView.search, 250, function() {
-      searchView.results.find(".esper-bs").remove();
       if (searchView.search.val().trim() === "") {
         searchView.resultsDropdown.hide();
         if (searchView.resultsDropdown.hasClass("esper-open")) {
@@ -115,6 +114,7 @@ module Esper.GmailSearch {
                 var last = false;
 
                 searchView.spinner.hide();
+                searchView.results.find(".esper-bs").remove();
 
                 results.items.forEach(function(e) {
                   if (threadId !== e.gmail_thrid) {
