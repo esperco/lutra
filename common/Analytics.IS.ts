@@ -3,9 +3,9 @@
   and is used mostly to post event-tracking messages to the content script.
 */
 
+/// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="./Analytics.ts" />
 /// <reference path="./Message.ts" />
-/// <reference path="./ApiT.ts" />
 
 module Esper.Analytics {
   export function track(event: Trackable, properties?: Object) {

@@ -11,6 +11,8 @@
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 /// <reference path="../marten/typings/quill/quill.d.ts" />
 
+/// <reference path="../marten/ts/Log.ts" />
+
 /// <reference path="../common/Analytics.Chrome.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
@@ -19,7 +21,6 @@
 /// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
-/// <reference path="../common/Log.ts" />
 /// <reference path="../common/LRU.ts" />
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
