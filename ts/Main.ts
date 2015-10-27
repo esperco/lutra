@@ -9,13 +9,13 @@
 /// <reference path="../marten/ts/JsonHttp.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="../marten/ts/Api.ts" />
+/// <reference path="../marten/ts/XDate.ts" />
 
 /// <reference path="Test.ts"/>
 /// <reference path="List.ts"/>
 /// <reference path="Analytics.ts"/>
 /// <reference path="Deferred.ts"/>
 /// <reference path="Promise.ts"/>
-/// <reference path="XDate.ts"/>
 /// <reference path="Util.ts"/>
 /// <reference path="GmailCompose.ts"/>
 /// <reference path="Pay.ts"/>
