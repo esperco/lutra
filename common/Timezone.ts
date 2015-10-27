@@ -330,10 +330,10 @@ module Esper.Timezone {
   interface Dictionary {
     [index: string]: string;
   }
-  export var idOfValue: Dictionary;
-  export var valueOfId: Dictionary;
-  export var timezones: Bloodhound<string>;
-  export var rawTimezoneValues: string[];
+  var idOfValue: Dictionary;
+  var valueOfId: Dictionary;
+  var timezones: Bloodhound<string>;
+  var rawTimezoneValues: string[];
 
   export function init() {
     rawTimezoneValues = [];
@@ -353,6 +353,19 @@ module Esper.Timezone {
       local: function(){return rawTimezoneValues;},
       queryTokenizer: Esper.bloodhound.tokenizers.nonword,
       datumTokenizer: Esper.bloodhound.tokenizers.nonword
+    });
+  }
+
+  export function appendDropdownMenu(parent: JQuery,
+                                     id: string,
+                                     selected: string,
+                                     onSelect?: () => void) {
+    parent.renderReact(Dropdown.Menu, {
+      id: id,
+      dataEngine: timezones,
+      initialData: rawTimezoneValues,
+      selectedOption: valueOfId[selected],
+      onSelect: onSelect
     });
   }
 
@@ -380,6 +393,14 @@ module Esper.Timezone {
     }
 
     return selector;
+  }
+
+  export function getValueFromId(id: string) {
+    return valueOfId[id];
+  }
+
+  export function getIdFromValue(value: string) {
+    return idOfValue[value];
   }
 
   export function selectedTimezone(selector) {

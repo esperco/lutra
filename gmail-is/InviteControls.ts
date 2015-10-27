@@ -897,14 +897,21 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
                                      checked?: boolean) {
 '''
 <li #viewPerson class="list-group-item">
-  <div class="row clearfix">
+  <div class="row clearfix esper-bs">
     <label class="col-xs-12 col-lg-6 inline-form-text" #labelPerson>
       <input #checkPerson type="checkbox"/>
     </label>
-    <div #tzSelectDiv class="col-xs-12 col-lg-6" />
+    <div #tzSelectDiv class="col-xs-12 col-lg-6 dropdown esper-dropdown">
+      <button #tzSelectButton class="btn btn-default esper-dropdown-toggle" data-toggle="dropdown">
+        <span #tzSelectValue />
+        <i class="fa fa-chevron-down" />
+      </button>
+      <div #tzSelectMenu class="dropdown-menu esper-dropdown-select" />
+    </div>
   </div>
 </li>
 '''
+    tzSelectButton.dropdown();
     var display = 0 < name.length ? name + " <" + email + ">" : email;
     // createTextNode escapes the text, preventing potential injection attacks
     labelPerson.append(document.createTextNode(display));
@@ -923,23 +930,28 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       // do nothing if the guest is already correctly included or not
     });
 
-    var tzSel = Timezone.appendTimezoneSelector(tzSelectDiv, tz);
-    tzSel.bind("typeahead:change", function() {
-      var tz = Timezone.selectedTimezone(tzSel);
-      var pref : ApiT.GuestPreferences = {
-        taskid: taskPrefs.taskid,
-        email: email,
-        timezone: tz
-      };
+    tzSelectValue.text(Timezone.getValueFromId(tz));
+    Timezone.appendDropdownMenu(tzSelectMenu,
+      "invite-" + email + "-timezone",
+      tz,
+      function() {
+        var tzVal = (<Dropdown.Menu> tzSelectMenu.reactComponent()).getSelectedOption();
+        var tz = Timezone.getIdFromValue(tzVal);
+        tzSelectValue.text(tzVal);
+        var pref : ApiT.GuestPreferences = {
+          taskid: taskPrefs.taskid,
+          email: email,
+          timezone: tz
+        };
 
-      function sameEmail(g: ApiT.GuestPreferences) { return g.email === email; }
-      var guestPrefs =
-        List.exists(taskPrefs.guest_preferences, sameEmail) ?
-        List.replace(taskPrefs.guest_preferences, pref, sameEmail) :
-        taskPrefs.guest_preferences.concat([pref]);
+        function sameEmail(g: ApiT.GuestPreferences) { return g.email === email; }
+        var guestPrefs =
+          List.exists(taskPrefs.guest_preferences, sameEmail) ?
+          List.replace(taskPrefs.guest_preferences, pref, sameEmail) :
+          taskPrefs.guest_preferences.concat([pref]);
 
-      taskPrefs.guest_preferences = guestPrefs;
-      Api.putTaskPrefs(taskPrefs);
+        taskPrefs.guest_preferences = guestPrefs;
+        Api.putTaskPrefs(taskPrefs);
     });
 
     return viewPerson;

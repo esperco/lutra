@@ -32,6 +32,10 @@ module Esper.XDate {
     return d.getUTCDate();
   }
 
+  export function localDay(d : Date) : number {
+    return d.getDate();
+  }
+
   /* 0-23 */
   export function hours(d : Date) : number {
     return d.getUTCHours();
@@ -89,6 +93,10 @@ module Esper.XDate {
     return fullMonths[d.getUTCMonth()];
   }
 
+  export function localFullMonth(d : Date) : string {
+    return fullMonths[d.getMonth()];
+  }
+
   /* "Aug 13" */
   export function dateOnlyWithoutYear(d : Date) : string {
     return month(d)
@@ -111,6 +119,10 @@ module Esper.XDate {
 
   export function fullMonthDay(d : Date) : string {
     return fullMonth(d) + " " + day(d).toString();
+  }
+
+  export function localFullMonthDay(d : Date) : string {
+    return localFullMonth(d) + " " + localDay(d).toString();
   }
 
   /* "1:30pm" */
@@ -139,6 +151,10 @@ module Esper.XDate {
     return formatTimeOnly(hours(d), minutes(d), true);
   }
 
+  export function localShortTimeOnly(d: Date): string {
+    return formatTimeOnly(d.getHours(), d.getMinutes(), true);
+  }
+
   export function utcToLocalTimeOnly(d : Date) : string {
     return formatTimeOnly(d.getHours(), d.getMinutes(), false);
   }
@@ -159,6 +175,15 @@ module Esper.XDate {
       t1 = t1.slice(0, -2);
     }
     return fullMonthDay(d1) + ", " + t1 + "-" + t2;
+  }
+
+  export function localRange(d1: Date, d2: Date): string {
+    var t1 = localShortTimeOnly(d1);
+    var t2 = localShortTimeOnly(d2);
+    if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
+      t1 = t1.slice(0, -2);
+    }
+    return localFullMonthDay(d1) + ", " + t1 + "-" + t2;
   }
 
   /* "12:30pm to 1:30 pm" */
