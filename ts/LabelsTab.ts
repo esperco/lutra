@@ -59,8 +59,7 @@ module Esper.LabelsTab {
       save.hide();
       save.prop("disabled", true);
       newLabel.prop("disabled", true);
-      var labels = newLabel.val() || "";
-      labels = labels.split(",");
+      var labels = (newLabel.val() || "").split(",");
       Api.getSyncedLabels(team.teamid).done(function(response) {
         _.each(labels, function(label: string) {
           label = label.trim();

@@ -90,16 +90,6 @@ module Esper.Page {
     }
   }
 
-  export var preferences : Loadable = {
-    load: function() {
-      pageSelector.hideAll();
-      showPage("preferences");
-      Log.d("Loaded executive preferences!");
-      ExecutivePreferences.load();
-      Util.focus();
-    }
-  }
-
   export var usagePeriod : Loadable = {
     load: function(teamid, periodStart) {
       pageSelector.hideAll();

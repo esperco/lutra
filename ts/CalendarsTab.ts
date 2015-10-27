@@ -172,7 +172,7 @@ module Esper.CalendarsTab {
         var teamCalendars = List.map(uniqueCalIDs, function(calID) {
           return calData[calID];
         });
-        Api.putTeamCalendars(team.teamid, { calendars: teamCalendars })
+        Api.putTeamCalendars(team.teamid, teamCalendars)
           .done(function() {
             Route.nav.path("team-settings/" + team.teamid + "/calendars");
             window.location.reload();
@@ -262,7 +262,7 @@ module Esper.CalendarsTab {
 
     return Deferred.join(calls)
       .then(function() {
-        return Api.putTeamCalendars(team.teamid, { calendars: teamCals });
+        return Api.putTeamCalendars(team.teamid, teamCals);
       });
   }
 

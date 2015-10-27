@@ -99,7 +99,7 @@ module Esper.PreferencesTab {
     };
   }
 
-  function readEmailPrefs(li) {
+  function readEmailPrefs(li): ApiT.EmailPref {
     var sendTo = [];
     li.find(".esper-preference-check").each(function() {
       var email = $(this);
@@ -114,7 +114,7 @@ module Esper.PreferencesTab {
     return {
       enabled: li.find("div.preference-toggle-switch").hasClass("on"),
       recipients: sendTo,
-      send_time: { hour: parseInt(sendTime), minute: "0" },
+      send_time: { hour: parseInt(sendTime), minute: 0 },
       day_of: dayOf,
       html_format: format,
       include_task_notes: includeTaskNotes
@@ -155,7 +155,7 @@ module Esper.PreferencesTab {
     };
   }
 
-  export function currentPreferences() {
+  export function currentPreferences(): ApiT.Preferences {
     var workplaces = [];
     $(".esper-prefs-workplaces").find("li.workplace").each(function() {
       var workplace = readWorkplace($(this));
@@ -170,20 +170,18 @@ module Esper.PreferencesTab {
         transportation.push(kids.eq(1).text());
     });
 
-    var meeting_types = {};
-    meeting_types["phone_call"] =
-      readPhonePrefs($(".esper-prefs-phone").eq(0));
-    meeting_types["video_call"] =
-      readVideoPrefs($(".esper-prefs-video").eq(0));
+    var meeting_types = {
+      phone_call: readPhonePrefs($(".esper-prefs-phone").eq(0)),
+      video_call: readVideoPrefs($(".esper-prefs-video").eq(0))
+    };
     Preferences.meals.forEach(function(meal) {
       meeting_types[meal] = readMealPrefs($(".esper-prefs-" + meal).eq(0));
     });
 
-    var email_types = {};
-    email_types["daily_agenda"] =
-      readEmailPrefs($(".esper-prefs-daily-agenda").eq(0));
-    email_types["tasks_update"] =
-      readEmailPrefs($(".esper-prefs-tasks-update").eq(0));
+    var email_types = {
+      daily_agenda: readEmailPrefs($(".esper-prefs-daily-agenda").eq(0)),
+      tasks_update: readEmailPrefs($(".esper-prefs-tasks-update").eq(0))
+    };
 
     var general = readGeneralPrefs($(".esper-prefs-general").eq(0));
 
@@ -234,11 +232,10 @@ module Esper.PreferencesTab {
   }
 
   export function currentEmailTypes() {
-    var email_types = {};
-    email_types["daily_agenda"] =
-      readEmailPrefs($(".esper-prefs-daily-agenda").eq(0));
-    email_types["tasks_update"] =
-      readEmailPrefs($(".esper-prefs-tasks-update").eq(0));
+    var email_types = {
+      daily_agenda: readEmailPrefs($(".esper-prefs-daily-agenda").eq(0)),
+      tasks_update: readEmailPrefs($(".esper-prefs-tasks-update").eq(0))
+    };
     return email_types;
   }
 

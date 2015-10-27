@@ -25,7 +25,7 @@ module Esper.Login {
   export function initCredentials() {
     var stored: StoredCredentials = Store.get("login");
     if (stored && stored.uid && stored.api_secret) {  // sanity check
-      setCredentials(data.uid, data.api_secret);
+      setCredentials(stored.uid, stored.api_secret);
     } else {
       Store.remove("login");
     }
