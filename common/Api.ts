@@ -815,6 +815,6 @@ module Esper.Api {
   }
 
   export function init() {
-    esperVersion = "stoat-" + Conf.version;
+    JsonHttp.esperVersion = "stoat-" + Conf.version;
   }
 }
