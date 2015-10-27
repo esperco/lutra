@@ -8,6 +8,7 @@
 /// <reference path="../marten/ts/JsonHttp.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="../marten/ts/Watchable.ts" />
+/// <reference path="../marten/ts/XDate.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/Api.ts" />
@@ -23,7 +24,6 @@
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Util.ts" />
 /// <reference path="../common/Promise.ts" />
-/// <reference path="../common/XDate.ts" />
 /// <reference path="../common/LRU.ts" />
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
