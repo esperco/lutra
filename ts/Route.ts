@@ -157,10 +157,6 @@ module Esper.Route {
       });
     },
 
-    "preferences" : function (data) {
-      withLogin(Page.preferences.load);
-    },
-
     "usage-period/:teamid/:start" : function (data) {
       withLogin(function() {
         Page.usagePeriod.load(data.teamid, data.start);

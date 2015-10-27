@@ -331,7 +331,6 @@ module Esper.Settings {
     if (teams.length === 1 && firstTime) {
       firstTime = false;
       if (teams[0]) {
-        Login.setTeam(teams[0]);
         Route.nav.path("team-settings/" + teams[0].teamid);
       }
     }

@@ -2,31 +2,39 @@
   Login and team management
 */
 
+/// <reference path="../marten/ts/Login.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="./Store.ts" />
+/// <reference path="./Util.ts" />
+
 module Esper.Login {
 
-  export var data : any = {}; // FIXME
+  // Cache for later use
+  export var data: ApiT.LoginResponse;
 
-  export function loggedIn(): boolean {
-    return data && data.uid;
+  interface StoredCredentials {
+    uid: string;
+    api_secret: string;
   }
 
-  export function getApiSecret(): string {
-    return data.api_secret;
-  }
-
-  export function initLoginInfo() {
-    var stored = Store.get("login");
-
-    if (stored && stored.uid) // sanity check
-      data = stored;
-    else
+  /*
+    Retrieve credentials from localStorage -- we only need credentials, not
+    the rest of the login_response (which we should refetch on login to
+    ensure up-to-date data).
+  */
+  export function initCredentials() {
+    var stored: StoredCredentials = Store.get("login");
+    if (stored && stored.uid && stored.api_secret) {  // sanity check
+      setCredentials(stored.uid, stored.api_secret);
+    } else {
       Store.remove("login");
+    }
   };
 
   /* Pass UID and API secret to the Esper extension */
-  function postLoginInfo() {
+  function postCredentials() {
     var x = data;
-    Log.d("postLoginInfo:", x);
+    Log.d("postCredentials:", x);
     if (Util.isDefined(x)
         && Util.isDefined(x.api_secret)
         && Util.isDefined(x.uid)) {
@@ -53,23 +61,20 @@ module Esper.Login {
     }
   }
 
-  export function setLoginInfo(stored) {
-    if (!Util.isDefined(stored.team) && Util.isDefined(stored.teams[0]))
-      stored.team = stored.teams[0];
-
+  export function setLoginInfo(info: ApiT.LoginResponse) {
     // Persistent storage never sent to the server
+    data = info;
+    setCredentials(data.uid, data.api_secret);
+    var stored: StoredCredentials = {
+      uid: data.uid,
+      api_secret: data.api_secret
+    };
     Store.set("login", stored);
-    data = stored;
-    postLoginInfo();
+    postCredentials();
 
     // Identify in analytics
     Analytics.identify();
   };
-
-  function saveLoginInfo() {
-    var stored = data;
-    Store.set("login", stored);
-  }
 
   export function clearLoginInfo() {
     var esperMessage = {
@@ -81,7 +86,8 @@ module Esper.Login {
     window.postMessage(esperMessage, "*");
 
     Store.remove("login");
-    delete data;
+    data = undefined;
+    unsetCredentials();
 
     // This will clear analytics tracking identity as appropriate
     Analytics.identify();
@@ -106,13 +112,6 @@ module Esper.Login {
   };
 
   /* Utilities */
-  export function me() {
-    if (Util.isDefined(data))
-      return data.uid;
-    else
-      return;
-  };
-
   export function isAdmin() {
     if (Util.isDefined(data))
       return data.is_admin === true;
@@ -155,29 +154,6 @@ module Esper.Login {
       return data.teams;
     else
       return [];
-  };
-
-  export function getTeam(): ApiT.Team {
-    if (Util.isDefined(data))
-      return data.team;
-  };
-
-  export function setTeam(team) {
-    data.team = team;
-    saveLoginInfo();
-  };
-
-  export function organizers() {
-    return getTeam().team_assistants;
-  };
-
-  export function leader() {
-    return getTeam().team_executive;
-  };
-
-  export function init() {
-    initLoginInfo();
-    postLoginInfo();
   };
 
 }

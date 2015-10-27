@@ -4,11 +4,15 @@
 
 /* Main modules */
 
+/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="../marten/ts/Watchable.ts" />
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../marten/ts/Api.ts" />
+
 /// <reference path="Test.ts"/>
 /// <reference path="List.ts"/>
 /// <reference path="Analytics.ts"/>
-/// <reference path="Watchable.ts"/>
-/// <reference path="Log.ts"/>
 /// <reference path="Deferred.ts"/>
 /// <reference path="Promise.ts"/>
 /// <reference path="XDate.ts"/>
@@ -16,16 +20,12 @@
 /// <reference path="GmailCompose.ts"/>
 /// <reference path="Pay.ts"/>
 /// <reference path="Status.ts"/>
-/// <reference path="Unixtime.ts"/>
 /// <reference path="Cache.ts"/>
 /// <reference path="Svg.ts"/>
 /// <reference path="Show.ts"/>
 /// <reference path="Store.ts"/>
 /// <reference path="ParseUrl.ts"/>
 /// <reference path="Login.ts"/>
-/// <reference path="ApiT.ts"/>
-/// <reference path="JsonHttp.ts"/>
-/// <reference path="Api.ts"/>
 /// <reference path="CalPicker.ts"/>
 /// <reference path="Settings.ts"/>
 /// <reference path="Signin.ts"/>
@@ -38,7 +38,6 @@
 /// <reference path="WorkflowsTab.ts"/>
 /// <reference path="CalendarsTab.ts"/>
 /// <reference path="LabelsTab.ts"/>
-/// <reference path="ExecutivePreferences.ts"/>
 /// <reference path="UsageTab.ts"/>
 /// <reference path="AboutTab.ts"/>
 /// <reference path="TemplateTab.ts"/>
@@ -55,7 +54,7 @@ module Esper.Main {
   function main() {
     Analytics.init();
     Svg.init();
-    Login.initLoginInfo();
+    Login.initCredentials();
     Route.setup();
     Status.init();
     Pay.init();
