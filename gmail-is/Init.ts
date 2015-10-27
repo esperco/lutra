@@ -131,7 +131,6 @@ module Esper.Init {
       listenForMessages();
       obtainCredentials();
       Inactivity.init();
-      ObserveMessage.init();
       ExtensionOptions.init();
       ThreadState.init();
       Timezone.init();
