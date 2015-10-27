@@ -26,7 +26,7 @@ module Esper.GmailSearch {
   </div>
 </div>
 '''
-    var isChecked;
+
     var searchThread = e.gmail_thrid;
     info.html("<b>" + e.subject + "</b> - " + e.snippet);
 
@@ -40,14 +40,13 @@ module Esper.GmailSearch {
       List.iter(task.task_threads || [], function(thread: ApiT.EmailThread) {
         if (thread.gmail_thrid === searchThread) {
           (<HTMLInputElement>link[0]).checked = true;
-          isChecked = true;
         }
       });
     }
 
     link.click(function(e) {
-      if (isChecked) {
-        TaskTab.unlinkThread(task.task_teamid, task.taskid, searchThread);
+      if (!link.is(":checked")) {
+        TaskTab.unlinkThread(team.teamid, task.taskid, searchThread);
       } else {
         Api.getTaskForThread(team.teamid, searchThread, false, false)
           .done(function(newTask) {
@@ -111,8 +110,6 @@ module Esper.GmailSearch {
           .done(function(task) {
             Api.emailSearch(team.teamid, searchView.search.val())
               .done(function(results) {
-                console.error("STOP");
-                console.log(results);
                 var numResults = results.items.length;
                 var i = 0;
                 var last = false;
