@@ -27,6 +27,36 @@ module Esper.Login {
     }
   };
 
+  /* Pass UID and API secret to the Esper extension */
+  function postCredentials() {
+    var x = data;
+    Log.d("postCredentials:", x);
+    if (Util.isDefined(x)
+      && Util.isDefined(x.api_secret)
+      && Util.isDefined(x.uid)) {
+      var esperMessage = {
+        sender: "Esper",
+        type: "Account",
+        value: {
+          googleAccountId: x.email,
+          credentials: {
+            apiSecret: x.api_secret,
+            uid: x.uid
+          },
+          declined: false
+        }
+      };
+      Log.d("esperMessage:", esperMessage);
+
+      Log.d("sending message using window.postMessage");
+
+      // Post only to same domain (this is readable by the Chrome Extension
+      // but not by a hostile iFrame)
+      var target = window.location.protocol + "//" + window.location.host;
+      window.postMessage(esperMessage, target);
+    }
+  }
+
   export function setLoginInfo(info: ApiT.LoginResponse) {
     // Persistent storage never sent to the server
     data = info;
@@ -37,7 +67,7 @@ module Esper.Login {
       email: data.email
     };
     Store.set(storedLoginKey, stored);
-    postCredentials(stored);
+    postCredentials();
 
     // Identify in analytics
     Analytics.identify();

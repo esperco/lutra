@@ -40,6 +40,20 @@ module.exports = {
 
     // Preprocess with Oblivion?
     oblivion: true
+  },
+
+  // Config for simple script to post localStorage credentials to window
+  {
+    compilerOptions: {
+      noImplicitAny: true,
+      jsx: "react"
+    },
+    globs: ["marten/typings/**/*.d.ts", "marten/ts/**/*.{ts,tsx}",
+            "ts/*.{ts,tsx}"],
+    devIn: ["ts/Login.Post.Dev.ts"],
+    prodIn: ["ts/Login.Post.Prod.ts"],
+    out: "js/login.js",
+    oblivion: false
   }],
 
   // Path to oblivion executable for pre-processing TS files. Oblivion is not
