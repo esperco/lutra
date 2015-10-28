@@ -8,11 +8,13 @@
 */
 module Esper.Login {
 
-  // Actual variable storing everything
-  export var credentials: {
+  export interface Credentials {
     uid: string;
     apiSecret: string;
-  };
+  }
+
+  // Actual variable storing everything
+  export var credentials: Credentials;
 
   export function loggedIn(): boolean {
     return !!(credentials && credentials.uid);
