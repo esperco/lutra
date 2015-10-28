@@ -23,12 +23,25 @@ module Esper.GmailSearch {
       <input #link type="checkbox" aria-label="...">
     </span>
     <div #info class="form-control esper-gmail-search-result" aria-label="..." readonly>
+      <object #logo class="esper-email-logo"/>
+    </div>
   </div>
 </div>
 '''
 
+    var newTask;
     var searchThread = e.gmail_thrid;
-    info.html("<b>" + e.subject + "</b> - " + e.snippet);
+
+    Api.getTaskForThread(team.teamid, searchThread, false, false)
+      .done(function(existingTask) {
+        if (existingTask !== undefined) {
+          logo.attr("data", Init.esperRootUrl + "img/menu-logo-purple.svg");
+        } else {
+          logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
+        }
+        info.html(info.html() + "<b>" + e.subject + "</b> - " + e.snippet);
+        newTask = existingTask;
+      });
 
     var url = window.location.origin + window.location.pathname + "#all/" + searchThread;
     info.click(function(e) {
