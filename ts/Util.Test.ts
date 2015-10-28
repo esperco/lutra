@@ -1,3 +1,4 @@
+/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Util.ts"/>
 module Esper.Util {
 
@@ -25,6 +26,12 @@ module Esper.Util {
         var o: any = deepFreeze({ x: {y: 5 }});
         o.x.z === 6;
         expect(o.x.z).toBeUndefined();
+      });
+
+      it("should not call isFrozen on non-objects", function() {
+        spyOn(Object, "isFrozen");
+        expect(deepFreeze(5)).toBe(5);
+        expect(Object.isFrozen).not.toHaveBeenCalled();
       });
     });
 

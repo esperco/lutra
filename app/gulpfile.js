@@ -52,7 +52,7 @@ gulp.task("build", gulp.parallel("build-vendor-once", buildBase));
 gulp.task("build-production", gulp.series("production", "build"));
 
 gulp.task("watch", gulp.series(
-  function(cb) { config.watchMode = true; cb(); }, "build",
+  function(cb) { config.watchMode = true; cb(); }, "rebuild",
   gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
                 "http-server", "live-reload")));
 
