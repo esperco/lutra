@@ -275,7 +275,7 @@ module Esper.Signin {
     Log.d(JSON.stringify(tokenDescription));
   }
 
-  function useInvite(inviteCode) {
+  function useInvite(inviteCode: string, landingUrl: string) {
     Log.d("useInvite");
     return Api.postToken(inviteCode)
       .then(
@@ -290,7 +290,7 @@ module Esper.Signin {
 
           // Show login data
           displayLoginLinks("Welcome to Esper! Please sign in.",
-            "#!", inviteCode, null);
+            landingUrl, inviteCode, null);
         },
         /* failure */
         function() {
@@ -300,10 +300,9 @@ module Esper.Signin {
       );
   }
 
-  function loginOrSignup(optEmail) {
+  function loginOrSignup(optEmail, landingUrl) {
     Log.d("loginOrSignup - " + optEmail);
     var uid = Login.me();
-    var landingUrl = location.hash;
     if (Util.isDefined(optEmail) && Login.myEmail() !== optEmail) {
       forceLogin(landingUrl, undefined, optEmail);
     } else if (Util.isDefined(uid)) {
@@ -355,17 +354,18 @@ module Esper.Signin {
 
   export function signin( whenDone?: { (): void },
                           optInviteCode?: string,
-                          optEmail?: string) {
+                          optEmail?: string,
+                          landingUrl?: string) {
     document.title = "Sign in - Esper";
+    landingUrl = landingUrl || location.hash;
     if (optInviteCode !== undefined) {
-      useInvite(optInviteCode);
+      useInvite(optInviteCode, landingUrl);
     } else {
-      var p = loginOrSignup(optEmail)
+      var p = loginOrSignup(optEmail, landingUrl)
       if (p) {
         p.done(function(ok) { // Logged in
           if (ok) {
-            var landingUrl = document.URL;
-            whenDone = whenDone || function() { };
+            whenDone = whenDone || function() { Route.nav.path(landingUrl); };
             if (Login.isNylas()) {
               whenDone();
             } else {

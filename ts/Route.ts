@@ -55,9 +55,15 @@ module Esper.Route {
     }
   ];
 
-  function withLogin(whenDone,
+  function withLogin(whenDone: () => void,
                      optInviteCode?: string,
-                     optEmail?: string) {
+                     optEmail?: string,
+                     landingUrl?: string) {
+    // Default whenDone to nav to landingUrl or home
+    whenDone = whenDone || function() {
+      Route.nav.path(landingUrl || "");
+    };
+
     // Wrap callback with any hooks
     function callback() {
       for (let i in postLoginHooks) {
@@ -69,7 +75,7 @@ module Esper.Route {
       }
       whenDone();
     }
-    Signin.signin(callback, optInviteCode, optEmail);
+    Signin.signin(callback, optInviteCode, optEmail, landingUrl);
   }
 
   function gotToken(token) {
@@ -98,18 +104,16 @@ module Esper.Route {
       }
     },
 
+    "login/:email" : function(data) {
+      withLogin(undefined, undefined, data.email, "#!");
+    },
+
     /*
       NB: Because of https://github.com/visionmedia/page.js/issues/187, you
       need to double-encode redirect.
     */
-    "login/:email/:redirect" : function(data) {
-      withLogin(function() {
-        nav.path(data.redirect);
-      }, undefined, data.email);
-    },
-
-    "login/:email" : function(data) {
-      withLogin(nav.home, undefined, data.email);
+    "login-redirect/:redirect": function(data) {
+      withLogin(undefined, undefined, undefined, data.redirect);
     },
 
     /* various pages */

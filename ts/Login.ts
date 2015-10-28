@@ -77,7 +77,7 @@ module Esper.Login {
     var esperMessage = {
       sender: "Esper",
       type: "Logout",
-      value: { googleAccountId: data.email }
+      value: { googleAccountId: data && data.email }
     };
     Log.d("esperMessage:", esperMessage);
     window.postMessage(esperMessage, "*");
