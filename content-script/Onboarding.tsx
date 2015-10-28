@@ -949,11 +949,18 @@ module Esper.Onboarding {
   class FinishSlide extends Slide<{}> {
     render() {
       var videoList: [string, string][] = [
-        ["Creating Tasks", "https://youtu.be/HjSvKdw8j-A"],
-        ["Creating Events", "https://youtu.be/wJ-CX7q7Tu0"],
-        ["Composing an Email", "https://youtu.be/n12EPAC3DIE"],
-        ["Sending an Invitation", "https://youtu.be/7QCyGYdyV6A"],
-        ["Setting Preferences", "https://youtu.be/ZtX-87KAYtg"]
+        ["Create a Task", "https://youtu.be/vQ-XcwQQDNg"],
+        ["Create Events", "https://youtu.be/_mum9uSodUo"],
+        ["Link Events", "https://youtu.be/oqhnF6wHY7Q"],
+        ["Draft Emails", "https://youtu.be/rA-deetbleQ"],
+        ["Linking Emails together with Task Notes", "https://youtu.be/e-EPFLAcOQo"],
+        ["Insert Emails into the Calendar Event Description", "https://youtu.be/AnUhbTkbquU"],
+        ["Send Event Invitation", "https://youtu.be/zuBE2d1YobA"],
+        ["Schedule Event Reminders", "https://youtu.be/1KORUttWy1k"],
+        ["Esper Agenda", "https://youtu.be/Nk2b1-msHUk"],
+        ["Use Esper Workflows", "https://youtu.be/reWgAs2hE9o"],
+        ["Esper TimeStats", "https://youtu.be/qSP5DcLtMqs"],
+        ["Supporting Multiple Executives", "https://youtu.be/f1gx4OdYbEs"]
       ];
 
       var self = this;
