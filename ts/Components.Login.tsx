@@ -17,7 +17,7 @@ module Esper.Components {
   export class LoginInfo extends Component<{}, LoginInfoState> {
     render() {
       if (this.state.busy) {
-        return <p className="navbar-text">Loaindg &hellip; </p>;
+        return <div className="esper-spinner"></div>;
       }
 
       if (this.state.loginInfo) {
@@ -28,12 +28,9 @@ module Esper.Components {
       var domain = encodeURIComponent(encodeURIComponent(location.href));
       var redirect = Api.prefix + "/#!/login-redirect/" + domain;
       return <a href={redirect}>Login / Signup</a>;
-
-
     }
 
     componentDidMount() {
-      // This ensures our sidebar gets updated if eventId or task changes
       this.setSources([
         Login.InfoStore
       ]);

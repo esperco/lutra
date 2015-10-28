@@ -21,3 +21,22 @@
     text-align: center;
   }
 }
+
+@keyframes scaleout {
+  0% {
+    transform: scale(0.0);
+  } 100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+.esper-spinner {
+  display: block;
+  position: relative;
+  background-color: @purple;
+  border-radius: 100%;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
+  height: 20px;
+  width: 20px;
+}
