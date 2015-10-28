@@ -186,6 +186,15 @@ module Esper.XDate {
     return localFullMonthDay(d1) + ", " + t1 + "-" + t2;
   }
 
+  export function localRangeTimeOnly(d1: Date, d2: Date): string {
+    var t1 = localShortTimeOnly(d1);
+    var t2 = localShortTimeOnly(d2);
+    if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
+      t1 = t1.slice(0, -2);
+    }
+    return t1 + "-" + t2;
+  }
+
   /* "12:30pm to 1:30 pm" */
   export function hourRange(d1 : Date, d2 : Date) : string {
     return utcToLocalTimeOnly(d1) +" to "+ utcToLocalTimeOnly(d2);
