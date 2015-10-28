@@ -50,21 +50,20 @@ module Esper.GmailSearch {
       } else {
         Api.getTaskForThread(team.teamid, searchThread, false, false)
           .done(function(newTask) {
-            var newTaskId = newTask.taskid;
             var currentTask = task;
             var job;
-            if (currentTask !== undefined) {
-              job = Api.switchTaskForThread(team.teamid, threadId,
-                                            currentTask.taskid, newTaskId);
-              var meetingType = currentTask.task_meeting_type;
-              if (meetingType && !newTask.task_meeting_type) {
+            if (newTask !== undefined) {
+              job = Api.switchTaskForThread(team.teamid, searchThread,
+                                            newTask.taskid, currentTask.taskid);
+              var meetingType = newTask.task_meeting_type;
+              if (meetingType && !currentTask.task_meeting_type) {
                 job.done(function() {
-                  return Api.setTaskMeetingType(newTaskId, meetingType);
+                  return Api.setTaskMeetingType(currentTask.taskid, meetingType);
                 });
-                newTask.task_meeting_type = meetingType;
+                currentTask.task_meeting_type = meetingType;
               }
             } else {
-              job = Api.linkThreadToTask(team.teamid, threadId, newTaskId);
+              job = Api.linkThreadToTask(team.teamid, searchThread, currentTask.taskid);
             }
 
             job.done(function() {
@@ -73,9 +72,9 @@ module Esper.GmailSearch {
               TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
             });
 
-            CurrentThread.setTask(newTask);
-            eventsTab.taskTitle.val(newTask.task_title);
-            TaskTab.selectMeetingTypeOnUserTab(newTask.task_meeting_type,
+            CurrentThread.setTask(currentTask);
+            eventsTab.taskTitle.val(currentTask.task_title);
+            TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
                                                userTab);
             Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
           });
