@@ -452,6 +452,19 @@ type token_response = [
     window_end: string; // timestamp
   }
 
+  export interface CalendarStats {
+    by_label:   CalendarStatsByLabel;
+    unlabelled: CalendarStatEntry;
+    total:      CalendarStatEntry;
+  }
+  export interface CalendarStatsByLabel {
+    [index: string]: CalendarStatEntry;
+  }
+  export interface CalendarStatEntry {
+    event_count: number;
+    event_duration: number; //in seconds
+  }
+
   export interface Task {
     taskid: string;
     task_teamid: string;

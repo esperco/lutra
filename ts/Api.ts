@@ -541,6 +541,13 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(q), "text");
   }
 
+  export function postForCalendarStats(teamid: string, calid: string,
+    ApiT.CalendarRequest): JQueryPromise<ApiT.CalendarStats> {
+    var url = prefix + "/api/calendar/stats/" + string(Login.myUid())
+      + "/" + string(teamid) + "/" + string(calid);
+    return JsonHttp.post(url, JSON.stringify(q));
+  }
+
   export function postCalendarShow(teamid: string,
     teamCalendars: ApiT.Calendar[]): JQueryPromise<void> {
     var cals = { google_cal_ids: calIds(teamCalendars) };
