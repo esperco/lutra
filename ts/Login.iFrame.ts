@@ -47,13 +47,13 @@ module Esper.Login {
               setCredentials(credentials.uid, credentials.apiSecret);
               iframeLoginDfd.resolve(ev.data.value.credentials);
             } else {
-              iframeLoginDfd.fail();
+              iframeLoginDfd.reject();
             }
           }
 
           // No credentials
           else if (ev.data.type === "NoCredentials") {
-            iframeLoginDfd.fail();
+            iframeLoginDfd.reject();
           }
 
           // iFrame ready => post request
