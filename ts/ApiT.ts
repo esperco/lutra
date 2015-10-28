@@ -12,6 +12,14 @@ module Esper.ApiT {
     download_page: string;
   }
 
+  export interface TeamCreationRequest {
+    executive_email?: string;
+    executive_name: string;
+    executive_gender?: string;
+    team_calendars?: Calendar[];
+    team_email_aliases?: string[];
+  }
+
   export interface TeamCalendar {
     access_uid: string;
     google_calendar_id: string;
