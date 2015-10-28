@@ -50,33 +50,37 @@ module Esper.GmailSearch {
       } else {
         Api.getTaskForThread(team.teamid, searchThread, false, false)
           .done(function(newTask) {
-            var currentTask = task;
             var job;
-            if (newTask !== undefined) {
-              job = Api.switchTaskForThread(team.teamid, searchThread,
-                                            newTask.taskid, currentTask.taskid);
-              var meetingType = newTask.task_meeting_type;
-              if (meetingType && !currentTask.task_meeting_type) {
+            CurrentThread.getTaskForThread()
+              .done(function(autoTask) {
+                var currentTask = autoTask;
+                CurrentThread.setTask(currentTask);
+
+                if (newTask !== undefined) {
+                  job = Api.switchTaskForThread(team.teamid, searchThread,
+                                                newTask.taskid, currentTask.taskid);
+                  var meetingType = newTask.task_meeting_type;
+                  if (meetingType && !currentTask.task_meeting_type) {
+                    job.done(function() {
+                      return Api.setTaskMeetingType(currentTask.taskid, meetingType);
+                    });
+                    currentTask.task_meeting_type = meetingType;
+                  }
+                } else {
+                  job = Api.linkThreadToTask(team.teamid, searchThread, currentTask.taskid);
+                }
+
                 job.done(function() {
-                  return Api.setTaskMeetingType(currentTask.taskid, meetingType);
+                  TaskTab.refreshTaskProgressSelection(team, threadId, eventsTab);
+                  TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+                  TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
                 });
-                currentTask.task_meeting_type = meetingType;
-              }
-            } else {
-              job = Api.linkThreadToTask(team.teamid, searchThread, currentTask.taskid);
-            }
 
-            job.done(function() {
-              TaskTab.refreshTaskProgressSelection(team, threadId, eventsTab);
-              TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
-              TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
-            });
-
-            CurrentThread.setTask(currentTask);
-            eventsTab.taskTitle.val(currentTask.task_title);
-            TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
-                                               userTab);
-            Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
+                eventsTab.taskTitle.val(currentTask.task_title);
+                TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
+                                                   userTab);
+                Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
+              });
           });
       }
     });
