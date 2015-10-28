@@ -41,7 +41,6 @@
 
 /// <reference path=".//Menu.ts" />
 /// <reference path="./Gcal.ts" />
-/// <reference path="./ActiveEvents.ts" />
 /// <reference path="./CalEventView.ts" />
 /// <reference path="./CalSidebar.tsx" />
 /// <reference path="./Init.ts" />

@@ -30,18 +30,6 @@ module Esper.Types {
     item: T;
   }
 
-  /* One short list of the recently consulted email threads */
-  export interface ActiveThreads {
-    googleAccountId: string;
-    threads: Visited<GmailThread>[];
-  }
-
-  /* One short list of the recently consulted events per calendar */
-  export interface ActiveEvents {
-    googleAccountId: string;
-    calendars: { [calendarId: string]: Visited<FullEventId>[] };
-  }
-
   export interface Account {
     googleAccountId: string;
       /* Google account (email address) tied to the Esper account */
@@ -52,9 +40,6 @@ module Esper.Types {
          this field should be set to false
          if credentials exist.
       */
-
-    activeThreads?: ActiveThreads; /* for Google Calendar */
-    activeEvents?: ActiveEvents;   /* for Gmail */
   }
 
   export interface Storage {

@@ -142,22 +142,6 @@ module Esper.Auth {
           );
           break;
 
-        /* Receive an updated list of recently accessed calendar events */
-        case "ActiveEvents":
-          EsperStorage.saveActiveEvents(
-            request.value,
-            function() { Log.d("Received and stored active events"); }
-          );
-          break;
-
-        /* Receive an updated list of recently accessed email threads */
-        case "ActiveThreads":
-          EsperStorage.saveActiveThreads(
-            request.value,
-            function() { Log.d("Received and stored active threads"); }
-          );
-          break;
-
         /* Listen for request from the injected script at mail.google.com */
         case "CredentialsRequest":
           obtainCredentials(request.value, false);

@@ -53,7 +53,6 @@
 /// <reference path="./ComposeToolbar.ts" />
 /// <reference path="./CurrentThread.ts" />
 /// <reference path="./PrefTimezone.ts" />
-/// <reference path="./ActiveThreads.ts" />
 /// <reference path="./Slides.ts" />
 /// <reference path="./FileUpload.ts" />
 /// <reference path="./FinalizeEvent.ts" />
