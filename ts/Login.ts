@@ -13,6 +13,12 @@ module Esper.Login {
   // Cache for later use
   export var data: ApiT.LoginResponse;
 
+  interface StoredCredentials {
+    uid: string;
+    api_secret: string;
+    email: string;
+  }
+
   /*
     Retrieve credentials from localStorage -- we only need credentials, not
     the rest of the login_response (which we should refetch on login to
