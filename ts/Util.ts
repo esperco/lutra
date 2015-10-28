@@ -11,6 +11,11 @@ module Esper.Util {
       return o;
     }
 
+    // Ignore non-objects
+    if (typeof o !== "object") {
+      return o;
+    }
+
     // Return if already frozen
     if (Object.isFrozen(o)) {
       return o;
@@ -24,8 +29,7 @@ module Esper.Util {
     // not mutating functions
     Object.getOwnPropertyNames(o).forEach(function (prop) {
       if (o.hasOwnProperty(prop) &&
-          (<any> o)[prop] !== null &&
-          typeof (<any> o)[prop] === "object") {
+          (<any> o)[prop] !== null) {
         deepFreeze((<any> o)[prop]);
       }
     });
