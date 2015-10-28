@@ -1,4 +1,5 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Components.Login.tsx" />
 
 module Esper.Views {
 
@@ -10,8 +11,12 @@ module Esper.Views {
       return <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container">
           <div className="navbar-header">
-            <a className="navbar-brand" href="/#!/">Esper Directory</a>
+            <a className="navbar-brand" href="/#!/">Esper</a>
           </div>
+
+          <ul className="nav navbar-nav navbar-right">
+            <li><Components.LoginInfo /></li>
+          </ul>
         </div>
       </nav>;
     }

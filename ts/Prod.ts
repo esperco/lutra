@@ -1,2 +1,6 @@
 /// <reference path="./Main.ts" />
-Esper.PRODUCTION = true;
+
+module Esper {
+  PRODUCTION = true;
+  Api.prefix = "https://app.esper.com";
+}

@@ -2,4 +2,8 @@
 /// <reference path="./Layout.Test.ts" />
 /// <reference path="./Route.Test.ts" />
 
-Esper.PRODUCTION = false;
+module Esper {
+  PRODUCTION = false;
+  Api.prefix = "http://localhost";
+}
+
