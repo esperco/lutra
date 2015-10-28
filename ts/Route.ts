@@ -55,9 +55,15 @@ module Esper.Route {
     }
   ];
 
-  function withLogin(whenDone,
+  function withLogin(whenDone: () => void,
                      optInviteCode?: string,
-                     optEmail?: string) {
+                     optEmail?: string,
+                     landingUrl?: string) {
+    // Default whenDone to nav to landingUrl or home
+    whenDone = whenDone || function() {
+      Route.nav.path(landingUrl || "");
+    };
+
     // Wrap callback with any hooks
     function callback() {
       for (let i in postLoginHooks) {
@@ -69,7 +75,7 @@ module Esper.Route {
       }
       whenDone();
     }
-    Signin.signin(callback, optInviteCode, optEmail);
+    Signin.signin(callback, optInviteCode, optEmail, landingUrl);
   }
 
   function gotToken(token) {
@@ -99,8 +105,15 @@ module Esper.Route {
     },
 
     "login/:email" : function(data) {
-      var close = function() { window.close(); };
-      withLogin(close, undefined, data.email);
+      withLogin(undefined, undefined, data.email, "#!");
+    },
+
+    /*
+      NB: Because of https://github.com/visionmedia/page.js/issues/187, you
+      need to double-encode redirect.
+    */
+    "login-redirect/:redirect": function(data) {
+      withLogin(undefined, undefined, undefined, data.redirect);
     },
 
     /* various pages */
@@ -207,6 +220,18 @@ module Esper.Route {
 
   /* e.g. route.nav.path("a/b/c") goes to URL /#!/a/b/c */
   nav.path = function(frag: string) {
+    /*
+      Check to see if path is a full domain, in which case, just change
+      our location
+    */
+    var match = frag.match(/^https?:\/\/[^/]*/);
+    var domain = match && match[0];
+    if (domain && authorizedDomain(domain)) {
+      window.location.href = frag;
+      return;
+    }
+
+    // If we just have a hash or path, then use router
     if (frag[0] === "#") {
       frag = frag.slice(1);
     }
@@ -222,6 +247,11 @@ module Esper.Route {
   nav.home = function() {
     nav.path("");
   };
+
+  // Function for checking if redirect URL is safe (including protocol)
+  function authorizedDomain(domain: string): boolean {
+    return _.contains(Conf.authorizedDomains || [], domain);
+  }
 
   /* Initialization */
   export function setup() {

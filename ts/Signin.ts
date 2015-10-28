@@ -220,7 +220,7 @@ module Esper.Signin {
       <div #buttonContainer />
       <div class="advisory">
         <p>Use Microsoft Office or Exchange?
-        Contact us at <a href="mailto:support@esper.com">support@esper.com</a> 
+        Contact us at <a href="mailto:support@esper.com">support@esper.com</a>
         for assistance.</p>
         <p>
           By signing in, you agree to Esper's
@@ -275,7 +275,7 @@ module Esper.Signin {
     Log.d(JSON.stringify(tokenDescription));
   }
 
-  function useInvite(inviteCode) {
+  function useInvite(inviteCode: string, landingUrl: string) {
     Log.d("useInvite");
     return Api.postToken(inviteCode)
       .then(
@@ -290,7 +290,7 @@ module Esper.Signin {
 
           // Show login data
           displayLoginLinks("Welcome to Esper! Please sign in.",
-            "#!", inviteCode, null);
+            landingUrl, inviteCode, null);
         },
         /* failure */
         function() {
@@ -300,12 +300,10 @@ module Esper.Signin {
       );
   }
 
-  function loginOrSignup(optEmail) {
+  function loginOrSignup(optEmail, landingUrl) {
     Log.d("loginOrSignup - " + optEmail);
     var uid = Login.me();
-    var landingUrl = document.URL;
-    landingUrl["hash"] = "#!";
-    if (Util.isDefined(optEmail)) {
+    if (Util.isDefined(optEmail) && Login.myEmail() !== optEmail) {
       forceLogin(landingUrl, undefined, optEmail);
     } else if (Util.isDefined(uid)) {
       return Api.getLoginInfo()
@@ -356,17 +354,18 @@ module Esper.Signin {
 
   export function signin( whenDone?: { (): void },
                           optInviteCode?: string,
-                          optEmail?: string) {
+                          optEmail?: string,
+                          landingUrl?: string) {
     document.title = "Sign in - Esper";
+    landingUrl = landingUrl || location.hash;
     if (optInviteCode !== undefined) {
-      useInvite(optInviteCode);
+      useInvite(optInviteCode, landingUrl);
     } else {
-      var p = loginOrSignup(optEmail)
+      var p = loginOrSignup(optEmail, landingUrl)
       if (p) {
         p.done(function(ok) { // Logged in
           if (ok) {
-            var landingUrl = document.URL;
-            whenDone = whenDone || function() { };
+            whenDone = whenDone || function() { Route.nav.path(landingUrl); };
             if (Login.isNylas()) {
               whenDone();
             } else {
@@ -382,10 +381,6 @@ module Esper.Signin {
 
   export function loginOnce(uid, landingUrl) {
     var loginNonce = getLoginNonce();
-    /*
-      TODO: figure out why redirecting to landingUrl causes an infinite loop;
-            disabled for now.
-     */
     Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
     var loginCall = JsonHttp.noWarn(function() {
       return Api.loginOnce(uid, loginNonce)
@@ -394,17 +389,15 @@ module Esper.Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        Route.nav.home();
+        Route.nav.path(landingUrl || "");
       })
       .fail(function(err) {
         clearLoginNonce();
         if (err['status'] === 403) {
           Route.nav.home();
-          Status.report($(`<span>We were unable to log you in. Esper is 
-            currently in private beta. Please contact
+          Status.report($(`<span>We were unable to log you in. Please contact
             <a href="mailto:support@esper.com">support@esper.com</a> for
             information about joining.</span>`), "danger");
-          // Route.nav.path("join-from-login");
         } else {
           Route.nav.home();
           Status.reportError("We were unable to login.");

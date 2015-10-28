@@ -4,6 +4,7 @@
 
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="./Login.Post.ts" />
 /// <reference path="./Store.ts" />
 /// <reference path="./Util.ts" />
 
@@ -24,11 +25,11 @@ module Esper.Login {
     ensure up-to-date data).
   */
   export function initCredentials() {
-    var stored: StoredCredentials = Store.get("login");
+    var stored: StoredCredentials = Store.get(storedLoginKey);
     if (stored && stored.uid && stored.api_secret) {  // sanity check
       setCredentials(stored.uid, stored.api_secret);
     } else {
-      Store.remove("login");
+      Store.remove(storedLoginKey);
     }
   };
 
@@ -37,8 +38,8 @@ module Esper.Login {
     var x = data;
     Log.d("postCredentials:", x);
     if (Util.isDefined(x)
-        && Util.isDefined(x.api_secret)
-        && Util.isDefined(x.uid)) {
+      && Util.isDefined(x.api_secret)
+      && Util.isDefined(x.uid)) {
       var esperMessage = {
         sender: "Esper",
         type: "Account",
@@ -71,7 +72,7 @@ module Esper.Login {
       api_secret: data.api_secret,
       email: data.email
     };
-    Store.set("login", stored);
+    Store.set(storedLoginKey, stored);
     postCredentials();
 
     // Identify in analytics
@@ -82,12 +83,12 @@ module Esper.Login {
     var esperMessage = {
       sender: "Esper",
       type: "Logout",
-      value: { googleAccountId: data.email }
+      value: { googleAccountId: data && data.email }
     };
     Log.d("esperMessage:", esperMessage);
     window.postMessage(esperMessage, "*");
 
-    Store.remove("login");
+    Store.remove(storedLoginKey);
     data = undefined;
     unsetCredentials();
 

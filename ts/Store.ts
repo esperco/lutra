@@ -8,13 +8,13 @@
 
 module Esper.Store {
 
-  export function set(k, v) {
+  export function set(k: string, v: any) {
     localStorage.setItem(k, JSON.stringify(v));
   };
 
-  export function get(k) {
+  export function get(k: string): any {
     var s = localStorage.getItem(k);
-    var x;
+    var x: any;
     if (s) {
       try {
         x = JSON.parse(s);
@@ -26,7 +26,7 @@ module Esper.Store {
     return x;
   };
 
-  export function remove(k) {
+  export function remove(k: string) {
     localStorage.removeItem(k);
   };
 
