@@ -684,13 +684,19 @@ module Esper.Onboarding {
           />;
         });
         return (<div>
-          <div className="well">
-            Thanks! We need to know who you support in your organization, and
-            which calendars correspond to which executives. If you don't see
-            a calendar, you'll need to have the executive {' '}
-            <a href="https://support.google.com/calendar/answer/37082?hl=en">
-            share it with you on Google</a>.
-          </div>
+          { supportsExecutive ? 
+            <div className="well">
+              Thanks! We need to know who you support in your organization, and
+              which calendars correspond to which executives. If you don't see
+              a calendar, you'll need to have the executive {' '}
+              <a href="https://support.google.com/calendar/answer/37082?hl=en">
+              share it with you on Google</a>.
+            </div> :
+            <div className="well">
+              Thanks! Please place a checkmark next to the calendars you’d like
+              to link to Esper.
+            </div>
+          }
           { teamForms }
           <div>
             { supportsExecutive ? 
