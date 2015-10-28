@@ -937,7 +937,7 @@ module Esper.Onboarding {
                 (this.state.nameHasError ? "has-error" : "")}>
               <label htmlFor={this.getId("name")}
                 className="control-label">
-                { supportsExecutive ? "Name" : "Your name" }
+                { supportsExecutive ? "Name" : "Your Name" }
               </label>
               <input id={this.getId("name")} name="name"
                 type="text" className="form-control"
@@ -994,7 +994,7 @@ module Esper.Onboarding {
             <div className="esper-col-spacer">
               <label className="group-heading">
                 { supportsExecutive ? "Other Calendars"
-                  : "Other Calendars to sync"}
+                  : "Other Calendars to Sync"}
               </label>
               <div>{calCheckboxes}</div>
             </div>
