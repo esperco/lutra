@@ -1130,14 +1130,11 @@ module Esper.Api {
   }
 
   /* Team creation */
-  export function createTeam(execEmail: string, execName: string)
+  export function createTeam(body: ApiT.TeamCreationRequest)
     : JQueryPromise<ApiT.Team>
   {
     var url = prefix + "/api/team-create/" + string(Login.myUid());
-    return JsonHttp.post(url, JSON.stringify({
-      executive_email: string(execEmail),
-      executive_name: string(execName)
-    }));
+    return JsonHttp.post(url, JSON.stringify(body));
   }
 
   export function putTeamCalendars(teamid: string, cals: ApiT.Calendar[])
