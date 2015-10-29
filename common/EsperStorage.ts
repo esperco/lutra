@@ -53,18 +53,6 @@ module Esper.EsperStorage {
       esper.accounts[googleAccountId] = account;
     }
     account.googleAccountId = googleAccountId; // compatibility fix 2014-08-04
-    if (account.activeEvents === undefined) {
-      account.activeEvents = {
-        googleAccountId: googleAccountId,
-        calendars: {}
-      };
-    }
-    if (account.activeThreads === undefined) {
-      account.activeThreads = {
-        googleAccountId: googleAccountId,
-        threads: []
-      };
-    }
     Log.d("getAccount returns:", account);
     return account;
   }
@@ -83,37 +71,6 @@ module Esper.EsperStorage {
       } else {
         account.declined = false;
       }
-      return esper;
-    }, whenDone);
-  }
-
-  export function saveActiveEvents(x: Types.ActiveEvents,
-                                   whenDone: () => void) {
-    update(function(esper) {
-      var k = x.googleAccountId;
-      var account = getAccount(esper, k);
-      var old = account.activeEvents.calendars;
-      var updates = x.calendars;
-      for (var cal in updates) {
-        var oldCal = old[cal];
-        if (old[cal] === undefined) {
-          oldCal = [];
-        }
-        old[cal] = Visited.merge(updates[cal], oldCal, Visited.maxEvents);
-      }
-      return esper;
-    }, whenDone);
-  }
-
-  export function saveActiveThreads(x: Types.ActiveThreads,
-                                   whenDone: () => void) {
-    update(function(esper) {
-      var k = x.googleAccountId;
-      var account = getAccount(esper, k);
-      account.activeThreads.threads =
-        Visited.merge(x.threads,
-                      account.activeThreads.threads,
-                      Visited.maxThreads);
       return esper;
     }, whenDone);
   }

@@ -247,7 +247,6 @@ module Esper.CalEventView {
       alreadyInitialized = true;
       listenForNewEventId(function(fullEventId) {
         Log.d("New current event ID:", fullEventId);
-        ActiveEvents.handleNewActiveEvent(fullEventId);
         updateView(fullEventId);
       });
     }

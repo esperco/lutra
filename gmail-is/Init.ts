@@ -91,7 +91,6 @@ module Esper.Init {
           "CredentialsRequest",
           "LoginRequest",
           "Logout",
-          "ActiveThreads"
         ];
         var isIgnored = List.mem(ignored, request.type);
         if (! isIgnored) {
