@@ -13,7 +13,7 @@ module Esper.GmailSearch {
     endTime: JQuery;
   }
 
-  function renderSearchResult(e: ApiT.EmailThread, task: ApiT.Task,
+  function renderSearchResult(e: ApiT.EmailThreadSearch, task: ApiT.Task,
                               team: ApiT.Team, threadId: string, eventsTab, userTab) {
     Log.d("renderSearchResult()");
 '''
@@ -24,6 +24,9 @@ module Esper.GmailSearch {
     </span>
     <div #info class="form-control esper-gmail-search-result" aria-label="..." readonly>
       <object #logo class="esper-email-logo"/>
+      <div class="gmail-from" #from/>
+      <div class="gmail-subject" #subject/>
+      <div class="gmail-date" #date/>
     </div>
   </div>
 </div>
@@ -31,6 +34,9 @@ module Esper.GmailSearch {
 
     var newTask;
     var searchThread = e.gmail_thrid;
+    from.html(e.first_from);
+    subject.html("<b>" + e.first_subject + "</b> - " + e.last_snippet);
+    date.html(e.last_date);
 
     Api.getTaskForThread(team.teamid, searchThread, false, false)
       .done(function(existingTask) {
@@ -39,7 +45,6 @@ module Esper.GmailSearch {
         } else {
           logo.attr("data", Init.esperRootUrl + "img/footer-logo.svg");
         }
-        info.html(info.html() + "<b>" + e.subject + "</b> - " + e.snippet);
         newTask = existingTask;
       });
 

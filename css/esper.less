@@ -18,11 +18,29 @@
 
   .form-control {
     &.esper-gmail-search-result {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      width: 422px;
       padding: 6px 5px;
+
+      .gmail-from {
+        float: left;
+        width: 20%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .gmail-subject {
+        float: left;
+        width: 50%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .gmail-date {
+        float: right;
+        width: 10%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
   // Creates an arrow for dropdown menus
@@ -2459,7 +2477,7 @@ textarea.esper-description-text {
   .esper-modal;
   top: 10%;
   max-height: 80%;
-  @search_width: 480px;
+  @search_width: 1000px;
   width: @search_width;
   margin-left: -@search_width/2;
 }

@@ -180,8 +180,17 @@ module Esper.ApiT {
     snippet: string;
   }
 
-  export interface EmailThreadList {
-    items: EmailThread[];
+  export interface EmailThreadSearch {
+    gmail_owner: string;
+    gmail_thrid: string;
+    first_subject: string;
+    last_snippet: string;
+    first_from: string;
+    last_date: string;
+  }
+
+  export interface EmailThreadSearchList {
+    items: EmailThreadSearch[];
   }
 
   export interface EmailMessage {
