@@ -77,9 +77,8 @@ module Esper.GmailSearch {
 
     link.click(function(e) {
       if (!link.is(":checked")) {
-        var unlinkFun = TaskTab.unlinkThread(team.teamid, task.taskid, searchThread);
         delete linkThreads[searchThread];
-        unlinkThreads[searchThread] = unlinkFun;
+        unlinkThreads[searchThread] = task.taskid;
       } else {
         delete unlinkThreads[searchThread];
         linkThreads[searchThread] = task.taskid;
@@ -94,7 +93,7 @@ module Esper.GmailSearch {
                        threadId: string,
                        searchView: SearchView,
                        eventsTab: TaskTab.TaskTabView) {
-    Util.afterTyping(searchView.search, 250, function() {
+    Util.afterTypingNoClick(searchView.search, 250, function() {
       if (searchView.search.val().trim() === "") {
         searchView.resultsDropdown.hide();
         if (searchView.resultsDropdown.hasClass("esper-open")) {

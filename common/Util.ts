@@ -142,6 +142,33 @@ module Esper.Util {
       .keydown(callback);
   }
 
+  export function afterTypingNoClick(elt: JQuery, delayMs: number, func) {
+    var lastPressed = Date.now(); // date in milliseconds
+    function callback(event) {
+      var t1 = lastPressed;
+      var t2 = Date.now();
+      if (lastPressed >= t2) {
+        lastPressed = lastPressed + 1;
+      } else {
+        lastPressed = t2;
+      }
+      var lastPressed0 = lastPressed;
+      window.setTimeout(function() {
+        var isEnterKey = (event.which === 13 || event.keyCode === 13);
+        var isEscKey = (event.which === 27 || event.keyCode === 27);
+        if (lastPressed0 === lastPressed && !isEnterKey && !isEscKey) func();
+      }, delayMs);
+    }
+
+    elt
+      .unbind("click")
+      .click(callback)
+      .unbind("focus")
+      .focus(callback)
+      .unbind("keydown")
+      .keydown(callback);
+  }
+
   // NB: Moved randomString() to Marten
   // export function randomString() {
   //   return Math.random().toString(36).slice(2);
