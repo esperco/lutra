@@ -162,7 +162,8 @@ module Esper.ComposeControls {
 <div #templateButton class="esper-composition-button">
   <object #templateIcon class="esper-svg esper-composition-button-icon"/>
   <div #templateBadge class="esper-composition-badge">...</div>
-  <ul #templateDropdown class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
+  <ul #templateDropdown
+    class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown esper-template">
     <div #viewTemplates class="esper-dropdown-section">
       <li #customizeTemplates class="esper-li">Customize&hellip;</li>
     </div>
