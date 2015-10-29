@@ -142,7 +142,7 @@ module Esper.Util {
       .keydown(callback);
   }
 
-  export function afterTypingNoClick(elt: JQuery, delayMs: number, func) {
+  export function afterTypingNoClickNoFocus(elt: JQuery, delayMs: number, func) {
     var lastPressed = Date.now(); // date in milliseconds
     function callback(event) {
       var t1 = lastPressed;
@@ -162,9 +162,7 @@ module Esper.Util {
 
     elt
       .unbind("click")
-      .click(callback)
       .unbind("focus")
-      .focus(callback)
       .unbind("keydown")
       .keydown(callback);
   }

@@ -93,7 +93,7 @@ module Esper.GmailSearch {
                        threadId: string,
                        searchView: SearchView,
                        eventsTab: TaskTab.TaskTabView) {
-    Util.afterTypingNoClick(searchView.search, 250, function() {
+    Util.afterTypingNoClickNoFocus(searchView.search, 250, function() {
       if (searchView.search.val().trim() === "") {
         searchView.resultsDropdown.hide();
         if (searchView.resultsDropdown.hasClass("esper-open")) {
