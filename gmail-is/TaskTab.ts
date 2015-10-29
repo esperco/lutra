@@ -806,7 +806,7 @@ module Esper.TaskTab {
         class="esper-section-actions esper-clearfix esper-open">
           <div style="display:inline-block">
             <div #createEmail
-            class="esper-link-action esper-dropdown-btn esper-click-safe">
+            class="esper-link-action esper-dropdown-btn esper-click-safe esper-disabled">
               <object #createEmailIcon class="esper-svg esper-link-action-icon"/>
               <div class="esper-link-action-text esper-click-safe">
               Create
