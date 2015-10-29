@@ -64,6 +64,9 @@
     },
     "typeahead/typeahead.d.ts": {
       "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
+    },
+    "chartjs/chart.d.ts": {
+      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     }
   }
 }
