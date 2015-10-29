@@ -16,6 +16,34 @@
   @import "../marten/less/_custom_bootstrap";
   // TODO: Override certain Bootstrap settings like font-family
 
+  .form-control {
+    &.esper-gmail-search-result {
+      padding: 6px 5px;
+
+      .gmail-from {
+        float: left;
+        width: 20%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 0px 15px 0 0;
+      }
+      .gmail-subject {
+        float: left;
+        width: 50%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .gmail-date {
+        float: right;
+        width: 10%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
   // Creates an arrow for dropdown menus
   .dropdown-arrow-top {
     &:before, &:after {
@@ -2027,6 +2055,13 @@ ul.esper-ev-dropdown {
   margin: 5px 5px 0 0;
 }
 
+.esper-email-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  margin: 0px 5px 0 0;
+}
+
 .esper-composition-vertical-divider {
   float: left;
   width: 1px;
@@ -2469,7 +2504,7 @@ textarea.esper-description-text {
   .esper-modal;
   top: 10%;
   max-height: 80%;
-  @search_width: 480px;
+  @search_width: 900px;
   width: @search_width;
   margin-left: -@search_width/2;
 }

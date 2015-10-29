@@ -83,7 +83,7 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  function unlinkThread(teamid, taskid, threadId) {
+  export function unlinkThread(teamid, taskid, threadId) {
     return Api.unlinkThreadFromTask(teamid, threadId, taskid)
       .then(function() {
         /* force the creation of a task for the newly unlinked thread */
@@ -249,12 +249,14 @@ module Esper.TaskTab {
     taskTab.linkedThreadsList.hide();
     return Api.getTaskForThread(team.teamid, threadId, false, true)
       .done(function(task) {
-        displayLinkedThreadsList(task, threadId, taskTab);
-        if ((task.task_threads.length > 1 &&
-                  taskTab.showLinkedThreads.text() === "Show") ||
-                  (task.task_threads.length <= 1 &&
-                  taskTab.showLinkedThreads.text() === "Hide")) {
-          taskTab.showLinkedThreads.click();
+        if (task !== undefined) {
+          displayLinkedThreadsList(task, threadId, taskTab);
+          if ((task.task_threads.length > 1 &&
+                    taskTab.showLinkedThreads.text() === "Show") ||
+                    (task.task_threads.length <= 1 &&
+                    taskTab.showLinkedThreads.text() === "Hide")) {
+            taskTab.showLinkedThreads.click();
+          }
         }
       })
       .always(function() {
@@ -304,7 +306,7 @@ module Esper.TaskTab {
       });
   }
 
-  function selectMeetingTypeOnUserTab(meetingType : string,
+  export function selectMeetingTypeOnUserTab(meetingType : string,
                                       userTabContent : UserTab.UserTabView)
   : void {
     userTabContent.meetingSelector.find(".extra").remove();
@@ -800,6 +802,23 @@ module Esper.TaskTab {
       </div>
 
       <div #linkedThreadsContainer class="esper-section-container">
+        <div #linkEmails
+        class="esper-section-actions esper-clearfix esper-open">
+          <div style="display:inline-block">
+            <div #createEmail
+            class="esper-link-action esper-dropdown-btn esper-click-safe">
+              <object #createEmailIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text esper-click-safe">
+              Create
+              </div>
+            </div>
+            <div class="esper-vertical-divider"/>
+            <div #linkEmail class="esper-link-action">
+              <object #linkEmailIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text">Link</div>
+            </div>
+          </div>
+        </div>
         <div #linkedThreadsSpinner class="esper-events-list-loading">
           <div class="esper-spinner esper-list-spinner"/>
         </div>
@@ -941,8 +960,9 @@ module Esper.TaskTab {
       }
     }, "TaskTab.refreshLinkedEventsList");
 
-    refreshLinkedThreadsIcon.attr("data",
-      Init.esperRootUrl + "img/refresh.svg");
+    refreshLinkedThreadsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    createEmailIcon.attr("data", Init.esperRootUrl + "img/create.svg");
+    linkEmailIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
@@ -954,19 +974,20 @@ module Esper.TaskTab {
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedThreadsAction = function() {
       refreshLinkedThreadsList(team, threadId, taskTabView);
-      if (linkedThreadsContainer.css("display") === "none") {
-        Sidebar.toggleList(linkedThreadsContainer);
-        showLinkedEvents.text("Hide");
-        linkedEventsHeader.addClass("esper-open");
+      if (linkedThreadsList.css("display") === "none") {
+        Sidebar.toggleList(linkedThreadsList);
+        showLinkedThreads.text("Hide");
+        linkedThreadsHeader.addClass("esper-open");
       }
     };
     refreshLinkedThreads.click(refreshLinkedThreadsAction);
 
+
     /* Set function to refresh from outside without passing any arguments  */
     refreshLinkedEventsAction = function() {
       refreshLinkedEventsList(team, threadId, taskTabView);
-      if (linkedEventsContainer.css("display") === "none") {
-        Sidebar.toggleList(linkedEventsContainer);
+      if (linkedEventsList.css("display") === "none") {
+        Sidebar.toggleList(linkedEventsList);
         showLinkedEvents.text("Hide");
         linkedEventsHeader.addClass("esper-open");
       }
@@ -981,7 +1002,7 @@ module Esper.TaskTab {
     refreshWorkflowList(team, threadId, taskTabView);
 
     showLinkedThreads.click(function() {
-      Sidebar.toggleList(linkedThreadsContainer);
+      Sidebar.toggleList(linkedThreadsList);
       if (showLinkedThreads.text() === "Hide") {
         showLinkedThreads.text("Show");
         linkedThreadsHeader.removeClass("esper-open");
@@ -992,7 +1013,7 @@ module Esper.TaskTab {
     });
 
     showLinkedEvents.click(function() {
-      Sidebar.toggleList(linkedEventsContainer);
+      Sidebar.toggleList(linkedEventsList);
       if (showLinkedEvents.text() === "Hide") {
         showLinkedEvents.text("Show");
         linkActions.removeClass("esper-open");
@@ -1124,6 +1145,14 @@ module Esper.TaskTab {
     linkEvent.click(function() {
       var searchModal =
         CalSearch.viewOfSearchModal(team, threadId, taskTabView);
+      $("body").append(searchModal.view);
+      searchModal.search.focus();
+      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
+    });
+
+    linkEmail.click(function() {
+      var searchModal =
+        GmailSearch.viewOfSearchModal(team, threadId, taskTabView, userTabContent);
       $("body").append(searchModal.view);
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEvent);

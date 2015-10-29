@@ -70,9 +70,10 @@
 /// <reference path="./TimeTracker.ts" />
 /// <reference path="./Inactivity.ts" />
 /// <reference path="./Init.ts" />
+/// <reference path="./GmailSearch.ts" />
 
 module Esper.Main {
-  export function init() : void {
+  export function init(): void {
     Log.tag = "Esper [IS]";
     Log.d("Initializing injected script");
     Init.init();
