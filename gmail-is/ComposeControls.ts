@@ -42,15 +42,23 @@ module Esper.ComposeControls {
                            guestTz: string) : string
   {
     if (!execTz) execTz = CurrentThread.eventTimezone(ev);
-    var execMoment = (<any> moment)(ev.start.utc).tz(execTz);
-    var forExec = execMoment.format("dddd, MMMM D") + // Saturday, May 30
-                  " at " + execMoment.format("h:mm a") + // 3:45 pm
-                  " " + execMoment.zoneAbbr(); // EDT
+    var execStart = (<any> moment)(ev.start.utc).tz(execTz);
+    var execEnd = (<any> moment)(ev.end.utc).tz(execTz);
+    var forExec = execStart.format("dddd, MMMM D") + // Saturday, May 30
+                  " at " +
+                  XDate.localRangeTimeOnly(
+                    new Date(execStart.format("YYYY-MM-DDThh:mm:ss")),
+                    new Date(execEnd.format("YYYY-MM-DDThh:mm:ss"))) +
+                  " " + execStart.zoneAbbr(); // EDT
     var forGuest = "";
     if (guestTz && guestTz !== execTz) {
-      var guestMoment = (<any> moment)(ev.start.utc).tz(guestTz);
-      forGuest = " / " + guestMoment.format("h:mm a") +
-                 " " + guestMoment.zoneAbbr();
+      var guestStart = (<any> moment)(ev.start.utc).tz(guestTz);
+      var guestEnd = (<any> moment)(ev.end.utc).tz(guestTz);
+      forGuest = " / " +
+                 XDate.localRangeTimeOnly(
+                    new Date(guestStart.format("YYYY-MM-DDThh:mm:ss")),
+                    new Date(guestEnd.format("YYYY-MM-DDThh:mm:ss"))) +
+                 " " + guestStart.zoneAbbr();
     }
     return forExec + forGuest;
   }

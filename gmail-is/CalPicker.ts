@@ -45,7 +45,13 @@ module Esper.CalPicker {
     locationDropdown : JQuery;
     pickerSwitcher : JQuery;
     execTzDiv : JQuery;
+    execTzButton: JQuery;
+    execTzValue : JQuery;
+    execTzMenu: JQuery;
     guestTzDiv : JQuery;
+    guestTzButton : JQuery;
+    guestTzValue : JQuery;
+    guestTzMenu : JQuery;
     viewCalInput : JQuery;
     viewCalDropdown : JQuery;
     calendarView : JQuery;
@@ -144,16 +150,28 @@ module Esper.CalPicker {
               #pickerSwitcher class="esper-select form-control"/>
           </div>
         </div>
-        <div class="col-md-12 col-lg-4"><div class="row">
+        <div class="col-md-12 col-lg-4 esper-bs"><div class="row">
           <div class="col-md-6 col-lg-12 form-group">
             <label for="esper-calpicker-exec-tz"
               class="control-label">Executive Timezone</label>
-            <div #execTzDiv />
+            <div #execTzDiv class="dropdown esper-dropdown" style="width: 100%;">
+              <button #execTzButton id="esper-calpicker-exec-tz" class="btn btn-default esper-dropdown-toggle" data-toggle="dropdown">
+                <span #execTzValue />
+                <i class="fa fa-chevron-down" />
+              </button>
+              <div #execTzMenu class="dropdown-menu esper-dropdown-select"/>
+            </div>
           </div>
           <div class="col-md-6 col-lg-12 form-group">
             <label for="esper-calpicker-guest-tz"
               class="control-label">Guest Timezone</label>
-            <div #guestTzDiv />
+            <div #guestTzDiv class="dropdown esper-dropdown" style="width: 100%;">
+              <button #guestTzButton id="esper-calpicker-guest-tz" class="btn btn-default esper-dropdown-toggle" data-toggle="dropdown">
+                <span #guestTzValue />
+                <i class="fa fa-chevron-down" />
+              </button>
+              <div #guestTzMenu class="dropdown-menu esper-dropdown-select" />
+            </div>
           </div>
         </div>
       </div></div>
@@ -166,6 +184,8 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
+    execTzButton.dropdown();
+    guestTzButton.dropdown();
     var prefs = Teams.getTeamPreferences(team);
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
@@ -305,34 +325,36 @@ module Esper.CalPicker {
       calendarCheckboxRow.appendTo(viewCalDropdown);
     });
 
-    var execTz = Timezone.appendTimezoneSelector(execTzDiv, showTimezone);
-    execTz.attr("id", "esper-calpicker-exec-tz");
-    var guestTz = Timezone.appendTimezoneSelector(guestTzDiv, guestTimezone);
-    guestTz.attr("id", "esper-calpicker-guest-tz");
-
-    execTz.bind("typeahead:change", function() {
-      var tz = Timezone.selectedTimezone(execTz);
-      showTimezone = tz;
-      showZoneAbbr = zoneAbbr(tz);
-      updateZoneAbbrDisplay();
-      calendarView.fullCalendar("refetchEvents");
-      tpref.executive_timezone = tz;
-      Api.putTaskPrefs(tpref);
+    execTzValue.text(Timezone.getValueFromId(showTimezone));
+    Timezone.appendDropdownMenu(execTzMenu,
+      "calpicker-exec-timezone",
+      showTimezone, 
+      function() {
+        var tzVal = (<Dropdown.Menu> execTzMenu.reactComponent()).getSelectedOption();
+        var tz = Timezone.getIdFromValue(tzVal);
+        execTzValue.text(tzVal);
+        showTimezone = tz;
+        showZoneAbbr = zoneAbbr(tz);
+        updateZoneAbbrDisplay();
+        calendarView.fullCalendar("refetchEvents");
+        tpref.executive_timezone = tz;
+        Api.putTaskPrefs(tpref);
+        Analytics.track(Analytics.Trackable.SelectCalendarPickerExecutiveTimezone);
     });
-    execTz.click(function() {
-      Analytics.track(Analytics.Trackable.SelectCalendarPickerExecutiveTimezone);
-    });
-
-    guestTz.bind("typeahead:change", function() {
-      var tz = Timezone.selectedTimezone(guestTz);
-      guestTimezone = tz;
-      guestZoneAbbr = zoneAbbr(tz);
-      calendarView.fullCalendar("refetchEvents");
-      tpref.guest_timezone = tz;
-      Api.putTaskPrefs(tpref);
-    });
-    guestTz.click(function() {
-      Analytics.track(Analytics.Trackable.SelectCalendarPickerGuestTimezone);
+    guestTzValue.text(Timezone.getValueFromId(guestTimezone));
+    Timezone.appendDropdownMenu(guestTzMenu,
+      "calpicker-guest-timezone",
+      guestTimezone,
+      function() {
+        var tzVal = (<Dropdown.Menu> guestTzMenu.reactComponent()).getSelectedOption();
+        var tz = Timezone.getIdFromValue(tzVal);
+        guestTzValue.text(tzVal);
+        guestTimezone = tz;
+        guestZoneAbbr = zoneAbbr(tz);
+        calendarView.fullCalendar("refetchEvents");
+        tpref.guest_timezone = tz;
+        Api.putTaskPrefs(tpref);
+        Analytics.track(Analytics.Trackable.SelectCalendarPickerGuestTimezone);
     });
 
     var pv = <PickerView> _view;

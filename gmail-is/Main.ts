@@ -4,8 +4,13 @@
   as required by gmail.js.
 */
 
+/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="../marten/ts/JsonHttp.ts" />
+/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../marten/ts/Watchable.ts" />
+/// <reference path="../marten/ts/XDate.ts" />
+
 /// <reference path="../common/Esper.ts" />
-/// <reference path="../common/ApiT.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Analytics.IS.ts" />
 /// <reference path="../common/HostUrl.ts" />
@@ -18,10 +23,7 @@
 /// <reference path="../common/EsperCache.ts" />
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Util.ts" />
-/// <reference path="../common/Watchable.ts" />
 /// <reference path="../common/Promise.ts" />
-/// <reference path="../common/XDate.ts" />
-/// <reference path="../common/Log.ts" />
 /// <reference path="../common/LRU.ts" />
 /// <reference path="../common/Visited.ts" />
 /// <reference path="../common/EsperStorage.ts" />
@@ -32,7 +34,6 @@
 /// <reference path="../common/Preferences.ts" />
 /// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/TaskPreferences.ts" />
-/// <reference path="../common/JsonHttp.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="../common/Timezone.ts" />
@@ -47,8 +48,6 @@
 /// <reference path="./Recur.ts" />
 /// <reference path="./CalPicker.ts" />
 /// <reference path="./CalSearch.ts" />
-/// <reference path="./GmailSearch.ts" />
-/// <reference path="./ObserveMessage.ts" />
 /// <reference path="./ComposeHashtags.ts" />
 /// <reference path="./ComposeControls.ts" />
 /// <reference path="./ComposeToolbar.ts" />
@@ -72,13 +71,14 @@
 /// <reference path="./TimeTracker.ts" />
 /// <reference path="./Inactivity.ts" />
 /// <reference path="./Init.ts" />
+/// <reference path="./GmailSearch.ts" />
 
 module Esper.Main {
-  export function init() : void {
-    Log.tag = "Esper [IS]";
-    Log.d("Initializing injected script");
-    Init.init();
-  }
+    export function init(): void {
+        Log.tag = "Esper [IS]";
+        Log.d("Initializing injected script");
+        Init.init();
+    }
 }
 
 /* Called once per page */

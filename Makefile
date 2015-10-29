@@ -18,10 +18,6 @@ rebuild: manifest.json.dev
 	$(MAKE) dev-rebuild
 	$(MAKE) install-dev
 
-tikhon: manifest.json.dev
-	$(MAKE) tikhon-build
-	$(MAKE) install-dev
-
 # Make a production build; see full instructions in README.md.
 release:
 	$(MAKE) clean
@@ -42,10 +38,6 @@ zip:
 	rm -rf esper esper.zip
 	cp -a pub esper
 	zip -r esper esper
-
-tikhon-build:
-	$(MAKE) -C common tikhon-conf
-	npm run build
 
 dev-build:
 	$(MAKE) -C common dev-conf

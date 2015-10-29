@@ -3,12 +3,12 @@
 */
 
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../marten/ts/Watchable.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/Types.ts" />
-/// <refernece path="../common/Watchable.ts" />
 /// <reference path="./Gcal.ts" />
 
 module Esper.CurrentEvent {

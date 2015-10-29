@@ -6,3 +6,5 @@ module Esper.Conf {
     export var url = "http://localhost";
   }
 }
+
+Esper.PRODUCTION = false;

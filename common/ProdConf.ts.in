@@ -6,3 +6,5 @@ module Esper.Conf {
     export var url = "https://app.esper.com";
   }
 }
+
+Esper.PRODUCTION = true;

@@ -4,11 +4,11 @@
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/Api.ts" />
-/// <reference path="../common/Log.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Analytics.Chrome.ts" />
+/// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
@@ -825,7 +825,10 @@ module Esper.Onboarding {
         {errorMsg}
       </div>);
 
-      var calCheckboxes = _.map(this.props.calendars, function(cal) {
+      var sortedCalendars = _.sortBy(this.props.calendars, function(cal) {
+        return cal.calendar_title.toLowerCase();
+      });
+      var calCheckboxes = _.map(sortedCalendars, function(cal) {
         var checked = _.includes(team.calendars, cal.google_cal_id);
         return (<div className="checkbox">
           <label>
@@ -837,7 +840,7 @@ module Esper.Onboarding {
         </div>);
       });
 
-      var calOptions = _.map(this.props.calendars, function(cal) {
+      var calOptions = _.map(sortedCalendars, function(cal) {
         return (<option value={cal.google_cal_id}>
           {cal.calendar_title}
         </option>);
@@ -949,11 +952,18 @@ module Esper.Onboarding {
   class FinishSlide extends Slide<{}> {
     render() {
       var videoList: [string, string][] = [
-        ["Creating Tasks", "https://youtu.be/HjSvKdw8j-A"],
-        ["Creating Events", "https://youtu.be/wJ-CX7q7Tu0"],
-        ["Composing an Email", "https://youtu.be/n12EPAC3DIE"],
-        ["Sending an Invitation", "https://youtu.be/7QCyGYdyV6A"],
-        ["Setting Preferences", "https://youtu.be/ZtX-87KAYtg"]
+        ["Create a Task", "https://youtu.be/vQ-XcwQQDNg"],
+        ["Create Events", "https://youtu.be/_mum9uSodUo"],
+        ["Link Events", "https://youtu.be/oqhnF6wHY7Q"],
+        ["Draft Emails", "https://youtu.be/rA-deetbleQ"],
+        ["Linking Emails together with Task Notes", "https://youtu.be/e-EPFLAcOQo"],
+        ["Insert Emails into the Calendar Event Description", "https://youtu.be/AnUhbTkbquU"],
+        ["Send Event Invitation", "https://youtu.be/zuBE2d1YobA"],
+        ["Schedule Event Reminders", "https://youtu.be/1KORUttWy1k"],
+        ["Esper Agenda", "https://youtu.be/Nk2b1-msHUk"],
+        ["Use Esper Workflows", "https://youtu.be/reWgAs2hE9o"],
+        ["Esper TimeStats", "https://youtu.be/qSP5DcLtMqs"],
+        ["Supporting Multiple Executives", "https://youtu.be/f1gx4OdYbEs"]
       ];
 
       var self = this;
