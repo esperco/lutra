@@ -33,10 +33,20 @@ module Esper.GmailSearch {
 '''
 
     var newTask;
+    var date_output;
     var searchThread = e.gmail_thrid;
     from.html(e.first_from);
+
+    var thread_date = new Date(e.last_date);
+    var now = new Date();
+    if (now.getDay() === thread_date.getDay()) {
+      date_output = XDate.utcToLocalTimeOnly(thread_date);
+    } else {
+      date_output = XDate.month(thread_date) + " " + thread_date.getDate();
+    }
+
     subject.html("<b>" + e.first_subject + "</b> - " + e.last_snippet);
-    date.html(e.last_date);
+    date.html(date_output);
 
     Api.getTaskForThread(team.teamid, searchThread, false, false)
       .done(function(existingTask) {
