@@ -195,7 +195,7 @@ module Esper.GmailSearch {
         <div #spinner class="esper-spinner esper-search-spinner"/>
         <div #results>
           <div #noResults class="esper-no-results esper-click-safe">
-            <span class="esper-click-safe">No upcoming events named </span>
+            <span class="esper-click-safe">No emails named </span>
             &quot;
             <span #noResultsFeedback class="esper-bold esper-click-safe"/>
             &quot;
