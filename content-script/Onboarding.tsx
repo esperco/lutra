@@ -825,7 +825,10 @@ module Esper.Onboarding {
         {errorMsg}
       </div>);
 
-      var calCheckboxes = _.map(this.props.calendars, function(cal) {
+      var sortedCalendars = _.sortBy(this.props.calendars, function(cal) {
+        return cal.calendar_title.toLowerCase();
+      });
+      var calCheckboxes = _.map(sortedCalendars, function(cal) {
         var checked = _.includes(team.calendars, cal.google_cal_id);
         return (<div className="checkbox">
           <label>
@@ -837,7 +840,7 @@ module Esper.Onboarding {
         </div>);
       });
 
-      var calOptions = _.map(this.props.calendars, function(cal) {
+      var calOptions = _.map(sortedCalendars, function(cal) {
         return (<option value={cal.google_cal_id}>
           {cal.calendar_title}
         </option>);
