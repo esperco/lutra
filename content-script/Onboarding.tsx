@@ -479,7 +479,7 @@ module Esper.Onboarding {
             <li>Set customized confirmations and reminder emails for events</li>
             <li>Stay organized with automatically compiled Agendas and Task
             Lists</li>
-            <li>See how you allocate your time with Timestats</li>
+            <li>See how you allocate time with TimeStats</li>
           </ul>
         </p>
         <p>
@@ -689,15 +689,18 @@ module Esper.Onboarding {
         return (<div>
           { supportsExecutive ? 
             <div className="well">
-              Thanks! We need to know who you support in your organization, and
-              which calendars correspond to which executives. If you don't see
-              a calendar, you'll need to have the executive {' '}
+              Thanks! We need to link the individuals you support to their
+              respective calendars. Please add each individual you support to
+              the list below and mark which calendars correspond to their
+              schedule in the “Calendars associated with this Executive” list.
+              If the calendar you’re looking for doesn’t appear in this list,
+              ask the calendar owner to {" "}
               <a href="https://support.google.com/calendar/answer/37082?hl=en">
-              share it with you on Google</a>.
+              share it with you first on Google</a>.
             </div> :
             <div className="well">
-              Thanks! Please place a checkmark next to the calendars you’d like
-              to link to Esper.
+              Thanks! Please place a checkmark next to the calendars you wish
+              to use for scheduling.
             </div>
           }
           { teamForms }
