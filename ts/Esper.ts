@@ -6,6 +6,7 @@
 
 /// <reference path="../marten/typings/jquery/jquery.d.ts" />
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../marten/typings/chartjs/chart.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
 /// <reference path="../marten/typings/moment/moment.d.ts" />
 /// <reference path="../marten/typings/moment-timezone/moment-timezone.d.ts" />
@@ -19,6 +20,7 @@ type ReactStatic = typeof React;
 
 // For classes, refer to class's type
 type EventEmitterType = typeof EventEmitter3.EventEmitter;
+type ChartStatic = typeof Chart;
 
 declare module Esper {
   export var _: _.LoDashStatic;
@@ -26,6 +28,7 @@ declare module Esper {
   export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
+  export var Chart: ChartStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
   export var pageJs: PageJS.Static;

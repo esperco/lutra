@@ -1,0 +1,16 @@
+
+.canvas-holder.with-vertical-label {
+  position: relative;
+  margin-left: @line-height-computed * 1.25;
+
+  .vertical-label {
+    display: block;
+    position: absolute;
+    top: 50%; left: 0;
+    transform: rotate(-90deg) translateX(-50%) translateY(-125%);
+    transform-origin: top left;
+
+    font-size: @font-size-small;
+    line-height: @line-height-computed;
+  }
+}
