@@ -84,7 +84,7 @@ module Esper.Main {
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);
     Message.listen(Message.Type.RenderGettingStarted, function() {
       Auth.openWelcomeModal(Login.getAccount(), true, true);
-      Onboarding.CurrentSlide.set(3);
+      Onboarding.CurrentSlide.set(4);
     });
 
     // Listen to location changes

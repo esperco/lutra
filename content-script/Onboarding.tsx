@@ -159,6 +159,7 @@ module Esper.Onboarding {
     private calendarStore: Model.StoreOne<ApiT.Calendars>;
     private calendarQuery: CalendarQuery;
     private teamStore: TeamStore;
+    private supportsExecutive: Model.StoreOne<boolean>;
 
     constructor(props) {
       super(props);
@@ -176,6 +177,9 @@ module Esper.Onboarding {
 
       // Store of pending / completed requests to create new teams
       this.teamStore = new TeamStore();
+
+      // Store of whether the user is a single-user team or supports an exec
+      this.supportsExecutive = new Model.StoreOne<boolean>();
     }
 
     render() {
@@ -198,7 +202,8 @@ module Esper.Onboarding {
 
         data: {
           calendarQuery: this.calendarQuery,
-          teamStore: this.teamStore
+          teamStore: this.teamStore,
+          supportsExecutive: this.supportsExecutive
         }
       });
 
@@ -266,6 +271,7 @@ module Esper.Onboarding {
   interface DataSources {
     calendarQuery: CalendarQuery;
     teamStore: TeamStore;
+    supportsExecutive: Model.StoreOne<boolean>;
   }
 
   interface SlideWrapperProps extends SlideLogic {
@@ -279,6 +285,7 @@ module Esper.Onboarding {
 
   interface SlideWrapperState {
     busy: boolean;
+    blocked: boolean;
   }
 
   interface SlideProps {
@@ -306,7 +313,7 @@ module Esper.Onboarding {
 
     getState() {
       return (this.props.getState ?
-        this.props.getState(this) : { busy: false });
+        this.props.getState(this) : { busy: false, blocked: false });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -339,6 +346,7 @@ module Esper.Onboarding {
             firstSlide={ !this.props.index }
             lastSlide={ this.props.index + 1 >= slides.length }
             busy={this.state.busy}
+            blocked={this.state.blocked}
             prev={this.handlePrev.bind(this)}
             next={this.handleNext.bind(this)}
           />
@@ -367,7 +375,7 @@ module Esper.Onboarding {
         this.props.next(this)
           .done(onDone)
           .fail(function() {
-            // Show error message?
+            // TODO: Show error message?
           })
           .always(this.unmakeBusy.bind(this));
       } else {
@@ -376,11 +384,11 @@ module Esper.Onboarding {
     }
 
     protected makeBusy() {
-      this.setState({ busy: true });
+      this.setState({ busy: true, blocked: false });
     }
 
     protected unmakeBusy() {
-      this.setState({ busy: false });
+      this.setState({ busy: false, blocked: false });
     }
   }
 
@@ -430,6 +438,7 @@ module Esper.Onboarding {
     firstSlide: boolean;
     lastSlide: boolean;
     busy: boolean;
+    blocked: boolean;
     prev: () => void;
     next: () => void;
   }
@@ -445,7 +454,7 @@ module Esper.Onboarding {
               onClick={this.props.prev}>Back</button> :
             null
           }
-          <button type="button" disabled={this.props.busy}
+          <button type="button" disabled={this.props.busy || this.props.blocked}
             className="btn btn-primary btn-onboarding-next"
             onClick={this.props.next}>
             {this.props.lastSlide ? "Finish" : "Next"}
@@ -548,7 +557,65 @@ module Esper.Onboarding {
     view: PermissionSlide,
     title: "Connect to Google",
     getState: function() {
-      return { busy: !Login.loggedIn() };
+      return { busy: !Login.loggedIn(), blocked: false };
+    }
+  };
+
+
+  ///////////
+
+  // Slide 2 => identify slide
+  class IdentifySlide extends Slide<{}> {
+    hasSelected: boolean = false;
+
+    identifyUser(e) {
+      this.hasSelected = true;
+      this.props.data.supportsExecutive.set(e.target.value === "true");
+      // Reset the number of stored request to be 1
+      this.props.data.teamStore.reset();
+      this.props.data.teamStore.add();
+    }
+
+    render() {
+      return (<div>
+        <p>
+          Do you support an executive?
+          <div>
+            <input id="esper-support-executive"
+              type="radio"
+              value="true"
+              onChange={this.identifyUser.bind(this)}
+              name="esper-identify-slide-group"/>
+            <label htmlFor="esper-support-executive">
+              Yes, I support someone
+            </label>
+            <br />
+            <input id="esper-support-myself"
+              type="radio"
+              value="false"
+              onChange={this.identifyUser.bind(this)}
+              name="esper-identify-slide-group"/>
+            <label htmlFor="esper-support-myself">
+              No, I support myself
+            </label>
+          </div>
+        </p>
+      </div>);
+    }
+  }
+
+  var identifySlideLogic: SlideLogic = {
+    view: IdentifySlide,
+    title: "Getting to Know You",
+    getState: function(instance: SlideWrapper) {
+      var slide = instance.currentSlide as IdentifySlide;
+      return {
+        busy: false,
+        blocked: !slide.hasSelected
+      };
+    },
+    getSources: function(instance: SlideWrapper) {
+      return [instance.props.data.supportsExecutive];
     }
   };
 
@@ -561,7 +628,7 @@ module Esper.Onboarding {
     teamRequests: [TeamRequest, Model.StoreMetadata][];
   }
 
-  // Slide 2 => set calendar
+  // Slide 3 => set calendar
   class CalendarSlide extends Slide<CalendarSlideState> {
     teamForms: {
       [index: string]: TeamForm
@@ -603,11 +670,13 @@ module Esper.Onboarding {
 
       else {
         var teamStore = this.props.data.teamStore;
+        var supportsExecutive = this.props.data.supportsExecutive.val();
         var registerTeamForms = this.registerTeamForms.bind(this);
         var teamForms = _.map(this.state.teamRequests, function(team) {
           var remove = () => { teamStore.remove(team[1]._id) };
           return <TeamForm key={team[1]._id}
             ref={(c) => {registerTeamForms(team[1]._id, c)}}
+            supportsExecutive={supportsExecutive}
             team={team[0]}
             metadata={team[1]}
             calendars={calendars}
@@ -615,19 +684,27 @@ module Esper.Onboarding {
           />;
         });
         return (<div>
-          <div className="well">
-            Thanks! We need to know who you support in your organization, and
-            which calendars correspond to which executives. If you don't see
-            a calendar, you'll need to have the executive {' '}
-            <a href="https://support.google.com/calendar/answer/37082?hl=en">
-            share it with you on Google</a>.
-          </div>
+          { supportsExecutive ? 
+            <div className="well">
+              Thanks! We need to know who you support in your organization, and
+              which calendars correspond to which executives. If you don't see
+              a calendar, you'll need to have the executive {' '}
+              <a href="https://support.google.com/calendar/answer/37082?hl=en">
+              share it with you on Google</a>.
+            </div> :
+            <div className="well">
+              Thanks! Please place a checkmark next to the calendars you’d like
+              to link to Esper.
+            </div>
+          }
           { teamForms }
           <div>
-            <button className="btn btn-secondary"
-                    onClick={this.addExec.bind(this)}>
-              <i className="fa fa-fw fa-plus"></i> Add Another Executive
-            </button>
+            { supportsExecutive ? 
+              <button className="btn btn-secondary"
+                      onClick={this.addExec.bind(this)}>
+                <i className="fa fa-fw fa-plus"></i> Add Another Executive
+              </button> : null
+            }
           </div>
         </div>);
       }
@@ -655,7 +732,8 @@ module Esper.Onboarding {
       var calMetadata = calData[1];
 
       return {
-        busy: !calendars.length && calMetadata.updateInProgress
+        busy: !calendars.length && calMetadata.updateInProgress,
+        blocked: false
       };
     },
 
@@ -666,6 +744,7 @@ module Esper.Onboarding {
     next: function(instance: SlideWrapper) {
       var slide = instance.currentSlide as CalendarSlide;
       var teamStore = instance.props.data.teamStore;
+      var supportsExecutive = instance.props.data.supportsExecutive.val();
 
       // Set to false if ANY of our teams are invalid
       var isValid = true;
@@ -712,8 +791,19 @@ module Esper.Onboarding {
           teamStore.update(localId, request, {
             dataStatus: Model.DataStatus.INFLIGHT
           });
+          let body;
+          if (supportsExecutive) {
+            body = {
+              executive_name: request.name,
+              executive_email: request.email
+            }
+          } else {
+            body = {
+              executive_name: request.name
+            }
+          }
 
-          let promise = Api.createTeam(request.email, request.name)
+          let promise = Api.createTeam(body)
             .then(function(team) {
               // Put calendars
               var calendars = _.map<string, ApiT.Calendar>(
@@ -773,6 +863,7 @@ module Esper.Onboarding {
   interface TeamFormProps {
     key?: string;
     ref?: (c: TeamForm) => void;
+    supportsExecutive: boolean;
     team: TeamRequest;
     metadata: Model.StoreMetadata;
     calendars: ApiT.Calendar[];
@@ -798,6 +889,7 @@ module Esper.Onboarding {
 
     render() {
       var team = this.props.team;
+      var supportsExecutive = this.props.supportsExecutive;
 
       // Disable editing unless this is not yet saved
       // TODO: Allow editing of already created teams
@@ -853,25 +945,34 @@ module Esper.Onboarding {
             <div className={"form-group " +
                 (this.state.nameHasError ? "has-error" : "")}>
               <label htmlFor={this.getId("name")}
-                className="control-label">Name</label>
+                className="control-label">
+                { supportsExecutive ? "Name" : "Your Name" }
+              </label>
               <input id={this.getId("name")} name="name"
                 type="text" className="form-control"
                 defaultValue={team.name}
                 disabled={disabled}
                 placeholder="Tony Stark" />
             </div>
-            <div className={"form-group " +
-                (this.state.emailHasError ? "has-error" : "")}>
-              <label htmlFor={this.getId("email")}
-                className="control-label">Email</label>
-              <input id={this.getId("email") } type="email" name="email"
-                defaultValue={team.email}
-                disabled={disabled}
-                className="form-control" placeholder="tony@stark.com" />
-            </div>
+            { supportsExecutive ? 
+              <div className={"form-group " +
+                  (this.state.emailHasError ? "has-error" : "")}>
+                <label htmlFor={this.getId("email")}
+                  className="control-label">
+                  Email
+                </label>
+                <input id={this.getId("email") } type="email" name="email"
+                  defaultValue={team.email}
+                  disabled={disabled}
+                  className="form-control" placeholder="tony@stark.com" />
+              </div> : null
+            }
             <div className="form-group">
               <label htmlFor={this.getId("default-cal")}
-                className="control-label">Default Calendar</label>
+                className="control-label">
+                { supportsExecutive ? "Default Calendar"
+                  : " Default Calendar to Add Events"}
+              </label>
               <select id={this.getId("default-cal")}
                 value={team.defaultCal}
                 name="default-cal"
@@ -881,7 +982,7 @@ module Esper.Onboarding {
               </select>
             </div>
             {
-              disabled ? "" :
+              disabled || !supportsExecutive ? "" :
               <div className="esper-remove-link form-group"
                 onClick={this.props.remove}>
                 <i className="fa fa-fw fa-close"></i>
@@ -900,7 +1001,10 @@ module Esper.Onboarding {
           </div></div>
           <div className="col-sm-6 form-group">
             <div className="esper-col-spacer">
-              <label className="group-heading">Other Calendars</label>
+              <label className="group-heading">
+                { supportsExecutive ? "Other Calendars"
+                  : "Other Calendars to Sync"}
+              </label>
               <div>{calCheckboxes}</div>
             </div>
           </div>
@@ -914,13 +1018,18 @@ module Esper.Onboarding {
     validate(): TeamRequest {
       /* Using jQuery selectors here is unfortunately not type-checkable.
          TODO: Use React's ref attribute with enums or properties */
+      var supportsExecutive = this.props.supportsExecutive;
       var name = this.find("input[name=name]").val();
       var nameIsValid = !!name;
 
-      var email = this.find("input[name=email]").val();
-      var emailIsValid = !!email; // TODO: Validate email
+      if (supportsExecutive) {
+        var email = this.find("input[name=email]").val();
+        var emailIsValid =
+          email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i) !== null;
+      }
 
-      if (nameIsValid && emailIsValid) {
+      if ((nameIsValid && !supportsExecutive)
+           || (nameIsValid && emailIsValid)) {
         var defaultCal = this.find("[name=default-cal]").val();
         var calendars = this.find("[name=calendars]:checked").map(
           function() {
@@ -930,16 +1039,27 @@ module Esper.Onboarding {
           calendars.push(defaultCal);
         }
 
-        return _.extend({}, this.props.team, {
-          name: name,
-          email: email,
-          defaultCal: defaultCal,
-          calendars: calendars
-        }) as TeamRequest;
+        var teamProps;
+        if (supportsExecutive) {
+          teamProps = {
+            name: name,
+            email: email,
+            defaultCal: defaultCal,
+            calendars: calendars
+          }
+        } else {
+          teamProps = {
+            name: name,
+            defaultCal: defaultCal,
+            calendars: calendars
+          }
+        }
+
+        return _.extend({}, this.props.team, teamProps) as TeamRequest;
       } else {
         this.setState({
           nameHasError: !nameIsValid,
-          emailHasError: !emailIsValid
+          emailHasError: !supportsExecutive || !emailIsValid
         });
       }
     }
@@ -948,7 +1068,7 @@ module Esper.Onboarding {
 
   ///////////
 
-  // Slide 3 => videos + final stuff
+  // Slide 4 => videos + final stuff
   class FinishSlide extends Slide<{}> {
     render() {
       var videoList: [string, string][] = [
@@ -1023,6 +1143,7 @@ module Esper.Onboarding {
   var slides: SlideLogic[] = [
     welcomeSlideLogic,
     permissionSlideLogic,
+    identifySlideLogic,
     calendarSlideLogic,
     finishSlideLogic
   ];
