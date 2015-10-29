@@ -197,6 +197,7 @@ module Esper.GmailSearch {
     );
 
     function closeModal() {
+      Analytics.track(Analytics.Trackable.ClickCancelEmailSearch);
       linkThreads = {};
       unlinkThreads = {};
       view.remove();
@@ -204,7 +205,9 @@ module Esper.GmailSearch {
 
     function workAndCloseModal() {
       $.each(unlinkThreads, function(searchThread, taskid) {
-        TaskTab.unlinkThread(team.teamid, taskid, searchThread);
+        TaskTab.unlinkThread(team.teamid, taskid, searchThread).done(function() {
+          TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+        });
       });
 
       $.each(linkThreads, function(searchThread, taskid) {
@@ -243,6 +246,7 @@ module Esper.GmailSearch {
               });
           });
       });
+      Analytics.track(Analytics.Trackable.ClickDoneEmailSearch);
       linkThreads = {};
       unlinkThreads = {};
       view.remove();

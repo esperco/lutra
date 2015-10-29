@@ -1155,7 +1155,7 @@ module Esper.TaskTab {
         GmailSearch.viewOfSearchModal(team, threadId, taskTabView, userTabContent);
       $("body").append(searchModal.view);
       searchModal.search.focus();
-      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
+      Analytics.track(Analytics.Trackable.LinkTaskTabEmail);
     });
 
     /* Task Label Stuff */
