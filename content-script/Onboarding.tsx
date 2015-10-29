@@ -670,6 +670,7 @@ module Esper.Onboarding {
       }
 
       else {
+        var self = this;
         var teamStore = this.props.data.teamStore;
         var supportsExecutive = this.props.data.supportsExecutive.val();
         var registerTeamForms = this.registerTeamForms.bind(this);
@@ -677,6 +678,7 @@ module Esper.Onboarding {
           var remove = () => { teamStore.remove(team[1]._id) };
           return <TeamForm key={team[1]._id}
             ref={(c) => {registerTeamForms(team[1]._id, c)}}
+            first={_.first(self.state.teamRequests) === team}
             supportsExecutive={supportsExecutive}
             team={team[0]}
             metadata={team[1]}
@@ -864,6 +866,7 @@ module Esper.Onboarding {
   interface TeamFormProps {
     key?: string;
     ref?: (c: TeamForm) => void;
+    first: boolean;
     supportsExecutive: boolean;
     team: TeamRequest;
     metadata: Model.StoreMetadata;
@@ -890,6 +893,7 @@ module Esper.Onboarding {
 
     render() {
       var team = this.props.team;
+      var first = this.props.first;
       var supportsExecutive = this.props.supportsExecutive;
 
       // Disable editing unless this is not yet saved
@@ -982,7 +986,7 @@ module Esper.Onboarding {
               </select>
             </div>
             {
-              disabled || !supportsExecutive ? "" :
+              disabled || !supportsExecutive || first ? "" :
               <div className="esper-remove-link form-group"
                 onClick={this.props.remove}>
                 <i className="fa fa-fw fa-close"></i>
@@ -1005,7 +1009,7 @@ module Esper.Onboarding {
                 { supportsExecutive ? "Calendars Associated with this Executive"
                   : "Other Calendars to Sync"}
               </label>
-              <div>{calCheckboxes}</div>
+              <div className="esper-sync-calendars">{calCheckboxes}</div>
             </div>
           </div>
         </div>

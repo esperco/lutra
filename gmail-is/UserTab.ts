@@ -15,7 +15,6 @@ module Esper.UserTab {
 '''
 <div #view class="esper-preference-section esper-contains-list esper-clearfix">
   <div class="esper-clearfix">
-    <span #viewAvailability class="esper-preference-text esper-link">View</span>
     <object #availabilityIcon class="esper-svg esper-preference-icon"/>
     <span class="esper-preference-title esper-bold">
       Availability
@@ -37,7 +36,6 @@ module Esper.UserTab {
 
     var numAvailabilities = availabilities.length;
     if (numAvailabilities === 0) {
-      viewAvailability.hide();
       availability
         .append($("<li class='esper-empty-list'>No availability</li>"));
     } else {
@@ -65,10 +63,6 @@ module Esper.UserTab {
         toTimeText.text(" " + formatTime(a.avail_to.time) + " ");
 
         availability.append(availabilityRow);
-      });
-
-      viewAvailability.click(function() {
-        // TODO: open calendar modal
       });
     }
 

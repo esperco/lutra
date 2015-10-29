@@ -48,7 +48,8 @@ module Esper.GmailSearch {
       date_output = XDate.month(thread_date) + " " + thread_date.getDate();
     }
 
-    subject.html("<b>" + e.first_subject + "</b> - " + e.last_snippet);
+    subject.html("<b>" + e.first_subject.substring(0,50) + "</b> - " 
+                  + e.last_snippet.substring(0,80));
     date.html(date_output);
 
     Api.getTaskForThread(team.teamid, searchThread, false, false)
@@ -166,7 +167,7 @@ module Esper.GmailSearch {
         <div #spinner class="esper-spinner esper-search-spinner"/>
         <div #results>
           <div #noResults class="esper-no-results esper-click-safe">
-            <span class="esper-click-safe">No upcoming events named </span>
+            <span class="esper-click-safe">No emails named </span>
             &quot;
             <span #noResultsFeedback class="esper-bold esper-click-safe"/>
             &quot;
