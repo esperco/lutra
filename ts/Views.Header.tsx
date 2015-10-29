@@ -11,7 +11,7 @@ module Esper.Views {
       return <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container">
           <div className="navbar-header">
-            <a className="navbar-brand" href="/#!/">Esper</a>
+            <a className="navbar-brand" href="/#!/">Esper Time</a>
           </div>
 
           <ul className="nav navbar-nav navbar-right">
