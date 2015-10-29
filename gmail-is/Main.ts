@@ -74,11 +74,11 @@
 /// <reference path="./GmailSearch.ts" />
 
 module Esper.Main {
-    export function init(): void {
-        Log.tag = "Esper [IS]";
-        Log.d("Initializing injected script");
-        Init.init();
-    }
+  export function init(): void {
+    Log.tag = "Esper [IS]";
+    Log.d("Initializing injected script");
+    Init.init();
+  }
 }
 
 /* Called once per page */
