@@ -412,7 +412,7 @@ module Esper.Api {
   export function emailSearch(teamid: string, query: string):
     JQueryPromise<ApiT.EmailThreadSearchList> {
     var url =
-      Conf.Api.url + "/api/gmail/thread-search/" + string(Login.myUid())
+      prefix + "/api/gmail/thread-search/" + string(Login.myUid())
       + "/" + string(teamid)
       + "/" + encodeURIComponent(query);
     return JsonHttp.get(url);
