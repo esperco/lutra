@@ -409,6 +409,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(cals));
   }
 
+  export function emailSearch(teamid: string, query: string):
+    JQueryPromise<ApiT.EmailThreadSearchList> {
+    var url =
+      prefix + "/api/gmail/thread-search/" + string(Login.myUid())
+      + "/" + string(teamid)
+      + "/" + encodeURIComponent(query);
+    return JsonHttp.get(url);
+  }
+
   export function eventRange(teamid: string, teamCalendars: ApiT.Calendar[],
                              from: number, until: number):
   JQueryPromise<ApiT.CalendarEventList> {
