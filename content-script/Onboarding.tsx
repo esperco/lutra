@@ -479,6 +479,7 @@ module Esper.Onboarding {
             <li>Set customized confirmations and reminder emails for events</li>
             <li>Stay organized with automatically compiled Agendas and Task
             Lists</li>
+            <li>See how you allocate your time with Timestats</li>
           </ul>
         </p>
         <p>
@@ -724,7 +725,7 @@ module Esper.Onboarding {
 
   var calendarSlideLogic: SlideLogic = {
     view: CalendarSlide,
-    title: "Set Up Esper",
+    title: "Set Up Calendars",
 
     getState: function(instance: SlideWrapper) {
       var calData = instance.props.data.calendarQuery.get();
@@ -946,7 +947,7 @@ module Esper.Onboarding {
                 (this.state.nameHasError ? "has-error" : "")}>
               <label htmlFor={this.getId("name")}
                 className="control-label">
-                { supportsExecutive ? "Name" : "Your Name" }
+                { supportsExecutive ? "Executive's Name" : "Your Name" }
               </label>
               <input id={this.getId("name")} name="name"
                 type="text" className="form-control"
@@ -959,7 +960,7 @@ module Esper.Onboarding {
                   (this.state.emailHasError ? "has-error" : "")}>
                 <label htmlFor={this.getId("email")}
                   className="control-label">
-                  Email
+                  Executive's Email
                 </label>
                 <input id={this.getId("email") } type="email" name="email"
                   defaultValue={team.email}
@@ -970,8 +971,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("default-cal")}
                 className="control-label">
-                { supportsExecutive ? "Default Calendar"
-                  : " Default Calendar to Add Events"}
+                Default Calendar to Add Events
               </label>
               <select id={this.getId("default-cal")}
                 value={team.defaultCal}
@@ -1002,7 +1002,7 @@ module Esper.Onboarding {
           <div className="col-sm-6 form-group">
             <div className="esper-col-spacer">
               <label className="group-heading">
-                { supportsExecutive ? "Other Calendars"
+                { supportsExecutive ? "Calendars Associated with this Executive"
                   : "Other Calendars to Sync"}
               </label>
               <div>{calCheckboxes}</div>
@@ -1072,18 +1072,18 @@ module Esper.Onboarding {
   class FinishSlide extends Slide<{}> {
     render() {
       var videoList: [string, string][] = [
-        ["Create a Task", "https://youtu.be/vQ-XcwQQDNg"],
-        ["Create Events", "https://youtu.be/_mum9uSodUo"],
-        ["Link Events", "https://youtu.be/oqhnF6wHY7Q"],
-        ["Draft Emails", "https://youtu.be/rA-deetbleQ"],
-        ["Linking Emails together with Task Notes", "https://youtu.be/e-EPFLAcOQo"],
-        ["Insert Emails into the Calendar Event Description", "https://youtu.be/AnUhbTkbquU"],
-        ["Send Event Invitation", "https://youtu.be/zuBE2d1YobA"],
-        ["Schedule Event Reminders", "https://youtu.be/1KORUttWy1k"],
-        ["Esper Agenda", "https://youtu.be/Nk2b1-msHUk"],
-        ["Use Esper Workflows", "https://youtu.be/reWgAs2hE9o"],
-        ["Esper TimeStats", "https://youtu.be/qSP5DcLtMqs"],
-        ["Supporting Multiple Executives", "https://youtu.be/f1gx4OdYbEs"]
+        ["Create a Task", "https://youtu.be/vQ-XcwQQDNg?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Create Events", "https://youtu.be/_mum9uSodUo?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Link Events", "https://youtu.be/oqhnF6wHY7Q?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Draft Emails", "https://youtu.be/rA-deetbleQ?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Linking Emails together with Task Notes", "https://youtu.be/e-EPFLAcOQo?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Insert Emails into the Calendar Event Description", "https://youtu.be/AnUhbTkbquU?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Send Event Invitation", "https://youtu.be/zuBE2d1YobA?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Schedule Event Reminders", "https://youtu.be/1KORUttWy1k?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Esper Agenda", "https://youtu.be/Nk2b1-msHUk?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Use Esper Workflows", "https://youtu.be/reWgAs2hE9o?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Esper TimeStats", "https://youtu.be/qSP5DcLtMqs?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Supporting Multiple Executives", "https://youtu.be/f1gx4OdYbEs?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"]
       ];
 
       var self = this;
