@@ -105,5 +105,9 @@ module Esper.Query {
       };
       return [ret, metadata];
     }
+
+    val(key: K): V {
+      return this.get(key)[0];
+    }
   }
 }

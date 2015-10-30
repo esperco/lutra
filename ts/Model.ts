@@ -20,7 +20,9 @@ module Esper.Model {
     READY = 1,  // Local state accurately reflects server (as far as we know)
     UNSAVED,    // Local state has changes not yet pushed to server
     INFLIGHT,   // Push to server in progress
-    FETCHING    // Pull from server in progress
+    FETCHING,   // Pull from server in progress
+    PUSH_ERROR, // Error while saving (treat as unsaved)
+    FETCH_ERROR // Error while fetching
   };
 
   // Metadata that lives alongside the actual object data -- need at least
@@ -30,6 +32,7 @@ module Esper.Model {
     dataStatus?: DataStatus;
     lastUpdate?: Date;
     aliases?: string[];
+    lastError?: Error;
   }
 
   // Variant on StoreMetadata for new objects (_id is required)

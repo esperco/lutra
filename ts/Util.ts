@@ -1,3 +1,5 @@
+/// <reference path="../typings/lodash/lodash.d.ts" />
+
 module Esper.Util {
   // Return a random alphanumeric string
   export function randomString() {
@@ -63,5 +65,28 @@ module Esper.Util {
     for (var i = 0; i < hex.length; i += 2)
       s += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
     return s;
+  }
+
+  /* Stable stringification of objects for comparison */
+  export function cmpStringify(o: any): string {
+    return JSON.stringify(tuplify(o));
+  }
+
+  /*
+    Recursively converts objects to sorted nested lists of 2-tuples.
+    Lack of strong typing isn't ideal, but should be OK if only used by
+    cmpStringify to generate stable strings for identical objects.
+  */
+  function tuplify(o: any): any {
+    if (typeof o !== "object") {
+      return o;
+    }
+
+    var keys = _.keys(o);
+    keys.sort();
+
+    return _.map(keys, function(k) {
+      return [k, tuplify(o[k])];
+    });
   }
 }
