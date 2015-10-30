@@ -1,13 +1,20 @@
 /// <reference path="./Esper.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
+/// <reference path="./Views.LabelsOverTime.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 
 module Esper.Route {
 
   // Index page
   pageJs("/", function() {
-    Layout.render(<Views.Index />);
+    // Layout.render(<Views.Index />);
+    nav.path("/labels-over-time");
+  });
+
+  // Graph labels over time
+  pageJs("/labels-over-time", function() {
+    Layout.render(<Views.LabelsOverTime />);
   });
 
   // 404 page

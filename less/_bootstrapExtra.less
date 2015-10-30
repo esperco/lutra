@@ -1,0 +1,17 @@
+/*
+  Tweaks to Bootstrap classes
+*/
+
+.list-group-item.one-line {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+}
+
+a.list-group-item {
+  cursor: pointer; // No href required
+
+  &.active {
+    cursor: default;
+  }
+}
