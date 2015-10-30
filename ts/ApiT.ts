@@ -472,6 +472,14 @@ type token_response = [
     window_end: string; // timestamp
   }
 
+  export interface CalendarStatsRequest {
+    window_starts: string[]; // timestamp sorted ascendingly
+    window_end: string; // timestamp
+  }
+
+  export interface CalendarStatsResult {
+    stats: CalendarStats[];
+  }
   export interface CalendarStats {
     by_label:   CalendarStatsByLabel;
     unlabelled: CalendarStatEntry;
