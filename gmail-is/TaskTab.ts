@@ -805,6 +805,14 @@ module Esper.TaskTab {
         <div #linkEmails
         class="esper-section-actions esper-clearfix esper-open">
           <div style="display:inline-block">
+            <div #createEmail
+            class="esper-link-action esper-dropdown-btn esper-click-safe esper-disabled">
+              <object #createEmailIcon class="esper-svg esper-link-action-icon"/>
+              <div class="esper-link-action-text esper-click-safe">
+              Create
+              </div>
+            </div>
+            <div class="esper-vertical-divider"/>
             <div #linkEmail class="esper-link-action">
               <object #linkEmailIcon class="esper-svg esper-link-action-icon"/>
               <div class="esper-link-action-text">Link</div>
@@ -953,6 +961,7 @@ module Esper.TaskTab {
     }, "TaskTab.refreshLinkedEventsList");
 
     refreshLinkedThreadsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    createEmailIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEmailIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -1146,7 +1155,7 @@ module Esper.TaskTab {
         GmailSearch.viewOfSearchModal(team, threadId, taskTabView, userTabContent);
       $("body").append(searchModal.view);
       searchModal.search.focus();
-      Analytics.track(Analytics.Trackable.LinkTaskTabEvent);
+      Analytics.track(Analytics.Trackable.LinkTaskTabEmail);
     });
 
     /* Task Label Stuff */

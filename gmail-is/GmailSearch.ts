@@ -13,8 +13,11 @@ module Esper.GmailSearch {
     endTime: JQuery;
   }
 
+  var linkThreads = {};
+  var unlinkThreads = {};
+
   function renderSearchResult(e: ApiT.EmailThreadSearch, task: ApiT.Task,
-                              team: ApiT.Team, threadId: string, eventsTab, userTab) {
+                              team: ApiT.Team, threadId: string, eventsTab) {
     Log.d("renderSearchResult()");
 '''
 <div #view class="esper-bs">
@@ -75,42 +78,11 @@ module Esper.GmailSearch {
 
     link.click(function(e) {
       if (!link.is(":checked")) {
-        TaskTab.unlinkThread(team.teamid, task.taskid, searchThread);
+        delete linkThreads[searchThread];
+        unlinkThreads[searchThread] = task.taskid;
       } else {
-        Api.getTaskForThread(team.teamid, searchThread, false, false)
-          .done(function(newTask) {
-            var job;
-            CurrentThread.getTaskForThread()
-              .done(function(autoTask) {
-                var currentTask = autoTask;
-                CurrentThread.setTask(currentTask);
-
-                if (newTask !== undefined) {
-                  job = Api.switchTaskForThread(team.teamid, searchThread,
-                                                newTask.taskid, currentTask.taskid);
-                  var meetingType = newTask.task_meeting_type;
-                  if (meetingType && !currentTask.task_meeting_type) {
-                    job.done(function() {
-                      return Api.setTaskMeetingType(currentTask.taskid, meetingType);
-                    });
-                    currentTask.task_meeting_type = meetingType;
-                  }
-                } else {
-                  job = Api.linkThreadToTask(team.teamid, searchThread, currentTask.taskid);
-                }
-
-                job.done(function() {
-                  TaskTab.refreshTaskProgressSelection(team, threadId, eventsTab);
-                  TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
-                  TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
-                });
-
-                eventsTab.taskTitle.val(currentTask.task_title);
-                TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
-                                                   userTab);
-                Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
-              });
-          });
+        delete unlinkThreads[searchThread];
+        linkThreads[searchThread] = task.taskid;
       }
     });
 
@@ -121,9 +93,8 @@ module Esper.GmailSearch {
   function setupSearch(team: ApiT.Team,
                        threadId: string,
                        searchView: SearchView,
-                       eventsTab: TaskTab.TaskTabView,
-                       userTab) {
-    Util.afterTyping(searchView.search, 250, function() {
+                       eventsTab: TaskTab.TaskTabView) {
+    Util.afterTypingNoClickNoFocus(searchView.search, 250, function() {
       if (searchView.search.val().trim() === "") {
         searchView.resultsDropdown.hide();
         if (searchView.resultsDropdown.hasClass("esper-open")) {
@@ -150,7 +121,7 @@ module Esper.GmailSearch {
 
                 results.items.forEach(function(e) {
                   if (threadId !== e.gmail_thrid) {
-                    renderSearchResult(e, task, team, threadId, eventsTab, userTab)
+                    renderSearchResult(e, task, team, threadId, eventsTab)
                       .appendTo(searchView.results);
                   }
                 });
@@ -216,8 +187,10 @@ module Esper.GmailSearch {
 </div>
 '''
     var searchView = <SearchView> _view;
+    linkThreads = {};
+    unlinkThreads = {};
 
-    setupSearch(team, threadId, searchView, eventsTab, userTabContents);
+    setupSearch(team, threadId, searchView, eventsTab);
 
     search.css(
       "background",
@@ -225,12 +198,64 @@ module Esper.GmailSearch {
     );
 
     function closeModal() {
-      TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+      Analytics.track(Analytics.Trackable.ClickCancelEmailSearch);
+      linkThreads = {};
+      unlinkThreads = {};
       view.remove();
     }
+
+    function workAndCloseModal() {
+      $.each(unlinkThreads, function(searchThread, taskid) {
+        TaskTab.unlinkThread(team.teamid, taskid, searchThread).done(function() {
+          TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+        });
+      });
+
+      $.each(linkThreads, function(searchThread, taskid) {
+        Api.getTaskForThread(team.teamid, searchThread, false, false)
+          .done(function(newTask) {
+            var job;
+            CurrentThread.getTaskForThread()
+              .done(function(autoTask) {
+                var currentTask = autoTask;
+                CurrentThread.setTask(currentTask);
+
+                if (newTask !== undefined) {
+                  job = Api.switchTaskForThread(team.teamid, searchThread,
+                    newTask.taskid, currentTask.taskid);
+                  var meetingType = newTask.task_meeting_type;
+                  if (meetingType && !currentTask.task_meeting_type) {
+                    job.done(function() {
+                      return Api.setTaskMeetingType(currentTask.taskid, meetingType);
+                    });
+                    currentTask.task_meeting_type = meetingType;
+                  }
+                } else {
+                  job = Api.linkThreadToTask(team.teamid, searchThread, currentTask.taskid);
+                }
+
+                job.done(function() {
+                  TaskTab.refreshTaskProgressSelection(team, threadId, eventsTab);
+                  TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+                  TaskTab.refreshLinkedEventsList(team, threadId, eventsTab);
+                });
+
+                eventsTab.taskTitle.val(currentTask.task_title);
+                TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
+                                                    userTabContents);
+                Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
+              });
+          });
+      });
+      Analytics.track(Analytics.Trackable.ClickDoneEmailSearch);
+      linkThreads = {};
+      unlinkThreads = {};
+      view.remove();
+    }
+
     view.click(closeModal);
     Util.preventClickPropagation(modal);
-    done.click(closeModal);
+    done.click(workAndCloseModal);
     cancel.click(closeModal);
 
     return _view;
