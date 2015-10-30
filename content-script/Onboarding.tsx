@@ -1110,13 +1110,17 @@ module Esper.Onboarding {
       });
 
       return (<div>
-        <p>To get the most out of Esper view the instructional videos below so
-        you can master all of these time-saving features.
+        <p>
+          To get the most out of Esper view the instructional videos below so
+          you can master all of these time-saving features.
         </p>
 
-        <p>Let us know if you’re interested in a personalized training session
-        {" "}<a href="http://esper.com/request-demo" target="_blank">here</a>.
+        <p>
+          Let us know if you’re interested in a personalized training session
+          {" "}<a href="http://esper.com/request-demo" target="_blank">here</a>.
         </p>
+
+        <h4>LIST OF VIDEOS</h4>
 
         <ol>
           {videoLinks}
