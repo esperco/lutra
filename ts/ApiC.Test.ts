@@ -48,6 +48,15 @@ module Esper.ApiC {
       expect((<jasmine.Spy> ApiTest.testFn).calls.count()).toEqual(2);
     });
 
+    it("should return a new promise if passed different args", function() {
+      expect(this.cFn("a", {sub1: "b", sub2: 3})).toBe(this.promise);
+
+      var promise2 = $.Deferred().promise();
+      (<jasmine.Spy> ApiTest.testFn).and.returnValue(promise2);
+      expect(this.cFn("a", {sub1: "b", sub2: 2})).toBe(promise2);
+      expect((<jasmine.Spy> ApiTest.testFn).calls.count()).toEqual(2);
+    });
+
     it("should return a promise that resolves with cached value on success",
     function() {
       this.cFn("a", {sub1: "b", sub2: 2});
@@ -70,8 +79,8 @@ module Esper.ApiC {
     describe("store", function() {
       beforeEach(function() {
         this.args = ["a", {sub1: "b", sub2: 2}];
-        this.keyStr = Util.cmpStringify(this.args);
-        this.cFn(this.args);
+        this.keyStr = this.cFn.strFunc(this.args);
+        this.cFn.apply(null, this.args);
 
         this.listener = jasmine.createSpy("listener");
         this.cFn.store.addChangeListener(this.listener);
@@ -148,7 +157,6 @@ module Esper.ApiC {
       });
     });
 
-    // Test timeout
     describe("after timeout", function() {
       beforeEach(function() {
         jasmine.clock().mockDate(new Date(2015,1,1));
