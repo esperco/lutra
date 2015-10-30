@@ -55,7 +55,7 @@ module Esper.Menu {
 
   function updateLinks(ul) {
     //sign-in is now done with onboarding
-    var signIOLink = makeActionLink("Sign out", Login.logout)
+    var signOutLink = makeActionLink("Sign out", Login.logout)
 
     function openSettings() {
       window.open(Conf.Api.url);
@@ -109,7 +109,7 @@ module Esper.Menu {
       .append(hr)
       .append(getStartedLink)
       .append(helpLink)
-      .append(signIOLink);
+      .append(signOutLink);
   }
 
   export interface Menu {
