@@ -1,6 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
+/// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.Chart.tsx" />
 /// <reference path="./TimeStats.ts" />
 
@@ -16,7 +17,6 @@ module Esper.Views {
     teamId: string;
     calId: string;
   }
-
   var selectStore = new Model.StoreOne<CalSelection>();
 
   // Action to update our selection -- also triggers async calls
@@ -32,8 +32,25 @@ module Esper.Views {
     });
   }
 
+  // Store for currently selected labels
+  interface LabelSelection {
+    labels: string[];
+  }
+  var labelSelectStore = new Model.StoreOne<LabelSelection>();
+
+  // Action to update selected labels
+  function updateLabels(labels: string[]) {
+    labelSelectStore.set({
+      labels: labels
+    });
+  }
+
+
+  /////
+
   interface LabelsOverTimeState {
     selection: CalSelection;
+    selectedLabels: string[];
     stats: TimeStats.StatResult[];
   }
 
@@ -51,6 +68,7 @@ module Esper.Views {
               selectedTeamId={selectedTeamId}
               selectedCalId={selectedCalId}
               updateFn={updateSelection} />
+            {this.renderLabels()}
           </div>
           <div className="col-sm-9">
             {this.renderChart()}
@@ -63,15 +81,27 @@ module Esper.Views {
       var stats = this.state.stats;
       if (! stats) {
         return <div>Please select a calendar</div>
-      } else if (_.find(stats, (stat) => !stat.ready)) {
-        return <div>Loading &hellip;</div>
       } else if (_.find(stats, (stat) => stat.error)) {
         return <div>Something broke!</div>
+      } else if (_.find(stats, (stat) => !stat.ready)) {
+        return <div>Loading &hellip;</div>
       }
 
       var data = this.getChartData(stats);
       return <Components.BarChart width={2} height={1}
         units="Hours" verticalLabel="Time (Hours)" data={data} />
+    }
+
+    renderLabels() {
+      var stats = this.state.stats;
+      if (!stats && _.find(stats, (stat) => !stat.ready)) {
+        return <span></span>;
+      } else {
+        return <Components.LabelSelector
+          allLabels={TimeStats.getLabels(stats)}
+          selectedLabels={this.state.selectedLabels}
+          updateFn={updateLabels} />;
+      }
     }
 
     getChartData(stats: TimeStats.StatResult[]) {
@@ -84,6 +114,11 @@ module Esper.Views {
       _.each(stats, (stat, i) => {
         if (stat && stat.ready) {
           _.each(stat.stats.by_label, (val, name) => {
+            // Only included selected labels
+            if (! _.contains(this.state.selectedLabels, name)) {
+              return;
+            }
+
             var list = dataValues[name] = dataValues[name] || [];
 
             // This label may be new, so prefill 0s up to current index
@@ -126,7 +161,11 @@ module Esper.Views {
     }
 
     componentDidMount() {
-      this.setSources([selectStore, TimeStats.intervalQuery]);
+      this.setSources([
+        selectStore,
+        labelSelectStore,
+        TimeStats.intervalQuery
+      ]);
     }
 
     getState() {
@@ -140,10 +179,12 @@ module Esper.Views {
           numIntervals: 5,
           interval: TimeStats.Interval.WEEKLY
         });
+        var labelStoreVal = labelSelectStore.val();
       }
 
       return {
         selection: selection,
+        selectedLabels: (labelStoreVal && labelStoreVal.labels) || [],
         stats: stats
       };
     }

@@ -119,4 +119,19 @@ module Esper.TimeStats {
   }
 
   export var intervalQuery = new IntervalQueryClass();
+
+
+  ////
+
+  export function getLabels(results: StatResult[]) {
+    var ret: string[] = [];
+    _.each(results, (result) => {
+      if (result.ready) {
+        _.each(result.stats.by_label, (v, name) => {
+          ret.push(name);
+        });
+      }
+    });
+    return _.uniq(ret);
+  }
 }
