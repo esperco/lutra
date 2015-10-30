@@ -126,9 +126,10 @@ module Esper.XDate {
   }
 
   /* "1:30pm" */
-  export function formatTimeOnly(hour, min, short, spacer = "") {
-    var ampm;
-    var h;
+  export function formatTimeOnly(hour: number, min: number,
+                                 short: boolean, spacer = "") {
+    var ampm: string;
+    var h: number;
     if (hour < 12) {
       h = 0 < hour ? hour : 12;
       ampm = "am";
