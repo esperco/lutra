@@ -21,6 +21,8 @@ module Esper.Views {
 
   // Action to update our selection -- also triggers async calls
   function updateSelection(teamId: string, calId: string) {
+    var current = selectStore.val();
+
     selectStore.set({teamId: teamId, calId: calId});
     TimeStats.intervalQuery.async({
       teamId: teamId,
@@ -30,6 +32,11 @@ module Esper.Views {
       numIntervals: 5,
       interval: TimeStats.Interval.WEEKLY
     });
+
+    // Clear label selection if switching teams (default)
+    if (current.teamId !== teamId) {
+      labelSelectStore.unset();
+    }
   }
 
   // Store for currently selected labels
