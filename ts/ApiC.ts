@@ -131,6 +131,12 @@ module Esper.ApiC {
           }
           return data;
         });
+
+        // Clean up old promises in memory
+        if (promises[key] === promise) {
+          delete promises[key];
+        }
+
         return err;
       });
 
@@ -138,10 +144,13 @@ module Esper.ApiC {
     };
 
     ret.store = store;
+    ret._promises = promises; // Expose for debugging only (not in type)
     return (<A & HasStore<T>> ret);
   }
 
 
   // Actual API Calls /////////////////
+
+
 
 }
