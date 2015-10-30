@@ -25,6 +25,7 @@ module Esper.ApiC {
 
   interface HasStore<T> {
     store: Model.CappedStore<T>;
+    strFunc: (...args: any[]) => string;
   }
 
   /*
@@ -144,6 +145,7 @@ module Esper.ApiC {
     };
 
     ret.store = store;
+    ret.strFunc = strFunc;
     ret._promises = promises; // Expose for debugging only (not in type)
     return (<A & HasStore<T>> ret);
   }
@@ -153,5 +155,7 @@ module Esper.ApiC {
 
   export var postForCalendarStats = makeC
     <typeof Api.postForCalendarStats, ApiT.CalendarStats>
-    (Api.postForCalendarStats);
+    (Api.postForCalendarStats, {
+      store: new Model.CappedStore<ApiT.CalendarStats>()
+    });
 }
