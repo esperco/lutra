@@ -1110,18 +1110,13 @@ module Esper.Onboarding {
       });
 
       return (<div>
-        <p>Let’s face it, most of us already use our inbox as a task list.
-        So why not embrace it? At Esper, we do exactly that. Esper is built on
-        Tasks. Tasks are comprised of emails and events that you can link
-        together. Finally, your inbox works seamlessly with your calendar!</p>
+        <p>To get the most out of Esper view the instructional videos below so
+        you can master all of these time-saving features.
+        </p>
 
-        <p>When you open a Gmail thread, the Esper Sidebar will pop up on the
-        right side of your screen.From the Esper Sidebar, you can create Tasks,
-        create Linked Events, send Invitations, see Executive Preferences and
-        more directly from your inbox!</p>
-
-        <p>Check out our videos to learn how you can become an Esper scheduling
-        expert!</p>
+        <p>Let us know if you’re interested in a personalized training session
+        {" "}<a href="http://esper.com/request-demo" target="_blank">here</a>.
+        </p>
 
         <ol>
           {videoLinks}
