@@ -1,6 +1,8 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
+/// <reference path="./Components.Chart.tsx" />
+/// <reference path="./TimeStats.ts" />
 
 /*
   Page for seeing label stats over time
@@ -10,17 +12,135 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   // Store for currently selected team and calendar
-  var selectStore = new Model.StoreOne<Components.CalSelection>();
+  interface CalSelection {
+    teamId: string;
+    calId: string;
+  }
 
-  export class LabelsOverTime extends Component<{}, {}> {
+  var selectStore = new Model.StoreOne<CalSelection>();
+
+  // Action to update our selection -- also triggers async calls
+  function updateSelection(teamId: string, calId: string) {
+    selectStore.set({teamId: teamId, calId: calId});
+    TimeStats.intervalQuery.async({
+      teamId: teamId,
+      calId: calId,
+
+      // Hard-coded for now
+      numIntervals: 5,
+      interval: TimeStats.Interval.WEEKLY
+    });
+  }
+
+  interface LabelsOverTimeState {
+    selection: CalSelection;
+    stats: TimeStats.StatResult[];
+  }
+
+  export class LabelsOverTime extends Component<{}, LabelsOverTimeState> {
     render() {
+      if (this.state.selection) {
+        var selectedTeamId = this.state.selection.teamId;
+        var selectedCalId = this.state.selection.calId;
+      }
+
       return <div id="labels-over-time-page" className="container">
         <div className="row">
           <div className="col-sm-3">
-            <Components.CalSelector store={selectStore} />
+            <Components.CalSelector
+              selectedTeamId={selectedTeamId}
+              selectedCalId={selectedCalId}
+              updateFn={updateSelection} />
+          </div>
+          <div className="col-sm-9">
+            {this.renderChart()}
           </div>
         </div>
       </div>;
+    }
+
+    renderChart() {
+      var stats = this.state.stats;
+      if (! stats) {
+        return <div>Please select a calendar</div>
+      } else if (_.find(stats, (stat) => !stat.ready)) {
+        return <div>Loading &hellip;</div>
+      } else if (_.find(stats, (stat) => stat.error)) {
+        return <div>Something broke!</div>
+      }
+
+      var data = this.getChartData(stats);
+      return <Components.BarChart width={2} height={1}
+        units="Hours" verticalLabel="Time (Hours)" data={data} />
+    }
+
+    getChartData(stats: TimeStats.StatResult[]) {
+      var labels = _.map(stats,
+        // MMM d => Oct 4
+        (stat) => "Week starting " + moment(stat.start).format("MMM D")
+      );
+
+      var dataValues: { [index: string]: number[] } = {};
+      _.each(stats, (stat, i) => {
+        if (stat && stat.ready) {
+          _.each(stat.stats.by_label, (val, name) => {
+            var list = dataValues[name] = dataValues[name] || [];
+
+            // This label may be new, so prefill 0s up to current index
+            _.times(i - list.length, () => {
+              list.push(0);
+            })
+
+            list.push(val.event_duration / 3600); // Hours
+          });
+
+          // Bump up any remaining stats
+          _.each(dataValues, (list, name) => {
+            _.times(i + 1 - list.length, () => {
+              list.push(0);
+            });
+          });
+        }
+      });
+
+      var datasets = _.map(dataValues, (values, name) => {
+        return {
+          label: name,
+          fillColor: "rgba(151,187,205,0.5)",
+          strokeColor: "rgba(151,187,205,0.8)",
+          highlightFill: "rgba(151,187,205,0.75)",
+          highlightStroke: "rgba(151,187,205,1)",
+          data: values
+        }
+      });
+
+      return {
+        labels: labels,
+        datasets: datasets
+      };
+    }
+
+    componentDidMount() {
+      this.setSources([selectStore, TimeStats.intervalQuery]);
+    }
+
+    getState() {
+      var selection = selectStore.val();
+      if (selection && selection.calId && selection.teamId) {
+        // Hard-code in selection for now
+        // TODO: Make this user-changeable
+        var stats = TimeStats.intervalQuery.get({
+          teamId: selection.teamId,
+          calId: selection.calId,
+          numIntervals: 5,
+          interval: TimeStats.Interval.WEEKLY
+        });
+      }
+
+      return {
+        selection: selection,
+        stats: stats
+      };
     }
   }
 }

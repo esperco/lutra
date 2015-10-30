@@ -13,16 +13,16 @@ module Esper.TimeStats {
   // fine
   export var statStore = ApiC.postForCalendarStats.store;
 
-  enum Interval { DAILY, WEEKLY, MONTHLY };
+  export enum Interval { DAILY, WEEKLY, MONTHLY };
 
-  interface StatRequest {
+  export interface StatRequest {
     teamId: string;
     calId: string;
     numIntervals: number;
     interval: Interval
   }
 
-  interface StatResult {
+  export interface StatResult {
     start: Date;
     stats: ApiT.CalendarStats;
     ready?: boolean;
@@ -36,51 +36,66 @@ module Esper.TimeStats {
       super([statStore]);
     }
 
+    // Return synchronous data -- can safely be called within React render
+    // context
     get(val: StatRequest): StatResult[] {
-      var ret: StatResult[] = [];
+      return _.map(this.calcPeriods(val), (period) => {
+        var fn = ApiC.postForCalendarStats;
+        let calReq = this.makeCalendarRequest(period.start, period.end);
+        let keyStr = fn.strFunc([val.teamId, val.calId, calReq]);
+        let storeGet = fn.store.get(keyStr);
+        let data = storeGet && storeGet[0];
+        let metadata = storeGet && storeGet[1];
+
+        return {
+          start: period.start,
+          stats: data,
+          ready: metadata
+            && metadata.dataStatus === Model.DataStatus.READY,
+          error: metadata
+            && metadata.dataStatus === Model.DataStatus.FETCH_ERROR
+            && metadata.lastError
+        };
+      });
+    }
+
+    // Trigger async call -- should be called outside React
+    async(val: StatRequest) {
+      _.each(this.calcPeriods(val), (period) => {
+        let calReq = this.makeCalendarRequest(period.start, period.end);
+        ApiC.postForCalendarStats(val.teamId, val.calId, calReq);
+      });
+    }
+
+    // Breaks intervals down into start and end periods
+    calcPeriods(val: StatRequest) {
+      var ret: {start: Date, end: Date}[] = [];
+      var addToRet = (startM: moment.Moment) => {
+        let start = startM.clone().toDate();
+        let end = this.endDate(start, val.interval);
+        ret.unshift({
+          start: start,
+          end: end
+        });
+      }
 
       // Prepend the current time period and work backwards from there
       var intervalStr = this.momentStr(val.interval);
       var i = moment().startOf(intervalStr);
-      ret.unshift(this.makeResult(val, i.clone().toDate()));
+      addToRet(i);
 
       if (val.numIntervals > 1) {
-        var self = this;
-        _.times(val.numIntervals - 1, function() {
+        _.times(val.numIntervals - 1, () => {
           i = i.subtract(1, intervalStr);
-          ret.unshift(self.makeResult(val, i.clone().toDate()));
+          addToRet(i);
         });
       }
 
       return ret;
     }
 
-    makeResult(req: StatRequest, start: Date): StatResult {
-      var end = moment(start)
-                  .clone()
-                  .endOf(this.momentStr(req.interval))
-                  .toDate();
-      var calReq = this.makeCalendarRequest(start, end);
-
-      // Post request -- we don't need promise here. We'll check store and
-      // have that reactively update.
-      var fn = ApiC.postForCalendarStats;
-      fn(req.teamId, req.calId, calReq);
-
-      var keyStr = fn.strFunc([req.teamId, req.calId, calReq]);
-      var storeGet = fn.store.get(keyStr);
-      var data = storeGet && storeGet[0];
-      var metadata = storeGet && storeGet[1];
-
-      return {
-        start: start,
-        stats: data,
-        ready: metadata
-          && metadata.dataStatus === Model.DataStatus.READY,
-        error: metadata
-          && metadata.dataStatus === Model.DataStatus.FETCH_ERROR
-          && metadata.lastError
-      };
+    endDate(start: Date, interval: Interval): Date {
+      return moment(start).clone().endOf(this.momentStr(interval)).toDate();
     }
 
     makeCalendarRequest(start: Date, end: Date): ApiT.CalendarRequest {

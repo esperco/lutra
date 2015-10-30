@@ -12,19 +12,13 @@ module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Pass a store for managing selected team and calendar
-  export interface CalSelection {
-    teamId: string;
-    calId: string;
-  }
-
   interface CalSelectorProps {
-    store: Model.StoreOne<CalSelection>;
+    selectedTeamId: string;
+    selectedCalId: string;
+    updateFn: (teamId: string, calId: string) => void
   }
 
   interface CalSelectorState {
-    selectedTeamId: string;
-    selectedCalId: string;
     teams: ApiT.Team[]; // Includes calendars
   }
 
@@ -61,16 +55,14 @@ module Esper.Components {
         var calId = calendar.google_cal_id;
 
         var classes = ["list-group-item", "one-line"];
-        if (this.state.selectedCalId === calId &&
-            this.state.selectedTeamId === teamId) {
+        if (this.props.selectedCalId === calId &&
+            this.props.selectedTeamId === teamId) {
           classes.push("active");
         }
 
         return (
           <a key={teamId + " " + calId} className={classes.join(" ")}
-              onClick={() => this.props.store.set({
-                teamId: teamId, calId: calId
-              })}>
+             onClick={() => this.props.updateFn(teamId, calId)}>
             <i className="fa fa-fw fa-calendar-o"></i>
             {" " + calendar.calendar_title}
           </a>);
@@ -78,15 +70,12 @@ module Esper.Components {
     }
 
     componentDidMount() {
-      this.setSources([Login.InfoStore, this.props.store]);
+      this.setSources([Login.InfoStore]);
     }
 
     getState() {
       var loginInfo = Login.InfoStore.val();
-      var selected = this.props.store.val();
       return {
-        selectedTeamId: selected && selected.teamId,
-        selectedCalId: selected && selected.calId,
         teams: (loginInfo && loginInfo.teams) || []
       };
     }
