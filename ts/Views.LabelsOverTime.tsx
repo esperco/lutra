@@ -44,7 +44,7 @@ module Esper.Views {
         var selectedCalId = this.state.selection.calId;
       }
 
-      return <div id="labels-over-time-page" className="container">
+      return <div id="labels-over-time-page" className="container-fluid padded">
         <div className="row">
           <div className="col-sm-3">
             <Components.CalSelector

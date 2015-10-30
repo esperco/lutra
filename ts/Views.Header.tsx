@@ -9,7 +9,7 @@ module Esper.Views {
   export class Header extends Component<{}, {}> {
     render() {
       return <nav className="navbar navbar-default navbar-fixed-top">
-        <div className="container">
+        <div className="container-fluid padded">
           <div className="navbar-header">
             <a className="navbar-brand" href="/#!/">Esper Time</a>
           </div>
