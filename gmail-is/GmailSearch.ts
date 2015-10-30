@@ -177,7 +177,7 @@ module Esper.GmailSearch {
     </div>
     <div class="esper-modal-footer esper-clearfix">
       <button #done class="esper-btn esper-btn-primary modal-primary">
-        Done
+        Link
       </button>
       <button #cancel class="esper-btn esper-btn-secondary modal-cancel">
         Cancel
@@ -247,7 +247,7 @@ module Esper.GmailSearch {
               });
           });
       });
-      Analytics.track(Analytics.Trackable.ClickDoneEmailSearch);
+      Analytics.track(Analytics.Trackable.ClickLinkEmailSearch);
       linkThreads = {};
       unlinkThreads = {};
       view.remove();
