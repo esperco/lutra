@@ -79,10 +79,10 @@ module Esper.GmailSearch {
     link.click(function(e) {
       if (!link.is(":checked")) {
         delete linkThreads[searchThread];
-        unlinkThreads[searchThread] = task.taskid;
+        unlinkThreads[searchThread] = task;
       } else {
         delete unlinkThreads[searchThread];
-        linkThreads[searchThread] = task.taskid;
+        linkThreads[searchThread] = task;
       }
     });
 
@@ -205,13 +205,15 @@ module Esper.GmailSearch {
     }
 
     function workAndCloseModal() {
-      $.each(unlinkThreads, function(searchThread, taskid) {
-        TaskTab.unlinkThread(team.teamid, taskid, searchThread).done(function() {
-          TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
-        });
+      $.each(unlinkThreads, function(searchThread, task) {
+        if (task !== undefined) {
+          TaskTab.unlinkThread(team.teamid, task.taskid, searchThread).done(function() {
+            TaskTab.refreshLinkedThreadsList(team, threadId, eventsTab);
+          });
+        }
       });
 
-      $.each(linkThreads, function(searchThread, taskid) {
+      $.each(linkThreads, function(searchThread, task) {
         Api.getTaskForThread(team.teamid, searchThread, false, false)
           .done(function(newTask) {
             var job;
