@@ -12,11 +12,18 @@ module Esper.ApiC {
     (...args: any[]): JQueryPromise<T>;
   }
 
+  /*
+    NB: The (...args: any[]) signature should correspond to the API function's
+    signature. It'd be nice if we could use type inference to check that but
+    that depends on variadic signatures making their way into TypeScript.
+
+    https://github.com/Microsoft/TypeScript/issues/5453
+  */
   interface CacheOpts<T> {
     // Store to save stuff
     store?: Model.CappedStore<T>;
 
-    // Function for converting strings
+    // Function for converting arguments to API function to string id
     strFunc?: (...args: any[]) => string;
 
     // Cache timeout in milliseconds
