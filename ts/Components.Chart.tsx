@@ -20,9 +20,12 @@ module Esper.Components {
     height: number;
   }
 
-  export class ChartCanvas<P extends ChartCanvasProps> extends Component<P,{}> {
+  export abstract class ChartCanvas<P extends ChartCanvasProps>
+    extends Component<P,{}>
+  {
     _canvas: React.Component<any, any>;
-    _chartObj: Chart;
+    chartObj: Chart;
+    chartInstance: ChartInstance;
 
     render() {
       return <div className="canvas-holder">
@@ -37,27 +40,44 @@ module Esper.Components {
       </canvas>;
     }
 
-    // Subclass should call super to apply a particular kind of chart
+    /*
+      Where Chart.js gets initially invoked -- chart specifics are controlled
+      by this.getChartInstance (called by this.drawChart).
+    */
     componentDidMount() {
       var canvas = React.findDOMNode(this._canvas) as HTMLCanvasElement;
-      this._chartObj = new Chart(canvas.getContext("2d"));
+      this.chartObj = new Chart(canvas.getContext("2d"));
+      this.drawChart();
     }
 
-    // We're using Chart.js, so don't accidentally clobber our canvas
-    // by using React's property update
-    shouldComponentUpdate() {
-      return false;
-    }
-
-    /* TODO - set in subclasses to update our chart data when we get new props
-
-    // Example only ...
-    componentWillReceiveProps(props: P) {
-      this._lineChart.datasets[0].points[2].value = 50;
-      this._lineChart.update();
-    }
-
+    /*
+      For now, just blow away and redraw chart everytime props change. Maybe
+      use this.chartInstance.update instead if this leads to poor UX.
     */
+    componentDidUpdate() {
+      this.cleanupChart();
+      this.drawChart();
+    }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      this.cleanupChart();
+    }
+
+    drawChart() {
+      if (this.chartInstance) {
+        this.cleanupChart();
+      }
+      this.chartInstance = this.getChartInstance(this.chartObj);
+    }
+
+    cleanupChart() {
+      this.chartInstance.destroy();
+      delete this.chartInstance;
+    }
+
+    // Override to draw specific line or bar or whatever chart
+    abstract getChartInstance(chart: Chart): ChartInstance;
   }
 
   export interface BarChartProps extends ChartCanvasProps {
@@ -80,9 +100,7 @@ module Esper.Components {
       }
     }
 
-    componentDidMount() {
-      super.componentDidMount();
-
+    getChartInstance(chartObj: Chart) {
       var options: BarChartOptions = {};
       var suffix = (this.props.units ? (" " + this.props.units) : "");
       options.tooltipTemplate =
@@ -90,7 +108,7 @@ module Esper.Components {
       options.multiTooltipTemplate =
         "<%if (datasetLabel){%><%=datasetLabel%><%}%> - <%= value %>" + suffix;
 
-      this._barChart = this._chartObj.Bar(this.props.data, options);
+      return chartObj.Bar(this.props.data, options);
     }
   }
 }
