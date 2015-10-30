@@ -151,6 +151,7 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
-
-
+  export var postForCalendarStats = makeC
+    <typeof Api.postForCalendarStats, ApiT.CalendarStats>
+    (Api.postForCalendarStats);
 }
