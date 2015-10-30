@@ -52,6 +52,7 @@ module Esper.Views {
     selection: CalSelection;
     selectedLabels: string[];
     stats: TimeStats.StatResult[];
+    allLabels: [string, string][]; // Label + Badget Text
   }
 
   export class LabelsOverTime extends Component<{}, LabelsOverTimeState> {
@@ -98,7 +99,7 @@ module Esper.Views {
         return <span></span>;
       } else {
         return <Components.LabelSelector
-          allLabels={TimeStats.getLabels(stats)}
+          allLabels={this.state.allLabels}
           selectedLabels={this.state.selectedLabels}
           updateFn={updateLabels} />;
       }
@@ -126,12 +127,7 @@ module Esper.Views {
               list.push(0);
             })
 
-            /*
-              Convert to hours and round to near .01 hour -- rounding
-              may be slightly off because of floating point arithmetic
-              but that should be OK
-            */
-            list.push(Number((val.event_duration / 3600).toFixed(2)));
+            list.push(TimeStats.toHours(val.event_duration));
           });
 
           // Bump up any remaining stats
@@ -168,7 +164,7 @@ module Esper.Views {
       ]);
     }
 
-    getState() {
+    getState(): LabelsOverTimeState {
       var selection = selectStore.val();
       if (selection && selection.calId && selection.teamId) {
         // Hard-code in selection for now
@@ -179,13 +175,35 @@ module Esper.Views {
           numIntervals: 5,
           interval: TimeStats.Interval.WEEKLY
         });
-        var labelStoreVal = labelSelectStore.val();
+
+        if (stats && !_.find(stats, (stat) => !stat.ready)) {
+          // Aggregate time stats and sort by overall durations by label
+          var agg = TimeStats.aggregate(stats);
+          var labelsAgg = _.map(agg.by_label,
+            (statEntry, name): [string, number] => [
+              name,
+              TimeStats.toHours(statEntry.event_duration)
+            ]
+          );
+          labelsAgg = _.sortBy(labelsAgg, (pair) => -pair[1]);
+          var labelPairs = _.map(labelsAgg, (pair): [string, string] => [
+            pair[0],
+            pair[1] + "h"
+          ]);
+
+          // If no selected labels, default to 4 most frequent labels
+          var labelStoreVal = labelSelectStore.val();
+          var selectedLabels: string[] = labelStoreVal ?
+            labelStoreVal.labels :
+            _.map(labelPairs.slice(0, 4), (pair) => pair[0]);
+        }
       }
 
       return {
         selection: selection,
-        selectedLabels: (labelStoreVal && labelStoreVal.labels) || [],
-        stats: stats
+        selectedLabels: selectedLabels || [],
+        stats: stats,
+        allLabels: labelPairs || []
       };
     }
   }

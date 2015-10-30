@@ -12,7 +12,7 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface LabelSelectorProps {
-    allLabels: string[];
+    allLabels: [string, string][]; // Label + badge text
     selectedLabels: string[];
     updateFn: (selectedLabels: string[]) => void
   }
@@ -33,13 +33,15 @@ module Esper.Components {
     }
 
     renderLabels() {
-      return _.map(this.props.allLabels, (label) => {
+      return _.map(this.props.allLabels, (pair) => {
+        var label = pair[0];
+        var badgeText = pair[1];
         var selected = _.contains(this.props.selectedLabels, label);
         return <div key={label} className="checkbox">
           <label>
             <input type="checkbox" value={label} checked={selected}
               onChange={this.handleChange.bind(this)} />
-            {" "}{label}
+            {" "}{label}{" "}{badgeText}
           </label>
         </div>
       });

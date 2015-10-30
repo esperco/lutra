@@ -123,15 +123,48 @@ module Esper.TimeStats {
 
   ////
 
-  export function getLabels(results: StatResult[]) {
-    var ret: string[] = [];
-    _.each(results, (result) => {
+  // Combines stat results to get aggregate data by label
+  export function aggregate(results: StatResult[]): ApiT.CalendarStats {
+    var accumulator: ApiT.CalendarStats = {
+      by_label: {},
+      unlabelled: {
+        event_count: 0,
+        event_duration: 0
+      },
+      total: {
+        event_count: 0,
+        event_duration: 0
+      }
+    };
+
+    return _.reduce(results, (agg: ApiT.CalendarStats, result: StatResult) => {
       if (result.ready) {
         _.each(result.stats.by_label, (v, name) => {
-          ret.push(name);
+          var statEntry: ApiT.CalendarStatEntry = agg.by_label[name] =
+            agg.by_label[name] || {
+              event_count: 0,
+              event_duration: 0
+            };
+          addTo(statEntry, v);
         });
+        addTo(agg.unlabelled, result.stats.unlabelled);
+        addTo(agg.total, result.stats.total);
       }
-    });
-    return _.uniq(ret);
+      return agg;
+    }, accumulator);
+  }
+
+  function addTo(entry: ApiT.CalendarStatEntry, plus: ApiT.CalendarStatEntry) {
+    entry.event_count += plus.event_count;
+    entry.event_duration += plus.event_duration;
+  }
+
+  /*
+    Time stat durations are normally seconds. This normalizes to hours and
+    rounds to nearest .01 hour -- rounding may be slightly off because of
+    floating point arithmetic but that should be OK in most cases
+  */
+  export function toHours(seconds: number) {
+    return Number((seconds / 3600).toFixed(2))
   }
 }
