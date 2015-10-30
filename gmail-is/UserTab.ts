@@ -5,7 +5,7 @@ module Esper.UserTab {
   export var currentMeetingType : string = "other";
 
   function formatTime(hourMinute: ApiT.HourMinute) {
-    return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, "");
+    return XDate.formatTimeOnly(hourMinute.hour, hourMinute.minute, false);
   }
 
   function displayAvailability(meetingPrefs: JQuery,
