@@ -270,7 +270,11 @@ module Esper.CalPicker {
           curViewList.push(cal.calendar_title);
         }
       });
-      viewCalValue.text(curViewList.join(", "));
+      if (curViewList.length === 0) {
+        viewCalValue.text("None");
+      } else {
+        viewCalValue.text(curViewList.join(", "));
+      }
     }
     updateCalendarViewList();
     viewCalInput.dropdown();

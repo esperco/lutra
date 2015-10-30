@@ -104,13 +104,14 @@ module Esper.Login {
   export function setAccount(account: Types.Account) {
     var oldAccount = watchableAccount.get();
     if (! accountEqual(oldAccount, account)) {
+      watchableInfo.set(undefined);
       if (account && account.credentials) {
         setCredentials(account.credentials.uid, account.credentials.apiSecret);
         getLoginInfo();
-        watchableAccount.set(account);
       } else {
         unsetCredentials();
       }
+      watchableAccount.set(account);
     }
   }
 
