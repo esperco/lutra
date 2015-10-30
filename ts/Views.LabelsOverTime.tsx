@@ -91,7 +91,12 @@ module Esper.Views {
               list.push(0);
             })
 
-            list.push(val.event_duration / 3600); // Hours
+            /*
+              Convert to hours and round to near .01 hour -- rounding
+              may be slightly off because of floating point arithmetic
+              but that should be OK
+            */
+            list.push(Number((val.event_duration / 3600).toFixed(2)));
           });
 
           // Bump up any remaining stats
