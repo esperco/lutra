@@ -72,5 +72,37 @@ module Esper.Util {
         expect(l).toEqual([2, 3, 4]);
       });
     });
+
+    describe("cmpStringify", function() {
+      it("should return the same string for identifical objects regardless " +
+         "of key order",
+      function() {
+        var a = {x: 5, y: 6};
+        var b = {y: 6, x: 5};
+        expect(cmpStringify(a)).toEqual(cmpStringify(b));
+      });
+
+      it("should not return the same string for different objects",
+      function() {
+        var a = {x: 5, y: 6};
+        var b = {x: 6, y: 5};
+        expect(cmpStringify(a)).not.toEqual(cmpStringify(b));
+      });
+
+      it("should handle nested objects", function() {
+        var a = {x: 5, y: {a: 6, b: 7}};
+        var b = {y: {b: 7, a: 6}, x: 5};
+        expect(cmpStringify(a)).toEqual(cmpStringify(b));
+
+        var c = {x: 5, y: {a: 6, b: 7}};
+        var d = {x: 5, y: {a: 6, b: 8}};
+        expect(cmpStringify(c)).not.toEqual(cmpStringify(d));
+      });
+
+      it("should handle non-objects", function() {
+        expect(cmpStringify(1)).toEqual(cmpStringify(1));
+        expect(cmpStringify(1)).not.toEqual(cmpStringify("1"));
+      });
+    });
   });
 }

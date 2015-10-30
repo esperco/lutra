@@ -4,6 +4,7 @@
 /// <reference path="../marten/typings/jasmine/jasmine.d.ts"/>
 /// <reference path="./Esper.Test.ts"/>
 /// <reference path="./Bootstrap.Test.ts"/>
+/// <reference path="../marten/ts/ApiC.Test.ts"/>
 /// <reference path="../marten/ts/Util.Test.ts"/>
 /// <reference path="../marten/ts/Emit.Test.ts"/>
 /// <reference path="../marten/ts/Model.Test.ts"/>
