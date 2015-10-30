@@ -53,6 +53,7 @@ module Esper.CalPicker {
     guestTzValue : JQuery;
     guestTzMenu : JQuery;
     viewCalInput : JQuery;
+    viewCalValue : JQuery;
     viewCalDropdown : JQuery;
     calendarView : JQuery;
     events : { [eventId : string] : TZEventObj };
@@ -136,10 +137,13 @@ module Esper.CalPicker {
           <div class="form-group">
             <label for="esper-calpicker-calendars" class="control-label">
               View Calendars</label>
-            <div class="dropdown">
-              <select #viewCalInput class="esper-select form-control"
+            <div class="dropdown esper-dropdown" style="width: 100%;">
+              <button #viewCalInput class="btn btn-default esper-dropdown-toggle"
                       id="esper-calpicker-calendars"
-                      data-toggle="dropdown" />
+                      data-toggle="dropdown">
+                <span #viewCalValue/>
+                <i class="fa fa-chevron-down"/>
+              </button>
               <ul #viewCalDropdown class="dropdown-menu" />
             </div>
           </div>
@@ -239,7 +243,6 @@ module Esper.CalPicker {
     });
 
     Sidebar.customizeSelectArrow(pickerSwitcher);
-    Sidebar.customizeSelectArrow(viewCalInput);
 
     for (var i = 0; i < calendars.length; i++) {
       var opt = $("<option value='" + i + "'>" +
@@ -267,15 +270,13 @@ module Esper.CalPicker {
           curViewList.push(cal.calendar_title);
         }
       });
-      viewCalInput.children().remove();
-      viewCalInput.append("<option>" + curViewList.join(", ") + "</option>");
+      viewCalValue.text(curViewList.join(", "));
     }
     updateCalendarViewList();
     viewCalInput.dropdown();
-    viewCalInput.mousedown(function(e) {
-      e.preventDefault();
+    viewCalInput.click(function(e) {
+      e.stopPropagation();
       viewCalDropdown.outerWidth(viewCalInput.outerWidth());
-      viewCalInput.dropdown('toggle');
       Analytics.track(Analytics.Trackable.ClickCalendarPickerViewCalendar);
     });
     List.iter(calendars, function(cal, i) {
