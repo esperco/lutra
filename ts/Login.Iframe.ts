@@ -34,7 +34,6 @@ module Esper.Login {
   function initEventListener() {
     if (! eventListenerReady) {
       window.addEventListener("message", function(ev) {
-        console.info(ev);
 
         // Only listen to API host Esper messages
         if (ev.origin === Api.prefix && ev.data &&
