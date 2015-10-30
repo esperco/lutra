@@ -17,13 +17,13 @@ module Esper.Views {
     teamId: string;
     calId: string;
   }
-  var selectStore = new Model.StoreOne<CalSelection>();
+  var calSelectStore = new Model.StoreOne<CalSelection>();
 
   // Action to update our selection -- also triggers async calls
   function updateSelection(teamId: string, calId: string) {
-    var current = selectStore.val();
+    var current = calSelectStore.val();
 
-    selectStore.set({teamId: teamId, calId: calId});
+    calSelectStore.set({teamId: teamId, calId: calId});
     TimeStats.intervalQuery.async({
       teamId: teamId,
       calId: calId,
@@ -34,7 +34,7 @@ module Esper.Views {
     });
 
     // Clear label selection if switching teams (default)
-    if (current.teamId !== teamId) {
+    if (current && current.teamId !== teamId) {
       labelSelectStore.unset();
     }
   }
@@ -56,17 +56,17 @@ module Esper.Views {
   /////
 
   interface LabelsOverTimeState {
-    selection: CalSelection;
+    selectedCal: CalSelection;
     selectedLabels: string[];
-    stats: TimeStats.StatResult[];
+    results: TimeStats.StatResults;
     allLabels: [string, string][]; // Label + Badget Text
   }
 
   export class LabelsOverTime extends Component<{}, LabelsOverTimeState> {
     render() {
-      if (this.state.selection) {
-        var selectedTeamId = this.state.selection.teamId;
-        var selectedCalId = this.state.selection.calId;
+      if (this.state.selectedCal) {
+        var selectedTeamId = this.state.selectedCal.teamId;
+        var selectedCalId = this.state.selectedCal.calId;
       }
 
       return <div id="labels-over-time-page" className="container-fluid padded">
@@ -86,23 +86,23 @@ module Esper.Views {
     }
 
     renderChart() {
-      var stats = this.state.stats;
-      if (! stats) {
+      var results = this.state.results;
+      if (! results) {
         return <div>Please select a calendar</div>
-      } else if (_.find(stats, (stat) => stat.error)) {
+      } else if (results.error) {
         return <div>Something broke!</div>
-      } else if (_.find(stats, (stat) => !stat.ready)) {
+      } else if (!results.ready) {
         return <div>Loading &hellip;</div>
       }
 
-      var data = this.getChartData(stats);
+      var data = this.getChartData(results);
       return <Components.BarChart width={2} height={1}
         units="Hours" verticalLabel="Time (Hours)" data={data} />
     }
 
     renderLabels() {
-      var stats = this.state.stats;
-      if (!stats && _.find(stats, (stat) => !stat.ready)) {
+      var results = this.state.results;
+      if (!results || !results.ready) {
         return <span></span>;
       } else {
         return <Components.LabelSelector
@@ -112,38 +112,36 @@ module Esper.Views {
       }
     }
 
-    getChartData(stats: TimeStats.StatResult[]) {
-      var labels = _.map(stats,
+    getChartData(results: TimeStats.StatResults) {
+      var labels = _.map(results.starts,
         // MMM d => Oct 4
-        (stat) => "Week starting " + moment(stat.start).format("MMM D")
+        (start) => "Week starting " + moment(start).format("MMM D")
       );
 
       var dataValues: { [index: string]: number[] } = {};
-      _.each(stats, (stat, i) => {
-        if (stat && stat.ready) {
-          _.each(stat.stats.by_label, (val, name) => {
-            // Only included selected labels
-            if (! _.contains(this.state.selectedLabels, name)) {
-              return;
-            }
+      _.each(results.stats, (stat, i) => {
+        _.each(stat.by_label, (val, name) => {
+          // Only included selected labels
+          if (! _.contains(this.state.selectedLabels, name)) {
+            return;
+          }
 
-            var list = dataValues[name] = dataValues[name] || [];
+          var list = dataValues[name] = dataValues[name] || [];
 
-            // This label may be new, so prefill 0s up to current index
-            _.times(i - list.length, () => {
-              list.push(0);
-            })
+          // This label may be new, so prefill 0s up to current index
+          _.times(i - list.length, () => {
+            list.push(0);
+          })
 
-            list.push(TimeStats.toHours(val.event_duration));
+          list.push(TimeStats.toHours(val.event_duration));
+        });
+
+        // Bump up any remaining stats
+        _.each(dataValues, (list, name) => {
+          _.times(i + 1 - list.length, () => {
+            list.push(0);
           });
-
-          // Bump up any remaining stats
-          _.each(dataValues, (list, name) => {
-            _.times(i + 1 - list.length, () => {
-              list.push(0);
-            });
-          });
-        }
+        });
       });
 
       var datasets = _.map(dataValues, (values, name) => {
@@ -165,27 +163,27 @@ module Esper.Views {
 
     componentDidMount() {
       this.setSources([
-        selectStore,
+        calSelectStore,
         labelSelectStore,
         TimeStats.intervalQuery
       ]);
     }
 
     getState(): LabelsOverTimeState {
-      var selection = selectStore.val();
-      if (selection && selection.calId && selection.teamId) {
+      var selectedCal = calSelectStore.val();
+      if (selectedCal && selectedCal.calId && selectedCal.teamId) {
         // Hard-code in selection for now
         // TODO: Make this user-changeable
-        var stats = TimeStats.intervalQuery.get({
-          teamId: selection.teamId,
-          calId: selection.calId,
+        var results = TimeStats.intervalQuery.get({
+          teamId: selectedCal.teamId,
+          calId: selectedCal.calId,
           numIntervals: 5,
           interval: TimeStats.Interval.WEEKLY
         });
 
-        if (stats && !_.find(stats, (stat) => !stat.ready)) {
+        if (results && results.ready) {
           // Aggregate time stats and sort by overall durations by label
-          var agg = TimeStats.aggregate(stats);
+          var agg = TimeStats.aggregate(results.stats);
           var labelsAgg = _.map(agg.by_label,
             (statEntry, name): [string, number] => [
               name,
@@ -207,9 +205,9 @@ module Esper.Views {
       }
 
       return {
-        selection: selection,
+        selectedCal: selectedCal,
         selectedLabels: selectedLabels || [],
-        stats: stats,
+        results: results,
         allLabels: labelPairs || []
       };
     }

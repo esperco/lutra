@@ -22,9 +22,9 @@ module Esper.TimeStats {
     interval: Interval
   }
 
-  export interface StatResult {
-    start: Date;
-    stats: ApiT.CalendarStats;
+  export interface StatResults {
+    starts: Date[];
+    stats: ApiT.CalendarStats[];
     ready?: boolean;
     error?: Error;
   }
@@ -38,46 +38,42 @@ module Esper.TimeStats {
 
     // Return synchronous data -- can safely be called within React render
     // context
-    get(val: StatRequest): StatResult[] {
-      return _.map(this.calcPeriods(val), (period) => {
-        var fn = ApiC.postForCalendarStats;
-        let calReq = this.makeCalendarRequest(period.start, period.end);
-        let keyStr = fn.strFunc([val.teamId, val.calId, calReq]);
-        let storeGet = fn.store.get(keyStr);
-        let data = storeGet && storeGet[0];
-        let metadata = storeGet && storeGet[1];
+    get(val: StatRequest): StatResults {
+      var startDates = this.startDates(val);
 
-        return {
-          start: period.start,
-          stats: data,
-          ready: metadata
-            && metadata.dataStatus === Model.DataStatus.READY,
-          error: metadata
-            && metadata.dataStatus === Model.DataStatus.FETCH_ERROR
-            && metadata.lastError
-        };
-      });
+      var fn = ApiC.postForCalendarStats;
+      var keyStr = fn.strFunc([
+        val.teamId, val.calId,
+        this.makeCalendarStatsRequest(startDates, val.interval)
+      ]);
+      var storeGet = fn.store.get(keyStr);
+      var data = storeGet && storeGet[0];
+      var metadata = storeGet && storeGet[1];
+
+      return {
+        starts: startDates,
+        stats: data && data.stats,
+        ready: metadata
+          && metadata.dataStatus === Model.DataStatus.READY,
+        error: metadata
+          && metadata.dataStatus === Model.DataStatus.FETCH_ERROR
+          && metadata.lastError
+      };
     }
 
     // Trigger async call -- should be called outside React
     async(val: StatRequest) {
-      _.each(this.calcPeriods(val), (period) => {
-        let calReq = this.makeCalendarRequest(period.start, period.end);
-        ApiC.postForCalendarStats(val.teamId, val.calId, calReq);
-      });
+      ApiC.postForCalendarStats(val.teamId, val.calId,
+        this.makeCalendarStatsRequest(this.startDates(val), val.interval)
+      );
     }
 
-    // Breaks intervals down into start and end periods
-    calcPeriods(val: StatRequest) {
-      var ret: {start: Date, end: Date}[] = [];
+    // Calculate start dates for each interval
+    startDates(val: StatRequest): Date[] {
+      var ret: Date[] = [];
       var addToRet = (startM: moment.Moment) => {
-        let start = startM.clone().toDate();
-        let end = this.endDate(start, val.interval);
-        ret.unshift({
-          start: start,
-          end: end
-        });
-      }
+        ret.unshift(startM.clone().toDate());
+      };
 
       // Prepend the current time period and work backwards from there
       var intervalStr = this.momentStr(val.interval);
@@ -94,15 +90,14 @@ module Esper.TimeStats {
       return ret;
     }
 
-    endDate(start: Date, interval: Interval): Date {
-      return moment(start).clone().endOf(this.momentStr(interval)).toDate();
-    }
-
-    makeCalendarRequest(start: Date, end: Date): ApiT.CalendarRequest {
+    makeCalendarStatsRequest(starts: Date[], interval: Interval) {
+      var end = moment(starts[starts.length - 1])
+        .clone().endOf(this.momentStr(interval))
+        .toDate();
       return {
-        window_start: XDate.toString(start),
+        window_starts: _.map(starts, XDate.toString),
         window_end: XDate.toString(end)
-      };
+      }
     }
 
     // Returns the string Moment.js uses for an interval
@@ -124,7 +119,7 @@ module Esper.TimeStats {
   ////
 
   // Combines stat results to get aggregate data by label
-  export function aggregate(results: StatResult[]): ApiT.CalendarStats {
+  export function aggregate(results: ApiT.CalendarStats[]): ApiT.CalendarStats {
     var accumulator: ApiT.CalendarStats = {
       by_label: {},
       unlabelled: {
@@ -137,19 +132,18 @@ module Esper.TimeStats {
       }
     };
 
-    return _.reduce(results, (agg: ApiT.CalendarStats, result: StatResult) => {
-      if (result.ready) {
-        _.each(result.stats.by_label, (v, name) => {
-          var statEntry: ApiT.CalendarStatEntry = agg.by_label[name] =
-            agg.by_label[name] || {
-              event_count: 0,
-              event_duration: 0
-            };
-          addTo(statEntry, v);
-        });
-        addTo(agg.unlabelled, result.stats.unlabelled);
-        addTo(agg.total, result.stats.total);
-      }
+    return _.reduce(results, (agg: ApiT.CalendarStats,
+                              stat: ApiT.CalendarStats) => {
+      _.each(stat.by_label, (v, name) => {
+        var statEntry: ApiT.CalendarStatEntry = agg.by_label[name] =
+          agg.by_label[name] || {
+            event_count: 0,
+            event_duration: 0
+          };
+        addTo(statEntry, v);
+      });
+      addTo(agg.unlabelled, stat.unlabelled);
+      addTo(agg.total, stat.total);
       return agg;
     }, accumulator);
   }
