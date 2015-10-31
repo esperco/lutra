@@ -26,7 +26,10 @@ module Esper.Components {
   {
     render() {
       return <div className="esper-borderless-section">
-        <h4 className="esper-header">Select Calendar</h4>
+        <h4 className="esper-header">
+          <i className="fa fa-fw fa-calendar"></i>{" "}
+          Select Calendar
+        </h4>
         <div className="esper-content">
         {
           this.state.teams.length ?

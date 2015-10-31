@@ -56,4 +56,25 @@
   .esper-subheader {
     font-weight: bold;
   }
+
+  &.padded {
+    padding-left: @padding-base-horizontal;
+    padding-right: @padding-base-horizontal;
+  }
+
+  &:first-child {
+    padding-top: @padding-base-vertical;
+  }
+}
+
+///
+
+.esper-max-minus-nav {
+  max-height: calc(~'100% - @{navbar-height}');
+  overflow-y: auto;
+
+  &.padded {
+    padding-left: @padding-base-horizontal;
+    padding-right: @padding-base-horizontal
+  }
 }

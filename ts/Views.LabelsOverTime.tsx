@@ -69,17 +69,25 @@ module Esper.Views {
         var selectedCalId = this.state.selectedCal.calId;
       }
 
-      return <div id="labels-over-time-page" className="container-fluid padded">
+      return <div id="labels-over-time-page" className="container-fluid">
         <div className="row">
-          <div className="col-sm-3">
+          <div className="col-sm-3 col-lg-2 esper-max-minus-nav padded">
             <Components.CalSelector
               selectedTeamId={selectedTeamId}
               selectedCalId={selectedCalId}
               updateFn={updateSelection} />
             {this.renderLabels()}
           </div>
-          <div className="col-sm-9">
-            {this.renderChart()}
+          <div className="col-sm-9 col-lg-10">
+            <div className="esper-borderless-section">
+              <h4 className="esper-header">
+                <i className="fa fa-fw fa-bar-chart"></i>{" "}
+                Labeled Events Over Time
+              </h4>
+              <div className="esper-content">
+                {this.renderChart()}
+              </div>
+            </div>
           </div>
         </div>
       </div>;

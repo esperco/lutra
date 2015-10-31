@@ -25,8 +25,11 @@ module Esper.Components {
       }
 
       return <div className="esper-borderless-section">
-        <h4 className="esper-header">Select Labels</h4>
-        <div className="esper-content">
+        <h4 className="esper-header">
+          <i className="fa fa-fw fa-tags"></i>{" "}
+          Select Labels
+        </h4>
+        <div className="esper-content list-group">
           {this.renderLabels()}
         </div>
       </div>;
@@ -37,11 +40,12 @@ module Esper.Components {
         var label = pair[0];
         var badgeText = pair[1];
         var selected = _.contains(this.props.selectedLabels, label);
-        return <div key={label} className="checkbox">
+        return <div key={label} className="checkbox list-group-item one-line">
+          <span className="badge">{badgeText}</span>
           <label>
             <input type="checkbox" value={label} checked={selected}
               onChange={this.handleChange.bind(this)} />
-            {" "}{label}{" "}{badgeText}
+            {" "}{label}{" "}
           </label>
         </div>
       });
