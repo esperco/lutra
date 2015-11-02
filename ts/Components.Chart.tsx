@@ -12,16 +12,7 @@ module Esper.Components {
   // Set some global defaults for Chart.js
   Chart.defaults.global.responsive = true;
 
-  // Some props we need all ChartCanvasProps to have
-  interface ChartCanvasProps {
-    // Actual width and height are irrelevant -- chart always expands to fill
-    // width of container, but their ratio determines height of element
-    width: number;
-    height: number;
-  }
-
-  export abstract class ChartCanvas<P extends ChartCanvasProps>
-    extends Component<P,{}>
+  export abstract class ChartCanvas<P> extends Component<P,{}>
   {
     _canvas: React.Component<any, any>;
     chartObj: Chart;
@@ -34,10 +25,7 @@ module Esper.Components {
     }
 
     renderCanvas() {
-      return <canvas ref={(c) => this._canvas = c}
-        width={this.props.width}
-        height={this.props.height}>
-      </canvas>;
+      return <canvas ref={(c) => this._canvas = c} />;
     }
 
     /*
@@ -80,8 +68,9 @@ module Esper.Components {
     abstract getChartInstance(chart: Chart): ChartInstance;
   }
 
-  export interface BarChartProps extends ChartCanvasProps {
+  export interface BarChartProps {
     units?: string;
+    horizontalLabel?: string;
     verticalLabel?: string;
     data: LinearChartData;
   }
@@ -90,14 +79,26 @@ module Esper.Components {
     _barChart: LinearInstance;
 
     render() {
+      var classNames=["canvas-holder"];
       if (this.props.verticalLabel) {
-        return <div className="canvas-holder with-vertical-label">
-          {this.renderCanvas()}
-          <div className="vertical-label">{this.props.verticalLabel}</div>
-        </div>;
-      } else {
-        return super.render();
+        classNames.push("with-vertical-label");
       }
+      if (this.props.horizontalLabel) {
+        classNames.push("with-horizontal-label");
+      }
+      return <div className={classNames.join(" ")}>
+        {this.renderCanvas()}
+        {
+          this.props.verticalLabel ?
+          <div className="vertical-label">{this.props.verticalLabel}</div> :
+          ""
+        }
+        {
+          this.props.horizontalLabel ?
+          <div className="horizontal-label">{this.props.horizontalLabel}</div> :
+          ""
+        }
+      </div>;
     }
 
     getChartInstance(chartObj: Chart) {
