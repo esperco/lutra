@@ -6,6 +6,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Colors.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -40,8 +41,11 @@ module Esper.Components {
         var label = pair[0];
         var badgeText = pair[1];
         var selected = _.contains(this.props.selectedLabels, label);
+        var badgeStyle = selected ? {
+          background: Colors.getColorForLabel(label)
+        } : {};
         return <div key={label} className="checkbox list-group-item one-line">
-          <span className="badge">{badgeText}</span>
+          <span className="badge" style={badgeStyle}>{badgeText}</span>
           <label>
             <input type="checkbox" value={label} checked={selected}
               onChange={this.handleChange.bind(this)} />
