@@ -168,6 +168,14 @@ module Esper.Views {
     getState(): LabelsOverTimeState {
       var selectedCal = calSelectStore.val();
       if (selectedCal && selectedCal.calId && selectedCal.teamId) {
+
+        // Get selected team
+        var loginInfo = Login.InfoStore.val();
+        var team = _.find(loginInfo.teams,
+          (t) => t.teamid === selectedCal.teamId
+        );
+        if (! team) { throw new Error("Selected unavailable team"); }
+
         // Hard-code in selection for now
         // TODO: Make this user-changeable
         var results = TimeStats.intervalQuery.get({
@@ -188,6 +196,16 @@ module Esper.Views {
                 values: statEntry.durationValues
               };
             }
+          );
+
+          // Filter out task-related labels
+          labelsAgg = _.reject(labelsAgg, (label) =>
+            label.name === team.team_label_new ||
+            label.name === team.team_label_done ||
+            label.name === team.team_label_canceled ||
+            label.name === team.team_label_pending ||
+            label.name === team.team_label_urgent ||
+            label.name === team.team_label_in_progress
           );
 
           // Sort by total duration descending
