@@ -4,6 +4,7 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.Chart.tsx" />
 /// <reference path="./TimeStats.ts" />
+/// <reference path="./Colors.ts" />
 
 /*
   Page for seeing label stats over time
@@ -153,12 +154,13 @@ module Esper.Views {
       });
 
       var datasets = _.map(dataValues, (values, name) => {
+        var baseColor = Colors.getColorForLabel(name);
         return {
           label: name,
-          fillColor: "rgba(151,187,205,0.5)",
-          strokeColor: "rgba(151,187,205,0.8)",
-          highlightFill: "rgba(151,187,205,0.75)",
-          highlightStroke: "rgba(151,187,205,1)",
+          fillColor: baseColor,
+          strokeColor: Colors.darken(baseColor, 0.3),
+          highlightFill: Colors.lighten(baseColor, 0.3),
+          highlightStroke: baseColor,
           data: values
         }
       });
