@@ -37,8 +37,8 @@ module Esper.Agenda {
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.utcToLocalTimeOnly(start));
-    endTime.text(XDate.utcToLocalTimeOnly(end));
+    startTime.text(XDate.timeOnly(start));
+    endTime.text(XDate.timeOnly(end));
 
     if (!_.includes(filter, "time") && !_.includes(filter, "all"))
       time.hide();

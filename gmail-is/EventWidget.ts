@@ -325,17 +325,19 @@ module Esper.EventWidget {
     var calTimezone = calendar.calendar_timezone;
     var prefs = Teams.getTeamPreferences(team);
     var showTimezone = PrefTimezone.execTimezone(prefs, tpref);
+    
     var start = XDate.ofString(Timezone.shiftTime(e.start.local,
                                                   calTimezone,
                                                   showTimezone));
     var end = XDate.ofString(Timezone.shiftTime(e.end ? e.end.local : e.start.local,
                                                 calTimezone,
                                                 showTimezone));
+    
     weekday.text(XDate.fullWeekDay(start));
     month.text(XDate.month(start).toUpperCase());
     day.text(XDate.day(start).toString());
-    startTime.text(XDate.utcToLocalTimeOnly(start));
-    endTime.text(XDate.utcToLocalTimeOnly(end));
+    startTime.text(XDate.timeOnly(start));
+    endTime.text(XDate.timeOnly(end));
 
     timezone.text(CalPicker.zoneAbbr(showTimezone));
 
