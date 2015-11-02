@@ -34,9 +34,10 @@ module Esper.Views {
       interval: TimeStats.Interval.WEEKLY
     });
 
-    // Clear label selection if switching teams (default)
+    // Clear label selection and colors if switching teams (default)
     if (current && current.teamId !== teamId) {
       labelSelectStore.unset();
+      Colors.resetColorMap();
     }
   }
 
