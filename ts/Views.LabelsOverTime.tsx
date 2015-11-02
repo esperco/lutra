@@ -147,7 +147,7 @@ module Esper.Views {
           strokeColor: Colors.darken(baseColor, 0.3),
           highlightFill: Colors.lighten(baseColor, 0.3),
           highlightStroke: baseColor,
-          data: label.values
+          data: _.map(label.values, (value) => TimeStats.toHours(value))
         }
       });
 
