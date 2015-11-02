@@ -14,12 +14,17 @@
   height: 100%;
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  padding: 10px 10px 22%; // Nudge slightly higher
+
+  &.padded {
+    padding: 10px;
+  }
 
   .esper-center {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
+    position: absolute;
+    top: 42%; // Intionally nudge a little higher because of header margins
+    left: 50%;
+    min-width: 80%;
+    transform: translate(-50%, -50%);
     text-align: center;
   }
 }

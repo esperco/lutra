@@ -10,7 +10,7 @@ module Esper.Views {
 
   export class NotFound extends Component<{}, {}> {
     render() {
-      return <div id="not-found-page" className="esper-full-screen">
+      return <div id="not-found-page" className="esper-full-screen padded">
         <div className="esper-center">
           <h2>Whoops.</h2>
           <p>
