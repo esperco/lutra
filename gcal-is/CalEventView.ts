@@ -81,6 +81,7 @@ module Esper.CalEventView {
   export function mergeDescriptionText(userDescription: string,
                                        serverDescription: string) {
     var delimiter = "=== Conversation ===";
+    var poweredByEsper = "\nPowered by Esper\nhttp://esper.com";
 
     var split1 = userDescription.split(delimiter);
     var split2 = serverDescription.split(delimiter);
@@ -94,6 +95,7 @@ module Esper.CalEventView {
     }
     if (split2.length >= 2) {
       description += delimiter;
+      description += poweredByEsper;
       split2.shift();
       description += split2.join(delimiter);
     }
@@ -103,12 +105,28 @@ module Esper.CalEventView {
   export function testMergeDescriptionText() {
     Log.assert(mergeDescriptionText("", "") === "");
     Log.assert(mergeDescriptionText("bla", "") === "bla\n");
-    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
-                                        "=== Conversation ===")
-                   === "bla\n=== Conversation ===");
-    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\nbe gone",
-                                        "=== Conversation ===\nYo!")
-                   === "bla\n=== Conversation ===\nYo!");
+    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\n" +
+          "Powered by Esper\n" +
+          "http://esper.com\n" +
+          "be gone",
+        "=== Conversation ===\n" +
+          "Powered by Esper" +
+          "http://esper.com")
+      === "bla\n=== Conversation ===\n" +
+        "Powered by Esper\n" +
+        "http://esper.com");
+    Log.assert(mergeDescriptionText("bla\n=== Conversation ===\n" +
+          "Powered by Esper\n" +
+          "http://esper.com\n" +
+          "be gone",
+        "=== Conversation ===\n" +
+          "Powered by Esper\n" +
+          "http://esper.com\n" +
+          "Yo!")
+      === "bla\n=== Conversation ===\n" +
+        "Powered by Esper\n" +
+        "http://esper.com\n" +
+        "Yo!");
   }
 
   function mergeDescription(event: ApiT.CalendarEvent) {
