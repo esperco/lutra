@@ -56,10 +56,17 @@ module Esper.Views {
 
   /////
 
+  interface LabelValues {
+    name: string;
+    total: number;
+    values: number[];
+  }
+
   interface LabelsOverTimeState {
     selectedCal: CalSelection;
     selectedLabels: string[];
     results: TimeStats.StatResults;
+    labelValues: LabelValues[];
     allLabels: [string, string][]; // Label + Badget Text
   }
 
@@ -104,7 +111,7 @@ module Esper.Views {
         return <div>Loading &hellip;</div>
       }
 
-      var data = this.getChartData(results);
+      var data = this.getChartData(results, this.state.labelValues);
       return <Components.BarChart width={2} height={1}
         units="Hours" verticalLabel="Time (Hours)" data={data} />
     }
@@ -121,47 +128,26 @@ module Esper.Views {
       }
     }
 
-    getChartData(results: TimeStats.StatResults) {
+    getChartData(results: TimeStats.StatResults,
+                 sortedLabels: LabelValues[]) {
       var labels = _.map(results.starts,
         // MMM d => Oct 4
         (start) => "Week starting " + moment(start).format("MMM D")
       );
 
-      var dataValues: { [index: string]: number[] } = {};
-      _.each(results.stats, (stat, i) => {
-        _.each(stat.by_label, (val, name) => {
-          // Only included selected labels
-          if (! _.contains(this.state.selectedLabels, name)) {
-            return;
-          }
+      var filteredLabels = _.filter(sortedLabels, (label) =>
+        _.contains(this.state.selectedLabels, label.name)
+      )
 
-          var list = dataValues[name] = dataValues[name] || [];
-
-          // This label may be new, so prefill 0s up to current index
-          _.times(i - list.length, () => {
-            list.push(0);
-          })
-
-          list.push(TimeStats.toHours(val.event_duration));
-        });
-
-        // Bump up any remaining stats
-        _.each(dataValues, (list, name) => {
-          _.times(i + 1 - list.length, () => {
-            list.push(0);
-          });
-        });
-      });
-
-      var datasets = _.map(dataValues, (values, name) => {
-        var baseColor = Colors.getColorForLabel(name);
+      var datasets = _.map(filteredLabels, (label) => {
+        var baseColor = Colors.getColorForLabel(label.name);
         return {
-          label: name,
+          label: label.name,
           fillColor: baseColor,
           strokeColor: Colors.darken(baseColor, 0.3),
           highlightFill: Colors.lighten(baseColor, 0.3),
           highlightStroke: baseColor,
-          data: values
+          data: label.values
         }
       });
 
@@ -192,18 +178,23 @@ module Esper.Views {
         });
 
         if (results && results.ready) {
-          // Aggregate time stats and sort by overall durations by label
+          // Aggregate time stats by label
           var agg = TimeStats.aggregate(results.stats);
           var labelsAgg = _.map(agg.by_label,
-            (statEntry, name): [string, number] => [
-              name,
-              TimeStats.toHours(statEntry.event_duration)
-            ]
+            (statEntry, name) => {
+              return {
+                name: name,
+                total: statEntry.event_duration,
+                values: statEntry.durationValues
+              };
+            }
           );
-          labelsAgg = _.sortBy(labelsAgg, (pair) => -pair[1]);
-          var labelPairs = _.map(labelsAgg, (pair): [string, string] => [
-            pair[0],
-            pair[1] + "h"
+
+          // Sort by total duration descending
+          labelsAgg.sort((a, b) => b.total - a.total);
+          var labelPairs = _.map(labelsAgg, (label): [string, string] => [
+            label.name,
+            TimeStats.toHours(label.total) + "h"
           ]);
 
           // If no selected labels, default to 4 most frequent labels
@@ -217,6 +208,7 @@ module Esper.Views {
       return {
         selectedCal: selectedCal,
         selectedLabels: selectedLabels || [],
+        labelValues: labelsAgg,
         results: results,
         allLabels: labelPairs || []
       };

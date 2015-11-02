@@ -118,39 +118,78 @@ module Esper.TimeStats {
 
   ////
 
+  // Expand CalendarStatsEntry to contain list of values
+  export interface AggCalendarStatEntry extends ApiT.CalendarStatEntry {
+    countValues: number[];
+    durationValues: number[];
+  }
+
+  export interface AggCalendarStats extends ApiT.CalendarStats {
+    by_label: {
+      [index: string]: AggCalendarStatEntry
+    },
+    unlabelled: AggCalendarStatEntry,
+    total: AggCalendarStatEntry
+  }
+
   // Combines stat results to get aggregate data by label
-  export function aggregate(results: ApiT.CalendarStats[]): ApiT.CalendarStats {
-    var accumulator: ApiT.CalendarStats = {
+  export function aggregate(results: ApiT.CalendarStats[]): AggCalendarStats {
+    var accumulator: AggCalendarStats = {
       by_label: {},
       unlabelled: {
         event_count: 0,
-        event_duration: 0
+        event_duration: 0,
+        countValues: [],
+        durationValues: []
       },
       total: {
         event_count: 0,
-        event_duration: 0
+        event_duration: 0,
+        countValues: [],
+        durationValues: []
       }
     };
 
-    return _.reduce(results, (agg: ApiT.CalendarStats,
-                              stat: ApiT.CalendarStats) => {
+    return _.reduce(results, (agg: AggCalendarStats,
+                              stat: ApiT.CalendarStats,
+                              index: number) => {
       _.each(stat.by_label, (v, name) => {
-        var statEntry: ApiT.CalendarStatEntry = agg.by_label[name] =
+        var statEntry: AggCalendarStatEntry = agg.by_label[name] =
           agg.by_label[name] || {
             event_count: 0,
-            event_duration: 0
+            event_duration: 0,
+            countValues: [],
+            durationValues: []
           };
+
+        // This label may be new, so prefill 0s up to current index
+        _.times(index - statEntry.countValues.length, () => {
+          statEntry.countValues.push(0);
+          statEntry.durationValues.push(0);
+        });
+
         addTo(statEntry, v);
       });
+
+      // Bump up any remaining stats
+      _.each(agg.by_label, (v, name) => {
+        _.times(index + 1 - v.countValues.length, () => {
+          v.countValues.push(0);
+          v.durationValues.push(0);
+        });
+      });
+
       addTo(agg.unlabelled, stat.unlabelled);
       addTo(agg.total, stat.total);
       return agg;
     }, accumulator);
   }
 
-  function addTo(entry: ApiT.CalendarStatEntry, plus: ApiT.CalendarStatEntry) {
+  function addTo(entry: AggCalendarStatEntry, plus: ApiT.CalendarStatEntry) {
     entry.event_count += plus.event_count;
     entry.event_duration += plus.event_duration;
+    entry.countValues.push(plus.event_count);
+    entry.durationValues.push(plus.event_duration);
   }
 
   /*
