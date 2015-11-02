@@ -40,10 +40,10 @@ module Esper.GmailSearch {
     var searchThread = e.gmail_thrid;
     from.html(e.first_from);
 
-    var thread_date = new Date(e.last_date);
+    var thread_date = XDate.ofString(e.last_date);
     var now = new Date();
-    if (now.getDay() === thread_date.getDay()) {
-      date_output = XDate.utcToLocalTimeOnly(thread_date);
+    if (now.getDay() === thread_date.getUTCDay()) {
+      date_output = XDate.timeOnly(thread_date);
     } else {
       date_output = XDate.month(thread_date) + " " + thread_date.getDate();
     }
