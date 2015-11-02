@@ -67,8 +67,6 @@
 /// <reference path="./UserTab.ts" />
 /// <reference path="./GroupScheduling.ts" />
 /// <reference path="./BackgroundEvents.ts" />
-/// <reference path="./TimeTracker.ts" />
-/// <reference path="./Inactivity.ts" />
 /// <reference path="./Init.ts" />
 /// <reference path="./GmailSearch.ts" />
 
