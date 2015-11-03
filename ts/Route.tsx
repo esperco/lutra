@@ -26,7 +26,10 @@ module Esper.Route {
 
   // Graph labels over time
   pageJs("/labels-over-time", loginRequired, function() {
-    Layout.render(<Views.LabelsOverTime />);
+    Layout.render(<Views.LabelsOverTime />,
+      undefined,
+      <Views.Footer hoverable={true} />
+    );
   });
 
   // 404 page

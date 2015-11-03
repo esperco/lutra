@@ -4,7 +4,7 @@
 
 
 /* New variables */
-@footer-bg: #f8f8f8;
+@footer-bg: @brand-bg;
 
 
 /* Page-specific style imports and helper import */
@@ -18,7 +18,7 @@
 body, .footer {
   background: @footer-bg;
 }
-#esper-main{
+#esper-main {
   background: @body-bg;
   padding-top: @navbar-height;
   min-height: 70%;
@@ -26,8 +26,36 @@ body, .footer {
 .footer {
   margin: 0 auto;
   padding: @padding-large-vertical @padding-large-horizontal;
+  color: white;
   ul, li{
     list-style-type: none;
+  }
+
+  &.hoverable {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: @padding-large-vertical;
+    padding-bottom: 0;
+    overflow: hidden;
+
+    &:hover, &:focus {
+      max-height: 100%;
+      padding-bottom: @padding-large-vertical;
+    }
+
+    // NB: max-height instad of height because height => auto doesn't
+    // animate well
+    transition: padding 0.6s, max-height 0.6s;
+  }
+
+  a, a:hover, a:visited, a:active {
+    color: white;
+  }
+
+  .footer-links a {
+    padding-right: @padding-large-horizontal;
   }
 }
 
