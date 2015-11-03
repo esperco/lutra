@@ -204,7 +204,7 @@ module Esper.EventControls {
                  class="control-label">Description</label>
           <br /><br />
           <button #pickEmails class="btn btn-secondary">
-            Pick Emails
+            Insert Emails
           </button>
         </div>
         <div class="col-sm-10">
