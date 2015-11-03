@@ -44,14 +44,15 @@ module Esper.Components {
         var badgeStyle = selected ? {
           background: Colors.getColorForLabel(label)
         } : {};
-        return <div key={label} className="checkbox list-group-item one-line">
+        return <a href="#" onClick={this.handleClick.bind(this)}
+            key={label} className="checkbox list-group-item one-line">
           <span className="badge" style={badgeStyle}>{badgeText}</span>
           <label>
             <input type="checkbox" value={label} checked={selected}
               onChange={this.handleChange.bind(this)} />
             {" "}{label}{" "}
           </label>
-        </div>
+        </a>
       });
     }
 
@@ -64,6 +65,16 @@ module Esper.Components {
 
     handleChange() {
       this.props.updateFn(this.getLabels());
+    }
+
+    // Handle click outside of input element (if clicking input, handleChange
+    // should be triggered)
+    handleClick(e: MouseEvent) {
+      if ($(e.target).prop('nodeName').toLowerCase() !== "input") {
+        var input = $(e.currentTarget).find('input');
+        input.prop('checked', !input.prop('checked'));
+        this.handleChange(); // Manually fire handleChange
+      }
     }
   }
 }
