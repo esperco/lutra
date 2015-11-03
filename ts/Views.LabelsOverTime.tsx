@@ -106,11 +106,13 @@ module Esper.Views {
     renderChart() {
       var results = this.state.results;
       if (! results) {
-        return <div>Please select a calendar</div>
+        return this.renderMessage("Please select a calendar");
       } else if (results.error) {
-        return <div>Something broke!</div>
+        return this.renderMessage("Error loading data");
       } else if (!results.ready) {
-        return <div>Loading &hellip;</div>
+        return <div className="esper-center">
+          <span className="esper-spinner esper-large" />
+        </div>;
       }
 
       var data = this.getChartData(results, this.state.labelValues);
@@ -118,6 +120,16 @@ module Esper.Views {
               verticalLabel="Time (Hours)"
               horizontalLabel="Week Starting"
               data={data} />;
+    }
+
+    renderMessage(elm: JSX.Element|string) {
+      return <div className="esper-expanded minus-subheader padded">
+        <div className="panel panel-default focus-message">
+          <div className="panel-body">
+            {elm}
+          </div>
+        </div>
+      </div>
     }
 
     renderLabels() {

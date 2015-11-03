@@ -11,15 +11,15 @@
 ///////
 
 .esper-padded {
-  padding: @padding-base-vertical @padding-base-horizontal;
+  padding: @padding-base-vertical @padding-base-horizontal
+           @padding-large-vertical;
 }
 
 ///////
 
-.esper-full-screen {
+.esper-full-screen, .esper-expanded {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  overflow: auto;
 
   &.padded {
     .esper-padded;
@@ -27,6 +27,10 @@
 
   &.minus-nav {
     top: @navbar-height;
+  }
+
+  &.minus-subheader{
+    top: @font-size-h4 + @line-height-computed + @panel-body-padding;
   }
 
   .esper-center {
@@ -51,6 +55,18 @@
   .esper-left-sidebar {
     border-right: 1px solid @table-border-color;
   }
+
+  // e.g. if panel is only element
+  .panel.focus-message {
+    height: 95%;
+    margin: 0;
+
+    .panel-body {
+      .esper-center;
+      font-size: @font-size-large;
+      color: @gray-light;
+    }
+  }
 }
 
 /////
@@ -72,6 +88,21 @@
   animation: scaleout 1.0s ease-in-out 0s infinite;
   height: 20px;
   width: 20px;
+
+  &.esper-medium {
+    height: 40px;
+    width: 40px;
+  }
+
+  &.esper-large {
+    height: 65px;
+    width: 65px;
+  }
+
+  .esper-center & {
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 ////
