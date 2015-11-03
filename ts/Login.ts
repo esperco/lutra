@@ -11,12 +11,16 @@ module Esper.Login {
 
   export var InfoStore = new Model.StoreOne<ApiT.LoginResponse>();
 
+  var loginDeferred: JQueryDeferred<ApiT.LoginResponse> = $.Deferred();
+  export var loginPromise = loginDeferred.promise();
+
   export function init() {
     if (! Login.loggedIn()) {
       InfoStore.set(null, { dataStatus: Model.DataStatus.FETCHING });
 
-      var onFail = function() {
+      var onFail = function(err: Error) {
         InfoStore.set(null, { dataStatus: Model.DataStatus.READY });
+        loginDeferred.reject(err);
       };
 
       Login.loginViaIframe()
@@ -25,6 +29,7 @@ module Esper.Login {
         }, onFail)
         .then(function(loginInfo) {
           InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+          loginDeferred.resolve(loginInfo);
         }, onFail);
     }
   }

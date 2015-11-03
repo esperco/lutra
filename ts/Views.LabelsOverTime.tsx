@@ -106,9 +106,15 @@ module Esper.Views {
     renderChart() {
       var results = this.state.results;
       if (! results) {
-        return this.renderMessage("Please select a calendar");
+        return this.renderMessage(<span>
+          <i className="fa fa-fw fa-calendar"></i>{" "}
+          Please select a calendar
+        </span>);
       } else if (results.error) {
-        return this.renderMessage("Error loading data");
+        return this.renderMessage(<span>
+          <i className="fa fa-fw fa-warning"></i>{" "}
+          Error loading data
+        </span>);
       } else if (!results.ready) {
         return <div className="esper-center">
           <span className="esper-spinner esper-large" />
@@ -124,7 +130,7 @@ module Esper.Views {
 
     renderMessage(elm: JSX.Element|string) {
       return <div className="esper-expanded minus-subheader padded">
-        <div className="panel panel-default focus-message">
+        <div className="panel panel-default esper-focus-message">
           <div className="panel-body">
             {elm}
           </div>

@@ -1,10 +1,22 @@
 /// <reference path="./Esper.ts" />
+/// <reference path="./Login.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.LabelsOverTime.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
+/// <reference path="./Views.LoginRequired.tsx" />
 
 module Esper.Route {
+
+  // Helper for displaying the login required page
+  var loginRequired: PageJS.Callback = function(ctx, next) {
+    Login.loginPromise.done(next);
+    Login.loginPromise.fail(function() {
+      Layout.render(<Views.LoginRequired />);
+    });
+
+    // If busy, then we keep showing spinner
+  }
 
   // Index page
   pageJs("/", function() {
@@ -13,7 +25,7 @@ module Esper.Route {
   });
 
   // Graph labels over time
-  pageJs("/labels-over-time", function() {
+  pageJs("/labels-over-time", loginRequired, function() {
     Layout.render(<Views.LabelsOverTime />);
   });
 

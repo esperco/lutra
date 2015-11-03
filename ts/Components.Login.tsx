@@ -25,9 +25,7 @@ module Esper.Components {
       }
 
       // Double encode URI because of pageJs issue (see Otter's Route.ts)
-      var domain = encodeURIComponent(encodeURIComponent(location.href));
-      var redirect = Api.prefix + "/#!/login-redirect/" + domain;
-      return <a href={redirect}>Login / Signup</a>;
+      return <LoginLink>Login / Signup</LoginLink>;
     }
 
     componentDidMount() {
@@ -44,6 +42,20 @@ module Esper.Components {
         loginInfo: loginInfo,
         busy: metadata && metadata.dataStatus !== Model.DataStatus.READY
       };
+    }
+  }
+
+
+  /* Link to Otter login page with redirect back to current URL */
+
+  // NB: props.children is a special React property reserved for child
+  // JSX elements
+  export class LoginLink extends Component<{children?: JSX.Element[]}, {}> {
+    render() {
+      // Double encode URI because of pageJs issue (see Otter's Route.ts)
+      var here = encodeURIComponent(encodeURIComponent(location.href));
+      var redirect = Api.prefix + "/#!/login-redirect/" + here;
+      return <a href={redirect}>{this.props.children}</a>;
     }
   }
 }

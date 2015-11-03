@@ -11,7 +11,7 @@ module Esper.Views {
   export class NotFound extends Component<{}, {}> {
     render() {
       return <div id="not-found-page" className="esper-full-screen padded">
-        <div className="esper-center">
+        <div className="esper-focus-message"><div>
           <h2>Whoops.</h2>
           <p>
             We can't find what you're looking for. Please
@@ -20,7 +20,7 @@ module Esper.Views {
           </p><p>
             <a href="http://esper.com">Click here to go back to Esper.com.</a>
           </p>
-        </div>
+        </div></div>
       </div>;
     }
   }

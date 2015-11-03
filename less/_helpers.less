@@ -20,6 +20,7 @@
 .esper-full-screen, .esper-expanded {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
+  background: @body-bg;
 
   &.padded {
     .esper-padded;
@@ -57,14 +58,23 @@
   }
 
   // e.g. if panel is only element
-  .panel.focus-message {
+  .esper-focus-message {
     height: 95%;
+    font-size: 150%;
     margin: 0;
+    color: @gray-light;
 
-    .panel-body {
+    > *:first-child {
       .esper-center;
+    }
+
+    &.panel {
       font-size: @font-size-large;
-      color: @gray-light;
+    }
+
+    h2 {
+      font-weight: bold;
+      margin-bottom: 20px;
     }
   }
 }
