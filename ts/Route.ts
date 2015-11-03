@@ -116,6 +116,12 @@ module Esper.Route {
       withLogin(undefined, undefined, undefined, data.redirect);
     },
 
+    // Same as login-redirect, but logs out existing user first
+    "logout-redirect/:redirect": function(data) {
+      Login.clearAllLoginInfo();
+      withLogin(undefined, undefined, undefined, data.redirect);
+    },
+
     /* various pages */
 
     "team-settings/:teamid/calendars": function(data) {
