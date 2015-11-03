@@ -16,9 +16,9 @@ module Esper.Views {
             </a>
           </div>
 
-          <ul className="nav navbar-nav navbar-right">
-            <li><Components.LoginInfo /></li>
-          </ul>
+          <div className="nav navbar-nav navbar-right">
+            <Components.LoginInfo />
+          </div>
         </div>
       </nav>;
     }

@@ -21,7 +21,18 @@ module Esper.Components {
       }
 
       if (this.state.loginInfo) {
-        return <p className="navbar-text">{this.state.loginInfo.email}</p>;
+        return <div className="dropdown navbar-text">
+          <a href="#" className="dropdown-toggle" data-toggle="dropdown">
+            {this.state.loginInfo.email}{" "}
+            <span className="caret"></span>
+          </a>
+          <ul className="dropdown-menu">
+            <li><a href={Login.logoutURL()}>
+              <i className="fa fa-fw fa-sign-out"></i>{" "}
+              Logout
+            </a></li>
+          </ul>
+        </div>;
       }
 
       // Double encode URI because of pageJs issue (see Otter's Route.ts)

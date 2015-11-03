@@ -38,8 +38,17 @@ module Esper.Login {
     Return a login URL that redirects back to the curent page
   */
   export function loginURL() {
-    // Double encode URI because of pageJs issue (see Otter's Route.ts)
-    var here = encodeURIComponent(encodeURIComponent(location.href));
-    return Api.prefix + "/#!/login-redirect/" + here;
+    return Api.prefix + "/#!/login-redirect/" + here();
+  }
+
+  // Ditto, but logs out user
+  export function logoutURL() {
+    return Api.prefix + "/#!/logout-redirect/" + here();
+  }
+
+  // Returns current href, but double encodes because of pageJs issue (see
+  // Otter's Route.ts)
+  function here() {
+    return encodeURIComponent(encodeURIComponent(location.href));
   }
 }
