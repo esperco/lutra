@@ -2,6 +2,7 @@
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelSelector.tsx" />
+/// <reference path="./Components.PeriodSelector.tsx" />
 /// <reference path="./Components.Chart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
@@ -23,21 +24,42 @@ module Esper.Views {
   // Action to update our selection -- also triggers async calls
   function updateSelection(teamId: string, calId: string) {
     var current = calSelectStore.val();
-
     calSelectStore.set({teamId: teamId, calId: calId});
-    TimeStats.intervalQuery.async({
-      teamId: teamId,
-      calId: calId,
-
-      // Hard-coded for now
-      numIntervals: 5,
-      interval: TimeStats.Interval.WEEKLY
-    });
+    updateAsync();
 
     // Clear label selection and colors if switching teams (default)
     if (current && current.teamId !== teamId) {
       labelSelectStore.unset();
       Colors.resetColorMap();
+    }
+  }
+
+  // Store for currently selected interval
+  var intervalSelectStore = new Model.StoreOne<TimeStats.Interval>();
+
+  // Default
+  intervalSelectStore.set(TimeStats.Interval.WEEKLY);
+
+  // Hard-coded (for now) total number of intervals
+  var NUM_INTERVALS = 5;
+
+  // Action to update selected interval
+  function updateInterval(interval: TimeStats.Interval) {
+    intervalSelectStore.set(interval);
+    updateAsync();
+  }
+
+  // Call from update actions to trigger async actions
+  function updateAsync() {
+    var calSelect = calSelectStore.val();
+    var intervalSelect = intervalSelectStore.val();
+    if (calSelect && intervalSelect !== undefined) {
+      TimeStats.intervalQuery.async({
+        teamId: calSelect.teamId,
+        calId: calSelect.calId,
+        numIntervals: NUM_INTERVALS, // Hard-coded for now
+        interval: intervalSelect
+      });
     }
   }
 
@@ -54,7 +76,6 @@ module Esper.Views {
     });
   }
 
-
   /////
 
   interface LabelValues {
@@ -66,6 +87,7 @@ module Esper.Views {
   interface LabelsOverTimeState {
     selectedCal: CalSelection;
     selectedLabels: string[];
+    selectedInterval: TimeStats.Interval;
     results: TimeStats.StatResults;
     labelValues: LabelValues[];
     allLabels: [string, string][]; // Label + Badget Text
@@ -89,17 +111,21 @@ module Esper.Views {
             {this.renderLabels()}
           </div>
           <div className="col-sm-9 col-lg-10 esper-right-content padded">
-            <div className="esper-borderless-section">
-              <h4 className="esper-header">
+            <div className="esper-header clearfix">
+              <h4 className="pull-left">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}
                 Labeled Events Over Time
               </h4>
-              <div className="esper-content">
-                {this.renderChart()}
+              <div className="pull-right">
+                <Components.PeriodSelector
+                  selected={this.state.selectedInterval}
+                  updateFn={updateInterval} />
               </div>
             </div>
+            {this.renderChart()}
+            </div>
           </div>
-        </div></div>
+        </div>
       </div>;
     }
 
@@ -121,10 +147,30 @@ module Esper.Views {
         </div>;
       }
 
-      var data = this.getChartData(results, this.state.labelValues);
+      var horizontalLabel: string;
+      var startFormat: string;
+      switch(this.state.selectedInterval) {
+        case TimeStats.Interval.DAILY:
+          horizontalLabel = "Day"
+          startFormat = "MMM D"
+          break;
+        case TimeStats.Interval.MONTHLY:
+          horizontalLabel = "Month"
+          startFormat = "MMM"
+          break;
+        default:
+          horizontalLabel = "Week Starting";
+          startFormat = "MMM D";
+      }
+
+      var data = this.getChartData(
+        results,
+        this.state.labelValues,
+        startFormat
+      );
       return <Components.BarChart units="Hours"
               verticalLabel="Time (Hours)"
-              horizontalLabel="Week Starting"
+              horizontalLabel={horizontalLabel}
               data={data} />;
     }
 
@@ -151,10 +197,11 @@ module Esper.Views {
     }
 
     getChartData(results: TimeStats.StatResults,
-                 sortedLabels: LabelValues[]) {
+                 sortedLabels: LabelValues[],
+                 startFormat: string) {
       var labels = _.map(results.starts,
         // MMM d => Oct 4
-        (start) => moment(start).format("MMM D")
+        (start) => moment(start).format(startFormat)
       );
 
       var filteredLabels = _.filter(sortedLabels, (label) =>
@@ -183,11 +230,13 @@ module Esper.Views {
       this.setSources([
         calSelectStore,
         labelSelectStore,
+        intervalSelectStore,
         TimeStats.intervalQuery
       ]);
     }
 
     getState(): LabelsOverTimeState {
+      var selectedInterval = intervalSelectStore.val();
       var selectedCal = calSelectStore.val();
       if (selectedCal && selectedCal.calId && selectedCal.teamId) {
 
@@ -198,13 +247,11 @@ module Esper.Views {
         );
         if (! team) { throw new Error("Selected unavailable team"); }
 
-        // Hard-code in selection for now
-        // TODO: Make this user-changeable
         var results = TimeStats.intervalQuery.get({
           teamId: selectedCal.teamId,
           calId: selectedCal.calId,
-          numIntervals: 5,
-          interval: TimeStats.Interval.WEEKLY
+          numIntervals: NUM_INTERVALS, // Hard-coded for now
+          interval: selectedInterval
         });
 
         if (results && results.ready) {
@@ -248,6 +295,7 @@ module Esper.Views {
       return {
         selectedCal: selectedCal,
         selectedLabels: selectedLabels || [],
+        selectedInterval: selectedInterval,
         labelValues: labelsAgg,
         results: results,
         allLabels: labelPairs || []

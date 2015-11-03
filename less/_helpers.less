@@ -34,7 +34,8 @@
   }
 
   &.minus-subheader{
-    top: @font-size-h4 + @line-height-computed + @panel-body-padding;
+    top: @font-size-h4 + @line-height-computed +
+         @panel-body-padding + @padding-base-vertical;
   }
 
   .esper-center {
@@ -119,6 +120,12 @@
 }
 
 ////
+
+.esper-header {
+  line-height: @input-height-base;
+  vertical-align: middle;
+  margin-top: @padding-small-vertical;
+}
 
 .esper-borderless-section {
   .esper-header {
