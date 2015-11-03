@@ -6,7 +6,14 @@ module Esper.XDate {
     return new Date(d.getTime());
   }
 
+
+  // In order to have a consistent time showing across all computers
+  // there must be a Z at the end of the timestamp.
   export function ofString(s : string) : Date {
+    var lastChar = s.slice(-1);
+    if (lastChar !== "Z") {
+      s = s + "Z";
+    }
     return new Date(s);
   }
 
@@ -93,10 +100,6 @@ module Esper.XDate {
     return fullMonths[d.getUTCMonth()];
   }
 
-  export function localFullMonth(d : Date) : string {
-    return fullMonths[d.getMonth()];
-  }
-
   /* "Aug 13" */
   export function dateOnlyWithoutYear(d : Date) : string {
     return month(d)
@@ -119,10 +122,6 @@ module Esper.XDate {
 
   export function fullMonthDay(d : Date) : string {
     return fullMonth(d) + " " + day(d).toString();
-  }
-
-  export function localFullMonthDay(d : Date) : string {
-    return localFullMonth(d) + " " + localDay(d).toString();
   }
 
   /* "1:30pm" */
@@ -152,20 +151,12 @@ module Esper.XDate {
     return formatTimeOnly(hours(d), minutes(d), true);
   }
 
-  export function localShortTimeOnly(d: Date): string {
-    return formatTimeOnly(d.getHours(), d.getMinutes(), true);
-  }
-
   export function utcToLocalTimeOnly(d : Date) : string {
     return formatTimeOnly(d.getHours(), d.getMinutes(), false);
   }
 
   export function timeOnly24Hours(d : Date) : string {
     return pad(d.getUTCHours().toString()) + ":" + pad(d.getUTCMinutes().toString());
-  }
-
-  export function localTimeOnly24Hours(d : Date) : string {
-    return pad(d.getHours().toString()) + ":" + pad(d.getMinutes().toString());
   }
 
   /* "August 13, 12:30-1pm" */
@@ -178,22 +169,14 @@ module Esper.XDate {
     return fullMonthDay(d1) + ", " + t1 + "-" + t2;
   }
 
-  export function localRange(d1: Date, d2: Date): string {
-    var t1 = localShortTimeOnly(d1);
-    var t2 = localShortTimeOnly(d2);
-    if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
-      t1 = t1.slice(0, -2);
-    }
-    return localFullMonthDay(d1) + ", " + t1 + "-" + t2;
-  }
-
-  export function localRangeTimeOnly(d1: Date, d2: Date): string {
-    var t1 = localShortTimeOnly(d1);
-    var t2 = localShortTimeOnly(d2);
-    if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
-      t1 = t1.slice(0, -2);
-    }
-    return t1 + "-" + t2;
+  /* "12:30-1pm" */
+  export function rangeTimeOnly(d1: Date, d2: Date): string {
+      var t1 = shortTimeOnly(d1);
+      var t2 = shortTimeOnly(d2);
+      if (t1.slice(-2) === t2.slice(-2)) { // both am or both pm
+          t1 = t1.slice(0, -2);
+      }
+      return t1 + "-" + t2;
   }
 
   /* "12:30pm to 1:30 pm" */
