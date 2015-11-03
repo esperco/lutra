@@ -8,7 +8,10 @@ module Esper.Conf {
   // Authorized domains and protocols for logging in
   export var authorizedDomains = [
     "http://esper.com",
-    "https://app.esper.com"
+    "https://app.esper.com",
+    "https://time.esper.com",
+    "https://directory.esper.com",
+    "https://dir.esper.com"
   ];
 }
 
