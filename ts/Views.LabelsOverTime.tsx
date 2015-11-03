@@ -4,6 +4,8 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.PeriodSelector.tsx" />
 /// <reference path="./Components.Chart.tsx" />
+/// <reference path="./Components.EmailModal.tsx" />
+/// <reference path="./Layout.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
@@ -120,6 +122,11 @@ module Esper.Views {
                 <Components.PeriodSelector
                   selected={this.state.selectedInterval}
                   updateFn={updateInterval} />
+                {" "}
+                <button className="btn btn-default"
+                    onClick={this.openEmail.bind(this)}>
+                  Other?
+                </button>
               </div>
             </div>
             {this.renderChart()}
@@ -224,6 +231,13 @@ module Esper.Views {
         labels: labels,
         datasets: datasets
       };
+    }
+
+    openEmail() {
+      Layout.renderModal(<Components.EmailModal title="Request Custom Stats">
+        <p>Want something other than the default options? Let us know and we'll
+        see if we can generate something for you.</p>
+      </Components.EmailModal>);
     }
 
     componentDidMount() {

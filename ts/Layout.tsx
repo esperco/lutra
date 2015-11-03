@@ -2,6 +2,7 @@
   Module for rendering things (mostly React components) into our HTML page
 */
 
+/// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Views.Header.tsx" />
 /// <reference path="./Views.Footer.tsx" />
@@ -12,6 +13,7 @@ module Esper.Layout {
   export var headerSelector = "#esper-header";
   export var footerSelector = "#esper-footer";
   export var loadingSelector = "#esper-loading";
+  export var modalSelector = "#esper-modal";
 
   /*
     Renders a main React element, a header, and a footer. Renders the default
@@ -42,6 +44,17 @@ module Esper.Layout {
       are done before we hide the loader
     */
     window.requestAnimationFrame(hideLoader);
+  }
+
+  /*
+    Renders a modal into the a div near the end of the body -- replaces any
+    existing modal in that div
+  */
+  export function renderModal(modal: React.ReactElement<any>) {
+    $(modalSelector).renderReact(modal);
+    window.requestAnimationFrame(function() {
+      $(modalSelector + " .modal").modal("show");
+    });
   }
 
   function defaultHeader() {
