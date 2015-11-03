@@ -16,13 +16,13 @@ module Esper.Views {
       return <div className={"footer" + (this.props.hoverable ?
                              " hoverable": "")}>
         <div className="container-fluid padded clearfix">
-          <div className="footer-links pull-left">
-            <a href="http://esper.com/">Home</a>
-            <a href="http://esper.com/contact">Contact</a>
-            <a href="http://esper.com/privacy-policy">Privacy</a>
-            <a href="http://esper.com/terms-of-use">Terms</a>
-          </div>
-          <div className="pull-right">
+          <ul className="footer-links pull-left nav nav-pills">
+            <li><a href="http://esper.com/">Home</a></li>
+            <li><a href="http://esper.com/contact">Contact</a></li>
+            <li><a href="http://esper.com/privacy-policy">Privacy</a></li>
+            <li><a href="http://esper.com/terms-of-use">Terms</a></li>
+          </ul>
+          <div className="pull-right navbar-text">
             &copy; {new Date().getFullYear()} Esper
           </div>
         </div>

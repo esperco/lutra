@@ -24,3 +24,29 @@ a.list-group-item {
 .alert.compact {
   margin-bottom: @alert-padding;
 }
+
+.navbar-brand {
+  line-height: @navbar-height - (@navbar-padding-vertical * 2);
+  vertical-align: middle;
+
+  img {
+    height: @navbar-height - (@navbar-padding-vertical * 2);
+    width: auto;
+    margin: 0 @navbar-padding-horizontal;
+  }
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background-color: rgba(255, 255, 255, 0.8);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.navbar-default .btn-default.navbar-btn {
+  border-color: @navbar-default-border;
+  color: @navbar-default-border;
+
+  &:hover, &:focus {
+    background: @navbar-default-border;
+    color: white;
+  }
+}

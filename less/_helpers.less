@@ -17,23 +17,33 @@
 
 ///////
 
+/*
+  full-screen => intended for covering all or most of the screen
+  expanded => intended for expanding to the edges of a given container
+
+  These are mostly identical but differ in how padding is handled.
+*/
+.esper-full-screen.padded {
+  .esper-padded;
+}
+
+.esper-expanded.padded {
+  top: @padding-base-vertical;
+  bottom: @padding-large-vertical;
+  left: @padding-base-horizontal;
+  right: @padding-base-horizontal;
+}
+
 .esper-full-screen, .esper-expanded {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background: @body-bg;
 
-  &.padded {
-    top: @padding-base-vertical;
-    bottom: @padding-large-vertical;
-    left: @padding-base-horizontal;
-    right: @padding-base-horizontal;
-  }
-
   &.minus-nav {
     top: @navbar-height;
   }
 
-  &.minus-subheader{
+  &.minus-subheader, &.padded.minus-subheader {
     top: @font-size-h4 + @line-height-computed +
          @panel-body-padding + @padding-base-vertical;
   }
@@ -123,6 +133,12 @@
     display: block;
     height: 32px;
     width: 32px;
+  }
+
+  .navbar & {
+    height: @navbar-height - 14;
+    width: @navbar-height - 14;
+    margin: 7px;
   }
 }
 

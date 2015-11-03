@@ -1,5 +1,5 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="./Components.Login.tsx" />
+/// <reference path="./Login.ts" />
 
 module Esper.Views {
 
@@ -15,7 +15,7 @@ module Esper.Views {
             <h2>Login Required.</h2>
             <p>
               You must{" "}
-              <Components.LoginLink>login</Components.LoginLink>
+              <a href={Login.loginURL()}>login</a>
               {" "}to view this page.
             </p>
           </div>

@@ -25,6 +25,10 @@ helpers.vendor.watch("watch-vendor", config);
 helpers.html.build("build-html", config);
 helpers.html.watch("watch-html", config);
 
+// Images and other static assets
+helpers.assets.build("build-assets", config);
+helpers.assets.watch("watch-assets", config);
+
 // Test helpers
 helpers.test.build("build-test-reqs", config);
 
@@ -43,7 +47,7 @@ gulp.task("production", function(cb) {
 
 // Quick build, no vendor
 var buildBase = gulp.parallel(
-  "build-html", "build-test-reqs", "build-ts", "build-less");
+  "build-html", "build-test-reqs", "build-ts", "build-less", "build-assets");
 
 gulp.task("rebuild", gulp.parallel("build-vendor", buildBase));
 
@@ -53,7 +57,7 @@ gulp.task("build-production", gulp.series("production", "build"));
 
 gulp.task("watch", gulp.series(
   function(cb) { config.watchMode = true; cb(); }, "build",
-  gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-vendor",
-                "http-server", "live-reload")));
+  gulp.parallel("watch-html", "watch-ts", "watch-less", "watch-assets",
+                "watch-vendor", "http-server", "live-reload")));
 
 gulp.task("default", gulp.series("build"));

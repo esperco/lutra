@@ -64,6 +64,12 @@ module.exports = {
   // Where to find simple our html pages
   htmlDirs: ["html"],
 
+  // Static assets -- map from glob relative to root to destination direcory
+  // in pub
+  assets: {
+    "marten/img/**/*.*": "img"
+  },
+
   // A Browserify entry point for bundling together our third-party
   // vendor JS files
   vendorJSIndex: "vendor.js",

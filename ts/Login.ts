@@ -2,7 +2,7 @@
   Module for fetching login state of Otter and retrieving loginInfo
 */
 
-/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/Login.Iframe.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
@@ -32,5 +32,14 @@ module Esper.Login {
           loginDeferred.resolve(loginInfo);
         }, onFail);
     }
+  }
+
+  /*
+    Return a login URL that redirects back to the curent page
+  */
+  export function loginURL() {
+    // Double encode URI because of pageJs issue (see Otter's Route.ts)
+    var here = encodeURIComponent(encodeURIComponent(location.href));
+    return Api.prefix + "/#!/login-redirect/" + here;
   }
 }
