@@ -305,7 +305,7 @@ module Esper.Signin {
     var uid = Login.me();
     if (Util.isDefined(optEmail) && Login.myEmail() !== optEmail) {
       forceLogin(landingUrl, undefined, optEmail);
-    } else if (Util.isDefined(uid)) {
+    } else if (uid) {
       return Api.getLoginInfo()
         .then(
           /* success */
