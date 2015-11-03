@@ -563,7 +563,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
   <div class="esper-modal-header">
     <span #heading>Review event description</span>
     <button #pickEmails class="esper-btn esper-btn-secondary">
-      Pick Emails
+      Insert Emails
     </button>
   </div>
   <div class="esper-ev-modal-content">
