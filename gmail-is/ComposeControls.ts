@@ -47,8 +47,8 @@ module Esper.ComposeControls {
     var forExec = execStart.format("dddd, MMMM D") + // Saturday, May 30
                   " at " +
                   XDate.rangeTimeOnly(
-                    XDate.ofString(execStart.format("YYYY-MM-DDThh:mm:ss")),
-                    XDate.ofString(execEnd.format("YYYY-MM-DDThh:mm:ss"))) +
+                    XDate.ofString(execStart.format("YYYY-MM-DDTHH:mm:ss")),
+                    XDate.ofString(execEnd.format("YYYY-MM-DDTHH:mm:ss"))) +
                   " " + execStart.zoneAbbr(); // EDT
     var forGuest = "";
     if (guestTz && guestTz !== execTz) {
@@ -56,8 +56,8 @@ module Esper.ComposeControls {
       var guestEnd = (<any> moment)(ev.end.utc).tz(guestTz);
       forGuest = " / " +
                  XDate.rangeTimeOnly(
-                    XDate.ofString(guestStart.format("YYYY-MM-DDThh:mm:ss")),
-                    XDate.ofString(guestEnd.format("YYYY-MM-DDThh:mm:ss"))) +
+                    XDate.ofString(guestStart.format("YYYY-MM-DDTHH:mm:ss")),
+                    XDate.ofString(guestEnd.format("YYYY-MM-DDTHH:mm:ss"))) +
                  " " + guestStart.zoneAbbr();
     }
     return forExec + forGuest;

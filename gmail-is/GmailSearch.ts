@@ -45,7 +45,7 @@ module Esper.GmailSearch {
     if (now.getDay() === thread_date.getUTCDay()) {
       date_output = XDate.timeOnly(thread_date);
     } else {
-      date_output = XDate.month(thread_date) + " " + thread_date.getDate();
+      date_output = XDate.month(thread_date) + " " + XDate.day(thread_date);
     }
 
     subject.html("<b>" + e.first_subject.substring(0,50) + "</b> - " 
