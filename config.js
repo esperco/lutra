@@ -67,7 +67,8 @@ module.exports = {
   // Static assets -- map from glob relative to root to destination direcory
   // in pub
   assets: {
-    "marten/img/**/*.*": "img"
+    "marten/img/**/*.*": "img",
+    "marten/img/favicon.ico": ""
   },
 
   // A Browserify entry point for bundling together our third-party
