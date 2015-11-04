@@ -35,6 +35,7 @@ module Esper.Analytics {
     ClickMenuGetHelp,
     ClickMenuGetStarted,
     ClickMenuGetTaskList,
+    ClickMenuGetTimeStats,
     ClickModalSendAgenda,
     ClickModalSendTaskList,
     ClickOnboardingDisable,
