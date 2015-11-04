@@ -136,6 +136,7 @@ module Esper.InviteControls {
       location      : state.location,
       all_day       : event.all_day,
       guests        : state.guests,
+      send_notifications: true,
       recurrence    : event.recurrence,
       recurring_event_id : event.recurring_event_id
     };
