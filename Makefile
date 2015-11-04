@@ -1,5 +1,6 @@
-.PHONY: default setup dev src prod watch clean
+.PHONY: default install setup dev src prod watch clean
 default: dev
+install: s3
 
 # Install dependencies - npm's postinstall does the rest of the work
 setup:
@@ -21,3 +22,7 @@ watch:
 clean:
 	rm -f *~ */*~
 	rm -rf pub
+
+# Copy pub/ into S3 bucket
+s3:
+	./s3-install
