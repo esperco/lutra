@@ -240,12 +240,6 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(labels));
   }
 
-  export function getSharedLabels(teamid: string):
-    JQueryPromise<ApiT.EmailLabels> {
-    var url = prefix + "/api/labels/shared/" + string(teamid);
-    return JsonHttp.get(url);
-  }
-
   /***** Google profile information *****/
 
   export function getGoogleEmail(myUID: string, theirUID: string,
