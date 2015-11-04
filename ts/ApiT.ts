@@ -220,6 +220,7 @@ type token_response = [
     location?: Location;
     all_day?: boolean;
     guests: Guest[];
+    send_notifications?: boolean;
     color_id?: string;
     recurrence?: Recurrence;
     recurring_event_id?: string;
