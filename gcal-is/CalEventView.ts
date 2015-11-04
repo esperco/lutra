@@ -172,17 +172,14 @@ module Esper.CalEventView {
           updateView(fullEventId);
           Api.linkEventForTeam(teamid, threadId, eventId)
             .done(function() {
-              Api.syncEvent(teamid, threadId, calendarId, eventId)
-                .done(function() {
-                  updateView(fullEventId);
-                  Api.getEventDetails(teamid, calendarId,
-                                      team.team_calendars, eventId)
-                    .done(function(response) {
-                      if (response.event_opt !== undefined) {
-                        mergeDescription(response.event_opt);
-                        Log.d("Link and sync complete.");
-                      }
-                    });
+              updateView(fullEventId);
+              Api.getEventDetails(teamid, calendarId,
+                                  team.team_calendars, eventId)
+                .done(function(response) {
+                  if (response.event_opt !== undefined) {
+                    mergeDescription(response.event_opt);
+                    Log.d("Link and sync complete.");
+                  }
                 });
             });
         });

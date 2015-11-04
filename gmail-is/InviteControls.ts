@@ -806,10 +806,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         if (confirmEventIsNotHold(eventEdit)) {
           return Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
             .then(function(created) {
-              Api.syncEvent(team.teamid, threadId,
-                            created.google_cal_id,
-                            created.google_event_id);
-
               Api.sendEventInvites(team.teamid, from, guests, created);
               CurrentThread.linkedEventsChange.set(null);
 
