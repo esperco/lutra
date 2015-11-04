@@ -140,6 +140,19 @@ module Esper.EventControls {
     $("body").append(view);
   }
 
+  function displayNotifyAttendeesModal(onCommit: (boolean) => void) {
+'''
+<div #content>
+  <p>Would you like to notify attendees of the edited event?</p>
+</div>
+'''
+    return Modal.okCancelDialog("Notify Attendees", content,
+      function() { onCommit(true); return true; },
+      "Yes",
+      function() { onCommit(false); },
+      "No");
+  }
+
   /** Returns a widget for editing an event. If there is no current
    *  team, the widget will be blank and say "no team detected".
    */
@@ -385,76 +398,81 @@ module Esper.EventControls {
             endTime.val(XDate.timeOnly24Hours(end));
 
             save.click(function() {
-              //moment-tz apparently doesn't handle these timezones
-              if (calTimezone === "US/Eastern") calTimezone = "America/New_York";
-              else if (calTimezone === "US/Central") calTimezone = "America/Chicago";
-              else if (calTimezone === "US/Mountain") calTimezone = "America/Denver";
-              else if (calTimezone === "US/Pacific") calTimezone = "America/Los_Angeles";
+              var onCommit = function(notifyAttendees: boolean): void {
+                //moment-tz apparently doesn't handle these timezones
+                if (calTimezone === "US/Eastern") calTimezone = "America/New_York";
+                else if (calTimezone === "US/Central") calTimezone = "America/Chicago";
+                else if (calTimezone === "US/Mountain") calTimezone = "America/Denver";
+                else if (calTimezone === "US/Pacific") calTimezone = "America/Los_Angeles";
 
-              var st = startDate.val() + " " + startTime.val() + "Z";
-              var ed = endDate.val() + " " + endTime.val() + "Z";
-              var timeDiff = new Date(ed).getTime() - new Date(st).getTime();
-              if (timeDiff < 0) {
-                alert("Error: That change would make the event end " +
-                      "before it starts!");
-                return; // exit click handler
-              }
-              var shiftSt = Timezone.shiftTime(st, showTimezone, calTimezone);
-              var shiftEd = Timezone.shiftTime(ed, showTimezone, calTimezone);
+                var st = startDate.val() + " " + startTime.val() + "Z";
+                var ed = endDate.val() + " " + endTime.val() + "Z";
+                var timeDiff = new Date(ed).getTime() - new Date(st).getTime();
+                if (timeDiff < 0) {
+                  alert("Error: That change would make the event end " +
+                        "before it starts!");
+                  return; // exit click handler
+                }
+                var shiftSt = Timezone.shiftTime(st, showTimezone, calTimezone);
+                var shiftEd = Timezone.shiftTime(ed, showTimezone, calTimezone);
 
-              var evStart: ApiT.CalendarTime = {
-                local: shiftSt,
-                utc: (<any> moment).tz(shiftSt.replace(/Z$/, ""), calTimezone).format()
-              };
-              var evEnd: ApiT.CalendarTime = {
-                local: shiftEd,
-                utc: (<any> moment).tz(shiftEd.replace(/Z$/, ""), calTimezone).format()
-              };
+                var evStart: ApiT.CalendarTime = {
+                  local: shiftSt,
+                  utc: (<any> moment).tz(shiftSt.replace(/Z$/, ""), calTimezone).format()
+                };
+                var evEnd: ApiT.CalendarTime = {
+                  local: shiftEd,
+                  utc: (<any> moment).tz(shiftEd.replace(/Z$/, ""), calTimezone).format()
+                };
 
-              var location : ApiT.Location = {
-                title: "",
-                address: pubLocation.val(),
-                timezone: showTimezone
-              };
-              if (!location.address) location = null;
+                var location : ApiT.Location = {
+                  title: "",
+                  address: pubLocation.val(),
+                  timezone: showTimezone
+                };
+                if (!location.address) location = null;
 
-              var guests = [];
-              for (var person in peopleInvolved) {
-                if (peopleInvolved.hasOwnProperty(person)) {
-                  guests.push({
-                    display_name : peopleInvolved[person] || null,
-                    email        : person
-                  });
+                var guests = [];
+                for (var person in peopleInvolved) {
+                  if (peopleInvolved.hasOwnProperty(person)) {
+                    guests.push({
+                      display_name : peopleInvolved[person] || null,
+                      email        : person
+                    });
+                  }
+                }
+
+                var e: ApiT.CalendarEventEdit = {
+                  google_cal_id: event.google_cal_id,
+                  start: evStart,
+                  end: evEnd,
+                  title: pubTitle.val(),
+                  description: pubDescription.val(),
+                  description_messageids: descriptionMessageids,
+                  location: location,
+                  all_day: event.all_day,
+                  guests: guests,
+                  send_notifications: notifyAttendees,
+                  recurrence: event.recurrence,
+                  recurring_event_id: event.recurring_event_id
+                }
+
+                var alias = Login.myEmail();
+
+                function finish() {
+                  var taskTab = TaskTab.currentTaskTab;
+                  TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
+                  close();
+                }
+                if (event.recurrence || event.recurring_event_id) {
+                  changeRecurringEventModal(team, alias, event, e, showTimezone, finish);
+                } else {
+                  Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
+                    .done(finish);
                 }
               }
-
-              var e: ApiT.CalendarEventEdit = {
-                google_cal_id: event.google_cal_id,
-                start: evStart,
-                end: evEnd,
-                title: pubTitle.val(),
-                description: pubDescription.val(),
-                description_messageids: descriptionMessageids,
-                location: location,
-                all_day: event.all_day,
-                guests: guests,
-                recurrence: event.recurrence,
-                recurring_event_id: event.recurring_event_id
-              }
-
-              var alias = Login.myEmail();
-
-              function finish() {
-                var taskTab = TaskTab.currentTaskTab;
-                TaskTab.refreshLinkedEventsList(team, threadId, taskTab);
-                close();
-              }
-              if (event.recurrence || event.recurring_event_id) {
-                changeRecurringEventModal(team, alias, event, e, showTimezone, finish);
-              } else {
-                Api.updateGoogleEvent(team.teamid, alias, event.google_event_id, e)
-                  .done(finish);
-              }
+              var notifyModal = displayNotifyAttendeesModal(onCommit);
+              $("body").append(notifyModal.view);
             });
           });
 
