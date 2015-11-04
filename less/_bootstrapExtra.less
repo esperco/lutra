@@ -11,6 +11,13 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow-x: hidden;
+
+  // This helps floated badges behave more nicely with an accompanying label
+  label {
+    display: block;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+  }
 }
 
 a.list-group-item {
