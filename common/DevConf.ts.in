@@ -5,6 +5,9 @@ module Esper.Conf {
   export module Api {
     export var url = "http://localhost";
   }
+  export module TimeStats {
+    export var url = "http://localhost:5000";
+  }
 }
 
 Esper.PRODUCTION = false;

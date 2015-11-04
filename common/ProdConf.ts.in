@@ -5,6 +5,9 @@ module Esper.Conf {
   export module Api {
     export var url = "https://app.esper.com";
   }
+  export module TimeStats {
+    export var url = "https://time.esper.com";
+  }
 }
 
 Esper.PRODUCTION = true;

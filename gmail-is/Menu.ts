@@ -87,6 +87,13 @@ module Esper.Menu {
       Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     });
 
+    var timeStatsLink = $("<a class='esper-a'>Get TimeStats</a>")
+      .attr("href", Conf.TimeStats.url)
+      .attr("target", "_blank")
+      .click(function() {
+        Analytics.track(Analytics.Trackable.ClickMenuGetTimeStats);
+      });
+
     var hr = $("<hr>").addClass("esper-menu-hr");
 
     var getStartedLink = makeActionLink("Get Started", function() {
@@ -104,6 +111,7 @@ module Esper.Menu {
     ul
       .append(agendaLink)
       .append(taskListLink)
+      .append(timeStatsLink)
       .append(settingsLink)
       .append(optionsLink)
       .append(hr)
