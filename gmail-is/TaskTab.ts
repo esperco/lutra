@@ -83,11 +83,14 @@ module Esper.TaskTab {
     taskTab.refreshLinkedEvents.removeClass("esper-disabled");
   }
 
-  export function unlinkThread(teamid, taskid, threadId) {
+  export function unlinkThread(teamid, taskid, threadId,
+                               onNewTask? : (task: ApiT.Task) => void) {
     return Api.unlinkThreadFromTask(teamid, threadId, taskid)
       .then(function() {
         /* force the creation of a task for the newly unlinked thread */
         return Api.obtainTaskForThread(teamid, threadId, false, false);
+      }).done(function(newTask) {
+        if (onNewTask !== undefined) onNewTask(newTask);
       });
   }
 
@@ -359,7 +362,9 @@ module Esper.TaskTab {
       .done(function(task) {
         Api.setTaskTitle(task.taskid, query);
         task.task_title = query;
-        var meetingType = taskTitle.data("meetingType");
+        // FIXME: Meeting types should really be a property of event objects
+        //        and should be set in CalPicker.ts using meetingTypeMenu()
+        var meetingType = "Other";
         if (meetingType) {
           Api.setTaskMeetingType(task.taskid, meetingType);
           task.task_meeting_type = meetingType;
@@ -463,8 +468,7 @@ module Esper.TaskTab {
         if (task.task_archived) {
           li.text("Unarchive this task");
           apiCall = Api.unarchiveTask;
-        }
-        else {
+        } else {
           li.text("Archive this task");
           apiCall = Api.archiveTask;
         }
@@ -485,8 +489,29 @@ module Esper.TaskTab {
           });
       }
 
+      function addUnlinkOption(task) {
+'''
+<li #li class="esper-li dropdown" />
+'''
+        li.text("Unlink from " + task.task_title);
+        li.appendTo(actions)
+          .click(function() {
+            unlinkThread(team.teamid, task.taskid, threadId,
+              function(newTask: ApiT.Task) {
+                refreshTaskProgressSelection(team, threadId, taskTab);
+                refreshLinkedThreadsList(team, threadId, taskTab);
+                refreshLinkedEventsList(team, threadId, taskTab);
+                CurrentThread.setTask(newTask);
+                taskTitle.val(newTask.task_title);
+            });
+            Sidebar.dismissDropdowns();
+            Analytics.track(Analytics.Trackable.UnlinkTaskTabFromExistingTask);
+          });
+      }
+
       var currentTask = CurrentThread.task.get();
       if (currentTask !== undefined) {
+        addUnlinkOption(currentTask);
         addArchiveOption(currentTask);
       }
 
@@ -702,45 +727,6 @@ module Esper.TaskTab {
     taskLabelsList: JQuery;
   }
 
-  function meetingTypeDropdown(taskTitle : JQuery,
-                               taskCancel : JQuery) : JQuery {
-'''
-<select #meetingType
-        class="esper-meeting-type esper-select esper-select-fullwidth">
-  <option value="header">Select meeting type...</option>
-  <option #phone value="Phone_call">Phone call</option>
-  <option #video value="Video_call">Video call</option>
-  <option #breakfast value="Breakfast">Breakfast</option>
-  <option #brunch value="Brunch">Brunch</option>
-  <option #lunch value="Lunch">Lunch</option>
-  <option #coffee value="Coffee">Coffee</option>
-  <option #dinner value="Dinner">Dinner</option>
-  <option #drinks value="Drinks">Drinks</option>
-  <option value="Meeting">Meeting</option>
-  <option value="Other">Other</option>
-</select>
-'''
-    meetingType.change(function() {
-      var type = $(this).val();
-      if (type === "Other") {
-        taskTitle.val("");
-      } else {
-        taskTitle.data("meetingType", type);
-        type = type === "Phone_call" ? "Call" : type.replace("_", " ");
-        taskTitle.val(type + " ");
-      }
-      meetingType.hide();
-      taskTitle.show();
-      taskCancel.show();
-      taskTitle.focus();
-    });
-    meetingType.click(function() {
-      Analytics.track(Analytics.Trackable.SelectTaskTabMeetingType);
-    });
-    Sidebar.customizeSelectArrow(meetingType);
-    return meetingType;
-  }
-
   export function showTaskSpinner() {
     if (currentTaskTab) {
       currentTaskTab.headerContent.hide();
@@ -775,9 +761,8 @@ module Esper.TaskTab {
       <div #taskCaption class="esper-bold" style="margin-bottom:6px"/>
       <div class="esper-flex-row">
         <input #taskTitle type="text" size="24"
-               class="esper-input esper-task-name esper-flex-expand"/>
-        <button #taskCancel
-                class="esper-task-cancel esper-btn-secondary esper-remove-btn" />
+               class="esper-input esper-task-name esper-flex-expand"
+               placeholder="Name your task"/>
       </div>
       <ul #taskSearchDropdown
           class="esper-drop-ul esper-dropdown-btn esper-task-search-dropdown">
@@ -940,8 +925,6 @@ module Esper.TaskTab {
         taskTabView.taskCaption.text(taskLabelExists);
         taskTabView.taskTitle.text(task.task_title);
         displayTaskProgress(task, taskTabView);
-        taskTitle.show();
-        taskCancel.show();
         if (task.task_meeting_type) {
           selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
         }
@@ -1051,16 +1034,6 @@ module Esper.TaskTab {
         linkedThreadsSpinner.hide();
         hideTaskSpinner();
 
-        function showMTDrop() {
-          $("select.esper-meeting-type").remove();
-          taskTitle.hide();
-          taskCancel.hide();
-          taskTitle.after(meetingTypeDropdown(taskTitle, taskCancel));
-        }
-        taskCancel.click(function() {
-          showMTDrop();
-          Analytics.track(Analytics.Trackable.CancelTaskTabTask);
-        });
         if (task !== undefined) {
           taskCaption.text(taskLabelExists);
           title = task.task_title;
@@ -1071,9 +1044,10 @@ module Esper.TaskTab {
           }
         } else {
           taskCaption.text(taskLabelCreate);
-          showMTDrop();
-          title = deets.subject;
-          if (title === undefined) title = "(no subject)";
+          if (autoTask) {
+            title = deets.subject;
+            if (title === undefined) title = "(no subject)";
+          }
           displayEmptyLinkedThreadsList(taskTabView);
         }
         taskTitle.val(title);

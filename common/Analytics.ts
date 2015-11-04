@@ -81,7 +81,8 @@ module Esper.Analytics {
     SelectTaskTabMeetingType,
     SelectTaskTabTaskProgress,
     SelectTaskTabWorkflow,
-    UnarchiveTaskTabTask
+    UnarchiveTaskTabTask,
+    UnlinkTaskTabFromExistingTask
   };
 
   export interface TrackMessage {
