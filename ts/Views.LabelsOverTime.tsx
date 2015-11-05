@@ -78,6 +78,39 @@ module Esper.Views {
     });
   }
 
+  // Track view
+  interface TimeStatsView extends TimeStats.StatRequest {
+    labels: string[];
+  }
+  var currentView: TimeStatsView;
+  var currentTimer: number;
+  function trackView(request?: TimeStats.StatRequest, labels?: string[]) {
+    // Cancel existing request
+    if (currentTimer) { clearTimeout(currentTimer); }
+
+    if (request) {
+      var view = _.extend({
+        labels: labels || []
+      }, request) as TimeStatsView;
+      currentView = view;
+
+      // Set timeout to post Analytics tracking call after 3 seconds, but only
+      // if we're still looking at the same view
+      currentTimer = setTimeout(function() {
+        if (_.eq(currentView, view)) {
+          Analytics.track(Analytics.Trackable.ViewTimeStats, {
+            teamId: view.teamId,
+            calId: view.calId,
+            numIntervals: view.numIntervals,
+            interval: TimeStats.Interval[view.interval],
+            labels: view.labels,
+            labelCount: view.labels.length
+          });
+        }
+      }, 3000);
+    }
+  }
+
   /////
 
   interface LabelValues {
@@ -250,6 +283,9 @@ module Esper.Views {
     }
 
     getState(): LabelsOverTimeState {
+      // Clear previous analytics view
+      trackView(null);
+
       var selectedInterval = intervalSelectStore.val();
       var selectedCal = calSelectStore.val();
       if (selectedCal && selectedCal.calId && selectedCal.teamId) {
@@ -261,12 +297,13 @@ module Esper.Views {
         );
         if (! team) { throw new Error("Selected unavailable team"); }
 
-        var results = TimeStats.intervalQuery.get({
+        var queryRequest = {
           teamId: selectedCal.teamId,
           calId: selectedCal.calId,
           numIntervals: NUM_INTERVALS, // Hard-coded for now
           interval: selectedInterval
-        });
+        };
+        var results = TimeStats.intervalQuery.get(queryRequest);
 
         if (results && results.ready) {
           // Aggregate time stats by label
@@ -303,6 +340,8 @@ module Esper.Views {
           var selectedLabels: string[] = labelStoreVal ?
             labelStoreVal.labels :
             _.map(labelPairs.slice(0, 4), (pair) => pair[0]);
+
+          trackView(queryRequest, selectedLabels);
         }
       }
 
