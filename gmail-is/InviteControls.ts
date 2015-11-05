@@ -596,11 +596,7 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    Api.getRestrictedDescription(team.teamid,
-                                 original.google_event_id, state.guests)
-      .done(function (description) {
-        descriptionField.val(state.notes + description.description_text);
-      });
+    descriptionField.val(state.notes);
 
     if (execEvent) {
       if (duplicate) {
