@@ -346,30 +346,6 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function syncEvent(teamid: string, threadId: string, calid: string,
-    eventId: string): JQueryPromise<void>
-  {
-    var url =
-      prefix + "/api/thread/sync-event/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + string(threadId)
-      + "/" + string(calid)
-      + "/" + string(eventId);
-    return JsonHttp.put(url, "");
-  }
-
-  export function unsyncEvent(teamid: string, threadId: string, calid: string,
-    eventId: string): JQueryPromise<void>
-  {
-    var url =
-      prefix + "/api/thread/sync-event/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + string(threadId)
-      + "/" + string(calid)
-      + "/" + string(eventId);
-    return JsonHttp.delete_(url);
-  }
-
   export function deleteLinkedEvent(teamid: string, threadId: string,
     eventId: string): JQueryPromise<void>
   {
@@ -970,19 +946,6 @@ module Esper.Api {
       + "/" + string(teamid)
       + "/" + encodeURIComponent(fromEmail);
     var body = { invite_guests: guests, invite_event: event };
-    return JsonHttp.post(url, JSON.stringify(body));
-  }
-
-  export function getRestrictedDescription(teamid: string, eventid: string,
-    guests: ApiT.Guest[]): JQueryPromise<ApiT.EventDescription>
-  {
-    var url =
-      prefix + "/api/event/description/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + encodeURIComponent(eventid);
-    var guestEmails =
-      _.map(guests, function(g : ApiT.Guest) { return g.email; });
-    var body = { emails: guestEmails };
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
