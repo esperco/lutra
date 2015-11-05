@@ -3,6 +3,8 @@
 */
 
 module Esper.Analytics {
+  // Set this to the writeKey we want to use for the current project
+  export var writeKey: string;
 
   // Events to track
   export enum Trackable {
@@ -100,5 +102,30 @@ module Esper.Analytics {
     TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
     TimeStats          // time.esper.com
+  }
+
+
+  /* Helper functions */
+
+  // Helper to flatten objects into a single level, which works better with
+  // Mixpanel than nested objects
+  interface IFlatProps {
+    [index: string]: number|string|boolean|Date;
+  };
+  export function flatten(obj: Object, prefix?: string, ret?: IFlatProps)
+    : IFlatProps
+  {
+    ret = ret || {};
+    prefix = prefix ? prefix + "." : "";
+    for (let name in obj) {
+      if (obj.hasOwnProperty(name)) {
+        if (typeof obj[name] === "object") {
+          ret = flatten(obj[name], prefix + name, ret);
+        } else {
+          ret[prefix + name] = obj[name];
+        }
+      }
+    }
+    return ret;
   }
 }
