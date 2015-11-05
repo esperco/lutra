@@ -41,6 +41,7 @@ module Esper.TeamSettings {
         .removeClass("active");
     });
     var sel = tabViews[selected];
+    trackPage(sel.id);
     sel.tab
       .addClass("active");
     sel.content
@@ -60,6 +61,29 @@ module Esper.TeamSettings {
       Log.e("Cannot switch to hidden tab " + name);
     else
       switchTab(sel);
+  }
+
+  function trackPage(viewId: View) {
+    // Analytics tracking
+    switch(viewId) {
+      case View.Calendars:
+        Analytics.page(Analytics.Page.TeamCalendars);
+        break;
+      case View.Labels:
+        Analytics.page(Analytics.Page.TeamLabels);
+        break;
+      case View.Preferences:
+        Analytics.page(Analytics.Page.TeamPreferences);
+        break;
+      case View.Templates:
+        Analytics.page(Analytics.Page.TeamTemplates);
+        break;
+      case View.Workflows:
+        Analytics.page(Analytics.Page.TeamWorkflows);
+        break;
+      default:
+        Analytics.page(Analytics.Page.TeamSettings);
+    }
   }
 
   function findLastShown(tabs: TabView[]): TabView {
@@ -246,6 +270,7 @@ module Esper.TeamSettings {
     footer.append(Footer.load());
 
     signOut.click(Login.logout);
+    trackPage(viewId);
   }
 
 }

@@ -75,7 +75,7 @@ module Esper.Login {
     Store.set(storedLoginKey, stored);
 
     // Identify in analytics, then post credentials AFTER alias compeltes
-    Analytics.identify(postCredentials);
+    Analytics.identify(info, true, postCredentials);
   };
 
   export function clearLoginInfo() {
