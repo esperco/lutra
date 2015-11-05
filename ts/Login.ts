@@ -2,6 +2,7 @@
   Module for fetching login state of Otter and retrieving loginInfo
 */
 
+/// <reference path="../marten/ts/Analytics.Web.ts" />
 /// <reference path="../marten/ts/Api.ts" />
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/Login.Iframe.ts" />
@@ -20,6 +21,7 @@ module Esper.Login {
 
       var onFail = function(err: Error) {
         InfoStore.set(null, { dataStatus: Model.DataStatus.READY });
+        Analytics.identify(null); // Resets identity
         loginDeferred.reject(err);
       };
 
@@ -29,7 +31,9 @@ module Esper.Login {
         }, onFail)
         .then(function(loginInfo) {
           InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
-          loginDeferred.resolve(loginInfo);
+          Analytics.identify(loginInfo, false, function() {
+            loginDeferred.resolve(loginInfo);
+          });
         }, onFail);
     }
   }

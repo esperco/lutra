@@ -1,3 +1,4 @@
+/// <reference path="../marten/ts/Analytics.Web.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Layout.tsx" />
@@ -30,6 +31,7 @@ module Esper.Route {
       undefined,
       <Views.Footer hoverable={true} />
     );
+    Analytics.page(Analytics.Page.LabelsOverTime);
   });
 
   // 404 page
