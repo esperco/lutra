@@ -425,6 +425,7 @@ type token_response = [
     send_followup_reminders: boolean;
     double_booking_warning: boolean;
     no_location_warning: boolean;
+    link_email_warning: boolean;
     use_duplicate_events: boolean;
     delete_holds_inquiry: boolean;
     bcc_exec_on_reply: boolean;
