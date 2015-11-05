@@ -19,10 +19,9 @@ module Esper.Page {
     "not-found": {ids:["not-found-page"]}
   }, undefined);
 
-  function showPage(k, properties?: Object) {
+  function showPage(k) {
     $('#init-loading').fadeOut(600);
     pageSelector.show(k);
-    Analytics.page(k, properties);
   }
 
 
@@ -36,6 +35,7 @@ module Esper.Page {
     load: function() {
       pageSelector.hideAll();
       showPage("settings");
+      Analytics.page(Analytics.Page.Settings);
       Log.d("settings.load()");
       Settings.load();
       Util.focus();
