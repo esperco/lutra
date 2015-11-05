@@ -950,8 +950,8 @@ module Esper.Api {
   }
 
   export function getEventDescriptionWithMessages(description: string,
-    messageids: string[]): JQueryPromise<ApiT.EventDescription>
-  {
+                                                  messageids: string[]):
+  JQueryPromise<ApiT.EventDescription> {
     var url = prefix + "/api/event/description-with-messages/"
             + string(Login.myUid());
     var body = { description: description,
