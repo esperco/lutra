@@ -67,7 +67,8 @@ module Esper.GmailSearch {
   }
 
   function renderSearchResult(e: ApiT.EmailThreadSearch, task: ApiT.Task,
-                              team: ApiT.Team, threadId: string, eventsTab) {
+                              team: ApiT.Team, threadId: string,
+                              link_email_warning: boolean) {
     Log.d("renderSearchResult()");
 '''
 <div #view class="esper-bs">
@@ -92,7 +93,7 @@ module Esper.GmailSearch {
 
     var thread_date = XDate.ofString(e.last_date);
     var now = new Date();
-    if (now.getDay() === thread_date.getDay()) {
+    if (now.getDate() === XDate.day(thread_date)) {
       date_output = XDate.timeOnly(thread_date);
     } else {
       date_output = XDate.month(thread_date) + " " + XDate.day(thread_date);
@@ -124,14 +125,13 @@ module Esper.GmailSearch {
           (<HTMLInputElement>link[0]).checked = true;
         }
       });
-
-      //check for already clicked in this session, but not yet linked threads
-      $.each(linkThreads, function(localthread, task) {
-        if (localthread === searchThread) {
-          (<HTMLInputElement>link[0]).checked = true;
-        }
-      })
     }
+    //check for already clicked in this session, but not yet linked threads
+    $.each(linkThreads, function(localthread, task) {
+      if (localthread === searchThread) {
+        (<HTMLInputElement>link[0]).checked = true;
+      }
+    })
 
     link.click(function(e) {
       if (!link.is(":checked")) {
@@ -140,11 +140,12 @@ module Esper.GmailSearch {
       } else {
         delete unlinkThreads[searchThread];
         linkThreads[searchThread] = task;
-        if (newTask !== undefined) {
+        if (newTask !== undefined && link_email_warning) {
+          
 '''
 <div #modal class="esper-bs">
-  <p> 
-    This email is already linked to the following task:
+  <p>
+    Linking this email will break its current link to the following Task:
   </p>
   <div class="panel panel-default">
     <div #title class="panel-heading"/>
@@ -222,33 +223,48 @@ module Esper.GmailSearch {
         searchView.spinner.show();
         searchView.noResults.hide();
         var task = CurrentThread.task.get();
-        Api.getTaskForThread(team.teamid, threadId, false, true)
-          .done(function(task) {
-            Api.emailSearch(team.teamid, searchView.search.val())
-              .done(function(results) {
-                var numResults = results.items.length;
-                var i = 0;
-                var last = false;
 
-                searchView.spinner.hide();
-                searchView.results.find(".esper-bs").remove();
+        var link_email_warning = true;
+        var prefJob = CurrentThread.getTeamAndPreferences()
+          .done(function(teamAndPrefs) {
+            teamAndPrefs.match({
+              some: function(allPrefs) {
+                var general = allPrefs.execPrefs.general;
+                if (general) link_email_warning = general.link_email_warning;
+              },
+              none: function() { /*doesn't matter*/ }
+            });
+          });
 
-                results.items.forEach(function(e) {
-                  if (threadId !== e.gmail_thrid) {
-                    renderSearchResult(e, task, team, threadId, eventsTab)
-                      .appendTo(searchView.results);
+        prefJob.done(function() {
+          Api.getTaskForThread(team.teamid, threadId, false, true)
+            .done(function(task) {
+              Api.emailSearch(team.teamid, searchView.search.val())
+                .done(function(results) {
+                  var numResults = results.items.length;
+                  var i = 0;
+                  var last = false;
+
+                  searchView.spinner.hide();
+                  searchView.results.find(".esper-bs").remove();
+
+                  results.items.forEach(function(e) {
+                    if (threadId !== e.gmail_thrid) {
+                      renderSearchResult(e, task, team, threadId, link_email_warning)
+                        .appendTo(searchView.results);
+                    }
+                  });
+
+                  if (results.items.length === 0) {
+                    searchView.noResultsFeedback.text(searchView.search.val());
+                    searchView.noResults.show();
+                  } else {
+                    searchView.noResults.hide();
                   }
                 });
-
-                if (results.items.length === 0) {
-                  searchView.noResultsFeedback.text(searchView.search.val());
-                  searchView.noResults.show();
-                } else {
-                  searchView.noResults.hide();
-                }
-              });
-          });
-        }
+            });
+        });
+      }
     });
   }
 
