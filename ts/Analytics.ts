@@ -3,6 +3,10 @@
 */
 
 /// <reference path="../marten/typings/segment-analytics/segment-analytics.d.ts" />
+/// <reference path="../marten/typings/moment/moment.d.ts" />
+/// <reference path="../marten/ts/Analytics.ts" />
+/// <reference path="./Login.ts" />
+/// <reference path="./Store.ts" />
 
 module Esper.Analytics {
 
@@ -33,24 +37,37 @@ module Esper.Analytics {
     analytics.load(Conf.segmentKey);
   };
 
-  // If we have a UID, identify ourselves. Otherwise dis-associate
-  export function identify() {
-    return; // Temporarily disabling analytics in Otter
+  // Store key for tracking the last user to alias
+  var lastAliasKey = "lastAlias";
+
+  // If we have a UID, identify ourselves. Otherwise dis-associate.
+  // Takes an optional callback that resolves only after alias is complete,
+  // or if no alias is required.
+  export function identify(cb?: () => void) {
+    cb = cb || function() { /* noop */ };
     analytics.ready(function() {
       var me = Login.me();
       if (me) {
-        /*
-          Only identify if we don't have a previous identity AND  we have
-          existing teams. If no teams, that means we're in the middle of
-          onboarding. Onboarding analytics is handled by extension. Don't
-          identify because this will interfere with analytics there (expecially
-          when using Mixpanel).
-        */
-        if (analytics.user().id() !== me && Login.data &&
-            Login.data.teams && Login.data.teams.length > 0) {
-          analytics.alias(me);
+        if (analytics.user().id() !== me && Login.data) {
+          var aliasRequired = false;
+
+          // Alias user if new account
+          if (Login.data.account_created &&
+              moment().diff(moment(Login.data.account_created)) < 300000 &&
+              Store.get(lastAliasKey) !== me)
+          {
+            aliasRequired = true;
+            analytics.alias(me, function() {
+              Store.set(lastAliasKey, me);
+              cb();
+            });
+          }
+
+          // Identify user regardless of previous login status
           analytics.identify(me, {
             email: Login.data.email
+          }, function() {
+            if (!aliasRequired) { cb(); }
           });
         }
       } else {
@@ -68,7 +85,6 @@ module Esper.Analytics {
 
   // Track which page you're on
   export function page(page: string, properties?: Object) {
-    return; // Temporarily disabling analytics in Otter
     properties = flatten(properties || {});
     properties['url'] = location.href; // So hash is included
 
@@ -112,7 +128,6 @@ module Esper.Analytics {
   };
 
   export function track(event: Trackable, properties?: Object) {
-    return; // Temporarily disabling analytics in otter;
     var eventName = Trackable[event];
     analytics.ready(function() {
       analytics.track(eventName, flatten(properties || {}));
