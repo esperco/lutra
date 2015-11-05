@@ -137,6 +137,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-double-booking").is(":checked"),
       no_location_warning:
         div.find(".esper-prefs-no-location").is(":checked"),
+      link_email_warning:
+        div.find(".esper-prefs-link-email").is(":checked"),
       delete_holds_inquiry:
         div.find(".esper-prefs-delete-holds").is(":checked"),
       use_duplicate_events:
@@ -1618,6 +1620,13 @@ module Esper.PreferencesTab {
         </label>
       </li>
       <li>
+        <label class="checkbox esper-preference-check" >
+          <input #linkEmailWarning type= "checkbox"
+                 class="esper-prefs-link-email" />
+          Warn me if I link an email already linked to a Task
+        </label>
+      </li>
+      <li>
         <label class="checkbox esper-preference-check">
           <input #deleteHoldsInquiry type="checkbox"
                  class="esper-prefs-delete-holds"/>
@@ -1662,6 +1671,8 @@ module Esper.PreferencesTab {
         doubleBookingWarning.prop("checked", true);
       if (general.no_location_warning)
         noLocationWarning.prop("checked", true);
+      if (general.link_email_warning)
+        linkEmailWarning.prop("checked", true);
       if (general.delete_holds_inquiry)
         deleteHoldsInquiry.prop("checked", true);
       if (general.use_duplicate_events)
@@ -1677,6 +1688,7 @@ module Esper.PreferencesTab {
     sendFollowupReminders.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
     noLocationWarning.click(saveGeneralPrefs);
+    linkEmailWarning.click(saveGeneralPrefs);
     deleteHoldsInquiry.click(saveGeneralPrefs);
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
