@@ -596,7 +596,14 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    descriptionField.val(state.notes);
+    var descriptionMessageids = [];
+    descriptionMessageids = original.description_messageids || [];
+
+    Api.getEventDescriptionWithMessages(state.notes,
+                                        descriptionMessageids)
+      .done(function (desc) {
+        descriptionField.val(desc.description_text);
+      });
 
     if (execEvent) {
       if (duplicate) {
@@ -608,22 +615,21 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    var descriptionMessageids = [];
-
     pickEmails.click(function() {
       descriptionMessageids = original.description_messageids || [];
       var task = CurrentThread.task.get();
-      var dialog = Modal.dialog("Task Messages",
-                                TaskMessageList.render(task.taskid,
-                                                       descriptionMessageids),
-                                function() {
-                                  Api.getEventDescriptionWithMessages
-                                  (descriptionField.val(), descriptionMessageids)
-                                    .then(function(desc) {
-                                      descriptionField.val(desc.description_text);
-                                    });
-                                  return true;
-                                });
+      var dialog = Modal.dialog(
+        "Task Messages",
+        TaskMessageList.render(task.taskid,
+                               descriptionMessageids),
+        function() {
+          Api.getEventDescriptionWithMessages
+          (descriptionField.val(), descriptionMessageids)
+            .then(function(desc) {
+              descriptionField.val(desc.description_text);
+            });
+          return true;
+        });
       $("body").append(dialog.view);
     });
 
