@@ -1,3 +1,5 @@
+/// <reference path="../common/Menu.ts" />
+
 module Esper.Init {
   export var esperRootUrl : string;
     /* URL prefix to access files provided by the extension.
@@ -41,7 +43,17 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    Menu.init();
+    var currentTeam = Menu.init();
+    CurrentThread.currentTeam.watch(function(team: Option.T<ApiT.Team>) {
+      team.match({
+        some : function (team) {
+          currentTeam.set(team);
+        },
+        none : function () {
+          // do nothing
+        }
+      });
+    });
     if (Login.loggedIn()) {
       /* menu is then created in reaction to this */
       Login.getLoginInfo()
