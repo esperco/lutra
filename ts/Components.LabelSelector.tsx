@@ -70,7 +70,8 @@ module Esper.Components {
     // Handle click outside of input element (if clicking input, handleChange
     // should be triggered)
     handleClick(e: MouseEvent) {
-      if ($(e.target).prop('nodeName').toLowerCase() !== "input") {
+      if ($(e.target).prop('nodeName').toLowerCase() !== "label" &&
+          !$.contains(this.find('label').get(0), $(e.target).get(0))) {
         var input = $(e.currentTarget).find('input');
         input.prop('checked', !input.prop('checked'));
         this.handleChange(); // Manually fire handleChange
