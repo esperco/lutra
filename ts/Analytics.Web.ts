@@ -11,7 +11,7 @@
 /// <reference path="./ApiT.ts" />
 
 module Esper.Analytics {
-  export function init(key) {
+  export function init(key: string) {
     writeKey = key; // Sets module-level variable used elsewhere
 
     // Init with write key
@@ -21,25 +21,33 @@ module Esper.Analytics {
   export function identify(loginInfo?: ApiT.LoginResponse,
                            alias=false, cb=function() {}) {
     analytics.ready(function() {
+      var cbScheduled = false;
+
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid() && loginInfo) {
-          var aliasRequired = false;
 
           // Alias user if new account
           if (alias && loginInfo.account_created &&
               moment().diff(moment(loginInfo.account_created)) < 300000)
           {
-            aliasRequired = true;
+            cbScheduled = true;
             analytics.alias(Login.myUid(), cb);
           }
 
           // Identify user regardless of previous login status
           analytics.identify(Login.myUid(), {
             email: loginInfo.email
-          }, (aliasRequired ? function() {} : cb));
+          }, (cbScheduled ? function() {} : cb));
+          cbScheduled = true;
         }
       } else {
         reset();
+      }
+
+      // If cbScheduled is still false, that means no Analytics identify
+      // call is being made, so call cb anyway just in case.
+      if (! cbScheduled) {
+        cb();
       }
     });
   }
