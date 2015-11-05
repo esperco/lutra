@@ -9,9 +9,6 @@
 /// <reference path="./JQStore.ts" />
 
 module Esper.Analytics {
-  // Set this to the writeKey we want to use for the current project
-  export var writeKey: string;
-
   // Setting variable (tweak for testing)
   var iframeOrigin = "https://esper.com";
 
