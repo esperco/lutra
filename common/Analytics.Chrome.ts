@@ -5,6 +5,8 @@
 */
 
 /// <reference path="../marten/typings/analytics-node/analytics-node.d.ts" />
+/// <reference path="../marten/ts/Analytics.Iframe.ts" />
+
 /// <reference path="./Esper.ts" />
 /// <reference path="./Conf.ts" />
 /// <reference path="./Analytics.ts" />
@@ -25,6 +27,9 @@ module Esper.Analytics {
     }
     analytics = new AnalyticsJs(Conf.segmentKey, opts);
 
+    // Set for iFrame too
+    writeKey = Conf.segmentKey;
+
     // Listen for posted messages to track
     Message.listen(Message.Type.Track, function(data: TrackMessage) {
       track(data.event, data.properties);
@@ -44,30 +49,19 @@ module Esper.Analytics {
       Log.w("Login info unavailable for identification. UID only.");
     }
 
-    // Alias uid with anonymous id and then delete it
-    if (hasAnonId()) {
-      analytics.alias({
-        previousId: getAnonId(),
-        userId: uid
+    // Identify with some traits
+    ExtensionOptions.load(function(opts) {
+      var optsFlattened: { [index: string]: string } = {};
+      _.each(ExtensionOptions.enumToString(opts), function(v,k) {
+        optsFlattened["opts." + k] = v;
       });
-    }
 
-    // Identify with some traits -- but only after flushing any anon calls
-    // so we can mitigate chance of MixPanel race conditions
-    analytics.flush(function() {
-      ExtensionOptions.load(function(opts) {
-        var optsFlattened: { [index: string]: string } = {};
-        _.each(ExtensionOptions.enumToString(opts), function(v,k) {
-          optsFlattened["opts." + k] = v;
-        });
-
-        analytics.identify({
-          userId: uid,
-          traits: _.extend({
-            email: Login.myEmail() || Login.myGoogleAccountId(),
-            teams: _.pluck(Login.myTeams(), 'teamid'),
-          }, optsFlattened)
-        });
+      analytics.identify({
+        userId: uid,
+        traits: _.extend({
+          email: Login.myEmail() || Login.myGoogleAccountId(),
+          teams: _.pluck(Login.myTeams(), 'teamid'),
+        }, optsFlattened)
       });
 
       // Associate users with team groups
@@ -83,58 +77,25 @@ module Esper.Analytics {
           }
         });
       });
-
-      deleteAnonId();
     });
-  }
-
-  /*
-    Create a temporary anonymousId we can use analytics purposes if user is
-    not logged in yet
-  */
-  var _anonId: string;
-
-  function getAnonId(): string {
-    if (! _anonId) {
-      /*
-        Use googleAccountId in lieu of anon ID if possible because Mixpanel
-        only lets us associate one anonymous ID with a user for aliasing later
-      */
-      var account = Login.getAccount();
-      _anonId = ((account && account.googleAccountId) ||
-                 ("anon_" + Util.randomString()));
-      analytics.identify({
-        userId: _anonId,
-        traits: {
-          anonymous: true
-        }
-      });
-      analytics.flush();
-    }
-    return _anonId;
-  }
-
-  function deleteAnonId(): void {
-    _anonId = null;
-  }
-
-  function hasAnonId(): boolean {
-    return !!_anonId;
   }
 
   export function track(event: Trackable, properties?: Object) {
     var eventName = Trackable[event];
-    analytics.track({
-      // Use anonId if we have one (it'll be cleared after alias is complete)
-      userId: hasAnonId() ? getAnonId() : Login.myUid() || getAnonId(),
 
-      event: eventName,
-      properties: properties || {}
-    });
-  }
+    if (Login.myUid()) {
+      analytics.track({
+        // Use anonId if we have one (it'll be cleared after alias is complete)
+        userId: Login.myUid(),
 
-  // Call before doing something that might cause analytics to not get sent
-  export function flush(cb: (err: Error) => void): void {
-    analytics.flush(cb);
+        event: eventName,
+        properties: properties || {}
+      });
+    }
+
+    else {
+      // Anonymous user => use esper.com's tracking ID
+      trackViaIframe(event, properties);
+    }
   }
 }

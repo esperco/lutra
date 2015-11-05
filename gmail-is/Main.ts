@@ -40,7 +40,7 @@
 /// <reference path="../common/TaskList.ts" />
 /// <reference path="../common/Agenda.ts" />
 
-/// <reference path="./Menu.ts" />
+/// <reference path="../common/Menu.ts" />
 /// <reference path="./Gmail.ts" />
 /// <reference path="./Thread.ts" />
 /// <reference path="./CalCache.ts" />

@@ -3,7 +3,7 @@
   (on the right hand side of the top bar)
 */
 
-/// <reference path="../common/Analytics.ts" />
+/// <reference path="./Analytics.ts" />
 module Esper.Menu {
   /*
     The current team for the purpose of offering a default choice
@@ -55,7 +55,7 @@ module Esper.Menu {
 
   function updateLinks(ul) {
     //sign-in is now done with onboarding
-    var signIOLink = makeActionLink("Sign out", Login.logout)
+    var signOutLink = makeActionLink("Sign out", Login.logout)
 
     function openSettings() {
       window.open(Conf.Api.url);
@@ -87,6 +87,13 @@ module Esper.Menu {
       Analytics.track(Analytics.Trackable.ClickMenuGetTaskList);
     });
 
+    var timeStatsLink = $("<a class='esper-a'>Get TimeStats</a>")
+      .attr("href", Conf.TimeStats.url)
+      .attr("target", "_blank")
+      .click(function() {
+        Analytics.track(Analytics.Trackable.ClickMenuGetTimeStats);
+      });
+
     var hr = $("<hr>").addClass("esper-menu-hr");
 
     var getStartedLink = makeActionLink("Get Started", function() {
@@ -104,12 +111,13 @@ module Esper.Menu {
     ul
       .append(agendaLink)
       .append(taskListLink)
+      .append(timeStatsLink)
       .append(settingsLink)
       .append(optionsLink)
       .append(hr)
       .append(getStartedLink)
       .append(helpLink)
-      .append(signIOLink);
+      .append(signOutLink);
   }
 
   export interface Menu {
@@ -196,8 +204,6 @@ module Esper.Menu {
       create();
     });
 
-    CurrentEvent.teamStore.addChangeListener(function() {
-      currentTeam.set(CurrentEvent.teamStore.val());
-    })
+    return currentTeam;
   }
 }
