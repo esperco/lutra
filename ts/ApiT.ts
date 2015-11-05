@@ -110,6 +110,7 @@ module Esper.ApiT {
   export interface LoginResponse {
     uid: string;
     api_secret: string;
+    account_created: string; // timestamp
     is_admin: boolean;
     is_alias: boolean;
     is_nylas: boolean;
