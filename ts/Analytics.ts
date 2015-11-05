@@ -88,7 +88,9 @@ module Esper.Analytics {
     SelectTaskTabTaskProgress,
     SelectTaskTabWorkflow,
     UnarchiveTaskTabTask,
-    UnlinkTaskTabFromExistingTask
+    UnlinkTaskTabFromExistingTask,
+    ViewTimeStats                // Viewed a particular set of time stats
+                                 // for at least 3 seconds
   };
 
   // Named pages to track
@@ -101,7 +103,7 @@ module Esper.Analytics {
     TeamWorkflows,     // app.esper.com/#!/team-settings/.../workflows
     TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
-    TimeStats          // time.esper.com
+    LabelsOverTime     // time.esper.com/#!/labels-over-time
   }
 
 
@@ -110,16 +112,17 @@ module Esper.Analytics {
   // Helper to flatten objects into a single level, which works better with
   // Mixpanel than nested objects
   interface IFlatProps {
-    [index: string]: number|string|boolean|Date;
+    [index: string]: number|string|boolean|Date|Array<IFlatProps>;
   };
-  export function flatten(obj: Object, prefix?: string, ret?: IFlatProps)
+  export function flatten(obj: {[index: string]: any},
+                          prefix?: string, ret?: IFlatProps)
     : IFlatProps
   {
     ret = ret || {};
     prefix = prefix ? prefix + "." : "";
     for (let name in obj) {
       if (obj.hasOwnProperty(name)) {
-        if (typeof obj[name] === "object") {
+        if (typeof obj[name] === "object" && !(obj[name] instanceof Array)) {
           ret = flatten(obj[name], prefix + name, ret);
         } else {
           ret[prefix + name] = obj[name];
