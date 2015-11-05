@@ -44,38 +44,30 @@ module Esper.Components {
         var badgeStyle = selected ? {
           background: Colors.getColorForLabel(label)
         } : {};
-        return <a href="#" onClick={this.handleClick.bind(this)}
-            key={label} className="checkbox list-group-item one-line">
+        var clickHandler = () => {
+          this.handleClick(label, !selected);
+        };
+        return <a href="#" onClick={clickHandler}
+            key={label} className="list-group-item one-line">
           <span className="badge" style={badgeStyle}>{badgeText}</span>
-          <label>
-            <input type="checkbox" value={label} checked={selected}
-              onChange={this.handleChange.bind(this)} />
-            {" "}{label}{" "}
-          </label>
+          <i className={"fa fa-fw " +
+            (selected ? "fa-check-square-o" : "fa-square-o")} />
+          {" "}{label}
         </a>
       });
     }
 
-    // Gets a list of labels based on what's checked
-    getLabels(): string[] {
-      return $.map(this.find("input:checked"), function(elm) {
-        return $(elm).val();
-      });
-    }
-
-    handleChange() {
-      this.props.updateFn(this.getLabels());
-    }
-
     // Handle click outside of input element (if clicking input, handleChange
     // should be triggered)
-    handleClick(e: MouseEvent) {
-      if ($(e.target).prop('nodeName').toLowerCase() !== "label" &&
-          !$.contains(this.find('label').get(0), $(e.target).get(0))) {
-        var input = $(e.currentTarget).find('input');
-        input.prop('checked', !input.prop('checked'));
-        this.handleChange(); // Manually fire handleChange
+    handleClick(label: string, newChecked: boolean) {
+      var allLabels = _.clone(this.props.selectedLabels);
+      var alreadyChecked = _.contains(allLabels, label);
+      if (newChecked && !alreadyChecked) {
+        allLabels.push(label);
+      } else if (!newChecked && alreadyChecked) {
+        allLabels = _.without(allLabels, label);
       }
+      this.props.updateFn(allLabels);
     }
   }
 }
