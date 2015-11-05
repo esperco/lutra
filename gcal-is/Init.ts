@@ -1,5 +1,6 @@
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="../common/Login.ts" />
+/// <reference path="../common/Menu.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="./CurrentEvent.ts" />
 /// <reference path="./CalSidebar.tsx" />
@@ -93,7 +94,10 @@ module Esper.Init {
 
   function injectEsperControls() {
     Login.printStatus();
-    Menu.init();
+    var currentTeam = Menu.init();
+    CurrentEvent.teamStore.addChangeListener(function() {
+      currentTeam.set(CurrentEvent.teamStore.val());
+    });
     if (Login.loggedIn()) {
       Login.getLoginInfo()
         .done(function(loginInfo) {
