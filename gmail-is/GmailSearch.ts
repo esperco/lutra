@@ -1,20 +1,70 @@
 module Esper.GmailSearch {
 
-  interface ResultView {
-    view: JQuery;
-    month: JQuery;
-    day: JQuery;
-    link: JQuery;
-    spinner: JQuery;
-    linked: JQuery;
-    check: JQuery;
-    title: JQuery;
-    startTime: JQuery;
-    endTime: JQuery;
-  }
-
   var linkThreads = {};
   var unlinkThreads = {};
+
+  function renderEvent(e: ApiT.CalendarEvent, team: ApiT.Team) {
+'''
+<div #view class="esper-ev-result esper-click-safe">
+  <div #weekday class="esper-ev-weekday esper-click-safe"/>
+  <div #date title class="esper-ev-date esper-clickable esper-click-safe">
+    <div #month class="esper-ev-month esper-click-safe"></div>
+    <div #day class="esper-ev-day esper-click-safe"></div>
+  </div>
+  <div>
+    <div class="esper-ev-title esper-click-safe"><span #title/></div>
+    <div class="esper-ev-times esper-click-safe">
+      <span #startTime class="esper-ev-start esper-click-safe"></span>
+      &rarr;
+      <span #endTime class="esper-ev-end esper-click-safe"></span>
+      <span #timezone class="esper-ev-tz esper-click-safe"/>
+    </div>
+  </div>
+</div>
+'''
+
+    var start = XDate.ofString(e.start.local);
+    var end = XDate.ofString(e.end ? e.end.local : e.start.local);
+
+    weekday.text(XDate.fullWeekDay(start));
+    month.text(XDate.month(start).toUpperCase());
+    day.text(XDate.day(start).toString());
+    startTime.text(XDate.timeOnly(start));
+    endTime.text(XDate.timeOnly(end));
+
+    var calendar = List.find(team.team_calendars, function(cal) {
+      return cal.google_cal_id === e.google_cal_id;
+    });
+    timezone.text(CalPicker.zoneAbbr(calendar.calendar_timezone));
+
+    if (e.title !== undefined) {
+      title.text(e.title);
+    } else {
+      title.text("Untitled event");
+    }
+
+    if (e.google_cal_url !== undefined) {
+      date
+        .addClass("esper-clickable")
+        .click(function() {
+          open(e.google_cal_url, "_blank");
+        })
+        .tooltip({
+          show: { delay: 500, effect: "none" },
+          hide: { effect: "none" },
+          "content": "Open in Google Calendar",
+          "position": { my: 'center bottom', at: 'center top-1' },
+          "tooltipClass": "esper-top esper-tooltip"
+        });
+      title
+        .addClass("esper-link-black")
+        .click(function() {
+          open(e.google_cal_url, "_blank");
+        });
+    }
+
+    return view;
+  }
 
   function renderSearchResult(e: ApiT.EmailThreadSearch, task: ApiT.Task,
                               team: ApiT.Team, threadId: string, eventsTab) {
@@ -42,7 +92,7 @@ module Esper.GmailSearch {
 
     var thread_date = XDate.ofString(e.last_date);
     var now = new Date();
-    if (now.getDay() === thread_date.getUTCDay()) {
+    if (now.getDay() === thread_date.getDay()) {
       date_output = XDate.timeOnly(thread_date);
     } else {
       date_output = XDate.month(thread_date) + " " + XDate.day(thread_date);
@@ -52,7 +102,7 @@ module Esper.GmailSearch {
                   + e.last_snippet.substring(0,80));
     date.html(date_output);
 
-    Api.getTaskForThread(team.teamid, searchThread, false, false)
+    var job = Api.getTaskForThread(team.teamid, searchThread, true, true)
       .done(function(existingTask) {
         if (existingTask !== undefined) {
           logo.attr("data", Init.esperRootUrl + "img/menu-logo-purple.svg");
@@ -74,6 +124,13 @@ module Esper.GmailSearch {
           (<HTMLInputElement>link[0]).checked = true;
         }
       });
+
+      //check for already clicked in this session, but not yet linked threads
+      $.each(linkThreads, function(localthread, task) {
+        if (localthread === searchThread) {
+          (<HTMLInputElement>link[0]).checked = true;
+        }
+      })
     }
 
     link.click(function(e) {
@@ -83,6 +140,63 @@ module Esper.GmailSearch {
       } else {
         delete unlinkThreads[searchThread];
         linkThreads[searchThread] = task;
+        if (newTask !== undefined) {
+'''
+<div #modal class="esper-bs">
+  <p> 
+    This email is already linked to the following task:
+  </p>
+  <div class="panel panel-default">
+    <div #title class="panel-heading"/>
+    <div #body class="panel-body">
+      <div #taskNotes>Task Notes:</div>
+      <div><br></div>
+      <div #linkedEmails>Linked Emails:</div>
+      <div><br></div>
+      <div #linkedEvents>Linked Events:</div>
+    </div>
+  </div>
+</div>
+<div #editorText/>
+'''
+          title.html(newTask.task_title);
+
+          if (newTask.task_notes_quill === "" || newTask.task_notes_quill === undefined) {
+            taskNotes.append("<div>None</div>");
+          } else {
+            var editor = new quill(editorText.get(0));
+            editor.setContents(JSON.parse(newTask.task_notes_quill));
+            taskNotes.append(editor.getHTML());
+          }
+
+          if (newTask.task_threads.length === 0) {
+            linkedEmails.append("<div>None</div>");
+          } else {
+            newTask.task_threads.forEach(function(thread) {
+'''<a #a class="esper-thread-link esper-link"></a>'''
+              a
+                .text(thread.subject)
+                .attr("title", thread.subject)
+                .click(function(e) {
+                  e.stopPropagation();
+                  var url = window.location.origin 
+                            + window.location.pathname + "#all/" 
+                            + thread.gmail_thrid;
+                  window.open(url, '_blank');
+                });
+              linkedEmails.append(a);
+            });
+          }
+
+          if (newTask.task_events.length === 0) {
+            linkedEvents.append("<div>None</div>");
+          } else {
+            newTask.task_events.forEach(function(event) {
+              linkedEvents.append(renderEvent(event.event, team));
+            });
+          }
+          Modal.alert("Warning", modal).view.appendTo($("body"));
+        }
       }
     });
 
