@@ -11,23 +11,27 @@
         user to an anonymous or distinct id, so we need to open a page under
         the esper.com domain to properly track.
 
-        Following query params are available:
+        Page should be called with a writeKey query param specifying the
+        proper Segment key to use.
 
-          * writeKey - Segment write key to use
-          * page - Name of page to track using analytics.page
-          * category - Optional page category
-          * event - Event to track using analytics.track. Mutually exclusive
-            with page param.
-          * properties - JSON-encoded dict of properties for event or page call
+        Once opened, the page will use window.post to post a message to the
+        parent or opener to notify that the script is ready. Window requesting
+        analytics to be sent should respond by posting a response in the
+        following form:
 
-        Sample usage
+        {
+          sender: "Esper",
+          type: "Analytics",
+          value: {
+            page: "...",    // Name of page to track using analytics.page
+            category: "..." // Optional page category
+            event: "..."    // Event to track using analytics.track. Mutually
+                            // exclusive with the page param
 
-          esper.com/analytics?writeKey=MY_WRITE_KEY&event=Signed%20Up&
-          properties=%7B%22plan%22%3A%22Startup%22%2C%22source%22%3A%22
-          Analytics%20Academy%22%7D
-
-        When complete, this page will call window.post to send a message
-        acknowledging completion.
+            // Additional properties to send with page or track call
+            properties: { ... }
+          }
+        }
       */
 
       // Load Analytics.js
@@ -41,6 +45,7 @@
       (function() {
         "use strict";
 
+        // Load the specified Segment write key
         function getParameterByName(name) {
           name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
           var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
@@ -48,38 +53,45 @@
           return (results === null ? "" :
             decodeURIComponent(results[1].replace(/\+/g, " ")));
         }
-
         analytics.load(getParameterByName("writeKey"));
 
-        var page = getParameterByName("page");
-        var category = getParameterByName("category");
-        var ev = getParameterByName("event");
-        var props = getParameterByName("properties");
-        props = (props && JSON.parse(props)) || {};
+        // Listen for message to post analytics to Segment
+        window.addEventListener("message", function(ev) {
+          if (ev.data && ev.data.sender === "Esper" &&
+              ev.data.type === "Analytics") {
+            var val = ev.data.value;
 
-        // Callback to post back to parent frame that analytics call completed
-        // and that ifrae can be completed
-        var cb = function() {
-          var win = window.opener || window.parent;
-          win.postMessage({
-            sender: "Esper Analytics",
-            type: "Analytics Sent"
-          }, "*");
-        };
+            var page = val.page;
+            var category = val.category;
+            var event = val.event;
+            var props = val.properties || {};
 
-        if (page) {
-          if (category) {
-            analytics.page(category, page, props, cb);
+            // To filter out possible weirdness with non-Esper sites calling
+            // this page
+            props.analyticsCaller = ev.origin;
+
+            if (page) {
+              if (category) {
+                analytics.page(category, page, props);
+              }
+              analytics.page(page, props);
+            }
+
+            else if (event) {
+              analytics.track(event, props);
+            }
           }
-          analytics.page(page, props, cb);
-        }
+        });
 
-        else if (ev) {
-          analytics.track(ev, props, cb);
-
-          // To filter out possible weirdness with sites -- page call should
-          // automatically add this
-          props.referrer = document.referrer;
+        /*
+          Notify parent or opener window that we're good to go.
+        */
+        var windowObj = window.opener || window.parent;
+        if (windowObj && windowObj !== window) {
+          windowObj.postMessage({
+            sender: "Esper Analytics",
+            type: "Ready"
+          }, "*");
         }
       })();
     </script>
