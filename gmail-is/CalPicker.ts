@@ -995,7 +995,7 @@ module Esper.CalPicker {
       <div #title class="esper-modal-title"/>
     </div>
     <div #calendar class="esper-calendar-grid esper-scroll-target">
-      <div #loadingSpinner class="esper-spinner" />
+      <div #loadingSpinner class="esper-spinner esper-inline-spinner" />
     </div>
     <div class="esper-modal-footer esper-clearfix">
       <span #busySpinner class="esper-spinner"></span>
