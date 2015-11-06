@@ -11,6 +11,7 @@ s3_bucket=time.esper.com
       --mime-type=text/css \
       --exclude="*" \
       --include="*.css" \
+      --add-header="Cache-Control:max-age=60" \
       --recursive * s3://$s3_bucket )
 
 # Do SVG files next with forced mime (mime-magic guesses this incorrectly)
@@ -28,4 +29,5 @@ s3_bucket=time.esper.com
       --exclude="*.css" \
       --exclude="*.svg" \
       --default-mime-type=text/html \
+      --add-header="Cache-Control:max-age=60" \
       --recursive * s3://$s3_bucket )
