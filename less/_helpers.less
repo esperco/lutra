@@ -1,0 +1,167 @@
+/*
+  Helper classes -- NB: Use esper- prefix here in case we want to move these
+  out into Marten for reuse with Chrome extension
+*/
+
+.esper-simple-content {
+  margin: 50px auto;
+  max-width: 800px;
+}
+
+///////
+
+.esper-padded {
+  padding: @padding-base-vertical @padding-base-horizontal
+           @padding-large-vertical;
+}
+
+///////
+
+/*
+  full-screen => intended for covering all or most of the screen
+  expanded => intended for expanding to the edges of a given container
+
+  These are mostly identical but differ in how padding is handled.
+*/
+.esper-full-screen.padded {
+  .esper-padded;
+}
+
+.esper-expanded.padded {
+  top: @padding-base-vertical;
+  bottom: @padding-large-vertical;
+  left: @padding-base-horizontal;
+  right: @padding-base-horizontal;
+}
+
+.esper-full-screen, .esper-expanded {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: @body-bg;
+
+  &.minus-nav {
+    top: @navbar-height;
+  }
+
+  &.minus-subheader, &.padded.minus-subheader {
+    top: @font-size-h4 + @line-height-computed +
+         @panel-body-padding + @padding-base-vertical;
+  }
+
+  .esper-center {
+    position: absolute;
+    top: 42%; // Intionally nudge a little higher because of header margins
+    left: 50%;
+    min-width: 80%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .esper-left-sidebar, .esper-right-content {
+    height: 100%;
+    position: relative;
+    overflow-y: auto;
+    background: @body-bg;
+    &.padded {
+      .esper-padded;
+    }
+  }
+
+  .esper-left-sidebar {
+    border-right: 1px solid @table-border-color;
+    overflow-x: hidden;
+  }
+
+  // e.g. if panel is only element
+  .esper-focus-message {
+    height: 95%;
+    font-size: 150%;
+    margin: 0;
+    color: @gray-light;
+
+    > *:first-child {
+      .esper-center;
+    }
+
+    &.panel {
+      font-size: @font-size-large;
+    }
+
+    h2 {
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+/////
+
+@keyframes scaleout {
+  0% {
+    transform: scale(0.0);
+  } 100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+.esper-spinner {
+  display: block;
+  position: relative;
+  background-color: @purple;
+  border-radius: 100%;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
+  height: 20px;
+  width: 20px;
+
+  &.esper-medium {
+    height: 40px;
+    width: 40px;
+  }
+
+  &.esper-large {
+    height: 65px;
+    width: 65px;
+  }
+
+  .esper-center & {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .modal-footer & {
+    float: left;
+    display: block;
+    height: 32px;
+    width: 32px;
+  }
+
+  .navbar & {
+    height: @navbar-height - 14;
+    width: @navbar-height - 14;
+    margin: 7px;
+  }
+}
+
+////
+
+.esper-header {
+  line-height: @input-height-base;
+  vertical-align: middle;
+  margin-top: @padding-small-vertical;
+}
+
+.esper-borderless-section {
+  .esper-header {
+    border-bottom: 1px solid @panel-default-border;
+    padding-bottom: @panel-body-padding;
+  }
+
+  .esper-subheader {
+    font-weight: bold;
+  }
+
+  &.padded {
+    .esper-padded;
+  }
+}
