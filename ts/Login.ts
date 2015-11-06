@@ -15,6 +15,9 @@ module Esper.Login {
   var loginDeferred: JQueryDeferred<ApiT.LoginResponse> = $.Deferred();
   export var loginPromise = loginDeferred.promise();
 
+  var profileDeferred: JQueryDeferred<ApiT.DirProfile> = $.Deferred();
+  export var profilePromise = profileDeferred.promise();
+
   export function init() {
     if (! Login.loggedIn()) {
       InfoStore.set(null, { dataStatus: Model.DataStatus.FETCHING });
@@ -34,6 +37,13 @@ module Esper.Login {
           Analytics.identify(loginInfo, false, function() {
             loginDeferred.resolve(loginInfo);
           });
+          Api.getDirProfile()
+            .done(function(dirProfile) {
+              profileDeferred.resolve(dirProfile);
+            })
+            .fail(function(err) {
+              profileDeferred.reject(err);
+            });
         }, onFail);
     }
   }

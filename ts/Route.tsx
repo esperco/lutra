@@ -5,6 +5,8 @@
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoginRequired.tsx" />
+/// <reference path="./Views.Profile.tsx" />
+/// <reference path="./Views.EditProfile.tsx" />
 
 module Esper.Route {
 
@@ -18,10 +20,25 @@ module Esper.Route {
     // If busy, then we keep showing spinner
   }
 
+  // Helper for displaying the directory edit profile page first time login
+  var profileRequired: PageJS.Callback = function(ctx, next) {
+    Login.profilePromise.done(next);
+    Login.profilePromise.fail(function() {
+      nav.path("/edit-profile");
+    });
+  }
+
   // Index page
   pageJs("/", function() {
-    Layout.render(<Views.Index />);
-    Analytics.page(Analytics.Page.DirectoryHome);
+    nav.path("/profile");
+  });
+
+  pageJs("/profile", loginRequired, profileRequired, function() {
+    Layout.render(<Views.Profile />);
+  });
+
+  pageJs("/edit-profile", loginRequired, function() {
+    Layout.render(<Views.EditProfile />);
   });
 
   // 404 page

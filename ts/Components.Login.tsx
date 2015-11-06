@@ -1,7 +1,7 @@
 /*
   Displays login info or link to login via Otter
 */
-
+/// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Login.ts" />
 
@@ -46,6 +46,7 @@ module Esper.Components {
       this.setSources([
         Login.InfoStore
       ]);
+      this.find('.dropdown-toggle').dropdown();
     }
 
     getState() {
