@@ -402,8 +402,4 @@ module Esper.Timezone {
   export function getIdFromValue(value: string) {
     return idOfValue[value];
   }
-
-  export function selectedTimezone(selector) {
-    return idOfValue[selector.typeahead('val')];
-  }
 }
