@@ -9,11 +9,13 @@ setup:
 
 # Do a quick build, don't rebuild vendor files if not necessary
 build:
+	$(MAKE) check-marten
 	npm run build
 
 dev: build
 
 prod: clean
+	$(MAKE) check-marten
 	npm run build-production
 
 watch:
@@ -26,3 +28,7 @@ clean:
 # Copy pub/ into S3 bucket
 s3:
 	./s3-install
+
+# Check Marten repo is up to date
+check-marten:
+	./marten/version_check.sh
