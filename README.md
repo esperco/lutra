@@ -6,6 +6,23 @@ A marten is not a Martin.
 
 This repo contains refactored helper code for Otter, Stoat, etc.
 
+Linking
+-------
+Call [link.sh](link.sh) from the root directory of the project linked to
+Marten. This will create a symlink to Marten.
+
+Version Checking
+----------------
+Calling [link.sh](link.sh) will create a MARTEN_VERSION file inside your project
+with the commit hash for the current version of Marten. You can call
+[marten/version_check.sh](version_check.sh) from inside your project to
+verify that the currently linked version of Marten has the specified commits.
+You can also call [marten/record_version.sh](record_version.sh) from inside
+your project to update the MARTEN_VERSION file to point to the current commit
+for Marten. This script will append the current commit, not replace it (useful
+if there are multiple unmerged forks you're trying to track), so you should
+prune the MARTEN_VERSION file from time to time.
+
 Test App
 --------
 The [app](app) folder contains a sample app that links to and relies on

@@ -27,3 +27,6 @@ cd $OLD_PWD && ln -s $DIR ./marten
 
 # Create .bowerrc file pointing to Marten's vendor dir
 echo "{\"directory\": \"marten/vendor\"}" > .bowerrc
+
+# Create a MARTEN_VERSION file with the latest commit
+cd $DIR && ./record_version.sh
