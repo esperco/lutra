@@ -81,6 +81,7 @@ module Esper.LabelsTab {
             });
           });
       });
+      Analytics.track(Analytics.Trackable.ClickLabelsTabSave);
     }
 
     save.click(saveLabels);

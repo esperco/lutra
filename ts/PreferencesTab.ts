@@ -619,6 +619,10 @@ module Esper.PreferencesTab {
       primaryBtn.text("Update");
     }
 
+    primaryBtn.click(function() {
+      Analytics.track(Analytics.Trackable.ClickPreferencesTabInfoModalPrimaryButton);
+    });
+
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/" + type + ".svg");
@@ -1061,6 +1065,7 @@ module Esper.PreferencesTab {
 
     addLocation.click(function() {
       showInfoModal("location", "Add", defaults, teamid, locations, save);
+      Analytics.track(Analytics.Trackable.ClickPreferencesTabAddLocation);
     })
 
     return view;
@@ -1088,6 +1093,7 @@ module Esper.PreferencesTab {
 
     addUsername.click(function() {
       showInfoModal("video", "Add", defaults, teamid, usernames, save);
+      Analytics.track(Analytics.Trackable.ClickPreferencesTabAddUsername);
     })
 
     return view;
@@ -1115,6 +1121,7 @@ module Esper.PreferencesTab {
 
     addNumber.click(function() {
       showInfoModal("phone", "Add", defaults, teamid, numbers, save);
+      Analytics.track(Analytics.Trackable.ClickPreferencesTabAddPhoneNumber);
     })
 
     return view;
@@ -1340,6 +1347,17 @@ module Esper.PreferencesTab {
     toggle.click(function() {
       togglePreference(_view, team.teamid, undefined);
       saveEmailTypes();
+      if (name === "Daily Agenda") {
+        if (toggleBg.hasClass("on"))
+          Analytics.track(Analytics.Trackable.EnablePreferencesTabDailyAgenda);
+        else
+          Analytics.track(Analytics.Trackable.DisablePreferencesTabDailyAgenda);
+      } else {
+        if (toggleBg.hasClass("on"))
+          Analytics.track(Analytics.Trackable.EnablePReferencesTabTasksUpdate);
+        else
+          Analytics.track(Analytics.Trackable.DisablePreferencesTabTasksUpdate);
+      }
     });
 
     view.addClass("esper-prefs-" + type);
@@ -1798,6 +1816,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
         showInfoModal(
           "workplace", "Add", initial.workplaces, team.teamid, workplaces,
           saveWorkplaces);
+        Analytics.track(Analytics.Trackable.ClickPreferencesTabAddWorkplace);
       });
       setDividerHeight(
         "workplace",

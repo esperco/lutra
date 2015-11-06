@@ -186,6 +186,7 @@ module Esper.TemplateTab {
       var newTitle = title.val();
       if (newTitle.length > 0) tmp.title = newTitle;
       tmp.content = JSON.stringify(editor.getContents());
+      Analytics.track(Analytics.Trackable.ClickTemplatesTabSaveTemplate);
       return Api.updateTemplate(team.teamid, tmp.id, tmp).done(reload);
     });
 
@@ -252,6 +253,7 @@ module Esper.TemplateTab {
             nowEditing.text("Editing template: " + title);
             template.append(viewOfTemplate(team, tmp, preferences, tabContainer));
           });
+          Analytics.track(Analytics.Trackable.ClickTemplatesTabCreateTemplate);
         }
       });
     });
