@@ -1,0 +1,73 @@
+/* Bootstrap + overrides - consider moving overrides into footer */
+@import "../marten/less/_custom_bootstrap";
+@import "../marten/less/_helpers";
+@navbar-height: 50px;
+@navbar-default-bg: @body-bg;
+@navbar-default-border: @brand-bg;
+@navbar-padding-vertical: 10px;
+
+/* New variables */
+@footer-bg: @brand-bg;
+@footer-default-color: white;
+@footer-default-link-color: white;
+
+
+/* Page-specific style imports import */
+@import "./_loading";
+
+
+/* Basic Layout */
+body, .footer {
+  background: @footer-bg;
+}
+#esper-main {
+  background: @body-bg;
+  padding-top: @navbar-height;
+  min-height: 70%;
+
+  // Not full width => need some padding to match nav
+  .container {
+    padding-top: @navbar-padding-vertical;
+    padding-bottom: @navbar-padding-vertical;
+  }
+}
+.footer {
+  margin: 0 auto;
+  padding: 0;
+  color: @footer-default-color;
+  box-shadow: 0 -2px 2px rgba(0,0,0,0.16);
+  ul, li{
+    list-style-type: none;
+  }
+
+  &.hoverable {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: @padding-large-vertical;
+    overflow: hidden;
+
+    &:hover, &:focus {
+      max-height: 100%;
+    }
+
+    // NB: max-height instad of height because height => auto doesn't
+    // animate well
+    transition: max-height 0.6s;
+  }
+
+  a, a:hover, a:visited, a:active {
+    color: @footer-default-link-color;
+  }
+
+  .footer-links {
+    padding-top: (@navbar-height -
+      (extract(@nav-link-padding, 1) * 2) -
+      @line-height-computed) / 2;
+
+    a {
+      padding-right: @padding-large-horizontal;
+    }
+  }
+}
