@@ -836,18 +836,6 @@ module Esper.CalPicker {
       // Signal that the linked events have changed
       // and that they must be refreshed from the server
       CurrentThread.linkedEventsChange.set(null);
-
-      // Don't wait for sync
-      var syncCalls =
-        List.map(linkedEvents, function(ev : ApiT.CalendarEvent) {
-          return Api.syncEvent(
-            team.teamid,
-            threadId,
-            ev.google_cal_id,
-            ev.google_event_id
-          );
-        });
-      Promise.join(syncCalls);
     }).fail(function(err) {
       callback(err);
     });

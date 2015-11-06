@@ -596,10 +596,13 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    Api.getRestrictedDescription(team.teamid,
-                                 original.google_event_id, state.guests)
-      .done(function (description) {
-        descriptionField.val(state.notes + description.description_text);
+    var descriptionMessageids = [];
+    descriptionMessageids = original.description_messageids || [];
+
+    Api.getEventDescriptionWithMessages(state.notes,
+                                        descriptionMessageids)
+      .done(function (desc) {
+        descriptionField.val(desc.description_text);
       });
 
     if (execEvent) {
@@ -612,22 +615,21 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
       }
     }
 
-    var descriptionMessageids = [];
-
     pickEmails.click(function() {
       descriptionMessageids = original.description_messageids || [];
       var task = CurrentThread.task.get();
-      var dialog = Modal.dialog("Task Messages",
-                                TaskMessageList.render(task.taskid,
-                                                       descriptionMessageids),
-                                function() {
-                                  Api.getEventDescriptionWithMessages
-                                  (descriptionField.val(), descriptionMessageids)
-                                    .then(function(desc) {
-                                      descriptionField.val(desc.description_text);
-                                    });
-                                  return true;
-                                });
+      var dialog = Modal.dialog(
+        "Task Messages",
+        TaskMessageList.render(task.taskid,
+                               descriptionMessageids),
+        function() {
+          Api.getEventDescriptionWithMessages
+          (descriptionField.val(), descriptionMessageids)
+            .then(function(desc) {
+              descriptionField.val(desc.description_text);
+            });
+          return true;
+        });
       $("body").append(dialog.view);
     });
 
@@ -806,10 +808,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         if (confirmEventIsNotHold(eventEdit)) {
           return Api.createTaskLinkedEvent(from, team.teamid, eventEdit, task.taskid)
             .then(function(created) {
-              Api.syncEvent(team.teamid, threadId,
-                            created.google_cal_id,
-                            created.google_event_id);
-
               Api.sendEventInvites(team.teamid, from, guests, created);
               CurrentThread.linkedEventsChange.set(null);
 
