@@ -221,7 +221,9 @@ module Esper.Onboarding {
 
       $('html').addClass('esper-bs');
       var elm = this.jQuery();
-      elm.modal();
+      elm.modal({
+        backdrop: 'static'
+      });
 
       var self = this;
       elm.on('hidden.bs.modal', function() {
