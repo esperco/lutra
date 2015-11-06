@@ -20,9 +20,9 @@ while read COMMIT; do
   cd $DIR
   if git branch --contains $COMMIT | grep "*"
     then
-      echo -e "\e[92mOK: Commit $COMMIT exists\e[0m"
+      echo -e "\e[92mOK: Commit $COMMIT exists on current Marten branch\e[0m"
     else
-      echo -e "\e[91mERROR: Commit $COMMIT not on current branch\e[0m"
+      echo -e "\e[91mERROR: Commit $COMMIT not on current Marten branch\e[0m"
       exit 1
   fi
 done <$COMMIT_FILE
