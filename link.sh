@@ -29,4 +29,8 @@ cd $OLD_PWD && ln -s $DIR ./marten
 echo "{\"directory\": \"marten/vendor\"}" > .bowerrc
 
 # Create a MARTEN_VERSION file with the latest commit
-cd $DIR && ./record_version.sh
+cd $OLD_PWD
+if [ ! -f MARTEN_VERSION ]
+  then
+    ./marten/record_version.sh
+fi
