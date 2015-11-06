@@ -103,7 +103,8 @@ module Esper.Analytics {
     TeamWorkflows,     // app.esper.com/#!/team-settings/.../workflows
     TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
-    LabelsOverTime     // time.esper.com/#!/labels-over-time
+    LabelsOverTime,    // time.esper.com/#!/labels-over-time
+    DirectoryHome      // dir.esper.com
   }
 
 
