@@ -55,10 +55,24 @@ module Esper.Route {
       expectRenderWith(this.spy, Views.LabelsOverTime);
     });
 
+    it("should navigate to labels over time page", function() {
+      fakePage("/labels-over-time");
+      expectRenderWith(this.spy, Views.LabelsOverTime);
+    });
+
+    it("should navigate to calendar page", function() {
+      fakePage("/calendar-labeling");
+      expectRenderWith(this.spy, Views.CalendarLabeling);
+    });
+
     it("should navigate to 404 page if none is found", function() {
       fakePage("not-a-real-page-at-all");
       expectRenderWith(this.spy, Views.NotFound);
     });
 
+    it("should set the current object on route", function() {
+      fakePage("/calendar-labeling");
+      expect(current).toBe("/calendar-labeling");
+    });
   });
 }
