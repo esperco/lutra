@@ -1354,7 +1354,7 @@ module Esper.PreferencesTab {
           Analytics.track(Analytics.Trackable.DisablePreferencesTabDailyAgenda);
       } else {
         if (toggleBg.hasClass("on"))
-          Analytics.track(Analytics.Trackable.EnablePReferencesTabTasksUpdate);
+          Analytics.track(Analytics.Trackable.EnablePreferencesTabTasksUpdate);
         else
           Analytics.track(Analytics.Trackable.DisablePreferencesTabTasksUpdate);
       }
