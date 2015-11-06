@@ -81,6 +81,23 @@ module Esper.ApiT {
     Executive
   }
 
+  export interface LabelledItem {
+    label: string;
+    item: string;
+  }
+
+  export interface DirProfile {
+    dir_display_name: string;
+    dir_other_names: LabelledItem[];
+    dir_company: string;
+    dir_company_title: string;
+    dir_company_location : string;
+    dir_email_list: LabelledItem[];
+    dir_phone_list: LabelledItem[];
+    dir_address_list: LabelledItem[];
+    dir_custom_list: LabelledItem[];
+  }
+
   export interface Profile {
     profile_uid: string;
     email: string;
