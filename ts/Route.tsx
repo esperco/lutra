@@ -35,9 +35,16 @@ module Esper.Route {
   });
 
   // 404 page
-  pageJs('*', function() {
-    Layout.render(<Views.NotFound />, null, null);
+  pageJs('*', function(ctx) {
+    // To deal with weird issue where hrefs get too many slashes prepended.
+    if (ctx.path.slice(0,2) === "//") {
+      nav.path(ctx.path.slice(1));
+    } else {
+      Log.e(ctx);
+      Layout.render(<Views.NotFound />, null, null);
+    }
   });
+
 
   // Turn on router
   export function init() {

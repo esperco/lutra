@@ -36,8 +36,14 @@
       cursor: pointer;
     }
 
+    /*
+      Force test frame to always technically be visible because some tests
+      depend on jQuery's concept of visibility
+    */
     #esper-test-frame.hide {
-      display: none;
+      position: absolute;
+      right: -100000%;
+      display: block !important;
     }
 
     #esper-test-frame {
@@ -46,6 +52,10 @@
       display: block;
       clear: both;
       border: 1px solid #007069;
+    }
+
+    .jasmine_html-reporter {
+      margin: 0;
     }
   </style>
 </head>

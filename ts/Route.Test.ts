@@ -50,9 +50,9 @@ module Esper.Route {
       this.spy = spyOn(Layout, "render");
     });
 
-    it("should navigate to index page with default route", function() {
+    it("should navigate to labels over time page with default route", function() {
       fakePage("/");
-      expectRenderWith(this.spy, Views.Index);
+      expectRenderWith(this.spy, Views.LabelsOverTime);
     });
 
     it("should navigate to 404 page if none is found", function() {
