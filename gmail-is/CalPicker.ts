@@ -107,6 +107,7 @@ module Esper.CalPicker {
   }
 
   function createView(refreshCal: JQuery,
+                      calendars: ApiT.Calendar[],
                       userSidebar: UserTab.UserTabView,
                       team: ApiT.Team,
                       tpref: ApiT.TaskPreferences) : PickerView {
@@ -194,7 +195,6 @@ module Esper.CalPicker {
     showCalendars = {}; // Clear out old entries from previous views
     userSidebar.calendarsContainer.children().remove();
 
-    var calendars = team.team_calendars;
     var writes = [];
     List.iter(calendars, function(cal) {
       if (cal.calendar_default_view) {
@@ -286,11 +286,11 @@ module Esper.CalPicker {
     List.iter(calendars, function(cal, i) {
 '''
 <li #calendarCheckboxRow class="esper-calendar-checkbox esper-li esper-click-safe">
-  <span #fakeCheckbox class="fa fa-fw esper-fake-checkbox" />
-  <span #calendarName class="esper-fake-checkbox-text"/>
+<span #fakeCheckbox class="fa fa-fw esper-fake-checkbox" />
+<span #calendarName class="esper-fake-checkbox-text"/>
 </li>
 '''
-      var calColor = colorForCalendar(team, cal);
+      var calColor = colorForCalendar(cal, i);
       fakeCheckbox.css("background", calColor.background);
       fakeCheckbox.css("color", calColor.foreground);
 
@@ -422,7 +422,8 @@ module Esper.CalPicker {
     Output event type:
       http://arshaw.com/fullcalendar/docs2/event_data/Event_Object/
   */
-  function importEvents(esperEvents : TZCalendarEvent[]) {
+  function importEvents(esperEvents : TZCalendarEvent[],
+                        calendars: ApiT.Calendar[]) {
     return CurrentThread.currentTeam.get().match({
       some : function (team) {
         return List.map(esperEvents, function(x) {
@@ -439,11 +440,8 @@ module Esper.CalPicker {
           };
 
           // Display ghost calendar events in gray
-          var evCal =
-            List.find(team.team_calendars, function(cal : ApiT.Calendar) {
-              return cal.google_cal_id === x.google_cal_id;
-            });
-          var colors = colorForCalendar(team, evCal);
+          var idx = _.findIndex(calendars, { 'google_cal_id': x.google_cal_id });
+          var colors = colorForCalendar(calendars[idx], idx);
           ev["color"] = colors.background;
           ev["textColor"] = colors.foreground;
           return ev;
@@ -464,8 +462,9 @@ module Esper.CalPicker {
     });
   }
 
-  function fetchEvents(team: ApiT.Team, picker,
-                       momentStart, momentEnd, tz, callback) {
+  function fetchEvents(team: ApiT.Team, 
+                       calendars: ApiT.Calendar[],
+                       picker, momentStart, momentEnd, tz, callback) {
     var start = momentStart.toDate();
     var end = momentEnd.toDate();
     var cacheFetches : JQueryPromise<TZCalendarEvent[]>[] =
@@ -489,7 +488,7 @@ module Esper.CalPicker {
     Promise.join(cacheFetches).done(function(ll) {
       var esperEvents = List.concat(ll);
       refreshCache = false;
-      var normalEvents = importEvents(esperEvents);
+      var normalEvents = importEvents(esperEvents, calendars);
 
       // Reinterpret drawn events in current showTimezone
       var movedEdits = [];
@@ -518,6 +517,7 @@ module Esper.CalPicker {
   }
 
   function setupCalendar(team: ApiT.Team,
+                         calendars: ApiT.Calendar[],
                          picker : PickerView) {
     var calendarView = picker.calendarView;
     var calendarJump = picker.dateJumper;
@@ -639,7 +639,7 @@ module Esper.CalPicker {
       eventRender: eventRender,
       editable: false,
       events: function(momentStart, momentEnd, tz, callback) {
-        return fetchEvents(team, picker, momentStart, momentEnd,
+        return fetchEvents(team, calendars, picker, momentStart, momentEnd,
                            tz, callback);
       }
     });
@@ -668,40 +668,45 @@ module Esper.CalPicker {
   function createPicker(refreshCal: JQuery,
                         userSidebar: UserTab.UserTabView,
                         team: ApiT.Team,
-                        tpref: ApiT.TaskPreferences) : Picker {
-    var pickerView = createView(refreshCal, userSidebar, team, tpref);
-    setupCalendar(team, pickerView);
+                        tpref: ApiT.TaskPreferences) : JQueryPromise<Picker> {
+    var calendars = team.team_calendars;
+    return Api.getCalendarList().done(function(x) {
+      calendars = _.uniq(_.union(calendars, x.calendars), 'google_cal_id');
+    }).then<Picker>(function() {
+      var pickerView = createView(refreshCal, calendars, userSidebar, team, tpref);
+      setupCalendar(team, calendars, pickerView);
 
-    // add the meeting type menu:
-    var menu = meetingTypeMenu();
-    pickerView.view.find(".fc-left").append(menu);
-    menu.change(function () {
-      meetingType = menu.val() || "other";
-      pickerView.calendarView.fullCalendar("refetchEvents");
+      // add the meeting type menu:
+      var menu = meetingTypeMenu();
+      pickerView.view.find(".fc-left").append(menu);
+      menu.change(function () {
+        meetingType = menu.val() || "other";
+        pickerView.calendarView.fullCalendar("refetchEvents");
+      });
+      menu.click(function() {
+        Analytics.track(Analytics.Trackable.SelectCalendarPickerMeetingType);
+      })
+
+      var type = UserTab.currentMeetingType;
+      if (menu.find("option[value='" + type + "']").length > 0) {
+        meetingType = type;
+        menu.val(type);
+      }
+
+      function render() {
+        pickerView.calendarView.fullCalendar("render");
+        updateZoneAbbrDisplay();
+      }
+
+      return {
+        view: pickerView.view,
+        events: pickerView.events,
+        eventTitle: pickerView.eventTitle,
+        eventLocation: pickerView.eventLocation,
+        render: render, // to be called after attaching the view to the dom tree
+      };
     });
-    menu.click(function() {
-      Analytics.track(Analytics.Trackable.SelectCalendarPickerMeetingType);
-    })
-
-    var type = UserTab.currentMeetingType;
-    if (menu.find("option[value='" + type + "']").length > 0) {
-      meetingType = type;
-      menu.val(type);
-    }
-
-    function render() {
-      pickerView.calendarView.fullCalendar("render");
-      updateZoneAbbrDisplay();
-    }
-
-    return {
-      view: pickerView.view,
-      events: pickerView.events,
-      eventTitle: pickerView.eventTitle,
-      eventLocation: pickerView.eventLocation,
-      render: render, // to be called after attaching the view to the dom tree
-    };
-  };
+  }
 
   /*
     Add 8 hours if the timezone offset is -08:00.
@@ -977,7 +982,9 @@ module Esper.CalPicker {
       </div>
       <div #title class="esper-modal-title"/>
     </div>
-    <div #calendar class="esper-calendar-grid esper-scroll-target"/>
+    <div #calendar class="esper-calendar-grid esper-scroll-target">
+      <div #loadingSpinner class="esper-spinner esper-inline-spinner" />
+    </div>
     <div class="esper-modal-footer esper-clearfix">
       <span #busySpinner class="esper-spinner"></span>
       <button #cancel class="esper-btn esper-btn-secondary">
@@ -990,7 +997,9 @@ module Esper.CalPicker {
   </div>
 </div>
 '''
-
+    loadingSpinner.show();
+    InThreadControls.setEventControlContainer(view);
+    Gmail.scrollToEventControl();
     CurrentThread.currentTeam.get().match({
       some : function (team) {
         function closeView() {
@@ -1013,41 +1022,43 @@ module Esper.CalPicker {
         title.text("Create linked events");
 
         var userInfo = UserTab.viewOfUserTab(team);
-        var picker = createPicker(refreshCal, userInfo, team, tpref);
-        calendar.append(picker.view);
+        createPicker(refreshCal, userInfo, team, tpref)
+          .done(function(picker) {
+            loadingSpinner.hide();
+            calendar.append(picker.view);
 
-        refreshCal.tooltip({
-          show: { delay: 500, effect: "none" },
-          hide: { effect: "none" },
-          "content": "Refresh calendars",
-          "position": { my: 'center bottom', at: 'center top-7' },
-          "tooltipClass": "esper-top esper-tooltip"
-        });
-
-        cancel.click(function() {
-          closeView();
-          Analytics.track(Analytics.Trackable.ClickCalendarPickerCancel);
-        });
-
-        save.click(function() {
-          makeBusy();
-          confirmEvents(view, picker, team, task, threadId,
-            function(err: Error) {
-              if (err) {
-                unmakeBusy();
-              } else {
-                closeView();
-              }
+            refreshCal.tooltip({
+              show: { delay: 500, effect: "none" },
+              hide: { effect: "none" },
+              "content": "Refresh calendars",
+              "position": { my: 'center bottom', at: 'center top-7' },
+              "tooltipClass": "esper-top esper-tooltip"
             });
-          Analytics.track(Analytics.Trackable.ClickCalendarPickerSave);
-        });
 
-        InThreadControls.setEventControlContainer(view);
-        picker.render();
-        Sidebar.selectUserTab();
-        Gmail.scrollToEventControl();
+            cancel.click(function() {
+              closeView();
+              Analytics.track(Analytics.Trackable.ClickCalendarPickerCancel);
+            });
+
+            save.click(function() {
+              makeBusy();
+              confirmEvents(view, picker, team, task, threadId,
+                function(err: Error) {
+                  if (err) {
+                    unmakeBusy();
+                  } else {
+                    closeView();
+                  }
+                });
+              Analytics.track(Analytics.Trackable.ClickCalendarPickerSave);
+            });
+
+            picker.render();
+            Sidebar.selectUserTab();
+        });
       },
       none : function () {
+        loadingSpinner.hide();
         window.alert("Cannot create cal picker because no team is currently detected.");
       }
     });
@@ -1131,18 +1142,15 @@ module Esper.CalPicker {
     foreground: string;
   }
 
-  function colorForCalendar(team: ApiT.Team, calendar: ApiT.Calendar)
+  function colorForCalendar(calendar: ApiT.Calendar,
+                            index: number)
     : eventColor
   {
-    var index = _.findIndex(team.team_calendars, function(teamCal) {
-      return teamCal.google_cal_id === calendar.google_cal_id;
-    });
-
     // Ghost calendar check
     if (/ Ghost$/.test(calendar.calendar_title)) {
       return {
         background: "#BCBEC0", // @gray_30
-        foreground: "333"
+        foreground: "#333"
       };
     }
 
