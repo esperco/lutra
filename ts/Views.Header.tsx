@@ -11,7 +11,7 @@ module Esper.Views {
       return <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container-fluid padded">
           <div className="navbar-header">
-            <a className="navbar-brand" href="/#!/">
+            <a className="navbar-brand lg" href="/#!/">
               <img alt="Esper" src="/img/esper-logo-purple.svg" />
             </a>
           </div>
