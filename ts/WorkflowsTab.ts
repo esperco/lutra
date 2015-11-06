@@ -374,6 +374,7 @@ module Esper.WorkflowsTab {
             nowEditing.text("Editing workflow: " + title);
             workflow.append(viewOfWorkflow(team, wf, preferences, tabContainer));
           });
+          Analytics.track(Analytics.Trackable.ClickWorkflowsTabCreateWorkflow);
         }
       });
     });
