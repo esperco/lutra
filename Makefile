@@ -18,14 +18,14 @@ prod: prod-build
 	@echo ""
 	@echo "      ~/service/api/master/install"
 
-dev-build:
+dev-build: check-marten
 	npm run build
 
-dev-rebuild:
+dev-rebuild: check-marten
 	rm -rf pub
 	npm run rebuild
 
-prod-build:
+prod-build: check-marten
 	rm -rf pub
 	npm run build-production
 
@@ -40,3 +40,7 @@ clean:
 	$(MAKE) -C ts clean
 	$(MAKE) -C html clean
 	$(MAKE) -C css clean
+
+# Check Marten repo is up to date
+check-marten:
+	./marten/version_check.sh
