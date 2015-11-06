@@ -40,16 +40,19 @@ zip:
 	zip -r esper esper
 
 dev-build:
+	$(MAKE) check-marten
 	$(MAKE) -C common dev-conf
 	npm run build
 
 # Build doesn't rebuild vendor files -- run rebuild to take care of those
 # Dev only, production is always a rebuild
 dev-rebuild:
+	$(MAKE) check-marten
 	$(MAKE) -C common dev-conf
 	npm run rebuild
 
 prod-build:
+	$(MAKE) check-marten
 	$(MAKE) -C common prod-conf
 	npm run build-production
 
@@ -68,3 +71,7 @@ clean:
 	$(MAKE) -C gmail-is clean
 	$(MAKE) -C gcal-is clean
 	$(MAKE) -C css clean
+
+# Check Marten repo is up to date
+check-marten:
+	./marten/version_check.sh
