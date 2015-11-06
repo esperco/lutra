@@ -125,7 +125,7 @@ module Esper.CurrentEvent {
         */
         var newTask: ApiT.NewTask = {
           task_title: Gcal.Event.extractEventTitle(),
-          task_progress: "In_progress"
+          task_progress: "Done"
         };
         taskStore.set(function(oldTask, oldMetadata) {
           if (oldTask) {
