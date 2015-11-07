@@ -34,8 +34,7 @@ to S3.
 
 ```
 make setup
-make prod
-make install
+make install # automatically calls make prod
 ```
 
 
