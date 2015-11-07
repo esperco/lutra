@@ -83,6 +83,17 @@ a.list-group-item {
     width: auto;
     margin: 0 @navbar-padding-horizontal;
   }
+
+  &.lg {
+    line-height: @navbar-height - (@navbar-padding-vertical * 4/3);
+    padding-top: @navbar-padding-vertical * 2/3;
+    padding-bottom: @navbar-padding-vertical * 2/3;
+
+    img {
+      height: @navbar-height - (@navbar-padding-vertical * 4/3);
+      margin: 0 (@navbar-padding-horizontal * 2/3);
+    }
+  }
 }
 
 .nav > li > a:hover, .nav > li > a:focus {
