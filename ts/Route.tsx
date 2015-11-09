@@ -24,7 +24,7 @@ module Esper.Route {
   var profileRequired: PageJS.Callback = function(ctx, next) {
     Login.profilePromise.done(next);
     Login.profilePromise.fail(function() {
-      nav.path("/edit-profile");
+      nav.path("/edit-profile-new");
     });
   }
 
@@ -37,8 +37,14 @@ module Esper.Route {
     Layout.render(<Views.Profile />);
   });
 
-  pageJs("/edit-profile", loginRequired, function() {
-    Layout.render(<Views.EditProfile />);
+  pageJs("/edit-profile", loginRequired, profileRequired, function() {
+    Layout.render(<Views.EditProfile esperProfile={undefined} dirProfile={Login.dirProfile.val()}/>);
+  });
+
+  pageJs("/edit-profile-new", loginRequired, function() {
+    Api.getMyProfile().done(function(profile) {
+      Layout.render(<Views.EditProfile esperProfile={profile} dirProfile={undefined} />);
+    });
   });
 
   // 404 page
