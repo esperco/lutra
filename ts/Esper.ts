@@ -8,6 +8,7 @@
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/typings/chartjs/chart.d.ts" />
 /// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../marten/typings/fullCalendar/fullCalendar.d.ts" />
 /// <reference path="../marten/typings/moment/moment.d.ts" />
 /// <reference path="../marten/typings/moment-timezone/moment-timezone.d.ts" />
 /// <reference path="../marten/typings/page/page.d.ts" />

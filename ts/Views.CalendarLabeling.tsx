@@ -1,5 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
+/// <reference path="./Components.Calendar.tsx" />
 
 module Esper.Views {
 
@@ -69,13 +70,10 @@ module Esper.Views {
       //   </div>;
       // }
 
-      return <div className="esper-expanded padded">
-        <div className="panel panel-default esper-focus-message">
-          <div className="panel-body">
-            Calendar
-          </div>
-        </div>
-      </div>;
+      return <Components.Calendar
+        teamId={this.state.selectedCal.teamId}
+        calId={this.state.selectedCal.calId}
+      />;
     }
 
     renderMessage(elm: JSX.Element|string) {

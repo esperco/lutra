@@ -16,6 +16,7 @@
 /* Page-specific style imports and helper import */
 @import "./_loading";
 @import "./_chart";
+@import "./_calendar";
 
 
 /* Basic Layout */
@@ -43,6 +44,7 @@ body, .footer {
     right: 0;
     max-height: @padding-large-vertical;
     overflow: hidden;
+    z-index: 10;
 
     &:hover, &:focus {
       max-height: 100%;

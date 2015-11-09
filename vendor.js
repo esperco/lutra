@@ -6,6 +6,7 @@ var inject        = require("marten-npm-vendors/depends").inject;
 // Bower packages
 var Chart         = require("Chart.js"),
     EventEmitter  = require("eventemitter3"),
+    fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
@@ -45,6 +46,7 @@ Esper = (function(esperObj) {
     Chart:        Chart,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
+    fullCalendar: fullCalendar,
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,

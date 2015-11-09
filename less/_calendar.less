@@ -1,0 +1,33 @@
+@import "../marten/less/_helpers";
+
+// Wrap to minimize chance of namespace conflict
+.fullcalendar-holder {
+  .esper-expanded;
+  .esper-expanded.padded;
+
+  // Import fullcalendar classes
+  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
+
+  // Style overrides go here
+  .fc {
+    .fc-toolbar {
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: @padding-large-vertical;
+
+      h1, h2, h3, h4, h5, h6 {
+        font-size: @font-size-large;
+        font-weight: bold;
+        line-height: @input-height-base;
+        vertical-align: middle;
+      }
+    }
+
+    button {
+      padding: 0 @padding-base-horizontal;
+      height: @input-height-base;
+      line-height: @input-height-base;
+      vertical-align: middle;
+    }
+  }
+}
