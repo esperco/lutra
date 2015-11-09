@@ -165,4 +165,10 @@ module Esper.ApiC {
     (Api.postForCalendarStats, {
       store: new Model.CappedStore<ApiT.CalendarStatsResult>()
     });
+
+  export var postCalendar = makeC
+    <typeof Api.postCalendar, ApiT.CalendarEventList>
+    (Api.postCalendar, {
+      store: new Model.CappedStore<ApiT.CalendarEventList>()
+    });
 }
