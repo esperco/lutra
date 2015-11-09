@@ -57,19 +57,6 @@ module Esper.Views {
         </span>);
       }
 
-      // else if (results.error) {
-      //   return this.renderMessage(<span>
-      //     <i className="fa fa-fw fa-warning"></i>{" "}
-      //     Error loading data
-      //   </span>);
-      // }
-
-      // else if (!results.ready) {
-      //   return <div className="esper-center">
-      //     <span className="esper-spinner esper-large" />
-      //   </div>;
-      // }
-
       return <Components.Calendar
         teamId={this.state.selectedCal.teamId}
         calId={this.state.selectedCal.calId}
