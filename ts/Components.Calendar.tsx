@@ -25,6 +25,8 @@ module Esper.Components {
   export abstract class Calendar extends Component<CalendarProps, CalendarState>
   {
     _fcDiv: React.Component<any, any>;
+    _currentStart: number;  // Unix time
+    _currentEnd: number;    // Unix time
 
     constructor(props: CalendarProps) {
       super(props);
@@ -83,6 +85,14 @@ module Esper.Components {
       });
     }
 
+    componentDidUpdate(prevProps: CalendarProps) {
+      // Important to do an equality check beforehand to avoid infinite
+      // callstack from fetchEvents updating busy state
+      if (! _.eq(this.props, prevProps)) {
+        $(React.findDOMNode(this._fcDiv)).fullCalendar('refetchEvents');
+      }
+    }
+
     fetchEvents(momentStart: moment.Moment, momentEnd: moment.Moment,
                 tz: string|boolean,
                 callback: (events: FullCalendar.EventObject[]) => void): void
@@ -90,12 +100,27 @@ module Esper.Components {
       momentStart.subtract(1, 'day'); // To get full range regardless of tz
       momentEnd.add(1, 'day'); // Ditto
 
+      /*
+        Remember currrent interval start/stop for callback purposes -- used
+        to avoid situation where navigating between multiple views quickly
+        causes state to be improperly updated. Use unix time to avoid
+        mutation issues.
+      */
+      var currentStart = this._currentStart = momentStart.unix();
+      var currentEnd = this._currentEnd = momentEnd.unix();
+
       var apiDone = false;
       ApiC.postCalendar(this.props.teamId, this.props.calId, {
         window_start: XDate.toString(momentStart.toDate()),
         window_end: XDate.toString(momentEnd.toDate())
       }).done((result) => {
-        this.setState({showBusy: false, showError: false});
+
+        // Only update state if we're still looking at the same interval
+        if (this._currentStart === currentStart &&
+            this._currentEnd === currentEnd) {
+          this.setState({showBusy: false, showError: false});
+        }
+
         callback(_.map(result.events, (event): FullCalendar.EventObject => {
           return {
             id: event.google_event_id,
