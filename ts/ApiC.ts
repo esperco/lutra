@@ -103,7 +103,9 @@ module Esper.ApiC {
 
       // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
       // any user-set data we may have cached)
-      store.upsert(key, function(data: T, metadata: Model.StoreMetadata): T | [T, Model.StoreMetadata] {
+      store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
+        : T | [T, Model.StoreMetadata]
+      {
         if (canSave(metadata)) {
           return [data, _.extend({}, metadata, {
             dataStatus: Model.DataStatus.FETCHING
@@ -117,28 +119,32 @@ module Esper.ApiC {
       promise = promises[key] = (<any> fn).apply(Api, arguments);
       promise.done(function(newData: T) {
         // On success, update store
-        store.upsert(key, function(data: T, metadata: Model.StoreMetadata): T | [T, Model.StoreMetadata] {
-          if (canSave(metadata)) {
-            return [newData, _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.READY
-            })];
-          }
-          return data;
-        });
+        store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
+            : T | [T, Model.StoreMetadata]
+          {
+            if (canSave(metadata)) {
+              return [newData, _.extend({}, metadata, {
+                dataStatus: Model.DataStatus.READY
+              })];
+            }
+            return data;
+          });
         return newData;
 
       }).fail(function(err) {
         // On failure, update store to note failure (again, don't override
         // user data)
-        store.upsert(key, function(data: T, metadata: Model.StoreMetadata): T | [T, Model.StoreMetadata] {
-          if (canSave(metadata)) {
-            return [data, _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.FETCH_ERROR,
-              lastError: err
-            })];
-          }
-          return data;
-        });
+        store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
+            : T | [T, Model.StoreMetadata]
+          {
+            if (canSave(metadata)) {
+              return [data, _.extend({}, metadata, {
+                dataStatus: Model.DataStatus.FETCH_ERROR,
+                lastError: err
+              })];
+            }
+            return data;
+          });
 
         // Clean up old promises in memory
         if (promises[key] === promise) {
@@ -170,5 +176,11 @@ module Esper.ApiC {
     <typeof Api.postCalendar, ApiT.CalendarEventList>
     (Api.postCalendar, {
       store: new Model.CappedStore<ApiT.CalendarEventList>()
+    });
+
+  export var getTaskListForEvent = makeC
+    <typeof Api.getTaskListForEvent, ApiT.Task[]>
+    (Api.getTaskListForEvent, {
+      store: new Model.CappedStore<ApiT.Task[]>()
     });
 }
