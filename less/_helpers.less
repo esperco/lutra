@@ -34,6 +34,30 @@
   right: @padding-base-horizontal;
 }
 
+// Use for absolutely positioning a center div on screen
+.esper-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 80%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+
+  // Modal-ish message
+  &.esper-msg {
+    padding: @modal-inner-padding;
+    z-index: 5;
+    background: @body-bg;
+    border: 1px solid @component-active-bg;
+    border-radius: @border-radius-base;
+    min-width: 42%;
+  }
+
+  .esper-full-screen &, .esper-expanded  & {
+    top: 42%; // Intentionally nudge a little higher because of header margins
+  }
+}
+
 .esper-full-screen, .esper-expanded {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -46,15 +70,6 @@
   &.minus-subheader, &.padded.minus-subheader {
     top: @font-size-h4 + @line-height-computed +
          @panel-body-padding + @padding-base-vertical;
-  }
-
-  .esper-center {
-    position: absolute;
-    top: 42%; // Intionally nudge a little higher because of header margins
-    left: 50%;
-    min-width: 80%;
-    transform: translate(-50%, -50%);
-    text-align: center;
   }
 
   .esper-left-sidebar, .esper-right-content {
@@ -111,18 +126,8 @@
   background-color: @purple;
   border-radius: 100%;
   animation: scaleout 1.0s ease-in-out 0s infinite;
-  height: 20px;
-  width: 20px;
-
-  &.esper-medium {
-    height: 40px;
-    width: 40px;
-  }
-
-  &.esper-large {
-    height: 65px;
-    width: 65px;
-  }
+  height: @line-height-computed;
+  width: @line-height-computed;
 
   .esper-center & {
     margin-left: auto;
@@ -140,6 +145,23 @@
     height: @navbar-height - 14;
     width: @navbar-height - 14;
     margin: 7px;
+  }
+
+  &.esper-inline {
+    display: inline-block;
+    margin: 0 @padding-xs-horizontal;
+    line-height: @line-height-computed;
+    vertical-align: middle;
+  }
+
+  &.esper-medium {
+    height: 40px;
+    width: 40px;
+  }
+
+  &.esper-large {
+    height: 65px;
+    width: 65px;
   }
 }
 
