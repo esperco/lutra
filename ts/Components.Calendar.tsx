@@ -71,11 +71,9 @@ module Esper.Components {
       Where fullCalendar gets initially invoked
     */
     componentDidMount() {
-      // this.setSources([
-      //   ApiC.postCalendar.store
-      // ]);
+      var fcDiv = $(React.findDOMNode(this._fcDiv));
 
-      $(React.findDOMNode(this._fcDiv)).fullCalendar({
+      fcDiv.fullCalendar({
         header: {
           left: 'today prev,next',
           center: 'title',
@@ -84,7 +82,11 @@ module Esper.Components {
         defaultView: 'agendaWeek',
         snapDuration: "00:15:00",
         events: this.fetchEvents.bind(this),
-        eventClick: this.selectEvent.bind(this)
+        eventClick: this.selectEvent.bind(this),
+        height: fcDiv.parent().height() - 10,
+        windowResize: () => {
+          fcDiv.fullCalendar('option', 'height', fcDiv.parent().height() - 10);
+        }
       });
     }
 
