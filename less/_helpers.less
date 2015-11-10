@@ -129,9 +129,13 @@
   height: @line-height-computed;
   width: @line-height-computed;
 
-  .esper-center & {
+  .esper-center &, .esper-left-sidebar & {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .esper-left-sidebar & {
+    margin-top: @padding-large-vertical * 2;
   }
 
   .modal-footer & {

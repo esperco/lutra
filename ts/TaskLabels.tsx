@@ -1,5 +1,8 @@
 /*
   Component for updating labels for a given task
+
+  NB: This should be re-written pending changes to us attaching tags to
+  events directly, rather than to task. Or if we implement a type-ahead.
 */
 
 /// <reference path="./ReactHelpers.ts" />
@@ -24,6 +27,10 @@ module Esper.TaskLabels {
 
     // Callback to handle label changes
     handleChange: (labels: string[]) => void;
+
+    // Classes
+    listClasses?: string;
+    itemClasses?: string;
   }
 
   export class LabelList extends Component<LabelListProps, {}> {
@@ -35,15 +42,18 @@ module Esper.TaskLabels {
       var labelSettingsUrl = Api.prefix + "/#!/team-settings/" +
         this.props.team.teamid + "/labels";
 
-      return (<div className="esper-bs">
-        <div>
+      return (<div className="esper-bs esper">
+        <div className={this.props.listClasses}>
           { labelElms && labelElms.length ? labelElms :
             <div className="esper-no-content">No Labels Found</div> }
         </div>
         <div className="esper-subsection-footer">
           {
             this.props.busy ?
-            <span>Saving &hellip;</span> :
+            <span>
+              <span className="esper-spinner esper-inline" />
+              {" "}Saving &hellip;
+            </span> :
             <a href={labelSettingsUrl} target="_blank">
               <i className="fa fa-fw fa-cog"></i>
               {" "} Configure Labels
@@ -56,48 +66,41 @@ module Esper.TaskLabels {
     renderLabel(name: string, index: number) {
       var checked = (this.props.task &&
                      _.contains(this.props.task.task_labels, name));
-      var id = this.getId(index.toString());
-      return (<div className="checkbox" key={index.toString() + "-" + name}>
-        <label htmlFor={id}>
-          <input id={id} type="checkbox" className="checkbox"
-            checked={checked} value={name}
-            onChange={this.onLabelClick.bind(this) } />
-          {" "} {name}
-        </label>
-      </div>);
+      return (<a className={this.props.itemClasses}
+                 key={index.toString() + "-" + name}
+                 onClick={() => this.toggle(name) }>
+        <i className={"fa fa-fw " +
+          (checked ? "fa-check-square-o" : "fa-square-o")} />
+        {" "}{name}
+      </a>);
     }
 
-    // Gets a list of labels based on what's checked
+    // Gets a list of labels based on what's already checked
     getLabels(): string[] {
-      var checkedLabels = $.map(this.find("input:checked"), function(elm) {
-        return $(elm).val();
-      });
-
-      /*
-        If we have an existing task and set of labels, preserve any labels
-        not in our list, including task progress labels.
-      */
-      if (this.props.task) {
-        var nonTeamLabels = _.difference(this.props.task.task_labels,
-                                         this.props.team.team_labels);
-        checkedLabels = checkedLabels.concat(nonTeamLabels);
-      }
-
       /*
         Make sure we set a "in progress" label to prevent the "new" label
         from being re-added
       */
-      else {
-        checkedLabels.push(this.props.team.team_label_in_progress);
-      }
-
-      return checkedLabels;
+      return (this.props.task ?
+        this.props.task.task_labels :
+        [this.props.team.team_label_in_progress]
+      );
     }
 
-    protected onLabelClick(e: MouseEvent) {
-      this.props.handleChange(this.getLabels());
+    protected toggle(label: string) {
+      var allLabels = this.getLabels();
+      if (_.contains(allLabels, label)) {
+        allLabels = _.without(allLabels, label);
+      } else {
+        // Concat rather than push so we don't mutate task prop
+        allLabels = allLabels.concat([label]);
+      }
+      this.props.handleChange(allLabels);
     }
   }
+
+
+  /////
 
   /*
     Makes API call for updating labels for a particular eventId. In order to
