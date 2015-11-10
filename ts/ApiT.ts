@@ -92,10 +92,11 @@ module Esper.ApiT {
     company: string;
     company_title: string;
     company_location : string;
-    email_list: LabelledItem[];
-    phone_list: LabelledItem[];
-    address_list: LabelledItem[];
-    custom_list: LabelledItem[];
+    primary_email: string;
+    other_emails: LabelledItem[];
+    phones: LabelledItem[];
+    addresses: LabelledItem[];
+    custom_entries: LabelledItem[];
   }
 
   export interface Profile {

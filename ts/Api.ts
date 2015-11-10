@@ -40,13 +40,21 @@ module Esper.Api {
   export function getDirProfile():
   JQueryPromise<ApiT.DirProfile> {
     var url = prefix + "/api/directory/profile/" + string(Login.myUid());
-    return JsonHttp.get(url);
+    return (JsonHttp.noWarn(function() {
+      return JsonHttp.get(url);
+    }));
   }
 
   export function setDirProfile(dirProfile : ApiT.DirProfile):
   JQueryPromise<void> {
     var url = prefix + "/api/directory/profile/" + string(Login.myUid());
     return JsonHttp.put(url, JSON.stringify(dirProfile));
+  }
+
+  export function removeDirProfile():
+  JQueryPromise<void> {
+    var url = prefix + "/api/directory/profile/" + string(Login.myUid());
+    return JsonHttp.delete_(url);
   }
 
   /* Esper login and password management */
