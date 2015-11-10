@@ -14,19 +14,22 @@ module Esper.DirProfile {
   export var profilePromise = profileDeferred.promise();
 
   export function init() {
-    Login.loginPromise.done(function() {
-      Store.set(null, { dataStatus: Model.DataStatus.FETCHING });
+    Store.set(null, { dataStatus: Model.DataStatus.FETCHING });
 
-      var onFail = function(err: Error) {
-        Store.set(null, { dataStatus: Model.DataStatus.READY });
-        profileDeferred.reject(err);
-      };
+    var onFail = function(err: Error) {
+      Store.set(null, {
+        dataStatus: Model.DataStatus.FETCH_ERROR,
+        lastError: err
+      });
+      profileDeferred.reject(err);
+    };
 
+    Login.loginPromise.then(function() {
       Api.getDirProfile()
         .then(function(dirProfile) {
           Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
           profileDeferred.resolve(dirProfile);
         }, onFail);
-    });
+    }, onFail);
   }
 }

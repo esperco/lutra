@@ -11,6 +11,8 @@ module Esper.Views {
 
   interface ProfileState {
     dirProfile: ApiT.DirProfile;
+    error: Error;
+    hasError: boolean;
     busy: boolean;
   };
 
@@ -18,6 +20,16 @@ module Esper.Views {
     render() {
       if (this.state.busy) {
         return <div className="esper-spinner" />;
+      }
+
+      if (this.state.hasError) {
+        return <div className="container">
+          <div className="well">
+            An error has occurred while fetching your user profile.
+            <br/>
+            {this.state.error}
+          </div>
+        </div>;
       }
 
       var profile = this.state.dirProfile;
@@ -36,17 +48,13 @@ module Esper.Views {
 
     getState() {
       var tuple = DirProfile.Store.get();
-      if (tuple === undefined) {
-        return {
-          dirProfile: null,
-          busy: true
-        };
-      }
       var dirProfile = tuple[0];
       var metadata = tuple[1];
       return {
         dirProfile: dirProfile,
-        busy: metadata && metadata.dataStatus !== Model.DataStatus.READY
+        error: metadata.lastError,
+        hasError: metadata && metadata.dataStatus === Model.DataStatus.FETCH_ERROR,
+        busy: metadata && metadata.dataStatus === Model.DataStatus.FETCHING
       }
     }
   }
