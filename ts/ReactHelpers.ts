@@ -87,7 +87,7 @@ module Esper.ReactHelpers {
     constructor(props: P) {
       super(props);
       this.sources = [];
-      this.state = (<S> this.getState(true));
+      this.state = (<S> this.getState(props));
     }
 
     // Reference to JQuery-wrapped parent node
@@ -116,26 +116,35 @@ module Esper.ReactHelpers {
       this.setSources([]);
     }
 
+    componentWillReceiveProps(nextProps: P) {
+      this.onChange(nextProps);
+    }
+
     // Call to change the sources this component is listening to. Adds and
     // removes listeners as appropriate.
     protected setSources(newSources: Emit.EmitBase[]): void {
-      var self = this;
-      _.each(this.sources || [], function(source) {
-        source.removeChangeListener(self.onChange);
+      _.each(this.sources || [], (source) => {
+        source.removeChangeListener(this.onChange.bind(this));
       });
 
       this.sources = newSources;
-      _.each(this.sources, function(source) {
-        source.addChangeListener(self.onChange);
+      _.each(this.sources, (source) => {
+        source.addChangeListener(this.onChange.bind(this));
       });
     }
 
-    // Callback to trigger from listeners
-    // Implement as arrow function so "this" value is properly referenced
-    protected onChange = (): void => this.setState(<S> this.getState());
+    // Callback to trigger from listeners -- can optionally take new props
+    protected onChange(newProps?: P) {
+      var newState = <S> this.getState(newProps || this.props);
+
+      // React doesn't like null / non-object states, so do a quick check
+      if (newState) {
+        this.setState(newState)
+      }
+    }
 
     // Interface for getting State -- passed a boolean = true if this is
     // called during the initial constructor
-    protected getState(init=false): void|S { return; }
+    protected getState(props: P): S { return; }
   }
 }
