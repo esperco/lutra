@@ -6,6 +6,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Calendars.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -52,9 +53,7 @@ module Esper.Components {
 
     renderCalendars(teamId: string, calendars: ApiT.Calendar[]) {
       return _.map(calendars, (calendar) => {
-        // NB: When we bring in Nylas integration, need to use key other
-        // than google_cal_id
-        var calId = calendar.google_cal_id;
+        var calId = Calendars.getId(calendar);
 
         var classes = ["list-group-item", "one-line"];
         if (this.props.selectedCalId === calId &&

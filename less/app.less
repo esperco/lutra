@@ -4,7 +4,8 @@
 @navbar-height: 50px;
 @navbar-default-bg: @body-bg;
 @navbar-default-border: @brand-bg;
-@navbar-padding-vertical: 10px;
+@navbar-padding-vertical: 15px;
+@navbar-padding-horizontal: 10px;
 
 /* New variables */
 @footer-bg: @brand-bg;
@@ -12,9 +13,10 @@
 @footer-default-link-color: white;
 
 
-/* Page-specific style imports and helper import */
+/* Project-specific imports */
 @import "./_loading";
 @import "./_chart";
+@import "./_calendar";
 
 
 /* Basic Layout */
@@ -42,6 +44,7 @@ body, .footer {
     right: 0;
     max-height: @padding-large-vertical;
     overflow: hidden;
+    z-index: 10;
 
     &:hover, &:focus {
       max-height: 100%;
