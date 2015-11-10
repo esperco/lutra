@@ -21,6 +21,20 @@
         line-height: @input-height-base;
         vertical-align: middle;
       }
+
+      button {
+        border-color: @btn-default-border;
+        color: @btn-default-color;
+        background: @btn-default-bg;
+
+        &.fc-state-active {
+          .btn-default.active;
+        }
+
+        .fc-icon {
+          top: 0;
+        }
+      }
     }
 
     button {
@@ -28,6 +42,17 @@
       height: @input-height-base;
       line-height: @input-height-base;
       vertical-align: middle;
+    }
+
+    .fc-event {
+      &.selectable {
+        cursor: pointer;
+      }
+
+      &.active {
+        background: @btn-primary-bg;
+        border-color: darken(@btn-primary-bg, 5%);
+      }
     }
   }
 }

@@ -19,4 +19,9 @@ module Esper.Calendars {
   export function getId(cal: ApiT.Calendar) {
     return cal.google_cal_id;
   }
+
+  // Same as above, but for events
+  export function getEventId(event: ApiT.CalendarEvent) {
+    return event.google_event_id;
+  }
 }

@@ -15,6 +15,8 @@ module Esper.Components {
   interface CalendarProps {
     teamId: string;
     calId: string;
+    eventId?: string;
+    updateFn: (eventId: string, eventTitle?: string) => void;
   }
 
   interface CalendarState {
@@ -81,14 +83,15 @@ module Esper.Components {
         },
         defaultView: 'agendaWeek',
         snapDuration: "00:15:00",
-        events: this.fetchEvents.bind(this)
+        events: this.fetchEvents.bind(this),
+        eventClick: this.selectEvent.bind(this)
       });
     }
 
-    componentDidUpdate(prevProps: CalendarProps) {
-      // Important to do an equality check beforehand to avoid infinite
-      // callstack from fetchEvents updating busy state
-      if (! _.eq(this.props, prevProps)) {
+    componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
+      // Important to do an equality check before calling refetchEvents to
+      // avoid infinite callstack from fetchEvents updating busy state
+      if (!_.eq(this.props, prevProps)) {
         $(React.findDOMNode(this._fcDiv)).fullCalendar('refetchEvents');
       }
     }
@@ -122,13 +125,16 @@ module Esper.Components {
         }
 
         callback(_.map(result.events, (event): FullCalendar.EventObject => {
+          var eventId = Calendars.getEventId(event);
+          var selected = this.props.eventId === eventId;
           return {
-            id: event.google_event_id,
+            id: eventId,
             title: event.title || "",
             allDay: event.all_day,
             start: this.adjustTz(event.start.local),
             end: this.adjustTz(event.end.local),
-            editable: false
+            editable: false,
+            className: (selected ? "active" : "selectable")
           };
         }));
       }).fail(() => {
@@ -151,6 +157,13 @@ module Esper.Components {
     adjustTz(timestamp: string) {
       var calendar = Calendars.get(this.props.teamId, this.props.calId);
       return moment.tz(timestamp, calendar.calendar_timezone).toDate()
+    }
+
+    // Handle event selection
+    selectEvent(event: FullCalendar.EventObject) {
+      // Completely replace previous eventIds -- i.e. currently only support
+      // selection of a single event. We may want to revisit in the future.
+      this.props.updateFn(event.id, event.title);
     }
   }
 }

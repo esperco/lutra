@@ -1,5 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
+/// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.Calendar.tsx" />
 
 module Esper.Views {
@@ -7,17 +8,35 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Store for currently selected team and calendar
+  // Store for currently selected team, calendar, and event
   interface CalSelection {
     teamId: string;
     calId: string;
+    eventId?: string;
+    eventTitle?: string;
   }
   var calSelectStore = new Model.StoreOne<CalSelection>();
 
-  // Action to update our selection -- also triggers async calls
+  // Action to update our selection
   function updateSelection(teamId: string, calId: string) {
     var current = calSelectStore.val();
-    calSelectStore.set({teamId: teamId, calId: calId});
+
+    // Update only if calendar doesn't match (to avoid clobbering eventId)
+    if (!current || current.teamId !== teamId || current.calId !== calId) {
+      calSelectStore.set({teamId: teamId, calId: calId});
+    }
+  }
+
+  function updateEvent(eventId: string, eventTitle?: string) {
+    calSelectStore.set(function(oldData) {
+      var newData = _.cloneDeep(oldData);
+      newData.eventId = eventId;
+      newData.eventTitle = eventTitle;
+      return newData;
+    });
+
+    // Trigger async calls
+    ApiC.getTaskListForEvent(eventId, false, false);
   }
 
   ////
@@ -41,6 +60,7 @@ module Esper.Views {
               selectedTeamId={selectedTeamId}
               selectedCalId={selectedCalId}
               updateFn={updateSelection} />
+            {this.renderLabelEditor()}
           </div>
           <div className="col-sm-9 col-lg-10 esper-right-content padded">
             {this.renderCalendar()}
@@ -60,6 +80,8 @@ module Esper.Views {
       return <Components.Calendar
         teamId={this.state.selectedCal.teamId}
         calId={this.state.selectedCal.calId}
+        eventId={this.state.selectedCal.eventId}
+        updateFn={updateEvent}
       />;
     }
 
@@ -71,6 +93,19 @@ module Esper.Views {
           </div>
         </div>
       </div>;
+    }
+
+    renderLabelEditor() {
+      if (this.state.selectedCal && this.state.selectedCal.eventId) {
+        return <Components.LabelEditor
+          teamId={this.state.selectedCal.teamId}
+          calId={this.state.selectedCal.calId}
+          eventId={this.state.selectedCal.eventId}
+          eventTitle={this.state.selectedCal.eventTitle}
+        />;
+      } else {
+        return <span />;
+      }
     }
 
     componentDidMount() {
