@@ -637,7 +637,7 @@ module Esper.Onboarding {
       [index: string]: TeamForm
     };
 
-    protected getState(init = false): CalendarSlideState {
+    protected getState(): CalendarSlideState {
       var calData = this.props.data.calendarQuery.get();
       var teamData = this.props.data.teamStore.getAll();
       return {
@@ -889,7 +889,7 @@ module Esper.Onboarding {
       super(props);
     }
 
-    getState(init=false) {
+    getState() {
       return {
         nameHasError: false,
         emailHasError: false
