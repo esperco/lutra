@@ -55,33 +55,40 @@ module Esper.Components {
   }
 
   export class LabelEditor
-    extends Component<LabelEditorProps, {}>
+    extends Component<LabelEditorProps, LabelEditorState>
   {
     render() {
-      return <div>
-        { this.renderContent() }
+      return <div className="esper-borderless-section">
+        <h4 className="esper-header">
+          <i className="fa fa-fw fa-tags"></i>{" "}
+          Select Labels
+        </h4>
+        <div className="esper-content">
+          <h5 className="esper-subheader">{this.props.eventTitle}</h5>
+          { this.renderContent() }
+        </div>
       </div>;
     }
 
     renderContent() {
-      var store = ApiC.getTaskListForEvent.store;
-      var keyStr = this.getStoreKey();
-      var metadata = store.metadata(keyStr);
-      var dataStatus = metadata && metadata.dataStatus;
-
-      if (dataStatus === Model.DataStatus.FETCHING) {
-        return <div className="esper-spinner"></div>;
+      if (this.state.dataStatus === Model.DataStatus.FETCHING) {
+        return <div className="esper-spinner esper-medium"></div>;
       }
 
-      if (dataStatus === Model.DataStatus.PUSH_ERROR ||
-          dataStatus === Model.DataStatus.FETCH_ERROR) {
-        return <div>Error</div>;
+      if (this.state.dataStatus === Model.DataStatus.PUSH_ERROR ||
+          this.state.dataStatus === Model.DataStatus.FETCH_ERROR) {
+        return <div className="alert alert-danger">
+          <i className="fa fa-fw fa-warning" />{" "}
+          Whoops. Something went wrong. Please try again later.
+        </div>;
       }
 
       return <TaskLabels.LabelList
+        listClasses="list-group"
+        itemClasses="list-group-item"
         team={Teams.get(this.props.teamId)}
-        task={this.getTask()}
-        busy={dataStatus === Model.DataStatus.INFLIGHT}
+        task={this.state.task}
+        busy={this.state.dataStatus === Model.DataStatus.INFLIGHT}
         handleChange={this.handleLabelChange.bind(this)}
       />;
     }
@@ -98,11 +105,14 @@ module Esper.Components {
         [this.props.eventId, false, false]);
     }
 
-    getTask() {
+    getState(props: LabelEditorProps): LabelEditorState {
       var store = ApiC.getTaskListForEvent.store;
       var keyStr = this.getStoreKey();
       var metadata = store.metadata(keyStr);
       var dataStatus = metadata && metadata.dataStatus;
+      if (dataStatus === undefined) {
+        dataStatus = Model.DataStatus.READY
+      }
 
       var task: ApiT.Task|ApiT.NewTask = metadata &&
         _.find(store.val(keyStr), (t) => {
@@ -114,9 +124,14 @@ module Esper.Components {
                                 this.props.eventId);
 
       // Create NewTask object if not task
-      return task || {
+      task = task || {
         task_title: this.props.eventTitle,
         task_progress: "In_progress"
+      };
+
+      return {
+        task: task,
+        dataStatus: dataStatus
       };
     }
 
@@ -125,7 +140,7 @@ module Esper.Components {
       // Mark as busy, update our local source of truth
       var key = this.getStoreKey();
       var store = ApiC.getTaskListForEvent.store;
-      var task = this.getTask();
+      var task = this.state.task;
       var hasTaskId = false;
       if (!! ((task as ApiT.Task).taskid)) {
         hasTaskId = true;
@@ -154,9 +169,9 @@ module Esper.Components {
       // Get a promise that resolves to a task
       var p: JQueryPromise<ApiT.Task>;
       if (hasTaskId) {
-        var dfd = $.Deferred<ApiT.Task>();
-        p = dfd.promise();
-        dfd.resolve(task as ApiT.Task);
+        p = $.Deferred<ApiT.Task>()
+             .resolve(task as ApiT.Task)
+             .promise();
       } else {
         p = Api.obtainTaskForEvent(
           this.props.teamId,
@@ -166,16 +181,6 @@ module Esper.Components {
         );
       }
 
-      // Define failure handling
-      function handleFail(err: Error) {
-        store.upsert(key, (taskList, meta) => {
-          var meta = _.clone(meta) || {};
-          meta.dataStatus = Model.DataStatus.PUSH_ERROR;
-          meta.lastError = err;
-          return [taskList, meta];
-        });
-      }
-
       // Create task after getting a taskId
       p.then((task) => {
         var promise = TaskLabels.putLabels(task.taskid,
@@ -183,18 +188,34 @@ module Esper.Components {
 
         /*
           If we get a promise back, that means there were no prior pending
-          calls and we should attach a promise to handle saves completing
+          calls and we should pass along the promise with a bool indicating
+          we should update save status when it's complete. Otherwise, pass
+          along false to signal that we should ignore / defer to the callback
+          on the earlier promise.
         */
         if (promise) { // No existing call, set up post handlers
-          promise.then(function() {
-            store.upsert(key, (taskList, meta) => {
-              var meta = _.clone(meta) || {};
-              meta.dataStatus = Model.DataStatus.READY;
-              return [taskList, meta];
-            });
-          }, handleFail);
+          return promise.then(() => true);
+        } else {
+          return false;
         }
-      }, handleFail);
+      })
+
+      .then((update: boolean) => {
+        if (update) {
+          store.upsert(key, (taskList, meta) => {
+            var meta = _.clone(meta) || {};
+            meta.dataStatus = Model.DataStatus.READY;
+            return [taskList, meta];
+          });
+        }
+      }, (err: Error) => {
+        store.upsert(key, (taskList, meta) => {
+          var meta = _.clone(meta) || {};
+          meta.dataStatus = Model.DataStatus.PUSH_ERROR;
+          meta.lastError = err;
+          return [taskList, meta];
+        });
+      });
     }
   }
 }
