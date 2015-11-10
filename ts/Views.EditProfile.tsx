@@ -8,9 +8,9 @@ module Esper.Views {
   interface stateStuff {
     header: string;
     display_name: string;
-    more_names_list: ApiT.LabelledItem[];
+    other_names: ApiT.LabelledItem[];
     primary_email: string;
-    more_emails_list: ApiT.LabelledItem[];
+    other_emails: ApiT.LabelledItem[];
   }
 
   interface propStuff {
@@ -20,6 +20,7 @@ module Esper.Views {
 
   export class EditProfile extends Component<propStuff, stateStuff> {
     constructor(props : propStuff) {
+
       super(props);
       var dirProfile = this.props.dirProfile;
       var esperProfile = this.props.esperProfile;
@@ -27,71 +28,146 @@ module Esper.Views {
         this.state = {
           header: "Edit Profile",
           display_name: dirProfile.display_name,
-          more_names_list: dirProfile.more_names_list,
+          other_names: dirProfile.other_names,
           primary_email: dirProfile.primary_email,
-          more_emails_list: dirProfile.more_emails_list,
+          other_emails: dirProfile.other_emails,
         };
       } else if (esperProfile !== undefined) {
-        var otherEmails : ApiT.LabelledItem[] = [];
+        var otherEmails: ApiT.LabelledItem[] = [];
         esperProfile.other_emails.map(function(e) {
           var x = { label: "", item: e };
           otherEmails.push(x);
         });
-        
+
         this.state = {
           header: "Create New Profile",
           display_name: esperProfile.display_name,
-          more_names_list: otherEmails,
+          other_names: otherEmails,
           primary_email: esperProfile.email,
-          more_emails_list: otherEmails
+          other_emails: otherEmails
         };
       } else { //shouldn't happen
         this.state = {
           header: "Create New Profile",
           display_name: "",
-          more_names_list: [],
+          other_names: [],
           primary_email: "",
-          more_emails_list: []
+          other_emails: []
         };
       }
     }
 
-    entryHTML() {
-      return <div className="input-group">
-        <span className="input-group-addon">Display Name</span>
-        <input type="text" className="form-control" />
-        <div className="input-group-btn">
-          <button className="btn btn-default" type="button">
-            &nbsp; <span className="glyphicon glyphicon-plus"></span>
-          </button>
-        </div>
-      </div>;
+    newName() {
+      var name = { label: "", item: "" };
+      this.setState(function(oldState) {
+        return {
+          header: oldState.header,
+          display_name: oldState.display_name,
+          other_names: oldState.other_names.concat([name]),
+          primary_email: oldState.primary_email,
+          other_emails: oldState.other_emails
+        };
+      });
+    }
+
+    removeName(i : number) {
+      this.setState(function(oldState) {
+        var names = oldState.other_names.slice();
+        delete names[i];
+        return {
+          header: oldState.header,
+          display_name: oldState.display_name,
+          other_names: names,
+          primary_email: oldState.primary_email,
+          other_emails: oldState.other_emails
+        };
+      });
+    }
+
+    newEmail() {
+      var email = { label: "", item: "" };
+      this.setState(function(oldState) {
+        return {
+          header: oldState.header,
+          display_name: oldState.display_name,
+          other_names: oldState.other_names,
+          primary_email: oldState.primary_email,
+          other_emails: oldState.other_emails.concat([email])
+        };
+      });
+    }
+
+    removeEmail(i: number) {
+      this.setState(function(oldState) {
+        var emails = oldState.other_emails.slice();
+        delete emails[i];
+        return {
+          header: oldState.header,
+          display_name: oldState.display_name,
+          other_names: oldState.other_names,
+          primary_email: oldState.primary_email,
+          other_emails: emails
+        };
+      });
     }
 
     render() {
+      var thisArg = this;
+      var names = _.map(this.state.other_names, function(name, i) {
+        if (name !== undefined) {
+          return <div className="input-group">
+            <span className="input-group-addon">Display Name</span>
+            <input type="text" className="form-control"
+              defaultValue={name.item}/>
+            <div className="input-group-btn">
+              <button className="btn btn-default" onClick={() => thisArg.removeName(i) }>
+                &nbsp;<span className="glyphicon glyphicon-minus"></span>
+              </button>
+            </div>
+          </div>;
+        }
+      });
+
+      var emails = _.map(this.state.other_emails, function(email,i) {
+        if (email !== undefined) {
+          return <div className="input-group">
+            <span className="input-group-addon">Email</span>
+            <input type="text" className="form-control"
+              defaultValue={email.item}/>
+            <div className="input-group-btn">
+              <button className="btn btn-default" onClick={() => thisArg.removeEmail(i)}>
+                &nbsp;<span className="glyphicon glyphicon-minus"></span>
+              </button>
+            </div>
+          </div>;
+        }
+      });
+
       return <div className="container">
         <h1>{this.state.header}</h1>
         <div><br/></div>
-        <div className="input-group name">
+        <div className="input-group">
           <span className="input-group-addon">Display Name</span>
           <input type="text" className="form-control" 
             defaultValue={this.state.display_name}/>
           <div className="input-group-btn">
-            <button className="btn btn-default" type="button">
+            <button className="btn btn-default" type="button" onClick={() => this.newName()}>
               &nbsp;<span className="glyphicon glyphicon-plus"></span>
             </button>
           </div>
         </div>
+        {names}
         <div><br/></div>
         <div className="input-group">
           <span className="input-group-addon">Email</span>
           <input type="text" className="form-control" defaultValue={this.state.primary_email}/>
           <div className="input-group-btn">
-            <button className="btn btn-default" type="button">
+            <button className="btn btn-default" onClick={() => this.newEmail() } >
               &nbsp;<span className="glyphicon glyphicon-plus"></span>
             </button>
           </div>
         </div>
+        {emails}
         <div><br/></div>
         <div className="input-group">
           <span className="input-group-addon">Company</span>
