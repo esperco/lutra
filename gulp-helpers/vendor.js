@@ -78,7 +78,11 @@ module.exports = function(gulp) {
         ret = ret.pipe(sourcemaps.init({loadMaps: true}))
 
           // Minimization
-          .pipe(uglify()).on("error", gutil.log)
+          .pipe(uglify({
+            output: {
+              "ascii_only": true
+            }
+          })).on("error", gutil.log)
 
           // Write sourcemap to external file
           .pipe(sourcemaps.write("./"));
