@@ -80,7 +80,7 @@ module Esper.ApiC {
     // OK to use any type for purpose of constructing our new function
     // since it'll be converted back to strongly typed when returned.
     var ret: any = function(/* varargs */) {
-      var key = strFunc(arguments);
+      var key = strFunc(_.toArray<any>(arguments));
 
       // If existing promise pending, return that
       var promise = promises[key];
