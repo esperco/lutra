@@ -39,8 +39,24 @@ module Esper.Views {
   // Store for currently selected interval
   var intervalSelectStore = new Model.StoreOne<TimeStats.Interval>();
 
-  // Default
-  intervalSelectStore.set(TimeStats.Interval.WEEKLY);
+  // Set some defaults
+  function setDefaults() {
+    var callAsync = false;
+
+    if (! intervalSelectStore.isSet()) {
+      intervalSelectStore.set(TimeStats.Interval.WEEKLY);
+      callAsync = true;
+    }
+
+    if (! calSelectStore.isSet()) {
+      calSelectStore.set(Calendars.defaultSelection());
+      callAsync = true;
+    }
+
+    if (callAsync) {
+      updateAsync();
+    }
+  }
 
   // Hard-coded (for now) total number of intervals
   var NUM_INTERVALS = 5;
@@ -77,6 +93,9 @@ module Esper.Views {
       labels: labels
     });
   }
+
+
+  ////////
 
   // Track view
   interface TimeStatsView extends TimeStats.StatRequest {
@@ -129,6 +148,11 @@ module Esper.Views {
   }
 
   export class LabelsOverTime extends Component<{}, LabelsOverTimeState> {
+    constructor(props: {}) {
+      setDefaults();
+      super(props);
+    }
+
     render() {
       if (this.state.selectedCal) {
         var selectedTeamId = this.state.selectedCal.teamId;
