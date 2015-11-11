@@ -21,3 +21,4 @@
 /// <reference path="analytics-node/analytics-node.d.ts" />
 /// <reference path="typeahead/typeahead.d.ts" />
 /// <reference path="chartjs/chart.d.ts" />
+/// <reference path="filepicker-js/filepicker-js.d.ts" />
