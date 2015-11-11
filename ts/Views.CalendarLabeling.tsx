@@ -39,6 +39,13 @@ module Esper.Views {
     ApiC.getTaskListForEvent(eventId, false, false);
   }
 
+  function setDefaults() {
+    if (! calSelectStore.isSet()) {
+      calSelectStore.set(Calendars.defaultSelection());
+    }
+  }
+
+
   ////
 
   interface CalendarLabelingState {
@@ -46,6 +53,11 @@ module Esper.Views {
   }
 
   export class CalendarLabeling extends Component<{}, CalendarLabelingState> {
+    constructor(props: {}) {
+      setDefaults();
+      super(props);
+    }
+
     render() {
       if (this.state.selectedCal) {
         var selectedTeamId = this.state.selectedCal.teamId;

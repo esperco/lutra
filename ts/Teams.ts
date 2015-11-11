@@ -14,4 +14,9 @@ module Esper.Teams {
       );
     }
   }
+
+  export function all(): ApiT.Team[] {
+    var loginInfo = Login.InfoStore.val();
+    return (loginInfo && loginInfo.teams) || [];
+  }
 }
