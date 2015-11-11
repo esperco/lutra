@@ -216,6 +216,7 @@ type token_response = [
     title?: string;
     description?: string;
     description_messageids: string[];
+    labels: string[];
     location?: Location;
     all_day?: boolean;
     guests: Attendee[];
@@ -236,6 +237,7 @@ type token_response = [
     title?: string;
     description?: string;
     description_messageids?: string[];
+    labels?: string[];
     location?: Location;
     all_day?: boolean;
     guests: Guest[];

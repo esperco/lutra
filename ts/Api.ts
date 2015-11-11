@@ -980,6 +980,16 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function updateIndividualEvent(calendar_id: string,
+                                        event_id: string,
+                                        event: ApiT.CalendarEventEdit:
+  JQueryPromise<ApiT.CalendarEventOpt> {
+    var url = prefix + "/api/calendar/event/edit/" + string(Login.myUid())
+            + "/" + encodeURIComponent(calendar_id)
+            + "/" + encodeURIComponent(event_id);
+    return JsonHttp.post(url, JSON.stringify(event));
+  }
+
   export function updateGoogleEvent(teamid: string,
                                     alias: string,
                                     eventid: string,
