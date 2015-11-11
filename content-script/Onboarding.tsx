@@ -706,8 +706,8 @@ module Esper.Onboarding {
       var calendars = (calData && calData.calendars) || [];
 
       return {
-        busy: (!calendars.length &&
-               calMeta.dataStatus !== Model.DataStatus.READY),
+        busy: !calendars.length &&
+              !(calMeta && calMeta.dataStatus !== Model.DataStatus.READY),
         blocked: false
       };
     },
