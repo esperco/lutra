@@ -12,7 +12,7 @@
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/Query.ts" />
+/// <reference path="../marten/ts/ApiC.ts" />
 /// <reference path="./Auth.ts" />
 
 module Esper.Onboarding {
@@ -43,41 +43,6 @@ module Esper.Onboarding {
 
 
   //////////////
-
-  // Query manager for getting calendars for the *current* user -- must be
-  // initialized with reference to a store of calendars
-  class CalendarQuery extends Query.Manager<{}, ApiT.Calendar[]> {
-    store: Model.StoreOne<ApiT.Calendars>;
-
-    constructor(store: Model.StoreOne<ApiT.Calendars>) {
-      super([store]);
-      this.store = store;
-    }
-
-    getAsync(): JQueryPromise<any> {
-      var store = this.store;
-      return Api.getCalendarList()
-        .then(function(calendars) {
-          store.set(calendars);
-        });
-    }
-
-    getData(): ApiT.Calendar[] {
-      var val = this.store.val();
-      return val && (val.calendars || []);
-    }
-
-    // Only fetch async if no data -- unlikely calendars have changed in
-    // between calls
-    shouldGetAsync(data, key): boolean {
-      return !data;
-    }
-
-    // Only one set of calendars to return, so always empty object as key
-    get() {
-      return super.get({});
-    }
-  }
 
   // Interface for team creation requests
   enum TeamRequestError {
@@ -156,8 +121,6 @@ module Esper.Onboarding {
 
   export class OnboardingModal
       extends ReactHelpers.Component<OnboardingModalProps, ModalState> {
-    private calendarStore: Model.StoreOne<ApiT.Calendars>;
-    private calendarQuery: CalendarQuery;
     private teamStore: TeamStore;
     private supportsExecutive: Model.StoreOne<boolean>;
 
@@ -170,10 +133,6 @@ module Esper.Onboarding {
         to this component instance so they get cleaned up when the onboarding
         flow is complete.
       */
-
-      // Store and query for accessing calendars this user has access to
-      this.calendarStore = new Model.StoreOne<ApiT.Calendars>();
-      this.calendarQuery = new CalendarQuery(this.calendarStore);
 
       // Store of pending / completed requests to create new teams
       this.teamStore = new TeamStore();
@@ -201,7 +160,6 @@ module Esper.Onboarding {
         },
 
         data: {
-          calendarQuery: this.calendarQuery,
           teamStore: this.teamStore,
           supportsExecutive: this.supportsExecutive
         }
@@ -271,7 +229,6 @@ module Esper.Onboarding {
   }
 
   interface DataSources {
-    calendarQuery: CalendarQuery;
     teamStore: TeamStore;
     supportsExecutive: Model.StoreOne<boolean>;
   }
@@ -637,12 +594,20 @@ module Esper.Onboarding {
       [index: string]: TeamForm
     };
 
+    constructor(props: SlideProps) {
+      ApiC.getCalendarList(); // Async call to populate stores
+      super(props);
+    }
+
     protected getState(): CalendarSlideState {
-      var calData = this.props.data.calendarQuery.get();
+      var key = ApiC.getCalendarList.strFunc([]);
+      var calData = ApiC.getCalendarList.store.val(key);
+      var calMeta = ApiC.getCalendarList.store.metadata(key);
       var teamData = this.props.data.teamStore.getAll();
       return {
-        calendars: calData[0],
-        calendarsUpdating: calData[1].updateInProgress,
+        calendars: calData && calData.calendars,
+        calendarsUpdating: !(calMeta &&
+                             calMeta.dataStatus === Model.DataStatus.READY),
         teamRequests: _.sortBy(teamData, function(team) {
           return team[0].createdOn;
         })
@@ -689,7 +654,7 @@ module Esper.Onboarding {
           />;
         });
         return (<div>
-          { supportsExecutive ? 
+          { supportsExecutive ?
             <div className="well">
               Thanks! We need to link the individuals you support to their
               respective calendars. Please add each individual you support to
@@ -707,7 +672,7 @@ module Esper.Onboarding {
           }
           { teamForms }
           <div>
-            { supportsExecutive ? 
+            { supportsExecutive ?
               <button className="btn btn-secondary"
                       onClick={this.addExec.bind(this)}>
                 <i className="fa fa-fw fa-plus"></i> Add Another Executive
@@ -724,7 +689,7 @@ module Esper.Onboarding {
 
     componentDidMount() {
       this.setSources([
-        this.props.data.calendarQuery,
+        ApiC.getCalendarList.store,
         this.props.data.teamStore
       ]);
     }
@@ -735,18 +700,20 @@ module Esper.Onboarding {
     title: "Set Up Calendars",
 
     getState: function(instance: SlideWrapper) {
-      var calData = instance.props.data.calendarQuery.get();
-      var calendars = calData[0] || [];
-      var calMetadata = calData[1];
+      var key = ApiC.getCalendarList.strFunc([]);
+      var calData = ApiC.getCalendarList.store.val(key);
+      var calMeta = ApiC.getCalendarList.store.metadata(key);
+      var calendars = (calData && calData.calendars) || [];
 
       return {
-        busy: !calendars.length && calMetadata.updateInProgress,
+        busy: (!calendars.length &&
+               calMeta.dataStatus !== Model.DataStatus.READY),
         blocked: false
       };
     },
 
     getSources: function(instance: SlideWrapper) {
-      return [instance.props.data.calendarQuery];
+      return [ApiC.getCalendarList.store];
     },
 
     next: function(instance: SlideWrapper) {
