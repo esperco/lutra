@@ -11,7 +11,9 @@ module Esper.Conf {
     "https://app.esper.com",
     "https://time.esper.com",
     "https://directory.esper.com",
-    "https://dir.esper.com"
+    "https://dir.esper.com",
+    "https://time.staging.esper.com",
+    "https://dir.staging.esper.com"
   ];
 }
 
