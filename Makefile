@@ -28,7 +28,10 @@ clean:
 # Copy pub/ into S3 bucket, do a make prod before hand to ensure that only
 # production version is installed and we don't accidentally install dev
 s3: prod
-	./s3-install
+	./marten/s3-install.sh pub dir.esper.com
+
+staging: prod
+	./marten/s3-install.sh pub dir.staging.esper.com
 
 # Check Marten repo is up to date
 check-marten:
