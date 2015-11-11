@@ -104,7 +104,11 @@ module.exports = function(gulp) {
         if (config.production) {
           // loadMaps = true so we can load tsify/browserify sourcemaps
           ret = ret
-            .pipe(uglify())
+            .pipe(uglify({
+              output: {
+                "ascii_only": true
+              }
+            }))
             // External sourcemaps so we don't defeat the purpose of uglifying
             .pipe(sourcemaps.write("./"));
         } else {
