@@ -26,14 +26,10 @@ module Esper.CalendarsTab {
         viewBox.prop("checked", true);
       if (cal.calendar_default_write)
         writeBox.prop("checked", true);
-      if (cal.calendar_default_dupe) {
+      if (cal.calendar_default_dupe)
         dupeBox.prop("checked", true);
-        viewBox.prop("checked", true).prop("disabled", true);
-      }
-      if (cal.calendar_default_agenda) {
+      if (cal.calendar_default_agenda)
         agendaBox.prop("checked", true);
-        viewBox.prop("checked", true).prop("disabled", true);
-      }
 
       csvButton.click(function() {
         var now = new Date();
