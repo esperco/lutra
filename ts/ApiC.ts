@@ -2,6 +2,7 @@
   Caching for API calls
 */
 
+/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="./Api.ts" />
 /// <reference path="./Model.Capped.ts" />
 /// <reference path="./Util.ts" />
@@ -24,7 +25,7 @@ module Esper.ApiC {
     store?: Model.CappedStore<T>;
 
     // Function for converting arguments to API function to string id
-    strFunc?: (...args: any[]) => string;
+    strFunc?: (args: any[]) => string;
 
     // Cache timeout in milliseconds
     timeout?: number;
@@ -32,7 +33,7 @@ module Esper.ApiC {
 
   interface HasStore<T> {
     store: Model.CappedStore<T>;
-    strFunc: (...args: any[]) => string;
+    strFunc: (args: any[]) => string;
   }
 
   /*
@@ -168,7 +169,9 @@ module Esper.ApiC {
 
   export var getCalendarList = makeC
     <typeof Api.getCalendarList, ApiT.Calendars>
-    (Api.getCalendarList);
+    (Api.getCalendarList, {
+      strFunc: (args: any[]) => ["calendar-list"].concat(args).join(" ")
+    });
 
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>
