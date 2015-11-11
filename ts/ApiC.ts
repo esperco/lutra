@@ -166,16 +166,20 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
-  export var postForCalendarStats = makeC
-    <typeof Api.postForCalendarStats, ApiT.CalendarStatsResult>
-    (Api.postForCalendarStats, {
-      store: new Model.CappedStore<ApiT.CalendarStatsResult>()
-    });
+  export var getCalendarList = makeC
+    <typeof Api.getCalendarList, ApiT.Calendars>
+    (Api.getCalendarList);
 
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>
     (Api.postCalendar, {
       store: new Model.CappedStore<ApiT.CalendarEventList>()
+    });
+
+  export var postForCalendarStats = makeC
+    <typeof Api.postForCalendarStats, ApiT.CalendarStatsResult>
+    (Api.postForCalendarStats, {
+      store: new Model.CappedStore<ApiT.CalendarStatsResult>()
     });
 
   export var getTaskListForEvent = makeC
