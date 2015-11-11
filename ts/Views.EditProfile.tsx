@@ -55,6 +55,10 @@ module Esper.Views {
       }
     }
 
+    componentDidMount() {
+      this.find('.dropdown-toggle').dropdown();
+    }
+
     // Name Helpers
     newName = () => {
       var name = {label:"", item:""};
@@ -197,6 +201,7 @@ module Esper.Views {
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
+        <label>Name</label>
         <div className="input-group">
           <span className="input-group-addon">*Display Name:</span>
           <input type="text" className="form-control" onChange={(e) => this.handleDisplayName(e)}
@@ -209,6 +214,7 @@ module Esper.Views {
         </div>
         {this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, "Add name description")}
         <div><br/></div>
+        <label>Email</label>
         <div className="input-group">
           <span className="input-group-addon">*Email:</span>
           <input type="text" className="form-control"
@@ -221,6 +227,7 @@ module Esper.Views {
         </div>
         {this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, "Add name description")}
         <div><br/></div>
+        <label>Company Info</label>
         <div className="input-group">
           <span className="input-group-addon">Company:</span>
           <input type="text" className="form-control"/>
@@ -233,6 +240,41 @@ module Esper.Views {
           <span className="input-group-addon">Company Location:</span>
           <input type="text" className="form-control"/>
         </div>
+        <div><br/></div>
+        <label>Phone</label>
+        <div className="row">
+          <div className="col-xs-2">
+            <div className="input-group">
+              <input type="text" className="form-control"/>
+              <div className="input-group-btn">
+                <button className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  &nbsp;<span className="caret"></span>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-right">
+                  <li><a href="#">Mobile</a></li>
+                  <li><a href="#">Work</a></li>
+                  <li><a href="#">Home</a></li>
+                  <li><a href="#">Custom</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="col-xs-10">
+            <div className="input-group">
+              <input type="text" className="form-control"/>
+              <div className="input-group-btn">
+                <button className="btn btn-default" onClick={() => this.newEmail() } >
+                  &nbsp;<span className="glyphicon glyphicon-plus"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/*this.renderList(this.state.phones, this.handlePhoneLabel, this.handlePhoneItem, this.removePhone, "Phone description")}
+        <div><br/></div>
+        {//this.renderList(this.state.addresses, this.handleAddressLabel, this.handleAddressItem, this.removeAddress, "Address description")}
+        <div><br/></div>
+        {//this.renderList(this.state.custom_entries, this.handleCustomLabel, this.handleCustomItem, this.removeCustom, "Phone description")*/}
         <div><br/></div>
         <button className="btn btn-primary"
           onClick={() => this.saveProfile()}>Save</button>
