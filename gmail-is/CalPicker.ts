@@ -792,7 +792,8 @@ module Esper.CalPicker {
       description_messageids: [],
       location: { title: "", address: eventLocation.val() },
       guests: [],
-      all_day: isFullDay
+      all_day: isFullDay,
+      labels: []
     };
     return event;
   }
