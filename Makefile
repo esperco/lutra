@@ -31,7 +31,7 @@ s3: prod
 	./marten/s3-install.sh pub dir.esper.com
 
 staging: prod
-	./marten/s3-install.sh pub dir.staging.esper.com
+	./marten/s3-install.sh pub dir-staging.esper.com
 
 # Check Marten repo is up to date
 check-marten:
