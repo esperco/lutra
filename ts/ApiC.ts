@@ -2,6 +2,7 @@
   Caching for API calls
 */
 
+/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="./Api.ts" />
 /// <reference path="./Model.Capped.ts" />
 /// <reference path="./Util.ts" />
@@ -24,7 +25,7 @@ module Esper.ApiC {
     store?: Model.CappedStore<T>;
 
     // Function for converting arguments to API function to string id
-    strFunc?: (...args: any[]) => string;
+    strFunc?: (args: any[]) => string;
 
     // Cache timeout in milliseconds
     timeout?: number;
@@ -32,7 +33,7 @@ module Esper.ApiC {
 
   interface HasStore<T> {
     store: Model.CappedStore<T>;
-    strFunc: (...args: any[]) => string;
+    strFunc: (args: any[]) => string;
   }
 
   /*
@@ -79,7 +80,7 @@ module Esper.ApiC {
     // OK to use any type for purpose of constructing our new function
     // since it'll be converted back to strongly typed when returned.
     var ret: any = function(/* varargs */) {
-      var key = strFunc(arguments);
+      var key = strFunc(_.toArray<any>(arguments));
 
       // If existing promise pending, return that
       var promise = promises[key];
@@ -166,16 +167,22 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
-  export var postForCalendarStats = makeC
-    <typeof Api.postForCalendarStats, ApiT.CalendarStatsResult>
-    (Api.postForCalendarStats, {
-      store: new Model.CappedStore<ApiT.CalendarStatsResult>()
+  export var getCalendarList = makeC
+    <typeof Api.getCalendarList, ApiT.Calendars>
+    (Api.getCalendarList, {
+      strFunc: (args: any[]) => ["calendar-list"].concat(args).join(" ")
     });
 
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>
     (Api.postCalendar, {
       store: new Model.CappedStore<ApiT.CalendarEventList>()
+    });
+
+  export var postForCalendarStats = makeC
+    <typeof Api.postForCalendarStats, ApiT.CalendarStatsResult>
+    (Api.postForCalendarStats, {
+      store: new Model.CappedStore<ApiT.CalendarStatsResult>()
     });
 
   export var getTaskListForEvent = makeC
