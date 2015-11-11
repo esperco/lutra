@@ -982,7 +982,7 @@ module Esper.Api {
 
   export function updateIndividualEvent(calendar_id: string,
                                         event_id: string,
-                                        event: ApiT.CalendarEventEdit:
+                                        event: ApiT.CalendarEventEdit):
   JQueryPromise<ApiT.CalendarEventOpt> {
     var url = prefix + "/api/calendar/event/edit/" + string(Login.myUid())
             + "/" + encodeURIComponent(calendar_id)
