@@ -74,8 +74,12 @@ module Esper.Login {
     };
     Store.set(storedLoginKey, stored);
 
-    // Identify in analytics, then post credentials AFTER alias compeltes
+    // Identify in analytics, then post credentials AFTER alias completes
     Analytics.identify(info, true, postCredentials);
+
+    // Post credentials again after timeout in case analytics errors
+    // Posting credentials twice shouldn't cause any errors
+    setTimeout(postCredentials, 2000);
   };
 
   export function clearLoginInfo() {
