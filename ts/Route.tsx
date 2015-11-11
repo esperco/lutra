@@ -38,12 +38,14 @@ module Esper.Route {
   });
 
   pageJs("/edit-profile", loginRequired, profileRequired, function() {
-    Layout.render(<Views.EditProfile esperProfile={undefined} dirProfile={Login.dirProfile.val()}/>);
+    Layout.render(<Views.EditProfile header="Edit Profile" esperProfile={undefined} 
+      dirProfile={Login.dirProfile.val()}/>);
   });
 
   pageJs("/edit-profile-new", loginRequired, function() {
     Api.getMyProfile().done(function(profile) {
-      Layout.render(<Views.EditProfile esperProfile={profile} dirProfile={undefined} />);
+      Layout.render(<Views.EditProfile header="Create New Profile"
+        esperProfile={profile} dirProfile={undefined} />);
     });
   });
 
