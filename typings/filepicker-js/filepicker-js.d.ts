@@ -65,35 +65,46 @@ declare module FilePicker {
     size: number;
   }
 
+  export class FilepickerException {
+    constructor(text: string);
+  }
+
+  export class FPError {
+    constructor(code: number);
+  }
+
   interface fp {
-    setKey(key: string);
+    setKey(key: string): void;
 
-    pick(picker_options: PickerOptions, onSuccess: (Blob) => any,
-         onError: (FPError) => any, onProgress: (FPProgress) => any);
-    pick(picker_options: PickerOptions, onSuccess: (Blob) => any,
-         onError: (FPError) => any);
-    pick(picker_options: PickerOptions, onSuccess: (Blob) => any);
-    pick(onSuccess: (Blob) => any, onError: (FPError) => any,
-         onProgress: (FPProgress) => any);
-    pick(onSuccess: (Blob) => any, onError: (FPError) => any);
-    pick(onSuccess: (Blob) => any);
+    pick(picker_options: PickerOptions, onSuccess: (blob: Blob) => any,
+         onError: (error: FPError) => any,
+         onProgress: (progress: FPProgress) => any): void;
+    pick(picker_options: PickerOptions, onSuccess: (blob: Blob) => any,
+         onError: (error: FPError) => any): void;
+    pick(picker_options: PickerOptions, onSuccess: (blob: Blob) => any): void;
+    pick(onSuccess: (blob: Blob) => any, onError: (error: FPError) => any,
+         onProgress: (progress: FPProgress) => any): void;
+    pick(onSuccess: (blob: Blob) => any,
+         onError: (error: FPError) => any): void;
+    pick(onSuccess: (blob: Blob) => any): void;
 
     pickAndStore(picker_options: PickerOptions, store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any, onError: (FPError) => any,
-                 onProgress: (FPProgress) => any);
+                 onSuccess: (blobs: Blob[]) => any,
+                 onError: (error: FPError) => any,
+                 onProgress: (progress: FPProgress) => any): void;
     pickAndStore(picker_options: PickerOptions, store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any, onError: (FPError) => any);
+                 onSuccess: (blobs: Blob[]) => any,
+                 onError: (error: FPError) => any): void;
     pickAndStore(picker_options: PickerOptions, store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any);
+                 onSuccess: (blobs: Blob[]) => any): void;
     pickAndStore(store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any,onError: (FPError) => any,
-                 onProgress: (FPProgress) => any);
+                 onSuccess: (blobs: Blob[]) => any,
+                 onError: (error: FPError) => any,
+                 onProgress: (progress: FPProgress) => any): void;
     pickAndStore(store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any, onError: (FPError) => any);
+                 onSuccess: (blobs: Blob[]) => any,
+                 onError: (error: FPError) => any): void;
     pickAndStore(store_options: StoreOptions,
-                 onSuccess: (blobs: Blob[]) => any);
-
-    FilepickerException: Error;
-    FPError: Error;
+                 onSuccess: (blobs: Blob[]) => any): void;
   }
 }
