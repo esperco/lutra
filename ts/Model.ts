@@ -36,6 +36,14 @@ module Esper.Model {
     lastError?: Error;
   }
 
+  // Typeguard functions for metadata
+  export function isMetadata(arg: any): arg is StoreMetadata {
+    return !!(typeof arg === "object" && _.difference(
+      _.keys(arg),
+      ["_id", "dataStatus", "lastUpdate", "aliases", "lastError"]
+    ).length === 0);
+  }
+
   // Variant on StoreMetadata for new objects (_id is required)
   export interface StoreMetadataForInsert extends StoreMetadata {
     _id: string;
@@ -52,7 +60,7 @@ module Esper.Model {
   }
 
   // Base class for Store-like classes with EventEmitters
-  export class StoreBase extends Emit.EmitBase {
+  export class StoreBase<TData> extends Emit.EmitBase {
     // More explicit typing on listeners
     addChangeListener(callback: (_ids: string[]) => void): void {
       super.addChangeListener(callback);
@@ -65,10 +73,17 @@ module Esper.Model {
     protected emitChange(_ids?: string[]): void {
       super.emitChange(_ids);
     }
+
+    isTuple(arg: TData|[TData, StoreMetadata]): arg is [TData, StoreMetadata]
+    {
+      return (arg instanceof Array &&
+        arg.length === 2 &&
+        isMetadata(arg[1]));
+    }
   }
 
   // Base class for Model Stores
-  export class Store<TData> extends StoreBase {
+  export class Store<TData> extends StoreBase<TData> {
 
     // Actual container for data
     protected data: {
@@ -163,9 +178,9 @@ module Esper.Model {
       if (secondArg) {
         data = (<TData> firstArg);
         metadata = (<StoreMetadata> secondArg);
-      } else if (firstArg instanceof Array) {
-        data = (<TData> firstArg[0]);
-        metadata = (<StoreMetadata> firstArg[1]);
+      } else if (this.isTuple(firstArg)) {
+        data = firstArg[0];
+        metadata = firstArg[1];
       } else {
         data = (<TData> firstArg);
       }
@@ -268,7 +283,7 @@ module Esper.Model {
         update = current ? update.apply(null, current) : update();
       }
 
-      if (_.isArray(update)) {
+      if (this.isTuple(update)) {
         data = update[0];
         metadata = update[1];
       } else {

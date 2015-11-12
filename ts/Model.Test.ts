@@ -669,5 +669,34 @@ module Esper.Model {
           });
       });
     });
+
+    describe("isTuple", function() {
+      it("should return true for data, metadata pair", function() {
+        expect(myRabbitStore.isTuple([{
+          uid: "rabbit",
+          carrots: 123
+        }, {
+          dataStatus: Model.DataStatus.READY
+        }])).toBe(true);
+      });
+
+      it("should return false if just data", function() {
+        expect(myRabbitStore.isTuple({
+          uid: "rabbit",
+          carrots: 123
+        })).toBe(false);
+      });
+
+      it("should return false if metadata has extra values", function() {
+        var metadataPlus = (<StoreMetadata> {
+          dataStatus: Model.DataStatus.READY,
+          extraVal: 123
+        });
+        expect(myRabbitStore.isTuple([{
+          uid: "rabbit",
+          carrots: 123
+        }, metadataPlus])).toBe(false);
+      });
+    });
   });
 }

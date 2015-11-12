@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/Model.ts"/>
 /// <reference path="../marten/ts/Model.Capped.ts"/>
 /// <reference path="../marten/ts/Model.StoreOne.ts"/>
+/// <reference path="../marten/ts/Model.Batch.ts" />
 /// <reference path="../marten/ts/JQStore.ts"/>
 /// <reference path="../marten/ts/ReactHelpers.ts"/>
 /// <reference path="./IndexPage.tsx"/>
