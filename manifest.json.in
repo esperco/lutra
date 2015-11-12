@@ -18,7 +18,7 @@
   },
 
   "background": {
-    "scripts": ["js/event-page.js"],
+    "scripts": ["js/vendor.js", "js/event-page.js"],
     "persistent": false
   },
 

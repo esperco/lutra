@@ -28,7 +28,7 @@
  *  if task is valid then team should always be valid as well
  */
 
-/// <reference path="../common/Analytics.IS.ts" />
+/// <reference path="../common/Analytics.ts" />
 module Esper.CurrentThread {
 
   /** The team that is detected for the current thread. I am not sure

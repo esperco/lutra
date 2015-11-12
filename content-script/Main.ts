@@ -13,7 +13,7 @@
 
 /// <reference path="../marten/ts/Log.ts" />
 
-/// <reference path="../common/Analytics.Chrome.ts" />
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
@@ -73,7 +73,6 @@ module Esper.Main {
     }
 
     Api.init();
-    Analytics.init();
     Update.init();
     Auth.init();
     ExtensionOptions.init();
@@ -82,6 +81,8 @@ module Esper.Main {
 
     // Miscellaneous messaging setup
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);
+    Message.pipeToExtension(Message.Type.Track);
+    Message.pipeToExtension(Message.Type.Identify);
     Message.listen(Message.Type.RenderGettingStarted, function() {
       Auth.openWelcomeModal(Login.getAccount(), true, true);
       Onboarding.CurrentSlide.set(4);

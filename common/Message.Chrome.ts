@@ -22,6 +22,7 @@ module Esper.Message {
       type: type,
       value: value
     };
+    callback = callback || function() {};
     chrome.runtime.sendMessage(esperMessage, callback);
   }
 
@@ -45,7 +46,7 @@ module Esper.Message {
   // Content Script
   export function pipeToExtension(type: Type, callback?: (r: any) => void) {
     listen(type, function(value) {
-      postToExtension(type, callback);
+      postToExtension(type, value, callback);
     });
   }
 }
