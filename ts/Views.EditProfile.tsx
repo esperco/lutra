@@ -21,6 +21,11 @@ module Esper.Views {
                   phones: ApiT.LabelledItem[] = [],
                   addresses: ApiT.LabelledItem[] = [],
                   custom_entries: ApiT.LabelledItem[] = []): ApiT.DirProfile {
+
+      if (other_emails === []) other_emails = [{label:"Main", item:""}];
+      if (phones === []) phones = [{label:"Mobile", item:""}];
+      if (addresses === []) addresses = [{label:"Home", item:""}];
+      if (custom_entries === []) custom_entries = [{label:"", item:""}];
       return {
         display_name: display_name,
         other_names: other_names,
@@ -41,7 +46,10 @@ module Esper.Views {
       var esperProfile = this.props.esperProfile;
 
       if (dirProfile !== undefined) {
-        this.state = dirProfile;
+        this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
+          dirProfile.other_emails, dirProfile.other_names, dirProfile.company,
+          dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
+          dirProfile.addresses, dirProfile.custom_entries);
       } else if (esperProfile !== undefined) {
         var otherEmails: ApiT.LabelledItem[] = [];
         esperProfile.other_emails.map(function(e) {
@@ -50,18 +58,21 @@ module Esper.Views {
         });
         this.state = this.createProfile(esperProfile.display_name,
                                         esperProfile.email, otherEmails)
-      } else { //shouldn't happen
+      } else { //shouldn't happen yet
         this.state = this.createProfile("","")
       }
     }
 
     componentDidMount() {
-      this.find('.dropdown-toggle').dropdown();
+      $('.dropdown-toggle').dropdown();
+    }
+    componentDidUpdate() {
+      $('.dropdown-toggle').dropdown();
     }
 
     // Name Helpers
     newName = () => {
-      var name = {label:"", item:""};
+      var name = {label:"Nickname", item:""};
       this.setState(function(o) {
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, o.other_names.concat([name]), o.company,
@@ -109,7 +120,7 @@ module Esper.Views {
 
     // Email Helpers
     newEmail = () => {
-      var email = { label: "", item: "" };
+      var email = { label: "Work", item: "" };
       this.setState(function(o) {
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails.concat([email]), o.other_names, o.company,
@@ -147,6 +158,46 @@ module Esper.Views {
       });
     }
 
+    //Phone Helpers
+    newPhone = () => {
+      var phone = {label:"Work", item:""};
+      this.setState(function(o) {
+        return this.createProfile(o.display_name, o.primary_email,
+            o.other_emails, o.other_names, o.company, o.company_location,
+            o.company_title, o.phones.concat([phone]), o.addresses,
+            o.custom_entries);
+      });
+    }
+    removePhone = (i: number) => {
+      this.setState(function(o) {
+        var phones = $.extend(true, [], o.phones);
+        delete phones[i];
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, o.company, o.company_location,
+          o.company_title, phones, o.addresses, o.custom_entries);
+      });
+    }
+    handlePhoneLabel = (e, i) => {
+      var text = e.target.value;
+      this.setState(function(o) {
+        var phones = $.extend(true, [], o.phones);
+        phones[i].label = text;
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, o.company, o.company_location,
+          o.company_title, phones, o.addresses, o.custom_entries);
+      });
+    }
+    handlePhoneItem = (e, i) => {
+      var text = e.target.value;
+      this.setState(function(o) {
+        var phones = $.extend(true, [], o.phones);
+        phones[i].item = text;
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, o.company, o.company_location,
+          o.company_title, phones, o.addresses, o.custom_entries);
+      });
+    }
+
     cleanList = (list: ApiT.LabelledItem[]) => {
       var newList : ApiT.LabelledItem[] = [];
       for (var i=0; i < list.length; i++) {
@@ -174,30 +225,66 @@ module Esper.Views {
       Login.dirProfile.set(null, { dataStatus: Model.DataStatus.READY });
     }
 
-    renderList = (list: ApiT.LabelledItem[], handleLabel, handleItem, removeEntry, placeHolder) => {
+    changeOption = (search: string, text: string) => {
+      $("#" + search).val(text);
+      var event = new Event('input', { bubbles: true });
+      $("#" + search).get(0).dispatchEvent(event);
+    }
+
+    selectLabel = (search: string, text: string) => {
+      $("#" + search).val(text);
+      $("#" + search).select();
+      var event = new Event('input', { bubbles: true });
+      $("#" + search).get(0).dispatchEvent(event);
+    }
+
+    renderList = (list: ApiT.LabelledItem[], handleLabel, handleItem, removeEntry, addEntry, dropList: string[]) => {
       var thisArg = this;
       return _.map(list, function(entry, i) {
+        var uid = "id" + i;
+        var chooseFunction = removeEntry;
+        var plusOrMinus = "glyphicon glyphicon-minus";
+        if (i === 0) {
+          chooseFunction = addEntry;
+          plusOrMinus = "glyphicon glyphicon-plus";
+        }
         if (entry !== undefined) {
-          return <div className="input-group">
-            <input type="text" className="form-control"
-              onChange={function(e) {handleLabel(e, i)}}
-              defaultValue={entry.label} placeholder={placeHolder}/>
-            <div className="input-group-addon">:</div>
-            <input type="text" className="form-control"
-              onChange={function(e) {handleItem(e, i)}}
-              defaultValue={entry.item}/>
-            <div className="input-group-btn">
-              <button className="btn btn-default" onClick={function() {removeEntry(i)}}>
-                &nbsp;<span className="glyphicon glyphicon-minus"></span>
-              </button>
+          return <div className="row">
+            <div className="col-xs-2">
+              <div className="input-group">
+                <input type="text" id={uid} className="form-control" onChange={function(e) { handleLabel(e,i) } }
+                  defaultValue={entry.label}/>
+                <div className="input-group-btn">
+                  <button className="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    &nbsp;<span className="caret"></span>
+                  </button>
+                  <ul className="dropdown-menu dropdown-menu-right">
+                    {_.map(dropList, function(option, i) {
+                      return <li><a onClick={() => thisArg.changeOption(uid, option)}>{option}</a></li>;
+                    })}
+                    <li><a onClick={function() { thisArg.selectLabel(uid, "Custom") } }>Custom</a></li>
+                  </ul>
+                </div>
+              </div>
             </div>
-          </div>;
+            <div className="col-xs-10">
+              <div className="input-group">
+                <input type="text" className="form-control" onChange={function(e) { handleItem(e, i) } }
+                  defaultValue={entry.item}/>
+                <div className="input-group-btn">
+                  <button className="btn btn-default" onClick={function() { chooseFunction(i) } } >
+                    &nbsp;<span className={plusOrMinus}></span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         }
       });
     }
 
     render() {
-      var thisArg = this;
+      var a = false;
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
@@ -212,7 +299,7 @@ module Esper.Views {
             </button>
           </div>
         </div>
-        {this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, "Add name description")}
+        {/*this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, "Add name description")*/}
         <div><br/></div>
         <label>Email</label>
         <div className="input-group">
@@ -225,7 +312,7 @@ module Esper.Views {
             </button>
           </div>
         </div>
-        {this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, "Add name description")}
+        {/*this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, "Add name description")*/}
         <div><br/></div>
         <label>Company Info</label>
         <div className="input-group">
@@ -242,39 +329,7 @@ module Esper.Views {
         </div>
         <div><br/></div>
         <label>Phone</label>
-        <div className="row">
-          <div className="col-xs-2">
-            <div className="input-group">
-              <input type="text" className="form-control"/>
-              <div className="input-group-btn">
-                <button className="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                  &nbsp;<span className="caret"></span>
-                </button>
-                <ul className="dropdown-menu dropdown-menu-right">
-                  <li><a href="#">Mobile</a></li>
-                  <li><a href="#">Work</a></li>
-                  <li><a href="#">Home</a></li>
-                  <li><a href="#">Custom</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="col-xs-10">
-            <div className="input-group">
-              <input type="text" className="form-control"/>
-              <div className="input-group-btn">
-                <button className="btn btn-default" onClick={() => this.newEmail() } >
-                  &nbsp;<span className="glyphicon glyphicon-plus"></span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/*this.renderList(this.state.phones, this.handlePhoneLabel, this.handlePhoneItem, this.removePhone, "Phone description")}
-        <div><br/></div>
-        {//this.renderList(this.state.addresses, this.handleAddressLabel, this.handleAddressItem, this.removeAddress, "Address description")}
-        <div><br/></div>
-        {//this.renderList(this.state.custom_entries, this.handleCustomLabel, this.handleCustomItem, this.removeCustom, "Phone description")*/}
+        {this.renderList(this.state.phones, this.handlePhoneLabel, this.handlePhoneItem, this.removePhone, this.newPhone, ["Mobile","Work","Home"])}
         <div><br/></div>
         <button className="btn btn-primary"
           onClick={() => this.saveProfile()}>Save</button>
