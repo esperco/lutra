@@ -3,9 +3,8 @@
 */
 
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/ApiC.ts" />
-/// <reference path="../marten/ts/XDate.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./Events.ts" />
 /// <reference path="./Calendars.ts" />
 
 module Esper.Components {
@@ -115,18 +114,16 @@ module Esper.Components {
       var currentEnd = this._currentEnd = momentEnd.unix();
 
       var apiDone = false;
-      ApiC.postCalendar(this.props.teamId, this.props.calId, {
-        window_start: XDate.toString(momentStart.toDate()),
-        window_end: XDate.toString(momentEnd.toDate())
-      }).done((result) => {
-
+      Events.fetch(this.props.teamId, this.props.calId,
+        momentStart.toDate(), momentEnd.toDate()
+      ).done((events) => {
         // Only update state if we're still looking at the same interval
         if (this._currentStart === currentStart &&
             this._currentEnd === currentEnd) {
           this.setState({showBusy: false, showError: false});
         }
 
-        callback(_.map(result.events, (event): FullCalendar.EventObject => {
+        callback(_.map(events, (event): FullCalendar.EventObject => {
           var eventId = Calendars.getEventId(event);
           var selected = this.props.eventId === eventId;
           return {
@@ -143,7 +140,7 @@ module Esper.Components {
         this.setState({showBusy: false, showError: true});
       }).always(() => {
         apiDone = true;
-      })
+      });
 
       // Promise will return synchronously if already complete and update
       // state accordingly -- so only update to busy and avoid React re-render
