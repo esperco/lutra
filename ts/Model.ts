@@ -8,6 +8,7 @@
   the dispatcher so they're updated when Actions are dispatched.
 */
 
+/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Util.ts" />
 /// <reference path="./Emit.ts" />
 
@@ -240,7 +241,7 @@ module Esper.Model {
       this.set(_id, [data, metadata]);
     }
 
-    /* Updates a key's data and/or metadata -- fun */
+    /* Updates a key's data and/or metadata */
     update(_id: string, updateFn: UpdateFn<TData>): void;
     update(_id: string, tuple: [TData, StoreMetadata]): void;
     update(_id: string, data: TData, metadata?: StoreMetadata): void;
@@ -275,6 +276,105 @@ module Esper.Model {
       }
 
       this.set(_id, data, metadata);
+    }
+
+    /*
+      Helper to fetch data via a promise and store it at a particular key when
+      the promise resolves. Updates dataStatus metadata accordingly.
+    */
+    fetch(_id: string, promise: JQueryPromise<TData>) {
+      function canSave(metadata: StoreMetadata) {
+        var dataStatus = metadata && metadata.dataStatus;
+        return (dataStatus !== Model.DataStatus.UNSAVED &&
+                dataStatus !== Model.DataStatus.INFLIGHT);
+      }
+
+      if (promise.state() === "pending") {
+        // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
+        // any user-set data we may have cached)
+        this.upsert(_id, function(data, metadata) {
+          if (canSave(metadata)) {
+            return [data, _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.FETCHING
+            })];
+          }
+          return data;
+        });
+      }
+
+      promise.done((newData: TData) => {
+        // On success, update store
+        this.upsert(_id, function(data, metadata) {
+          if (canSave(metadata)) {
+            return [newData, _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.READY
+            })];
+          }
+          return data;
+        });
+      }).fail((err) => {
+        // On failure, update store to note failure (again, don't override
+        // user data)
+        this.upsert(_id, function(data, metadata) {
+          if (canSave(metadata)) {
+            return [data, _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.FETCH_ERROR,
+              lastError: err
+            })];
+          }
+          return data;
+        });
+        return err;
+      });
+    }
+
+    /*
+      Helper to save data via a promise and update dataStatus metadata based
+      on promise resolution. Optionally takes new data to populate store.
+    */
+    push(_id: string, promise: JQueryPromise<any>, newData?: TData) {
+      promise = promise.then(() => {
+        return this.val(_id);
+      });
+      this.pushFetch(_id, promise, newData);
+    }
+
+    /*
+      Helper to save data via a promise and update data based on what the
+      promise returns. Updates dataStatus accordingly. Can also set initial
+      data in store pending promise resolution.
+    */
+    pushFetch(_id: string, promise: JQueryPromise<TData>, initData?: TData) {
+      if (promise.state() === "pending" || initData !== undefined) {
+        // Set to INFLIGHT and populate with initData (if any)
+        this.upsert(_id, function(data, metadata) {
+          return [
+            initData === undefined ? data : initData,
+            _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.INFLIGHT
+            })
+          ];
+        });
+      }
+
+      promise.done((newData: TData) => {
+        // On success, update store
+        this.upsert(_id, function(data, metadata) {
+          return [newData, _.extend({}, metadata, {
+            dataStatus: Model.DataStatus.READY
+          })];
+        });
+      }).fail((err) => {
+        // On failure, update store to note failure (again, don't override
+        // user data)
+        this.upsert(_id, function(data, metadata) {
+          return [data, _.extend({}, metadata, {
+            dataStatus: Model.DataStatus.PUSH_ERROR,
+            lastError: err
+          })];
+        });
+        return err;
+      });
     }
 
     // Remove a key from store

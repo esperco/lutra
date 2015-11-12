@@ -433,5 +433,241 @@ module Esper.Model {
       });
     });
 
+    describe("push", function() {
+      beforeEach(function() {
+        reset();
+        this.uid = "brownRabbitId";
+        this.dfd = $.Deferred<Rabbit>();
+      });
+
+      it("should set an initial value if one is passed", function() {
+        myRabbitStore.push(this.uid, this.dfd, {
+          uid: this.uid, carrots: 123
+        });
+        expect(myRabbitStore.val(this.uid).carrots).toEqual(123);
+      });
+
+      it("should not override existing data if no value is passed", function() {
+        myRabbitStore.insert(this.uid, {
+          uid: this.uid,
+          carrots: 456
+        });
+        myRabbitStore.push(this.uid, this.dfd.promise());
+        expect(myRabbitStore.val(this.uid).carrots).toEqual(456);
+      });
+
+      it("should normally update dataStatus to INFLIGHT", function() {
+        myRabbitStore.push(this.uid, this.dfd, {
+          uid: this.uid, carrots: 123
+        });
+        expect(myRabbitStore.metadata(this.uid).dataStatus)
+          .toBe(DataStatus.INFLIGHT);
+      });
+
+      describe("after promise resolves", function() {
+        beforeEach(function() {
+          myRabbitStore.insert(this.uid, {
+            uid: this.uid,
+            carrots: 456
+          });
+          myRabbitStore.push(this.uid, this.dfd.promise());
+          this.dfd.resolve({
+            uid: this.uid,
+            carrots: 789
+          });
+        });
+
+        it("should update the store metadata to READY", function() {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.READY);
+        });
+
+        it("should not update store value", function() {
+          expect(myRabbitStore.val(this.uid).carrots).toBe(456);
+        });
+      });
+
+      describe("after promise fails", function() {
+        beforeEach(function() {
+          myRabbitStore.push(this.uid, this.dfd.promise());
+          this.err = new Error("Whoops!");
+          this.dfd.reject(this.err);
+        });
+
+        it("should update dataStatus to PUSH_ERROR and populate lastError",
+          function() {
+            var metadata = myRabbitStore.metadata(this.uid);
+            expect(metadata.dataStatus).toBe(DataStatus.PUSH_ERROR);
+            expect(metadata.lastError).toBe(this.err);
+          });
+      });
+    });
+
+    describe("fetch", function() {
+      beforeEach(function() {
+        reset();
+        this.uid = "brownRabbitId";
+        this.dfd = $.Deferred<Rabbit>();
+      });
+
+      describe("default", function() {
+        beforeEach(function() {
+          myRabbitStore.fetch(this.uid, this.dfd.promise());
+        });
+
+        it("should normally update dataStatus to FETCHING", function() {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.FETCHING);
+        });
+
+        it("should update value and dataStatus to READY after promise resolves",
+          function()
+        {
+          this.dfd.resolve({
+            uid: this.uid, carrots: 789
+          });
+
+          var data = myRabbitStore.val(this.uid);
+          expect(data.carrots).toBe(789);
+
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.READY);
+        });
+
+        it("should update dataStatus to FETCH_ERROR after promise rejects",
+          function()
+        {
+          this.err = new Error("Boom");
+          this.dfd.reject(this.err);
+
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.FETCH_ERROR);
+        });
+      });
+
+      describe("if data at key is currently UNSAVED", function() {
+        beforeEach(function() {
+          myRabbitStore.insert({
+            uid: this.uid,
+            carrots: 456
+          }, {
+            _id: this.uid,
+            dataStatus: DataStatus.UNSAVED
+          });
+          myRabbitStore.fetch(this.uid, this.dfd);
+        });
+
+        it("should not update dataStatus initially", function() {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.UNSAVED);
+        });
+
+        it("should not update dataStatus after promise resolves",
+          function()
+        {
+          this.dfd.resolve(null);
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.UNSAVED);
+        });
+
+        it("should not update dataStatus after promise rejects",
+          function()
+        {
+          this.err = new Error("Boom");
+          this.dfd.reject(this.err);
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.UNSAVED);
+        });
+      });
+
+      describe("if data at key is currently INFLIGHT", function() {
+        beforeEach(function() {
+          myRabbitStore.insert({
+            uid: this.uid,
+            carrots: 456
+          }, {
+            _id: this.uid,
+            dataStatus: DataStatus.INFLIGHT
+          });
+          myRabbitStore.fetch(this.uid, this.dfd);
+        });
+
+        it("should not update dataStatus initially", function() {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.INFLIGHT);
+        });
+
+        it("should not update dataStatus after promise resolves",
+          function()
+        {
+          this.dfd.resolve(null);
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.INFLIGHT);
+        });
+
+        it("should not update dataStatus after promise rejects",
+          function()
+        {
+          this.err = new Error("Boom");
+          this.dfd.reject(this.err);
+          var metadata = myRabbitStore.metadata(this.uid);
+          expect(metadata.dataStatus).toBe(DataStatus.INFLIGHT);
+        });
+      });
+    });
+
+    describe("pushFetch", function() {
+      beforeEach(function() {
+        reset();
+        this.uid = "brownRabbitId";
+        this.dfd = $.Deferred<Rabbit>();
+        myRabbitStore.pushFetch(this.uid, this.dfd.promise(), {
+          uid: this.uid,
+          carrots: 123
+        });
+      });
+
+      it("should update with initial value", function() {
+        expect(myRabbitStore.val(this.uid).carrots).toEqual(123);
+      });
+
+      it("should set status to INFLIGHT", function() {
+        expect(myRabbitStore.metadata(this.uid).dataStatus)
+          .toBe(DataStatus.INFLIGHT);
+      });
+
+      describe("after promise resolves", function() {
+        beforeEach(function() {
+          this.dfd.resolve({
+            uid: this.uid,
+            carrots: 789
+          });
+        });
+
+        it("should update the store metadata to READY", function() {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.READY);
+        });
+
+        it("should update store value", function() {
+          expect(myRabbitStore.val(this.uid).carrots).toBe(789);
+        });
+      });
+
+      describe("after promise fails", function() {
+        beforeEach(function() {
+          myRabbitStore.push(this.uid, this.dfd.promise());
+          this.err = new Error("Whoops!");
+          this.dfd.reject(this.err);
+        });
+
+        it("should update dataStatus to PUSH_ERROR and populate lastError",
+          function() {
+            var metadata = myRabbitStore.metadata(this.uid);
+            expect(metadata.dataStatus).toBe(DataStatus.PUSH_ERROR);
+            expect(metadata.lastError).toBe(this.err);
+          });
+      });
+    });
   });
 }
