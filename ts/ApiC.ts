@@ -102,57 +102,18 @@ module Esper.ApiC {
         }
       }
 
-      // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
-      // any user-set data we may have cached)
-      store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
-        : T | [T, Model.StoreMetadata]
-      {
-        if (canSave(metadata)) {
-          return [data, _.extend({}, metadata, {
-            dataStatus: Model.DataStatus.FETCHING
-          })];
-        }
-        return data;
-      });
-
       // Call original function and attach promise handlers that update our
       // stores
       promise = promises[key] = (<any> fn).apply(Api, arguments);
-      promise.done(function(newData: T) {
-        // On success, update store
-        store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
-            : T | [T, Model.StoreMetadata]
-          {
-            if (canSave(metadata)) {
-              return [newData, _.extend({}, metadata, {
-                dataStatus: Model.DataStatus.READY
-              })];
-            }
-            return data;
-          });
-        return newData;
 
-      }).fail(function(err) {
-        // On failure, update store to note failure (again, don't override
-        // user data)
-        store.upsert(key, function(data: T, metadata: Model.StoreMetadata)
-            : T | [T, Model.StoreMetadata]
-          {
-            if (canSave(metadata)) {
-              return [data, _.extend({}, metadata, {
-                dataStatus: Model.DataStatus.FETCH_ERROR,
-                lastError: err
-              })];
-            }
-            return data;
-          });
+      // Tie store updates to promise resolution / rejection
+      store.fetch(key, promise);
 
+      promise.always(function() {
         // Clean up old promises in memory
         if (promises[key] === promise) {
           delete promises[key];
         }
-
-        return err;
       });
 
       return promise;
