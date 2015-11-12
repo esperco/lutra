@@ -7,13 +7,12 @@
 /// <reference path="../marten/typings/analytics-node/analytics-node.d.ts" />
 /// <reference path="../marten/ts/Analytics.Iframe.ts" />
 
-/// <reference path="./Esper.ts" />
-/// <reference path="./Conf.ts" />
-/// <reference path="./Analytics.ts" />
-/// <reference path="./Login.ts" />
-/// <reference path="./Message.ts" />
-/// <reference path="./ExtensionOptions.Storage.ts" />
-/// <reference path="./Util.ts" />
+/// <reference path="../common/Esper.ts" />
+/// <reference path="../common/Conf.ts" />
+/// <reference path="../common/Analytics.ts" />
+/// <reference path="../common/Message.Chrome.ts" />
+/// <reference path="../common/ExtensionOptions.Storage.ts" />
+/// <reference path="../common/Util.ts" />
 
 module Esper.Analytics {
   // Reference to Analytics NodeJS library
@@ -31,23 +30,17 @@ module Esper.Analytics {
     writeKey = Conf.segmentKey;
 
     // Listen for posted messages to track
-    Message.listen(Message.Type.Track, function(data: TrackMessage) {
-      track(data.event, data.properties);
-    });
+    Message.listenToExtension(Message.Type.Track, trackChrome);
+
+    // Listen for posted messages to identify
+    Message.listenToExtension(Message.Type.Identify, identifyChrome);
   }
 
   // If we have a UID, identify ourselves -- should be called after login
   // info set to get the most info available
-  export function identify() {
-    var uid = Login.myUid();
-    if (!uid) {
-      Log.e("Unable to identify -- not logged in.");
-      return;
-    }
-
-    if (!Login.watchableInfo.isValid()) {
-      Log.w("Login info unavailable for identification. UID only.");
-    }
+  export function identifyChrome(data: IdentifyMessage) {
+    var uid = data.uid;
+    var teams = (data.info && data.info.teams) || [];
 
     // Identify with some traits
     ExtensionOptions.load(function(opts) {
@@ -59,13 +52,12 @@ module Esper.Analytics {
       analytics.identify({
         userId: uid,
         traits: _.extend({
-          email: Login.myEmail() || Login.myGoogleAccountId(),
-          teams: _.pluck(Login.myTeams(), 'teamid'),
+          email: data.info && data.info.email,
+          teams: _.pluck(teams, 'teamid'),
         }, optsFlattened)
       });
 
       // Associate users with team groups
-      var teams = Login.myTeams();
       _.each(teams, function(team) {
         analytics.group({
           userId: uid,
@@ -73,29 +65,24 @@ module Esper.Analytics {
           traits: {
             name: team.team_name,
             execId: team.team_executive,
-            anonymous: false
           }
         });
       });
     });
   }
 
-  export function track(event: Trackable, properties?: Object) {
-    var eventName = Trackable[event];
-
-    if (Login.myUid()) {
+  export function trackChrome(data: TrackMessage) {
+    if (data.uid) {
       analytics.track({
-        // Use anonId if we have one (it'll be cleared after alias is complete)
-        userId: Login.myUid(),
-
-        event: eventName,
-        properties: properties || {}
+        userId: data.uid,
+        event: Trackable[data.event],
+        properties: data.properties || {}
       });
     }
 
     else {
       // Anonymous user => use esper.com's tracking ID
-      trackViaIframe(event, properties);
+      trackViaIframe(data.event, data.properties);
     }
   }
 }

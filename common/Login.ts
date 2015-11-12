@@ -1,4 +1,5 @@
 /// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="../marten/ts/Watchable.ts" />
 /// <reference path="../marten/ts/Login.ts" />

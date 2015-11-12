@@ -25,6 +25,9 @@ module Esper.Message {
     // Post an analytics tracking call
     Track,
 
+    // Post an analytics identify call
+    Identify,
+
     // Post call from CS to IS that location hash has changed
     LocationUpdate,
 

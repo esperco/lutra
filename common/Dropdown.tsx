@@ -6,7 +6,6 @@
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/Query.ts" />
 
 module Esper.Dropdown {
   var React = Esper.React;

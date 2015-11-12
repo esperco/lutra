@@ -6,6 +6,9 @@
   reasons is not accessible from the content scripts.
 
     https://developer.chrome.com/extensions/event_pages
+
+  Also, stuff like Analytics goes here to avoid conflict with various page's
+  CSPs (which occasionally affect Content Scripts for some reason)
 */
 
 /// <reference path="../marten/typings/jquery/jquery.d.ts" />
@@ -27,6 +30,7 @@
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Message.Chrome.ts" />
 
+/// <reference path="./Analytics.Chrome.ts" />
 /// <reference path="./Update.ts" />
 module Esper.Main {
 
@@ -34,6 +38,7 @@ module Esper.Main {
     Log.tag = "Esper [EP]";
     Log.d("Initializing event page");
     Update.init();
+    Analytics.init();
 
     // Handle calls to open option page (for some reason this is event page
     // only call)

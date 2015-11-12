@@ -31,7 +31,7 @@
 /// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
-/// <reference path="../common/Analytics.IS.ts" />
+/// <reference path="../common/Analytics.ts" />
 
 /// <reference path="../common/Option.ts" />
 /// <reference path="../common/Team.ts" />

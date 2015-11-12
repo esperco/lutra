@@ -1,4 +1,4 @@
-/// <reference path="../common/Analytics.Chrome.ts" />
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../common/Login.ts" />
