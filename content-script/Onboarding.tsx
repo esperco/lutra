@@ -854,13 +854,10 @@ module Esper.Onboarding {
   class TeamForm extends ReactHelpers.Component<TeamFormProps, TeamFormState> {
     constructor(props) {
       super(props);
-    }
-
-    getState() {
-      return {
+      this.state = {
         nameHasError: false,
         emailHasError: false
-      }
+      };
     }
 
     render() {
@@ -899,7 +896,7 @@ module Esper.Onboarding {
       });
       var calCheckboxes = _.map(sortedCalendars, function(cal) {
         var checked = _.includes(team.calendars, cal.google_cal_id);
-        return (<div className="checkbox">
+        return (<div className="checkbox" key={cal.google_cal_id}>
           <label>
             <input type="checkbox" value={cal.google_cal_id}
               disabled={disabled}
@@ -910,7 +907,7 @@ module Esper.Onboarding {
       });
 
       var calOptions = _.map(sortedCalendars, function(cal) {
-        return (<option value={cal.google_cal_id}>
+        return (<option value={cal.google_cal_id} key={cal.google_cal_id}>
           {cal.calendar_title}
         </option>);
       });
