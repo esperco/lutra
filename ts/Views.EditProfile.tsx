@@ -22,10 +22,10 @@ module Esper.Views {
                   addresses: ApiT.LabelledItem[] = [],
                   custom_entries: ApiT.LabelledItem[] = []): ApiT.DirProfile {
 
-      if (other_emails === []) other_emails = [{label:"Main", item:""}];
-      if (phones === []) phones = [{label:"Mobile", item:""}];
-      if (addresses === []) addresses = [{label:"Home", item:""}];
-      if (custom_entries === []) custom_entries = [{label:"", item:""}];
+      if (other_emails.length === 0) other_emails = [{label:"Work", item:""}];
+      if (phones.length === 0) phones = [{label:"Mobile", item:""}];
+      if (addresses.length === 0) addresses = [{label:"Home", item:""}];
+      if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
       return {
         display_name: display_name,
         other_names: other_names,
@@ -46,20 +46,24 @@ module Esper.Views {
       var esperProfile = this.props.esperProfile;
 
       if (dirProfile !== undefined) {
+        dirProfile.other_names.unshift(undefined);
         this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
           dirProfile.other_emails, dirProfile.other_names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
           dirProfile.addresses, dirProfile.custom_entries);
       } else if (esperProfile !== undefined) {
+        var otherNames: ApiT.LabelledItem[] = [];
+        otherNames.unshift(undefined);
         var otherEmails: ApiT.LabelledItem[] = [];
+        otherEmails.push({ label: "Work", item: esperProfile.email });
         esperProfile.other_emails.map(function(e) {
           var x = { label: "", item: e };
           otherEmails.push(x);
         });
         this.state = this.createProfile(esperProfile.display_name,
-                                        esperProfile.email, otherEmails)
+          "", otherEmails, otherNames);
       } else { //shouldn't happen yet
-        this.state = this.createProfile("","")
+        this.state = this.createProfile("", "", [], [undefined]);
       }
     }
 
@@ -348,7 +352,7 @@ module Esper.Views {
                   </button>
                   <ul className="dropdown-menu dropdown-menu-right">
                     {_.map(dropList, function(option, i) {
-                      return <li><a onClick={() => thisArg.changeOption(uid, option)}>{option}</a></li>;
+                      return <li><a onClick={function() { thisArg.changeOption(uid, option) } }>{option}</a></li>;
                     })}
                     <li><a onClick={function() { thisArg.selectLabel(uid, "Custom") } }>Custom</a></li>
                   </ul>
@@ -378,29 +382,19 @@ module Esper.Views {
         <div><br/></div>
         <label>Name</label>
         <div className="input-group">
-          <span className="input-group-addon">*Display Name:</span>
+          <span className="input-group-addon">Display Name:</span>
           <input type="text" className="form-control" onChange={(e) => this.handleDisplayName(e)}
             defaultValue={this.state.display_name}/>
           <div className="input-group-btn">
             <button className="btn btn-default" onClick={this.newName}>
-              &nbsp;<span className="glyphicon glyphicon-plus"></span>
+              &nbsp;<span className="glyphicon glyphicon-plus"></span>&nbsp;
             </button>
           </div>
         </div>
-        {/*this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, "Add name description")*/}
+        {this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, this.newName, ["Nickname", "Phonetic"]) }
         <div><br/></div>
         <label>Email</label>
-        <div className="input-group">
-          <span className="input-group-addon">*Email:</span>
-          <input type="text" className="form-control"
-            defaultValue={this.state.primary_email}/>
-          <div className="input-group-btn">
-            <button className="btn btn-default" onClick={() => this.newEmail() } >
-              &nbsp;<span className="glyphicon glyphicon-plus"></span>
-            </button>
-          </div>
-        </div>
-        {/*this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, "Add name description")*/}
+        {this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, this.newEmail, ["Work", "Home"])}
         <div><br/></div>
         <label>Company Info</label>
         <div className="input-group">
