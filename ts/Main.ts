@@ -10,13 +10,16 @@
 
 module Esper.Conf {
   export var segmentKey: string; // Set via Dev.ts or Prod.ts
+  export var filepickerKey: string;
 }
 
 module Esper.Main {
   export function init() {
     Login.init();
+    DirProfile.init();
     Route.init();
     Analytics.init(Conf.segmentKey);
+    filepicker.setKey(Conf.filepickerKey);
   }
 }
 

@@ -20,13 +20,15 @@ module Esper.Views {
                   company_title: string = "",
                   phones: ApiT.LabelledItem[] = [],
                   addresses: ApiT.LabelledItem[] = [],
-                  custom_entries: ApiT.LabelledItem[] = []): ApiT.DirProfile {
+                  custom_entries: ApiT.LabelledItem[] = [],
+                  image_url: string = ""): ApiT.DirProfile {
 
       if (other_emails.length === 0) other_emails = [{label:"Work", item:""}];
       if (phones.length === 0) phones = [{label:"Mobile", item:""}];
       if (addresses.length === 0) addresses = [{label:"Home", item:""}];
       if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
       return {
+        image_url: image_url,
         display_name: display_name,
         other_names: other_names,
         primary_email: primary_email,
@@ -51,7 +53,7 @@ module Esper.Views {
         this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
           dirProfile.other_emails, names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
-          dirProfile.addresses, dirProfile.custom_entries);
+          dirProfile.addresses, dirProfile.custom_entries, dirProfile.image_url);
       } else if (esperProfile !== undefined) {
         var otherEmails: ApiT.LabelledItem[] = [];
         otherEmails.push({ label: "Work", item: esperProfile.email });
