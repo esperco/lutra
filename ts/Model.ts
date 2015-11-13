@@ -372,21 +372,35 @@ module Esper.Model {
         });
       }
 
+      /*
+        canSave for push / pushFetch works differently from fetch -- we don't
+        want to clobber UNSAVED data only (i.e. data that was changed in
+        between us initiating a push to server and us receiving a response)
+      */
+      function canSave(metadata: StoreMetadata) {
+        var dataStatus = metadata && metadata.dataStatus;
+        return dataStatus !== Model.DataStatus.UNSAVED;
+      }
+
       promise.done((newData: TData) => {
         // On success, update store
         this.upsert(_id, function(data, metadata) {
-          return [newData, _.extend({}, metadata, {
-            dataStatus: Model.DataStatus.READY
-          })];
+          if (canSave(metadata)) {
+            return [newData, _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.READY
+            })];
+          }
         });
       }).fail((err) => {
         // On failure, update store to note failure (again, don't override
         // user data)
         this.upsert(_id, function(data, metadata) {
-          return [data, _.extend({}, metadata, {
-            dataStatus: Model.DataStatus.PUSH_ERROR,
-            lastError: err
-          })];
+          if (canSave(metadata)) {
+            return [data, _.extend({}, metadata, {
+              dataStatus: Model.DataStatus.PUSH_ERROR,
+              lastError: err
+            })];
+          }
         });
         return err;
       });
