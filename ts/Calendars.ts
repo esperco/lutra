@@ -13,16 +13,21 @@ module Esper.Calendars {
     }
   }
 
-  // Extract ID for calendar -- refactored into function because this may
-  // change -- i.e. when we bring in Nylas integration, need to use key other
-  // than google_cal_id
-  export function getId(cal: ApiT.Calendar) {
-    return cal.google_cal_id;
+  /*
+    Extract ID for calendar -- refactored into function because this may
+    change -- i.e. when we bring in Nylas integration, need to use key other
+    than google_cal_id.
+  */
+  export function getId(calOrEvent: ApiT.Calendar|ApiT.CalendarEvent) {
+    return calOrEvent.google_cal_id;
   }
 
-  // Same as above, but for events
+  /*
+    Same as above, but for events. Include calendar id because no guarantee
+    event id isn't reused across different calendars
+  */
   export function getEventId(event: ApiT.CalendarEvent) {
-    return event.google_event_id;
+    return getId(event) + "|" + event.google_event_id;
   }
 
   // Returns a default team and calendar selection

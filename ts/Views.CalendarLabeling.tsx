@@ -34,9 +34,6 @@ module Esper.Views {
       newData.eventTitle = eventTitle;
       return newData;
     });
-
-    // Trigger async calls
-    ApiC.getTaskListForEvent(eventId, false, false);
   }
 
   function setDefaults() {
@@ -112,8 +109,10 @@ module Esper.Views {
         return <Components.LabelEditor
           teamId={this.state.selectedCal.teamId}
           calId={this.state.selectedCal.calId}
-          eventId={this.state.selectedCal.eventId}
-          eventTitle={this.state.selectedCal.eventTitle}
+          events={[{
+            id: this.state.selectedCal.eventId,
+            title: this.state.selectedCal.eventTitle
+          }]}
         />;
       } else {
         return <span />;
