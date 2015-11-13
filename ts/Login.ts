@@ -11,7 +11,6 @@
 module Esper.Login {
 
   export var InfoStore = new Model.StoreOne<ApiT.LoginResponse>();
-  export var dirProfile = new Model.StoreOne<ApiT.DirProfile>();
 
   var loginDeferred: JQueryDeferred<ApiT.LoginResponse> = $.Deferred();
   export var loginPromise = loginDeferred.promise();
@@ -22,11 +21,9 @@ module Esper.Login {
   export function init() {
     if (! Login.loggedIn()) {
       InfoStore.set(null, { dataStatus: Model.DataStatus.FETCHING });
-      dirProfile.set(null, { dataStatus: Model.DataStatus.FETCHING });
 
       var onFail = function(err: Error) {
         InfoStore.set(null, { dataStatus: Model.DataStatus.READY });
-        dirProfile.set(null, { dataStatus: Model.DataStatus.READY });
         Analytics.identify(null); // Resets identity
         loginDeferred.reject(err);
       };
@@ -40,15 +37,6 @@ module Esper.Login {
           Analytics.identify(loginInfo, false, function() {
             loginDeferred.resolve(loginInfo);
           });
-          Api.getDirProfile()
-            .done(function(profile) {
-              dirProfile.set(profile, { dataStatus: Model.DataStatus.READY });
-              profileDeferred.resolve(profile);
-            })
-            .fail(function(err) {
-              dirProfile.set(null, { dataStatus: Model.DataStatus.READY });
-              profileDeferred.reject(err);
-            });
         }, onFail);
     }
   }

@@ -328,12 +328,12 @@ module Esper.Views {
         s.company, s.company_location, s.company_title,
         this.cleanList(s.phones), this.cleanList(s.addresses), this.cleanList(s.custom_entries));
       Api.setDirProfile(profile);
-      Login.dirProfile.set(profile, { dataStatus: Model.DataStatus.READY });
+      DirProfile.Store.set(profile, { dataStatus: Model.DataStatus.READY });
     }
 
     deleteProfile = () => {
       Api.removeDirProfile();
-      Login.dirProfile.set(null, { dataStatus: Model.DataStatus.READY });
+      DirProfile.Store.set(null, { dataStatus: Model.DataStatus.READY });
     }
 
     changeOption = (search: string, text: string) => {
