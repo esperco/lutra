@@ -6,6 +6,7 @@ var inject        = require("marten-npm-vendors/depends").inject;
 // Bower packages
 var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
+    filepicker    = require("filepicker-js-bower"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone");
@@ -41,6 +42,10 @@ Esper = (function(esperObj) {
     _:            lodash,
     $:            jQuery,
     jQuery:       jQuery,
+    // NB: This only works because we own the dir.esper.com domain
+    //     It's highly likely that we would run into conflicts with other
+    //     extensions if we replicate this hack in stoat
+    filepicker:   window.filepicker,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     moment:       moment,
