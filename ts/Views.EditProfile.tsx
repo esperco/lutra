@@ -94,7 +94,7 @@ module Esper.Views {
             o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handleNameLabel = (e, i) => {
+    handleNameLabel = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var names = $.extend(true, [], o.other_names);
@@ -104,7 +104,7 @@ module Esper.Views {
             o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handleNameItem = (e, i) => {
+    handleNameItem = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var names = $.extend(true, [], o.other_names);
@@ -142,7 +142,7 @@ module Esper.Views {
             o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handleEmailLabel = (e, i) => {
+    handleEmailLabel = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var emails = $.extend(true, [], o.other_emails);
@@ -152,7 +152,7 @@ module Esper.Views {
             o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handleEmailItem = (e, i) => {
+    handleEmailItem = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var emails = $.extend(true, [], o.other_emails);
@@ -182,7 +182,7 @@ module Esper.Views {
           o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handlePhoneLabel = (e, i) => {
+    handlePhoneLabel = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var phones = $.extend(true, [], o.phones);
@@ -192,7 +192,7 @@ module Esper.Views {
           o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
-    handlePhoneItem = (e, i) => {
+    handlePhoneItem = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var phones = $.extend(true, [], o.phones);
@@ -222,7 +222,7 @@ module Esper.Views {
           o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
       });
     }
-    handleAddressLabel = (e, i) => {
+    handleAddressLabel = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var addresses = $.extend(true, [], o.addresses);
@@ -232,7 +232,7 @@ module Esper.Views {
           o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
       });
     }
-    handleAddressItem = (e, i) => {
+    handleAddressItem = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var addresses = $.extend(true, [], o.addresses);
@@ -262,7 +262,7 @@ module Esper.Views {
           o.company_title, o.phones, o.addresses, entries, o.image_url);
       });
     }
-    handleCustomLabel = (e, i) => {
+    handleCustomLabel = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var entries = $.extend(true, [], o.custom_entries);
@@ -272,7 +272,7 @@ module Esper.Views {
           o.company_title, o.phones, o.addresses, entries, o.image_url);
       });
     }
-    handleCustomItem = (e, i) => {
+    handleCustomItem = (e, i: number) => {
       var text = e.target.value;
       this.setState(function(o) {
         var entries = $.extend(true, [], o.custom_entries);
@@ -311,21 +311,23 @@ module Esper.Views {
 
     changeProfile = () => {
       filepicker.pick(
-        function(Blob){
+        function(blob: Blob){
+          debugger;
           this.setState(function(o) {
             return this.createProfile(o.display_name, o.primary_email,
               o.other_emails, o.other_names, o.company, o.company_location,
-              o.company_title, o.phones, o.addresses, o.custom_entries, Blob.url);
+              o.company_title, o.phones, o.addresses, o.custom_entries, blob.url);
           });
         }.bind(this)
       );
     }
 
     cleanList = (list: ApiT.LabelledItem[]) => {
+      debugger;
       var newList : ApiT.LabelledItem[] = [];
       for (var i=0; i < list.length; i++) {
-        if (list[i] == undefined || list[i] === null || list[i].item === "") {
-          break;
+        if (list[i] === undefined || list[i] === null || list[i].item === "") {
+          continue;
         }
         newList.push(list[i]);
       }
