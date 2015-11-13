@@ -82,7 +82,7 @@ module Esper.Views {
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, o.other_names.concat([name]), o.company,
             o.company_location, o.company_title, o.phones, o.addresses,
-            o.custom_entries);
+            o.custom_entries, o.image_url);
       });
     }
     removeName = (i : number) => {
@@ -91,7 +91,7 @@ module Esper.Views {
         delete names[i];
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleNameLabel = (e, i) => {
@@ -101,7 +101,7 @@ module Esper.Views {
         names[i].label = text;
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleNameItem = (e, i) => {
@@ -111,7 +111,7 @@ module Esper.Views {
         names[i].item = text;
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleDisplayName = (e) => {
@@ -119,7 +119,7 @@ module Esper.Views {
       this.setState(function(o) {
         return this.createProfile(text, o.primary_email,
             o.other_emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
 
@@ -130,7 +130,7 @@ module Esper.Views {
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails.concat([email]), o.other_names, o.company,
             o.company_location, o.company_title, o.phones, o.addresses,
-            o.custom_entries);
+            o.custom_entries, o.image_url);
       });
     }
     removeEmail = (i: number) => {
@@ -139,7 +139,7 @@ module Esper.Views {
         delete emails[i];
         return this.createProfile(o.display_name, o.primary_email,
             emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleEmailLabel = (e, i) => {
@@ -149,7 +149,7 @@ module Esper.Views {
         emails[i].label = text;
         return this.createProfile(o.display_name, o.primary_email,
             emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleEmailItem = (e, i) => {
@@ -159,7 +159,7 @@ module Esper.Views {
         emails[i].item = text;
         return this.createProfile(o.display_name, o.primary_email,
             emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries);
+            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
 
@@ -170,7 +170,7 @@ module Esper.Views {
         return this.createProfile(o.display_name, o.primary_email,
             o.other_emails, o.other_names, o.company, o.company_location,
             o.company_title, o.phones.concat([phone]), o.addresses,
-            o.custom_entries);
+            o.custom_entries, o.image_url);
       });
     }
     removePhone = (i: number) => {
@@ -179,7 +179,7 @@ module Esper.Views {
         delete phones[i];
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries);
+          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handlePhoneLabel = (e, i) => {
@@ -189,7 +189,7 @@ module Esper.Views {
         phones[i].label = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries);
+          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handlePhoneItem = (e, i) => {
@@ -199,7 +199,7 @@ module Esper.Views {
         phones[i].item = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries);
+          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
 
@@ -210,7 +210,7 @@ module Esper.Views {
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
           o.company_title, o.phones, o.addresses.concat([address]),
-          o.custom_entries);
+          o.custom_entries, o.image_url);
       });
     }
     removeAddress = (i: number) => {
@@ -219,7 +219,7 @@ module Esper.Views {
         delete addresses[i];
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries);
+          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
       });
     }
     handleAddressLabel = (e, i) => {
@@ -229,7 +229,7 @@ module Esper.Views {
         addresses[i].label = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries);
+          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
       });
     }
     handleAddressItem = (e, i) => {
@@ -239,7 +239,7 @@ module Esper.Views {
         addresses[i].item = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries);
+          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
       });
     }
 
@@ -250,7 +250,7 @@ module Esper.Views {
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
           o.company_title, o.phones, o.addresses,
-          o.custom_entries.concat([entry]));
+          o.custom_entries.concat([entry]), o.image_url);
       });
     }
     removeCustom = (i: number) => {
@@ -259,7 +259,7 @@ module Esper.Views {
         delete entries[i];
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries);
+          o.company_title, o.phones, o.addresses, entries, o.image_url);
       });
     }
     handleCustomLabel = (e, i) => {
@@ -269,7 +269,7 @@ module Esper.Views {
         entries[i].label = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries);
+          o.company_title, o.phones, o.addresses, entries, o.image_url);
       });
     }
     handleCustomItem = (e, i) => {
@@ -279,7 +279,7 @@ module Esper.Views {
         entries[i].item = text;
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries);
+          o.company_title, o.phones, o.addresses, entries, o.image_url);
       });
     }
 
@@ -289,7 +289,7 @@ module Esper.Views {
       this.setState(function(o) {
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, text, o.company_location,
-          o.company_title, o.phones, o.addresses, o.custom_entries);
+          o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleCompanyTitle = (e) => {
@@ -297,7 +297,7 @@ module Esper.Views {
       this.setState(function(o) {
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, o.company_location,
-          text, o.phones, o.addresses, o.custom_entries);
+          text, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
     }
     handleCompanyLoc = (e) => {
@@ -305,8 +305,20 @@ module Esper.Views {
       this.setState(function(o) {
         return this.createProfile(o.display_name, o.primary_email,
           o.other_emails, o.other_names, o.company, text,
-          o.company_title, o.phones, o.addresses, o.custom_entries);
+          o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
       });
+    }
+
+    changeProfile = () => {
+      filepicker.pick(
+        function(Blob){
+          this.setState(function(o) {
+            return this.createProfile(o.display_name, o.primary_email,
+              o.other_emails, o.other_names, o.company, o.company_location,
+              o.company_title, o.phones, o.addresses, o.custom_entries, Blob.url);
+          });
+        }.bind(this)
+      );
     }
 
     cleanList = (list: ApiT.LabelledItem[]) => {
@@ -326,15 +338,18 @@ module Esper.Views {
       var profile = this.createProfile(s.display_name, s.primary_email,
         this.cleanList(s.other_emails), this.cleanList(s.other_names),
         s.company, s.company_location, s.company_title,
-        this.cleanList(s.phones), this.cleanList(s.addresses), this.cleanList(s.custom_entries));
-      Api.setDirProfile(profile);
-      DirProfile.Store.set(profile, { dataStatus: Model.DataStatus.READY });
+        this.cleanList(s.phones), this.cleanList(s.addresses),
+        this.cleanList(s.custom_entries), s.image_url);
+      Api.setDirProfile(profile).done(function() {
+        DirProfile.Store.set(profile, { dataStatus: Model.DataStatus.READY });
+        Route.nav.path("/profile");
+      });
     }
 
-    deleteProfile = () => {
+    /*deleteProfile = () => {
       Api.removeDirProfile();
       DirProfile.Store.set(null, { dataStatus: Model.DataStatus.READY });
-    }
+    }*/
 
     changeOption = (search: string, text: string) => {
       $("#" + search).val(text);
@@ -406,6 +421,15 @@ module Esper.Views {
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
+        <label>Profile Picture</label>
+        <div className="media">
+          <div className="media-left">
+            <a onClick={this.changeProfile}>
+              <img className="media-object edit-profile-image" src={this.state.image_url}/>
+            </a>
+          </div>
+        </div>
+        <div><br/></div>
         <label>Name</label>
         <div className="input-group">
           <span className="input-group-addon">Display Name:</span>
@@ -450,8 +474,6 @@ module Esper.Views {
         <div><br/></div>
         <button className="btn btn-primary"
           onClick={() => this.saveProfile()}>Save</button>
-        <button className="btn btn-primary"
-          onClick={() => this.deleteProfile()}>Delete</button>
       </div>;
     }
   }
