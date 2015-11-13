@@ -13,6 +13,7 @@
 /// <reference path="../marten/typings/lodash/lodash.d.ts" />
 /// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
 /// <reference path="../marten/typings/react/react-global.d.ts" />
+/// <reference path="../marten/typings/filepicker-js/filepicker-js.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
@@ -23,6 +24,7 @@ type EventEmitterType = typeof EventEmitter3.EventEmitter;
 declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
+  export var filepicker: FilePicker.fp;
   export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;

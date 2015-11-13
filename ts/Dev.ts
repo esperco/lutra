@@ -6,5 +6,6 @@ module Esper {
   PRODUCTION = false;
   Api.prefix = "http://localhost";
   Conf.segmentKey = "QwsMs5clHuU0IhYhq664x8VyV32HFph6";
+  Conf.filepickerKey = "AqYeUdtktQ323XkfiN1ggz";
 }
 
