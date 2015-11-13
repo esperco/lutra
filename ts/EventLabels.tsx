@@ -148,7 +148,7 @@ module Esper.EventLabels {
         start: event.start,
         end: event.end,
         guests: event.guests,
-        title: event.title + "!",
+        title: event.title,
 
         // Actual thing we're updating
         labels: labels

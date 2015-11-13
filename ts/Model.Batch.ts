@@ -33,10 +33,20 @@ module Esper.Model {
       }
     }
 
+    /* Check if values have been set for all references in a batch */
+    batchHas(_id: string): boolean {
+      if (this.has(_id)) {
+        return _.every(this.val(_id), (itemId) => this.itemStore.has(itemId));
+      }
+      return false;
+    }
+
     /* Combines a list of _ids with the latest item values */
     batchVal(_id: string): TData[] {
-      var idList = this.val(_id);
-      return _.map(idList, (_id) => this.itemStore.val(_id));
+      if (this.batchHas(_id)) {
+        var idList = this.val(_id);
+        return _.map(idList, (itemId) => this.itemStore.val(itemId));
+      }
     }
 
     /* Batch upserts based on a promise, updates dataStatus accordingly */
