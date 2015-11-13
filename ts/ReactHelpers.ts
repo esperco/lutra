@@ -117,7 +117,7 @@ module Esper.ReactHelpers {
     }
 
     componentWillReceiveProps(nextProps: P) {
-      this.onChange(nextProps);
+      this.updateState(nextProps);
     }
 
     // Call to change the sources this component is listening to. Adds and
@@ -133,8 +133,13 @@ module Esper.ReactHelpers {
       });
     }
 
-    // Callback to trigger from listeners -- can optionally take new props
-    protected onChange(newProps?: P) {
+    // Callback to trigger from listeners -- forces usage of current props
+    protected onChange() {
+      this.updateState();
+    }
+
+    // Update state using getState function
+    protected updateState(newProps?: P) {
       var newState = <S> this.getState(newProps || this.props);
 
       // React doesn't like null / non-object states, so do a quick check
