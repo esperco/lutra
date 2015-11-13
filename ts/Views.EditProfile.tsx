@@ -46,14 +46,13 @@ module Esper.Views {
       var esperProfile = this.props.esperProfile;
 
       if (dirProfile !== undefined) {
-        dirProfile.other_names.unshift(undefined);
+        var names = $.extend(true, [], dirProfile.other_names);
+        names.unshift(undefined);
         this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
-          dirProfile.other_emails, dirProfile.other_names, dirProfile.company,
+          dirProfile.other_emails, names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
           dirProfile.addresses, dirProfile.custom_entries);
       } else if (esperProfile !== undefined) {
-        var otherNames: ApiT.LabelledItem[] = [];
-        otherNames.unshift(undefined);
         var otherEmails: ApiT.LabelledItem[] = [];
         otherEmails.push({ label: "Work", item: esperProfile.email });
         esperProfile.other_emails.map(function(e) {
@@ -61,7 +60,7 @@ module Esper.Views {
           otherEmails.push(x);
         });
         this.state = this.createProfile(esperProfile.display_name,
-          "", otherEmails, otherNames);
+          "", otherEmails, [undefined]);
       } else { //shouldn't happen yet
         this.state = this.createProfile("", "", [], [undefined]);
       }
@@ -282,6 +281,32 @@ module Esper.Views {
       });
     }
 
+    //Company Helpers
+    handleCompany = (e) => {
+      var text = e.target.value;
+      this.setState(function(o) {
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, text, o.company_location,
+          o.company_title, o.phones, o.addresses, o.custom_entries);
+      });
+    }
+    handleCompanyTitle = (e) => {
+      var text = e.target.value;
+      this.setState(function(o) {
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, o.company, o.company_location,
+          text, o.phones, o.addresses, o.custom_entries);
+      });
+    }
+    handleCompanyLoc = (e) => {
+      var text = e.target.value;
+      this.setState(function(o) {
+        return this.createProfile(o.display_name, o.primary_email,
+          o.other_emails, o.other_names, o.company, text,
+          o.company_title, o.phones, o.addresses, o.custom_entries);
+      });
+    }
+
     cleanList = (list: ApiT.LabelledItem[]) => {
       var newList : ApiT.LabelledItem[] = [];
       for (var i=0; i < list.length; i++) {
@@ -376,7 +401,6 @@ module Esper.Views {
     }
 
     render() {
-      var a = false;
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
@@ -399,15 +423,18 @@ module Esper.Views {
         <label>Company Info</label>
         <div className="input-group">
           <span className="input-group-addon">Company:</span>
-          <input type="text" className="form-control"/>
+          <input type="text" className="form-control" defaultValue={this.state.company}
+            onChange={this.handleCompany}/>
         </div>
         <div className="input-group">
           <span className="input-group-addon">Job Title:</span>
-          <input type="text" className="form-control"/>
+          <input type="text" className="form-control" defaultValue={this.state.company_title}
+            onChange={this.handleCompanyTitle}/>
         </div>
         <div className="input-group">
           <span className="input-group-addon">Company Location:</span>
-          <input type="text" className="form-control"/>
+          <input type="text" className="form-control" defaultValue={this.state.company_location}
+            onChange={this.handleCompanyLoc}/>
         </div>
         <div><br/></div>
         <label>Phone</label>
