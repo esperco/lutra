@@ -15,6 +15,7 @@ module Esper.Conf {
 module Esper.Main {
   export function init() {
     Login.init();
+    DirProfile.init();
     Route.init();
     Analytics.init(Conf.segmentKey);
   }

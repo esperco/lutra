@@ -3,6 +3,7 @@
 /// <reference path="./Login.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
+/// <reference path="./Views.Profile.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoginRequired.tsx" />
 

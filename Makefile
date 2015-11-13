@@ -25,9 +25,13 @@ clean:
 	rm -f *~ */*~
 	rm -rf pub
 
-# Copy pub/ into S3 bucket
-s3:
-	./s3-install
+# Copy pub/ into S3 bucket, do a make prod before hand to ensure that only
+# production version is installed and we don't accidentally install dev
+s3: prod
+	./marten/s3-install.sh pub dir.esper.com
+
+staging: prod
+	./marten/s3-install.sh pub dir-staging.esper.com
 
 # Check Marten repo is up to date
 check-marten:
