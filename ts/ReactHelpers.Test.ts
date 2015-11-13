@@ -152,12 +152,12 @@ module Esper.ReactHelpers {
 
   /////////////
 
-  var stringStore = new Model.StoreOne<string>();
+  var stringStore = new Model.Store<string>();
 
   // NB: Wrap string in object because React needs an object
   class StoreComponent extends Component<{ prop: string }, { val: string }> {
     getState(props: { prop: string }) {
-      return { val: stringStore.val() + " " + props.prop };
+      return { val: stringStore.val(props.prop) };
     }
 
     render() {
@@ -173,7 +173,8 @@ module Esper.ReactHelpers {
     beforeEach(function() {
       this.sandbox = $("<div>").appendTo("body");
       this.elm = $('<div class="penguin">').appendTo(this.sandbox);
-      stringStore.set("first");
+      stringStore.upsert("A", "first");
+      stringStore.upsert("B", "second");
       this.elm.renderReact(StoreComponent, { prop: "A" });
       this.component = this.elm.reactComponent();
     });
@@ -185,17 +186,17 @@ module Esper.ReactHelpers {
     });
 
     it("should display initial state", function() {
-      expect(this.component.jQuery().text()).toBe("first A");
+      expect(this.component.jQuery().text()).toBe("first");
     });
 
     it("should use updated state on change", function() {
-      stringStore.set("second");
-      expect(this.component.jQuery().text()).toBe("second A");
+      stringStore.upsert("A", "plus");
+      expect(this.component.jQuery().text()).toBe("plus");
     });
 
     it("should use updated props on change", function() {
       this.elm.renderReact(StoreComponent, { prop: "B" });
-      expect(this.component.jQuery().text()).toBe("first B");
+      expect(this.component.jQuery().text()).toBe("second");
     });
   });
 }
