@@ -8,7 +8,7 @@
 module Esper.Model {
 
   // Base class for Model Stores
-  export class StoreOne<TData> extends StoreBase {
+  export class StoreOne<TData> extends StoreBase<TData> {
 
     // Actual data object
     protected data: [TData, StoreMetadata];
@@ -59,7 +59,7 @@ module Esper.Model {
         data = (<TData> firstArg);
         metadata = (<StoreMetadata> secondArg);
       }
-      else if (firstArg instanceof Array) {
+      else if (this.isTuple(firstArg)) {
         data = (<TData> firstArg[0]);
         metadata = (<StoreMetadata> firstArg[1]);
       }
