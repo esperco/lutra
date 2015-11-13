@@ -125,7 +125,15 @@ module Esper.Components {
 
         callback(_.map(events, (event): FullCalendar.EventObject => {
           var eventId = Calendars.getEventId(event);
-          var selected = this.props.eventId === eventId;
+          var classNames: string[] = [];
+          if (this.props.eventId === eventId) {
+            classNames.push("active");
+          } else {
+            classNames.push("selectable");
+          }
+          if (event.labels && event.labels.length) {
+            classNames.push("labeled");
+          }
           return {
             id: eventId,
             title: event.title || "",
@@ -133,7 +141,7 @@ module Esper.Components {
             start: this.adjustTz(event.start.local),
             end: this.adjustTz(event.end.local),
             editable: false,
-            className: (selected ? "active" : "selectable")
+            className: classNames.join(" ")
           };
         }));
       }).fail(() => {
