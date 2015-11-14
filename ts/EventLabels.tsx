@@ -116,7 +116,7 @@ module Esper.EventLabels {
       if (checkedByAll) {
         icon = "fa-check-square";
       } else if (checkedBySome) {
-        icon = "fa-check-square-o";
+        icon = "fa-minus-square-o";
       } else {
         icon = "fa-square-o"
       }
