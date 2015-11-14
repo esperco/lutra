@@ -168,10 +168,10 @@ declare module FullCalendar {
     export interface View {
         name: string;
         title: string;
-        start: Date | string;
-        end: Date | string;
-        visStart: Date;
-        visEnd: Date;
+        start: moment.Moment;
+        end: moment.Moment;
+        intervalStart: moment.Moment;
+        intervalEnd: moment.Moment;
     }
 
     export interface ViewOptionHash {

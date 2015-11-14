@@ -441,7 +441,7 @@ module Esper.Model {
       });
 
       it("should set an initial value if one is passed", function() {
-        myRabbitStore.push(this.uid, this.dfd, {
+        myRabbitStore.push(this.uid, this.dfd.promise(), {
           uid: this.uid, carrots: 123
         });
         expect(myRabbitStore.val(this.uid).carrots).toEqual(123);
@@ -500,6 +500,28 @@ module Esper.Model {
             expect(metadata.dataStatus).toBe(DataStatus.PUSH_ERROR);
             expect(metadata.lastError).toBe(this.err);
           });
+      });
+
+      describe("if data at key is UNSAVED after fetch initiated", function() {
+        beforeEach(function() {
+          myRabbitStore.push(this.uid, this.dfd, {
+            uid: this.uid, carrots: 123
+          });
+          myRabbitStore.update(this.uid, {
+            uid: this.uid,
+            carrots: 456
+          }, {
+            dataStatus: DataStatus.UNSAVED
+          });
+          this.dfd.resolve();
+        });
+
+        it("should not update dataStatus to READY after resolution",
+          function()
+        {
+          expect(myRabbitStore.metadata(this.uid).dataStatus)
+            .toBe(DataStatus.UNSAVED);
+        });
       });
     });
 
