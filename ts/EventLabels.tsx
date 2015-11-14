@@ -167,16 +167,7 @@ module Esper.EventLabels {
 
     protected scheduleUpdate(event: ApiT.CalendarEvent, labels: string[]) {
       var _id = this.queueIdFn(event);
-      nextUpdates[_id] = {
-        // Because these props aren't optional for some reason
-        start: event.start,
-        end: event.end,
-        guests: event.guests,
-        title: event.title,
-
-        // Actual thing we're updating
-        labels: labels
-      };
+      nextUpdates[_id] = labels;
 
       // Enqueue update that only fires API call if the nextUpdates object
       // has a saved update.
@@ -186,7 +177,7 @@ module Esper.EventLabels {
           var calId = event.google_cal_id;
           var eventId = event.google_event_id;
           delete nextUpdates[_id];
-          return Api.updateIndividualEvent(calId, eventId, edit);
+          return Api.updateEventLabels(calId, eventId, edit);
         }
       });
 
@@ -207,8 +198,8 @@ module Esper.EventLabels {
       "|" + event.google_event_id;
   };
 
-  // Used to track the next pending update for an id in a queue
+  // Used to track the next pending label update for an id in a queue
   var nextUpdates: {
-    [index: string]: ApiT.CalendarEventEdit
+    [index: string]: string[]
   } = {};
 }

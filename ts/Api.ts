@@ -993,7 +993,7 @@ module Esper.Api {
   export function updateEventLabels(calendar_id: string, event_id: string,
                                     labels: string[]):
   JQueryPromise<void> {
-    var url = prefix + "/api/calendar/event/labels/" + string(Login.myUid())
+    var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + encodeURIComponent(calendar_id)
             + "/" + encodeURIComponent(event_id);
     return JsonHttp.post(url, JSON.stringify({labels:labels}));
