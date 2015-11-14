@@ -14,8 +14,8 @@ module Esper.Components {
   interface CalendarProps {
     teamId: string;
     calId: string;
-    eventId?: string;
-    updateFn: (eventId: string, eventTitle?: string) => void;
+    eventIds?: string[];
+    updateFn: (eventId: string, eventTitle: string, add: boolean) => void;
   }
 
   interface CalendarState {
@@ -81,7 +81,7 @@ module Esper.Components {
         snapDuration: "00:15:00",
         events: this.getSync.bind(this),
         viewRender:this.fetchAsync.bind(this),
-        eventClick: this.selectEvent.bind(this),
+        eventClick: this.toggleEvent.bind(this),
         height: fcDiv.parent().height() - 10,
         windowResize: () => {
           fcDiv.fullCalendar('option', 'height', fcDiv.parent().height() - 10);
@@ -161,11 +161,9 @@ module Esper.Components {
 
       callback(_.map(events, (event): FullCalendar.EventObject => {
         var eventId = Calendars.getEventId(event);
-        var classNames: string[] = [];
-        if (this.props.eventId === eventId) {
+        var classNames: string[] = ["selectable"];
+        if (_.contains(this.props.eventIds || [], eventId)) {
           classNames.push("active");
-        } else {
-          classNames.push("selectable");
         }
         if (event.labels && event.labels.length) {
           classNames.push("labeled");
@@ -190,11 +188,10 @@ module Esper.Components {
       return moment.tz(timestamp, calendar.calendar_timezone).toDate()
     }
 
-    // Handle event selection
-    selectEvent(event: FullCalendar.EventObject) {
-      // Completely replace previous eventIds -- i.e. currently only support
-      // selection of a single event. We may want to revisit in the future.
-      this.props.updateFn(event.id, event.title);
+    // Handle event selection, toggle
+    toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
+      var currentlySelected = _.contains(this.props.eventIds || [], event.id);
+      this.props.updateFn(event.id, event.title, jsEvent.shiftKey);
     }
   }
 }

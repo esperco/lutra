@@ -15,7 +15,9 @@ module Esper.Components {
   interface CalSelectorProps {
     selectedTeamId: string;
     selectedCalId: string;
-    updateFn: (teamId: string, calId: string) => void
+    updateFn: (teamId: string, calId: string) => void;
+    minimized?: boolean;
+    toggleMinimized?: () => void;
   }
 
   interface CalSelectorState {
@@ -26,16 +28,24 @@ module Esper.Components {
     Component<CalSelectorProps, CalSelectorState>
   {
     render() {
+      if (this.props.toggleMinimized) {
+        var minIcon = <i className={"fa pull-right min-icon " +
+          (this.props.minimized ? "fa-plus-square" : "fa-minus-square")
+        } onClick={this.props.toggleMinimized} />;
+      }
       return <div className="esper-borderless-section">
         <h4 className="esper-header">
+          {minIcon}
           <i className="fa fa-fw fa-calendar"></i>{" "}
           Select Calendar
         </h4>
         <div className="esper-content">
         {
-          this.state.teams.length ?
-          this.renderTeams(this.state.teams) :
-          "No Teams Found"
+          this.props.minimized ? "" :
+          ( this.state.teams.length ?
+            this.renderTeams(this.state.teams) :
+            "No Teams Found"
+          )
         }
         </div>
       </div>;
