@@ -7,6 +7,7 @@
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Calendars.ts" />
+/// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -15,7 +16,9 @@ module Esper.Components {
   interface CalSelectorProps {
     selectedTeamId: string;
     selectedCalId: string;
-    updateFn: (teamId: string, calId: string) => void
+    updateFn: (teamId: string, calId: string) => void;
+    minimized?: boolean;
+    toggleMinimized?: () => void;
   }
 
   interface CalSelectorState {
@@ -26,19 +29,14 @@ module Esper.Components {
     Component<CalSelectorProps, CalSelectorState>
   {
     render() {
-      return <div className="esper-borderless-section">
-        <h4 className="esper-header">
-          <i className="fa fa-fw fa-calendar"></i>{" "}
-          Select Calendar
-        </h4>
-        <div className="esper-content">
-        {
-          this.state.teams.length ?
+      return <BorderlessSection icon="fa-calendar" title="Select Calendar"
+          minimized={this.props.minimized}
+          toggleMinimized={this.props.toggleMinimized}>
+        { this.state.teams.length ?
           this.renderTeams(this.state.teams) :
           "No Teams Found"
         }
-        </div>
-      </div>;
+      </BorderlessSection>;
     }
 
     renderTeams(teams: ApiT.Team[]) {

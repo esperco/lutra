@@ -12,8 +12,10 @@ module Esper.Views {
   interface CalSelection {
     teamId: string;
     calId: string;
-    eventId?: string;
-    eventTitle?: string;
+    events: {
+      id: string,
+      title: string
+    }[]
   }
   var calSelectStore = new Model.StoreOne<CalSelection>();
 
@@ -21,28 +23,64 @@ module Esper.Views {
   function updateSelection(teamId: string, calId: string) {
     var current = calSelectStore.val();
 
-    // Update only if calendar doesn't match (to avoid clobbering eventId)
+    // Update only if calendar doesn't match (to avoid clobbering events)
     if (!current || current.teamId !== teamId || current.calId !== calId) {
-      calSelectStore.set({teamId: teamId, calId: calId});
+      calSelectStore.set({teamId: teamId, calId: calId, events: []});
     }
   }
 
-  function updateEvent(eventId: string, eventTitle?: string) {
+  function updateEvent(eventId: string, eventTitle: string, add: boolean) {
     calSelectStore.set(function(oldData) {
       var newData = _.cloneDeep(oldData);
-      newData.eventId = eventId;
-      newData.eventTitle = eventTitle;
+      newData.events = newData.events || [];
+      var selected = _.find(newData.events, (e) => e.id === eventId);
+
+      // Add => cumulative, shift key is down
+      if (add) {
+        if (selected) {
+          newData.events = _.filter(newData.events, (e) => e.id !== eventId);
+        } else {
+          newData.events.push({
+            id: eventId,
+            title: eventTitle
+          });
+        }
+      }
+
+      // Exclusive, select one event only
+      else if (selected) {
+        newData.events = [];
+      } else {
+        newData.events = [{
+          id: eventId,
+          title: eventTitle
+        }];
+      }
+
+      // Switch to minimized state for calendar selector as soon as we pick
+      // an event so we can start labeling right away
+      if (!selected && !calSelectMinStore.isSet()) {
+        calSelectMinStore.set(true);
+      }
+
       return newData;
     });
-
-    // Trigger async calls
-    ApiC.getTaskListForEvent(eventId, false, false);
   }
 
   function setDefaults() {
     if (! calSelectStore.isSet()) {
-      calSelectStore.set(Calendars.defaultSelection());
+      calSelectStore.set(_.extend({
+        events: []
+      }, Calendars.defaultSelection()) as CalSelection);
     }
+  }
+
+  // Store to track minimized state of cal selector
+  var calSelectMinStore = new Model.StoreOne<boolean>();
+
+  function toggleMinCalSelect() {
+    var current = calSelectMinStore.val();
+    calSelectMinStore.set(!current);
   }
 
 
@@ -50,6 +88,7 @@ module Esper.Views {
 
   interface CalendarLabelingState {
     selectedCal: CalSelection;
+    minimizeCalSelector: boolean;
   }
 
   export class CalendarLabeling extends Component<{}, CalendarLabelingState> {
@@ -71,7 +110,10 @@ module Esper.Views {
             <Components.CalSelector
               selectedTeamId={selectedTeamId}
               selectedCalId={selectedCalId}
-              updateFn={updateSelection} />
+              updateFn={updateSelection}
+              minimized={this.state.minimizeCalSelector}
+              toggleMinimized={toggleMinCalSelect}
+            />
             {this.renderLabelEditor()}
           </div>
           <div className="col-sm-9 col-lg-10 esper-right-content padded">
@@ -92,7 +134,7 @@ module Esper.Views {
       return <Components.Calendar
         teamId={this.state.selectedCal.teamId}
         calId={this.state.selectedCal.calId}
-        eventId={this.state.selectedCal.eventId}
+        eventIds={_.map(this.state.selectedCal.events, (e) => e.id)}
         updateFn={updateEvent}
       />;
     }
@@ -108,12 +150,13 @@ module Esper.Views {
     }
 
     renderLabelEditor() {
-      if (this.state.selectedCal && this.state.selectedCal.eventId) {
+      if (this.state.selectedCal &&
+          this.state.selectedCal.events &&
+          this.state.selectedCal.events.length > 0) {
         return <Components.LabelEditor
           teamId={this.state.selectedCal.teamId}
           calId={this.state.selectedCal.calId}
-          eventId={this.state.selectedCal.eventId}
-          eventTitle={this.state.selectedCal.eventTitle}
+          events={this.state.selectedCal.events}
         />;
       } else {
         return <span />;
@@ -123,12 +166,14 @@ module Esper.Views {
     componentDidMount() {
       this.setSources([
         calSelectStore,
+        calSelectMinStore
       ]);
     }
 
     getState() {
       return {
-        selectedCal: calSelectStore.val()
+        selectedCal: calSelectStore.val(),
+        minimizeCalSelector: calSelectMinStore.val()
       }
     }
   }
