@@ -129,15 +129,39 @@ module Esper.EventLabels {
     }
 
     protected toggle(label: string) {
+      // Toggling logic - apply label to events unless ALL events already have
+      // it applied, in which case remove.
+      var add = !_.contains(this.getAllChecked(), label);
+
+      // Update state
+      this.setState({
+        busy: true,
+        hasError: false
+      });
+
+      var promises: JQueryPromise<void>[] = [];
       _.each(this.props.events, (ev) => {
         var newLabels: string[];
-        if (_.contains(ev.labels, label)) {
-          newLabels = _.without(ev.labels, label);
-        } else {
+        if (add) {
           // Concat rather than push so we don't mutate task prop
           newLabels = (ev.labels || []).concat([label]);
+        } else {
+          newLabels = _.without(ev.labels, label);
         }
-        this.scheduleUpdate(ev, newLabels);
+        promises.push(this.scheduleUpdate(ev, newLabels));
+      });
+
+      var allPromises: JQueryPromise<void> = $.when.apply($, promises);
+      allPromises.done(() => {
+        this.setState({
+          busy: false,
+          hasError: false
+        });
+      }).fail(() => {
+        this.setState({
+          busy: false,
+          hasError: true
+        });
       });
     }
 
@@ -154,12 +178,6 @@ module Esper.EventLabels {
         labels: labels
       };
 
-      // Update state
-      this.setState({
-        busy: true,
-        hasError: false
-      });
-
       // Enqueue update that only fires API call if the nextUpdates object
       // has a saved update.
       var p = Queue.enqueue(_id, () => {
@@ -172,22 +190,12 @@ module Esper.EventLabels {
         }
       });
 
-      p.done(() => {
-        this.setState({
-          busy: false,
-          hasError: false
-        });
-      }).fail(() => {
-        this.setState({
-          busy: false,
-          hasError: true
-        });
-      });
-
       // Fire callback to parent
       if (this.props.callback) {
         this.props.callback(event, labels, p);
       }
+
+      return p;
     }
   }
 
