@@ -6,6 +6,7 @@
 /// <reference path="../marten/ts/EventLabels.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -18,7 +19,10 @@ module Esper.Components {
     events: {
       id: string;
       title?: string;
-    }[]
+    }[],
+
+    minimized?: boolean;
+    toggleMinimized?: () => void;
   }
 
   interface LabelEditorState {
@@ -38,16 +42,12 @@ module Esper.Components {
         this.props.events.length + " Events Selected"
       );
 
-      return <div className="esper-borderless-section">
-        <h4 className="esper-header">
-          <i className="fa fa-fw fa-tags"></i>{" "}
-          Select Labels
-        </h4>
-        <div className="esper-content">
-          <h5 className="esper-subheader">{heading}</h5>
-          { this.renderContent() }
-        </div>
-      </div>;
+      return <BorderlessSection icon="fa-tags" title="Select Labels"
+          minimized={this.props.minimized}
+          toggleMinimized={this.props.toggleMinimized}>
+         <h5 className="esper-subheader">{heading}</h5>
+         { this.renderContent() }
+      </BorderlessSection>;
     }
 
     renderContent() {

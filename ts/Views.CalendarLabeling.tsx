@@ -57,6 +57,12 @@ module Esper.Views {
         }];
       }
 
+      // Switch to minimized state for calendar selector as soon as we pick
+      // an event so we can start labeling right away
+      if (!selected && !calSelectMinStore.isSet()) {
+        calSelectMinStore.set(true);
+      }
+
       return newData;
     });
   }
