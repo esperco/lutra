@@ -175,6 +175,14 @@
   line-height: @input-height-base;
   vertical-align: middle;
   margin-top: @padding-small-vertical;
+
+  .min-icon {
+    cursor: pointer;
+  }
+
+  .pull-right {
+    line-height: @input-height-base;
+  }
 }
 
 .esper-borderless-section {
@@ -189,5 +197,9 @@
 
   &.padded {
     .esper-padded;
+  }
+
+  &:last-child {
+    margin-bottom: @panel-body-padding;
   }
 }
