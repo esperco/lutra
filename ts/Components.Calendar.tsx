@@ -191,7 +191,8 @@ module Esper.Components {
     // Handle event selection, toggle
     toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
       var currentlySelected = _.contains(this.props.eventIds || [], event.id);
-      this.props.updateFn(event.id, event.title, jsEvent.shiftKey);
+      this.props.updateFn(event.id, event.title,
+        jsEvent.shiftKey || jsEvent.ctrlKey);
     }
   }
 }
