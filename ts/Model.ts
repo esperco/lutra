@@ -439,9 +439,9 @@ module Esper.Model {
 
   ////////////
 
-  interface TrackingKey {
+  export interface TrackingKey {
     store: StoreBase<any>;
-    key: string;
+    key?: string;
   }
 
   /*
@@ -467,15 +467,21 @@ module Esper.Model {
     return ret;
   }
 
-  export function register<T>(store: StoreBase<T>, key: string) {
+  export function register<T>(store: StoreBase<T>, key?: string) {
     // Avoid duplicate registries
     if (isTrackingActive &&
         !_.find(trackingKeys, (k) => k.store === store && k.key === key))
     {
-      trackingKeys.push({
-        store: store,
-        key: key
-      });
+      if (key) {
+        trackingKeys.push({
+          store: store,
+          key: key
+        });
+      } else {
+        trackingKeys.push({
+          store: store,
+        });
+      }
     }
   }
 

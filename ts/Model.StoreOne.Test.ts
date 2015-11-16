@@ -191,10 +191,8 @@ module Esper.Model {
 
         expect(this.post).toHaveBeenCalledWith([{
           store: myRabbitStore,
-          key: ""
         }, {
           store: yourRabbitStore,
-          key: ""
         }]);
       });
     });

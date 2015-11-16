@@ -44,7 +44,7 @@ module Esper.Model {
 
     // Returns true if an item exists
     isSet(): boolean {
-      register(this, "");
+      register(this);
       return this.hasOwnProperty("data");
     }
 
