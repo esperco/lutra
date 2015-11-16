@@ -198,5 +198,12 @@ module Esper.ReactHelpers {
       this.elm.renderReact(StoreComponent, { prop: "B" });
       expect(this.component.jQuery().text()).toBe("second");
     });
+
+    it("should disconnect on removal", function() {
+      spyOn(this.component, "setState");
+      this.sandbox.remove();
+      stringStore.upsert("A", "plus");
+      expect(this.component.setState).not.toHaveBeenCalled();
+    });
   });
 }

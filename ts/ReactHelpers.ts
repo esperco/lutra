@@ -124,19 +124,22 @@ module Esper.ReactHelpers {
     // removes listeners as appropriate.
     protected setSources(newSources: Emit.EmitBase[]): void {
       _.each(this.sources || [], (source) => {
-        source.removeChangeListener(this.onChange.bind(this));
+        source.removeChangeListener(this.onChange);
       });
 
       this.sources = newSources;
       _.each(this.sources, (source) => {
-        source.addChangeListener(this.onChange.bind(this));
+        source.addChangeListener(this.onChange);
       });
     }
 
-    // Callback to trigger from listeners -- forces usage of current props
-    protected onChange() {
-      this.updateState();
-    }
+    /*
+      Callback to trigger from listeners -- forces usage of current props.
+
+      Arrow function so that we can have consistent external references to
+      this.onChange, but still has access to "this".
+    */
+    protected onChange = () => { this.updateState(); }
 
     // Update state using getState function
     protected updateState(newProps?: P) {
