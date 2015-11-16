@@ -111,7 +111,7 @@ module Esper.ReactHelpers {
       });
     }
 
-    renderWithData() {
+    renderWithData(): JSX.Element {
       return React.createElement("span");
     }
 
