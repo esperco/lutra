@@ -167,16 +167,7 @@ module Esper.TeamSettings {
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));
     contentTmp.append(TemplateTab.load(team, contentTmp))
-
-    /* We don't have access to executive email accounts,
-     * so executives don't need to configure label sync. */
-    if (Login.isExecCustomer(team)) {
-      tabViewLab.shown = false;
-      tabLab.remove();
-      contentLab.remove();
-    } else {
-      contentLab.append(LabelsTab.load(team));
-    }
+    contentLab.append(LabelsTab.load(team));
 
     var last = findLastShown(tabViews);
     last.tab.children() // the <a> element
