@@ -146,8 +146,25 @@ module Esper.ReactHelpers {
       var newState = <S> this.getState(newProps || this.props);
 
       // React doesn't like null / non-object states, so do a quick check
-      if (newState) {
+      if (newState !== undefined && newState !== null) {
         this.setState(newState)
+      } else {
+
+        /*
+          NB: React docs advise against doing a forceUpdate for simplicity
+          and efficiency reasons but if you're using our `setSources` helper,
+          it's actually simpler to provide a mechanism by which the component
+          will always re-render in the event a source changes without needing
+          to define a getState function. It's a little less efficient since we
+          can't do a `shouldComponentUpdate` check, but simpler than
+          artificially introducing state management.
+
+          If efficiency is important, define `getState` to return the existing
+          `this.state` rather than null or undefined, and then define a
+          `shoudComponentUpdate` function that returns false if states are
+          identical (===).
+        */
+        this.forceUpdate();
       }
     }
 

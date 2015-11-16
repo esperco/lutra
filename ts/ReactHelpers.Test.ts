@@ -206,4 +206,41 @@ module Esper.ReactHelpers {
       expect(this.component.setState).not.toHaveBeenCalled();
     });
   });
+
+
+  //////////
+
+  class StatelessStoreComponent extends Component<{}, {}> {
+    render() {
+      return React.createElement("div", {}, stringStore.val("myVal"));
+    }
+
+    componentDidMount(): void {
+      this.setSources([stringStore]);
+    }
+  }
+
+  describe("ReactHelpers.Component hooked up to a store without setState",
+    function()
+  {
+    beforeEach(function() {
+      this.sandbox = $("<div>").appendTo("body");
+      this.elm = $('<div class="penguin">').appendTo(this.sandbox);
+      stringStore.upsert("myVal", "first");
+      this.elm.renderReact(StatelessStoreComponent);
+      this.component = this.elm.reactComponent();
+    });
+
+    afterEach(function() {
+      stringStore.reset();
+      stringStore.removeAllChangeListeners();
+      this.sandbox.remove();
+    });
+
+    it("should force update when a source changes", function() {
+      spyOn(this.component, "render").and.callThrough();
+      stringStore.upsert("myVal", "second");
+      expect(this.component.render).toHaveBeenCalled();
+    });
+  });
 }
