@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../marten/ts/EventLabels.tsx" />
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="./CurrentThread.ts" />
 
 module Esper.EventLabels {
@@ -27,7 +28,8 @@ module Esper.EventLabels {
           itemClasses="list-group-item"
           team={this.state.team}
           events={events}
-          callback={this.toggleLabelCallback.bind(this)} />
+          callback={this.toggleLabelCallback.bind(this)}
+          callbackAll={this.analyticsCallback.bind(this)} />
       }
 
       return <div className="esper-section-content esper-no-content">
@@ -56,6 +58,12 @@ module Esper.EventLabels {
 
       // Update watcher
       CurrentThread.linkedEvents.set(linkedEvents);
+    }
+
+    analyticsCallback(events: ApiT.CalendarEvent[]) {
+      Analytics.track(Analytics.Trackable.EditGmailEventLabels, {
+        eventsSelected: events.length
+      });
     }
 
     /*

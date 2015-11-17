@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../marten/ts/EventLabels.tsx" />
+/// <reference path="../common/Analytics.ts" />
 /// <reference path="./CurrentEvent.ts" />
 
 module Esper.EventLabels {
@@ -39,7 +40,8 @@ module Esper.EventLabels {
             itemClasses="list-group-item"
             team={this.props.team}
             events={[this.props.event]}
-            callback={this.toggleLabelCallback.bind(this)} />
+            callback={this.toggleLabelCallback.bind(this)}
+            callbackAll={this.analyticsCallback.bind(this)} />
         }
       </div>);
     }
@@ -59,6 +61,12 @@ module Esper.EventLabels {
       var newData = _.clone(event);
       newData.labels = labels;
       CurrentEvent.eventStore.push(_id, promise, newData);
+    }
+
+    analyticsCallback(events: ApiT.CalendarEvent[]) {
+      Analytics.track(Analytics.Trackable.EditGcalEventLabels, {
+        eventsSelected: events.length
+      });
     }
   }
 }
