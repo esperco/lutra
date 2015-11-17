@@ -17,6 +17,9 @@ module Esper.Views {
   };
 
   export class Profile extends Component<{}, ProfileState> {
+    test = () => {
+      Route.nav.path("/edit-profile")
+    }
     render() {
       if (this.state.busy) {
         return <div className="container esper-spinner" />;
@@ -99,6 +102,8 @@ module Esper.Views {
             {addressRows}
             {customRows}
           </table>
+          <button className="btn btn-primary"
+            onClick={() => this.test() }>Edit</button>
         </div>
       </div>;
     }

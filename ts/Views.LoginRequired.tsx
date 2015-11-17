@@ -7,21 +7,29 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   export class LoginRequired extends Component<{}, {}> {
-    render() {
+    submitLogin = (e) => {
+      e.preventDefault();
+      var email = document.forms["login"]["email"].value;
+      var password = document.forms["login"]["password"].value;
+    }
 
-      return <div id="login-required-page" className="esper-full-screen padded">
-        <div className="esper-focus-message">
-          <div>
-            <h2>Login Required.</h2>
-            <p>
-              You must{" "}
-              <a href={Login.loginURL()}>login</a>
-              {" "}to view this page.
-            </p>
+    render() {
+      return <div className="container">
+        <h2>Sign In</h2>
+        <form name="login">
+          <div className="form-group">
+            <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
           </div>
+          <div className="form-group">
+            <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
+          </div>
+          <button type="submit" onClick={this.submitLogin}
+            className="btn btn-default">Submit</button>
+        </form>
+        <div>
+          <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
         </div>
       </div>;
     }
   }
 }
-
