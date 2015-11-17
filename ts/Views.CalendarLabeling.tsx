@@ -83,6 +83,9 @@ module Esper.Views {
     calSelectMinStore.set(!current);
   }
 
+  // Export with prefix for testing
+  export var clCalSelectStore = calSelectStore;
+  export var clCalSelectMinStore = calSelectMinStore;
 
   ////
 
@@ -124,7 +127,7 @@ module Esper.Views {
     }
 
     renderCalendar() {
-      if (! this.state.selectedCal) {
+      if (!this.state.selectedCal || !this.state.selectedCal.calId) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-calendar"></i>{" "}
           Please select a calendar

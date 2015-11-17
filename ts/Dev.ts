@@ -1,6 +1,9 @@
 /// <reference path="./Main.ts" />
 /// <reference path="./Layout.Test.ts" />
 /// <reference path="./Route.Test.ts" />
+/// <reference path="./Calendars.Test.ts" />
+/// <reference path="./Views.CalendarLabeling.Test.tsx" />
+/// <reference path="./Views.LabelsOverTime.Test.tsx" />
 
 module Esper {
   PRODUCTION = false;

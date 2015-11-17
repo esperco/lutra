@@ -39,7 +39,7 @@ module Esper.Calendars {
       _.each(team.team_calendars, (cal) => {
         var likelihood = 0;
         if (cal.is_primary) {
-          retScore = 100;
+          likelihood = 100;
         }
         if (cal.calendar_default_write) {
           likelihood += 10;
