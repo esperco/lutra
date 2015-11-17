@@ -59,7 +59,7 @@ module Esper.Views {
   }
 
   // Hard-coded (for now) total number of intervals
-  var NUM_INTERVALS = 5;
+  export var NUM_INTERVALS = 5;
 
   // Action to update selected interval
   function updateInterval(interval: TimeStats.Interval) {
@@ -93,6 +93,12 @@ module Esper.Views {
       labels: labels
     });
   }
+
+
+  // Export stores with prefix for test access
+  export var lotCalSelectorStore = calSelectStore;
+  export var lotIntervalSelectStore = intervalSelectStore;
+  export var lotLabelSelectStore = labelSelectStore;
 
 
   ////////
