@@ -158,7 +158,10 @@ module Esper.Auth {
             request.value.googleAccountId,
             function() { Log.d("Removed credentials from storage"); }
           );
-          window.location.reload();
+          if (HostUrl.isGmail(window.location.href) ||
+              HostUrl.isGcal(window.location.href)) {
+            window.location.reload();
+          }
           break;
 
         case "ClearSyncStorage":
