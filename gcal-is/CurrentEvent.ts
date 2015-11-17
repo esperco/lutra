@@ -3,8 +3,11 @@
 */
 
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../marten/ts/Model.Batch.ts" />
+/// <reference path="../marten/ts/Model.Capped.ts" />
 /// <reference path="../marten/ts/Watchable.ts" />
 /// <reference path="../common/Api.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Teams.ts" />
@@ -13,14 +16,61 @@
 
 module Esper.CurrentEvent {
 
-  // Watcher for reference to current event
-  export var eventIdStore = new Model.StoreOne<Types.FullEventId>();
+  // Things to store
+  // * FullEventId => Events
+  // * taskid => Tasks
+  // * task list for current event
+  // * Currently selected team
+  // * Currently selected fullEvent
 
-  // Watcher for reference to currently selected team
-  export var teamStore = new Model.StoreOne<ApiT.Team>();
+  // event Id plus selected team
+  interface CurrentSelection extends Types.FullEventId {
+    calendarId: string;
+    eventId: string;
 
-  // Watcher for reference to current task (set via currentTeam and eventId)
-  export var taskStore = new Model.StoreOne<ApiT.Task|ApiT.NewTask>();
+    /*
+      It'd be more consistent to store a teamId and keep the teams separate
+      so we could update team data without having refresh other stores, but
+      team data rarely changes, so OK to store this in denormalized form.
+    */
+    team?: ApiT.Team;
+  }
+  export var currentStore = new Model.StoreOne<CurrentSelection>();
+
+  // Watcher for storing actual event data
+  export var eventStore = new Model.CappedStore<ApiT.CalendarEvent>();
+
+  // Watcher for storing task data
+  export var taskStore = new Model.CappedStore<ApiT.Task>();
+
+  // Watcher for map between events and tasks
+  export var taskEventStore = new Model.BatchStore(taskStore);
+
+  // Get key for eventStore (task is just taskId)
+  export function getEventKey(calId: string, eventId: string): string;
+  export function getEventKey(evt: ApiT.CalendarEvent|Types.FullEventId);
+  export function getEventKey(first: any, second?: any) {
+    var calId: string;
+    var eventId: string;
+    if (second) {
+      calId = first;
+      eventId = second;
+    }
+
+    else {
+      var calEvent = <ApiT.CalendarEvent> first;
+      if (calEvent.google_cal_id) {
+        calId = calEvent.google_cal_id;
+        eventId = calEvent.google_event_id;
+      } else {
+        var fullEvent = <Types.FullEventId> first;
+        calId = fullEvent.calendarId;
+        eventId = fullEvent.eventId;
+      }
+    }
+
+    return calId + "|" + eventId;
+  }
 
   /*
     Function to set the above stores and watchers when eventId changes.
@@ -28,151 +78,119 @@ module Esper.CurrentEvent {
     the stores/watchers listen to each other to avoid callback soup.
   */
   export function setEventId(fullEventId: Types.FullEventId) {
-    eventIdStore.set(fullEventId);
 
     if (fullEventId && fullEventId.eventId) {
-      // Signal that we're fetching a new task
-      taskStore.set(function(task, metadata) {
-        return [task, {
-          dataStatus: Model.DataStatus.FETCHING
-        }];
-      });
+      var eventKey = getEventKey(fullEventId);
 
       // Ensure we have login info before making new calls
-      Login.getLoginInfo()
+      var initPromise = Login.getLoginInfo()
 
         // Also make sure teams are initialized first (if we don't pass a
         // param, this won't re-run API call if already set or in progress)
         .then(function() {
           return Teams.initialize();
-        })
-
-        // Fetch task for this event
-        .then(function() {
-          return Api.getTaskListForEvent(fullEventId.eventId, false, false)
-            .then(function(tasks): ApiT.Task {
-              return tasks && tasks[0];
-            });
-        })
-
-        // Update current task and team based on event
-        .then(function(task) {
-          if (task) {
-            taskStore.set([task, {dataStatus: Model.DataStatus.READY}]);
-            teamStore.set(_.find(Login.myTeams(), function(team) {
-              return team.teamid === task.task_teamid;
-            }));
-          }
-
-          // If no task for event, infer current team from calendar Id
-          else {
-            taskStore.unset();
-            teamStore.set(guessTeam(fullEventId.calendarId));
-          }
         });
-    }
-  }
 
-  export function getEventId() {
-    return eventIdStore.val();
-  }
+      /*
+        Fetch event details and update stores -- event data is fetched
+        alongside task data, but parallel fetch event promises in case there
+        is no task.
+      */
+      if (! eventStore.has(eventKey)) {
+        var eventPromise = initPromise
+          .then(function() {
+            var team = guessTeam(fullEventId.calendarId);
+            var calId = fullEventId.calendarId;
+            var eventId = fullEventId.eventId;
+            refreshEvent(team, calId, eventId);
+          });
+      }
 
-  /*
-    Returns a promise that resolves to the task for the current event.
-    Will create task if none exists yet and will fetch from local store if
-    already set.
-  */
-  export function getTask(): JQueryPromise<ApiT.Task> {
-    // Check current store, but be sure to check it's actually a task and
-    // not a NewTask
-    var current = taskStore.val();
-    if (current && (<ApiT.Task> current).taskid) {
-      return Promise.defer(<ApiT.Task> current);
-    }
+      // Promise to set task and taskEvents
+      var tasksPromise: JQueryPromise<ApiT.Task[]>;
+      if (! taskEventStore.batchHas(eventKey)) {
+        tasksPromise = initPromise
+          .then(function() {
+            return Api.getTaskListForEvent(fullEventId.eventId, true, false);
+          });
 
-    /* Else, create/refresh a task */
-    return refreshTask();
-  }
+        var taskEventPromise = tasksPromise
+          .then(function(tasks: ApiT.Task[]) {
+            return _.map(tasks, (t) => [t.taskid, t]);
+          });
+        taskEventStore.batchFetch(eventKey, taskEventPromise);
 
-  /* Refresh existing task and stores; create task if none exists */
-  export function refreshTask(): JQueryPromise<ApiT.Task> {
-    var ret: JQueryPromise<ApiT.Task>;
+        // Also update any events tied to tasks
+        tasksPromise
+          .done(function(tasks: ApiT.Task[]) {
+            _.each(tasks, (t) => {
+              _.each(t.task_events, (e) => {
+                if (e.task_event) {
+                  var k = getEventKey(e.task_event);
+                  eventStore.upsertSafe(k, e.task_event, {
+                    dataStatus: Model.DataStatus.READY
+                  });
+                }
+              });
+            });
+          });
+      }
 
-    // Check current store, but be sure to check it's actually a task and
-    // not a NewTask
-    var current = taskStore.val();
-    if (current && (<ApiT.Task> current).taskid) {
-      // Update status to reflect that we're fetching from server
-      taskStore.set(function(oldTask, oldMetadata) {
-        return [oldTask, {dataStatus: Model.DataStatus.FETCHING}];
+      /*
+        We've already fetched this before, create a fake promise  that resolves
+        immediately with the tasks.
+      */
+      else {
+        tasksPromise = $.Deferred<ApiT.Task[]>()
+          .resolve(taskEventStore.batchVal(eventKey))
+          .promise();
+      }
+
+      currentStore.set(fullEventId, {
+        dataStatus: Model.DataStatus.FETCHING
       });
 
-      ret = Api.getTask((<ApiT.Task>current).taskid, false, false);
+      // Promise to set current and guess team
+      tasksPromise.then(function(tasks: ApiT.Task[]) {
+        var task = tasks && tasks[0];
+        var team: ApiT.Team;
+        if (task) {
+          team = _.find(Login.myTeams(), function(t) {
+            return t.teamid === task.task_teamid;
+          });
+        } else {
+          team = guessTeam(fullEventId.calendarId)
+        }
+
+        currentStore.set({
+          calendarId: fullEventId.calendarId,
+          eventId: fullEventId.eventId,
+          team: team
+        }, {
+          dataStatus: Model.DataStatus.READY
+        });
+      }, function(err) {
+        currentStore.set(null, {
+          dataStatus: Model.DataStatus.FETCH_ERROR,
+          lastError: err
+        });
+      });
     }
 
     else {
-      /* Else, create a task */
-      var team = teamStore.val();
-      var eventId = eventIdStore.val();
-      if (team && eventId) {
-
-        /*
-          First, create a NewTask object and update our local source of truth
-          if none exists. Note that assign a dataStatus of FETCHING rather than
-          INFLIGHT because this NewTask object is a default placeholder that
-          we're okay with having overriden, not actual data that we want to
-          ensure is saved to the server.
-        */
-        var newTask: ApiT.NewTask = {
-          task_title: Gcal.Event.extractEventTitle(),
-          task_progress: "Done"
-        };
-        taskStore.set(function(oldTask, oldMetadata) {
-          if (oldTask) {
-            // Existing data, don't change
-            return [oldTask, oldMetadata];
-          }
-          return [newTask, { dataStatus: Model.DataStatus.FETCHING }];
-        });
-
-        // Send to server and return promise
-        ret = Api.obtainTaskForEvent(
-          team.teamid,
-          eventId.calendarId,
-          eventId.eventId,
-          newTask,
-          false, false);
-      }
+      currentStore.unset();
     }
-
-    // Update stores after fetching
-    return ret.then(function(task) {
-      updateTaskFromServer(task);
-      return task;
-    });
   }
 
-  /*
-    Updates the currently stored task based on server data. If dataStatus is
-    INFLIGHT, will not update an existing Task in store since server fetch may
-    not accurately reflet pending local changes. If current task is a NewTask,
-    will try to merge NewTask values into task.
-  */
-  function updateTaskFromServer(task: ApiT.Task) {
-    taskStore.set(function(oldTask, oldMetadata) {
-      if (oldMetadata &&
-          oldMetadata.dataStatus === Model.DataStatus.INFLIGHT) {
-        // No taskId => NewTask, try to merge
-        if (oldTask && !(<ApiT.Task> oldTask).taskid) {
-          return (<ApiT.Task> _.extend(task, oldTask));
-        }
-      }
-
-      // Not in flight, save normally
-      return [task, {
-        dataStatus: Model.DataStatus.READY
-      }];
-    });
+  export function refreshEvent(team: ApiT.Team, calId: string, eventId: string)
+  {
+    var teamId = team.teamid;
+    var teamCalendars = team.team_calendars;
+    var p = Api.getEventDetails(teamId, calId, teamCalendars, eventId)
+      .then(function(evOpt) {
+        return evOpt && evOpt.event_opt
+      });
+    eventStore.fetch(getEventKey(calId, eventId), p);
   }
 
   /*
@@ -212,30 +230,9 @@ module Esper.CurrentEvent {
   // For when we change team while viewing an event -- we should update task
   // as well.
   export function setTeam(team: ApiT.Team) {
-    teamStore.set(team);
-
-    var currentTask = (<ApiT.Task> taskStore.val());
-    if (!currentTask || currentTask.task_teamid !== team.teamid) {
-      taskStore.set(function(task, metadata) {
-        return [null, {
-          dataStatus: Model.DataStatus.FETCHING
-        }];
-      });
-
-      var fullEventId = eventIdStore.val();
-      Api.getTaskListForEvent(fullEventId.eventId, false, false)
-        .done(function(tasks) {
-          taskStore.set([_.find(tasks, function(task) {
-            return task.task_teamid === team.teamid;
-          }), {
-            dataStatus: Model.DataStatus.READY
-          }]);
-        });
-    }
-  }
-
-  export function getTeam(): ApiT.Team {
-    return teamStore.val();
+    currentStore.set((data) => <CurrentSelection> _.extend({}, data, {
+      team: team
+    }));
   }
 
   // Watch hash change

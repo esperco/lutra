@@ -9,7 +9,7 @@
 /// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/ExtensionOptions.Model.ts" />
-/// <reference path="./TaskLabels.Gcal.tsx" />
+/// <reference path="./EventLabels.Gcal.tsx" />
 /// <reference path="./CurrentEvent.ts" />
 
 module Esper.CalSidebar {
@@ -88,83 +88,82 @@ module Esper.CalSidebar {
 
   //////
 
-  interface SidebarAttrs {
-    eventId: Types.FullEventId;
-    sidebarState: ExtensionOptions.SidebarOpts;
-    task: ApiT.Task|ApiT.NewTask;
-    taskMetadata: Model.StoreMetadata;
-    team: ApiT.Team;
-  }
+  class SidebarAndDock extends Component<{}, {}> {
+    renderWithData() {
+      var current = CurrentEvent.currentStore.val();
+      var currentMeta = CurrentEvent.currentStore.metadata();
+      var currentStatus = currentMeta && currentMeta.dataStatus;
+      var sidebarState = this.getSidebarState(current);
 
-  class SidebarAndDock extends Component<{}, SidebarAttrs> {
-    render() {
-      if (Login.loggedIn() && this.state.eventId &&
-          this.state.sidebarState !== ExtensionOptions.SidebarOpts.NONE) {
+      // Do not render anything visible, disabled
+      if (sidebarState === ExtensionOptions.SidebarOpts.NONE) {
+        return <span />;
+      }
+
+      if (current && current.eventId) {
+        if (Login.loggedIn() && current.team) {
+          var eventKey = CurrentEvent.getEventKey(current);
+          var task = _.find(CurrentEvent.taskEventStore.batchVal(eventKey),
+            (t) => t.task_teamid === current.team.teamid);
+          var taskMetadata = CurrentEvent.taskEventStore.metadata(eventKey);
+
+          var event = CurrentEvent.eventStore.val(eventKey);
+          var eventMetadata = CurrentEvent.eventStore.metadata(eventKey);
+
+          var sidebar = <Sidebar
+            team={current.team}
+            task={task}
+            taskMetadata={taskMetadata}
+            event={event}
+            eventMetadata={eventMetadata}
+            sidebarState={sidebarState} />;
+        }
+
         return (<div>
-          <Sidebar
-            eventId={this.state.eventId}
-            task={this.state.task}
-            taskMetadata={this.state.taskMetadata}
-            team={this.state.team}
-            sidebarState={this.state.sidebarState} />
+          { sidebar }
           <Dock
-            eventId={this.state.eventId}
-            task={this.state.task}
-            taskMetadata={this.state.taskMetadata}
-            team={this.state.team}
-            sidebarState={this.state.sidebarState} />
+            eventId={current}
+            team={current.team}
+            status={currentStatus}
+            sidebarState={sidebarState} />
         </div>);
       }
 
       // No event (don't render)
       // TODO: Render something for new events
       else {
-        return <span></span>;
+        return <span />;
       }
     }
 
     componentDidMount() {
-      // This ensures our sidebar gets updated if eventId or task changes
-      this.setSources([
-        ExtensionOptions.store,
-        CurrentEvent.eventIdStore,
-        CurrentEvent.teamStore,
-        CurrentEvent.taskStore,
-        sidebarStateStore
-      ]);
-
       // Ensures sidebar is updated after logging in
-      Login.onLogin(this.onChange);
+      Login.onLogin(() => this.updateState());
     }
 
-    getState() {
-      var eventId = CurrentEvent.eventIdStore.val();
-      var task = CurrentEvent.taskStore.val();
-      var taskMetadata = CurrentEvent.taskStore.metadata();
-      var team = CurrentEvent.teamStore.val();
-
-      var sidebarState: ExtensionOptions.SidebarOpts;
+    getSidebarState(eventId: Types.FullEventId) {
       var optState = ExtensionOptions.store.val();
       if (optState && (
           optState.calendarSidebarState ===
             ExtensionOptions.SidebarOpts.SHOW ||
           optState.calendarSidebarState ===
             ExtensionOptions.SidebarOpts.HIDE)) {
-        sidebarState = getSidebarState(eventId);
+        return getSidebarState(eventId);
       } else {
-        sidebarState = ExtensionOptions.SidebarOpts.NONE;
+        return ExtensionOptions.SidebarOpts.NONE;
       }
-
-      return {
-        eventId: eventId,
-        task: task,
-        taskMetadata: taskMetadata,
-        team: team,
-        sidebarState: sidebarState
-      };
     }
   }
 
+
+  interface SidebarAttrs {
+    team: ApiT.Team;
+    sidebarState: ExtensionOptions.SidebarOpts;
+    task?: ApiT.Task;
+    taskMetadata?: Model.StoreMetadata;
+    event?: ApiT.CalendarEvent;
+    eventMetadata?: Model.StoreMetadata;
+  }
 
   class Sidebar extends Component<SidebarAttrs, {}> {
     render() {
@@ -180,11 +179,10 @@ module Esper.CalSidebar {
           <div className="esper-spinner esper-sidebar-spinner"></div> :
           (
             this.props.team ?
-            <TaskLabels.LabelListControl
+            <EventLabels.LabelListControl
               team={this.props.team}
-              task={this.props.task}
-              taskMetadata={this.props.taskMetadata}
-              eventId={this.props.eventId} /> : ""
+              event={this.props.event}
+              eventMetadata={this.props.eventMetadata} /> : ""
           )
         }
       </div>);
@@ -192,15 +190,22 @@ module Esper.CalSidebar {
   }
 
 
-  class Dock extends Component<SidebarAttrs, {}> {
+  interface DockAttrs {
+    team?: ApiT.Team; // Currently selected team
+    status: Model.DataStatus;
+    eventId: Types.FullEventId;
+    sidebarState: ExtensionOptions.SidebarOpts;
+  }
+
+  class Dock extends Component<DockAttrs, {}> {
     render() {
       var teamName: JSX.Element;
       var loading: boolean;
       if (this.props.team) {
         teamName = (<span>{this.props.team.team_name}</span>);
       }
-      else if (this.props.taskMetadata &&
-          this.props.taskMetadata.dataStatus === Model.DataStatus.FETCHING) {
+      else if (!this.props.status ||
+          this.props.status === Model.DataStatus.FETCHING) {
         loading = true;
         teamName = (<span className="esper-dock-loading">
           Loading &hellip;
@@ -257,6 +262,7 @@ module Esper.CalSidebar {
         var email = profile && profile.email;
         var selected = team.teamid === selectedTeamId;
         function selectTeam() {
+          console.info(team);
           CurrentEvent.setTeam(team);
         }
 

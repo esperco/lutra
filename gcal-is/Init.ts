@@ -95,8 +95,9 @@ module Esper.Init {
   function injectEsperControls() {
     Login.printStatus();
     var currentTeam = Menu.init();
-    CurrentEvent.teamStore.addChangeListener(function() {
-      currentTeam.set(CurrentEvent.teamStore.val());
+    CurrentEvent.currentStore.addChangeListener(function() {
+      var val = CurrentEvent.currentStore.val();
+      currentTeam.set(val && val.team);
     });
     if (Login.loggedIn()) {
       Login.getLoginInfo()

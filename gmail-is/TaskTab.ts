@@ -1,4 +1,4 @@
-/// <reference path="./TaskLabels.Gmail.tsx" />
+/// <reference path="./EventLabels.Gmail.tsx" />
 
 module Esper.TaskTab {
 
@@ -718,21 +718,21 @@ module Esper.TaskTab {
     linkedEventsSpinner: JQuery;
     linkedEventsList: JQuery;
 
-    taskLabelsHeader: JQuery;
-    showTaskLabels: JQuery;
-    refreshTaskLabels: JQuery;
-    refreshTaskLabelsIcon: JQuery;
-    taskLabelsSpinner: JQuery;
-    taskLabelsContainer: JQuery;
-    taskLabelsList: JQuery;
+    eventLabelsHeader: JQuery;
+    showEventLabels: JQuery;
+    refreshEventLabels: JQuery;
+    refreshEventLabelsIcon: JQuery;
+    eventLabelsSpinner: JQuery;
+    eventLabelsContainer: JQuery;
+    eventLabelsList: JQuery;
   }
 
   export function showTaskSpinner() {
     if (currentTaskTab) {
       currentTaskTab.headerContent.hide();
       currentTaskTab.taskSpinner.show();
-      currentTaskTab.taskLabelsList.hide();
-      currentTaskTab.taskLabelsSpinner.show();
+      currentTaskTab.eventLabelsList.hide();
+      currentTaskTab.eventLabelsSpinner.show();
     }
   }
 
@@ -740,8 +740,8 @@ module Esper.TaskTab {
     if (currentTaskTab) {
       currentTaskTab.headerContent.show();
       currentTaskTab.taskSpinner.hide();
-      currentTaskTab.taskLabelsList.show();
-      currentTaskTab.taskLabelsSpinner.hide();
+      currentTaskTab.eventLabelsList.show();
+      currentTaskTab.eventLabelsSpinner.hide();
     }
   }
 
@@ -849,21 +849,21 @@ module Esper.TaskTab {
     </div>
 
     <div class="esper-section">
-      <div #taskLabelsHeader
+      <div #eventLabelsHeader
            class="esper-section-header esper-clearfix esper-open">
-        <span #showTaskLabels
+        <span #showEventLabels
               class="esper-link" style="float:right">Hide</span>
-        <span class="esper-bold" style="float:left">Labels</span>
-        <div #refreshTaskLabels
+        <span class="esper-bold" style="float:left">Event Labels</span>
+        <div #refreshEventLabels
              class="esper-refresh esper-clickable">
-          <object #refreshTaskLabelsIcon class="esper-svg"/>
+          <object #refreshEventLabelsIcon class="esper-svg"/>
         </div>
       </div>
-      <div #taskLabelsContainer class="esper-section-container" >
-        <div #taskLabelsSpinner class="esper-events-list-loading" >
+      <div #eventLabelsContainer class="esper-section-container" >
+        <div #eventLabelsSpinner class="esper-events-list-loading" >
           <div class="esper-spinner esper-list-spinner" />
         </div>
-        <div #taskLabelsList class="esper-label-list">
+        <div #eventLabelsList class="esper-label-list">
         </div>
       </div>
     </div>
@@ -947,7 +947,7 @@ module Esper.TaskTab {
     createEmailIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEmailIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshLinkedEventsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
-    refreshTaskLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
+    refreshEventLabelsIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
     createEventIcon.attr("data", Init.esperRootUrl + "img/create.svg");
     linkEventIcon.attr("data", Init.esperRootUrl + "img/link.svg");
     refreshWorkflowIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
@@ -1134,22 +1134,22 @@ module Esper.TaskTab {
 
     /* Task Label Stuff */
 
-    taskLabelsList.renderReact(
-      React.createElement(TaskLabels.LabelListControl, {}));
+    eventLabelsList.renderReact(
+      React.createElement(EventLabels.LabelListControl, {}));
 
-    showTaskLabels.click(function() {
-      Sidebar.toggleList(taskLabelsContainer);
-      if (showTaskLabels.text() === "Hide") {
-        showTaskLabels.text("Show");
-        taskLabelsHeader.removeClass("esper-open");
+    showEventLabels.click(function() {
+      Sidebar.toggleList(eventLabelsContainer);
+      if (showEventLabels.text() === "Hide") {
+        showEventLabels.text("Show");
+        eventLabelsHeader.removeClass("esper-open");
       } else {
-        showTaskLabels.text("Hide");
-        taskLabelsHeader.addClass("esper-open");
+        showEventLabels.text("Hide");
+        eventLabelsHeader.addClass("esper-open");
       }
     });
 
-    refreshTaskLabels.click(function() {
-      CurrentThread.refreshTaskForThread(false);
+    refreshEventLabels.click(function() {
+      CurrentThread.linkedEventsChange.set(null);
     });
 
 
