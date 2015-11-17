@@ -163,6 +163,7 @@ module Esper.Model {
     // Returns true if an item exists
     has(_id: string): boolean {
       _id = this.aliasOrId(_id);
+      register(this, _id); // Tracker registration
       return this.data.hasOwnProperty(_id);
     }
 
@@ -197,16 +198,11 @@ module Esper.Model {
     protected cleanMetadata(_id: string, metadata?: StoreMetadata)
       : StoreMetadata
     {
-      // Make sure _id matches
-      if (metadata) {
-        metadata._id = _id;
-      }
-      else if (this.has(_id)) {
-        metadata = _.cloneDeep(this.get(_id)[1]);
-      }
-      else {
-        metadata = { _id: _id };
-      }
+      // Make sure _id matches. Extend old values.
+      metadata = _.extend(
+        _.cloneDeep(this.metadata(_id) || {}),
+        metadata,
+        {_id: _id});
 
       // Some defaults and overrides
       metadata.dataStatus = metadata.dataStatus || DataStatus.READY;
@@ -294,50 +290,49 @@ module Esper.Model {
     }
 
     /*
+      Variant of upsert that only updates if metadata is not UNSAVED or
+      INFLIGHT (avoids clobbering user data)
+    */
+    upsertSafe(_id: string, upsertFn: UpdateFn<TData>): void;
+    upsertSafe(_id: string, tuple: [TData, StoreMetadata]): void;
+    upsertSafe(_id: string, data: TData, metadata?: StoreMetadata): void;
+    upsertSafe(_id: string, update: any, metadata?: StoreMetadata): void {
+      var currentMeta = this.metadata(_id);
+      var dataStatus = currentMeta && currentMeta.dataStatus;
+      if (dataStatus !== Model.DataStatus.UNSAVED &&
+          dataStatus !== Model.DataStatus.INFLIGHT) {
+        return this.upsert(_id, update, metadata);
+      }
+    }
+
+    /*
       Helper to fetch data via a promise and store it at a particular key when
       the promise resolves. Updates dataStatus metadata accordingly.
     */
     fetch(_id: string, promise: JQueryPromise<TData>) {
-      function canSave(metadata: StoreMetadata) {
-        var dataStatus = metadata && metadata.dataStatus;
-        return (dataStatus !== Model.DataStatus.UNSAVED &&
-                dataStatus !== Model.DataStatus.INFLIGHT);
-      }
-
       if (promise.state() === "pending") {
         // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
         // any user-set data we may have cached)
-        this.upsert(_id, function(data, metadata) {
-          if (canSave(metadata)) {
-            return [data, _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.FETCHING
-            })];
-          }
-          return data;
+        this.upsertSafe(_id, function(data, metadata) {
+          return [data, {
+            dataStatus: Model.DataStatus.FETCHING
+          }];
         });
       }
 
       promise.done((newData: TData) => {
         // On success, update store
-        this.upsert(_id, function(data, metadata) {
-          if (canSave(metadata)) {
-            return [newData, _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.READY
-            })];
-          }
-          return data;
+        this.upsertSafe(_id, newData, {
+          dataStatus: Model.DataStatus.READY
         });
       }).fail((err) => {
         // On failure, update store to note failure (again, don't override
         // user data)
-        this.upsert(_id, function(data, metadata) {
-          if (canSave(metadata)) {
-            return [data, _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.FETCH_ERROR,
-              lastError: err
-            })];
-          }
-          return data;
+        this.upsertSafe(_id, function(data, metadata) {
+          return [data, {
+            dataStatus: Model.DataStatus.FETCH_ERROR,
+            lastError: err
+          }];
         });
         return err;
       });
@@ -365,9 +360,7 @@ module Esper.Model {
         this.upsert(_id, function(data, metadata) {
           return [
             initData === undefined ? data : initData,
-            _.extend({}, metadata, {
-              dataStatus: Model.DataStatus.INFLIGHT
-            })
+            { dataStatus: Model.DataStatus.INFLIGHT }
           ];
         });
       }
@@ -386,9 +379,9 @@ module Esper.Model {
         // On success, update store
         this.upsert(_id, function(data, metadata) {
           if (canSave(metadata)) {
-            return [newData, _.extend({}, metadata, {
+            return [newData, {
               dataStatus: Model.DataStatus.READY
-            })];
+            }];
           }
         });
       }).fail((err) => {
@@ -396,10 +389,10 @@ module Esper.Model {
         // user data)
         this.upsert(_id, function(data, metadata) {
           if (canSave(metadata)) {
-            return [data, _.extend({}, metadata, {
+            return [data, {
               dataStatus: Model.DataStatus.PUSH_ERROR,
               lastError: err
-            })];
+            }];
           }
         });
         return err;
@@ -434,5 +427,60 @@ module Esper.Model {
       this.remove(_id);
     }
   }
+
+
+  ////////////
+
+  export interface TrackingKey {
+    store: StoreBase<any>;
+    key?: string;
+  }
+
+  /*
+    Tracking code is loosely inspired by Meteor's tracker
+    (https://www.meteor.com/tracker).
+
+    It is intended for use with our React classes. Basic idea is to track
+    calls to our stores to make it easy to set up auto-updating React
+    components.
+
+    Track takes two functions. It calls the first function and returns its
+    return value. It also calls the post function with a list of variables
+    that have been tracked.
+  */
+  export function track<T>(main: () => T,
+    post: (args: TrackingKey[]) => void): T
+  {
+    trackingKeys = [];
+    isTrackingActive = true;
+    var ret = main();
+    post(trackingKeys);
+    isTrackingActive = false;
+    return ret;
+  }
+
+  export function register<T>(store: StoreBase<T>, key?: string) {
+    // Avoid duplicate registries
+    if (isTrackingActive &&
+        !_.find(trackingKeys, (k) => k.store === store && k.key === key))
+    {
+      if (key) {
+        trackingKeys.push({
+          store: store,
+          key: key
+        });
+      } else {
+        trackingKeys.push({
+          store: store,
+        });
+      }
+    }
+  }
+
+  // Boolean to test if tracking is active
+  var isTrackingActive = false;
+
+  // A list of registered trackingKeys we're tracking
+  var trackingKeys: TrackingKey[];
 }
 

@@ -54,7 +54,6 @@ module Esper.Emit {
 
       this.alreadyEmitted = true;
       try {
-        this.emit
         if (args) {
           this.emit.apply(this, [this.CHANGE_EVENT].concat(args));
         } else {

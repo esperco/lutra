@@ -6,6 +6,7 @@
 /// <reference path="../typings/react/react-global.d.ts" />
 /// <reference path="./Emit.ts" />
 /// <reference path="./JQStore.ts" />
+/// <reference path="./Model.ts" />
 /// <reference path="./Util.ts" />
 
 /*
@@ -79,10 +80,40 @@ module Esper.ReactHelpers {
     }
   });
 
+  function isTrackingKey(a: Emit.EmitBase|Model.TrackingKey)
+    : a is Model.TrackingKey
+  {
+    var typedA = <Model.TrackingKey> a;
+    return !!typedA.store;
+  }
+
+  interface Source {
+    emitter: Emit.EmitBase;
+    keys?: string[]
+
+    // Create a new onChange function for each source
+    onChange: (_ids: string[]) => void;
+  }
+
   // Subclass of Component with some helper functions
   export class Component<P,S> extends React.Component<P,S> {
-    // List of stores this component is listening to. Set via getSources.
-    sources: Emit.EmitBase[];
+    // List of stores this component is listening to. Set via setSources.
+    sources: Source[];
+
+    /*
+      In subclass, you can choose to override either render or renderWithData.
+      If using renderWithData, any references to Model.Store (or subclasses)
+      will be automatically tracked and you don't have to call setSources.
+    */
+    render() {
+      return Model.track(() => this.renderWithData(), (calls) => {
+        this.setSources(calls);
+      });
+    }
+
+    renderWithData(): JSX.Element {
+      return React.createElement("span");
+    }
 
     constructor(props: P) {
       super(props);
@@ -120,22 +151,69 @@ module Esper.ReactHelpers {
       this.updateState(nextProps);
     }
 
-    // Call to change the sources this component is listening to. Adds and
-    // removes listeners as appropriate.
-    protected setSources(newSources: Emit.EmitBase[]): void {
+    /*
+      Call to change the sources this component is listening to. Adds and
+      removes listeners as appropriate.
+
+      Sources can be either an emitter or a TrackingKey (store + key list).
+      If no key list is provided, then emitter will trigger change on each
+      change. Otherwise, will filter against keys if emitter passes any.
+    */
+    protected setSources(newSources: Array<Emit.EmitBase|Model.TrackingKey>)
+      : void
+    {
       _.each(this.sources || [], (source) => {
-        source.removeChangeListener(this.onChange.bind(this));
+        source.emitter.removeChangeListener(source.onChange);
       });
 
-      this.sources = newSources;
-      _.each(this.sources, (source) => {
-        source.addChangeListener(this.onChange.bind(this));
+      this.sources = [];
+      _.each(newSources, (source) => {
+        var emitter: Emit.EmitBase;
+        var key: string;
+        if (isTrackingKey(source)) {
+          emitter = source.store;
+          key = source.key;
+        } else { // Source is just the emitter
+          emitter = source;
+        }
+
+        var current = this.findMatchingSource(emitter);
+        if (current) { // Just update keys, if any
+          if (key) {
+            current.keys = current.keys || [];
+            current.keys.push(key);
+          }
+        } else {
+          var newSrc = this.createSource(emitter, key ? [key] : undefined);
+          newSrc.emitter.addChangeListener(newSrc.onChange);
+          this.sources.push(newSrc);
+        }
       });
     }
 
-    // Callback to trigger from listeners -- forces usage of current props
-    protected onChange() {
-      this.updateState();
+    protected findMatchingSource(emitter: Emit.EmitBase): Source {
+      return _.find(this.sources, (s) => s.emitter === emitter);
+    }
+
+    // Like createSimpleSource, but ensure that only call updateState if
+    // keys match
+    protected createSource(emitter: Emit.EmitBase, keys?: string[])
+      : Source
+    {
+      var src = {
+        emitter: emitter,
+        keys: keys,
+        onChange: (_ids?: string[]) => {
+          // No _ids => force update
+          if (_.isUndefined(_ids) || _.isNull(_ids) || !src.keys) {
+            this.updateState();
+          }
+          else if (_.intersection(_ids, src.keys).length > 0) {
+            this.updateState();
+          }
+        }
+      };
+      return src;
     }
 
     // Update state using getState function
@@ -143,8 +221,25 @@ module Esper.ReactHelpers {
       var newState = <S> this.getState(newProps || this.props);
 
       // React doesn't like null / non-object states, so do a quick check
-      if (newState) {
+      if (newState !== undefined && newState !== null) {
         this.setState(newState)
+      } else {
+
+        /*
+          NB: React docs advise against doing a forceUpdate for simplicity
+          and efficiency reasons but if you're using our `setSources` helper,
+          it's actually simpler to provide a mechanism by which the component
+          will always re-render in the event a source changes without needing
+          to define a getState function. It's a little less efficient since we
+          can't do a `shouldComponentUpdate` check, but simpler than
+          artificially introducing state management.
+
+          If efficiency is important, define `getState` to return the existing
+          `this.state` rather than null or undefined, and then define a
+          `shoudComponentUpdate` function that returns false if states are
+          identical (===).
+        */
+        this.forceUpdate();
       }
     }
 

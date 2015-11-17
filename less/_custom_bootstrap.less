@@ -62,6 +62,24 @@
   }
 }
 
+.list-group.compact {
+  margin-bottom: 0;
+
+  .list-group-item {
+    padding: @padding-small-horizontal;
+    border-left: 0;
+    border-right: 0;
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+}
+
 a.list-group-item {
   cursor: pointer; // No href required
 

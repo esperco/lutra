@@ -6,6 +6,7 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Model.StoreOne.ts" />
+/// <reference path="./Test.ts" />
 
 module Esper.ReactHelpers {
   // Set listener in scope to use
@@ -197,6 +198,101 @@ module Esper.ReactHelpers {
     it("should use updated props on change", function() {
       this.elm.renderReact(StoreComponent, { prop: "B" });
       expect(this.component.jQuery().text()).toBe("second");
+    });
+
+    it("should disconnect on removal", function() {
+      spyOn(this.component, "setState");
+      this.sandbox.remove();
+      stringStore.upsert("A", "plus");
+      expect(this.component.setState).not.toHaveBeenCalled();
+    });
+  });
+
+
+  //////////
+
+  class StatelessStoreComponent extends Component<{}, {}> {
+    render() {
+      return React.createElement("div", {}, stringStore.val("myVal"));
+    }
+
+    componentDidMount(): void {
+      this.setSources([stringStore]);
+    }
+  }
+
+  describe("ReactHelpers.Component hooked up to a store without setState",
+    function()
+  {
+    beforeEach(function() {
+      stringStore.upsert("myVal", "first");
+      var elm = React.createElement(StatelessStoreComponent);
+      this.component = Test.render(elm);
+    });
+
+    afterEach(function() {
+      stringStore.reset();
+      stringStore.removeAllChangeListeners();
+    });
+
+    it("should force update when a source changes", function() {
+      spyOn(this.component, "render").and.callThrough();
+      stringStore.upsert("myVal", "second");
+      expect(this.component.render).toHaveBeenCalled();
+    });
+  });
+
+
+  //////
+
+  var storeOne = new Model.StoreOne<string>();
+  var storeMany = new Model.Store<string>();
+
+  class DataComponent extends Component<{}, {}> {
+    renderWithData() {
+      if (storeOne.isSet()) {
+        var key = storeOne.val();
+        var value = storeMany.val(key);
+      }
+      return React.createElement('span', value);
+    }
+  }
+
+  describe("ReactHelpers.Component with renderData", function() {
+    beforeEach(function() {
+      var elm = React.createElement(DataComponent);
+      this.component = Test.render(elm);
+      spyOn(this.component, "render").and.callThrough();
+    });
+
+    afterEach(function() {
+      storeOne.reset();
+      storeOne.removeAllChangeListeners();
+      storeMany.reset();
+      storeMany.removeAllChangeListeners();
+    });
+
+    it("should re-render when first-order store changes", function() {
+      storeOne.set("x");
+      expect(this.component.render.calls.count()).toEqual(1);
+
+      storeMany.set("x", "5");
+      expect(this.component.render.calls.count()).toEqual(2);
+    });
+
+    it("should not re-render when second-order store changes if first-order " +
+       "store value would prevent second-order from being called", function()
+    {
+      storeMany.set("x", "5");
+      expect(this.component.render).not.toHaveBeenCalled();
+    });
+
+    it("should only re-render when affected keys are called", function() {
+      storeOne.set("x");
+      expect(this.component.render.calls.count()).toEqual(1);
+
+      storeMany.set("y", "5");
+      expect(this.component.render.calls.count()).toEqual(1);
     });
   });
 }

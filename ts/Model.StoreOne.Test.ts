@@ -1,5 +1,6 @@
 /* Test StoreOne module */
 
+/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Model.StoreOne.ts"/>
 
 module Esper.Model {
@@ -11,6 +12,7 @@ module Esper.Model {
 
   class RabbitStore extends StoreOne<Rabbit> { }
   var myRabbitStore = new RabbitStore();
+  var yourRabbitStore = new RabbitStore();
 
 
   describe("Model.StoreOne", function() {
@@ -168,6 +170,30 @@ module Esper.Model {
 
       it("should call the listener with the _id", function() {
         expect(listener).toHaveBeenCalled();
+      });
+    });
+
+    ///////
+
+    describe("track", function() {
+      beforeEach(function() {
+        reset();
+        this.post = jasmine.createSpy("post");
+      });
+
+      it("should call the post function with StoreOne and empty keys",
+        function()
+      {
+        track(() => {
+          myRabbitStore.isSet();
+          yourRabbitStore.get();
+        }, this.post);
+
+        expect(this.post).toHaveBeenCalledWith([{
+          store: myRabbitStore,
+        }, {
+          store: yourRabbitStore,
+        }]);
       });
     });
   });
