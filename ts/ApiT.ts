@@ -114,6 +114,16 @@ module Esper.ApiT {
     uid: string;
   }
 
+  export interface DirProfileSearchResults {
+    search_results: WeightedDirProfile[];
+    search_count: number;
+  }
+
+  export interface WeightedDirProfile {
+    profile_data: DirProfile;
+    profile_score: number;
+  }
+
   export interface Profile {
     profile_uid: string;
     email: string;
