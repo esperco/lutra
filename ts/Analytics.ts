@@ -81,6 +81,9 @@ module Esper.Analytics {
     DisablePreferencesTabTasksUpdate,
     EditCalendarPickerEventTitle,
     EditCalendarPickerLocation,
+    EditGcalEventLabels,
+    EditGmailEventLabels,
+    EditTimeEsperEventLabels,
     EditTaskNotes,
     EnablePreferencesTabDailyAgenda,
     EnablePreferencesTabTasksUpdate,
@@ -118,6 +121,7 @@ module Esper.Analytics {
     TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
     LabelsOverTime,    // time.esper.com/#!/labels-over-time
+    CalendarLabeling,  // time.esper.com/#!/calendar-labeling
     DirectoryHome      // dir.esper.com
   }
 

@@ -27,6 +27,10 @@ module Esper.EventLabels {
     callback?: (event: ApiT.CalendarEvent, labels: string[],
                 promise: JQueryPromise<void>) => void;
 
+    // Optional callback called once for each edit (even if edit is for
+    // multiple events)
+    callbackAll?: (events: ApiT.CalendarEvent[]) => void;
+
     // Classes
     listClasses?: string;
     itemClasses?: string;
@@ -139,6 +143,9 @@ module Esper.EventLabels {
         hasError: false
       });
 
+      // A list of events with newLabels (for callback)
+      var newEvents: ApiT.CalendarEvent[] = [];
+
       var promises: JQueryPromise<void>[] = [];
       _.each(this.props.events, (ev) => {
         var newLabels: string[];
@@ -149,6 +156,10 @@ module Esper.EventLabels {
           newLabels = _.without(ev.labels, label);
         }
         promises.push(this.scheduleUpdate(ev, newLabels));
+
+        var newEv = _.cloneDeep(ev);
+        newEv.labels = newLabels;
+        newEvents.push(newEv);
       });
 
       var allPromises: JQueryPromise<void> = $.when.apply($, promises);
@@ -163,6 +174,10 @@ module Esper.EventLabels {
           hasError: true
         });
       });
+
+      if (this.props.callbackAll) {
+        this.onChangeAll(newEvents);
+      }
     }
 
     protected scheduleUpdate(event: ApiT.CalendarEvent, labels: string[]) {
@@ -187,6 +202,33 @@ module Esper.EventLabels {
       }
 
       return p;
+    }
+
+    /*
+      Purpose of callbackAll is to fire a single (or at least not very many
+      callbacks) for event editing. So we set a variable tracking copies
+      of our events and wait to post unti lafter things stop changing.
+    */
+    private _lastEventIds: string[];
+    private _lastEvents: ApiT.CalendarEvent[];
+
+    protected onChangeAll(events: ApiT.CalendarEvent[]) {
+      var eventIds = _.map(events,
+        (ev) => ev.google_cal_id + "|" + ev.google_event_id
+      );
+      if (this._lastEventIds && !_.eq(eventIds, this._lastEventIds)) {
+        this.props.callbackAll(this._lastEvents);
+      }
+
+      this._lastEventIds = eventIds;
+      this._lastEvents = events;
+
+      setTimeout(() => {
+        if (_.eq(eventIds, this._lastEventIds)) {
+          this.props.callbackAll(this._lastEvents);
+          delete this._lastEventIds;
+        }
+      }, 2000);
     }
   }
 
