@@ -124,23 +124,27 @@ module Esper.Signin {
                                  optInvite?: string,
                                  optEmail?: string):
     JQuery {
-'''
-<button #button class="button-primary sign-in-btn exchange-btn">
-  <div #logo class="sign-in-icon exchange-icon"/>
-  <div class="sign-in-text">Microsoft Exchange</div>
-</button>
-'''
-    var exchangeIcon = $("<img class='svg-block'/>")
-      .appendTo(logo);
-    Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
 
-    // Set handler
-    button.click(function() {
-      showExchangeModal();
-      return false;
-    });
+      return $(`<span />`);
 
-    return button;
+
+// '''
+// <button #button class="button-primary sign-in-btn exchange-btn">
+//   <div #logo class="sign-in-icon exchange-icon"/>
+//   <div class="sign-in-text">Microsoft Exchange</div>
+// </button>
+// '''
+//     var exchangeIcon = $("<img class='svg-block'/>")
+//       .appendTo(logo);
+//     Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
+
+//     // Set handler
+//     button.click(function() {
+//       showExchangeModal();
+//       return false;
+//     });
+
+//     return button;
   };
 
   function showExchangeModal() {
