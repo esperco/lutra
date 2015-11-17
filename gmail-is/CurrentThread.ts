@@ -270,10 +270,7 @@ module Esper.CurrentThread {
    */
   export function setTask(newTask : ApiT.Task) {
     task.set(newTask);
-
-    if (newTask) {
-      linkedEventsChange.set(null);
-    }
+    linkedEventsChange.set(null);
   }
 
   /** We cache the event preferences here until the current task changes.
