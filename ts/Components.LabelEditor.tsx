@@ -2,6 +2,7 @@
   Component for updating labels for a given task
 */
 
+/// <reference path="../marten/ts/Analytics.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/EventLabels.tsx" />
 /// <reference path="./Events.ts" />
@@ -57,6 +58,7 @@ module Esper.Components {
         team={Teams.get(this.props.teamId)}
         events={this.state.events}
         callback={this.toggleLabelCallback.bind(this)}
+        callbackAll={this.analyticsCallback.bind(this)}
       />;
     }
 
@@ -74,6 +76,12 @@ module Esper.Components {
       var newData = _.clone(event);
       newData.labels = labels;
       Events.EventStore.push(_id, promise, newData);
+    }
+
+    analyticsCallback(events: ApiT.CalendarEvent[]) {
+      Analytics.track(Analytics.Trackable.EditTimeEsperEventLabels, {
+        eventsSelected: events.length
+      });
     }
 
     getState(props: LabelEditorProps): LabelEditorState {
