@@ -14,6 +14,10 @@
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
 /// <reference path="../common/Util.ts" />
 
+declare module Esper.Conf {
+  export var version: string;
+}
+
 module Esper.Analytics {
   // Reference to Analytics NodeJS library
   var analytics: AnalyticsNode.Analytics;
@@ -52,6 +56,7 @@ module Esper.Analytics {
       analytics.identify({
         userId: uid,
         traits: _.extend({
+          extensionVersion: Conf.version,
           email: data.info && data.info.email,
           teams: _.pluck(teams, 'teamid'),
         }, optsFlattened)
