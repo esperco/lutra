@@ -65,7 +65,7 @@ module Esper.Route {
       undefined,
       <Views.Footer hoverable={true} />
     );
-    Analytics.page(Analytics.Page.LabelsOverTime);
+    Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
   // 404 page
