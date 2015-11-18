@@ -90,28 +90,38 @@ module Esper.Slides {
     }
 
     function slideForward(previous, next) {
-      // Expand parent to accomodate larger objects but never shrink (so slide
-      // back doesn't cut off
+      /*
+        Expand parent to accomodate larger objects but never shrink for UX
+        reasons. Also, ensure min-height has a min of something not zero to
+        avoid potential issues with weird height responses from jQuery.
+      */
+      var minHeight = parseInt(previous.parent().css("min-height"));
+      minHeight = minHeight || 300;
       previous.parent().css({
         "overflow" : "hidden",
-        "height"   : Math.max(next.outerHeight(true) + 50, /* 50px buffer */
-                              currentHeight) + "px"
+        "min-height": Math.max(minHeight, previous.outerHeight(true)) + "px"
       });
       previous.animate({left : -animation.width}, animation.time);
 
-      var previousTop = parseInt(previous.css("top")) || 0;
       next.css({
         "left": animation.width,
-        "top" : (previousTop - previous.outerHeight(true)) + "px"
+        "top" : -previous.outerHeight(true) + "px"
       });
 
       previous.after(next);
-      next.animate({left : 0}, animation.time);
+      next.animate({left : 0}, animation.time, function() {
+        previous.hide();
+        next.css({left: 0, top: 0});
+      });
     }
 
     function slideBack(previous, next) {
-      previous.animate({left : 0}, animation.width);
+      previous.show();
+      next.css({
+        top: -previous.outerHeight(true) + "px"
+      });
 
+      previous.animate({left : 0}, animation.width);
       next.animate({left : animation.width}, animation.time, function () {
         next.remove();
       });
