@@ -26,17 +26,25 @@ module Esper.Message {
     chrome.runtime.sendMessage(esperMessage, callback);
   }
 
-  // Listen for typed message -- call from Content Script or Event Page.
-  // Can send back response as well.
+  // Listen for typed message -- call from Event Page -- doesn't seem to
+  // work with content script. Can send back response as well.
   export function listenToExtension(type: Type,
-      callback: (value: any, sender: chrome.runtime.MessageSender)=>any) {
+      callback: (value: any,
+                 sender: chrome.runtime.MessageSender) => any) {
     chrome.runtime.onMessage.addListener(
       function(request, sender, sendResponse) {
         var esperMessage: Message.ExtensionMessage = request;
         if (esperMessage && esperMessage.type === type) {
           var ret = callback(esperMessage.value, sender);
           if (! _.isUndefined(ret)) {
-            sendResponse(ret);
+            // Wrap with $.when so we can return async functions
+            $.when(ret).then(function(r) {
+              sendResponse(r)
+            }, function(err) {
+              sendResponse(err);
+            });
+            return true;  // Return true to signal to Chrome to keep channel
+                          // open for async calls
           }
         }
       });
