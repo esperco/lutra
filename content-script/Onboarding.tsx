@@ -965,7 +965,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("address")}
                 className="control-label">
-                Executive&apos;s Address
+                { supportsExecutive ? "Executive's Address" : "Your Address" }
               </label>
               <input id={this.getId("address")} name="address"
                 type="text" className="form-control"
@@ -976,7 +976,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("phone")}
                 className="control-label">
-                Executive&apos;s Phone
+                { supportsExecutive ? "Executive's Phone" : "Your Phone" }
               </label>
               <input id={this.getId("phone")} name="phone"
                 type="text" className="form-control"
@@ -988,7 +988,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("timezone")}
                      className="control-label">
-                Executive&apos;s Timezone
+                { supportsExecutive ? "Executive's Timezone" : "Your Timezone" }
               </label>
               <select id={this.getId("timezone")}
                       value={team.timezone}
