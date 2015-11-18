@@ -14,7 +14,7 @@ module Esper.Message {
     // Request and push updates to Gcal EventSidebarState
     RequestEventState,  // Request from storage
     EventStateData,     // Data from storage
-    EventStateUpdate,   // Updat from user to save to storage
+    EventStateUpdate,   // Update from user to save to storage
 
     // Open Extension options page
     OpenExtensionOptions,
@@ -33,7 +33,10 @@ module Esper.Message {
 
     // Instruct CS to render Getting Started page on the
     // onboarding modal again from IS
-    RenderGettingStarted
+    RenderGettingStarted,
+
+    // Chrome Extension Updates
+    RequestExtensionUpdate    // CS asks EP and gets a response
   }
 
   export interface Message {
