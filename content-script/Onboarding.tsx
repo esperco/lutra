@@ -54,8 +54,11 @@ module Esper.Onboarding {
     teamid?: string;       // _id server responds with after team creation
     name?: string;         // team name
     email?: string;        // e-mail address for sec
+    address?: string;      // exec's work location
+    phone?: string;        // exec's phone number
     defaultCal?: string;   // google_cal_id of primary calendar
     calendars?: [string];  // google_cal_ids of all other calendars
+    timezone?: string;     // IANA timezone, e.g. "Europe/London"
 
     // Why last save request failed
     error?: TeamRequestError
@@ -933,7 +936,7 @@ module Esper.Onboarding {
                   (this.state.emailHasError ? "has-error" : "")}>
                 <label htmlFor={this.getId("email")}
                   className="control-label">
-                  Executive's Email
+                  Executive&apos;s Email
                 </label>
                 <input id={this.getId("email") } type="email" name="email"
                   defaultValue={team.email}
@@ -942,17 +945,26 @@ module Esper.Onboarding {
               </div> : null
             }
             <div className="form-group">
-              <label htmlFor={this.getId("default-cal")}
+              <label htmlFor={this.getId("address")}
                 className="control-label">
-                Default Calendar to Add Events
+                Executive's Address
               </label>
-              <select id={this.getId("default-cal")}
-                value={team.defaultCal}
-                name="default-cal"
+              <input id={this.getId("address")} name="address"
+                type="text" className="form-control"
+                defaultValue={team.address}
                 disabled={disabled}
-                className="form-control">
-                {calOptions}
-              </select>
+                placeholder="10880 Malibu Point, Malibu, CA 90265" />
+            </div>
+            <div className="form-group">
+              <label htmlFor={this.getId("phone")}
+                className="control-label">
+                Executive's Phone
+              </label>
+              <input id={this.getId("phone")} name="phone"
+                type="text" className="form-control"
+                defaultValue={team.phone}
+                disabled={disabled}
+                placeholder="555-555-5555" />
             </div>
             {
               disabled || !supportsExecutive || first ? "" :
@@ -974,6 +986,19 @@ module Esper.Onboarding {
           </div></div>
           <div className="col-sm-6 form-group">
             <div className="esper-col-spacer">
+              <div className="form-group">
+                <label htmlFor={this.getId("default-cal")}
+                       className="control-label">
+                  Default Calendar to Add Events
+                </label>
+                <select id={this.getId("default-cal")}
+                        value={team.defaultCal}
+                        name="default-cal"
+                        disabled={disabled}
+                        className="form-control">
+                  {calOptions}
+                </select>
+              </div>
               <label className="group-heading">
                 { supportsExecutive ? "Calendars Associated with this Executive"
                   : "Other Calendars to Sync"}
