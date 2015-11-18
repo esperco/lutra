@@ -7,6 +7,7 @@
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Colors.ts" />
+/// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -15,7 +16,9 @@ module Esper.Components {
   interface LabelSelectorProps {
     allLabels: [string, string][]; // Label + badge text
     selectedLabels: string[];
-    updateFn: (selectedLabels: string[]) => void
+    updateFn: (selectedLabels: string[]) => void;
+    minimized?: boolean;
+    toggleMinimized?: () => void;
   }
 
   export class LabelSelector extends Component<LabelSelectorProps, {}>
@@ -25,15 +28,11 @@ module Esper.Components {
         return <span></span>
       }
 
-      return <div className="esper-borderless-section">
-        <h4 className="esper-header">
-          <i className="fa fa-fw fa-tags"></i>{" "}
-          Select Labels
-        </h4>
-        <div className="esper-content list-group">
-          {this.renderLabels()}
-        </div>
-      </div>;
+      return <BorderlessSection icon="fa-tags" title="Select Labels"
+          minimized={this.props.minimized}
+          toggleMinimized={this.props.toggleMinimized}>
+        {this.renderLabels()}
+      </BorderlessSection>;
     }
 
     renderLabels() {
