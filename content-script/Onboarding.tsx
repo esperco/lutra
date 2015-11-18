@@ -769,7 +769,7 @@ module Esper.Onboarding {
           teamStore.update(localId, request, {
             dataStatus: Model.DataStatus.INFLIGHT
           });
-          let body;
+          let body: ApiT.TeamCreationRequest;
           if (supportsExecutive) {
             body = {
               executive_name: request.name,
@@ -991,7 +991,7 @@ module Esper.Onboarding {
                 Executive&apos;s Timezone
               </label>
               <select id={this.getId("timezone")}
-                      value={"America/Los_Angeles"}
+                      value={team.timezone}
                       name="timezone"
                       disabled={disabled}
                       className="form-control">
@@ -1061,7 +1061,7 @@ module Esper.Onboarding {
 
       var address = this.find("input[name=address]").val();
       var phone = this.find("input[name=phone]").val();
-      var timezone = this.find("input[name=timezone]").val();
+      var timezone = this.find("[name=timezone]").val();
 
       if ((nameIsValid && !supportsExecutive)
            || (nameIsValid && emailIsValid)) {

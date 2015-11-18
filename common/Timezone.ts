@@ -52,11 +52,11 @@ module Esper.Timezone {
   */
   var supportedTimezones: ZoneName[] = [
     /* US timezones first */
-    { id: "America/Anchorage", name: "Alaska Time" },
-    { id: "America/Chicago", name: "Central Time" },
-    { id: "America/Denver", name: "Mountain Time" },
     { id: "America/Los_Angeles", name: "Pacific Time" },
+    { id: "America/Denver", name: "Mountain Time" },
+    { id: "America/Chicago", name: "Central Time" },
     { id: "America/New_York", name: "Eastern Time" },
+    { id: "America/Anchorage", name: "Alaska Time" },
     { id: "America/Phoenix", name: "Mountain Time - Arizona" },
     { id: "America/Puerto_Rico", name: "Puerto Rico" },
     { id: "Pacific/Honolulu", name: "Hawaii Time" },
