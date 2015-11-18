@@ -419,18 +419,32 @@ ul.esper-drop-ul {
   display: inline-block;
 }
 
-.esper-dropdown-list {
-  display: inline-block;
-  max-height: 300px;
-  overflow-y: auto;
-  list-style: none;
-  padding: 0;
-  width: 100%;
-}
+.esper-filter-dropdown {
+  .esper-dropdown-search {
+    margin-bottom: 5px;
+    input {
+      width: 100%;
+    }
+  }
 
-.esper-dropdown-search {
-  input {
+  .esper-dropdown-list {
+    display: inline-block;
+    max-height: 300px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
     width: 100%;
+    margin: 0;
+    vertical-align: middle;
+
+    .esper-bs & {
+      margin: 0;
+
+      input[type="radio"], input[type="checkbox"] {
+        margin-top: 0;
+        vertical-align: middle;
+      }
+    }
   }
 }
 
