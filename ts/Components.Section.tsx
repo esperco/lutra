@@ -43,7 +43,7 @@ module Esper.Components {
             <i className={"fa fa-fw " + this.props.icon}></i> :
             ""
           }{" "}
-          Select Calendar
+          { this.props.title }
         </h4>
         <div className="esper-content">
           { minimized ? "" : this.props.children }
