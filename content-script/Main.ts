@@ -28,6 +28,8 @@
 /// <reference path="../common/Message.Chrome.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
+/// <reference path="../common/Dropdown.tsx" />
+/// <reference path="../common/Timezone.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 
 /// <reference path="./Update.ts" />
@@ -78,6 +80,7 @@ module Esper.Main {
     ExtensionOptions.init();
     ThreadState.init();
     CalSidebar.init();
+    Timezone.init();
 
     // Miscellaneous messaging setup
     Message.pipeToExtension(Message.Type.OpenExtensionOptions);

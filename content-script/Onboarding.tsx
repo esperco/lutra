@@ -773,11 +773,17 @@ module Esper.Onboarding {
           if (supportsExecutive) {
             body = {
               executive_name: request.name,
-              executive_email: request.email
+              executive_email: request.email,
+              executive_address: request.address,
+              executive_phone: request.phone,
+              executive_timezone: request.timezone
             }
           } else {
             body = {
-              executive_name: request.name
+              executive_name: request.name,
+              executive_address: request.address,
+              executive_phone: request.phone,
+              executive_timezone: request.timezone
             }
           }
 
@@ -915,6 +921,18 @@ module Esper.Onboarding {
         </option>);
       });
 
+      var tzOptions = _.map(Timezone.list, function(tz) {
+        /* We append the timezone's ID (e.g. America/Los_Angeles)
+           to help the user understand how timezones are sorted.
+           This a poor solution needed because the React implementation
+           here doesn't support search with typeahead yet.
+        */
+        var label = tz.label + " - " + tz.id;
+        return (<option value={tz.id} key={tz.id}>
+          {label}
+        </option>);
+      });
+
       return (<div>
         {errorMsg}
         <div className="row clearfix form-set">
@@ -947,7 +965,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("address")}
                 className="control-label">
-                Executive's Address
+                Executive&apos;s Address
               </label>
               <input id={this.getId("address")} name="address"
                 type="text" className="form-control"
@@ -958,7 +976,7 @@ module Esper.Onboarding {
             <div className="form-group">
               <label htmlFor={this.getId("phone")}
                 className="control-label">
-                Executive's Phone
+                Executive&apos;s Phone
               </label>
               <input id={this.getId("phone")} name="phone"
                 type="text" className="form-control"
@@ -966,6 +984,21 @@ module Esper.Onboarding {
                 disabled={disabled}
                 placeholder="555-555-5555" />
             </div>
+
+            <div className="form-group">
+              <label htmlFor={this.getId("timezone")}
+                     className="control-label">
+                Executive&apos;s Timezone
+              </label>
+              <select id={this.getId("timezone")}
+                      value={"America/Los_Angeles"}
+                      name="timezone"
+                      disabled={disabled}
+                      className="form-control">
+                {tzOptions}
+              </select>
+            </div>
+
             {
               disabled || !supportsExecutive || first ? "" :
               <div className="esper-remove-link form-group"
@@ -1026,6 +1059,10 @@ module Esper.Onboarding {
           email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i) !== null;
       }
 
+      var address = this.find("input[name=address]").val();
+      var phone = this.find("input[name=phone]").val();
+      var timezone = this.find("input[name=timezone]").val();
+
       if ((nameIsValid && !supportsExecutive)
            || (nameIsValid && emailIsValid)) {
         var defaultCal = this.find("[name=default-cal]").val();
@@ -1042,12 +1079,18 @@ module Esper.Onboarding {
           teamProps = {
             name: name,
             email: email,
+            address: address,
+            phone: phone,
+            timezone: timezone,
             defaultCal: defaultCal,
             calendars: calendars
           }
         } else {
           teamProps = {
             name: name,
+            address: address,
+            phone: phone,
+            timezone: timezone,
             defaultCal: defaultCal,
             calendars: calendars
           }
