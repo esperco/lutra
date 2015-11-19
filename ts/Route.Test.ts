@@ -48,6 +48,7 @@ module Esper.Route {
   describe("Routes", function() {
     beforeEach(function() {
       this.spy = spyOn(Layout, "render");
+      TestFixtures.mockLogin();
     });
 
     it("should navigate to labels over time page with default route", function() {

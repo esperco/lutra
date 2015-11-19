@@ -2,10 +2,22 @@
   Helpers for getting current calendar
 */
 
+/// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
 
 module Esper.Calendars {
+  export interface CalSelection {
+    teamId: string;
+    calId: string;
+    events?: {
+      id: string,
+      title: string
+    }[];
+  }
+
+  export var selectStore = new Model.StoreOne<CalSelection>();
+
   export function get(teamId: string, calId: string) {
     var team = Teams.get(teamId);
     if (team) {
@@ -63,6 +75,12 @@ module Esper.Calendars {
         teamId: retTeam.teamid,
         calId: getId(retCal)
       };
+    }
+  }
+
+  export function setDefault() {
+    if (! selectStore.isSet()) {
+      selectStore.set(defaultSelection());
     }
   }
 }

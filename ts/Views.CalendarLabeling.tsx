@@ -2,35 +2,24 @@
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.Calendar.tsx" />
+/// <refernece path="./Calendars.ts" />
 
 module Esper.Views {
-
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Store for currently selected team, calendar, and event
-  interface CalSelection {
-    teamId: string;
-    calId: string;
-    events: {
-      id: string,
-      title: string
-    }[]
-  }
-  var calSelectStore = new Model.StoreOne<CalSelection>();
-
   // Action to update our selection
   function updateSelection(teamId: string, calId: string) {
-    var current = calSelectStore.val();
+    var current = Calendars.selectStore.val();
 
     // Update only if calendar doesn't match (to avoid clobbering events)
     if (!current || current.teamId !== teamId || current.calId !== calId) {
-      calSelectStore.set({teamId: teamId, calId: calId, events: []});
+      Calendars.selectStore.set({teamId: teamId, calId: calId, events: []});
     }
   }
 
   function updateEvent(eventId: string, eventTitle: string, add: boolean) {
-    calSelectStore.set(function(oldData) {
+    Calendars.selectStore.set(function(oldData) {
       var newData = _.cloneDeep(oldData);
       newData.events = newData.events || [];
       var selected = _.find(newData.events, (e) => e.id === eventId);
@@ -68,10 +57,10 @@ module Esper.Views {
   }
 
   function setDefaults() {
-    if (! calSelectStore.isSet()) {
-      calSelectStore.set(_.extend({
+    if (! Calendars.selectStore.isSet()) {
+      Calendars.selectStore.set(_.extend({
         events: []
-      }, Calendars.defaultSelection()) as CalSelection);
+      }, Calendars.defaultSelection()) as Calendars.CalSelection);
     }
   }
 
@@ -84,13 +73,12 @@ module Esper.Views {
   }
 
   // Export with prefix for testing
-  export var clCalSelectStore = calSelectStore;
   export var clCalSelectMinStore = calSelectMinStore;
 
   ////
 
   interface CalendarLabelingState {
-    selectedCal: CalSelection;
+    selectedCal: Calendars.CalSelection;
     minimizeCalSelector: boolean;
   }
 
@@ -168,14 +156,14 @@ module Esper.Views {
 
     componentDidMount() {
       this.setSources([
-        calSelectStore,
+        Calendars.selectStore,
         calSelectMinStore
       ]);
     }
 
     getState() {
       return {
-        selectedCal: calSelectStore.val(),
+        selectedCal: Calendars.selectStore.val(),
         minimizeCalSelector: calSelectMinStore.val()
       }
     }
