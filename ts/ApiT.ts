@@ -185,6 +185,7 @@ type token_response = [
   export interface TeamMember {
     member_email: string;
     member_uid: string;
+    member_other_emails: string[];
   }
 
   export interface CalendarTime {
