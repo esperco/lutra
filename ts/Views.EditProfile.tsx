@@ -90,13 +90,13 @@ module Esper.Views {
       this.setState(function(o) {
         var entries = $.extend(true, [], o[key]);
         delete entries[i];
-        var update = {};
+        var update: { [index: string]: ApiT.LabelledItem[]; } = {};
         update[key] = entries;
         return update;
       });
     }
-    handleLabelList = (e, key: string, i: number) => {
-      var text = e.target.value;
+    handleLabelList = (e: FormEvent, key: string, i: number) => {
+      var text = (e.target as HTMLInputElement).value;
       this.setState(function(o) {
         var entries = $.extend(true, [], o[key]);
         entries[i].label = text;
