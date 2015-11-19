@@ -7,10 +7,14 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   export class LoginRequired extends Component<{}, {}> {
-    submitLogin = (e) => {
+    submitLogin = (e: React.SyntheticEvent) => {
       e.preventDefault();
       var email = document.forms["login"]["email"].value;
       var password = document.forms["login"]["password"].value;
+      Api.postDirLogin({ email, password }).done(function(loginResponse) {
+        Login.setCredentials(loginResponse.uid, loginResponse.api_secret);
+        Login.init();
+      });
     }
 
     render() {

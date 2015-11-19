@@ -37,6 +37,7 @@ module Esper.Login {
           Analytics.identify(loginInfo, false, function() {
             loginDeferred.resolve(loginInfo);
           });
+          DirProfile.init();
         }, onFail);
     }
   }
