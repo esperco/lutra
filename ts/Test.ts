@@ -7,6 +7,7 @@
 /// <reference path="../typings/react/react-global.d.ts" />
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../typings/lodash/lodash.d.ts" />
+/// <reference path="./Api.ts" />
 
 module Esper.Test {
 
@@ -36,11 +37,22 @@ module Esper.Test {
     return (<any>frame.get(0)).contentWindow;
   }
 
+  // Track renderings
+  var renderContainers: HTMLElement[] = [];
+
   // Render a React Component into a DOM
   export function render(elm: React.ReactElement<any>) {
-    var TestUtils = React.addons.TestUtils;
-    return TestUtils.renderIntoDocument(elm);
+    var container = document.createElement('div')
+    renderContainers.push(container);
+    return React.render(elm, container);
   };
+
+  export function cleanupRenders() {
+    _.each(renderContainers || [], (container) => {
+      React.unmountComponentAtNode(container)
+    });
+    renderContainers = [];
+  }
 
   // Helper for comparing a ReactElement vs. expected class and props in
   // Jasmine. Does a shallow comparison on props.
@@ -56,6 +68,15 @@ module Esper.Test {
       expect(_.eq(props, element.props)).toBeTruthy(
         `Exepected ${JSON.stringify(props)} to be ` +
         `${JSON.stringify(element.props)}`);
+    }
+  }
+
+  // Mock all APIs
+  export function mockAPIs() {
+    for (var name in Api) {
+      if (Api.hasOwnProperty(name) && name instanceof Function) {
+        spyOn(Api, name).and.returnValue($.Deferred<any>().promise());
+      }
     }
   }
 }
