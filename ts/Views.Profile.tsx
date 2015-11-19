@@ -17,6 +17,15 @@ module Esper.Views {
   };
 
   export class Profile extends Component<{}, ProfileState> {
+    createRows(items: ApiT.LabelledItem[], key: string, label?: string): JSX.Element[] {
+      return _.map(items, function(item: ApiT.LabelledItem, i: number) {
+        return <tr key={key + i}>
+          <td>{item.label + label}</td>
+          <td>{item.item}</td>
+        </tr>;
+      });
+    }
+
     render() {
       if (this.state.busy) {
         return <div className="container esper-spinner" />;
@@ -33,47 +42,18 @@ module Esper.Views {
       }
 
       var profile = this.state.dirProfile;
-      var otherNamesRows: JSX.Element[] = [];
-      var emailRows: JSX.Element[] = [];
-      var phoneRows: JSX.Element[] = [];
-      var addressRows: JSX.Element[] = [];
-      var customRows: JSX.Element[] = [];
-
-      for (var i = 0; i < profile.other_names.length; i++) {
-        otherNamesRows.push(<tr key={"other-name" + i}>
-          <td>{profile.other_names[i].label}</td>
-          <td>{profile.other_names[i].item}</td>
-        </tr>);
-      }
-      for (var i = 0; i < profile.other_emails.length; i++) {
-        emailRows.push(<tr key={"other-email" + i}>
-          <td>{profile.other_emails[i].label} Email</td>
-          <td>{profile.other_emails[i].item}</td>
-        </tr>);
-      }
-      for (var i = 0; i < profile.phones.length; i++) {
-        phoneRows.push(<tr key={"phone" + i}>
-          <td>{profile.phones[i].label} Phone</td>
-          <td>{profile.phones[i].item}</td>
-        </tr>);
-      }
-      for (var i = 0; i < profile.addresses.length; i++) {
-        addressRows.push(<tr key={"address" + i}>
-          <td>{profile.addresses[i].label} Address</td>
-          <td>{profile.addresses[i].item}</td>
-        </tr>);
-      }
-      for (var i = 0; i < profile.custom_entries.length; i++) {
-        customRows.push(<tr key={"custom-entry" + i}>
-          <td>{profile.custom_entries[i].label}</td>
-          <td>{profile.custom_entries[i].item}</td>
-        </tr>);
-      }
+      var otherNamesRows = this.createRows(profile.other_names, "other-name");
+      var emailRows = this.createRows(profile.other_emails, "other-email", " Email");
+      var phoneRows = this.createRows(profile.phones, "phone", " Phone");
+      var addressRows = this.createRows(profile.addresses, "address", " Address");
+      var customRows = this.createRows(profile.custom_entries, "custom-entry");
 
       return <div className="container">
         <div className="well">
           <div className="profile-header">
-            { profile.image_url ? <img src={profile.image_url} /> : null }
+            { profile.image_url ?
+              <img className="img-lg" src={profile.image_url} />
+            : null }
             <div className="profile-title">
               <h1>{profile.display_name}</h1>
               <h3>{profile.company_title}</h3>
