@@ -54,8 +54,11 @@ module Esper.Onboarding {
     teamid?: string;       // _id server responds with after team creation
     name?: string;         // team name
     email?: string;        // e-mail address for sec
+    address?: string;      // exec's work location
+    phone?: string;        // exec's phone number
     defaultCal?: string;   // google_cal_id of primary calendar
     calendars?: [string];  // google_cal_ids of all other calendars
+    timezone?: string;     // IANA timezone, e.g. "Europe/London"
 
     // Why last save request failed
     error?: TeamRequestError
@@ -766,15 +769,21 @@ module Esper.Onboarding {
           teamStore.update(localId, request, {
             dataStatus: Model.DataStatus.INFLIGHT
           });
-          let body;
+          let body: ApiT.TeamCreationRequest;
           if (supportsExecutive) {
             body = {
               executive_name: request.name,
-              executive_email: request.email
+              executive_email: request.email,
+              executive_address: request.address,
+              executive_phone: request.phone,
+              executive_timezone: request.timezone
             }
           } else {
             body = {
-              executive_name: request.name
+              executive_name: request.name,
+              executive_address: request.address,
+              executive_phone: request.phone,
+              executive_timezone: request.timezone
             }
           }
 
@@ -912,6 +921,18 @@ module Esper.Onboarding {
         </option>);
       });
 
+      var tzOptions = _.map(Timezone.list, function(tz) {
+        /* We append the timezone's ID (e.g. America/Los_Angeles)
+           to help the user understand how timezones are sorted.
+           This a poor solution needed because the React implementation
+           here doesn't support search with typeahead yet.
+        */
+        var label = tz.label + " - " + tz.id;
+        return (<option value={tz.id} key={tz.id}>
+          {label}
+        </option>);
+      });
+
       return (<div>
         {errorMsg}
         <div className="row clearfix form-set">
@@ -933,7 +954,7 @@ module Esper.Onboarding {
                   (this.state.emailHasError ? "has-error" : "")}>
                 <label htmlFor={this.getId("email")}
                   className="control-label">
-                  Executive's Email
+                  Executive&apos;s Email
                 </label>
                 <input id={this.getId("email") } type="email" name="email"
                   defaultValue={team.email}
@@ -942,18 +963,42 @@ module Esper.Onboarding {
               </div> : null
             }
             <div className="form-group">
-              <label htmlFor={this.getId("default-cal")}
+              <label htmlFor={this.getId("address")}
                 className="control-label">
-                Default Calendar to Add Events
+                { supportsExecutive ? "Executive's Address" : "Your Address" }
               </label>
-              <select id={this.getId("default-cal")}
-                value={team.defaultCal}
-                name="default-cal"
+              <input id={this.getId("address")} name="address"
+                type="text" className="form-control"
+                defaultValue={team.address}
                 disabled={disabled}
-                className="form-control">
-                {calOptions}
+                placeholder="10880 Malibu Point, Malibu, CA 90265" />
+            </div>
+            <div className="form-group">
+              <label htmlFor={this.getId("phone")}
+                className="control-label">
+                { supportsExecutive ? "Executive's Phone" : "Your Phone" }
+              </label>
+              <input id={this.getId("phone")} name="phone"
+                type="text" className="form-control"
+                defaultValue={team.phone}
+                disabled={disabled}
+                placeholder="555-555-5555" />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor={this.getId("timezone")}
+                     className="control-label">
+                { supportsExecutive ? "Executive's Timezone" : "Your Timezone" }
+              </label>
+              <select id={this.getId("timezone")}
+                      value={team.timezone}
+                      name="timezone"
+                      disabled={disabled}
+                      className="form-control">
+                {tzOptions}
               </select>
             </div>
+
             {
               disabled || !supportsExecutive || first ? "" :
               <div className="esper-remove-link form-group"
@@ -974,6 +1019,19 @@ module Esper.Onboarding {
           </div></div>
           <div className="col-sm-6 form-group">
             <div className="esper-col-spacer">
+              <div className="form-group">
+                <label htmlFor={this.getId("default-cal")}
+                       className="control-label">
+                  Default Calendar to Add Events
+                </label>
+                <select id={this.getId("default-cal")}
+                        value={team.defaultCal}
+                        name="default-cal"
+                        disabled={disabled}
+                        className="form-control">
+                  {calOptions}
+                </select>
+              </div>
               <label className="group-heading">
                 { supportsExecutive ? "Calendars Associated with this Executive"
                   : "Other Calendars to Sync"}
@@ -1001,6 +1059,10 @@ module Esper.Onboarding {
           email.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i) !== null;
       }
 
+      var address = this.find("input[name=address]").val();
+      var phone = this.find("input[name=phone]").val();
+      var timezone = this.find("[name=timezone]").val();
+
       if ((nameIsValid && !supportsExecutive)
            || (nameIsValid && emailIsValid)) {
         var defaultCal = this.find("[name=default-cal]").val();
@@ -1017,12 +1079,18 @@ module Esper.Onboarding {
           teamProps = {
             name: name,
             email: email,
+            address: address,
+            phone: phone,
+            timezone: timezone,
             defaultCal: defaultCal,
             calendars: calendars
           }
         } else {
           teamProps = {
             name: name,
+            address: address,
+            phone: phone,
+            timezone: timezone,
             defaultCal: defaultCal,
             calendars: calendars
           }

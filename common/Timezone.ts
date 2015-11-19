@@ -40,15 +40,28 @@ module Esper.Timezone {
     name: string; // Full customary name
   }
 
+  // Enriched variant of ZoneName
+  export interface ZoneInfo {
+    id: string;    // IANA timezone identifier: America/Los_Angeles
+    name: string;  // Full customary name: Pacific Time
+    label: string; // Richer text: (GMT-08:00) Pacific Time (PST)
+  }
+
   /* We need this because moment-timezone doesn't supply the full names,
      and we want to show those in our menu.
   */
   var supportedTimezones: ZoneName[] = [
+    /* US timezones first */
     { id: "America/Los_Angeles", name: "Pacific Time" },
     { id: "America/Denver", name: "Mountain Time" },
     { id: "America/Chicago", name: "Central Time" },
     { id: "America/New_York", name: "Eastern Time" },
     { id: "America/Anchorage", name: "Alaska Time" },
+    { id: "America/Phoenix", name: "Mountain Time - Arizona" },
+    { id: "America/Puerto_Rico", name: "Puerto Rico" },
+    { id: "Pacific/Honolulu", name: "Hawaii Time" },
+
+    /* Other timezones sorted alphabetically */
     { id: "Africa/Abidjan", name: "Abidjan" },
     { id: "Africa/Accra", name: "Accra" },
     { id: "Africa/Algiers", name: "Algiers" },
@@ -114,11 +127,9 @@ module Esper.Timezone {
     { id: "America/Noronha", name: "Noronha" },
     { id: "America/Panama", name: "Panama" },
     { id: "America/Paramaribo", name: "Paramaribo" },
-    { id: "America/Phoenix", name: "Mountain Time - Arizona" },
     { id: "America/Port-au-Prince", name: "Port-au-Prince" },
     { id: "America/Port_of_Spain", name: "Port of Spain" },
     { id: "America/Porto_Velho", name: "Porto Velho" },
-    { id: "America/Puerto_Rico", name: "Puerto Rico" },
     { id: "America/Recife", name: "Recife" },
     { id: "America/Regina", name: "Central Time - Regina" },
     { id: "America/Rio_Branco", name: "Rio Branco" },
@@ -269,7 +280,6 @@ module Esper.Timezone {
     { id: "Pacific/Gambier", name: "Gambier" },
     { id: "Pacific/Guadalcanal", name: "Guadalcanal" },
     { id: "Pacific/Guam", name: "Guam" },
-    { id: "Pacific/Honolulu", name: "Hawaii Time" },
     { id: "Pacific/Kiritimati", name: "Kiritimati" },
     { id: "Pacific/Kosrae", name: "Kosrae" },
     { id: "Pacific/Kwajalein", name: "Kwajalein" },
@@ -302,6 +312,8 @@ module Esper.Timezone {
   var timezones: Bloodhound<string>;
   var rawTimezoneValues: string[];
 
+  export var list: ZoneInfo[] = [];
+
   export function init() {
     rawTimezoneValues = [];
     valueOfId = {};
@@ -314,6 +326,11 @@ module Esper.Timezone {
       rawTimezoneValues.push(value);
       idOfValue[value] = z.id;
       valueOfId[z.id] = value;
+      list.push({
+        id: z.id,
+        name: z.name,
+        label: value
+      });
     });
 
     timezones = new Esper.bloodhound({
@@ -342,8 +359,7 @@ module Esper.Timezone {
 '''
     parent.append(selector);
     selector.typeahead(
-      { highlight: true,
-      },
+      { highlight: true },
       { name: "timezones",
         source: function(query, sync, async) {
           timezones.search(query, sync, async);
