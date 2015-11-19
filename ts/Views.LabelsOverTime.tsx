@@ -7,6 +7,7 @@
 /// <reference path="./Components.EmailModal.tsx" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./TimeStats.ts" />
+/// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
 /*
@@ -16,17 +17,10 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Store for currently selected team and calendar
-  interface CalSelection {
-    teamId: string;
-    calId: string;
-  }
-  var calSelectStore = new Model.StoreOne<CalSelection>();
-
   // Action to update our selection -- also triggers async calls
   function updateSelection(teamId: string, calId: string) {
-    var current = calSelectStore.val();
-    calSelectStore.set({teamId: teamId, calId: calId});
+    var current = Calendars.selectStore.val();
+    Calendars.selectStore.set({teamId: teamId, calId: calId});
     updateAsync();
 
     // Clear label selection and colors if switching teams (default)
@@ -41,21 +35,11 @@ module Esper.Views {
 
   // Set some defaults
   function setDefaults() {
-    var callAsync = false;
-
     if (! intervalSelectStore.isSet()) {
       intervalSelectStore.set(TimeStats.Interval.WEEKLY);
-      callAsync = true;
     }
-
-    if (! calSelectStore.isSet()) {
-      calSelectStore.set(Calendars.defaultSelection());
-      callAsync = true;
-    }
-
-    if (callAsync) {
-      updateAsync();
-    }
+    Calendars.setDefault();
+    updateAsync();
   }
 
   // Hard-coded (for now) total number of intervals
@@ -69,7 +53,7 @@ module Esper.Views {
 
   // Call from update actions to trigger async actions
   function updateAsync() {
-    var calSelect = calSelectStore.val();
+    var calSelect = Calendars.selectStore.val();
     var intervalSelect = intervalSelectStore.val();
     if (calSelect && intervalSelect !== undefined) {
       TimeStats.intervalQuery.async({
@@ -96,7 +80,6 @@ module Esper.Views {
 
 
   // Export stores with prefix for test access
-  export var lotCalSelectorStore = calSelectStore;
   export var lotIntervalSelectStore = intervalSelectStore;
   export var lotLabelSelectStore = labelSelectStore;
 
@@ -145,7 +128,7 @@ module Esper.Views {
   }
 
   interface LabelsOverTimeState {
-    selectedCal: CalSelection;
+    selectedCal: Calendars.CalSelection;
     selectedLabels: string[];
     selectedInterval: TimeStats.Interval;
     results: TimeStats.StatResults;
@@ -305,7 +288,7 @@ module Esper.Views {
 
     componentDidMount() {
       this.setSources([
-        calSelectStore,
+        Calendars.selectStore,
         labelSelectStore,
         intervalSelectStore,
         TimeStats.intervalQuery
@@ -317,7 +300,7 @@ module Esper.Views {
       trackView(null);
 
       var selectedInterval = intervalSelectStore.val();
-      var selectedCal = calSelectStore.val();
+      var selectedCal = Calendars.selectStore.val();
       if (selectedCal && selectedCal.calId && selectedCal.teamId) {
 
         // Get selected team
