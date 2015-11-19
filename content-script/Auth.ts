@@ -64,13 +64,14 @@ module Esper.Auth {
   // Store id of last account we tried logging in for (so we know whether
   // we should focus on this tab on login)
   var loginInProgressFor: string;
+  var loginWindow: Window;
 
   export function openLoginTab(googleAccountId) {
     loginInProgressFor = googleAccountId;
     var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
     Log.d("Going off to " + url);
-    var win = window.open(url, '_blank');
-    win.focus();
+    loginWindow = window.open(url, '_blank');
+    loginWindow.focus();
   }
 
   export function openWelcomeModal(account: Types.Account,
@@ -211,6 +212,9 @@ module Esper.Auth {
             Analytics.identify();
             Onboarding.handleLogin();
             Message.postToExtension(Message.Type.FocusOnSender);
+            if (loginWindow) {
+              loginWindow.close();
+            }
             break;
           }
         }
@@ -218,6 +222,9 @@ module Esper.Auth {
         // Always unset loginInProgress variable so future logins in other
         // tabs don't accidentally refocus on this one
         loginInProgressFor = ""; // Unset
+
+        // Delete login window reference
+        loginWindow = undefined;
       }
     });
   }
