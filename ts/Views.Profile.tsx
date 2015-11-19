@@ -17,7 +17,7 @@ module Esper.Views {
   };
 
   export class Profile extends Component<{}, ProfileState> {
-    createRows(items: ApiT.LabelledItem[], key: string, label?: string): JSX.Element[] {
+    createRows(items: ApiT.LabelledItem[], key: string, label = ""): JSX.Element[] {
       return _.map(items, function(item: ApiT.LabelledItem, i: number) {
         return <tr key={key + i}>
           <td>{item.label + label}</td>
