@@ -15,6 +15,11 @@ module Esper.ApiT {
   export interface TeamCreationRequest {
     executive_email?: string;
     executive_name: string;
+    executive_first_name?: string;
+    executive_last_name?: string;
+    executive_timezone?: string;
+    executive_address?: string;
+    executive_phone?: string;
     executive_gender?: string;
     team_calendars?: Calendar[];
     team_email_aliases?: string[];
