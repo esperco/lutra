@@ -228,6 +228,20 @@ module Esper.InviteControls {
   Guest event
 </div>
 '''
+    var hasCalendarRow = true;
+    var hasGuestsRow = true;
+    if (duplicate) {
+      if (execEvent) {
+        calendarRow.remove();
+        hasCalendarRow = false;
+        execEventTag.appendTo(heading);
+        guestsRow.remove();
+        hasGuestsRow = false;
+      } else {
+        guestsEventTag.appendTo(heading);
+      }
+    }
+
     var prefs    = state.prefs;
     var team     = prefs.team;
     var threadId = CurrentThread.threadId.get();
@@ -302,57 +316,49 @@ module Esper.InviteControls {
       none: function() { }
     });
 
-    var peopleInvolved : { [email:string]: string } = {};
-    CurrentThread.getExternalParticipants().done(function(participants) {
-      if (participants.length > 0) {
-        List.iter(participants, function (participant) {
-          var name = participant.display_name || "";
-          var email = participant.email;
-          var tz = timezoneForGuest(email, taskPrefs, event);
-          var v = viewPersonInvolved(peopleInvolved, email, name,
-                                     tz, taskPrefs);
-          viewPeopleInvolved.append(v);
-        });
+    if (hasGuestsRow) {
+      var peopleInvolved : { [email:string]: string } = {};
+      CurrentThread.getExternalParticipants().done(function(participants) {
+        if (participants.length > 0) {
+          List.iter(participants, function (participant) {
+            var name = participant.display_name || "";
+            var email = participant.email;
+            var tz = timezoneForGuest(email, taskPrefs, event);
+            var v = viewPersonInvolved(peopleInvolved, email, name,
+                                       tz, taskPrefs);
+            viewPeopleInvolved.append(v);
+          });
+          noGuestsFound.hide();
+          viewPeopleInvolved.show();
+        } else {
+          noGuestsFound.show();
+          viewPeopleInvolved.hide();
+        }
+      });
+
+      addGuest.click(function() {
+        var name  = newGuestName.val();
+        var email = newGuestEmail.val();
+        peopleInvolved[email] = name;
+        if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
+
+        var checked = true;
+        var tz = timezoneForGuest(email, taskPrefs, event);
+        var v = viewPersonInvolved(peopleInvolved, email, name,
+                                   tz, taskPrefs, checked);
+        viewPeopleInvolved.append(v);
+        newGuestName.val("");
+        newGuestEmail.val("");
+
         noGuestsFound.hide();
         viewPeopleInvolved.show();
-      } else {
-        noGuestsFound.show();
-        viewPeopleInvolved.hide();
-      }
-    });
-
-    addGuest.click(function() {
-      var name  = newGuestName.val();
-      var email = newGuestEmail.val();
-      peopleInvolved[email] = name;
-      if (name === "" || email === "" || !email.match(/.*@.*\..*/)) return;
-
-      var checked = true;
-      var tz = timezoneForGuest(email, taskPrefs, event);
-      var v = viewPersonInvolved(peopleInvolved, email, name,
-                                 tz, taskPrefs, checked);
-      viewPeopleInvolved.append(v);
-      newGuestName.val("");
-      newGuestEmail.val("");
-
-      noGuestsFound.hide();
-      viewPeopleInvolved.show();
-    });
+      });
+    }
 
     var preferences  = prefs.execPrefs;
     var duplicate    = preferences.general.use_duplicate_events;
     var execReminder = preferences.general.send_exec_reminder;
     var holdColor    = preferences.general.hold_event_color;
-
-    if (duplicate) {
-      if (execEvent) {
-        calendarRow.remove();
-        execEventTag.appendTo(heading);
-        guestsRow.remove();
-      } else {
-        guestsEventTag.appendTo(heading);
-      }
-    }
 
     function searchLocation() {
       var query = pubLocation.val();

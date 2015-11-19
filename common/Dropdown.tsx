@@ -39,10 +39,9 @@ module Esper.Dropdown {
 
     render() {
       return (
-        <div>
+        <div className="esper-filter-dropdown">
           <SearchBar dataEngine={this.props.dataEngine}
             displayData={this.displayData} />
-          <hr />
           <List id={this.props.id}
             initialData={this.props.initialData}
             displayData={this.displayData}
@@ -154,7 +153,7 @@ module Esper.Dropdown {
               value={this.props.text}
               name={this.props.name}
               id={this.props.id} />
-            {this.props.text}
+            {" "}{this.props.text}
           </label>
         </li>
       );

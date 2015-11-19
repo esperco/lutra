@@ -2,6 +2,8 @@
  *  active account.
  */
 
+/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="./Login.ts" />
 /// <reference path="./Profile.ts" />
 /// <reference path="./Promise.ts" />
 /// <reference path="./Preferences.ts" />
@@ -59,9 +61,33 @@ module Esper.Teams {
     } else if (uid in profiles) {
       return profiles[uid];
     } else {
-      Log.e("No profile found for user " + uid);
-      return null;
+      Log.e("No profile found for user " + uid + ". Stubbing.");
+      return createStubProfile(uid);
     }
+  }
+
+  // Fallback option if no profile data is available
+  function createStubProfile(uid: string): ApiT.Profile {
+    var loginInfo = Login.watchableInfo.getValidOrNothing();
+    if (! loginInfo) {
+      Log.e("Login info missing.");
+      return;
+    }
+
+    var member = _.find(loginInfo.team_members, (m) => m.member_uid === uid);
+    if (! member) {
+      Log.e("Unable to find team member in login info for user " + uid);
+      return;
+    }
+
+    return {
+      profile_uid: uid,
+      email: member.member_email,
+      other_emails: member.member_other_emails,
+      google_access: true,
+      display_name: member.member_email,
+      has_ios_app: false
+    };
   }
 
   export function getPreferences(teamid: string): ApiT.Preferences {

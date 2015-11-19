@@ -1,39 +1,28 @@
+/*
+  Manually request updates to latest Chrome E
+*/
+
+/// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../common/Message.Chrome.ts" />
+
 module Esper.Update {
-  /*
-     Listening to and forwarding the onUpdateAvailable events
-     here in the event page because we don't have access to this part
-     of the API from the content scripts.
-  */
 
-  function sendMessageToAllTabs(
-    message: Message.Message,
-    responseHandler?: (m: Message.Message) => void
-  ) {
-    chrome.tabs.query({}, function(tabs) {
-      List.iter(tabs, function(tab: chrome.tabs.Tab) {
-        if (HostUrl.hasExtension(tab.url)) {
-          Log.d("Sending message to tab " + tab.url);
-          chrome.tabs.sendMessage(tab.id, message, responseHandler);
-        }
-      });
+  function requestUpdate() {
+    var dfd = $.Deferred();
+    chrome.runtime.requestUpdateCheck((status, details) => {
+      dfd.resolve(status);
+      if (status === "update_available") {
+        chrome.runtime.reload();
+      }
     });
-  }
-
-  export function sendVersionUpdate(version: string) {
-    var message: Message.Message = {
-      sender: "Esper",
-      type: "UpdateAvailable",
-      value: version
-    };
-    sendMessageToAllTabs(message);
+    return dfd.promise();
   }
 
   export function init() {
-    // https://developer.chrome.com/extensions/runtime#event-onUpdateAvailable
-    chrome.runtime.onUpdateAvailable.addListener(
-      function(details: chrome.runtime.UpdateAvailableDetails) {
-        sendVersionUpdate(details.version);
-      }
+    // Listen for requests to manually update
+    Message.listenToExtension(
+      Message.Type.RequestExtensionUpdate,
+      requestUpdate
     );
   }
 }
