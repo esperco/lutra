@@ -98,6 +98,11 @@ module Esper.Components {
 
     componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
       $(React.findDOMNode(this._fcDiv)).fullCalendar('refetchEvents');
+      if (! _.eq(prevProps, this.props)) {
+        var view = $(React.findDOMNode(this._fcDiv))
+          .fullCalendar('getView');
+        this.fetchAsync(view);
+      }
     }
 
     // Offset range to handle timezone weirdness -- doesn't mutate
