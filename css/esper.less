@@ -321,8 +321,13 @@
 @availability_maybe: #E0C208;
 @availability_no: #EA7768;
 
-/*** Google (Gmail or Calendar?) ***/
-.dw .nH .nH .no { margin-right: 256px; }
+/*
+  This is applied to the Gmail container containing compose and chat popups
+  when the sidebar is active.
+*/
+.esper-sidebar-active {
+  margin-right: @sidebar_width + 14;
+}
 
 /*** Element IDs ***/
 #esper-support-executive, #esper-support-myself {
@@ -966,9 +971,9 @@ textarea.esper-input { resize: none; }
   }
 }
 
-/*** Esper Calendar Sidebar ***/
+/*** Esper Gmail / Calendar Sidebar Containers ***/
 
-.esper-cal-sidebar {
+.esper-cal-sidebar, .esper-gmail-sidebar {
   position: fixed;
   right: 0;
   bottom: 0;
@@ -977,7 +982,7 @@ textarea.esper-input { resize: none; }
 
   // Set so this sits on top of every in Google Calendar except the very top
   // One Google bar
-  z-index: 6;
+  z-index: 4;
 
   // Override this in child elements to make them clickable
   pointer-events: none;

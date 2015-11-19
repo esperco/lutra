@@ -2,9 +2,17 @@
   Extraction of data from the Gmail document and JavaScript environment.
 */
 
+/// <reference path="../marten/ts/JQStore.ts" />
 /// <reference path="./gmail.d.ts" />
 
 module Esper.Gmail {
+
+  /*
+    Store references to jQuery element for anchor point -- this is set when the
+    findSidebarAnchor is called and get cleared once the anchor element is
+    removed from the DOM.
+  */
+  var anchorPoint = new JQStore();
 
   /*
     Find a good insertion point for the menu icon in the top navigation bar.
@@ -21,15 +29,19 @@ module Esper.Gmail {
   }
 
   export function findSidebarAnchor() {
-    var anchor = $(".nH.g.id");
+    /*
+      Old anchor point -- leave commented out for now so it's easy to find and
+      revert if we need to
+    */
+    // var anchor = $(".nH.g.id");
 
-    if (anchor.length !== 1) {
-      Log.d("Cannot find anchor point for the Esper sidebar.");
-      return $();
-    } else {
-      Log.i("Found anchor point for the Esper sidebar.");
-      return anchor;
+    var ret = anchorPoint.get();
+    if (! ret) {
+      ret = $(`<div id="esper" class="esper esper-gmail-sidebar" />`);
+      $("body").append(ret);
+      anchorPoint.set(ret);
     }
+    return ret;
   }
 
   /** Returns the tbody that contains the composition toolbar. This is
@@ -208,6 +220,27 @@ module Esper.Gmail {
    */
   export function threadMessages() {
     return $("div.nH.aHU");
+  }
+
+  /*
+    Returns the object containing compose popups
+  */
+  export function composePopups() {
+    return $(".dw .nH .nH .no");
+  }
+
+  /*
+    Adjust the bottom menubar for the compose popups (this is absolutely
+    positioned and adjusting the size of the container for popups may
+    result in the menubar being shifted funny)
+  */
+  export function adjustPopups() {
+    composePopups().find(".aDj.aDi").each(function(i: number, elm: Element) {
+      var offset = $(elm).parents(".nH.nn").first().offset();
+      if (offset && offset.left !== undefined) {
+        $(elm).css({left: (offset.left + 1) + "px"})
+      }
+    });
   }
 
   /*

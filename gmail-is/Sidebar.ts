@@ -172,7 +172,7 @@ module Esper.Sidebar {
     }
   }
 
-  function displayDock(rootElement, sidebar, isCorrectTeam: boolean) {
+  function displayDock(rootElement, sidebar) {
 '''
 <div #view class="esper-dock-container">
   <div #wrap class="esper-dock-wrap">
@@ -243,7 +243,7 @@ module Esper.Sidebar {
       setCurrentThreadState(ExtensionOptions.SidebarOpts.SHOW);
 
       function afterAnimation() {
-        displayTeamSidebar(rootElement, true, false);
+        displayTeamSidebar(rootElement);
       }
       setTimeout(afterAnimation, timeout);
     }
@@ -349,7 +349,6 @@ module Esper.Sidebar {
 
   function displaySidebar(rootElement,
                           threadId: string,
-                          autoTask: boolean,
                           linkedEvents: ApiT.TaskEvent[]) {
 '''
 <div #view class="esper-sidebar">
@@ -397,7 +396,7 @@ module Esper.Sidebar {
           var userTabContent = UserTab.viewOfUserTab(team);
           userContent.append(userTabContent.view);
           TaskTab.displayTaskTab(taskContent, team, threadId,
-                                 autoTask, linkedEvents,
+                                 linkedEvents,
                                  workflows, userTabContent);
         });
       },
@@ -435,9 +434,7 @@ module Esper.Sidebar {
     rootElement.append(view);
   }
 
-  function displayTeamSidebar(rootElement,
-                              isCorrectTeam: boolean,
-                              autoTask: boolean) {
+  function displayTeamSidebar(rootElement) {
     var threadId = CurrentThread.threadId.get();
     Log.d("displayTeamSidebar() for thread", threadId);
 
@@ -450,13 +447,13 @@ module Esper.Sidebar {
           some : function (team) {
             Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
               .done(function(linkedEvents) {
-                var sidebar = displaySidebar(rootElement, threadId, autoTask, linkedEvents);
-                displayDock(rootElement, sidebar, isCorrectTeam);
+                var sidebar = displaySidebar(rootElement, threadId, linkedEvents);
+                displayDock(rootElement, sidebar);
               });
           },
           none : function () {
-            var sidebar = displaySidebar(rootElement, threadId, autoTask, []);
-            displayDock(rootElement, sidebar, isCorrectTeam);
+            var sidebar = displaySidebar(rootElement, threadId, []);
+            displayDock(rootElement, sidebar);
           }
         });
       }
@@ -472,44 +469,40 @@ module Esper.Sidebar {
       return;
     }
 
-    function retry() {
-      Log.d("Trying to display Esper sidebar...");
+    // Don't draw sidebar if no thread id
+    var threadId = CurrentThread.threadId.get();
+    if (! threadId) {
+      Log.d("No threadId -- hiding Esper sidebar");
+      removeEsperRoot();
+      Gmail.composePopups().removeClass("esper-sidebar-active");
+    }
+
+    else {
       var rootElement = insertEsperRoot();
       if (rootElement === undefined) {
         return false;
       } else {
-        var threadId = CurrentThread.threadId.get();
+        Gmail.composePopups().addClass("esper-sidebar-active");
         var teams = Login.myTeams();
-
-        // TODO: Remove autotask logic from Sidebar.ts?
-        //CurrentThread.hasMessageFromExecutive().done(function(autoTask) {
-          // XXX temporarily disable automatic task creation until bugs fixed
-          var autoTask = false;
-
-          // TODO: Determine whether the team is "correct" (?)
-          var correctTeam = true;
-
-          CurrentThread.currentTeam.get().match({
-            some : function (team) {
-              displayTeamSidebar(rootElement, correctTeam, autoTask);
-            },
-            none : function () {
-              if (teams.length === 1) {
-                Log.w("Team not detected, using one and only team.");
-                CurrentThread.setTeam(Option.wrap(teams[0]));
-              }
-
-              displayTeamSidebar(rootElement, correctTeam, autoTask);
+        CurrentThread.currentTeam.get().match({
+          some : function (team) {
+            displayTeamSidebar(rootElement);
+          },
+          none : function () {
+            if (teams.length === 1) {
+              Log.w("Team not detected, using one and only team.");
+              CurrentThread.setTeam(Option.wrap(teams[0]));
             }
-          });
 
-        //});
-
-        return true;
+            displayTeamSidebar(rootElement);
+          }
+        });
       }
     }
 
-    Util.repeatUntil(20, 500, retry);
+    // Fix compose menu bar on popups -- run after everything else done
+    // so offsets are correct before calling
+    window.requestAnimationFrame(Gmail.adjustPopups);
   }
 
   var initJob: JQueryPromise<void>;

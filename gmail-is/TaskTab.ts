@@ -748,7 +748,6 @@ module Esper.TaskTab {
   export function displayTaskTab(tab1,
                                  team: ApiT.Team,
                                  threadId: string,
-                                 autoTask: boolean,
                                  linkedEvents: ApiT.TaskEvent[],
                                  workflows: ApiT.Workflow[],
                                  userTabContent : UserTab.UserTabView) {
@@ -1023,9 +1022,7 @@ module Esper.TaskTab {
     });
 
     showTaskSpinner();
-    var apiGetTask = autoTask ?
-      Api.obtainTaskForThread
-      : Api.getTaskForThread;
+    var apiGetTask = Api.getTaskForThread;
 
     apiGetTask(team.teamid, threadId, false, true).done(function(task) {
       CurrentThread.setTask(task);
@@ -1044,10 +1041,6 @@ module Esper.TaskTab {
           }
         } else {
           taskCaption.text(taskLabelCreate);
-          if (autoTask) {
-            title = deets.subject;
-            if (title === undefined) title = "(no subject)";
-          }
           displayEmptyLinkedThreadsList(taskTabView);
         }
         taskTitle.val(title);
