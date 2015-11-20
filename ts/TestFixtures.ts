@@ -5,6 +5,7 @@
 /// <reference path="../marten/typings/jasmine/jasmine.d.ts" />
 /// <reference path="../marten/ts/Api.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Teams.ts" />
 
 module Esper.TestFixtures {
   export var uid = "my-uid";
@@ -19,6 +20,7 @@ module Esper.TestFixtures {
   export function mockLoginInfo() {
     var info = getLoginInfo();
     Login.InfoStore.set(info);
+    Teams.loadFromLoginInfo(info);
     return info;
   }
 

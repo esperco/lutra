@@ -7,6 +7,7 @@
 
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Route.tsx" />
+/// <reference path="./Teams.ts" />
 /// <reference path="./TimeStats.ts" />
 
 module Esper.Conf {
@@ -16,6 +17,7 @@ module Esper.Conf {
 module Esper.Main {
   export function init() {
     Login.init();
+    Teams.init();
     Route.init();
     Analytics.init(Conf.segmentKey);
   }
