@@ -56,7 +56,10 @@ module Esper.Components {
         <div key={team.teamid}>
           <h5 className="esper-subheader">{team.team_name}</h5>
           <div className="list-group">
-            {this.renderCalendars(team.teamid, team.team_calendars)}
+            { Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
+              this.renderCalendars(team.teamid, team.team_calendars) :
+              <div className="esper-spinner" />
+            }
           </div>
         </div>);
     }
