@@ -57,6 +57,24 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
+  export function registerDirLogin(dirLoginEdit: ApiT.DirLoginEdit):
+  JQueryPromise<ApiT.DirLogin> {
+    var url = prefix + "/api/directory/register";
+    return JsonHttp.put(url, JSON.stringify(dirLoginEdit));
+  }
+
+  export function postDirLogin(dirLoginEdit: ApiT.DirLoginEdit):
+  JQueryPromise<ApiT.LoginResponse> {
+    var url = prefix + "/api/directory/login";
+    return JsonHttp.post(url, JSON.stringify(dirLoginEdit));
+  }
+
+  export function updateDirLogin(dirLogin: ApiT.DirLogin):
+  JQueryPromise<void> {
+    var url = prefix + "/api/directory/login";
+    return JsonHttp.put(url, JSON.stringify(dirLogin));
+  }
+
   /* Esper login and password management */
 
   export function getLoginInfo():
