@@ -184,20 +184,20 @@ module Esper.Views {
     })();
 
     renderList = (key: string, dropList: string[]) => {
-      var thisArg = this;
+      var self = this;
       return _.map(this.state[key], function(entry: ApiT.LabelledItem, i: number) {
-        var uid = "id" + thisArg.incr();
-        var chooseFunction = thisArg.removeLabelledItem.bind(thisArg, key, i);
+        var uid = "id" + self.incr();
+        var chooseFunction = self.removeLabelledItem.bind(self, key, i);
         var plusOrMinus = "glyphicon glyphicon-minus";
         if (i === 0) {
-          chooseFunction = thisArg.newLabelledItem.bind(thisArg, key, dropList[0]);
+          chooseFunction = self.newLabelledItem.bind(self, key, dropList[0]);
           plusOrMinus = "glyphicon glyphicon-plus";
         }
         if (entry !== undefined) {
           return <div className="row">
             <div className="col-xs-2">
               <div className="input-group">
-                <input type="text" id={uid} className="form-control" onChange={function(e) { thisArg.handleLabelList(e,key,i) } }
+                <input type="text" id={uid} className="form-control" onChange={function(e) { self.handleLabelList(e,key,i) } }
                   defaultValue={entry.label}/>
                 <div className="input-group-btn">
                   <button className="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -205,16 +205,16 @@ module Esper.Views {
                   </button>
                   <ul className="dropdown-menu dropdown-menu-right">
                     {_.map(dropList, function(option, i) {
-                      return <li><a onClick={function() { thisArg.changeOption(uid, option) } }>{option}</a></li>;
+                      return <li><a onClick={function() { self.changeOption(uid, option) } }>{option}</a></li>;
                     })}
-                    <li><a onClick={function() { thisArg.selectLabel(uid, "Custom") } }>Custom</a></li>
+                    <li><a onClick={function() { self.selectLabel(uid, "Custom") } }>Custom</a></li>
                   </ul>
                 </div>
               </div>
             </div>
             <div className="col-xs-10">
               <div className="input-group">
-                <input type="text" className="form-control" onChange={function(e) { thisArg.handleItemList(e,key,i) }}
+                <input type="text" className="form-control" onChange={function(e) { self.handleItemList(e,key,i) }}
                   defaultValue={entry.item}/>
                 <div className="input-group-btn">
                   <button className="btn btn-default" onClick={chooseFunction}>
