@@ -8,8 +8,8 @@
 
 module Esper.Queue {
   // A QueueFn is just a callable that returns a promise
-  export interface QueueFn {
-    (): JQueryPromise<any>
+  export interface QueueFn<T> {
+    (): JQueryPromise<T>
   }
 
   /*
@@ -25,7 +25,7 @@ module Esper.Queue {
     empties and are reset when adding a new function to an empty queue.
   */
   export var DMap: {
-    [index: string]: JQueryDeferred<void>;
+    [index: string]: JQueryDeferred<any>;
   } = {};
 
   // Reset for testing
@@ -43,7 +43,7 @@ module Esper.Queue {
     Returns a promise that resolves when the entire queue has been resolved
     and rejects when any promise has been rejected.
   */
-  export function enqueue(key: string, fn: QueueFn) {
+  export function enqueue<T>(key: string, fn: QueueFn<T>): JQueryPromise<T> {
     // Ensure list exists under this key
     var queue = QMap[key] = QMap[key] || [];
     queue.push(fn);
@@ -51,14 +51,14 @@ module Esper.Queue {
     // If there's no pending deferred, start queue
     var dfd = DMap[key];
     if (!dfd || dfd.state() !== "pending") {
-      dfd = DMap[key] = $.Deferred<void>();
+      dfd = DMap[key] = $.Deferred<T>();
       advanceQueue(key);
     }
     return dfd.promise();
   }
 
   // Callback tied to promise to advance a queue on failure
-  function advanceQueue(key: string) {
+  function advanceQueue(key: string, lastResult?: any) {
     var queue = QMap[key];
     if (! queue) {
       Log.e("advanceQueue called on non-existent queue");
@@ -72,7 +72,7 @@ module Esper.Queue {
     }
 
     if (! queue.length) {  // Empty queue => resolve deferred promise
-      dfd.resolve();
+      dfd.resolve(lastResult);
       delete DMap[key];
       return;
     }
@@ -87,7 +87,7 @@ module Esper.Queue {
     */
     if (promise) {
       promise
-        .done(() => advanceQueue(key))
+        .done((res: any) => advanceQueue(key, res))
         .fail((err) => {
           dfd.reject(err);
 
