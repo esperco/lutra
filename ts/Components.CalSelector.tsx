@@ -56,7 +56,8 @@ module Esper.Components {
         <div key={team.teamid}>
           <h5 className="esper-subheader">{team.team_name}</h5>
           <div className="list-group">
-            { Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
+            {
+              Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
               this.renderCalendars(team.teamid, team.team_calendars) :
               <div className="esper-spinner" />
             }
@@ -84,7 +85,7 @@ module Esper.Components {
     }
 
     componentDidMount() {
-      this.setSources([Teams.teamStore]);
+      this.setSources([Teams.teamStore, Teams.allTeamsStore]);
     }
 
     getState() {

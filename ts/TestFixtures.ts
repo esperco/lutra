@@ -18,6 +18,11 @@ module Esper.TestFixtures {
   }
 
   export function mockLoginInfo() {
+    Teams.teamStore.reset();
+    Teams.teamStore.removeAllChangeListeners();
+    Teams.allTeamsStore.reset();
+    Teams.allTeamsStore.removeAllChangeListeners();
+
     var info = getLoginInfo();
     Login.InfoStore.set(info);
     Teams.loadFromLoginInfo(info);

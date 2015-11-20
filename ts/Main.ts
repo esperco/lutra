@@ -19,7 +19,10 @@ module Esper.Main {
     Login.init();
     Teams.init();
     Route.init();
-    Analytics.init(Conf.segmentKey);
+
+    if (! TESTING) {
+      Analytics.init(Conf.segmentKey);
+    }
   }
 }
 

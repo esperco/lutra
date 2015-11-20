@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/Login.Iframe.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="./Esper.ts" />
 
 module Esper.Login {
 
@@ -16,7 +17,7 @@ module Esper.Login {
   export var loginPromise = loginDeferred.promise();
 
   export function init() {
-    if (! Login.loggedIn()) {
+    if (!Login.loggedIn() && !TESTING) {
       InfoStore.set(null, { dataStatus: Model.DataStatus.FETCHING });
 
       var onFail = function(err: Error) {
