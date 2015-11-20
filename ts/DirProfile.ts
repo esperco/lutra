@@ -24,10 +24,12 @@ module Esper.DirProfile {
       profileDeferred.reject(err);
     };
 
-    Api.getDirProfile()
-      .then(function(dirProfile) {
-        Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
-        profileDeferred.resolve(dirProfile);
-      }, onFail);
+    Login.loginPromise.then(function() {
+      Api.getDirProfile()
+        .then(function(dirProfile) {
+          Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
+          profileDeferred.resolve(dirProfile);
+        }, onFail);
+    }, onFail);
   }
 }

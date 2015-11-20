@@ -83,7 +83,7 @@ module Esper.Views {
       this.setState(function(o) {
         var update: {[index: string]: ApiT.LabelledItem[];} = {};
         update[key] = o[key].concat([labelledItem]);
-        return update;
+        return update as ApiT.DirProfile;
       });
     }
     removeLabelledItem = (key: string, i : number) => {
@@ -92,42 +92,42 @@ module Esper.Views {
         delete entries[i];
         var update: { [index: string]: ApiT.LabelledItem[]; } = {};
         update[key] = entries;
-        return update;
+        return update as ApiT.DirProfile;
       });
     }
-    handleLabelList = (e: FormEvent, key: string, i: number) => {
+    handleLabelList = (e: React.SyntheticEvent, key: string, i: number) => {
       var text = (e.target as HTMLInputElement).value;
       this.setState(function(o) {
         var entries = $.extend(true, [], o[key]);
         entries[i].label = text;
         var update: { [index: string]: ApiT.LabelledItem[]; } = {};
         update[key] = entries;
-        return update;
+        return update as ApiT.DirProfile;
       });
     }
     handleItemList = (e: React.SyntheticEvent, key: string, i: number) => {
-      var text = e.target.value;
+      var text = (e.target as HTMLInputElement).value;
       this.setState(function(o) {
         var entries = $.extend(true, [], o[key]);
         entries[i].item = text;
         var update: { [index: string]: ApiT.LabelledItem[]; } = {};
         update[key] = entries;
-        return update;
+        return update as ApiT.DirProfile;
       });
     }
 
     //Regular item helpers
-    handleItem = (e, key: string) => {
-      var update: { [index: string]: ApiT.LabelledItem[]; } = {};
-      update[key] = e.target.value;
-      this.setState(update);
+    handleItem = (e: React.SyntheticEvent, key: string) => {
+      var update: { [index: string]: string; } = {};
+      update[key] = (e.target as HTMLInputElement).value;
+      this.setState(update as ApiT.DirProfile);
     }
 
     //profile picture helper
     changeProfile = () => {
       filepicker.pick(
         function(blob: Blob){
-          this.setState({ image_url: blob.url });
+          this.setState({ image_url: blob.url } as ApiT.DirProfile);
         }.bind(this)
       );
     }

@@ -4,6 +4,7 @@
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Store.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -15,6 +16,15 @@ module Esper.Components {
   };
 
   export class LoginInfo extends Component<{}, LoginInfoState> {
+    logout() {
+      if (Store.get("uid") === undefined) {
+        window.location.href = Login.logoutURL();
+      } else {
+        Store.clear();
+        window.location.reload();
+      }
+    }
+
     render() {
       if (this.state.busy) {
         return <div className="esper-spinner"></div>;
@@ -27,7 +37,7 @@ module Esper.Components {
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
-            <li><a href={Login.logoutURL()}>
+            <li className="clickable" onClick={this.logout}><a>
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
             </a></li>
