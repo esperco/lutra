@@ -92,6 +92,7 @@ module Esper.ApiT {
   }
 
   export interface DirProfile {
+    [index: string]: any;
     image_url: string;
     display_name: string;
     other_names: LabelledItem[];
@@ -103,6 +104,15 @@ module Esper.ApiT {
     phones: LabelledItem[];
     addresses: LabelledItem[];
     custom_entries: LabelledItem[];
+  }
+
+  export interface DirLoginEdit {
+    email: string;
+    hash_pwd: string;
+  }
+
+  export interface DirLogin extends DirLoginEdit {
+    uid: string;
   }
 
   export interface Profile {
