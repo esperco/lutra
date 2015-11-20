@@ -44,7 +44,9 @@ module Esper.Login {
         Login.setCredentials(Store.get("uid"), Store.get("api_secret"));
         Api.getLoginInfo().then(function(loginInfo) {
           InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
-          loginDeferred.resolve(loginInfo);
+          Analytics.identify(loginInfo, false, function() {
+            loginDeferred.resolve(loginInfo);
+          });
         }, onFail);
       }
     }
