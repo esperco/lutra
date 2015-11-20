@@ -122,6 +122,22 @@ module Esper.Queue {
       expect(p2Ret).toEqual(2);
     });
 
+    it("should feed the result from a promise to the next promise", function() {
+      var fn1 = jasmine.createSpy("queue1");
+      var dfd1 = $.Deferred();
+      fn1.and.returnValue(dfd1.promise());
+      var p1 = Queue.enqueue(this.qKey, fn1);
+      var p2 = Queue.enqueue(this.qKey, function(r: number) {
+        return $.Deferred<number>().resolve(r + 2).promise();
+      });
+
+      var pRet: number;
+      p2.done(function(ret: number) { pRet = ret; });
+
+      dfd1.resolve(1);
+      expect(pRet).toEqual(3);
+    });
+
     it("should return new promises for queueing after queue emptied",
       function()
     {

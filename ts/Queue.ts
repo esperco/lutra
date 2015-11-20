@@ -9,24 +9,28 @@
 module Esper.Queue {
   // A QueueFn is just a callable that returns a promise
   export interface QueueFn<T> {
-    (): JQueryPromise<T>
+    (x?: T): JQueryPromise<T>
+  }
+
+  interface IQMap<T> {
+    [index: string]: Array<QueueFn<T>>;
+  }
+
+  interface IDMap<T> {
+    [index: string]: JQueryDeferred<T>;
   }
 
   /*
     Global shared map of queues (which are themselves just lists of QueueFns.
   */
-  export var QMap: {
-    [index: string]: Array<() => JQueryPromise<any>>;
-  } = {};
+  export var QMap: IQMap<any> = {};
 
   /*
     Global shared map of the deferred object used to tracking the state
     of the overall queue itself. These deferreds resolve when a queue
     empties and are reset when adding a new function to an empty queue.
   */
-  export var DMap: {
-    [index: string]: JQueryDeferred<any>;
-  } = {};
+  export var DMap: IDMap<any> = {};
 
   // Reset for testing
   export function reset() {
@@ -78,7 +82,7 @@ module Esper.Queue {
     }
 
     var next = queue.shift();
-    var promise = next();
+    var promise = next(lastResult);
 
     /*
       It's possible for a QueueFn to fail to return a promise, in which case
