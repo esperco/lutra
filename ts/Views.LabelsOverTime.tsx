@@ -304,10 +304,7 @@ module Esper.Views {
       if (selectedCal && selectedCal.calId && selectedCal.teamId) {
 
         // Get selected team
-        var loginInfo = Login.InfoStore.val();
-        var team = _.find(loginInfo.teams,
-          (t) => t.teamid === selectedCal.teamId
-        );
+        var team = Teams.get(selectedCal.teamId);
         if (! team) { throw new Error("Selected unavailable team"); }
 
         var queryRequest = {

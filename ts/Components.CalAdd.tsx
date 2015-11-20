@@ -70,7 +70,7 @@ module Esper.Components {
 
     renderCalendar(cal: ApiT.Calendar) {
       var isSelected = false;
-      var team = this.getTeam();
+      var team = Teams.get(this.state.selectedTeamId);
       if (team) {
         isSelected = !!_.find(team.team_calendars,
           (c) => Calendars.getId(c) === Calendars.getId(cal)
@@ -88,21 +88,26 @@ module Esper.Components {
     }
 
     selectCalendar(cal: ApiT.Calendar) {
-      var team = this.getTeam();
+      var team = Teams.get(this.state.selectedTeamId);
+      var isSelected = false;
+      var _id: string;
+
       if (team) {
-        var isSelected = !!_.find(team.team_calendars,
+        _id = team.teamid;
+        isSelected = !!_.find(team.team_calendars,
           (c) => Calendars.getId(c) === Calendars.getId(cal)
         );
-        if (isSelected) {
-          Calendars.removeTeamCalendar(team.teamid, cal);
-        } else {
-          Calendars.addTeamCalendar(team.teamid, cal);
-        }
+      } else {
+        _id = Teams.createDefaultTeam();
+        this.setState({selectedTeamId: _id});
+        team = Teams.get(_id);
       }
-    }
 
-    getTeam() {
-      return Teams.get(this.state.selectedTeamId);
+      if (isSelected) {
+        Calendars.removeTeamCalendar(_id, cal);
+      } else {
+        Calendars.addTeamCalendar(_id, cal);
+      }
     }
 
     renderTeamSelector() {

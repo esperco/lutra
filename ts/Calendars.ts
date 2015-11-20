@@ -85,8 +85,8 @@ module Esper.Calendars {
     }
   }
 
-  export function addTeamCalendar(teamId: string, cal: ApiT.Calendar) {
-    var team = Teams.get(teamId);
+  export function addTeamCalendar(_id: string, cal: ApiT.Calendar) {
+    var team = Teams.get(_id);
     if (team) {
       var teamCopy = _.cloneDeep(team); // Store values immutable so clone
       teamCopy.team_calendars = teamCopy.team_calendars || [];
@@ -94,48 +94,53 @@ module Esper.Calendars {
       cal.calendar_default_view = true;
       cal.calendar_default_write = true;
       cal.calendar_default_agenda = true;
-      queueUpdate(teamCopy);
+      queueUpdate(_id, teamCopy);
     }
   }
 
-  export function removeTeamCalendar(teamId: string, cal: ApiT.Calendar) {
-    var team = Teams.get(teamId);
+  export function removeTeamCalendar(_id: string, cal: ApiT.Calendar) {
+    var team = Teams.get(_id);
     if (team) {
       var teamCopy = _.cloneDeep(team); // Store values immutable so clone
       _.remove(teamCopy.team_calendars,
         (c) => Calendars.getId(c) === Calendars.getId(cal)
       );
-      queueUpdate(teamCopy);
+      queueUpdate(_id, teamCopy);
     }
   }
 
   // Queues update to server to match calendars on a given team object
-  function queueUpdate(team: ApiT.Team) {
-    var _id = team.teamid;
-    nextUpdates[_id] = team.team_calendars;
+  function queueUpdate(_id: string, team: ApiT.Team) {
+    nextUpdates[_id] = team;
 
     /*
-      Prepend queue-id because we only want to be blocking on team calendar
+      Prepend team-cal- because we only want to be blocking on team calendar
       updates, not any object with this teamid
     */
-    var p = Queue.enqueue("team-cal-" + _id, () => {
-      var calendars = nextUpdates[_id];
+    var p = Queue.enqueue("team-cal-" + _id, (t?: ApiT.Team) => {
+      var calendars = nextUpdates[_id] && nextUpdates[_id].team_calendars;
       if (calendars) {
         delete nextUpdates[_id];
-        return Api.putTeamCalendars(_id, calendars);
+
+        var teamId = (team.teamid || (t && t.teamid));
+        if (teamId) {
+          return Api.putTeamCalendars(_id, calendars);
+        } else {
+          return Teams.saveTeam(_id, team);
+        }
       }
 
       // Return promise that resolves to current team to avoid pushFetch
       // setting something to null
-      var team = Teams.get(_id);
-      return $.Deferred<ApiT.Team>().resolve(team).promise();
+      var ret = t || Teams.get(_id);
+      return $.Deferred<ApiT.Team>().resolve(ret).promise();
     });
 
-    Teams.teamStore.pushFetch(team.teamid, p, team);
+    Teams.teamStore.pushFetch(_id, p, team);
   }
 
   // Track pending calendar updates for team
   var nextUpdates: {
-    [index: string]: ApiT.Calendar[]
+    [index: string]: ApiT.Team
   } = {};
 }

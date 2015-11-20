@@ -83,20 +83,23 @@ module Esper.Teams {
     var _id = getDefaultTeamId();
     var team = _id && teamStore.val(_id);
     if (team) {
-      var req: ApiT.TeamCreationRequest = {
-        executive_name: team.team_name,
-        team_calendars: team.team_calendars || []
-      };
-
-      var p = Api.createTeam(req).then((t) => {
-        console.info(t);
-        if (t && t.teamid) {
-          teamStore.alias(_id, t.teamid);
-        }
-        return t;
-      });
-      teamStore.pushFetch(_id, p);
+      return saveTeam(_id, team);
     }
+  }
+
+  // Create a team given an unsaved team from the store
+  export function saveTeam(_id: string, team: ApiT.Team) {
+    var req: ApiT.TeamCreationRequest = {
+      executive_name: team.team_name,
+      team_calendars: team.team_calendars || []
+    };
+
+    return Api.createTeam(req).then((t) => {
+      if (t && t.teamid) {
+        teamStore.alias(_id, t.teamid);
+      }
+      return t;
+    });
   }
 
   export function getDefaultTeamId(): string {
