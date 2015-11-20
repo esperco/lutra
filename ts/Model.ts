@@ -310,15 +310,13 @@ module Esper.Model {
       the promise resolves. Updates dataStatus metadata accordingly.
     */
     fetch(_id: string, promise: JQueryPromise<TData>) {
-      if (promise.state() === "pending") {
-        // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
-        // any user-set data we may have cached)
-        this.upsertSafe(_id, function(data, metadata) {
-          return [data, {
-            dataStatus: Model.DataStatus.FETCHING
-          }];
-        });
-      }
+      // Set to FETCHING (but don't override UNSAVED or INFLIGHT to preserve
+      // any user-set data we may have cached)
+      this.upsertSafe(_id, function(data, metadata) {
+        return [data, {
+          dataStatus: Model.DataStatus.FETCHING
+        }];
+      });
 
       promise.done((newData: TData) => {
         // On success, update store
@@ -355,15 +353,13 @@ module Esper.Model {
       data in store pending promise resolution.
     */
     pushFetch(_id: string, promise: JQueryPromise<TData>, initData?: TData) {
-      if (promise.state() === "pending" || initData !== undefined) {
-        // Set to INFLIGHT and populate with initData (if any)
-        this.upsert(_id, function(data, metadata) {
-          return [
-            initData === undefined ? data : initData,
-            { dataStatus: Model.DataStatus.INFLIGHT }
-          ];
-        });
-      }
+      // Set to INFLIGHT and populate with initData (if any)
+      this.upsert(_id, function(data, metadata) {
+        return [
+          initData === undefined ? data : initData,
+          { dataStatus: Model.DataStatus.INFLIGHT }
+        ];
+      });
 
       /*
         canSave for push / pushFetch works differently from fetch -- we don't
