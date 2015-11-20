@@ -43,7 +43,7 @@ module Esper.Queue {
     Returns a promise that resolves when the entire queue has been resolved
     and rejects when any promise has been rejected.
   */
-  export function enqueue<T>(key: string, fn: QueueFn<T>) {
+  export function enqueue<T>(key: string, fn: QueueFn<T>): JQueryPromise<T> {
     // Ensure list exists under this key
     var queue = QMap[key] = QMap[key] || [];
     queue.push(fn);
