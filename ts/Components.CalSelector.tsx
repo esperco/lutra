@@ -5,8 +5,10 @@
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Login.ts" />
+/// <reference path="./Layout.tsx" />
+/// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
+/// <reference path="./Components.CalAdd.tsx" />
 /// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
@@ -36,15 +38,33 @@ module Esper.Components {
           this.renderTeams(this.state.teams) :
           "No Teams Found"
         }
+        <div className="esper-subsection-footer">
+          <a href="#" onClick={this.editCalendars.bind(this)}>
+            <i className="fa fa-fw fa-calendar-check-o" />{" "}
+            Add / Remove Calendars
+          </a>
+        </div>
       </BorderlessSection>;
+    }
+
+    editCalendars() {
+      Layout.renderModal(<CalAddModal />);
     }
 
     renderTeams(teams: ApiT.Team[]) {
       return _.map(teams, (team) =>
         <div key={team.teamid}>
-          <h5 className="esper-subheader">{team.team_name}</h5>
+          {
+            teams.length > 1 ?
+            <h5 className="esper-subheader">{team.team_name}</h5> :
+            ""
+          }
           <div className="list-group">
-            {this.renderCalendars(team.teamid, team.team_calendars)}
+            {
+              Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
+              this.renderCalendars(team.teamid, team.team_calendars) :
+              <div className="esper-spinner" />
+            }
           </div>
         </div>);
     }
@@ -69,13 +89,12 @@ module Esper.Components {
     }
 
     componentDidMount() {
-      this.setSources([Login.InfoStore]);
+      this.setSources([Teams.teamStore, Teams.allTeamsStore]);
     }
 
     getState() {
-      var loginInfo = Login.InfoStore.val();
       return {
-        teams: (loginInfo && loginInfo.teams) || []
+        teams: Teams.all()
       };
     }
   }

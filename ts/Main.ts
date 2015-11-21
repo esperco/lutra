@@ -7,7 +7,8 @@
 
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Route.tsx" />
-/// <reference path="./TimeStats.ts" />
+/// <reference path="./Teams.ts" />
+/// <reference path="./Onboarding.ts" />
 
 module Esper.Conf {
   export var segmentKey: string; // Set via Dev.ts or Prod.ts
@@ -16,8 +17,13 @@ module Esper.Conf {
 module Esper.Main {
   export function init() {
     Login.init();
+    Teams.init();
     Route.init();
-    Analytics.init(Conf.segmentKey);
+
+    if (! TESTING) {
+      Onboarding.init();
+      Analytics.init(Conf.segmentKey);
+    }
   }
 }
 

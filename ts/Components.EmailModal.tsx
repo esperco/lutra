@@ -4,6 +4,7 @@
 
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/Api.ts" />
+/// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -24,59 +25,34 @@ module Esper.Components {
     render() {
       var sending = this.state.sending;
 
-      return (<div className="modal fade">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal">
-                <span aria-hidden="true">&times;</span>
-              </button>
-              <h4 className="modal-title">{
-                this.props.title || "Send Us a Message"
-              }</h4>
-            </div>
-            <div className="modal-body">
-              {
-                this.state.success ?
-                <div className="alert compact alert-success" role="alert">
-                  <i className="fa fa-fw fa-check"></i>{" "}
-                  Sent! We'll get back to you soon.
-                </div> : ""
-              }
-              {
-                this.state.error ?
-                <div className="alert compact alert-danger" role="alert">
-                  <i className="fa fa-fw fa-warning"></i>{" "}
-                  Whoops. Something broke.{" "}
-                  <a href="http://esper.com/contact">
-                    Please try contacting us at esper.com/contact.
-                  </a>
-                </div> : ""
-              }
-              {this.props.children}
-              <textarea className="form-control" rows={3}
-                disabled={this.state.sending || this.state.success} />
-            </div>
-            <div className="modal-footer">
-              {
-                this.state.sending ?
-                <span className="esper-spinner"></span> :
-                ""
-              }
-              <button type="button" className="btn btn-default"
-                  data-dismiss="modal">
-                Cancel
-              </button>
-              <button type="button"
-                  disabled={this.state.sending || this.state.success}
-                  onClick={this.send.bind(this)}
-                  className="btn btn-primary">
-                Send
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>);
+      return <Modal
+          title={this.props.title || "Send Us a Message"}
+          busy={this.state.sending}
+          disableOk={this.state.sending || this.state.success}
+          dismissText="Cancel"
+          okText="Send"
+          okOnClick={this.send.bind(this)}>
+        {
+          this.state.success ?
+          <div className="alert compact alert-success" role="alert">
+            <i className="fa fa-fw fa-check"></i>{" "}
+            Sent! We'll get back to you soon.
+          </div> : ""
+        }
+        {
+          this.state.error ?
+          <div className="alert compact alert-danger" role="alert">
+            <i className="fa fa-fw fa-warning"></i>{" "}
+            Whoops. Something broke.{" "}
+            <a href="http://esper.com/contact">
+              Please try contacting us at esper.com/contact.
+            </a>
+          </div> : ""
+        }
+        {this.props.children}
+        <textarea className="form-control" rows={3}
+          disabled={this.state.sending || this.state.success} />
+      </Modal>;
     }
 
     send() {
@@ -104,15 +80,6 @@ module Esper.Components {
             });
           });
       }
-    }
-
-    componentDidMount() {
-      this.jQuery().on('hidden.bs.modal', () => {
-        this.jQuery().parent().empty();
-      });
-      this.jQuery().on('shown.bs.modal', () => {
-        this.find('textarea').focus();
-      });
     }
 
     // Initialize with something, but we don't have any listeners that auto-
