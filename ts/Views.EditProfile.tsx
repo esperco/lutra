@@ -5,14 +5,14 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface propStuff {
+  interface Props {
     header: string;
     esperProfile: ApiT.Profile;
     dirProfile: ApiT.DirProfile;
   }
 
-  export class EditProfile extends Component<propStuff, ApiT.DirProfile> {
-    createProfile(display_name: string, primary_email: string,
+  export class EditProfile extends Component<Props, ApiT.DirProfile> {
+    createProfile(display_name: string,
                   other_emails: ApiT.LabelledItem[] = [],
                   other_names: ApiT.LabelledItem[] = [],
                   company: string = "",
@@ -33,7 +33,6 @@ module Esper.Views {
         image_url: image_url,
         display_name: display_name,
         other_names: other_names,
-        primary_email: primary_email,
         other_emails: other_emails,
         company: company,
         company_location: company_location,
@@ -44,7 +43,7 @@ module Esper.Views {
       };
     }
 
-    constructor(props : propStuff) {
+    constructor(props : Props) {
       super(props);
       var dirProfile = this.props.dirProfile;
       var esperProfile = this.props.esperProfile;
@@ -52,7 +51,7 @@ module Esper.Views {
       if (dirProfile !== undefined) {
         var names = $.extend(true, [], dirProfile.other_names);
         names.unshift(undefined);
-        this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
+        this.state = this.createProfile(dirProfile.display_name,
           dirProfile.other_emails, names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
           dirProfile.addresses, dirProfile.custom_entries, dirProfile.image_url);
@@ -64,17 +63,17 @@ module Esper.Views {
           otherEmails.push(x);
         });
         this.state = this.createProfile(esperProfile.display_name,
-          "", otherEmails, [undefined]);
+          otherEmails, [undefined]);
       } else { //shouldn't happen yet
-        this.state = this.createProfile("", "", [], [undefined]);
+        this.state = this.createProfile("", [], [undefined]);
       }
     }
 
     componentDidMount() {
-      $('.dropdown-toggle').dropdown();
+      this.find('.dropdown-toggle').dropdown();
     }
     componentDidUpdate() {
-      $('.dropdown-toggle').dropdown();
+      this.find('.dropdown-toggle').dropdown();
     }
 
     // Helpers for LabelledItem[] objects
@@ -146,7 +145,7 @@ module Esper.Views {
     saveProfile = () => {
       //clean up nulls and empty items
       var s = this.state;
-      var profile = this.createProfile(s.display_name, s.primary_email,
+      var profile = this.createProfile(s.display_name,
         this.cleanList(s.other_emails), this.cleanList(s.other_names),
         s.company, s.company_location, s.company_title,
         this.cleanList(s.phones), this.cleanList(s.addresses),
