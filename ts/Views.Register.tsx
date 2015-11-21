@@ -22,6 +22,7 @@ module Esper.Views {
       e.preventDefault();
       var email = document.forms["login"]["email"].value;
       var password = document.forms["login"]["password"].value;
+      var password2 = document.forms["login"]["password"].value;
       Api.postDirLogin({ email, hash_pwd: password })
         .done(function(loginResponse) {
           Store.set("uid", loginResponse.uid);
