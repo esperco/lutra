@@ -60,6 +60,8 @@ module Esper.ReactHelpers {
       window.requestAnimationFrame(function() {
         if (self.data("react-component") && !unmounted &&
             !$.contains(document.documentElement, self.get(0))) {
+          Log.e(self);
+          Log.e(self.data("react-component"));
           throw new Error("Node must be in DOM for React render");
         }
       });

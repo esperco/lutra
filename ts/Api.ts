@@ -254,7 +254,7 @@ module Esper.Api {
   /***** Nylas *****/
   export function getNylasLoginUrl(email: string):
     JQueryPromise<ApiT.UrlResult> {
-    var url = prefix + "/api/inbox/login/" + encodeURIComponent(email);
+    var url = prefix + "/api/nylas/login/" + encodeURIComponent(email);
     return JsonHttp.get(url);
   }
 
@@ -262,7 +262,7 @@ module Esper.Api {
     execName: string,
     timezone: string):
     JQueryPromise<void> {
-    var url = prefix + "/api/inbox/setup-calendar/" +
+    var url = prefix + "/api/nylas/setup-calendar/" +
       string(Login.me()) + "/" +
       encodeURIComponent(teamid) + "/" +
       encodeURIComponent(execName) + "/" +

@@ -97,6 +97,47 @@ module Esper.Queue {
       expect(p1.state()).toBe("resolved");
     });
 
+    it("should return a promise that resolves to the result of the last " +
+       "promise in the queue, if any",
+    function() {
+      var fn1 = jasmine.createSpy("queue1");
+      var dfd1 = $.Deferred();
+      fn1.and.returnValue(dfd1.promise());
+      var p1 = Queue.enqueue(this.qKey, fn1);
+
+      var fn2 = jasmine.createSpy("queue2");
+      var dfd2 = $.Deferred();
+      fn2.and.returnValue(dfd2.promise());
+      var p2 = Queue.enqueue(this.qKey, fn2);
+
+      var p1Ret: number;
+      p1.done(function(ret: number) { p1Ret = ret; });
+      var p2Ret: number;
+      p2.done(function(ret: number) { p2Ret = ret; });
+
+      dfd1.resolve(1);
+      dfd2.resolve(2);
+
+      expect(p1Ret).toEqual(2);
+      expect(p2Ret).toEqual(2);
+    });
+
+    it("should feed the result from a promise to the next promise", function() {
+      var fn1 = jasmine.createSpy("queue1");
+      var dfd1 = $.Deferred();
+      fn1.and.returnValue(dfd1.promise());
+      var p1 = Queue.enqueue(this.qKey, fn1);
+      var p2 = Queue.enqueue(this.qKey, function(r: number) {
+        return $.Deferred<number>().resolve(r + 2).promise();
+      });
+
+      var pRet: number;
+      p2.done(function(ret: number) { pRet = ret; });
+
+      dfd1.resolve(1);
+      expect(pRet).toEqual(3);
+    });
+
     it("should return new promises for queueing after queue emptied",
       function()
     {
