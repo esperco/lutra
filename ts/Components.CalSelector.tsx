@@ -54,7 +54,11 @@ module Esper.Components {
     renderTeams(teams: ApiT.Team[]) {
       return _.map(teams, (team) =>
         <div key={team.teamid}>
-          <h5 className="esper-subheader">{team.team_name}</h5>
+          {
+            teams.length > 1 ?
+            <h5 className="esper-subheader">{team.team_name}</h5> :
+            ""
+          }
           <div className="list-group">
             {
               Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
