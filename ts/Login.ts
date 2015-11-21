@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/Login.Iframe.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="./Store.ts" />
 
 module Esper.Login {
 
@@ -28,16 +29,26 @@ module Esper.Login {
         loginDeferred.reject(err);
       };
 
-      Login.loginViaIframe()
-        .then(function() {
-          return Api.getLoginInfo();
-        }, onFail)
-        .then(function(loginInfo) {
+      if (Store.get("uid") === undefined) {
+        Login.loginViaIframe()
+          .then(function() {
+            return Api.getLoginInfo();
+          }, onFail)
+          .then(function(loginInfo) {
+            InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+            Analytics.identify(loginInfo, false, function() {
+              loginDeferred.resolve(loginInfo);
+            });
+          }, onFail);
+      } else {
+        Login.setCredentials(Store.get("uid"), Store.get("api_secret"));
+        Api.getLoginInfo().then(function(loginInfo) {
           InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
           Analytics.identify(loginInfo, false, function() {
             loginDeferred.resolve(loginInfo);
           });
         }, onFail);
+      }
     }
   }
 

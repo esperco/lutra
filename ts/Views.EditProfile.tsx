@@ -5,14 +5,14 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface propStuff {
+  interface Props {
     header: string;
     esperProfile: ApiT.Profile;
     dirProfile: ApiT.DirProfile;
   }
 
-  export class EditProfile extends Component<propStuff, ApiT.DirProfile> {
-    createProfile(display_name: string, primary_email: string,
+  export class EditProfile extends Component<Props, ApiT.DirProfile> {
+    createProfile(display_name: string,
                   other_emails: ApiT.LabelledItem[] = [],
                   other_names: ApiT.LabelledItem[] = [],
                   company: string = "",
@@ -21,17 +21,18 @@ module Esper.Views {
                   phones: ApiT.LabelledItem[] = [],
                   addresses: ApiT.LabelledItem[] = [],
                   custom_entries: ApiT.LabelledItem[] = [],
-                  image_url: string = ""): ApiT.DirProfile {
-
-      if (other_emails.length === 0) other_emails = [{label:"Work", item:""}];
-      if (phones.length === 0) phones = [{label:"Mobile", item:""}];
-      if (addresses.length === 0) addresses = [{label:"Home", item:""}];
-      if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
+                  image_url: string = "",
+                  clean: boolean = false): ApiT.DirProfile {
+      if (!clean) {
+        if (other_emails.length === 0) other_emails = [{label:"Work", item:""}];
+        if (phones.length === 0) phones = [{label:"Mobile", item:""}];
+        if (addresses.length === 0) addresses = [{label:"Home", item:""}];
+        if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
+      }
       return {
         image_url: image_url,
         display_name: display_name,
         other_names: other_names,
-        primary_email: primary_email,
         other_emails: other_emails,
         company: company,
         company_location: company_location,
@@ -42,7 +43,7 @@ module Esper.Views {
       };
     }
 
-    constructor(props : propStuff) {
+    constructor(props : Props) {
       super(props);
       var dirProfile = this.props.dirProfile;
       var esperProfile = this.props.esperProfile;
@@ -50,7 +51,7 @@ module Esper.Views {
       if (dirProfile !== undefined) {
         var names = $.extend(true, [], dirProfile.other_names);
         names.unshift(undefined);
-        this.state = this.createProfile(dirProfile.display_name, dirProfile.primary_email,
+        this.state = this.createProfile(dirProfile.display_name,
           dirProfile.other_emails, names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
           dirProfile.addresses, dirProfile.custom_entries, dirProfile.image_url);
@@ -62,268 +63,75 @@ module Esper.Views {
           otherEmails.push(x);
         });
         this.state = this.createProfile(esperProfile.display_name,
-          "", otherEmails, [undefined]);
+          otherEmails, [undefined]);
       } else { //shouldn't happen yet
-        this.state = this.createProfile("", "", [], [undefined]);
+        this.state = this.createProfile("", [], [undefined]);
       }
     }
 
     componentDidMount() {
-      $('.dropdown-toggle').dropdown();
+      this.find('.dropdown-toggle').dropdown();
     }
     componentDidUpdate() {
-      $('.dropdown-toggle').dropdown();
+      this.find('.dropdown-toggle').dropdown();
     }
 
-    // Name Helpers
-    newName = () => {
-      var name = {label:"Nickname", item:""};
+    // Helpers for LabelledItem[] objects
+    newLabelledItem = (key: string, defaultString: string) => {
+      var labelledItem = {label: defaultString, item:""};
       this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails, o.other_names.concat([name]), o.company,
-            o.company_location, o.company_title, o.phones, o.addresses,
-            o.custom_entries, o.image_url);
+        var update: {[index: string]: ApiT.LabelledItem[];} = {};
+        update[key] = o[key].concat([labelledItem]);
+        return update as ApiT.DirProfile;
       });
     }
-    removeName = (i : number) => {
+    removeLabelledItem = (key: string, i : number) => {
       this.setState(function(o) {
-        var names = o.other_names.slice();
-        delete names[i];
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleNameLabel = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var names = $.extend(true, [], o.other_names);
-        names[i].label = text;
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleNameItem = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var names = $.extend(true, [], o.other_names);
-        names[i].item = text;
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails, names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleDisplayName = (e) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        return this.createProfile(text, o.primary_email,
-            o.other_emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-
-    // Email Helpers
-    newEmail = () => {
-      var email = { label: "Work", item: "" };
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails.concat([email]), o.other_names, o.company,
-            o.company_location, o.company_title, o.phones, o.addresses,
-            o.custom_entries, o.image_url);
-      });
-    }
-    removeEmail = (i: number) => {
-      this.setState(function(o) {
-        var emails = $.extend(true, [], o.other_emails);
-        delete emails[i];
-        return this.createProfile(o.display_name, o.primary_email,
-            emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleEmailLabel = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var emails = $.extend(true, [], o.other_emails);
-        emails[i].label = text;
-        return this.createProfile(o.display_name, o.primary_email,
-            emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleEmailItem = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var emails = $.extend(true, [], o.other_emails);
-        emails[i].item = text;
-        return this.createProfile(o.display_name, o.primary_email,
-            emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-
-    //Phone Helpers
-    newPhone = () => {
-      var phone = {label:"Mobile", item:""};
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-            o.other_emails, o.other_names, o.company, o.company_location,
-            o.company_title, o.phones.concat([phone]), o.addresses,
-            o.custom_entries, o.image_url);
-      });
-    }
-    removePhone = (i: number) => {
-      this.setState(function(o) {
-        var phones = $.extend(true, [], o.phones);
-        delete phones[i];
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handlePhoneLabel = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var phones = $.extend(true, [], o.phones);
-        phones[i].label = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handlePhoneItem = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var phones = $.extend(true, [], o.phones);
-        phones[i].item = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-
-    //Address Helpers
-    newAddress = () => {
-      var address = { label: "Work", item: "" };
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses.concat([address]),
-          o.custom_entries, o.image_url);
-      });
-    }
-    removeAddress = (i: number) => {
-      this.setState(function(o) {
-        var addresses = $.extend(true, [], o.addresses);
-        delete addresses[i];
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleAddressLabel = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var addresses = $.extend(true, [], o.addresses);
-        addresses[i].label = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleAddressItem = (e, i: number) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        var addresses = $.extend(true, [], o.addresses);
-        addresses[i].item = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, addresses, o.custom_entries, o.image_url);
-      });
-    }
-
-    //Custom Entry Helpers
-    newCustom = () => {
-      var entry = { label: "Custom", item: "" };
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses,
-          o.custom_entries.concat([entry]), o.image_url);
-      });
-    }
-    removeCustom = (i: number) => {
-      this.setState(function(o) {
-        var entries = $.extend(true, [], o.custom_entries);
+        var entries = $.extend(true, [], o[key]);
         delete entries[i];
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries, o.image_url);
+        var update: { [index: string]: ApiT.LabelledItem[]; } = {};
+        update[key] = entries;
+        return update as ApiT.DirProfile;
       });
     }
-    handleCustomLabel = (e, i: number) => {
-      var text = e.target.value;
+    handleLabelList = (e: React.SyntheticEvent, key: string, i: number) => {
+      var text = (e.target as HTMLInputElement).value;
       this.setState(function(o) {
-        var entries = $.extend(true, [], o.custom_entries);
+        var entries = $.extend(true, [], o[key]);
         entries[i].label = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries, o.image_url);
+        var update: { [index: string]: ApiT.LabelledItem[]; } = {};
+        update[key] = entries;
+        return update as ApiT.DirProfile;
       });
     }
-    handleCustomItem = (e, i: number) => {
-      var text = e.target.value;
+    handleItemList = (e: React.SyntheticEvent, key: string, i: number) => {
+      var text = (e.target as HTMLInputElement).value;
       this.setState(function(o) {
-        var entries = $.extend(true, [], o.custom_entries);
+        var entries = $.extend(true, [], o[key]);
         entries[i].item = text;
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          o.company_title, o.phones, o.addresses, entries, o.image_url);
+        var update: { [index: string]: ApiT.LabelledItem[]; } = {};
+        update[key] = entries;
+        return update as ApiT.DirProfile;
       });
     }
 
-    //Company Helpers
-    handleCompany = (e) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, text, o.company_location,
-          o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleCompanyTitle = (e) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, o.company_location,
-          text, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
-    }
-    handleCompanyLoc = (e) => {
-      var text = e.target.value;
-      this.setState(function(o) {
-        return this.createProfile(o.display_name, o.primary_email,
-          o.other_emails, o.other_names, o.company, text,
-          o.company_title, o.phones, o.addresses, o.custom_entries, o.image_url);
-      });
+    //Regular item helpers
+    handleItem = (e: React.SyntheticEvent, key: string) => {
+      var update: { [index: string]: string; } = {};
+      update[key] = (e.target as HTMLInputElement).value;
+      this.setState(update as ApiT.DirProfile);
     }
 
+    //profile picture helper
     changeProfile = () => {
       filepicker.pick(
         function(blob: Blob){
-          debugger;
-          this.setState(function(o) {
-            return this.createProfile(o.display_name, o.primary_email,
-              o.other_emails, o.other_names, o.company, o.company_location,
-              o.company_title, o.phones, o.addresses, o.custom_entries, blob.url);
-          });
+          this.setState({ image_url: blob.url } as ApiT.DirProfile);
         }.bind(this)
       );
     }
 
     cleanList = (list: ApiT.LabelledItem[]) => {
-      debugger;
       var newList : ApiT.LabelledItem[] = [];
       for (var i=0; i < list.length; i++) {
         if (list[i] === undefined || list[i] === null || list[i].item === "") {
@@ -337,11 +145,11 @@ module Esper.Views {
     saveProfile = () => {
       //clean up nulls and empty items
       var s = this.state;
-      var profile = this.createProfile(s.display_name, s.primary_email,
+      var profile = this.createProfile(s.display_name,
         this.cleanList(s.other_emails), this.cleanList(s.other_names),
         s.company, s.company_location, s.company_title,
         this.cleanList(s.phones), this.cleanList(s.addresses),
-        this.cleanList(s.custom_entries), s.image_url);
+        this.cleanList(s.custom_entries), s.image_url, true);
       Api.setDirProfile(profile).done(function() {
         DirProfile.Store.set(profile, { dataStatus: Model.DataStatus.READY });
         Route.nav.path("/profile");
@@ -374,21 +182,21 @@ module Esper.Views {
       }
     })();
 
-    renderList = (list: ApiT.LabelledItem[], handleLabel, handleItem, removeEntry, addEntry, dropList: string[]) => {
-      var thisArg = this;
-      return _.map(list, function(entry, i) {
-        var uid = "id" + thisArg.incr();
-        var chooseFunction = removeEntry;
+    renderList = (key: string, dropList: string[]) => {
+      var self = this;
+      return _.map(this.state[key], function(entry: ApiT.LabelledItem, i: number) {
+        var uid = "id" + self.incr();
+        var chooseFunction = self.removeLabelledItem.bind(self, key, i);
         var plusOrMinus = "glyphicon glyphicon-minus";
         if (i === 0) {
-          chooseFunction = addEntry;
+          chooseFunction = self.newLabelledItem.bind(self, key, dropList[0]);
           plusOrMinus = "glyphicon glyphicon-plus";
         }
         if (entry !== undefined) {
           return <div className="row">
             <div className="col-xs-2">
               <div className="input-group">
-                <input type="text" id={uid} className="form-control" onChange={function(e) { handleLabel(e,i) } }
+                <input type="text" id={uid} className="form-control" onChange={function(e) { self.handleLabelList(e,key,i) } }
                   defaultValue={entry.label}/>
                 <div className="input-group-btn">
                   <button className="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -396,19 +204,19 @@ module Esper.Views {
                   </button>
                   <ul className="dropdown-menu dropdown-menu-right">
                     {_.map(dropList, function(option, i) {
-                      return <li><a onClick={function() { thisArg.changeOption(uid, option) } }>{option}</a></li>;
+                      return <li><a onClick={function() { self.changeOption(uid, option) } }>{option}</a></li>;
                     })}
-                    <li><a onClick={function() { thisArg.selectLabel(uid, "Custom") } }>Custom</a></li>
+                    <li><a onClick={function() { self.selectLabel(uid, "Custom") } }>Custom</a></li>
                   </ul>
                 </div>
               </div>
             </div>
             <div className="col-xs-10">
               <div className="input-group">
-                <input type="text" className="form-control" onChange={function(e) { handleItem(e, i) }}
+                <input type="text" className="form-control" onChange={function(e) { self.handleItemList(e,key,i) }}
                   defaultValue={entry.item}/>
                 <div className="input-group-btn">
-                  <button className="btn btn-default" onClick={function() { chooseFunction(i) }}>
+                  <button className="btn btn-default" onClick={chooseFunction}>
                     &nbsp;<span className={plusOrMinus}></span>&nbsp;
                   </button>
                 </div>
@@ -427,7 +235,7 @@ module Esper.Views {
         <div className="media">
           <div className="media-left">
             <a onClick={this.changeProfile}>
-              <img className="media-object edit-profile-image" src={this.state.image_url}/>
+              <img className="media-object edit-profile-image" src={this.state.image_url === "" ? "https://lh5.googleusercontent.com/-pF0uQT0oqjY/AAAAAAAAAAI/AAAAAAAADEU/QJr95ei0nx8/photo.jpg" : this.state.image_url}/>
             </a>
           </div>
         </div>
@@ -435,44 +243,44 @@ module Esper.Views {
         <label>Name</label>
         <div className="input-group">
           <span className="input-group-addon">Display Name:</span>
-          <input type="text" className="form-control" onChange={(e) => this.handleDisplayName(e)}
+          <input type="text" className="form-control" onChange={(e) => this.handleItem(e, "display_name")}
             defaultValue={this.state.display_name}/>
           <div className="input-group-btn">
-            <button className="btn btn-default" onClick={this.newName}>
+            <button className="btn btn-default" onClick={() => this.newLabelledItem("other_names", "Nickname")}>
               &nbsp;<span className="glyphicon glyphicon-plus"></span>&nbsp;
             </button>
           </div>
         </div>
-        {this.renderList(this.state.other_names, this.handleNameLabel, this.handleNameItem, this.removeName, this.newName, ["Nickname", "Phonetic"]) }
+        {this.renderList("other_names", ["Nickname", "Phonetic"]) }
         <div><br/></div>
         <label>Email</label>
-        {this.renderList(this.state.other_emails, this.handleEmailLabel, this.handleEmailItem, this.removeEmail, this.newEmail, ["Work", "Home"])}
+        {this.renderList("other_emails", ["Work", "Home"])}
         <div><br/></div>
         <label>Company Info</label>
         <div className="input-group">
           <span className="input-group-addon">Company:</span>
           <input type="text" className="form-control" defaultValue={this.state.company}
-            onChange={this.handleCompany}/>
+            onChange={(e) => this.handleItem(e, "company")}/>
         </div>
         <div className="input-group">
           <span className="input-group-addon">Job Title:</span>
           <input type="text" className="form-control" defaultValue={this.state.company_title}
-            onChange={this.handleCompanyTitle}/>
+            onChange={(e) => this.handleItem(e, "company_title") }/>
         </div>
         <div className="input-group">
           <span className="input-group-addon">Company Location:</span>
           <input type="text" className="form-control" defaultValue={this.state.company_location}
-            onChange={this.handleCompanyLoc}/>
+            onChange={(e) => this.handleItem(e, "company_location") }/>
         </div>
         <div><br/></div>
         <label>Phone</label>
-        {this.renderList(this.state.phones, this.handlePhoneLabel, this.handlePhoneItem, this.removePhone, this.newPhone, ["Mobile","Work","Home"])}
+        {this.renderList("phones", ["Mobile","Work","Home"])}
         <div><br/></div>
         <label>Address</label>
-        {this.renderList(this.state.addresses, this.handleAddressLabel, this.handleAddressItem, this.removeAddress, this.newAddress, ["Work", "Home"]) }
+        {this.renderList("addresses", ["Work", "Home"]) }
         <div><br/></div>
         <label>Custom Entries</label>
-        {this.renderList(this.state.custom_entries, this.handleCustomLabel, this.handleCustomItem, this.removeCustom, this.newCustom, []) }
+        {this.renderList("custom_entries", ["Custom"]) }
         <div><br/></div>
         <button className="btn btn-primary"
           onClick={() => this.saveProfile()}>Save</button>

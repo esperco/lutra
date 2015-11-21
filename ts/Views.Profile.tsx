@@ -17,6 +17,10 @@ module Esper.Views {
   };
 
   export class Profile extends Component<{}, ProfileState> {
+    test = () => {
+      Route.nav.path("/edit-profile")
+    }
+
     createRows(items: ApiT.LabelledItem[], key: string, label = ""): JSX.Element[] {
       return _.map(items, function(item: ApiT.LabelledItem, i: number) {
         return <tr key={key + i}>
@@ -79,6 +83,8 @@ module Esper.Views {
             {addressRows}
             {customRows}
           </table>
+          <button className="btn btn-primary"
+            onClick={() => this.test() }>Edit</button>
         </div>
       </div>;
     }

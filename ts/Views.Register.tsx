@@ -1,7 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Store.ts" />
-/// <reference path="./Views.Register.tsx" />
 
 module Esper.Views {
 
@@ -12,9 +11,9 @@ module Esper.Views {
     error: boolean;
   }
 
-  export class LoginRequired extends Component<{}, State> {
+  export class Register extends Component<{}, State> {
     constructor(props: any) {
-      super(props)
+      super(props);
       this.state = { error: false };
     }
 
@@ -23,6 +22,7 @@ module Esper.Views {
       e.preventDefault();
       var email = document.forms["login"]["email"].value;
       var password = document.forms["login"]["password"].value;
+      var password2 = document.forms["login"]["password"].value;
       Api.postDirLogin({ email, hash_pwd: password })
         .done(function(loginResponse) {
           Store.set("uid", loginResponse.uid);
@@ -38,13 +38,13 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp;Email or password incorrect
+        &nbsp; Email or password incorrect
       </div>;
     }
 
     render() {
       return <div className="container">
-        <h2>Sign In</h2>
+        <h2>Register New User</h2>
         <form name="login">
           <div className="form-group">
             <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
@@ -52,16 +52,15 @@ module Esper.Views {
           <div className="form-group">
             <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
           </div>
+          <div className="form-group">
+            <input type="password" name="password2" className="form-control" placeholder="Confirm Password" style={{ width: "30%" }}/>
+            </div>
           <button type="submit" onClick={this.submitLogin}
             className="btn btn-default">Submit</button>
         </form>
         {(this.state.error === true) ? this.showError() : ""}
         <div>
-          New User?
-          <a onClick={() => Layout.render(<Views.Register />)}>{" Sign Up Here"}</a>
-          </div>
-        <div>
-          <a href={Login.loginURL()}>Or Login with Google / Microsoft.</a>
+          <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
         </div>
       </div>;
     }
