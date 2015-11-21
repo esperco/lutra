@@ -33,9 +33,9 @@ module Esper.ApproveTeam {
       name and e-mail addresses below.
     </p>
     <p>
-      If you do not recognize these team memembers,
+      If you do not recognize these team members,
       <strong>DO NOT APPROVE THIS TEAM</strong> and
-      <a href="http://esper.com/contact">contact us for support</a>.
+      <a href="https://esper.com/contact">contact us for support</a>.
 
       Approving a team with unrecognized people may result in them gaining
       access to your calendar and other information.
