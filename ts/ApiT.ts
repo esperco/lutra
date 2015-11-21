@@ -94,7 +94,6 @@ module Esper.ApiT {
     company: string;
     company_title: string;
     company_location : string;
-    primary_email: string;
     other_emails: LabelledItem[];
     phones: LabelledItem[];
     addresses: LabelledItem[];
