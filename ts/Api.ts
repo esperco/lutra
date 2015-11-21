@@ -75,6 +75,11 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(dirLogin));
   }
 
+  export function resetPasswordDir(email: string): JQueryPromise<void> {
+    var url = prefix + "/api/directory/reset/" + email;
+    return JsonHttp.get(url);
+  }
+
   /* Esper login and password management */
 
   export function getLoginInfo():
