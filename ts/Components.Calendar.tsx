@@ -163,6 +163,7 @@ module Esper.Components {
       var events = Events.get(this.props.teamId, this.props.calId,
         momentStart.toDate(), momentEnd.toDate()
       );
+      events = _.filter(events);
 
       callback(_.map(events, (event): FullCalendar.EventObject => {
         var eventId = Calendars.getEventId(event);
