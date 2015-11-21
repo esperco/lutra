@@ -24,8 +24,6 @@ module Esper.Components {
   export class CalAdd extends Component<CalAddProps, CalAddState>{
     constructor(props: CalAddProps) {
       super(props);
-      var loginInfo = Login.InfoStore.val();
-
       // Init state = first team (if any)
       this.state = {
         selectedTeamId: Teams.first() && Teams.first().teamid
