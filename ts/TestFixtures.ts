@@ -10,6 +10,10 @@
 module Esper.TestFixtures {
   export var uid = "my-uid";
   export var email = "me@esper.com"
+  export var teamId1 = "team-id-1";
+  export var team1Labels = ["Label 1", "Label 2", "Label 3"];
+  export var teamId2 = "team-id-2";
+  export var team2Labels = ["Label A", "Label B", "Label C"];
 
   export function mockLogin() {
     Login.setCredentials(uid, "secret");
@@ -40,7 +44,7 @@ module Esper.TestFixtures {
       email: email,
       teams: [
         {
-          teamid: "team-id-1",
+          teamid: teamId1,
           team_name: "Peter Griffin",
           team_approved: true,
           team_assistants: [uid],
@@ -58,7 +62,7 @@ module Esper.TestFixtures {
           }],
           team_email_aliases: [],
           team_executive: "O-w_peter____________w",
-          team_labels: ["Label 1", "Label 2", "Label 3"],
+          team_labels: team1Labels,
           team_label_urgent: "Urgent",
           team_label_new: "New",
           team_label_in_progress: "In Progress",
@@ -66,7 +70,7 @@ module Esper.TestFixtures {
           team_label_done: "Done",
           team_label_canceled: "Canceled"
         }, {
-          teamid: "team-id-2",
+          teamid: teamId2,
           team_name: "Stewie Griffin",
           team_approved: true,
           team_assistants: [uid],
@@ -94,7 +98,7 @@ module Esper.TestFixtures {
           }],
           team_email_aliases: [],
           team_executive: "O-w_stewie____________w",
-          team_labels: ["Label A", "Label B", "Label C"],
+          team_labels: team2Labels,
           team_label_urgent: "Urgent",
           team_label_new: "New",
           team_label_in_progress: "In Progress",
