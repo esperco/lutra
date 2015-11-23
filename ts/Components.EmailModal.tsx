@@ -50,7 +50,7 @@ module Esper.Components {
           </div> : ""
         }
         {this.props.children}
-        <textarea className="form-control" rows={3}
+        <textarea className="form-control esper-modal-focus" rows={3}
           disabled={this.state.sending || this.state.success} />
       </Modal>;
     }

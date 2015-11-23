@@ -64,7 +64,7 @@ module Esper.Components {
         this.jQuery().parent().remove();
       });
       this.jQuery().on('shown.bs.modal', () => {
-        this.find('input').focus();
+        this.find('.esper-modal-focus').focus();
       });
     }
   }
