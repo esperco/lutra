@@ -3,6 +3,8 @@
 */
 
 /// <reference path="./Components.CalAdd.tsx" />
+/// <reference path="./Components.LabelAdd.tsx" />
+/// <reference path="./Route.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -29,12 +31,32 @@ module Esper.Components {
             </span>
           }
         </div>
-        <CalAdd onDone={this.hideModal.bind(this)}/>
+        <CalAdd onDone={this.goToLabelModal.bind(this)}/>
+      </Modal>;
+    }
+
+    goToLabelModal() {
+      this.jQuery().modal('hide');
+      this.jQuery().on('hidden.bs.modal', () => {
+        Layout.renderModal(<OnboardingLabelModal />);
+      });
+    }
+  }
+
+  export class OnboardingLabelModal extends Component<{}, {}> {
+    render() {
+      return <Modal title="Set Up Labels">
+        <div className="well">
+          Create some labels to categorize your events. You
+          can always add more later.
+        </div>
+        <LabelAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
     }
 
     hideModal() {
       this.jQuery().modal('hide');
+      Route.nav.path("calendar-labeling");
     }
   }
 }

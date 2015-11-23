@@ -31,15 +31,18 @@ module Esper.Components {
     Component<CalSelectorProps, CalSelectorState>
   {
     render() {
+      var hasCalendars = !!_.find(this.state.teams,
+        (t) => t.team_calendars && t.team_calendars.length
+      );
       return <BorderlessSection icon="fa-calendar" title="Select Calendar"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
-        { this.state.teams.length ?
+        { hasCalendars ?
           this.renderTeams(this.state.teams) :
-          "No Teams Found"
+          <div className="esper-no-content">No Calendars Available</div>
         }
         <div className="esper-subsection-footer">
-          <a href="#" onClick={this.editCalendars.bind(this)}>
+          <a onClick={this.editCalendars.bind(this)}>
             <i className="fa fa-fw fa-calendar-check-o" />{" "}
             Add / Remove Calendars
           </a>
@@ -53,6 +56,7 @@ module Esper.Components {
 
     renderTeams(teams: ApiT.Team[]) {
       return _.map(teams, (team) =>
+        team.team_calendars && team.team_calendars.length ?
         <div key={team.teamid}>
           {
             teams.length > 1 ?
@@ -66,7 +70,8 @@ module Esper.Components {
               <div className="esper-spinner" />
             }
           </div>
-        </div>);
+        </div> : ""
+      );
     }
 
     renderCalendars(teamId: string, calendars: ApiT.Calendar[]) {

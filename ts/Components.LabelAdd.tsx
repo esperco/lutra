@@ -59,7 +59,7 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
-        <a href="#" className="pull-right text-danger"
+        <a className="pull-right text-danger"
            onClick={(e) => this.onClickRmLabel(e, label)}>
           <i className="fa fa-fw fa-close list-group-item-text" />
         </a>

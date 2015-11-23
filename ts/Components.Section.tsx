@@ -35,7 +35,8 @@ module Esper.Components {
       var minIcon = <i className={"fa pull-right min-icon " +
         (minimized ? "fa-plus-square" : "fa-minus-square")
       } onClick={this.onClickMin.bind(this)} />;
-      return <div className="esper-borderless-section">
+      return <div className={"esper-borderless-section" +
+          (minimized ? " minimized" : "")}>
         <h4 className="esper-header">
           {minIcon}
           {

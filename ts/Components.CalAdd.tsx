@@ -75,7 +75,7 @@ module Esper.Components {
         );
       }
 
-      return <a key={Calendars.getId(cal)} href="#"
+      return <a key={Calendars.getId(cal)}
                 onClick={() => this.selectCalendar(cal)}
                 className={"list-group-item" + (isSelected ?
                            " list-group-item-success" : "")}>

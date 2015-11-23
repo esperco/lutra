@@ -46,7 +46,7 @@ module Esper.Components {
         var clickHandler = () => {
           this.handleClick(label, !selected);
         };
-        return <a href="#" onClick={clickHandler}
+        return <a onClick={clickHandler}
             key={label} className="list-group-item one-line">
           <span className="badge" style={badgeStyle}>{badgeText}</span>
           <i className={"fa fa-fw " +

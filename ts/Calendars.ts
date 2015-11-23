@@ -50,9 +50,9 @@ module Esper.Calendars {
     var retScore = 0;
     _.each(Teams.all(), (team) => {
       _.each(team.team_calendars, (cal) => {
-        var likelihood = 0;
+        var likelihood = 1;
         if (cal.is_primary) {
-          likelihood = 100;
+          likelihood += 100;
         }
         if (cal.calendar_default_write) {
           likelihood += 10;
@@ -89,6 +89,7 @@ module Esper.Calendars {
     var team = Teams.get(_id);
     if (team) {
       var teamCopy = _.cloneDeep(team); // Store values immutable so clone
+      var cal = _.cloneDeep(cal);
       teamCopy.team_calendars = teamCopy.team_calendars || [];
       teamCopy.team_calendars.push(cal);
       cal.calendar_default_view = true;
@@ -103,8 +104,18 @@ module Esper.Calendars {
     if (team) {
       var teamCopy = _.cloneDeep(team); // Store values immutable so clone
       _.remove(teamCopy.team_calendars,
-        (c) => Calendars.getId(c) === Calendars.getId(cal)
+        (c) => Calendars.getId(c) === getId(cal)
       );
+
+      // Check if we're deselecting current calendar
+      var currentSelection = selectStore.val();
+      if (currentSelection &&
+          currentSelection.teamId === _id &&
+          currentSelection.calId === getId(cal))
+      {
+        selectStore.unset();
+      }
+
       queueUpdate(_id, teamCopy);
     }
   }
