@@ -129,13 +129,11 @@
   height: @line-height-computed;
   width: @line-height-computed;
 
-  .esper-center &, .esper-left-sidebar & {
+  &.esper-centered, .esper-center &, .esper-left-sidebar & {
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .esper-left-sidebar & {
     margin-top: @padding-large-vertical * 2;
+    margin-bottom: @padding-large-vertical * 2;
   }
 
   .modal-footer & {
@@ -202,4 +200,10 @@
   &:last-child {
     margin-bottom: @panel-body-padding;
   }
+}
+
+.esper-footer-text {
+  line-height: 32px;
+  vertical-align: middle;
+  padding: 0 @padding-base-horizontal;
 }
