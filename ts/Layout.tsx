@@ -51,7 +51,15 @@ module Esper.Layout {
     existing modal in that div
   */
   export function renderModal(modal: React.ReactElement<any>) {
-    $(modalSelector).renderReact(modal);
+    $(modalSelector).empty();
+
+    /*
+      Add an extra container layer for modal because modal needs to remove
+      its parent to trigger unmounting functions
+    */
+    var modalContainer = $('<div />').appendTo(modalSelector);
+    $(modalContainer).renderReact(modal);
+
     window.requestAnimationFrame(function() {
       $(modalSelector + " .modal").modal("show");
     });

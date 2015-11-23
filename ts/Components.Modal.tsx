@@ -61,10 +61,10 @@ module Esper.Components {
 
     componentDidMount() {
       this.jQuery().on('hidden.bs.modal', () => {
-        this.jQuery().parent().empty();
+        this.jQuery().parent().remove();
       });
       this.jQuery().on('shown.bs.modal', () => {
-        this.find('textarea').focus();
+        this.find('input').focus();
       });
     }
   }
