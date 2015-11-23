@@ -12,7 +12,8 @@ module Esper.Components {
   export class OnboardingCalModal extends Component<{}, {}> {
     render() {
       var info = Login.InfoStore.val();
-      return <Modal title="Connect Calendars to Esper">
+      return <Modal title="Connect Calendars to Esper"
+                    icon="fa-calendar-check-o">
         <div className="well">
           Welcome! Esper Time lets you label your calendar
           events and analyze how you spend your time. To get started, please
@@ -45,7 +46,7 @@ module Esper.Components {
 
   export class OnboardingLabelModal extends Component<{}, {}> {
     render() {
-      return <Modal title="Set Up Labels">
+      return <Modal title="Set Up Labels" icon="fa-tags">
         <div className="well">
           Create some labels to categorize your events. You
           can always add more later.

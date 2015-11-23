@@ -40,12 +40,18 @@ module Esper.Components {
     }
 
     renderWithData() {
+      var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }
         { this.renderLabelInput() }
-        <div className="list-group">
-          { _.map(this.getLabels(), this.renderLabel.bind(this)) }
-        </div>
+        { labels.length ?
+          <div className="list-group">
+            { _.map(labels, this.renderLabel.bind(this)) }
+          </div> :
+          <div className="esper-no-content">
+            No Labels Added Yet
+          </div>
+        }
         { this.renderFooter() }
       </div>;
     }
@@ -157,7 +163,7 @@ module Esper.Components {
 
   export class LabelAddModal extends Component<{}, {}> {
     render() {
-      return <Modal title="Edit Event Labels">
+      return <Modal title="Edit Event Labels" icon="fa-tags">
         <LabelAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
     }

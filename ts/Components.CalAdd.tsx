@@ -150,7 +150,8 @@ module Esper.Components {
 
   export class CalAddModal extends Component<{}, {}> {
     render() {
-      return <Modal title="Connect Calendars to Esper">
+      return <Modal title="Connect Calendars to Esper"
+                    icon="fa-calendar-check-o">
         <CalAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
     }

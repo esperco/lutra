@@ -27,6 +27,7 @@ module Esper.Components {
 
       return <Modal
           title={this.props.title || "Send Us a Message"}
+          icon="fa-envelope"
           busy={this.state.sending}
           disableOk={this.state.sending || this.state.success}
           dismissText="Cancel"

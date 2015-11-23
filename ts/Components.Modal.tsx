@@ -11,6 +11,7 @@ module Esper.Components {
   interface ModalProps {
     title: string;
     busy?: boolean;
+    icon?: string;
     disableOk?: boolean;
     dismissText?: string;
     okText?: string;
@@ -28,6 +29,11 @@ module Esper.Components {
                 <span aria-hidden="true">&times;</span>
               </button>
               <h4 className="modal-title">
+                { this.props.icon ?
+                  <span>
+                    <i className={"fa fa-fw " + this.props.icon} />{" "}
+                  </span> : ""
+                }
                 {this.props.title}
               </h4>
             </div>
