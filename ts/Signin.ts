@@ -228,7 +228,7 @@ module Esper.Signin {
         Contact us at <a href="mailto:support@esper.com">support@esper.com</a>
         for assistance.</p>
         <p>
-          By signing in, you agree to Esper's
+          By signing in, you agree to Esper&apos;s
           <a href="http://esper.com/terms-of-use">Terms of Use.</a>
         </p>
       </div>
