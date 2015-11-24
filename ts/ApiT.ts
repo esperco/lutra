@@ -93,6 +93,7 @@ module Esper.ApiT {
 
   export interface DirProfile {
     [index: string]: any;
+    uid: string;
     image_url: string;
     display_name: string;
     other_names: LabelledItem[];
