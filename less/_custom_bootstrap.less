@@ -49,6 +49,12 @@
   padding-right: @padding-base-horizontal;
 }
 
+.container-fluid {
+  .navbar-right {
+    margin-right: 0;
+  }
+}
+
 .list-group-item.one-line {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -117,6 +123,10 @@ a {
 .nav > li > a:hover, .nav > li > a:focus {
   background-color: rgba(255, 255, 255, 0.8);
   color: rgba(0, 0, 0, 0.8);
+}
+
+.navbar-nav > li > a > i {
+  line-height: @line-height-computed;
 }
 
 .navbar-default .btn-default.navbar-btn {
