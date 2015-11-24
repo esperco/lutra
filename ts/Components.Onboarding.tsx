@@ -57,7 +57,32 @@ module Esper.Components {
 
     hideModal() {
       this.jQuery().modal('hide');
+      this.jQuery().on('hidden.bs.modal', function() {
+        Layout.renderModal(<GifModal />);
+      });
       Route.nav.path("calendar-labeling");
+    }
+  }
+
+  export class GifModal extends Component<{}, {}> {
+    render() {
+      return (<Modal title="Getting Started" icon="fa-question-circle"
+                     showFooter={true}>
+        <div className="well">
+          Click on events in the calendar and then add labels via the sidebar.
+          You can see stats on what's been labeled by clicking
+          'Labels Over Time' in the upper right. Newly added labels may take
+          some time to show up.
+        </div>
+        <a href="img/TimeStats.gif" target="_blank">
+          <img src="img/TimeStats.gif"
+               style={{width: "100%", height: "auto"}} />
+        </a>
+      </Modal>);
+    }
+
+    hideModal() {
+      this.jQuery().modal('hide');
     }
   }
 }

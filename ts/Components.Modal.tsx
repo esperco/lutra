@@ -15,6 +15,7 @@ module Esper.Components {
     disableOk?: boolean;
     dismissText?: string;
     okText?: string;
+    showFooter?: boolean;
     okOnClick?: () => void;
     children?: JSX.Element[];
   }
@@ -41,7 +42,7 @@ module Esper.Components {
               {this.props.children}
             </div>
             {
-              this.props.okOnClick ?
+              (this.props.showFooter || this.props.okOnClick) ?
               <div className="modal-footer">
                 {
                   this.props.busy ?
@@ -52,12 +53,15 @@ module Esper.Components {
                     data-dismiss="modal">
                   {this.props.dismissText || "Close"}
                 </button>
-                <button type="button"
-                    disabled={this.props.disableOk}
-                    onClick={this.props.okOnClick}
-                    className="btn btn-primary">
-                  {this.props.okText || "OK"}
-                </button>
+                {
+                  this.props.okOnClick ?
+                  <button type="button"
+                      disabled={this.props.disableOk}
+                      onClick={this.props.okOnClick}
+                      className="btn btn-primary">
+                    {this.props.okText || "OK"}
+                  </button> : ""
+                }
               </div>: ""
             }
           </div>
