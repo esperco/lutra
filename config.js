@@ -68,7 +68,8 @@ module.exports = {
   // in pub
   assets: {
     "marten/img/**/*.*": "img",
-    "marten/img/favicon.ico": ""
+    "marten/img/favicon.ico": "",
+    "img/*.*": "img"
   },
 
   // A Browserify entry point for bundling together our third-party

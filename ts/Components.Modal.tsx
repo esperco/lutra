@@ -11,9 +11,11 @@ module Esper.Components {
   interface ModalProps {
     title: string;
     busy?: boolean;
+    icon?: string;
     disableOk?: boolean;
     dismissText?: string;
     okText?: string;
+    showFooter?: boolean;
     okOnClick?: () => void;
     children?: JSX.Element[];
   }
@@ -28,6 +30,11 @@ module Esper.Components {
                 <span aria-hidden="true">&times;</span>
               </button>
               <h4 className="modal-title">
+                { this.props.icon ?
+                  <span>
+                    <i className={"fa fa-fw " + this.props.icon} />{" "}
+                  </span> : ""
+                }
                 {this.props.title}
               </h4>
             </div>
@@ -35,7 +42,7 @@ module Esper.Components {
               {this.props.children}
             </div>
             {
-              this.props.okOnClick ?
+              (this.props.showFooter || this.props.okOnClick) ?
               <div className="modal-footer">
                 {
                   this.props.busy ?
@@ -46,12 +53,15 @@ module Esper.Components {
                     data-dismiss="modal">
                   {this.props.dismissText || "Close"}
                 </button>
-                <button type="button"
-                    disabled={this.props.disableOk}
-                    onClick={this.props.okOnClick}
-                    className="btn btn-primary">
-                  {this.props.okText || "OK"}
-                </button>
+                {
+                  this.props.okOnClick ?
+                  <button type="button"
+                      disabled={this.props.disableOk}
+                      onClick={this.props.okOnClick}
+                      className="btn btn-primary">
+                    {this.props.okText || "OK"}
+                  </button> : ""
+                }
               </div>: ""
             }
           </div>
@@ -61,10 +71,10 @@ module Esper.Components {
 
     componentDidMount() {
       this.jQuery().on('hidden.bs.modal', () => {
-        this.jQuery().parent().empty();
+        this.jQuery().parent().remove();
       });
       this.jQuery().on('shown.bs.modal', () => {
-        this.find('textarea').focus();
+        this.find('.esper-modal-focus').focus();
       });
     }
   }

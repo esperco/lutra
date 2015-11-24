@@ -44,10 +44,13 @@ module Esper.Route {
     features in page.js at the moment.
   */
 
-  // Index page
-  route("/", function() {
-    // Layout.render(<Views.Index />);
-    nav.path("/labels-over-time");
+  // Home page -- distinguish between "#" (does nothing) and "#!" (home)
+  var initLoad = true;
+  pageJs("", function(ctx) {
+    if (initLoad || ctx.pathname.indexOf("!") >= 0) {
+      initLoad = false;
+      nav.path("/labels-over-time");
+    }
   });
 
   // Graph labels over time

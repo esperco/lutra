@@ -1,5 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Components.Login.tsx" />
+/// <reference path="./Components.Onboarding.tsx" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Views {
@@ -31,6 +32,11 @@ module Esper.Views {
               <NavLink href="/calendar-labeling">
                 <i className="fa fa-fw fa-tags"></i>{" "}Label Events
               </NavLink>
+              <li>
+                <a onClick={this.openHelpModal.bind(this)}>
+                  <i className="fa fa-fw fa-question-circle" />
+                </a>
+              </li>
             </ul>
 
             <div className="nav navbar-nav navbar-right">
@@ -40,6 +46,10 @@ module Esper.Views {
 
         </div>
       </nav>;
+    }
+
+    openHelpModal() {
+      Layout.renderModal(<Components.GifModal />);
     }
   }
 

@@ -8,6 +8,7 @@
 /// <reference path="./Events.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Components.Section.tsx" />
+/// <reference path="./Components.LabelAdd.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -59,12 +60,14 @@ module Esper.Components {
         events={this.state.events}
         callback={this.toggleLabelCallback.bind(this)}
         callbackAll={this.analyticsCallback.bind(this)}
+        editLabelsFn={this.editLabelsCallback.bind(this)}
       />;
     }
 
     componentDidMount() {
       this.setSources([
-        Events.EventStore
+        Events.EventStore,
+        Teams.teamStore
       ]);
     }
 
@@ -82,6 +85,10 @@ module Esper.Components {
       Analytics.track(Analytics.Trackable.EditTimeEsperEventLabels, {
         eventsSelected: events.length
       });
+    }
+
+    editLabelsCallback() {
+      Layout.renderModal(<LabelAddModal />)
     }
 
     getState(props: LabelEditorProps): LabelEditorState {

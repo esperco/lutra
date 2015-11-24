@@ -75,7 +75,7 @@ module Esper.Components {
         );
       }
 
-      return <a key={Calendars.getId(cal)} href="#"
+      return <a key={Calendars.getId(cal)}
                 onClick={() => this.selectCalendar(cal)}
                 className={"list-group-item" + (isSelected ?
                            " list-group-item-success" : "")}>
@@ -150,7 +150,8 @@ module Esper.Components {
 
   export class CalAddModal extends Component<{}, {}> {
     render() {
-      return <Modal title="Connect Calendars to Esper">
+      return <Modal title="Connect Calendars to Esper"
+                    icon="fa-calendar-check-o">
         <CalAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
     }

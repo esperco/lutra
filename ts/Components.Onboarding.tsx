@@ -3,6 +3,8 @@
 */
 
 /// <reference path="./Components.CalAdd.tsx" />
+/// <reference path="./Components.LabelAdd.tsx" />
+/// <reference path="./Route.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -10,7 +12,8 @@ module Esper.Components {
   export class OnboardingCalModal extends Component<{}, {}> {
     render() {
       var info = Login.InfoStore.val();
-      return <Modal title="Connect Calendars to Esper">
+      return <Modal title="Connect Calendars to Esper"
+                    icon="fa-calendar-check-o">
         <div className="well">
           Welcome! Esper Time lets you label your calendar
           events and analyze how you spend your time. To get started, please
@@ -29,8 +32,53 @@ module Esper.Components {
             </span>
           }
         </div>
-        <CalAdd onDone={this.hideModal.bind(this)}/>
+        <CalAdd onDone={this.goToLabelModal.bind(this)}/>
       </Modal>;
+    }
+
+    goToLabelModal() {
+      this.jQuery().modal('hide');
+      this.jQuery().on('hidden.bs.modal', () => {
+        Layout.renderModal(<OnboardingLabelModal />);
+      });
+    }
+  }
+
+  export class OnboardingLabelModal extends Component<{}, {}> {
+    render() {
+      return <Modal title="Set Up Labels" icon="fa-tags">
+        <div className="well">
+          Create some labels to categorize your events. You
+          can always add more later.
+        </div>
+        <LabelAdd onDone={this.hideModal.bind(this)}/>
+      </Modal>;
+    }
+
+    hideModal() {
+      this.jQuery().modal('hide');
+      this.jQuery().on('hidden.bs.modal', function() {
+        Layout.renderModal(<GifModal />);
+      });
+      Route.nav.path("calendar-labeling");
+    }
+  }
+
+  export class GifModal extends Component<{}, {}> {
+    render() {
+      return (<Modal title="Getting Started" icon="fa-question-circle"
+                     showFooter={true}>
+        <div className="well">
+          Click on events in the calendar and then add labels via the sidebar.
+          You can see stats on what's been labeled by clicking
+          'Labels Over Time' in the upper right. Newly added labels may take
+          some time to show up.
+        </div>
+        <a href="img/TimeStats.gif" target="_blank">
+          <img src="img/TimeStats.gif"
+               style={{width: "100%", height: "auto"}} />
+        </a>
+      </Modal>);
     }
 
     hideModal() {

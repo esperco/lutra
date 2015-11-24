@@ -27,6 +27,7 @@ module Esper.Components {
 
       return <Modal
           title={this.props.title || "Send Us a Message"}
+          icon="fa-envelope"
           busy={this.state.sending}
           disableOk={this.state.sending || this.state.success}
           dismissText="Cancel"
@@ -50,7 +51,7 @@ module Esper.Components {
           </div> : ""
         }
         {this.props.children}
-        <textarea className="form-control" rows={3}
+        <textarea className="form-control esper-modal-focus" rows={3}
           disabled={this.state.sending || this.state.success} />
       </Modal>;
     }
