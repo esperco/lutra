@@ -134,6 +134,11 @@ module Esper.Calendars {
         delete nextUpdates[_id];
 
         var teamId = (team.teamid || (t && t.teamid));
+        Analytics.track(Analytics.Trackable.SetTimeStatsCalendars, {
+          numCalendars: calendars.length,
+          teamId: teamId,
+          calendarIds: _.map(calendars, (c) => getId(c))
+        });
         if (teamId) {
           return Api.putTeamCalendars(_id, calendars);
         } else {
