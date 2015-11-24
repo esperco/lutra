@@ -146,7 +146,7 @@ module Esper.ApiT {
     account_created: string; // timestamp
     is_admin: boolean;
     is_alias: boolean;
-    is_nylas: boolean;
+    platform?: string; // Google | Nylas
     email: string;
     teams: Team[];
     team_members: TeamMember[];
