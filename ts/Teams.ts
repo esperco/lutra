@@ -167,6 +167,12 @@ module Esper.Teams {
       var labels = nextLabelUpdates[teamId];
       if (labels) {
         delete nextLabelUpdates[teamId];
+        Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
+          numLabels: labels.length,
+          teamId: team.teamid,
+          teamName: team.team_name,
+          labels: labels
+        });
         return Api.putSyncedLabels(team.teamid, { labels: labels })
       }
     });

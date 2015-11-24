@@ -177,5 +177,9 @@ module Esper.Components {
     hideModal() {
       this.jQuery().modal('hide');
     }
+
+    componentDidMount() {
+      Analytics.track(Analytics.Trackable.OpenTimeStatsAddLabelsModal);
+    }
   }
 }

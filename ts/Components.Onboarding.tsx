@@ -2,6 +2,7 @@
   Onboarding steps
 */
 
+/// <reference path="../marten/ts/Analytics.ts" />
 /// <reference path="./Components.CalAdd.tsx" />
 /// <reference path="./Components.LabelAdd.tsx" />
 /// <reference path="./Route.tsx" />
@@ -36,6 +37,10 @@ module Esper.Components {
       </Modal>;
     }
 
+    componentDidMount() {
+      Analytics.track(Analytics.Trackable.OpenTimeStatsAddCalendarsModal);
+    }
+
     goToLabelModal() {
       this.jQuery().modal('hide');
       this.jQuery().on('hidden.bs.modal', () => {
@@ -53,6 +58,10 @@ module Esper.Components {
         </div>
         <LabelAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
+    }
+
+    componentDidMount() {
+      Analytics.track(Analytics.Trackable.OpenTimeStatsAddLabelsModal);
     }
 
     hideModal() {
@@ -79,6 +88,10 @@ module Esper.Components {
                style={{width: "100%", height: "auto"}} />
         </a>
       </Modal>);
+    }
+
+    componentDidMount() {
+      Analytics.track(Analytics.Trackable.OpenTimeStatsGifModal);
     }
 
     hideModal() {
