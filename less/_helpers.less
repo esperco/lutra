@@ -129,13 +129,11 @@
   height: @line-height-computed;
   width: @line-height-computed;
 
-  .esper-center &, .esper-left-sidebar & {
+  &.esper-centered, .esper-center &, .esper-left-sidebar & {
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .esper-left-sidebar & {
     margin-top: @padding-large-vertical * 2;
+    margin-bottom: @padding-large-vertical * 2;
   }
 
   .modal-footer & {
@@ -202,4 +200,39 @@
   &:last-child {
     margin-bottom: @panel-body-padding;
   }
+
+  .esper-subsection-footer {
+    padding: 0 @padding-base-horizontal @padding-base-vertical;
+  }
+
+  & + .esper-borderless-section {
+    .esper-header {
+      border-top: 1px solid @panel-default-border;
+      padding-top: @panel-body-padding;
+    }
+  }
+
+  &.minimized + .esper-borderless-section {
+    .esper-header {
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+}
+
+.esper-footer-text {
+  line-height: 32px;
+  vertical-align: middle;
+  padding: 0 @padding-base-horizontal;
+}
+
+.esper-no-content {
+  text-align: center;
+  padding: @panel-body-padding;
+  font-size: @font-size-large;
+  color: @panel-default-border;
+  border: 1px solid @panel-default-border;
+  border-radius: @panel-border-radius;
+  text-align: center;
+  margin-bottom: @padding-large-vertical
 }

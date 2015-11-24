@@ -49,6 +49,12 @@
   padding-right: @padding-base-horizontal;
 }
 
+.container-fluid {
+  .navbar-right {
+    margin-right: 0;
+  }
+}
+
 .list-group-item.one-line {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -80,7 +86,7 @@
   }
 }
 
-a.list-group-item {
+a {
   cursor: pointer; // No href required
 
   &.active {
@@ -119,6 +125,10 @@ a.list-group-item {
   color: rgba(0, 0, 0, 0.8);
 }
 
+.navbar-nav > li > a > i {
+  line-height: @line-height-computed;
+}
+
 .navbar-default .btn-default.navbar-btn {
   border-color: @navbar-default-border;
   color: @navbar-default-border;
@@ -134,4 +144,11 @@ a.list-group-item {
 
 .list-group {
   margin-bottom: @padding-large-vertical;
+}
+
+
+////
+
+.modal-body .modal-footer {
+  padding: @modal-inner-padding 0 0 0;
 }
