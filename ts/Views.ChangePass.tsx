@@ -1,8 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Store.ts" />
-/// <reference path="./Views.Register.tsx" />
-/// <reference path="./Views.ForgotPass.tsx" />
 
 module Esper.Views {
 
@@ -11,28 +9,32 @@ module Esper.Views {
 
   interface State {
     error: boolean;
+    success: boolean;
     msg: string;
   }
 
-  export class LoginRequired extends Component<{}, State> {
+  export class ChangePass extends Component<{}, State> {
     constructor(props: any) {
-      super(props)
-      this.state = { error: false, msg: "" };
+      super(props);
+      this.state = { error: false, success: false, msg: "" };
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
       var self = this;
       e.preventDefault();
-      var email = this.find("input[name='email']").val();
       var password = this.find("input[name='password']").val();
-      Api.postDirLogin({ email, password })
+      var password2 = this.find("input[name='password2']").val();
+      if (password !== password2) {
+        this.setState({ error: true, success: false, msg: "Passwords don't match" })
+        return;
+      }
+      Api.updateDirLogin({ email:Login.InfoStore.val().email, password })
         .done(function(loginResponse) {
-          Store.set("uid", loginResponse.uid);
-          Store.set("api_secret", loginResponse.api_secret);
+          self.setState({error: false, success: true, msg: "Successfully updated password"})
           window.location.reload();
         })
         .fail(function(err: ApiT.Error) {
-          self.setState({ error: true, msg: err.responseText });
+          self.setState({ error: true, success: false, msg: err.responseText });
         });
     }
 
@@ -44,30 +46,30 @@ module Esper.Views {
       </div>;
     }
 
+    showSuccess = () => {
+      return <div className="alert alert-success" role="alert">
+        <span className="glyphicon glyphicon-ok"></span>
+        <span className="sr-only">Success: </span>
+        &nbsp;{this.state.msg}
+      </div>;
+    }
+
     render() {
       return <div className="container">
-        <h2>Sign In</h2>
+        <h2>Change Password</h2>
+        <h4>Enter your new password twice below.</h4>
         <form name="login">
           <div className="form-group">
-            <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
+            <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
           </div>
           <div className="form-group">
-            <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
+            <input type="password" name="password2" className="form-control" placeholder="Confirm Password" style={{ width: "30%" }}/>
           </div>
           <button type="submit" onClick={this.submitLogin}
             className="btn btn-default">Submit</button>
         </form>
         {(this.state.error === true) ? this.showError() : ""}
-        <div>
-          New User?
-          <a onClick={() => Layout.render(<Views.Register />)}>{" Sign Up Here"}</a>
-          </div>
-        <div>
-          <a href={Login.loginURL()}>Or Login with Google / Microsoft.</a>
-        </div>
-        <div>
-          <a onClick={() => Layout.render(<Views.ForgotPass />)}>Forgot Password?</a>
-          </div>
+        {(this.state.success === true) ? this.showSuccess() : ""}
       </div>;
     }
   }

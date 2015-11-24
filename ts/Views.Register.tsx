@@ -9,28 +9,33 @@ module Esper.Views {
 
   interface State {
     error: boolean;
+    success: boolean;
+    msg: string;
   }
 
   export class Register extends Component<{}, State> {
     constructor(props: any) {
       super(props);
-      this.state = { error: false };
+      this.state = { error: false, success:  false, msg: "" };
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
       var self = this;
       e.preventDefault();
-      var email = document.forms["login"]["email"].value;
-      var password = document.forms["login"]["password"].value;
-      var password2 = document.forms["login"]["password"].value;
-      Api.postDirLogin({ email, password })
+      var email = this.find("input[name='email']").val();
+      var password = this.find("input[name='password']").val();
+      var password2 = this.find("input[name='password2']").val();
+      if (password !== password2) {
+        this.setState({ error: true, success: false, msg: "Passwords don't match" })
+        return;
+      }
+      Api.registerDirLogin({ email, password })
         .done(function(loginResponse) {
-          Store.set("uid", loginResponse.uid);
-          Store.set("api_secret", loginResponse.api_secret);
-          window.location.reload();
+          self.setState({ error: false, success: true,
+            msg: "Resitration successful. You should receive an email shortly." })
         })
-        .fail(function(err: Error) {
-          self.setState({ error: true });
+        .fail(function(err: ApiT.Error) {
+          self.setState({ error: true, success: false, msg: err.responseText });
         });
     }
 
@@ -38,7 +43,15 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp; Email or password incorrect
+        &nbsp; {this.state.msg}
+      </div>;
+    }
+
+    showSuccess = () => {
+      return <div className="alert alert-success" role="alert">
+        <span className="glyphicon glyphicon-ok"></span>
+        <span className="sr-only">Success: </span>
+        &nbsp;{this.state.msg}
       </div>;
     }
 
@@ -54,11 +67,12 @@ module Esper.Views {
           </div>
           <div className="form-group">
             <input type="password" name="password2" className="form-control" placeholder="Confirm Password" style={{ width: "30%" }}/>
-            </div>
+          </div>
           <button type="submit" onClick={this.submitLogin}
             className="btn btn-default">Submit</button>
         </form>
         {(this.state.error === true) ? this.showError() : ""}
+        {(this.state.success === true) ? this.showSuccess() : ""}
         <div>
           <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
         </div>
