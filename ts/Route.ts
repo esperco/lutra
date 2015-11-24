@@ -232,9 +232,16 @@ module Esper.Route {
     */
     var match = frag.match(/^https?:\/\/[^/]*/);
     var domain = match && match[0];
-    if (domain && authorizedDomain(domain)) {
-      window.location.href = frag;
-      return;
+    if (domain) {
+      if (authorizedDomain(domain)) {
+        Log.d("Route.nav.path: window.location.href = " + frag);
+        window.location.href = frag;
+        return;
+      }
+      else {
+        Log.e("Route.nav.path: Unauthorized domain " + domain);
+        return;
+      }
     }
 
     // If we just have a hash or path, then use router

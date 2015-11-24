@@ -386,7 +386,7 @@ module Esper.Signin {
 
   export function loginOnce(uid, landingUrl) {
     var loginNonce = getLoginNonce();
-    Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
+    Log.d("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
     var loginCall = JsonHttp.noWarn(function() {
       return Api.loginOnce(uid, loginNonce)
     });
@@ -394,7 +394,18 @@ module Esper.Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        Route.nav.path(landingUrl || "");
+/*
+        The following commented-out code doesn't work in context
+        with e.g. landingUrl = "http://localhost/#!"
+        resulting in a blank page at the end of a Microsoft/Nylas signin.
+        Route.nav.path(landingUrl) does work from the js console, though.
+*/
+//        if (landingUrl) {
+//          Log.d("Route.nav.path() " + landingUrl);
+//          Route.nav.path(landingUrl);
+//        } else {
+          Route.nav.home();
+//        }
       })
       .fail(function(err) {
         clearLoginNonce();

@@ -38,6 +38,7 @@ module Esper.Login {
     var x = data;
     Log.d("postCredentials:", x);
     if (Util.isDefined(x)
+      && usesGoogle()
       && Util.isDefined(x.api_secret)
       && Util.isDefined(x.uid)) {
       var esperMessage = {
