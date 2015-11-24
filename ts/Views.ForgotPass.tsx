@@ -23,7 +23,7 @@ module Esper.Views {
       var email = document.forms["login"]["email"].value;
       var password = document.forms["login"]["password"].value;
       var password2 = document.forms["login"]["password"].value;
-      Api.postDirLogin({ email, password })
+      Api.postDirLogin({ email, hash_pwd: password })
         .done(function(loginResponse) {
           Store.set("uid", loginResponse.uid);
           Store.set("api_secret", loginResponse.api_secret);
@@ -39,7 +39,7 @@ module Esper.Views {
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
         &nbsp; Email or password incorrect
-      </div>;
+        </div>;
     }
 
     render() {
@@ -48,21 +48,21 @@ module Esper.Views {
         <form name="login">
           <div className="form-group">
             <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
-          </div>
+            </div>
           <div className="form-group">
             <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
-          </div>
+            </div>
           <div className="form-group">
             <input type="password" name="password2" className="form-control" placeholder="Confirm Password" style={{ width: "30%" }}/>
             </div>
           <button type="submit" onClick={this.submitLogin}
             className="btn btn-default">Submit</button>
-        </form>
+          </form>
         {(this.state.error === true) ? this.showError() : ""}
         <div>
           <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
-        </div>
-      </div>;
+          </div>
+        </div>;
     }
   }
 }

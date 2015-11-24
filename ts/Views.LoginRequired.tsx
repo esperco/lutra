@@ -23,7 +23,7 @@ module Esper.Views {
       e.preventDefault();
       var email = document.forms["login"]["email"].value;
       var password = document.forms["login"]["password"].value;
-      Api.postDirLogin({ email, hash_pwd: password })
+      Api.postDirLogin({ email, password })
         .done(function(loginResponse) {
           Store.set("uid", loginResponse.uid);
           Store.set("api_secret", loginResponse.api_secret);
@@ -63,6 +63,9 @@ module Esper.Views {
         <div>
           <a href={Login.loginURL()}>Or Login with Google / Microsoft.</a>
         </div>
+        <div>
+          <a href={() => Layout.render(<Views.ForgotPass />)}>Forgot Password?</a>
+          </div>
       </div>;
     }
   }
