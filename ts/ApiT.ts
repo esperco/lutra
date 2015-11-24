@@ -49,6 +49,39 @@ module Esper.ApiT {
     team_calendar_accounts: string[];
   }
 
+  export interface GenericCalendar {
+    id: string;
+    title: string;
+    access_role?: string;
+      // one of: None, FreeBusyReader, Owner, Reader, Writer
+  }
+
+  export interface GenericCalendars {
+    calendars: GenericCalendar[];
+  }
+
+  export interface GenericCalendarEvent {
+    id: string;
+    calendar_id: string;
+    start: string; // timestamp;
+    end: string;   // timestamp;
+    timezone?: string;
+    title?: string;
+    description?: string;
+    description_messageids: string[];
+    labels: string[];
+    location?: string;
+    all_day: boolean;
+    guests: Attendee[];
+    transparent: boolean;
+    recurrence?: Recurrence;
+    recurring_event_id?: string;
+  }
+
+  export interface GenericCalendarEvents {
+    events: GenericCalendarEvent[];
+  }
+
   export interface Calendar {
     google_cal_id: string;
     authorized_as?: any;
