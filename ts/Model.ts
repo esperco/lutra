@@ -160,7 +160,10 @@ module Esper.Model {
       _ids = _.chain(_ids)
         .map((_id) => {
           var metadata = this.metadata(_id);
-          return [_id].concat(metadata && metadata.aliases || []);
+          if (metadata && metadata.aliases) {
+            return [metadata._id].concat(metadata.aliases || []);
+          }
+          return [_id];
         })
         .flatten()
         .uniq()
