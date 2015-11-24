@@ -147,11 +147,17 @@ module Esper.Components {
               Saving &hellip;
             </span>
           </div> :
-          <button className="btn btn-secondary" onClick={this.props.onDone}>
+          <button className="btn btn-secondary"
+                  onClick={this.handleDone.bind(this)}>
             Done
           </button>
         }
       </div>;
+    }
+
+    handleDone() {
+      this.submitInput();
+      this.props.onDone();
     }
   }
 
