@@ -371,10 +371,10 @@ module Esper.Signin {
         p.done(function(ok) { // Logged in
           if (ok) {
             whenDone = whenDone || function() { Route.nav.path(landingUrl); };
-            if (Login.usesNylas()) {
-              whenDone();
-            } else {
+            if (Login.usesGoogle()) {
               checkGooglePermissions(landingUrl).done(whenDone);
+            } else {
+              whenDone();
             }
           }
         });

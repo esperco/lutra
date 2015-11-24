@@ -132,6 +132,13 @@ module Esper.Login {
       return false;
   };
 
+  export function usesGoogle() {
+    if (Util.isDefined(data))
+      return data.platform === "Google";
+    else
+      return false;
+  };
+
   export function usesNylas() {
     if (Util.isDefined(data))
       return data.platform === "Nylas";
