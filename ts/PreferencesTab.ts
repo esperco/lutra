@@ -1711,7 +1711,7 @@ module Esper.PreferencesTab {
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
 
-    if (!Login.isNylas()) {
+    if (!Login.usesNylas()) {
       var savedColor = general.hold_event_color;
       showEventColorPicker(colorPicker, holdColor, savedColor);
       holdColor.click(function() {

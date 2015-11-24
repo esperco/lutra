@@ -132,9 +132,9 @@ module Esper.Login {
       return false;
   };
 
-  export function isNylas() {
+  export function usesNylas() {
     if (Util.isDefined(data))
-      return data.is_nylas === true;
+      return data.platform === "Nylas";
     else
       return false;
   };

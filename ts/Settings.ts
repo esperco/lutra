@@ -372,7 +372,7 @@ module Esper.Settings {
       return false;
     });
 
-    if (! Login.isNylas()) {
+    if (! Login.usesNylas()) {
       Api.getGoogleAuthInfo(document.URL)
         .done(function(info) {
           if (info.has_token)

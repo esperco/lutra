@@ -371,7 +371,7 @@ module Esper.Signin {
         p.done(function(ok) { // Logged in
           if (ok) {
             whenDone = whenDone || function() { Route.nav.path(landingUrl); };
-            if (Login.isNylas()) {
+            if (Login.usesNylas()) {
               whenDone();
             } else {
               checkGooglePermissions(landingUrl).done(whenDone);

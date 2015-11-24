@@ -157,7 +157,7 @@ module Esper.TeamSettings {
       delete viewId;
     }
     contentAcc.append(AccountTab.load(team, plans, payment));
-    if (Login.isNylas()) {
+    if (Login.usesNylas()) {
       tabViewCal.shown = false;
       tabCal.remove();
       contentCal.remove();
