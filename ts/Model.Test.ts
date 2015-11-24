@@ -410,6 +410,26 @@ module Esper.Model {
         expect(myRabbitStore.val("brownBunnyId").carrots).toEqual(carrots);
       });
 
+      it("should add to the _id list for our change listener (alias key)",
+        function()
+      {
+        var spy = jasmine.createSpy("change");
+        myRabbitStore.addChangeListener(spy);
+        myRabbitStore.upsert("brownBunnyId", {uid: "brownBunnyId",
+          carrots: 123});
+        expect(spy).toHaveBeenCalledWith(["brownRabbitId", "brownBunnyId"]);
+      });
+
+      it("should add to the _id list for our change listener (orig key)",
+        function()
+      {
+        var spy = jasmine.createSpy("change");
+        myRabbitStore.addChangeListener(spy);
+        myRabbitStore.upsert("brownRabbitId", {uid: "brownBunnyId",
+          carrots: 123});
+        expect(spy).toHaveBeenCalledWith(["brownRabbitId", "brownBunnyId"]);
+      });
+
       describe("removing by original _id", function() {
         beforeAll(function() {
           myRabbitStore.remove("brownRabbitId");

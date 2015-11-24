@@ -155,6 +155,22 @@ module Esper.Model {
       }
     }
 
+    // Update emitChange to handle aliases
+    protected emitChange(_ids?: string[]): void {
+      _ids = _.chain(_ids)
+        .map((_id) => {
+          var metadata = this.metadata(_id);
+          if (metadata && metadata.aliases) {
+            return [metadata._id].concat(metadata.aliases || []);
+          }
+          return [_id];
+        })
+        .flatten()
+        .uniq()
+        .value();
+      super.emitChange(_ids);
+    }
+
 
     ////////////
 

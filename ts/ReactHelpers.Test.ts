@@ -294,5 +294,13 @@ module Esper.ReactHelpers {
       storeMany.set("y", "5");
       expect(this.component.render.calls.count()).toEqual(1);
     });
+
+    it("should update for aliases", function() {
+      storeOne.set("x");
+      storeMany.upsert("x", "5");
+      storeMany.alias("x", "y");
+      storeMany.upsert("y", "6");
+      expect(this.component.render.calls.count()).toEqual(3);
+    });
   });
 }

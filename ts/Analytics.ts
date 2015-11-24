@@ -96,6 +96,9 @@ module Esper.Analytics {
     MinimizeSidebarOptions,
     OnboardingModalOpen,         // This happens automatically
     OnboardingLoginSuccess,      // Called after auto-login
+    OpenTimeStatsAddCalendarsModal,
+    OpenTimeStatsAddLabelsModal,
+    OpenTimeStatsGifModal,
     RenameTaskTabTask,
     SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,
@@ -104,6 +107,8 @@ module Esper.Analytics {
     SelectTaskTabMeetingType,
     SelectTaskTabTaskProgress,
     SelectTaskTabWorkflow,
+    SetTimeStatsCalendars,
+    SetTimeStatsLabels,
     UnarchiveTaskTabTask,
     UnlinkTaskTabFromExistingTask,
     ViewTimeStats                // Viewed a particular set of time stats

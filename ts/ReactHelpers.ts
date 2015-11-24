@@ -206,6 +206,7 @@ module Esper.ReactHelpers {
         emitter: emitter,
         keys: keys,
         onChange: (_ids?: string[]) => {
+
           // No _ids => force update
           if (_.isUndefined(_ids) || _.isNull(_ids) || !src.keys) {
             this.updateState();
