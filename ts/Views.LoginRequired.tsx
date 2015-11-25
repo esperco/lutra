@@ -11,13 +11,18 @@ module Esper.Views {
 
   interface State {
     error: boolean;
+    success: boolean;
     msg: string;
   }
 
-  export class LoginRequired extends Component<{}, State> {
+  export class LoginRequired extends Component<State, State> {
     constructor(props: any) {
       super(props)
-      this.state = { error: false, msg: "" };
+      if (props.error === undefined) {
+        this.state = { error: false, success: false, msg: "" };
+      } else {
+        this.state = props;
+      }
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
@@ -32,7 +37,11 @@ module Esper.Views {
           window.location.reload();
         })
         .fail(function(err: ApiT.Error) {
-          self.setState({ error: true, msg: err.responseText });
+          if (err['status'] === 400) {
+            self.setState({ error: true, success: false, msg: "Not a valid email address." });
+          } else {
+            self.setState({ error: true, success: false, msg: err.responseText });
+          }
         });
     }
 
@@ -40,6 +49,14 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
+        &nbsp;{this.state.msg}
+      </div>;
+    }
+
+    showSuccess = () => {
+      return <div className="alert alert-success" role="alert">
+        <span className="glyphicon glyphicon-ok"></span>
+        <span className="sr-only">Success: </span>
         &nbsp;{this.state.msg}
       </div>;
     }
@@ -58,6 +75,7 @@ module Esper.Views {
             className="btn btn-default">Submit</button>
         </form>
         {(this.state.error === true) ? this.showError() : ""}
+        {(this.state.success === true) ? this.showSuccess() : ""}
         <div>
           New User?
           <a onClick={() => Layout.render(<Views.Register />)}>{" Sign Up Here"}</a>

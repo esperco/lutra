@@ -25,7 +25,7 @@ module Esper.Views {
       var email = this.find("input[name='email']").val();
       var password = this.find("input[name='password']").val();
       var password2 = this.find("input[name='password2']").val();
-      if (password !== password2) {
+      if (password !== password2 || password === "" || password2 === "") {
         this.setState({ error: true, success: false, msg: "Passwords don't match" })
         return;
       }
@@ -33,9 +33,14 @@ module Esper.Views {
         .done(function(loginResponse) {
           self.setState({ error: false, success: true,
             msg: "Resitration successful. You should receive an email shortly." })
+          Layout.render(<Views.LoginRequired error={self.state.error} success={self.state.success} msg={self.state.msg}/>);
         })
         .fail(function(err: ApiT.Error) {
-          self.setState({ error: true, success: false, msg: err.responseText });
+          if (err['status'] === 400) {
+            self.setState({ error: true, success: false, msg: "Not a valid email." });
+          } else {
+            self.setState({ error: true, success: false, msg: err.responseText });
+          }
         });
     }
 

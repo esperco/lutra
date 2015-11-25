@@ -25,17 +25,21 @@ module Esper.Views {
       var email = this.find("input[name='email']").val();
       var password = this.find("input[name='password']").val();
       var password2 = this.find("input[name='password2']").val();
-      if (password !== password2) {
+      if (password !== password2 || password === "" || password2 === "") {
         this.setState({ error: true, success: false, msg: "Passwords don't match" })
         return;
       }
       Api.resetPasswordDir({ email, password })
         .done(function(loginResponse) {
-          self.setState({ error: false, success: true,
-            msg: "Password Reset. You should receive an email shortly to verify." })
+          self.setState({ error: false, success: true, msg: "You should receive an email shortly to verify password reset." })
+          Layout.render(<Views.LoginRequired error={self.state.error} success={self.state.success} msg={self.state.msg}/>);
         })
         .fail(function(err: ApiT.Error) {
-          self.setState({ error: true, success: false, msg: err.responseText });
+          if (err['status'] === 400) {
+            self.setState({ error: true, success: false, msg: "Not a valid email address." });
+          } else {
+            self.setState({ error: true, success: false, msg: err.responseText });
+          }
         });
     }
 
@@ -43,7 +47,7 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp;Email or password incorrect
+        &nbsp;{this.state.msg}
       </div>;
     }
 

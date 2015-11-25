@@ -243,6 +243,12 @@ module Esper.Views {
         <h1>{this.props.header}</h1>
         <div><br/></div>
         {(Store.get("uid") === undefined) ? "" : this.editPassword()}
+        <div>
+          <button className="btn btn-primary"
+            onClick={Api.removeDirProfile}>
+            Delete Profile
+          </button>
+        </div>
         <label>Profile Picture</label>
         <div className="media">
           <div className="media-left">
