@@ -20,15 +20,15 @@ module Esper.Analytics {
 
   export function identify(loginInfo?: ApiT.LoginResponse,
                            alias=false, cb=function() {}) {
-    analytics.ready(function() {
-      var cbCalled = false;
-      var cbWrap = () => {
-        if (! cbCalled) {
-          cbCalled = true;
-          cb();
-        }
-      };
+    var cbCalled = false;
+    var cbWrap = () => {
+      if (! cbCalled) {
+        cbCalled = true;
+        cb();
+      }
+    };
 
+    analytics.ready(function() {
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid() && loginInfo) {
 
@@ -47,10 +47,10 @@ module Esper.Analytics {
       } else {
         reset();
       }
-
-      // Sschedule timeout to auto-call cb in case Analytics.js fails
-      setTimeout(cbWrap, 500);
     });
+
+    // Schedule timeout to auto-call cb in case Analytics.js fails
+    setTimeout(cbWrap, 2000);
   }
 
   // Clear tracking IDs
