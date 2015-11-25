@@ -32,6 +32,7 @@ module Esper.Views {
         if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
       }
       return {
+        uid: DirProfile.Store.val().uid,
         image_url: image_url,
         display_name: display_name,
         other_names: other_names,
