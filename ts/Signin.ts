@@ -124,27 +124,28 @@ module Esper.Signin {
                                  optInvite?: string,
                                  optEmail?: string):
     JQuery {
+      if (Esper.PRODUCTION) { // remove when Nylas login fully works
+        return $(`<span />`);
+      }
+      else {
+'''
+<button #button class="button-primary sign-in-btn exchange-btn">
+  <div #logo class="sign-in-icon exchange-icon"/>
+  <div class="sign-in-text">Microsoft Exchange</div>
+</button>
+'''
+        var exchangeIcon = $("<img class='svg-block'/>")
+          .appendTo(logo);
+        Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
 
-      return $(`<span />`);
+        // Set handler
+        button.click(function() {
+          showExchangeModal();
+          return false;
+        });
 
-
-// '''
-// <button #button class="button-primary sign-in-btn exchange-btn">
-//   <div #logo class="sign-in-icon exchange-icon"/>
-//   <div class="sign-in-text">Microsoft Exchange</div>
-// </button>
-// '''
-//     var exchangeIcon = $("<img class='svg-block'/>")
-//       .appendTo(logo);
-//     Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
-
-//     // Set handler
-//     button.click(function() {
-//       showExchangeModal();
-//       return false;
-//     });
-
-//     return button;
+        return button;
+      }
   };
 
   function showExchangeModal() {
@@ -164,10 +165,12 @@ module Esper.Signin {
                  placeholder="hello@office365.com" class="form-control" />
         </div>
         <div class="modal-footer">
-          <button type="submit" #saveBtn class="button-primary modal-primary">
-            Save</button>
+          <button type="submit" #loginBtn class="button-primary modal-primary">
+            Log in
+          </button>
           <button #cancelBtn class="button-secondary modal-cancel">
-            Cancel</button>
+            Cancel
+          </button>
         </div>
       </form>
     </div>
@@ -191,8 +194,7 @@ module Esper.Signin {
       if (! Util.validateEmailAddress(email)) {
         emailGroup.addClass("has-error");
       } else {
-        saveBtn.text("Saving ...");
-        saveBtn.prop("disabled", true);
+        loginBtn.prop("disabled", true);
         Api.getNylasLoginUrl(email)
           .then(function(result) {
             setLoginNonce().done(function(loginNonce) {
@@ -201,8 +203,7 @@ module Esper.Signin {
             });
           }, function(err) {
             console.error(err);
-            saveBtn.text("Save");
-            saveBtn.prop("disabled", false);
+            loginBtn.prop("disabled", false);
             return err;
           });
       }
@@ -227,7 +228,7 @@ module Esper.Signin {
         Contact us at <a href="mailto:support@esper.com">support@esper.com</a>
         for assistance.</p>
         <p>
-          By signing in, you agree to Esper's
+          By signing in, you agree to Esper&apos;s
           <a href="http://esper.com/terms-of-use">Terms of Use.</a>
         </p>
       </div>
@@ -370,10 +371,10 @@ module Esper.Signin {
         p.done(function(ok) { // Logged in
           if (ok) {
             whenDone = whenDone || function() { Route.nav.path(landingUrl); };
-            if (Login.isNylas()) {
-              whenDone();
-            } else {
+            if (Login.usesGoogle()) {
               checkGooglePermissions(landingUrl).done(whenDone);
+            } else {
+              whenDone();
             }
           }
         });
@@ -385,7 +386,7 @@ module Esper.Signin {
 
   export function loginOnce(uid, landingUrl) {
     var loginNonce = getLoginNonce();
-    Log.d("loginOnce: " + uid + " " + landingUrl + " (ignored) " + loginNonce);
+    Log.d("loginOnce: " + uid + " " + landingUrl + " " + loginNonce);
     var loginCall = JsonHttp.noWarn(function() {
       return Api.loginOnce(uid, loginNonce)
     });
@@ -393,7 +394,18 @@ module Esper.Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-        Route.nav.path(landingUrl || "");
+/*
+        The following commented-out code doesn't work in context
+        with e.g. landingUrl = "http://localhost/#!"
+        resulting in a blank page at the end of a Microsoft/Nylas signin.
+        Route.nav.path(landingUrl) does work from the js console, though.
+*/
+//        if (landingUrl) {
+//          Log.d("Route.nav.path() " + landingUrl);
+//          Route.nav.path(landingUrl);
+//        } else {
+          Route.nav.home();
+//        }
       })
       .fail(function(err) {
         clearLoginNonce();

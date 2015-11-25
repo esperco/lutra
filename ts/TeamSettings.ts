@@ -157,12 +157,12 @@ module Esper.TeamSettings {
       delete viewId;
     }
     contentAcc.append(AccountTab.load(team, plans, payment));
-    if (Login.isNylas()) {
+    if (Login.usesGoogle()) {
+      contentCal.append(CalendarsTab.load(team));
+    } else {
       tabViewCal.shown = false;
       tabCal.remove();
       contentCal.remove();
-    } else {
-      contentCal.append(CalendarsTab.load(team));
     }
     contentPrf.append(PreferencesTab.load(team, contentPrf));
     contentWkf.append(WorkflowsTab.load(team, contentWkf));

@@ -38,6 +38,7 @@ module Esper.Login {
     var x = data;
     Log.d("postCredentials:", x);
     if (Util.isDefined(x)
+      && usesGoogle()
       && Util.isDefined(x.api_secret)
       && Util.isDefined(x.uid)) {
       var esperMessage = {
@@ -132,9 +133,16 @@ module Esper.Login {
       return false;
   };
 
-  export function isNylas() {
+  export function usesGoogle() {
     if (Util.isDefined(data))
-      return data.is_nylas === true;
+      return data.platform === "Google";
+    else
+      return false;
+  };
+
+  export function usesNylas() {
+    if (Util.isDefined(data))
+      return data.platform === "Nylas";
     else
       return false;
   };
