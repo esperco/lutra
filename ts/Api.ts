@@ -57,27 +57,27 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function registerDirLogin(dirLoginEdit: ApiT.DirLoginEdit):
+  export function registerDirLogin(dirLogin: ApiT.DirLogin):
   JQueryPromise<ApiT.DirLogin> {
-    var url = prefix + "/api/directory/register";
-    return JsonHttp.put(url, JSON.stringify(dirLoginEdit));
+    var url = prefix + "/api/auth/pwd/register/";
+    return JsonHttp.put(url, JSON.stringify(dirLogin));
   }
 
-  export function postDirLogin(dirLoginEdit: ApiT.DirLoginEdit):
+  export function postDirLogin(dirLogin: ApiT.DirLogin):
   JQueryPromise<ApiT.LoginResponse> {
-    var url = prefix + "/api/directory/login";
-    return JsonHttp.post(url, JSON.stringify(dirLoginEdit));
+    var url = prefix + "/api/auth/pwd/";
+    return JsonHttp.post(url, JSON.stringify(dirLogin));
   }
 
   export function updateDirLogin(dirLogin: ApiT.DirLogin):
   JQueryPromise<void> {
-    var url = prefix + "/api/directory/login";
+    var url = prefix + "/api/auth/pwd/update/" + string(Login.myUid());
     return JsonHttp.put(url, JSON.stringify(dirLogin));
   }
 
-  export function resetPasswordDir(email: string): JQueryPromise<void> {
-    var url = prefix + "/api/directory/reset/" + email;
-    return JsonHttp.get(url);
+  export function resetPasswordDir(dirLogin: ApiT.DirLogin): JQueryPromise<void> {
+    var url = prefix + "/api/auth/pwd/reset/";
+    return JsonHttp.put(url, JSON.stringify(dirLogin));
   }
 
   /* Esper login and password management */

@@ -105,13 +105,9 @@ module Esper.ApiT {
     custom_entries: LabelledItem[];
   }
 
-  export interface DirLoginEdit {
+  export interface DirLogin {
     email: string;
-    hash_pwd: string;
-  }
-
-  export interface DirLogin extends DirLoginEdit {
-    uid: string;
+    password: string;
   }
 
   export interface Profile {
@@ -843,6 +839,11 @@ type token_response = [
     rrule : Recur[];
     exdate : string[];
     rdate : string[];
+  }
+
+  export interface Error {
+    [index: string]: any;
+    responseText: string;
   }
 
   export type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
