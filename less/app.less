@@ -46,19 +46,35 @@ body, .footer {
   }
 }
 
+.search-input {
+  margin-right: 5px;
+}
+
+.search-result-row {
+  &:hover {
+    background-color: #e3e3e3;
+  }
+}
+
 .profile-header {
-  img {
+  .img-lg {
+    vertical-align: top;
     width: 168px;
+  }
+
+  .img-md {
+    vertical-align: top;
+    width: 84px;
   }
 
   .profile-title {
     display: inline-block;
     margin-left: 20px;
-    h1 {
+    h1, h3 {
       margin: 0px;
     }
-    h3 {
-      margin-top: 0px;
+    span {
+      display: block;
     }
   }
 }

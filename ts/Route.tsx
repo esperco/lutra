@@ -8,6 +8,7 @@
 /// <reference path="./Views.LoginRequired.tsx" />
 /// <reference path="./Views.Profile.tsx" />
 /// <reference path="./Views.EditProfile.tsx" />
+/// <reference path="./Views.Search.tsx" />
 
 module Esper.Route {
 
@@ -34,7 +35,12 @@ module Esper.Route {
     nav.path("/profile");
   });
 
-  pageJs("/profile", loginRequired, profileRequired, function() {
+  pageJs("/search", function(ctx) {
+    Layout.render(<Views.Search />);
+  });
+
+  pageJs("/profile", loginRequired, function() {
+    DirProfile.myProfile();
     Layout.render(<Views.Profile />);
   });
 
@@ -86,7 +92,7 @@ module Esper.Route {
     }
 
     // Navigate to a particular page
-    export function path(frag: string) {
+    export function path(frag: string, callback?: () => any) {
       pageJs(normalize(frag));
     }
 
