@@ -21,7 +21,13 @@ module Esper.Analytics {
   export function identify(loginInfo?: ApiT.LoginResponse,
                            alias=false, cb=function() {}) {
     analytics.ready(function() {
-      var cbScheduled = false;
+      var cbCalled = false;
+      var cbWrap = () => {
+        if (! cbCalled) {
+          cbCalled = true;
+          cb();
+        }
+      };
 
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid() && loginInfo) {
@@ -30,25 +36,20 @@ module Esper.Analytics {
           if (alias && loginInfo.account_created &&
               moment().diff(moment(loginInfo.account_created)) < 300000)
           {
-            cbScheduled = true;
-            analytics.alias(Login.myUid(), cb);
+            analytics.alias(Login.myUid(), cbWrap);
           }
 
           // Identify user regardless of previous login status
           analytics.identify(Login.myUid(), {
             email: loginInfo.email
-          }, (cbScheduled ? function() {} : cb));
-          cbScheduled = true;
+          }, cbWrap);
         }
       } else {
         reset();
       }
 
-      // If cbScheduled is still false, that means no Analytics identify
-      // call is being made, so call cb anyway just in case.
-      if (! cbScheduled) {
-        cb();
-      }
+      // Sschedule timeout to auto-call cb in case Analytics.js fails
+      setTimeout(cbWrap, 500);
     });
   }
 
