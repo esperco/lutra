@@ -126,6 +126,7 @@ module Esper.ApiT {
 
   export interface DirProfile {
     [index: string]: any;
+    uid: string;
     image_url: string;
     display_name: string;
     other_names: LabelledItem[];
@@ -145,6 +146,16 @@ module Esper.ApiT {
 
   export interface DirLogin extends DirLoginEdit {
     uid: string;
+  }
+
+  export interface DirProfileSearchResults {
+    search_results: WeightedDirProfile[];
+    search_count: number;
+  }
+
+  export interface WeightedDirProfile {
+    profile_data: DirProfile;
+    profile_score: number;
   }
 
   export interface Profile {
@@ -179,7 +190,7 @@ module Esper.ApiT {
     account_created: string; // timestamp
     is_admin: boolean;
     is_alias: boolean;
-    is_nylas: boolean;
+    platform?: string; // Google | Nylas
     email: string;
     teams: Team[];
     team_members: TeamMember[];

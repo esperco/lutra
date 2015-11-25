@@ -58,7 +58,7 @@ module Esper.EventLabels {
 
     render() {
       var labelElms = _.map(
-        this.props.team.team_labels,
+        this.getAllLabels(),
         this.renderLabel.bind(this));
 
       var labelSettingsUrl = Api.prefix + "/#!/team-settings/" +
@@ -99,14 +99,31 @@ module Esper.EventLabels {
     }
 
     /*
+      Returns a list of labels including those stored on the team and each
+      of the events themselves
+    */
+    getAllLabels() {
+      var labels = this.props.team.team_labels || [];
+      labels = _.reduce(this.props.events, (allLabels, event) => {
+        return labels.concat(event.labels || []);
+      }, labels);
+      return _.uniq(labels);
+    }
+
+    /*
       This input may be used to control labels for more than one event (e.g.
       from the Gmail side -- or for batch labeling. In that case, we need to
       distinguish between labels that apply to all events and labels that
       apply only to a subset.
     */
     getAllChecked() {
-      var labels: string[] = this.props.team.team_labels;
-      return _.reduce(this.props.events,
+      var firstEvent = this.props.events[0];
+      if (! firstEvent) {
+        return [];
+      }
+
+      var labels: string[] = firstEvent.labels;
+      return _.reduce(this.props.events.slice(1),
         (accumulator, event) => _.intersection(accumulator, event.labels || []),
         labels
       );
@@ -198,10 +215,9 @@ module Esper.EventLabels {
       var p = Queue.enqueue(_id, () => {
         var edit = nextUpdates[_id];
         if (edit) {
-          var calId = event.google_cal_id;
           var eventId = event.google_event_id;
           delete nextUpdates[_id];
-          return Api.updateEventLabels(calId, eventId, edit);
+          return Api.updateEventLabels(this.props.team.teamid, eventId, edit);
         }
       });
 
