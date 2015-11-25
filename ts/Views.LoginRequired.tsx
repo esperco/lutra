@@ -10,9 +10,9 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface State {
-    error: boolean;
-    success: boolean;
-    msg: string;
+    error?: boolean;
+    success?: boolean;
+    msg?: string;
   }
 
   export class LoginRequired extends Component<State, State> {

@@ -16,7 +16,7 @@ module Esper.Route {
   var loginRequired: PageJS.Callback = function(ctx, next) {
     Login.loginPromise.done(next);
     Login.loginPromise.fail(function() {
-        Layout.render(<Views.LoginRequired error={undefined} success={undefined} msg={undefined}/>);
+        Layout.render(<Views.LoginRequired />);
     });
 
     // If busy, then we keep showing spinner
