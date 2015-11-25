@@ -215,10 +215,9 @@ module Esper.EventLabels {
       var p = Queue.enqueue(_id, () => {
         var edit = nextUpdates[_id];
         if (edit) {
-          var calId = event.google_cal_id;
           var eventId = event.google_event_id;
           delete nextUpdates[_id];
-          return Api.updateEventLabels(calId, eventId, edit);
+          return Api.updateEventLabels(this.props.team.teamid, eventId, edit);
         }
       });
 
