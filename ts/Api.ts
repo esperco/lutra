@@ -80,6 +80,13 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function searchDirProfile(query: string):
+  JQueryPromise<ApiT.DirProfileSearchResults> {
+    var url = prefix + "/api/directory/search"
+      + "?query=" + encodeURIComponent(query);
+    return JsonHttp.get(url);
+  }
+
   /* Esper login and password management */
 
   export function getLoginInfo():
