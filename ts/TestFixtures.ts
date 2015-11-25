@@ -40,7 +40,7 @@ module Esper.TestFixtures {
       account_created: "2015-10-23T21:18:08.020-08:00",
       is_admin: false,
       is_alias: false,
-      is_nylas: false,
+      platform: "Google",
       email: email,
       teams: [
         {

@@ -21,7 +21,7 @@ module Esper.Components {
           select which calendar(s) you'd like to use with Esper Time.
 
           If the calendar you’re looking for doesn’t appear in this list,
-          {" "}{ info.is_nylas ?
+          {" "}{ (info as any).is_nylas || info.platform === "Nylas" ?
             <span>
               ask the calendar owner to share it with the Exchange or Office
               365 account you logged in with.
