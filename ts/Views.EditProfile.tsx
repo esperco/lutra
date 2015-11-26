@@ -1,4 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Store.ts" />
+/// <reference path="./Views.ChangePass.tsx" />
 
 module Esper.Views {
 
@@ -30,6 +32,7 @@ module Esper.Views {
         if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
       }
       return {
+        uid: DirProfile.Store.val().uid,
         image_url: image_url,
         display_name: display_name,
         other_names: other_names,
@@ -182,6 +185,15 @@ module Esper.Views {
       }
     })();
 
+    editPassword = () => {
+      return <div>
+        <button className="btn btn-primary"
+          onClick={() => Layout.render(<Views.ChangePass />) }>
+          Change Password
+        </button>    
+      </div>
+    }
+
     renderList = (key: string, dropList: string[]) => {
       var self = this;
       return _.map(this.state[key], function(entry: ApiT.LabelledItem, i: number) {
@@ -231,6 +243,13 @@ module Esper.Views {
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
+        {(Store.get("uid") === undefined) ? "" : this.editPassword()}
+        <div>
+          <button className="btn btn-primary"
+            onClick={Api.removeDirProfile}>
+            Delete Profile
+          </button>
+        </div>
         <label>Profile Picture</label>
         <div className="media">
           <div className="media-left">

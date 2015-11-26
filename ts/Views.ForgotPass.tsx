@@ -13,10 +13,10 @@ module Esper.Views {
     msg: string;
   }
 
-  export class Register extends Component<{}, State> {
+  export class ForgotPass extends Component<{}, State> {
     constructor(props: any) {
       super(props);
-      this.state = { error: false, success:  false, msg: "" };
+      this.state = { error: false, success: false, msg: "" };
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
@@ -29,15 +29,14 @@ module Esper.Views {
         this.setState({ error: true, success: false, msg: "Passwords don't match" })
         return;
       }
-      Api.registerDirLogin({ email, password })
+      Api.resetPasswordDir({ email, password })
         .done(function(loginResponse) {
-          self.setState({ error: false, success: true,
-            msg: "Resitration successful. You should receive an email shortly." })
+          self.setState({ error: false, success: true, msg: "You should receive an email shortly to verify password reset." })
           Layout.render(<Views.LoginRequired error={self.state.error} success={self.state.success} msg={self.state.msg}/>);
         })
         .fail(function(err: ApiT.Error) {
           if (err['status'] === 400) {
-            self.setState({ error: true, success: false, msg: "Not a valid email." });
+            self.setState({ error: true, success: false, msg: "Not a valid email address." });
           } else {
             self.setState({ error: true, success: false, msg: err.responseText });
           }
@@ -48,7 +47,7 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp; {this.state.msg}
+        &nbsp;{this.state.msg}
       </div>;
     }
 
@@ -62,7 +61,8 @@ module Esper.Views {
 
     render() {
       return <div className="container">
-        <h2>Register New User</h2>
+        <h2>Forgot Password</h2>
+        <h4>Enter your email address and new password.</h4>
         <form name="login">
           <div className="form-group">
             <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
@@ -75,7 +75,7 @@ module Esper.Views {
           </div>
           <button type="submit" onClick={this.submitLogin}
             className="btn btn-default">Submit</button>
-        </form>
+          </form>
         {(this.state.error === true) ? this.showError() : ""}
         {(this.state.success === true) ? this.showSuccess() : ""}
         <div>

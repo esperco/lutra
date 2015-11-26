@@ -2,6 +2,7 @@
 /// <reference path="./Login.ts" />
 /// <reference path="./Store.ts" />
 /// <reference path="./Views.Register.tsx" />
+/// <reference path="./Views.ForgotPass.tsx" />
 
 module Esper.Views {
 
@@ -9,28 +10,38 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface State {
-    error: boolean;
+    error?: boolean;
+    success?: boolean;
+    msg?: string;
   }
 
-  export class LoginRequired extends Component<{}, State> {
+  export class LoginRequired extends Component<State, State> {
     constructor(props: any) {
       super(props)
-      this.state = { error: false };
+      if (props.error === undefined) {
+        this.state = { error: false, success: false, msg: "" };
+      } else {
+        this.state = props;
+      }
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
       var self = this;
       e.preventDefault();
-      var email = document.forms["login"]["email"].value;
-      var password = document.forms["login"]["password"].value;
-      Api.postDirLogin({ email, hash_pwd: password })
+      var email = this.find("input[name='email']").val();
+      var password = this.find("input[name='password']").val();
+      Api.postDirLogin({ email, password })
         .done(function(loginResponse) {
           Store.set("uid", loginResponse.uid);
           Store.set("api_secret", loginResponse.api_secret);
           window.location.reload();
         })
-        .fail(function(err: Error) {
-          self.setState({ error: true });
+        .fail(function(err: ApiT.Error) {
+          if (err['status'] === 400) {
+            self.setState({ error: true, success: false, msg: "Not a valid email address." });
+          } else {
+            self.setState({ error: true, success: false, msg: err.responseText });
+          }
         });
     }
 
@@ -38,7 +49,15 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp;Email or password incorrect
+        &nbsp;{this.state.msg}
+      </div>;
+    }
+
+    showSuccess = () => {
+      return <div className="alert alert-success" role="alert">
+        <span className="glyphicon glyphicon-ok"></span>
+        <span className="sr-only">Success: </span>
+        &nbsp;{this.state.msg}
       </div>;
     }
 
@@ -56,6 +75,7 @@ module Esper.Views {
             className="btn btn-default">Submit</button>
         </form>
         {(this.state.error === true) ? this.showError() : ""}
+        {(this.state.success === true) ? this.showSuccess() : ""}
         <div>
           New User?
           <a onClick={() => Layout.render(<Views.Register />)}>{" Sign Up Here"}</a>
@@ -63,6 +83,9 @@ module Esper.Views {
         <div>
           <a href={Login.loginURL()}>Or Login with Google / Microsoft.</a>
         </div>
+        <div>
+          <a onClick={() => Layout.render(<Views.ForgotPass />)}>Forgot Password?</a>
+          </div>
       </div>;
     }
   }

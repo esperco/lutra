@@ -13,34 +13,28 @@ module Esper.Views {
     msg: string;
   }
 
-  export class Register extends Component<{}, State> {
+  export class ChangePass extends Component<{}, State> {
     constructor(props: any) {
       super(props);
-      this.state = { error: false, success:  false, msg: "" };
+      this.state = { error: false, success: false, msg: "" };
     }
 
     submitLogin = (e: React.SyntheticEvent) => {
       var self = this;
       e.preventDefault();
-      var email = this.find("input[name='email']").val();
       var password = this.find("input[name='password']").val();
       var password2 = this.find("input[name='password2']").val();
-      if (password !== password2 || password === "" || password2 === "") {
+      if (password !== password2) {
         this.setState({ error: true, success: false, msg: "Passwords don't match" })
         return;
       }
-      Api.registerDirLogin({ email, password })
+      Api.updateDirLogin({ email:Login.InfoStore.val().email, password })
         .done(function(loginResponse) {
-          self.setState({ error: false, success: true,
-            msg: "Resitration successful. You should receive an email shortly." })
-          Layout.render(<Views.LoginRequired error={self.state.error} success={self.state.success} msg={self.state.msg}/>);
+          self.setState({error: false, success: true, msg: "Successfully updated password"})
+          window.location.reload();
         })
         .fail(function(err: ApiT.Error) {
-          if (err['status'] === 400) {
-            self.setState({ error: true, success: false, msg: "Not a valid email." });
-          } else {
-            self.setState({ error: true, success: false, msg: err.responseText });
-          }
+          self.setState({ error: true, success: false, msg: err.responseText });
         });
     }
 
@@ -48,7 +42,7 @@ module Esper.Views {
       return <div className="alert alert-danger" role="alert">
         <span className="glyphicon glyphicon-exclamation-sign"></span>
         <span className="sr-only">Error: </span>
-        &nbsp; {this.state.msg}
+        &nbsp;{this.state.msg}
       </div>;
     }
 
@@ -62,11 +56,9 @@ module Esper.Views {
 
     render() {
       return <div className="container">
-        <h2>Register New User</h2>
+        <h2>Change Password</h2>
+        <h4>Enter your new password twice below.</h4>
         <form name="login">
-          <div className="form-group">
-            <input type="email" name="email" className="form-control" placeholder="Email" style={{ width: "30%" }}/>
-          </div>
           <div className="form-group">
             <input type="password" name="password" className="form-control" placeholder="Password" style={{ width: "30%" }}/>
           </div>
@@ -78,9 +70,6 @@ module Esper.Views {
         </form>
         {(this.state.error === true) ? this.showError() : ""}
         {(this.state.success === true) ? this.showSuccess() : ""}
-        <div>
-          <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
-        </div>
       </div>;
     }
   }
