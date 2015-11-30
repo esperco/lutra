@@ -309,38 +309,38 @@ module Esper.TaskTab {
       });
   }
 
-  export function selectMeetingTypeOnUserTab(meetingType : string,
-                                      userTabContent : UserTab.UserTabView)
+  export function selectMeetingTypeOnPeopleTab(meetingType : string,
+                                      peopleTabContent : PeopleTab.PeopleTabView)
   : void {
-    userTabContent.meetingSelector.find(".extra").remove();
+    peopleTabContent.meetingSelector.find(".extra").remove();
 
     // Use the default option for generic "meeting".
     meetingType = meetingType || ""; // In case it's non-existent for old tasks
     if (meetingType.toLowerCase() !== "meeting") {
       var found = false;
-      userTabContent.meetingSelector.find("option").each(function(i) {
+      peopleTabContent.meetingSelector.find("option").each(function(i) {
         var value = $(this).val();
         if (value && value.toLowerCase() === meetingType.toLowerCase()) {
           found = true;
-          userTabContent.meetingSelector.val(value);
-          userTabContent.meetingSelector.trigger("change");
-          if (userTabContent.showMeetings.text() === "Show") {
-            userTabContent.showMeetings.trigger("click");
+          peopleTabContent.meetingSelector.val(value);
+          peopleTabContent.meetingSelector.trigger("change");
+          if (peopleTabContent.showMeetings.text() === "Show") {
+            peopleTabContent.showMeetings.trigger("click");
           }
         }
       });
       if (!found) {
-        UserTab.currentMeetingType = meetingType.toLowerCase().replace(/ /,"_");
+        PeopleTab.currentMeetingType = meetingType.toLowerCase().replace(/ /,"_");
         var opt = $("<option value='" + meetingType + "' disabled class='extra'>"
                     + meetingType.replace("_", " ") + "</option>");
-        var drop = userTabContent.meetingSelector;
+        var drop = peopleTabContent.meetingSelector;
         drop.append($("<option disabled class='extra'>──────</option>"));
         drop.append(opt);
         drop.val(opt.val());
-        userTabContent.meetingInfo.hide();
-        userTabContent.noMeetingPrefs.show();
-        if (userTabContent.showMeetings.text() === "Show") {
-          userTabContent.showMeetings.trigger("click");
+        peopleTabContent.meetingInfo.hide();
+        peopleTabContent.noMeetingPrefs.show();
+        if (peopleTabContent.showMeetings.text() === "Show") {
+          peopleTabContent.showMeetings.trigger("click");
         }
       }
     }
@@ -354,7 +354,7 @@ module Esper.TaskTab {
    */
   // TODO: Update using centralized model at CurrentThread
   function createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
-                              userTabContent : UserTab.UserTabView) {
+                              peopleTabContent : PeopleTab.PeopleTabView) {
     Sidebar.dismissDropdowns();
     Log.d("Creating task with meetingType ", taskTitle.data("meetingType"));
     var force = true;
@@ -368,7 +368,7 @@ module Esper.TaskTab {
         if (meetingType) {
           Api.setTaskMeetingType(task.taskid, meetingType);
           task.task_meeting_type = meetingType;
-          selectMeetingTypeOnUserTab(meetingType, userTabContent);
+          selectMeetingTypeOnPeopleTab(meetingType, peopleTabContent);
         }
         CurrentThread.setTask(task);
         taskTitle.val(query);
@@ -388,7 +388,7 @@ module Esper.TaskTab {
                                 threadId: string,
                                 query,
                                 taskTab: TaskTabView,
-                                userTabContent : UserTab.UserTabView) {
+                                peopleTabContent : PeopleTab.PeopleTabView) {
     if (lastQuery === query && dropdown.hasClass("esper-open")) return;
     lastQuery = query;
     var teamid = team.teamid;
@@ -433,8 +433,8 @@ module Esper.TaskTab {
 
             CurrentThread.setTask(result.task_data);
             taskTitle.val(title);
-            selectMeetingTypeOnUserTab(result.task_data.task_meeting_type,
-                                       userTabContent);
+            selectMeetingTypeOnPeopleTab(result.task_data.task_meeting_type,
+                                       peopleTabContent);
             Sidebar.dismissDropdowns();
             Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
           });
@@ -455,7 +455,7 @@ module Esper.TaskTab {
         .appendTo(actions)
         .click(function() {
           createOrRenameTask(taskTitle, teamid, threadId, taskTab, query,
-                             userTabContent);
+                             peopleTabContent);
           Analytics.track(Analytics.Trackable.RenameTaskTabTask);
         });
 
@@ -602,9 +602,9 @@ module Esper.TaskTab {
             stepSelect.trigger("change");
           }
 
-          var userTabContent = $(".esper-user-tab-content");
-          userTabContent.children().remove();
-          userTabContent.append(UserTab.viewOfUserTab(team).view);
+          var peopleTabContent = $(".esper-user-tab-content");
+          peopleTabContent.children().remove();
+          peopleTabContent.append(PeopleTab.viewOfPeopleTab(team).view);
 
           workflowSection.removeClass("esper-hide");
         } else {
@@ -668,7 +668,7 @@ module Esper.TaskTab {
           meetingTypes[opt] = step.meeting_prefs[1];
           meetingInfo.children().remove();
           meetingSelector.children().remove();
-          UserTab.populateMeetingsDropdown(meetingSelector, meetingInfo,
+          PeopleTab.populateMeetingsDropdown(meetingSelector, meetingInfo,
                                            noMeetingPrefs,
                                            meetingTypes, workplaces,
                                            [], []);
@@ -750,7 +750,7 @@ module Esper.TaskTab {
                                  threadId: string,
                                  linkedEvents: ApiT.TaskEvent[],
                                  workflows: ApiT.Workflow[],
-                                 userTabContent : UserTab.UserTabView) {
+                                 peopleTabContent : PeopleTab.PeopleTabView) {
 '''
 <div #view class="esper-tab-flexbox">
   <div class="esper-tab-header">
@@ -925,7 +925,7 @@ module Esper.TaskTab {
         taskTabView.taskTitle.text(task.task_title);
         displayTaskProgress(task, taskTabView);
         if (task.task_meeting_type) {
-          selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+          selectMeetingTypeOnPeopleTab(task.task_meeting_type, peopleTabContent);
         }
         view.find("select.esper-meeting-type").hide();
       } else {
@@ -1037,7 +1037,7 @@ module Esper.TaskTab {
           displayLinkedThreadsList(task, threadId, taskTabView);
           displayTaskProgress(task, taskTabView);
           if (task.task_meeting_type) {
-            selectMeetingTypeOnUserTab(task.task_meeting_type, userTabContent);
+            selectMeetingTypeOnPeopleTab(task.task_meeting_type, peopleTabContent);
           }
         } else {
           taskCaption.text(taskLabelCreate);
@@ -1052,7 +1052,7 @@ module Esper.TaskTab {
                                  taskSearchResults,
                                  taskSearchActions, team,
                                  threadId, query, taskTabView,
-                                 userTabContent);
+                                 peopleTabContent);
           }
         });
         taskTitle.keydown(function(pressed) {
@@ -1119,7 +1119,7 @@ module Esper.TaskTab {
 
     linkEmail.click(function() {
       var searchModal =
-        GmailSearch.viewOfSearchModal(team, threadId, taskTabView, userTabContent);
+        GmailSearch.viewOfSearchModal(team, threadId, taskTabView, peopleTabContent);
       $("body").append(searchModal.view);
       searchModal.search.focus();
       Analytics.track(Analytics.Trackable.LinkTaskTabEmail);

@@ -1,6 +1,4 @@
-/* Executive scheduling preferences */
-
-module Esper.UserTab {
+module Esper.PeopleTab {
 
   export var currentMeetingType : string = "other";
 
@@ -765,7 +763,7 @@ module Esper.UserTab {
     });
   }
 
-  export interface UserTabView {
+  export interface PeopleTabView {
     view: JQuery;
     user: JQuery;
     preferencesSpinner: JQuery;
@@ -798,7 +796,7 @@ module Esper.UserTab {
     notes: JQuery;
   }
 
-  export function viewOfUserTab(team: ApiT.Team): UserTabView {
+  export function viewOfPeopleTab(team: ApiT.Team): PeopleTabView {
 '''
 <div #view class="esper-tab-flexbox">
   <div #user class="esper-tab-header"/>
@@ -886,7 +884,7 @@ module Esper.UserTab {
     noMeetingPrefs.append(noPrefsDescr).append(noPrefsLink);
     morePrefsLink.attr("href", noPrefsURL)
                  .click(function() {
-                   Analytics.track(Analytics.Trackable.ClickUserTabPreferences);
+                   Analytics.track(Analytics.Trackable.ClickPeopleTabPreferences);
                  });
 
     var prefs = Teams.getTeamPreferences(team);
@@ -933,7 +931,7 @@ module Esper.UserTab {
       meetingSelector.change(); // ensure this section is initialized correctly
 
       meetingSelector.click(function() {
-        Analytics.track(Analytics.Trackable.ClickUserTabMeetingsDropdown);
+        Analytics.track(Analytics.Trackable.ClickPeopleTabMeetingsDropdown);
       });
 
       // NB: Triggering click event is a bit hacky since meetings show always

@@ -108,7 +108,7 @@ module Esper.CalPicker {
 
   function createView(refreshCal: JQuery,
                       calendars: ApiT.Calendar[],
-                      userSidebar: UserTab.UserTabView,
+                      userSidebar: PeopleTab.PeopleTabView,
                       team: ApiT.Team,
                       tpref: ApiT.TaskPreferences) : PickerView {
 '''
@@ -666,7 +666,7 @@ module Esper.CalPicker {
     Create date and time picker using user's calendar.
   */
   function createPicker(refreshCal: JQuery,
-                        userSidebar: UserTab.UserTabView,
+                        userSidebar: PeopleTab.PeopleTabView,
                         team: ApiT.Team,
                         tpref: ApiT.TaskPreferences) : JQueryPromise<Picker> {
     var calendars = team.team_calendars;
@@ -687,7 +687,7 @@ module Esper.CalPicker {
         Analytics.track(Analytics.Trackable.SelectCalendarPickerMeetingType);
       })
 
-      var type = UserTab.currentMeetingType;
+      var type = PeopleTab.currentMeetingType;
       if (menu.find("option[value='" + type + "']").length > 0) {
         meetingType = type;
         menu.val(type);
@@ -1022,7 +1022,7 @@ module Esper.CalPicker {
         refreshCalIcon.attr("data", Init.esperRootUrl + "img/refresh.svg");
         title.text("Create linked events");
 
-        var userInfo = UserTab.viewOfUserTab(team);
+        var userInfo = PeopleTab.viewOfPeopleTab(team);
         createPicker(refreshCal, userInfo, team, tpref)
           .done(function(picker) {
             loadingSpinner.hide();
@@ -1055,7 +1055,7 @@ module Esper.CalPicker {
             });
 
             picker.render();
-            Sidebar.selectUserTab();
+            Sidebar.selectPeopleTab();
         });
       },
       none : function () {

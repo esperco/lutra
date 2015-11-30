@@ -355,12 +355,12 @@ module Esper.Sidebar {
   <div class="esper-tabs-container">
     <ul class="esper-tab-links">
       <li #taskTab class="esper-active esper-first esper-sidebar-task-tab">Task</li>
-      <li #userTab class="esper-sidebar-user-tab">User</li>
+      <li #peopleTab class="esper-sidebar-people-tab">People</li>
     </ul>
   </div>
   <div class="esper-tab-content">
     <div #taskContent class="esper-tab esper-active"/>
-    <div #userContent class="esper-tab esper-user-tab-content"/>
+    <div #peopleContent class="esper-tab esper-people-tab-content"/>
   </div>
 </div>
 '''
@@ -385,19 +385,19 @@ module Esper.Sidebar {
       Analytics.track(Analytics.Trackable.ClickTaskTab);
     });
 
-    userTab.click(function() {
-      Analytics.track(Analytics.Trackable.ClickUserTab);
+    peopleTab.click(function() {
+      Analytics.track(Analytics.Trackable.ClickPeopleTab);
     });
 
     CurrentThread.currentTeam.get().match({
       some : function  (team) {
         Api.listWorkflows(team.teamid).done(function(response) {
           var workflows = response.workflows;
-          var userTabContent = UserTab.viewOfUserTab(team);
-          userContent.append(userTabContent.view);
+          var peopleTabContent = PeopleTab.viewOfPeopleTab(team);
+          peopleContent.append(peopleTabContent.view);
           TaskTab.displayTaskTab(taskContent, team, threadId,
                                  linkedEvents,
-                                 workflows, userTabContent);
+                                 workflows, peopleTabContent);
         });
       },
       none : function () {
@@ -414,8 +414,8 @@ module Esper.Sidebar {
     $(".esper-sidebar-task-tab").click();
   }
 
-  export function selectUserTab() {
-    $(".esper-sidebar-user-tab").click();
+  export function selectPeopleTab() {
+    $(".esper-sidebar-people-tab").click();
   }
 
   function displayUpdateDock(rootElement, url) {
