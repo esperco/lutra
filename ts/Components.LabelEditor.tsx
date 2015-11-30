@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/EventLabels.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Layout.tsx" />
 /// <reference path="./Components.Section.tsx" />
 /// <reference path="./Components.LabelAdd.tsx" />
 
@@ -27,14 +28,9 @@ module Esper.Components {
     toggleMinimized?: () => void;
   }
 
-  interface LabelEditorState {
-    events: ApiT.CalendarEvent[];
-  }
-
-  export class LabelEditor
-    extends Component<LabelEditorProps, LabelEditorState>
+  export class LabelEditor extends Component<LabelEditorProps, {}>
   {
-    render() {
+    renderWithData() {
       if (!this.props.events || !this.props.events.length) {
         return <span />;
       }
@@ -44,44 +40,41 @@ module Esper.Components {
         this.props.events.length + " Events Selected"
       );
 
+      var events = _.map(this.props.events,
+        (e) => Events.EventStore.val(e.id)
+      );
+
       return <BorderlessSection icon="fa-tags" title="Select Labels"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
          <h5 className="esper-subheader">{heading}</h5>
-         { this.renderContent() }
+         { this.renderContent(events) }
       </BorderlessSection>;
     }
 
-    renderContent() {
+    renderContent(events: ApiT.GenericCalendarEvent[]) {
       return <EventLabels.LabelList
         listClasses="list-group"
         itemClasses="list-group-item"
         team={Teams.get(this.props.teamId)}
-        events={this.state.events}
+        events={events}
         callback={this.toggleLabelCallback.bind(this)}
         callbackAll={this.analyticsCallback.bind(this)}
         editLabelsFn={this.editLabelsCallback.bind(this)}
       />;
     }
 
-    componentDidMount() {
-      this.setSources([
-        Events.EventStore,
-        Teams.teamStore
-      ]);
-    }
-
     // Callback on toggle to update store
-    toggleLabelCallback(event: ApiT.CalendarEvent, labels: string[],
+    toggleLabelCallback(event: ApiT.GenericCalendarEvent, labels: string[],
       promise: JQueryPromise<any>)
     {
-      var _id = Calendars.getEventId(event);
+      var _id = Events.storeId(this.props.teamId, event);
       var newData = _.clone(event);
       newData.labels = labels;
       Events.EventStore.push(_id, promise, newData);
     }
 
-    analyticsCallback(events: ApiT.CalendarEvent[]) {
+    analyticsCallback(events: ApiT.GenericCalendarEvent[]) {
       Analytics.track(Analytics.Trackable.EditTimeEsperEventLabels, {
         eventsSelected: events.length
       });
@@ -89,15 +82,6 @@ module Esper.Components {
 
     editLabelsCallback() {
       Layout.renderModal(<LabelAddModal />)
-    }
-
-    getState(props: LabelEditorProps): LabelEditorState {
-      // Translate ids to actual event objects
-      return {
-        events: _.map(props.events,
-          (e) => Events.EventStore.val(e.id)
-        )
-      };
     }
   }
 }

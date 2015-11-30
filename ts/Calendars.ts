@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../marten/ts/Model.Capped.ts" />
 /// <reference path="../marten/ts/Queue.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
@@ -17,30 +18,18 @@ module Esper.Calendars {
     }[];
   }
 
+  // Store currently selected calendar
   export var selectStore = new Model.StoreOne<CalSelection>();
 
+  // Store list of calendars by teamId
+  export var calendarListStore =
+    new Model.CappedStore<ApiT.GenericCalendar[]>();
+
   export function get(teamId: string, calId: string) {
-    var team = Teams.get(teamId);
-    if (team) {
-      return _.find(team.team_calendars, (cal) => getId(cal) === calId);
+    var list = calendarListStore.val(teamId);
+    if (list) {
+      return _.find(list, (cal) => cal.id === calId);
     }
-  }
-
-  /*
-    Extract ID for calendar -- refactored into function because this may
-    change -- i.e. when we bring in Nylas integration, need to use key other
-    than google_cal_id.
-  */
-  export function getId(calOrEvent: ApiT.Calendar|ApiT.CalendarEvent) {
-    return calOrEvent.google_cal_id;
-  }
-
-  /*
-    Same as above, but for events. Include calendar id because no guarantee
-    event id isn't reused across different calendars
-  */
-  export function getEventId(event: ApiT.CalendarEvent) {
-    return getId(event) + "|" + event.google_event_id;
   }
 
   // Returns a default team and calendar selection
@@ -74,8 +63,18 @@ module Esper.Calendars {
     if (retTeam && retCal) {
       return {
         teamId: retTeam.teamid,
-        calId: getId(retCal)
+        calId: retCal.google_cal_id
       };
+    } else {
+      var calLists = calendarListStore.getAll();
+      if (calLists && calLists[0]) {
+        var cal = calLists[0][0][0];
+        var meta = calLists[0][1];
+        return {
+          teamId: meta._id,
+          calId: cal.id
+        };
+      }
     }
   }
 
@@ -85,6 +84,39 @@ module Esper.Calendars {
     }
   }
 
+  /*
+    Code for converting legacy non-generic Google calendar-specific to
+    generic calendar interface
+  */
+  export type Calendar = ApiT.Calendar|ApiT.GenericCalendar;
+  export function asGeneric(c: Calendar): ApiT.GenericCalendar {
+    var asCal = <ApiT.Calendar> c;
+    var asGen = <ApiT.GenericCalendar> c;
+
+    // Is Google, convert
+    if (asCal.google_cal_id) {
+      return {
+        id: asCal.google_cal_id,
+        title: asCal.calendar_title
+
+        /*
+          We can also return an optional "access_role" parameter, but since
+          time stats doesn't care about this right now, leave out
+        */
+        // access_role: ""
+      };
+    }
+
+    else {
+      return asGen;
+    }
+  }
+
+
+  /*
+    Code for adding and removing calendars for Google-based teams (currently
+    not an option for Nylas teams)
+  */
   export function addTeamCalendar(_id: string, cal: ApiT.Calendar) {
     var team = Teams.get(_id);
     if (team) {
@@ -104,14 +136,14 @@ module Esper.Calendars {
     if (team) {
       var teamCopy = _.cloneDeep(team); // Store values immutable so clone
       _.remove(teamCopy.team_calendars,
-        (c) => Calendars.getId(c) === getId(cal)
+        (c) => asGeneric(c).id === asGeneric(cal).id
       );
 
       // Check if we're deselecting current calendar
       var currentSelection = selectStore.val();
       if (currentSelection &&
           currentSelection.teamId === _id &&
-          currentSelection.calId === getId(cal))
+          currentSelection.calId === asGeneric(cal).id)
       {
         selectStore.unset();
       }
@@ -137,7 +169,7 @@ module Esper.Calendars {
         Analytics.track(Analytics.Trackable.SetTimeStatsCalendars, {
           numCalendars: calendars.length,
           teamId: teamId,
-          calendarIds: _.map(calendars, (c) => getId(c))
+          calendarIds: _.map(calendars, (c) => asGeneric(c).id)
         });
         if (teamId) {
           return Api.putTeamCalendars(_id, calendars);
@@ -153,10 +185,40 @@ module Esper.Calendars {
     });
 
     Teams.teamStore.pushFetch(_id, p, team);
+    calendarListStore.push(_id, p, _.map(team.team_calendars, asGeneric));
   }
 
   // Track pending calendar updates for team
   var nextUpdates: {
     [index: string]: ApiT.Team
   } = {};
+
+
+  /*
+    Initialize calendar list from Api.getGenericCalendarList for Nylas,
+    else use team cals passed with team
+  */
+
+  export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
+    if (loginResponse.platform === "Nylas") {
+      _.each(loginResponse.teams, function(t) {
+        var p = Api.getGenericCalendarList(t.teamid)
+          .then(function(cals) {
+            return cals.calendars;
+          });
+        calendarListStore.fetch(t.teamid, p);
+      });
+    }
+
+    else {
+      _.each(loginResponse.teams, function(t) {
+        var genCals = _.map(t.team_calendars, asGeneric) || [];
+        calendarListStore.upsert(t.teamid, genCals);
+      });
+    }
+  }
+
+  export function init() {
+    Login.loginPromise.done(loadFromLoginInfo);
+  }
 }

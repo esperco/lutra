@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/Util.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Calendars.ts" />
 
 module Esper.Teams {
   export var teamStore = new Model.CappedStore<ApiT.Team>();
@@ -98,6 +99,7 @@ module Esper.Teams {
     return Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         teamStore.alias(_id, t.teamid);
+        Calendars.calendarListStore.alias(_id, t.teamid);
       }
       return t;
     });

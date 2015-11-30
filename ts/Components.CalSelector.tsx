@@ -23,22 +23,19 @@ module Esper.Components {
     toggleMinimized?: () => void;
   }
 
-  interface CalSelectorState {
-    teams: ApiT.Team[]; // Includes calendars
-  }
-
-  export class CalSelector extends
-    Component<CalSelectorProps, CalSelectorState>
+  export class CalSelector extends Component<CalSelectorProps, {}>
   {
-    render() {
-      var hasCalendars = !!_.find(this.state.teams,
-        (t) => t.team_calendars && t.team_calendars.length
-      );
+    renderWithData() {
+      var teams = Teams.all();
+      var hasCalendars = !!_.find(teams, (t) => {
+        var calList = Calendars.calendarListStore.val(t.teamid);
+        return calList && calList.length;
+      });
       return <BorderlessSection icon="fa-calendar" title="Select Calendar"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
         { hasCalendars ?
-          this.renderTeams(this.state.teams) :
+          this.renderTeams(teams) :
           <div className="esper-no-content">No Calendars Available</div>
         }
         <div className="esper-subsection-footer">
@@ -55,9 +52,13 @@ module Esper.Components {
     }
 
     renderTeams(teams: ApiT.Team[]) {
-      return _.map(teams, (team) =>
-        team.team_calendars && team.team_calendars.length ?
-        <div key={team.teamid}>
+      return _.map(teams, (team) => {
+        var calList = Calendars.calendarListStore.val(team.teamid);
+        if (! (calList && calList.length)) {
+          return <span key={team.teamid} />;
+        }
+
+        return <div key={team.teamid}>
           {
             teams.length > 1 ?
             <h5 className="esper-subheader">{team.team_name}</h5> :
@@ -66,18 +67,17 @@ module Esper.Components {
           <div className="list-group">
             {
               Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
-              this.renderCalendars(team.teamid, team.team_calendars) :
+              this.renderCalendars(team.teamid, calList) :
               <div className="esper-spinner" />
             }
           </div>
-        </div> : ""
-      );
+        </div>;
+      });
     }
 
-    renderCalendars(teamId: string, calendars: ApiT.Calendar[]) {
+    renderCalendars(teamId: string, calendars: ApiT.GenericCalendar[]) {
       return _.map(calendars, (calendar) => {
-        var calId = Calendars.getId(calendar);
-
+        var calId = calendar.id;
         var classes = ["list-group-item", "one-line"];
         if (this.props.selectedCalId === calId &&
             this.props.selectedTeamId === teamId) {
@@ -88,19 +88,9 @@ module Esper.Components {
           <a key={teamId + " " + calId} className={classes.join(" ")}
              onClick={() => this.props.updateFn(teamId, calId)}>
             <i className="fa fa-fw fa-calendar-o"></i>
-            {" " + calendar.calendar_title}
+            {" " + calendar.title}
           </a>);
       });
-    }
-
-    componentDidMount() {
-      this.setSources([Teams.teamStore, Teams.allTeamsStore]);
-    }
-
-    getState() {
-      return {
-        teams: Teams.all()
-      };
     }
   }
 }
