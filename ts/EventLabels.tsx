@@ -17,19 +17,19 @@ module Esper.EventLabels {
     team: ApiT.Team;
 
     // Actual event objects
-    events: ApiT.CalendarEvent[];
+    events: ApiT.GenericCalendarEvent[];
 
     // Optional function to generate keys for queue from event
-    queueIdFn?: (ev: ApiT.CalendarEvent) => string;
+    queueIdFn?: (teamId: string, ev: ApiT.GenericCalendarEvent) => string;
 
     // Optional callback triggered when labels are toggled -- called once
     // for each event
-    callback?: (event: ApiT.CalendarEvent, labels: string[],
+    callback?: (event: ApiT.GenericCalendarEvent, labels: string[],
                 promise: JQueryPromise<void>) => void;
 
     // Optional callback called once for each edit (even if edit is for
     // multiple events)
-    callbackAll?: (events: ApiT.CalendarEvent[]) => void;
+    callbackAll?: (events: ApiT.GenericCalendarEvent[]) => void;
 
     // Classes
     listClasses?: string;
@@ -45,7 +45,7 @@ module Esper.EventLabels {
   }
 
   export class LabelList extends Component<LabelListProps, LabelListState> {
-    queueIdFn: (ev: ApiT.CalendarEvent) => string;
+    queueIdFn: (teamId: string, ev: ApiT.GenericCalendarEvent) => string;
 
     constructor(props: LabelListProps) {
       super(props);
@@ -170,7 +170,7 @@ module Esper.EventLabels {
       });
 
       // A list of events with newLabels (for callback)
-      var newEvents: ApiT.CalendarEvent[] = [];
+      var newEvents: ApiT.GenericCalendarEvent[] = [];
 
       var promises: JQueryPromise<void>[] = [];
       _.each(this.props.events, (ev) => {
@@ -206,8 +206,9 @@ module Esper.EventLabels {
       }
     }
 
-    protected scheduleUpdate(event: ApiT.CalendarEvent, labels: string[]) {
-      var _id = this.queueIdFn(event);
+    protected scheduleUpdate(event: ApiT.GenericCalendarEvent,
+                             labels: string[]) {
+      var _id = this.queueIdFn(this.props.team.teamid, event);
       nextUpdates[_id] = labels;
 
       // Enqueue update that only fires API call if the nextUpdates object
@@ -215,9 +216,8 @@ module Esper.EventLabels {
       var p = Queue.enqueue(_id, () => {
         var edit = nextUpdates[_id];
         if (edit) {
-          var eventId = event.google_event_id;
           delete nextUpdates[_id];
-          return Api.updateEventLabels(this.props.team.teamid, eventId, edit);
+          return Api.updateEventLabels(this.props.team.teamid, event.id, edit);
         }
       });
 
@@ -235,12 +235,12 @@ module Esper.EventLabels {
       of our events and wait to post unti lafter things stop changing.
     */
     private _lastEventIds: string[];
-    private _lastEvents: ApiT.CalendarEvent[];
+    private _lastEvents: ApiT.GenericCalendarEvent[];
 
-    protected onChangeAll(events: ApiT.CalendarEvent[]) {
-      var eventIds = _.map(events,
-        (ev) => ev.google_cal_id + "|" + ev.google_event_id
-      );
+    protected onChangeAll(events: ApiT.GenericCalendarEvent[]) {
+      var eventIds = _.map(events, (ev) => ev.id) || [];
+      eventIds.push(this.props.team.teamid);
+
       if (this._lastEventIds && !_.eq(eventIds, this._lastEventIds)) {
         this.props.callbackAll(this._lastEvents);
       }
@@ -260,9 +260,8 @@ module Esper.EventLabels {
   ///////
 
   // Default function for converting CalendarEvents to string ids
-  var defaultIdFn = function(event: ApiT.CalendarEvent) {
-    return "EventLabelCalendarEvent|" + event.google_cal_id +
-      "|" + event.google_event_id;
+  var defaultIdFn = function(teamId: string, event: ApiT.GenericCalendarEvent) {
+    return "EventLabelCalendarEvent|" + teamId + "|" + event.id;
   };
 
   // Used to track the next pending label update for an id in a queue
