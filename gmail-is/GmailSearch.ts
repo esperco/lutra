@@ -284,7 +284,7 @@ module Esper.GmailSearch {
 
   export function viewOfSearchModal(team, threadId,
                                   eventsTab: TaskTab.TaskTabView,
-                                  userTabContents) {
+                                  peopleTabContents) {
 '''
 <div #view class="esper-modal-bg">
   <div #modal class="esper-search-modal esper-modal-flexbox">
@@ -373,8 +373,8 @@ module Esper.GmailSearch {
                 });
 
                 eventsTab.taskTitle.val(currentTask.task_title);
-                TaskTab.selectMeetingTypeOnUserTab(currentTask.task_meeting_type,
-                                                    userTabContents);
+                TaskTab.selectMeetingTypeOnPeopleTab(currentTask.task_meeting_type,
+                                                    peopleTabContents);
                 Analytics.track(Analytics.Trackable.LinkTaskTabToExistingTask);
               });
           });
