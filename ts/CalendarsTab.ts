@@ -14,9 +14,14 @@ module Esper.CalendarsTab {
   <td><input #agendaBox type="checkbox" class="esper-cal-agenda"></td>
   <td><input #dupeBox type="checkbox" class="esper-cal-dupe"></td>
   <td #calName class="esper-cal-name"/>
-  <td><a #csvButton href="#">
-    <i class="fa fa-fw fa-cloud-download"></i> Export to CSV
-  </a></td>
+  <td>
+    <!-- hidden parameter specifying how many days ago
+         the stats should start. -->
+    <input #statsDays type="text" class="hide" value="31"/>
+    <a #csvButton href="#">
+      <i class="fa fa-fw fa-cloud-download"></i> Export to CSV
+    </a>
+  </td>
 </tr>
 '''
     calName.text(cal.calendar_title);
@@ -33,7 +38,8 @@ module Esper.CalendarsTab {
 
       csvButton.click(function() {
         var now = new Date();
-        var start = new Date(now.getTime() - 31*86400000);
+        var days = parseInt(statsDays.val());
+        var start = new Date(now.getTime() - days*86400000);
         var q = {
           window_start: XDate.toString(start),
           window_end:   XDate.toString(now)
