@@ -9,12 +9,20 @@
 /// <reference path="./Calendars.ts" />
 
 module Esper.Events {
-  export var EventStore = new Model.CappedStore<ApiT.GenericCalendarEvent>(200)
+  export interface TeamEvent extends ApiT.GenericCalendarEvent {
+    teamId: string;
+  }
+
+  export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent) {
+    return _.extend({teamId: teamId}, e) as TeamEvent;
+  }
+
+  export var EventStore = new Model.CappedStore<TeamEvent>(200)
   export var EventListStore = new Model.BatchStore(EventStore, 20);
 
   // Link stored events to teams to avoid mixing label data
-  export function storeId(teamId: string, event: ApiT.GenericCalendarEvent) {
-    return teamId + "|" + event.id;
+  export function storeId(event: TeamEvent) {
+    return event.teamId + "|" + event.id;
   }
 
   function keyForRequest(teamId: string, calId: string, start: Date, end: Date)
@@ -36,7 +44,10 @@ module Esper.Events {
         window_start: XDate.toString(start),
         window_end: XDate.toString(end)
       }).then((calEventList) =>
-        _.map(calEventList.events, (e) => [storeId(teamId, e), e])
+        _.map(calEventList.events, (e) => {
+          var te = asTeamEvent(teamId, e);
+          return [storeId(te), te];
+        })
       );
       EventListStore.batchFetch(key, p);
       return p.then(() => {

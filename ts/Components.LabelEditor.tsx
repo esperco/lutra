@@ -44,6 +44,10 @@ module Esper.Components {
         (e) => Events.EventStore.val(e.id)
       );
 
+      if (_.find(events, (e) => !!e.recurring_event_id)) {
+        heading += " + Recurring"
+      }
+
       return <BorderlessSection icon="fa-tags" title="Select Labels"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
@@ -68,10 +72,22 @@ module Esper.Components {
     toggleLabelCallback(event: ApiT.GenericCalendarEvent, labels: string[],
       promise: JQueryPromise<any>)
     {
-      var _id = Events.storeId(this.props.teamId, event);
-      var newData = _.clone(event);
-      newData.labels = labels;
-      Events.EventStore.push(_id, promise, newData);
+      var teamEvent = Events.asTeamEvent(this.props.teamId, event);
+
+      var events = [teamEvent];
+      if (event.recurring_event_id) {
+        events = Events.EventStore.valAll();
+        events = events.filter(
+          (e) => e.recurring_event_id === event.recurring_event_id
+        );
+      }
+
+      _.each(events, (e) => {
+        var _id = Events.storeId(e);
+        var newData = _.clone(e);
+        newData.labels = labels;
+        Events.EventStore.push(_id, promise, newData);
+      });
     }
 
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {

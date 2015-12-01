@@ -165,11 +165,27 @@ module Esper.Components {
       );
       events = _.filter(events);
 
+      // For inferring which events are "selected" by virtue of being a
+      // recurring event
+      var selectedEvents = _.map(this.props.eventIds,
+        (_id) => Events.EventStore.val(_id)
+      ) || [];
+      var recurringEventIds = _.map(selectedEvents,
+        (e) => e.recurring_event_id
+      );
+      recurringEventIds = _.uniq(_.filter(recurringEventIds));
+
       callback(_.map(events, (event): FullCalendar.EventObject => {
-        var eventId = Events.storeId(this.props.teamId, event);
+        var eventId = Events.storeId(event);
         var classNames: string[] = ["selectable"];
         if (_.contains(this.props.eventIds || [], eventId)) {
           classNames.push("active");
+        }
+        if (_.contains(recurringEventIds, event.recurring_event_id)) {
+          classNames.push("recurring-active");
+        }
+        if (event.recurring_event_id) {
+          classNames.push("recurring");
         }
         if (event.labels && event.labels.length) {
           classNames.push("labeled");
