@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/EventLabels.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./TimeStats.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Components.Section.tsx" />
 /// <reference path="./Components.LabelAdd.tsx" />
@@ -92,6 +93,8 @@ module Esper.Components {
           });
         });
       });
+
+      TimeStats.intervalQuery.invalidate();
     }
 
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {
