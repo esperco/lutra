@@ -70,8 +70,61 @@ module Esper.Model {
       super.removeChangeListener(callback);
     }
 
+    private emittedIds: string[];
+    private inTransaction: boolean;
+
     protected emitChange(_ids?: string[]): void {
-      super.emitChange(_ids);
+      if (this.inTransaction) {
+        if (_ids) {
+          this.emittedIds = (this.emittedIds || []).concat(_ids);
+        }
+      } else {
+        super.emitChange(_ids);
+      }
+    }
+
+    /*
+      Calls function within a "transaction" inspired by database transactions.
+
+      When using transact, StoreBase waits until the passed function completes
+      until calling change listeners and only calls those listeners once
+      per transaction.
+
+      Nested transactions are subsumed into parent transactions -- i.e. calling
+      a transaction within a transaction is equivalent to calling the single
+      parent transaction by itself.
+    */
+    transact(fn: () => void) {
+      var topLevel = !this.inTransaction;
+      this.inTransaction = true;
+      fn();
+      if (topLevel) {
+        this.inTransaction = false;
+        this.emitChange(this.emittedIds);
+        this.emittedIds = [];
+      }
+    }
+
+    /*
+      Takes a promise and calls a function with a wrapped copy of that promise
+      which runs the promise's callback functions within a transaction
+    */
+    transactP<T>(p: JQueryPromise<T>, fn: (p: JQueryPromise<T>) => void) {
+      var topLevel: boolean;
+      p.always(() => {
+        topLevel = !this.inTransaction;
+        this.inTransaction = true;
+      });
+
+      fn(p);
+
+      p.always(() => {
+        if (topLevel) {
+          this.inTransaction = false;
+          this.emitChange(this.emittedIds);
+          this.emittedIds = [];
+        }
+      });
     }
 
     isTuple(arg: TData|[TData, StoreMetadata]): arg is [TData, StoreMetadata]

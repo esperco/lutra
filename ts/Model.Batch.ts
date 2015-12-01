@@ -19,18 +19,22 @@ module Esper.Model {
     {
       var keys: string[] = [];
 
-      _.each(values, (tuple) => {
-        var _id = tuple[0];
-        var data = tuple[1];
-        this.itemStore.upsert(_id, data);
-        keys.push(_id);
-      });
+      this.transact(() => {
+        this.itemStore.transact(() => {
+          _.each(values, (tuple) => {
+            var _id = tuple[0];
+            var data = tuple[1];
+            this.itemStore.upsert(_id, data);
+            keys.push(_id);
+          });
 
-      if (metadata) {
-        this.upsert(_id, keys, metadata);
-      } else {
-        this.upsert(_id, keys);
-      }
+          if (metadata) {
+            this.upsert(_id, keys, metadata);
+          } else {
+            this.upsert(_id, keys);
+          }
+        });
+      });
     }
 
     /* Check if values have been set for all references in a batch */
@@ -61,9 +65,11 @@ module Esper.Model {
       // Update items stores too. Use the itemStore's fetch rather than
       // upsert directly so we can take advantage of dataStatus handling code
       promise.done((pairList) => {
-        _.each(pairList, (pair) => {
-          this.itemStore.fetch(pair[0],
-            $.Deferred().resolve(pair[1]).promise());
+        this.itemStore.transact(() => {
+          _.each(pairList, (pair) => {
+            this.itemStore.fetch(pair[0],
+              $.Deferred().resolve(pair[1]).promise());
+          });
         });
       });
     }
