@@ -80,7 +80,7 @@ module Esper.Components {
         <div className="well">
           Click on events in the calendar and then add labels via the sidebar.
           You can see stats on what's been labeled by clicking
-          'Labels Over Time' in the upper right. Newly added labels may take
+          'Charts' in the upper left. Newly added labels may take
           some time to show up.
         </div>
         <a href="img/TimeStats.gif" target="_blank">
