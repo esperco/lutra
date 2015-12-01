@@ -5,7 +5,7 @@
 // Override variables
 @import "./_bootstrap_variables";
 
-// Addition classes
+// Addition button classes
 .btn-secondary {
   color: @brand-text;
   background: @gray-lighter;
@@ -125,10 +125,6 @@ a {
   color: rgba(0, 0, 0, 0.8);
 }
 
-.navbar-nav > li > a > i {
-  line-height: @line-height-computed;
-}
-
 .navbar-default .btn-default.navbar-btn {
   border-color: @navbar-default-border;
   color: @navbar-default-border;
@@ -137,6 +133,18 @@ a {
     background: @navbar-default-border;
     color: white;
   }
+}
+
+
+/* FontAwesome Tweaks */
+
+.navbar-nav > li > a > .fa,
+.btn .fa {
+  line-height: @line-height-computed;
+}
+
+.fa.bs-height {
+  line-height: @line-height-computed;
 }
 
 
