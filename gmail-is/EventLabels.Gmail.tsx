@@ -21,7 +21,21 @@ module Esper.EventLabels {
   export class LabelListControl extends Component<{}, LabelListControlState>
   {
     render() {
-      var events = this.state.events;
+      var events = _.map(this.state.events, (ev): ApiT.GenericCalendarEvent => {
+        return ev && {
+          id: ev.google_event_id,
+          calendar_id: ev.google_cal_id,
+          title: ev.title,
+          start: ev.start.local,
+          end: ev.end.local,
+          description_messageids: ev.description_messageids,
+          labels: ev.labels,
+          all_day: ev.all_day,
+          guests: ev.guests,
+          transparent: ev.transparent
+        };
+      });
+
       if (events && events.length > 0) {
         return <EventLabels.LabelList
           listClasses="list-group compact"
@@ -46,13 +60,13 @@ module Esper.EventLabels {
       };
     }
 
-    toggleLabelCallback(event: ApiT.CalendarEvent, labels: string[],
+    toggleLabelCallback(event: ApiT.GenericCalendarEvent, labels: string[],
       promise: JQueryPromise<any>)
     {
       var linkedEvents = CurrentThread.linkedEvents.get();
       var linkedEv = _.find(linkedEvents, (ev) =>
-        ev.task_event.google_cal_id === event.google_cal_id &&
-        ev.task_event.google_event_id === event.google_event_id
+        ev.task_event.google_cal_id === event.calendar_id &&
+        ev.task_event.google_event_id === event.id
       );
       linkedEv.task_event.labels = labels;
 
@@ -60,7 +74,7 @@ module Esper.EventLabels {
       CurrentThread.linkedEvents.set(linkedEvents);
     }
 
-    analyticsCallback(events: ApiT.CalendarEvent[]) {
+    analyticsCallback(events: ApiT.GenericCalendarEvent[]) {
       Analytics.track(Analytics.Trackable.EditGmailEventLabels, {
         eventsSelected: events.length
       });

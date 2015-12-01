@@ -48,8 +48,10 @@ module Esper.CurrentEvent {
 
   // Get key for eventStore (task is just taskId)
   export function getEventKey(calId: string, eventId: string): string;
-  export function getEventKey(evt: ApiT.CalendarEvent|Types.FullEventId);
-  export function getEventKey(first: any, second?: any) {
+  export function getEventKey(
+    evt: ApiT.CalendarEvent|ApiT.GenericCalendarEvent|Types.FullEventId
+  ): string;
+  export function getEventKey(first: any, second?: any): string {
     var calId: string;
     var eventId: string;
     if (second) {
@@ -59,11 +61,15 @@ module Esper.CurrentEvent {
 
     else {
       var calEvent = <ApiT.CalendarEvent> first;
+      var genEvent = <ApiT.GenericCalendarEvent> first;
+      var fullEvent = <Types.FullEventId> first;
       if (calEvent.google_cal_id) {
         calId = calEvent.google_cal_id;
         eventId = calEvent.google_event_id;
+      } else if (genEvent.calendar_id) {
+        calId = genEvent.calendar_id;
+        eventId = genEvent.id;
       } else {
-        var fullEvent = <Types.FullEventId> first;
         calId = fullEvent.calendarId;
         eventId = fullEvent.eventId;
       }
