@@ -82,11 +82,15 @@ module Esper.Components {
         );
       }
 
-      _.each(events, (e) => {
-        var _id = Events.storeId(e);
-        var newData = _.clone(e);
-        newData.labels = labels;
-        Events.EventStore.push(_id, promise, newData);
+      Events.EventStore.transact(() => {
+        Events.EventStore.transactP(promise, (transactPromise) => {
+          _.each(events, (e) => {
+            var _id = Events.storeId(e);
+            var newData = _.clone(e);
+            newData.labels = labels;
+            Events.EventStore.push(_id, transactPromise, newData);
+          });
+        });
       });
     }
 
