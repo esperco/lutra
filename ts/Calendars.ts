@@ -195,27 +195,13 @@ module Esper.Calendars {
 
 
   /*
-    Initialize calendar list from Api.getGenericCalendarList for Nylas,
-    else use team cals passed with team
+    Initialize calendar list from team data
   */
-
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    if (loginResponse.platform === "Nylas") {
-      _.each(loginResponse.teams, function(t) {
-        var p = Api.getGenericCalendarList(t.teamid)
-          .then(function(cals) {
-            return cals.calendars;
-          });
-        calendarListStore.fetch(t.teamid, p);
-      });
-    }
-
-    else {
-      _.each(loginResponse.teams, function(t) {
-        var genCals = _.map(t.team_calendars, asGeneric) || [];
-        calendarListStore.upsert(t.teamid, genCals);
-      });
-    }
+    _.each(loginResponse.teams, function(t) {
+      var genCals = _.map(t.team_calendars, asGeneric) || [];
+      calendarListStore.upsert(t.teamid, genCals);
+    });
   }
 
   export function init() {
