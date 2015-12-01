@@ -9,8 +9,13 @@
 /// <reference path="./Calendars.ts" />
 
 module Esper.Events {
-  export var EventStore = new Model.CappedStore<ApiT.CalendarEvent>(200)
+  export var EventStore = new Model.CappedStore<ApiT.GenericCalendarEvent>(200)
   export var EventListStore = new Model.BatchStore(EventStore, 20);
+
+  // Link stored events to teams to avoid mixing label data
+  export function storeId(teamId: string, event: ApiT.GenericCalendarEvent) {
+    return teamId + "|" + event.id;
+  }
 
   function keyForRequest(teamId: string, calId: string, start: Date, end: Date)
   {
@@ -22,16 +27,16 @@ module Esper.Events {
   }
 
   export function fetch(teamId: string, calId: string, start: Date, end: Date,
-    forceRefresh=false): JQueryPromise<ApiT.CalendarEvent[]>
+    forceRefresh=false): JQueryPromise<ApiT.GenericCalendarEvent[]>
   {
     var key = keyForRequest(teamId, calId, start, end);
     if (forceRefresh || !EventListStore.has(key) ||
         EventListStore.metadata(key).dataStatus !== Model.DataStatus.READY) {
-      var p = Api.postCalendar(teamId, calId, {
+      var p = Api.postForGenericCalendarEvents(teamId, calId, {
         window_start: XDate.toString(start),
         window_end: XDate.toString(end)
       }).then((calEventList) =>
-        _.map(calEventList.events, (e) => [Calendars.getEventId(e), e])
+        _.map(calEventList.events, (e) => [storeId(teamId, e), e])
       );
       EventListStore.batchFetch(key, p);
       return p.then(() => {

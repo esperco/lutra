@@ -18,6 +18,7 @@ module Esper.Main {
   export function init() {
     Login.init();
     Teams.init();
+    Calendars.init();
     Route.init();
 
     if (! TESTING) {

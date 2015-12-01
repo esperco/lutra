@@ -67,39 +67,36 @@ module Esper.Components {
     }
 
     renderCalendar(cal: ApiT.Calendar) {
-      var isSelected = false;
-      var team = Teams.get(this.state.selectedTeamId);
-      if (team) {
-        isSelected = !!_.find(team.team_calendars,
-          (c) => Calendars.getId(c) === Calendars.getId(cal)
+      var genCal = Calendars.asGeneric(cal);
+      var calList = Calendars.calendarListStore.val(this.state.selectedTeamId);
+      var isSelected = calList &&
+        !!_.find(calList,
+          (c) => c.id === genCal.id
         );
-      }
 
-      return <a key={Calendars.getId(cal)}
+      return <a key={genCal.id}
                 onClick={() => this.selectCalendar(cal)}
                 className={"list-group-item" + (isSelected ?
                            " list-group-item-success" : "")}>
         <i className={"fa fa-fw " + (isSelected ?
                       "fa-calendar-check-o" : "fa-calendar-o")} />{" "}
-        {cal.calendar_title}
+        {genCal.title}
       </a>;
     }
 
     selectCalendar(cal: ApiT.Calendar) {
-      var team = Teams.get(this.state.selectedTeamId);
-      var isSelected = false;
-      var _id: string;
-
-      if (team) {
-        _id = team.teamid;
-        isSelected = !!_.find(team.team_calendars,
-          (c) => Calendars.getId(c) === Calendars.getId(cal)
-        );
-      } else {
+      var _id = this.state && this.state.selectedTeamId;
+      if (! _id) {
         _id = Teams.createDefaultTeam();
         this.setState({selectedTeamId: _id});
-        team = Teams.get(_id);
       }
+
+      var genCal = Calendars.asGeneric(cal);
+      var calList = Calendars.calendarListStore.val(this.state.selectedTeamId);
+      var isSelected = calList &&
+        !!_.find(calList,
+          (c) => c.id === genCal.id
+        );
 
       if (isSelected) {
         Calendars.removeTeamCalendar(_id, cal);

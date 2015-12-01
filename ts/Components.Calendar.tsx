@@ -166,7 +166,7 @@ module Esper.Components {
       events = _.filter(events);
 
       callback(_.map(events, (event): FullCalendar.EventObject => {
-        var eventId = Calendars.getEventId(event);
+        var eventId = Events.storeId(this.props.teamId, event);
         var classNames: string[] = ["selectable"];
         if (_.contains(this.props.eventIds || [], eventId)) {
           classNames.push("active");
@@ -178,20 +178,21 @@ module Esper.Components {
           id: eventId,
           title: event.title || "",
           allDay: event.all_day,
-          start: this.adjustTz(event.start.local),
-          end: this.adjustTz(event.end.local),
+          start: this.adjustTz(event.start, event.timezone),
+          end: this.adjustTz(event.end, event.timezone),
           editable: false,
           className: classNames.join(" ")
         };
       }));
     }
 
-    // Adjust a timetamp based on the currently selected calendar's timezone
-    // NB: We use the "local" value because the UTC value incorrectly handles
-    // things like Timezones
-    adjustTz(timestamp: string) {
-      var calendar = Calendars.get(this.props.teamId, this.props.calId);
-      return moment.tz(timestamp, calendar.calendar_timezone).toDate()
+    // Adjust a timetamp based on the currently selected event'ss timezone
+    adjustTz(timestamp: string, timezone?: string) {
+      if (timezone) {
+        return moment.tz(timestamp, timezone).toDate()
+      } else {
+        return moment(timestamp).toDate();
+      }
     }
 
     // Handle event selection, toggle
