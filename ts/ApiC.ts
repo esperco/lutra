@@ -72,7 +72,18 @@ module Esper.ApiC {
   {
     opts = opts || {};
     var store: Model.CappedStore<T> = opts.store || defaultStore;
-    var strFunc = opts.strFunc || Util.cmpStringify;
+    var strFunc = opts.strFunc;
+    if (! strFunc) {
+      /*
+        Create a unique identifier for this makeC call -- this will get
+        prepended to the argument list for the strFunc to avoid collisions
+        between API calls using the same store
+      */
+      var prefix = Util.randomString();
+      strFunc = function(a: any[]) {
+        return Util.cmpStringify([prefix].concat(a));
+      }
+    }
 
     // Generic map of keys to promises scoped outside function
     var promises: {[index: string]: JQueryPromise<T>} = {};
@@ -130,9 +141,7 @@ module Esper.ApiC {
 
   export var getCalendarList = makeC
     <typeof Api.getCalendarList, ApiT.Calendars>
-    (Api.getCalendarList, {
-      strFunc: (args: any[]) => ["calendar-list"].concat(args).join(" ")
-    });
+    (Api.getCalendarList);
 
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>

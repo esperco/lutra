@@ -179,5 +179,23 @@ module Esper.ApiC {
         expect((<jasmine.Spy> ApiTest.testFn).calls.count()).toEqual(2);
       });
     });
+
+    describe("multiple times with shared store", function() {
+      beforeEach(function() {
+        this.cFn2 = makeC(ApiTest.testFn, {
+          timeout: this.timeout,
+          store: this.cFn.store
+        });
+      });
+
+      it("should store identical API calls for different functions under " +
+         "different keys by default", function()
+      {
+        expect(this.cFn("a", {sub1: "b", sub2: 2})).toBe(this.promise);
+        expect(this.cFn2("a", {sub1: "b", sub2: 2})).toBe(this.promise);
+        expect((<jasmine.Spy> ApiTest.testFn).calls.count()).toEqual(2);
+        expect(this.cFn.store.getAll().length).toEqual(2);
+      });
+    });
   });
 }
