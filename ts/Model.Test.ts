@@ -771,5 +771,54 @@ module Esper.Model {
         }]);
       });
     });
+
+
+    ///////
+
+    describe("transact", function() {
+      beforeEach(function() {
+        reset();
+        listener = jasmine.createSpy("listener");
+        myRabbitStore.addChangeListener(listener);
+      });
+
+      it("should call listener only once per update", function() {
+        myRabbitStore.transact(function() {
+          myRabbitStore.insert("brown", {
+            uid: "brown",
+            carrots: 123
+          });
+
+          myRabbitStore.insert("black", {
+            uid: "black",
+            carrots: 123
+          });
+        });
+
+        expect(listener).toHaveBeenCalledWith(["brown", "black"]);
+        expect(listener.calls.count()).toEqual(1);
+      });
+
+      it("should call listener only once per update even when nested",
+        function()
+      {
+        myRabbitStore.transact(function() {
+          myRabbitStore.insert("brown", {
+            uid: "brown",
+            carrots: 123
+          });
+
+          myRabbitStore.transact(function() {
+            myRabbitStore.insert("black", {
+              uid: "black",
+              carrots: 123
+            });
+          });
+        });
+
+        expect(listener).toHaveBeenCalledWith(["brown", "black"]);
+        expect(listener.calls.count()).toEqual(1);
+      });
+    });
   });
 }
