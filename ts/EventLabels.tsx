@@ -217,7 +217,8 @@ module Esper.EventLabels {
         var edit = nextUpdates[_id];
         if (edit) {
           delete nextUpdates[_id];
-          return Api.updateEventLabels(this.props.team.teamid, event.id, edit);
+          var eventId = event.recurring_event_id || event.id;
+          return Api.updateEventLabels(this.props.team.teamid, eventId, edit);
         }
       });
 
