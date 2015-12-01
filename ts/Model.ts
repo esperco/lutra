@@ -105,6 +105,28 @@ module Esper.Model {
       }
     }
 
+    /*
+      Takes a promise and calls a function with a wrapped copy of that promise
+      which runs the promise's callback functions within a transaction
+    */
+    transactP<T>(p: JQueryPromise<T>, fn: (p: JQueryPromise<T>) => void) {
+      var topLevel: boolean;
+      p.always(() => {
+        topLevel = !this.inTransaction;
+        this.inTransaction = true;
+      });
+
+      fn(p);
+
+      p.always(() => {
+        if (topLevel) {
+          this.inTransaction = false;
+          this.emitChange(this.emittedIds);
+          this.emittedIds = [];
+        }
+      });
+    }
+
     isTuple(arg: TData|[TData, StoreMetadata]): arg is [TData, StoreMetadata]
     {
       return (arg instanceof Array &&

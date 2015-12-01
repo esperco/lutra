@@ -819,6 +819,133 @@ module Esper.Model {
         expect(listener).toHaveBeenCalledWith(["brown", "black"]);
         expect(listener.calls.count()).toEqual(1);
       });
+
+      it("should reset between transactions", function() {
+        myRabbitStore.transact(function() {
+          myRabbitStore.insert("brown", {
+            uid: "brown",
+            carrots: 123
+          });
+        });
+
+        myRabbitStore.transact(function() {
+          myRabbitStore.insert("black", {
+            uid: "black",
+            carrots: 123
+          });
+        });
+
+        expect(listener).toHaveBeenCalledWith(["brown"]);
+        expect(listener).toHaveBeenCalledWith(["black"]);
+        expect(listener.calls.count()).toEqual(2);
+      });
+    });
+
+    describe("transactP", function() {
+      beforeEach(function() {
+        reset();
+        listener = jasmine.createSpy("listener");
+        myRabbitStore.addChangeListener(listener);
+
+        this.dfd = $.Deferred<any>();
+        this.promise = this.dfd.promise();
+      });
+
+      it("should call listener only once per promise resolution", function() {
+        myRabbitStore.transactP(this.promise, function(p) {
+          p.done(function() {
+            myRabbitStore.insert("brown", {
+              uid: "brown",
+              carrots: 123
+            });
+          });
+
+          p.done(function() {
+            myRabbitStore.insert("black", {
+              uid: "black",
+              carrots: 123
+            });
+          });
+        });
+        this.dfd.resolve();
+
+        expect(listener).toHaveBeenCalledWith(["brown", "black"]);
+        expect(listener.calls.count()).toEqual(1);
+      });
+
+       it("should call listener only once per promise rejection", function() {
+        myRabbitStore.transactP(this.promise, function(p) {
+          p.fail(function() {
+            myRabbitStore.insert("brown", {
+              uid: "brown",
+              carrots: 123
+            });
+          });
+
+          p.fail(function() {
+            myRabbitStore.insert("black", {
+              uid: "black",
+              carrots: 123
+            });
+          });
+        });
+        this.dfd.reject();
+
+        expect(listener).toHaveBeenCalledWith(["brown", "black"]);
+        expect(listener.calls.count()).toEqual(1);
+      });
+
+      it("should call listener only once per promise even when nested",
+        function()
+      {
+        myRabbitStore.transactP(this.promise, function(p) {
+          p.done(function() {
+            myRabbitStore.insert("brown", {
+              uid: "brown",
+              carrots: 123
+            });
+          });
+
+          myRabbitStore.transactP(p, function(p2) {
+            p2.done(function() {
+              myRabbitStore.insert("black", {
+                uid: "black",
+                carrots: 123
+              });
+            });
+          });
+        });
+        this.dfd.resolve();
+
+        expect(listener).toHaveBeenCalledWith(["brown", "black"]);
+        expect(listener.calls.count()).toEqual(1);
+      });
+
+      it("should reset between transactions", function() {
+        myRabbitStore.transactP(this.promise, function(p) {
+          p.done(function() {
+            myRabbitStore.insert("brown", {
+              uid: "brown",
+              carrots: 123
+            });
+          });
+        });
+
+        myRabbitStore.transactP(this.promise, function(p) {
+          p.done(function() {
+            myRabbitStore.insert("black", {
+              uid: "black",
+              carrots: 123
+            });
+          });
+        });
+
+        this.dfd.resolve();
+
+        expect(listener).toHaveBeenCalledWith(["brown"]);
+        expect(listener).toHaveBeenCalledWith(["black"]);
+        expect(listener.calls.count()).toEqual(2);
+      });
     });
   });
 }
