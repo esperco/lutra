@@ -171,6 +171,7 @@ module Esper.ApiT {
 
   export interface Guest {
     display_name?: string;
+    image_url?: string;
     email: string;
   }
 
