@@ -650,6 +650,32 @@ input.incorrect{
     max-width: 90%;
 
     .feature-image {
+      width: 400px;
+
+      &.left-col {
+        float: left;
+      }
+
+      &.right-col {
+        float: right;
+      }
+    }
+
+    .feature-text {
+      &.right-col {
+        margin-left: 400px;
+      }
+
+      &.left-col {
+        margin-right: 400px;
+      }
+    }
+  }
+
+  @media (min-width: 1024px) {
+    max-width: 900px;
+
+    .feature-image {
       width: 500px;
 
       &.left-col {
@@ -672,8 +698,8 @@ input.incorrect{
     }
   }
 
-  @media (min-width: 1024px) {
-    max-width: 80%;
+  @media (min-width: 1200px) {
+    max-width: 1100px;
   }
 }
 
