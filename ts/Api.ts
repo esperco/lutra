@@ -108,6 +108,13 @@ module Esper.Api {
       "");
   }
 
+  /* Get Google Contacts */
+  export function getGoogleContacts(email: string):
+  JQueryPromise<ApiT.ContactInfo> {
+    var url = prefix + "/api/login/" + string(Login.myUid()) + "/" + email;
+    return JsonHttp.get(url);
+  }
+
   export function random():
     JQueryPromise<ApiT.Random> {
     return JsonHttp.post(prefix + "/api/random", "");
