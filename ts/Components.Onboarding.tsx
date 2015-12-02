@@ -79,9 +79,10 @@ module Esper.Components {
                      showFooter={true}>
         <div className="well">
           Click on events in the calendar and then add labels via the sidebar.
-          You can see stats on what's been labeled by clicking
-          'Charts' in the upper left. Newly added labels may take
-          some time to show up.
+          You can label multiple events at the same time by holding down
+          Shift when selecting events. See stats on what's been labeled by
+          clicking 'Charts' in the upper left. Data for newly labeled events
+          may take some time to show up.
         </div>
         <a href="img/TimeStats.gif" target="_blank">
           <img src="img/TimeStats.gif"

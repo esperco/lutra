@@ -45,14 +45,27 @@ module Esper.Components {
         (e) => Events.EventStore.val(e.id)
       );
 
+      var hasRecurring = false;
       if (_.find(events, (e) => !!e.recurring_event_id)) {
-        heading += " + Recurring"
+        hasRecurring = true;
       }
 
       return <BorderlessSection icon="fa-tags" title="Select Labels"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
-         <h5 className="esper-subheader">{heading}</h5>
+         <h5 className="esper-subheader select-labels-heading">
+           {heading}
+           { hasRecurring ?
+             <span className="recurring-note">
+               {" "}+ Recurring
+             </span>: ""
+           }
+           { this.props.events.length === 1 ?
+             <span className="shift-note">
+               {" "}(Hold Shift to Select Multiple Events)
+             </span>: ""
+           }
+         </h5>
          { this.renderContent(events) }
       </BorderlessSection>;
     }
