@@ -68,6 +68,12 @@ module Esper.TimeStats {
       );
     }
 
+    // Removes old stat data from store
+    invalidate() {
+      // Naive cache invalidation => just wipe everything for now
+      statStore.reset();
+    }
+
     // Calculate start dates for each interval
     startDates(val: StatRequest): Date[] {
       var ret: Date[] = [];

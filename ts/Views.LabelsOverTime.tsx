@@ -165,6 +165,11 @@ module Esper.Views {
                 Labeled Events Over Time
               </h4>
               <div className="pull-right">
+                <button className="btn btn-default"
+                        onClick={this.refresh.bind(this)}>
+                  <i className="fa fa-fw fa-refresh" title="refresh" />
+                </button>
+                {" "}
                 <Components.PeriodSelector
                   selected={this.state.selectedInterval}
                   updateFn={updateInterval} />
@@ -277,6 +282,11 @@ module Esper.Views {
         labels: labels,
         datasets: datasets
       };
+    }
+
+    refresh() {
+      TimeStats.intervalQuery.invalidate();
+      updateAsync();
     }
 
     openEmail() {

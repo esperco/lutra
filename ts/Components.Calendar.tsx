@@ -87,8 +87,39 @@ module Esper.Components {
           fcDiv.fullCalendar('option', 'height', fcDiv.parent().height() - 10);
         }
       });
+      this.insertRefreshButton();
 
       this.setSources([Events.EventStore]);
+    }
+
+    /*
+      Inserts a refresh button using jQuery -- ideally we'd prefer for React to
+      do this for us, but that's hard to make work with FullCalendar
+    */
+    insertRefreshButton() {
+      var btnId = "esper-fc-refresh";
+      var fcDiv = $(React.findDOMNode(this._fcDiv));
+      var container = fcDiv.find(".fc-right");
+
+      // Sanity check
+      if (!container || !container.length) {
+        Log.e("Unable to locate FC container for reresh button");
+        return;
+      }
+
+      // Only insert if refresh button is already there
+      if (!container.find("#" + btnId).length) {
+        var btn = $("<button type=\"button\" />");
+        btn.append($("<i class=\"fa fa-fw fa-refresh\" />"));
+        btn.addClass("fc-button fc-state-default");
+        btn.addClass("fc-corner-left fc-corner-right");
+        btn.attr("id", btnId);
+        btn.click(() => {
+          Events.invalidate();
+          this.updateCurrentView();
+        });
+        container.prepend(btn);
+      }
     }
 
     // Return something so setSources works
@@ -99,9 +130,7 @@ module Esper.Components {
     componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
       $(React.findDOMNode(this._fcDiv)).fullCalendar('refetchEvents');
       if (! _.eq(prevProps, this.props)) {
-        var view = $(React.findDOMNode(this._fcDiv))
-          .fullCalendar('getView');
-        this.fetchAsync(view);
+        this.updateCurrentView();
       }
     }
 
@@ -111,6 +140,12 @@ module Esper.Components {
         start.clone().subtract(1, 'day'),
         end.clone().add(1, 'day')
       ];
+    }
+
+    // Makes async calls to update current calendar view
+    updateCurrentView() {
+      var view = $(React.findDOMNode(this._fcDiv)).fullCalendar('getView');
+      this.fetchAsync(view);
     }
 
     // Asynchronusly make calls to update stores

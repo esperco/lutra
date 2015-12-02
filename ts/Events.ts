@@ -65,4 +65,10 @@ module Esper.Events {
     var key = keyForRequest(teamId, calId, start, end);
     return EventListStore.batchVal(key);
   }
+
+  // Naively invalidate all cached events for now
+  export function invalidate() {
+    EventListStore.reset();
+    EventStore.reset();
+  }
 }

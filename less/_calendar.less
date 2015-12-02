@@ -75,8 +75,13 @@
 
       &.recurring-active, &.active {
         box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.25);
-        position: relative;
-        z-index: 1;
+
+        /*
+          Using !important is an anti-pattern, but since full-calendar
+          applies some its styles inline, this appears to be the only way
+          to get drop-shadows to appear correctly from an external stylesheet.
+        */
+        z-index: 2 !important;
       }
 
       &.labeled.active {
