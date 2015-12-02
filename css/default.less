@@ -1520,22 +1520,31 @@ select.incorrect{
 /* Prominent Users */
 
 .users-text {
-  float: left;
   font-size: 18px;
+  text-align: center;
 }
 
 .users-container {
-  float: center;
-  display: inline-block;
-  vertical-align: bottom;
-  text-align: left;
-  width: 90%;
-  padding: 50px 0px;
+  margin-top: 25px;
+  text-align: center;
 }
 
 .users-logo {
-  img { height: 36px;
-        width: 36px; }
+  img {
+    display: inline-block;
+    height: 3em;
+    width: auto;
+    margin: 1.5em;
+  }
+
+  .no-break {
+    display: inline-block;
+    white-space: nowrap;
+  }
+}
+
+.testimonials {
+  margin-bottom: 50px;
 }
 
 
