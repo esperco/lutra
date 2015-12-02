@@ -15,7 +15,7 @@ module.exports = {
 
   // Port for live reload server to use. 35729 is the default for most
   // LiveReload browser extensions
-  liveReloadPort: 35729, 
+  liveReloadPort: 35729,
 
   // Live server port
   serverPort: 5000
