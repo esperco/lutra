@@ -27,7 +27,7 @@ module Esper.DirProfile {
     };
 
     Login.loginPromise.then(function() {
-      Api.getDirProfile()
+      Api.getDirProfile(Login.myUid())
         .then(function(dirProfile) {
           Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
           profileDeferred.resolve(dirProfile);
@@ -38,6 +38,18 @@ module Esper.DirProfile {
   export function myProfile() {
     // Check whether the profile in store is the logged in user's profile
     if (Store.val() && Store.val().uid === Login.myUid()) return;
+    Store.set(null, { dataStatus: Model.DataStatus.FETCHING });
+
+    var onFail = function(err: Error) {
+      Store.set(null, {
+        dataStatus: Model.DataStatus.FETCH_ERROR,
+        lastError: err
+      });
+    };
+
+    Api.getDirProfile(Login.myUid()).then(function(dirProfile) {
+      Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
+    }, onFail);
   }
 
   export function search(query: string) {
