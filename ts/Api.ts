@@ -37,9 +37,9 @@ module Esper.Api {
   }
 
   /* Directory Profile info */
-  export function getDirProfile():
+  export function getDirProfile(uid: string):
   JQueryPromise<ApiT.DirProfile> {
-    var url = prefix + "/api/directory/profile/" + string(Login.myUid());
+    var url = prefix + "/api/directory/profile/" + string(uid);
     return (JsonHttp.noWarn(function() {
       return JsonHttp.get(url);
     }));
@@ -51,9 +51,9 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(dirProfile));
   }
 
-  export function removeDirProfile():
+  export function removeDirProfile(uid: string):
   JQueryPromise<void> {
-    var url = prefix + "/api/directory/profile/" + string(Login.myUid());
+    var url = prefix + "/api/directory/profile/" + string(uid);
     return JsonHttp.delete_(url);
   }
 
