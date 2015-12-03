@@ -68,7 +68,7 @@ module Esper.Route {
   route("/labels-over-time", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.LabelsOverTime />,
       undefined,
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.LabelsOverTime);
   });
@@ -77,7 +77,7 @@ module Esper.Route {
   route("/calendar-labeling", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.CalendarLabeling />,
       undefined,
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
@@ -111,7 +111,7 @@ module Esper.Route {
     Layout.render(
       <Views.CalendarLabeling />,
       Components.onboardingLabelEventsHeader(),
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.TimeStatsOnboardingLabelEvents);
   });
@@ -120,7 +120,7 @@ module Esper.Route {
     Layout.render(
       <Views.LabelsOverTime />,
       Components.onboardingChartsHeader(),
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.TimeStatsOnboardingCharts);
   });

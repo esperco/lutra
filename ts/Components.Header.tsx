@@ -3,7 +3,7 @@
 /// <reference path="./Components.Onboarding.tsx" />
 /// <reference path="./Route.tsx" />
 
-module Esper.Views {
+module Esper.Components {
 
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;

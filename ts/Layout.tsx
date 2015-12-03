@@ -4,8 +4,8 @@
 
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="./Views.Header.tsx" />
-/// <reference path="./Views.Footer.tsx" />
+/// <reference path="./Components.Header.tsx" />
+/// <reference path="./Components.Footer.tsx" />
 
 module Esper.Layout {
   // References to our jQuery selectors
@@ -66,11 +66,11 @@ module Esper.Layout {
   }
 
   function defaultHeader() {
-    return <Views.Header />;
+    return <Components.Header />;
   }
 
   function defaultFooter() {
-    return <Views.Footer />;
+    return <Components.Footer />;
   }
 
   // Hide the loading screen
