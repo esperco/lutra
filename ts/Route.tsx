@@ -25,8 +25,10 @@ module Esper.Route {
   // Helper for displaying the directory edit profile page first time login
   var profileRequired: PageJS.Callback = function(ctx, next) {
     DirProfile.profilePromise.done(next);
-    DirProfile.profilePromise.fail(function() {
-      nav.path("/edit-profile-new");
+    DirProfile.profilePromise.fail(function(err: ApiT.Error) {
+      if (err['status'] === 404) {
+        nav.path("/edit-profile-new");
+      }
     });
   }
 
@@ -39,7 +41,7 @@ module Esper.Route {
     Layout.render(<Views.Search />);
   });
 
-  pageJs("/profile", loginRequired, function() {
+  pageJs("/profile", loginRequired, profileRequired, function() {
     DirProfile.myProfile();
     Layout.render(<Views.Profile />);
   });

@@ -1,6 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Store.ts" />
 /// <reference path="./Views.ChangePass.tsx" />
+/// <reference path="./Components.Invite.tsx" />
 
 module Esper.Views {
 
@@ -74,6 +75,9 @@ module Esper.Views {
 
     componentDidMount() {
       this.find('.dropdown-toggle').dropdown();
+      if (this.props.header == "Create New Profile") {
+        this.find("#myModal").modal('toggle');
+      }
     }
     componentDidUpdate() {
       this.find('.dropdown-toggle').dropdown();
@@ -250,6 +254,7 @@ module Esper.Views {
             Delete Profile
           </button>
         </div>
+        <Components.Invite esperProfile={this.props.esperProfile}/>
         <label>Profile Picture</label>
         <div className="media">
           <div className="media-left">
