@@ -15,7 +15,8 @@ module Esper.Views {
   }
 
   export class EditProfile extends Component<Props, ApiT.DirProfile> {
-    createProfile(display_name: string,
+    createProfile(uid: string,
+                  display_name: string,
                   other_emails: ApiT.LabelledItem[] = [],
                   other_names: ApiT.LabelledItem[] = [],
                   company: string = "",
@@ -33,17 +34,17 @@ module Esper.Views {
         if (custom_entries.length === 0) custom_entries = [{label:"Custom", item:""}];
       }
       return {
-        uid: DirProfile.Store.val().uid,
-        image_url: image_url,
-        display_name: display_name,
-        other_names: other_names,
-        other_emails: other_emails,
+        uid,
+        image_url,
+        display_name,
+        other_names,
+        other_emails,
         company: company,
-        company_location: company_location,
-        company_title: company_title,
-        phones: phones,
-        addresses: addresses,
-        custom_entries: custom_entries
+        company_location,
+        company_title,
+        phones,
+        addresses,
+        custom_entries
       };
     }
 
@@ -55,7 +56,7 @@ module Esper.Views {
       if (dirProfile !== undefined) {
         var names = $.extend(true, [], dirProfile.other_names);
         names.unshift(undefined);
-        this.state = this.createProfile(dirProfile.display_name,
+        this.state = this.createProfile(dirProfile.uid, dirProfile.display_name,
           dirProfile.other_emails, names, dirProfile.company,
           dirProfile.company_location, dirProfile.company_title, dirProfile.phones,
           dirProfile.addresses, dirProfile.custom_entries, dirProfile.image_url);
@@ -66,10 +67,10 @@ module Esper.Views {
           var x = { label: "", item: e };
           otherEmails.push(x);
         });
-        this.state = this.createProfile(esperProfile.display_name,
-          otherEmails, [undefined]);
+        this.state = this.createProfile(esperProfile.profile_uid,
+          esperProfile.display_name, otherEmails, [undefined]);
       } else { //shouldn't happen yet
-        this.state = this.createProfile("", [], [undefined]);
+        this.state = this.createProfile("", "", [], [undefined]);
       }
     }
 
@@ -152,7 +153,7 @@ module Esper.Views {
     saveProfile = () => {
       //clean up nulls and empty items
       var s = this.state;
-      var profile = this.createProfile(s.display_name,
+      var profile = this.createProfile(s.uid, s.display_name,
         this.cleanList(s.other_emails), this.cleanList(s.other_names),
         s.company, s.company_location, s.company_title,
         this.cleanList(s.phones), this.cleanList(s.addresses),
@@ -254,7 +255,8 @@ module Esper.Views {
             Delete Profile
           </button>
         </div>
-        <Components.Invite esperProfile={this.props.esperProfile}/>
+        {(this.props.header === "Create New Profile") ?
+          <Components.Invite esperProfile={this.props.esperProfile}/> : ""}
         <label>Profile Picture</label>
         <div className="media">
           <div className="media-left">

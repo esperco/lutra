@@ -28,7 +28,16 @@ module Esper.Route {
     DirProfile.profilePromise.fail(function(err: ApiT.Error) {
       if (err['status'] === 404) {
         nav.path("/edit-profile-new");
+      } else {
+        next();
       }
+    });
+  }
+
+  var noProfile: PageJS.Callback = function(ctx, next) {
+    DirProfile.profilePromise.fail(next);
+    DirProfile.profilePromise.done(function() {
+      nav.path("/edit-profile");
     });
   }
 
@@ -42,7 +51,6 @@ module Esper.Route {
   });
 
   pageJs("/profile", loginRequired, profileRequired, function() {
-    DirProfile.myProfile();
     Layout.render(<Views.Profile />);
   });
 
@@ -51,7 +59,7 @@ module Esper.Route {
       dirProfile={DirProfile.Store.val()}/>);
   });
 
-  pageJs("/edit-profile-new", loginRequired, function() {
+  pageJs("/edit-profile-new", loginRequired, noProfile, function() {
     Api.getMyProfile().done(function(profile) {
       Layout.render(<Views.EditProfile header="Create New Profile"
         esperProfile={profile} dirProfile={undefined} />);

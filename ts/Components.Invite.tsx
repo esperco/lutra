@@ -10,6 +10,15 @@ module Esper.Components {
   }
 
   export class Invite extends Component<AccountState, {}> {
+    constructor(props: AccountState) {
+      super(props);
+    }
+
+    componentDidMount() {
+    }
+
+    showContacts = (contactList: ApiT.Contact[]) => {
+    }
 
     render() {
       return <div className="modal fade" id="myModal" role="dialog">
