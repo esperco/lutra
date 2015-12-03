@@ -88,6 +88,7 @@ module Esper.Route {
       <Views.OnboardingStart />,
       Components.onboardingStartHeader()
     );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingStart);
   });
 
   route("/onboarding/add-cals", loginRequired, function() {
@@ -95,6 +96,7 @@ module Esper.Route {
       <Views.OnboardingAddCals />,
       Components.onboardingAddCalsHeader()
     );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingAddCals);
   });
 
   route("/onboarding/add-labels", loginRequired, function() {
@@ -102,6 +104,7 @@ module Esper.Route {
       <Views.OnboardingAddLabels />,
       Components.onboardingAddLabelsHeader()
     );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingAddLabels);
   });
 
   route("/onboarding/label-events", loginRequired, function() {
@@ -110,6 +113,7 @@ module Esper.Route {
       Components.onboardingLabelEventsHeader(),
       <Views.Footer hoverable={true} />
     );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingLabelEvents);
   });
 
   route("/onboarding/charts", loginRequired, function() {
@@ -118,6 +122,7 @@ module Esper.Route {
       Components.onboardingChartsHeader(),
       <Views.Footer hoverable={true} />
     );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingCharts);
   });
 
   // 404 page
