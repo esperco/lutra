@@ -3,8 +3,6 @@
 */
 
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
-/// <reference path="./Components.Onboarding.tsx" />
-/// <reference path="./Layout.tsx" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Route.tsx" />
@@ -50,6 +48,15 @@ module Esper.Onboarding {
     return completedSoFar() + 1 > current();
   }
 
+  // Should we launch onboarding?
+  export function required() {
+    /*
+      Only if no team or labels -- we could check to see if events are labeled
+      but that's hard to do without fetching a whole lot of events
+    */
+    return completedSoFar() < 2;
+  }
+
   /*
     Simple counter for how many events have been labeled in the current
     session
@@ -92,37 +99,5 @@ module Esper.Onboarding {
 
     // Else, everything is copacetic
     return paths.length + 1;
-  }
-
-  function renderCalModal() {
-    Layout.renderModal(
-      React.createElement(Components.OnboardingCalModal)
-    );
-  }
-
-  function renderLabelModal() {
-    Layout.renderModal(
-      React.createElement(Components.OnboardingLabelModal)
-    );
-  }
-
-  export function init() {
-    Login.loginPromise.done(function(loginInfo) {
-      var teamWithCal = _.find(loginInfo.teams,
-        (t) => t.team_calendars && t.team_calendars.length
-      );
-      if (! teamWithCal) {
-        renderCalModal();
-        return;
-      }
-
-      var teamWithLabels = _.find(loginInfo.teams,
-        (t) => t.team_labels && t.team_labels.length
-      );
-      if (! teamWithLabels) {
-        renderLabelModal();
-        return;
-      }
-    });
   }
 }

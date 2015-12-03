@@ -1,6 +1,7 @@
 /// <reference path="../marten/ts/Analytics.Web.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
@@ -19,6 +20,15 @@ module Esper.Route {
     });
 
     // If busy, then we keep showing spinner
+  }
+
+  // Check if we need to launch onboarding
+  var onboardingRequired: PageJS.Callback = function(ctx, next) {
+    if (Onboarding.required()) {
+      Route.nav.path(Onboarding.paths[0]);
+    } else {
+      next();
+    }
   }
 
   // Helper to wrap default pageJs route definition function
@@ -55,7 +65,7 @@ module Esper.Route {
   });
 
   // Graph labels over time
-  route("/labels-over-time", loginRequired, function() {
+  route("/labels-over-time", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.LabelsOverTime />,
       undefined,
       <Views.Footer hoverable={true} />
@@ -64,7 +74,7 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", loginRequired, function() {
+  route("/calendar-labeling", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.CalendarLabeling />,
       undefined,
       <Views.Footer hoverable={true} />
