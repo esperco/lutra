@@ -13,6 +13,8 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface LabelAddProps {
+    disableDone?: boolean;
+    doneText?: string;
     onDone: () => void;
   }
 
@@ -148,8 +150,9 @@ module Esper.Components {
             </span>
           </div> :
           <button className="btn btn-secondary"
+                  disabled={this.props.disableDone}
                   onClick={this.handleDone.bind(this)}>
-            Done
+            {this.props.doneText || "Done"}
           </button>
         }
       </div>;

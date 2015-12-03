@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/EventLabels.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Components.Section.tsx" />
@@ -108,6 +109,7 @@ module Esper.Components {
       });
 
       TimeStats.intervalQuery.invalidate();
+      Onboarding.incrLabeled();
     }
 
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {

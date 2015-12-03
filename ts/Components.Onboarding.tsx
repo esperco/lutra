@@ -5,6 +5,7 @@
 /// <reference path="../marten/ts/Analytics.ts" />
 /// <reference path="./Components.CalAdd.tsx" />
 /// <reference path="./Components.LabelAdd.tsx" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Components {
@@ -98,5 +99,101 @@ module Esper.Components {
     hideModal() {
       this.jQuery().modal('hide');
     }
+  }
+
+
+  ///////
+
+  interface OnboardingHeaderProps {
+    icon?: string;        // FontAwesome icon
+    title: string;        // Visible in title row
+    subTitle?: string;    // Still in title row, but smaller
+
+    // Below title row -- visible only on mouse over
+    children?: JSX.Element[];
+  }
+
+  class OnboardingHeader extends Component<OnboardingHeaderProps, {}> {
+    renderWithData() {
+      var step = Onboarding.current();
+      var disabledNext = !Onboarding.canGoToNext();
+
+      return <div className="onboarding-header-wrapper">
+        <div className="onboarding-header">
+          <div className="nav">
+            <h2 className="onboarding-title">
+              { this.props.icon ?
+                <i className={"fa fa-fw " + this.props.icon} /> :
+                null
+              }{" "}
+              {this.props.title}
+            </h2>{" "}
+            { this.props.subTitle ?
+              <span className="onboarding-subtitle">
+                {this.props.subTitle}
+              </span>: ""
+            }
+            <div className="pull-right">
+              <div className="btn-group">
+                { step > 0 ?
+                  <button type="button" className="btn navbar-btn btn-default"
+                          onClick={Onboarding.prev}>
+                    <i className="fa fa-fw fa-angle-left" />
+                  </button> : null
+                }
+                <button type="button" className="btn navbar-btn btn-default"
+                        onClick={Onboarding.next} disabled={disabledNext}>
+                  <i className="fa fa-fw fa-angle-right" />
+                </button>
+              </div>
+            </div>
+          </div>
+          { (this.props.children && this.props.children.length) ?
+            <div className="onboarding-header-content">
+              {this.props.children}
+            </div> : ""
+          }
+        </div>
+        { this.renderProgress() }
+      </div>
+    }
+
+    renderProgress() {
+      var total = Onboarding.paths.length;
+      var current = Onboarding.current() + 1;
+      var progress = Math.floor((current / total) * 100);
+      return <div className="progress skinny">
+        <div className="progress-bar" style={{width: progress + "%"}} />
+      </div>;
+    }
+  }
+
+  /*
+    Use functions rather component classes to spit out new headers because
+    we want to reuse our OnboardingHeader component instance (which helps
+    animate the progress bar)
+  */
+
+  export function onboardingStartHeader() {
+    return <OnboardingHeader title="Let's Get Started!" icon="fa-rocket" />;
+  }
+
+  export function onboardingAddCalsHeader() {
+    return <OnboardingHeader title="Add a Calendar to Continue"
+      icon="fa-calendar-check-o" />;
+  }
+
+  export function onboardingAddLabelsHeader() {
+    return <OnboardingHeader title="Add at Least 2 Labels to Continue"
+      icon="fa-tags" />;
+  }
+
+  export function onboardingLabelEventsHeader() {
+    return <OnboardingHeader title="Label an Event to Continue"
+      icon="fa-th-list" />;
+  }
+
+  export function onboardingChartsHeader() {
+    return <OnboardingHeader title="Congrats!" icon="fa-bar-chart" />;
   }
 }

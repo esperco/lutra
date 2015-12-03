@@ -7,6 +7,7 @@
 /// <reference path="./Views.LabelsOverTime.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoginRequired.tsx" />
+/// <reference path="./Views.Onboarding.tsx" />
 
 module Esper.Route {
 
@@ -69,6 +70,44 @@ module Esper.Route {
       <Views.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
+  });
+
+  // Onboarding steps
+  route("/onboarding/start", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingStart />,
+      Components.onboardingStartHeader()
+    );
+  });
+
+  route("/onboarding/add-cals", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingAddCals />,
+      Components.onboardingAddCalsHeader()
+    );
+  });
+
+  route("/onboarding/add-labels", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingAddLabels />,
+      Components.onboardingAddLabelsHeader()
+    );
+  });
+
+  route("/onboarding/label-events", loginRequired, function() {
+    Layout.render(
+      <Views.CalendarLabeling />,
+      Components.onboardingLabelEventsHeader(),
+      <Views.Footer hoverable={true} />
+    );
+  });
+
+  route("/onboarding/charts", loginRequired, function() {
+    Layout.render(
+      <Views.LabelsOverTime />,
+      Components.onboardingChartsHeader(),
+      <Views.Footer hoverable={true} />
+    );
   });
 
   // 404 page

@@ -14,6 +14,8 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface CalAddProps {
+    disableDone?: boolean;
+    doneText?: string;
     onDone: () => void;
   }
 
@@ -137,8 +139,9 @@ module Esper.Components {
               Saving &hellip; this may take a minute
             </span>
           </div> :
-          <button className="btn btn-secondary" onClick={this.props.onDone}>
-            Done
+          <button className="btn btn-secondary" onClick={this.props.onDone}
+                  disabled={this.props.disableDone}>
+            {this.props.doneText || "Done"}
           </button>
         }
       </div>;
