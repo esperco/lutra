@@ -29,7 +29,9 @@ module Esper.Views {
           Welcome to TimeStats!
           Esper TimeStats helps you label your calendar events and analyze how
           you spend your time. We'll need to set up a few things to get
-          started. When you're ready, click 'Next' to continue.
+          started. When you're ready, click the
+          {" "}<span className="symbol-quote">Next</span>{" "} button below
+          to continue.
         </div>
         <a href="img/TimeStats.gif" target="_blank">
           <img src="img/TimeStats.gif"
