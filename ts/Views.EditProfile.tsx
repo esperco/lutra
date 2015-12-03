@@ -250,7 +250,7 @@ module Esper.Views {
         {(Store.get("uid") === undefined) ? "" : this.editPassword()}
         <div>
           <button className="btn btn-primary"
-            onClick={Api.removeDirProfile}>
+            onClick={Api.removeDirProfile(Login.myUid())}>
             Delete Profile
           </button>
         </div>
