@@ -602,7 +602,7 @@ module Esper.TaskTab {
             stepSelect.trigger("change");
           }
 
-          var peopleTabContent = $(".esper-user-tab-content");
+          var peopleTabContent = $(".esper-people-tab-content");
           peopleTabContent.children().remove();
           peopleTabContent.append(PeopleTab.viewOfPeopleTab(team).view);
 
@@ -658,7 +658,7 @@ module Esper.TaskTab {
         }
 
         if (step.meeting_prefs) {
-          var meetingInfo = $(".esper-user-tab-meeting-info");
+          var meetingInfo = $(".esper-people-tab-meeting-info");
           var meetingSelector = $(".esper-meeting-selector");
           var noMeetingPrefs = $(".esper-no-prefs");
           var showHide = $(".esper-meetings");

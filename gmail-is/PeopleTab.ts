@@ -369,6 +369,57 @@ module Esper.PeopleTab {
     meetingView.append(view);
   }
 
+  function displayLabelledItems(overviewInfo: JQuery,
+                                labelTitle: string,
+                                labelledItem: ApiT.LabelledItem[]) {
+    if (labelledItem.length == 0) return;
+'''
+<div #view class="esper-preference-section esper-clearfix">
+  <div #titleText class="esper-overview-label-title esper-clearfix" />
+  <ul #itemText class="esper-preference-list" />
+</div>
+'''
+    titleText.text(labelTitle);
+    _.forEach(labelledItem, function(item) {
+      var li = $("<li>").append($("<span>").addClass("esper-bold")
+                                  .text(item.label))
+               .append($("<span>").text(" " + item.item));
+      if (_.last(labelledItem) == item) li.addClass("esper-last");
+      itemText.append(li);
+    });
+    overviewInfo.append(view);
+  }
+
+  export function populateOverviewDropdown(overviewInfo: JQuery,
+                                           spinner: JQuery,
+                                           profile: ApiT.DirProfile) {
+    overviewInfo.children().remove();
+    displayLabelledItems(overviewInfo, "Other names", profile.other_names);
+    displayLabelledItems(overviewInfo, "Emails", profile.other_emails);
+    displayLabelledItems(overviewInfo, "Phones", profile.phones);
+    displayLabelledItems(overviewInfo, "Addresses", profile.addresses);
+    displayLabelledItems(overviewInfo, "Miscellaneous", profile.custom_entries);
+    spinner.hide();
+  }
+
+  export function populateProfileHeader(profHeader: JQuery,
+                                 profSpinner: JQuery,
+                                 profPic: JQuery,
+                                 profName: JQuery,
+                                 profCompany: JQuery,
+                                 profCompanyTitle: JQuery,
+                                 profile: ApiT.DirProfile) {
+    if (profile.image_url !== undefined) {
+      profPic.css("background-image", "url('" + profile.image_url + "')");
+    }
+
+    profName.text(profile.display_name);
+    profCompany.text(profile.company);
+    profCompany.text(profile.company_title);
+    profSpinner.hide();
+    profHeader.show();
+  }
+
   export function populateMeetingsDropdown(drop: JQuery,
                                            meetInfo: JQuery,
                                            noMeetingPrefs: JQuery,
@@ -468,8 +519,7 @@ module Esper.PeopleTab {
         displayVideoInfo(meetInfo, meetingTypes.video_call, video_changes);
       } else if (!isNaN(field)) {
         displayWorkplace(meetInfo, workplaces[field], workplace_changes);
-      }
-      else {
+      } else {
         var meal = field.charAt(0).toUpperCase() + field.substring(1);
         var meal_changes = getSubPreferenceChanges(meal, meeting_changes);
         displayMealInfo(meetInfo, meetingTypes[field], meal_changes);
@@ -581,54 +631,6 @@ module Esper.PeopleTab {
 
     workInfo.children().remove();
     workInfo.append(view);
-  }
-
-  function viewOfUser(team: ApiT.Team, prefs: ApiT.Preferences) {
-'''
-<div #view>
-  <div #spinner>
-    <div class="esper-spinner esper-tab-header-spinner"/>
-  </div>
-  <div #profPic class="esper-profile-pic"/>
-  <div class="esper-profile-row esper-profile-name-row">
-    <span #name class="esper-profile-name"/>
-    <object #appleLogo class="esper-svg esper-ios-app-icon"/>
-  </div>
-  <div #email class="esper-profile-row esper-profile-email"/>
-  <div #mobile class="esper-profile-row esper-profile-email"/>
-</div>
-'''
-    var teamid = team.teamid;
-
-    Api.getProfile(team.team_executive, teamid)
-      .done(function(profile) {
-        spinner.hide();
-        if (profile.image_url !== undefined) {
-          profPic.css("background-image", "url('" + profile.image_url + "')");
-        }
-        name.text(team.team_name);
-        email.text(profile.email);
-
-        var phoneInfo = prefs.meeting_types.phone_call;
-        if (phoneInfo !== undefined) {
-          var pubMobile = List.find(phoneInfo.phones, function(p) {
-            return p.phone_type === "Mobile" && p.share_with_guests;
-          });
-          if (pubMobile !== null) {
-            mobile.text("Mobile: " + pubMobile.phone_number);
-          } else {
-            mobile.hide();
-          }
-        }
-
-        if (profile.has_ios_app) {
-          appleLogo.attr("data", Init.esperRootUrl + "img/apple.svg");
-        } else {
-          appleLogo.hide();
-        }
-      });
-
-    return view;
   }
 
   function displayDetailedGeneralPrefs(container : JQuery,
@@ -766,7 +768,15 @@ module Esper.PeopleTab {
   export interface PeopleTabView {
     view: JQuery;
     user: JQuery;
+    profBubbles: JQuery;
+    profHeader: JQuery;
+    headerSpinner: JQuery;
+    profPic: JQuery;
     preferencesSpinner: JQuery;
+    dirProfileSection: JQuery;
+    overviewHeader: JQuery;
+    showOverview: JQuery;
+    overviewContainer: JQuery;
     teamLabelsSection: JQuery;
     teamLabelsHeader: JQuery;
     showTeamLabels: JQuery;
@@ -799,10 +809,44 @@ module Esper.PeopleTab {
   export function viewOfPeopleTab(team: ApiT.Team): PeopleTabView {
 '''
 <div #view class="esper-tab-flexbox">
-  <div #user class="esper-tab-header"/>
+  <div #user class="esper-tab-header">
+    <div #profBubbles />
+    <hr />
+    <div #headerSpinner>
+      <div class="esper-spinner esper-tab-header-spinner" />
+    </div>
+    <div #profHeader
+      class="esper-people-tab-profile-header"
+      style="display: none;">
+      <div #profPic class="esper-profile-pic" />
+      <div class="esper-profile-row esper-profile-name-row">
+        <span #profName class="esper-profile-name"/>
+        <!-- <object class="esper-svg esper-ios-app-icon" /> -->
+      </div>
+      <div #profCompany class="esper-profile-row esper-profile-company" />
+      <div #profCompanyTitle class="esper-profile-row esper-profile-company-title" />
+    </div>
+  </div>
   <div class="esper-tab-overflow">
     <div #preferencesSpinner class="esper-events-list-loading">
-      <div class="esper-spinner esper-list-spinner"/>
+      <div class="esper-spinner esper-list-spinner" />
+    </div>
+    <div #dirProfileSection class="esper-section">
+      <div #overviewHeader
+           class="esper-section-header esper-clearfix">
+        <span #showOverview
+              class="esper-link" style="float:right">Hide</span>
+        <span class="esper-bold" style="float:left">Overview</span>
+      </div>
+      <div #overviewContainer class="esper-section-container">
+        <div #overviewSpinner class="esper-spinner esper-list-spinner" />
+        <div #overviewInfo class="esper-people-tab-overview-info" />
+        <div #overviewNoProfile
+          class="esper-people-tab-overview-no-profile"
+          style="display: none;">
+          This person does not have a directory profile.
+        </div>
+      </div>
     </div>
     <div class="esper-section">
       <div #meetingsHeader
@@ -821,7 +865,7 @@ module Esper.PeopleTab {
         </div>
         <div #noMeetingPrefs style="display: none"
              class="esper-no-content esper-no-prefs"/>
-        <div class="esper-user-tab-meeting-info" #meetingInfo/>
+        <div #meetingInfo class="esper-people-tab-meeting-info" />
       </div>
     </div>
     <div #teamLabelsSection class="esper-section">
@@ -894,6 +938,56 @@ module Esper.PeopleTab {
     meetingsNew.hide();
     coworkersNew.hide();
     notesNew.hide();
+
+    CurrentThread.getParticipants()
+      .done(function(guests: ApiT.Guest[]) {
+        _.forEach(guests, function(guest: ApiT.Guest) {
+          function fetchDirProfile() {
+            profHeader.hide();
+            headerSpinner.show();
+
+            overviewNoProfile.hide();
+            overviewSpinner.show();
+            overviewInfo.children().remove();
+
+            Api.getDirProfileByEmail(guest.email).then(function(profile) {
+              populateOverviewDropdown(overviewInfo, overviewSpinner, profile);
+              populateProfileHeader(profHeader,
+                                    headerSpinner,
+                                    profPic,
+                                    profName,
+                                    profCompany,
+                                    profCompanyTitle,
+                                    profile);
+            }, function(err) {
+              headerSpinner.hide();
+              overviewSpinner.hide();
+              if (err.status === 404) overviewNoProfile.show();
+            });
+          }
+
+          $("<div>").text(guest.display_name || guest.email)
+                    .addClass("esper-link")
+                    .click(fetchDirProfile)
+                    .appendTo(profBubbles);
+        });
+    });
+
+    Api.getDirProfile(team.team_executive).then(function(profile) {
+      populateOverviewDropdown(overviewInfo, overviewSpinner, profile);
+      populateProfileHeader(profHeader,
+                            headerSpinner,
+                            profPic,
+                            profName,
+                            profCompany,
+                            profCompanyTitle,
+                            profile);
+    }, function(err) {
+      headerSpinner.hide();
+      overviewSpinner.hide();
+      if (err.status === 404) overviewNoProfile.show();
+    });
+
     Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
       var workplace_changes =
         getPreferencesChanges("Workplace", changes.change_log);
@@ -914,8 +1008,6 @@ module Esper.PeopleTab {
         notesNew.show();
       }
       preferencesSpinner.hide();
-
-      user.append(viewOfUser(team, prefs));
 
       var meetingTypes = prefs.meeting_types;
       var workplaces = prefs.workplaces;
@@ -974,6 +1066,17 @@ module Esper.PeopleTab {
         calendarsHeader.addClass("esper-open");
       }
     });
+
+    showOverview.click(function() {
+      Sidebar.toggleList(overviewContainer);
+      if (showOverview.text() === "Hide") {
+        showOverview.text("Show");
+        overviewHeader.removeClass("esper-open");
+      } else {
+        showOverview.text("Hide");
+        overviewHeader.addClass("esper-open");
+      }
+    })
 
     showMeetings.click(function() {
       Sidebar.toggleList(meetingsContainer);
