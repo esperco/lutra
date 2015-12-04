@@ -1,6 +1,6 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 
-module Esper.Views {
+module Esper.Components {
 
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;

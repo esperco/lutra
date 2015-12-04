@@ -14,7 +14,9 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface CalAddProps {
-    onDone: () => void;
+    disableDone?: boolean;
+    doneText?: string;
+    onDone?: () => void;
   }
 
   interface CalAddState {
@@ -129,6 +131,12 @@ module Esper.Components {
       var dataStatus = Teams.dataStatus(this.state.selectedTeamId);
       var busy = dataStatus === Model.DataStatus.INFLIGHT;
 
+      // Don't render footer if no done option and we don't need to show
+      // busy indicator
+      if (!this.props.onDone && !busy) {
+        return;
+      }
+
       return <div className="clearfix modal-footer">
         { busy ?
           <div>
@@ -137,8 +145,9 @@ module Esper.Components {
               Saving &hellip; this may take a minute
             </span>
           </div> :
-          <button className="btn btn-secondary" onClick={this.props.onDone}>
-            Done
+          <button className="btn btn-secondary" onClick={this.props.onDone}
+                  disabled={this.props.disableDone}>
+            {this.props.doneText || "Done"}
           </button>
         }
       </div>;

@@ -1,12 +1,14 @@
 /// <reference path="../marten/ts/Analytics.Web.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.LabelsOverTime.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoginRequired.tsx" />
+/// <reference path="./Views.Onboarding.tsx" />
 
 module Esper.Route {
 
@@ -18,6 +20,15 @@ module Esper.Route {
     });
 
     // If busy, then we keep showing spinner
+  }
+
+  // Check if we need to launch onboarding
+  var onboardingRequired: PageJS.Callback = function(ctx, next) {
+    if (Onboarding.required()) {
+      Route.nav.path(Onboarding.paths[0]);
+    } else {
+      next();
+    }
   }
 
   // Helper to wrap default pageJs route definition function
@@ -54,21 +65,64 @@ module Esper.Route {
   });
 
   // Graph labels over time
-  route("/labels-over-time", loginRequired, function() {
+  route("/labels-over-time", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.LabelsOverTime />,
       undefined,
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.LabelsOverTime);
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", loginRequired, function() {
+  route("/calendar-labeling", loginRequired, onboardingRequired, function() {
     Layout.render(<Views.CalendarLabeling />,
       undefined,
-      <Views.Footer hoverable={true} />
+      <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
+  });
+
+  // Onboarding steps
+  route("/onboarding/start", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingStart />,
+      Components.onboardingStartHeader()
+    );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingStart);
+  });
+
+  route("/onboarding/add-cals", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingAddCals />,
+      Components.onboardingAddCalsHeader()
+    );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingAddCals);
+  });
+
+  route("/onboarding/add-labels", loginRequired, function() {
+    Layout.render(
+      <Views.OnboardingAddLabels />,
+      Components.onboardingAddLabelsHeader()
+    );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingAddLabels);
+  });
+
+  route("/onboarding/label-events", loginRequired, function() {
+    Layout.render(
+      <Views.CalendarLabeling />,
+      Components.onboardingLabelEventsHeader(),
+      <Components.Footer hoverable={true} />
+    );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingLabelEvents);
+  });
+
+  route("/onboarding/charts", loginRequired, function() {
+    Layout.render(
+      <Views.LabelsOverTime />,
+      Components.onboardingChartsHeader(),
+      <Components.Footer hoverable={true} />
+    );
+    Analytics.page(Analytics.Page.TimeStatsOnboardingCharts);
   });
 
   // 404 page
