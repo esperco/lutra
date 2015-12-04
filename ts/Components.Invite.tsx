@@ -5,16 +5,17 @@ module Esper.Components {
 
   var Component = ReactHelpers.Component;
 
-  interface AccountState {
-    esperProfile: ApiT.Profile;
-  }
-
-  export class Invite extends Component<AccountState, {}> {
-    constructor(props: AccountState) {
+  export class Invite extends Component<{email: string}, ApiT.ContactInfo> {
+    constructor(props: {email:string}) {
       super(props);
+      this.state = { contact_list: [], next_link: "", prev_link: "" };
     }
 
     componentDidMount() {
+      Api.getGoogleContacts(this.props.email)
+        .done(function(contactInfo: ApiT.ContactInfo) {
+          this.state = contactInfo;
+        });
     }
 
     showContacts = (contactList: ApiT.Contact[]) => {
