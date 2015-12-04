@@ -45,6 +45,14 @@ module Esper.Api {
     }));
   }
 
+  export function getDirProfileByEmail(email: string):
+  JQueryPromise<ApiT.DirProfile> {
+    var url = prefix + "/api/directory/profile/email/" + string(email);
+    return (JsonHttp.noWarn(function() {
+      return JsonHttp.get(url);
+    }));
+  }
+
   export function setDirProfile(dirProfile : ApiT.DirProfile):
   JQueryPromise<void> {
     var url = prefix + "/api/directory/profile/" + string(Login.myUid());
