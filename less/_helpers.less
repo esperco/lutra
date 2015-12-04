@@ -61,6 +61,7 @@
 .esper-full-screen, .esper-expanded {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
   background: @body-bg;
 
   &.minus-nav {
@@ -183,6 +184,10 @@
   }
 }
 
+.esper-panel-section {
+  margin-bottom: 20px; // To match well
+}
+
 .esper-borderless-section {
   .esper-header {
     border-bottom: 1px solid @panel-default-border;
@@ -234,5 +239,16 @@
   border: 1px solid @panel-default-border;
   border-radius: @panel-border-radius;
   text-align: center;
-  margin-bottom: @padding-large-vertical
+  margin-bottom: @padding-large-vertical;
+}
+
+.esper-wide-button {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.esper-de-em {
+  color: rgba(0, 0, 0, 0.5);
 }

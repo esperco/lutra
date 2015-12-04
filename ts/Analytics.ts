@@ -127,6 +127,11 @@ module Esper.Analytics {
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
     LabelsOverTime,    // time.esper.com/#!/labels-over-time
     CalendarLabeling,  // time.esper.com/#!/calendar-labeling
+    TimeStatsOnboardingStart,       // time.esper.com/#!/onboarding/start
+    TimeStatsOnboardingAddCals,     // time.esper.com/#!/onboarding/add-cals
+    TimeStatsOnboardingAddLabels,   // time.esper.com/#!/onboarding/add-labels
+    TimeStatsOnboardingLabelEvents, // time.esper.com/#!/onboarding/label-events
+    TimeStatsOnboardingCharts,      // time.esper.com/#!/onboarding/charts
     DirectoryHome      // dir.esper.com
   }
 
