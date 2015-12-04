@@ -12,7 +12,7 @@ module Esper.Views {
 
   function renderContainer(children: JSX.Element|JSX.Element[]) {
     return <div className="container onboarding-main"><div className="row">
-      <div className="col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
+      <div className="col-sm-offset-2 col-sm-8">
         <div className="panel panel-default">
           <div className="panel-body">
             {children}
@@ -81,7 +81,12 @@ module Esper.Views {
           can always add more later.
         </div>
         <Components.LabelAdd onDone={Onboarding.next} doneText="Next"
-          disableDone={!Onboarding.canGoToNext()} />
+          disableDone={!Onboarding.canGoToNext()}
+          suggestedLabels={[
+            "Product", "Business Development", "Sales",
+            "Email", "Internal Team", "Networking",
+            "Health & Wellness", "Personal", "Travel"
+          ]} />
       </div>);
     }
   }

@@ -16,6 +16,7 @@ module Esper.Components {
     disableDone?: boolean;
     doneText?: string;
     onDone: () => void;
+    suggestedLabels?: string[]
   }
 
   interface LabelAddState {
@@ -45,14 +46,19 @@ module Esper.Components {
       var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }
+        { this.renderSuggestedLabels() }
         { this.renderLabelInput() }
-        { labels.length ?
+        {
+          labels.length ?
           <div className="list-group">
             { _.map(labels, this.renderLabel.bind(this)) }
           </div> :
-          <div className="esper-no-content">
-            No Labels Added Yet
-          </div>
+          (
+            this.hasSuggested() ? null :
+            <div className="esper-no-content">
+              No Labels Added Yet
+            </div>
+          )
         }
         { this.renderFooter() }
       </div>;
@@ -63,7 +69,44 @@ module Esper.Components {
       return team.team_labels || [];
     }
 
+    renderSuggestedLabels() {
+      if (this.hasSuggested()) {
+        return <div className="esper-panel-section clearfix">
+          <label>Need Some Ideas?</label>
+          <div>
+            { _.map(this.props.suggestedLabels, (labelName) =>
+              <div className="col-sm-4 suggested-label" key={labelName}>
+                <button onClick={() => this.toggleSuggestedLabel(labelName)}
+                  className={"btn " + (_.contains(this.getLabels(), labelName) ?
+                  "btn-success" : "btn-default"
+                )}>
+                  {labelName}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      }
+    }
+
+    toggleSuggestedLabel(label: string) {
+      if (_.contains(this.getLabels(), label)) {
+        Teams.rmLabels(this.state.selectedTeamId, label);
+      } else {
+        Teams.addLabels(this.state.selectedTeamId, label);
+      }
+    }
+
+    hasSuggested() {
+      return this.props.suggestedLabels && this.props.suggestedLabels.length;
+    }
+
     renderLabel(label: string) {
+      if (this.hasSuggested() && _.contains(this.props.suggestedLabels, label))
+      {
+        return; // Only render if not suggested
+      }
+
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
@@ -77,7 +120,10 @@ module Esper.Components {
     renderLabelInput() {
       return <div className="form-group">
         <label htmlFor={this.getId("new-labels")}>
-          New Labels (Separate by Commas)
+          { this.hasSuggested() ?
+            "Or Use Your Own" :
+            "New Labels" }
+          {" "} (Separate by Commas)
         </label>
         <div className="input-group">
           <input type="text" className="form-control esper-modal-focus"
