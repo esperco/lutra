@@ -32,7 +32,7 @@ module Esper.Components {
         if (v) emailList.push(k);
       });
       Api.postContactsInvite("Brian Griffin", {email_list:emailList});
-      this.find("#myModal").modal('toggle');
+      $("#myModal").modal('hide');
     }
 
     selectAll = (onOrOff: boolean) => {
