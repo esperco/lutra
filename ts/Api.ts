@@ -39,7 +39,8 @@ module Esper.Api {
   /* Directory Profile info */
   export function getDirProfile(uid: string):
   JQueryPromise<ApiT.DirProfile> {
-    var url = prefix + "/api/directory/profile/" + string(uid);
+    var url = prefix + "/api/directory/" + string(Login.myUid())
+      + "/profile-uid/" + string(uid);
     return (JsonHttp.noWarn(function() {
       return JsonHttp.get(url);
     }));
@@ -47,7 +48,8 @@ module Esper.Api {
 
   export function getDirProfileByEmail(email: string):
   JQueryPromise<ApiT.DirProfile> {
-    var url = prefix + "/api/directory/profile/email/" + string(email);
+    var url = prefix + "/api/directory/" + string(Login.myUid())
+      + "/profile-email/" + string(email);
     return (JsonHttp.noWarn(function() {
       return JsonHttp.get(url);
     }));
@@ -90,7 +92,7 @@ module Esper.Api {
 
   export function searchDirProfile(query: string):
   JQueryPromise<ApiT.DirProfileSearchResults> {
-    var url = prefix + "/api/directory/search"
+    var url = prefix + "/api/directory/" + string(Login.myUid()) + "/search"
       + "?query=" + encodeURIComponent(query);
     return JsonHttp.get(url);
   }
