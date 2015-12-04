@@ -11,14 +11,35 @@ module Esper.Components {
       this.state = { contact_list: [], next_link: "", prev_link: "" };
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
+      var self = this;
       Api.getGoogleContacts(this.props.email)
         .done(function(contactInfo: ApiT.ContactInfo) {
-          this.state = contactInfo;
+          self.setState(contactInfo);
         });
     }
 
+    loadPage = (url: string) => {
+      var self = this;
+      Api.getGoogleContactsPage(url)
+        .done(function(contactInfo: ApiT.ContactInfo) {
+          self.setState(contactInfo);
+        })
+    }
+
     showContacts = (contactList: ApiT.Contact[]) => {
+      return _.map(contactList, function(contact) {
+        debugger;
+        return <div className="media">
+          <div className="media-left">
+            <img className="media-object" style={{ width: "64px", height: "64px"}} src={contact.picture !== "" ? "data:image/JPEG;base64," + contact.picture : "https://lh5.googleusercontent.com/-pF0uQT0oqjY/AAAAAAAAAAI/AAAAAAAADEU/QJr95ei0nx8/photo.jpg"}/>
+          </div>
+          <div className="media-body">
+            <h4 className="media-heading">{contact.name}</h4>
+            {contact.email}
+          </div>
+        </div>;
+      });
     }
 
     render() {
@@ -29,14 +50,21 @@ module Esper.Components {
               <button type="button" className="close" data-dismiss="modal">
                 <span aria-hidden="true">&times;</span>
               </button>
-              <h4 className="modal-title">Modal title</h4>
+              <h4 className="modal-title">Invite others to join!</h4>
             </div>
             <div className="modal-body">
-              <p>One fine body&hellip;</p>
+              {this.showContacts(this.state.contact_list)}
             </div>
             <div className="modal-footer">
-              <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" className="btn btn-primary">Save changes</button>
+              {this.state.prev_link !== "" ?
+                <button className="btn btn-default" onClick={() => this.loadPage(this.state.prev_link)}>{"< Prev Page"}</button> :
+                ""
+              }
+              {this.state.next_link !== "" ?
+                <button className="btn btn-default">Next Page ></button> :
+                ""
+              }
+              <button className="btn btn-primary">Send Invites</button>
             </div>
           </div>
         </div>
