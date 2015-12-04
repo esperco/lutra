@@ -40,9 +40,12 @@ module Esper.Components {
 
   ///////
 
+  interface StringFn { (): string; }
   interface OnboardingHeaderProps {
-    icon?: string;        // FontAwesome icon
-    title: string;        // Visible in title row
+    icon?: string;                // FontAwesome icon
+    title: string|StringFn;       // Visible in title row
+    modalTitle?: string;          // Optional alternate title for modal,
+                                  // defaults to title
 
     // Used as content for a modal
     children?: JSX.Element[];
@@ -51,49 +54,74 @@ module Esper.Components {
   class OnboardingHeader extends Component<OnboardingHeaderProps, {}> {
     renderWithData() {
       var step = Onboarding.current();
+      var nextText = "Next";
+      if (step === 0) {
+        nextText = "Get Started";
+      } else if (step >= Onboarding.paths.length - 1) {
+        nextText = "Finish";
+      }
+
       var disabledNext = !Onboarding.canGoToNext();
 
-      return <div className="onboarding-header">
-        <div className="nav">
-          <h2 className="onboarding-title">
-            { this.props.icon ?
-              <i className={"fa fa-fw " + this.props.icon} /> :
-              null
-            }{" "}
-            {this.props.title}
-          </h2>{" "}
-          { this.props.children ?
-            <a onClick={this.openModal.bind(this)}>
-              <i className="fa fa-fw fa-question-circle" />
-            </a> : null
-          }
-          <div className="pull-right">
-            <div className="btn-group">
-              { step > 0 ?
-                <button type="button" className="btn navbar-btn btn-default"
-                        onClick={Onboarding.prev}>
-                  <i className="fa fa-fw fa-angle-left" />
-                </button> : null
-              }
-              <button type="button" className={
-                    "btn navbar-btn btn-default" +
-                    (disabledNext ? "" : " onboarding-highlight")
-                  } onClick={Onboarding.next} disabled={disabledNext}>
-                <i className="fa fa-fw fa-angle-right" />
-              </button>
+      return <div className="onboarding-header-wrapper">
+        <div className="onboarding-header container">
+          <div className="nav">
+            <h2 className="onboarding-title">
+              { this.props.icon ?
+                <i className={"fa fa-fw " + this.props.icon} /> :
+                null
+              }{" "}
+              { this.getTitle() }
+            </h2>{" "}
+            { this.props.children ?
+              <a onClick={this.openModal.bind(this)}>
+                <i className="fa fa-fw fa-question-circle" />
+              </a> : null
+            }
+            <div className="pull-right">
+              <div className="btn-group">
+                { step > 0 ?
+                  <button type="button" className="btn navbar-btn btn-default"
+                          onClick={Onboarding.prev}>
+                    <i className="fa fa-angle-left" />
+                    {" "}Back
+                  </button> : null
+                }
+                <button type="button" className={
+                      "btn navbar-btn " + (disabledNext ?
+                      "btn-default" : "btn-success onboarding-highlight")
+                    } onClick={Onboarding.next} disabled={disabledNext}>
+                  { nextText }{" "}
+                  <i className="fa fa-angle-right" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
         { this.renderProgress() }
+        </div>
       </div>
     }
 
+    getTitle() {
+      if (typeof(this.props.title) === "string") {
+        return this.props.title as string;
+      } else {
+        return (this.props.title as StringFn)();
+      }
+    }
+
     componentDidMount() {
+      this._currentPath = Route.current;
       this.openModal();
     }
 
+    // Track the current path (used in update below)
+    _currentPath: string;
+
     componentDidUpdate(prevProps: OnboardingHeaderProps) {
-      if (prevProps.title !== this.props.title) {
+      // Open modal when path changes only
+      if (this._currentPath !== Route.current) {
+        this._currentPath = Route.current;
         this.openModal();
       }
     }
@@ -109,7 +137,8 @@ module Esper.Components {
 
     openModal() {
       if (this.props.children) {
-        Layout.renderModal(<Modal title={this.props.title}
+        Layout.renderModal(<Modal
+            title={this.props.modalTitle || this.getTitle()}
             icon="fa-question-circle" showFooter={true}>
           {this.props.children}
         </Modal>);
@@ -140,23 +169,41 @@ module Esper.Components {
   export function onboardingLabelEventsHeader() {
     var info = Login.InfoStore.val();
 
-    return <OnboardingHeader title="Label an Event to Continue"
-        icon="fa-th-list">
+    // Put title in function to have it reactively update
+    function title() {
+      var labelsRequired = Onboarding.labelsRequired();
+      if (labelsRequired > 0) {
+        return "Label " + eventStr(labelsRequired) + " to Continue";
+      }
+      return "Click Next to Continue";
+    }
+
+    function eventStr(num: number) {
+      if (num === 1) {
+        return "1 Event";
+      } else {
+        return num + " Events";
+      }
+    }
+
+    var modalTitle = "Label " + eventStr(Onboarding.LABELS_REQUIRED) +
+                     " to Continue";
+
+    return <OnboardingHeader title={title} modalTitle={modalTitle}
+            icon="fa-th-list">
       <p>
-        Awesome. You're all set to start labeling events. To label an event,
-        first click on an event in the calendar below to select it. You can
-        select multiple events by holding down the Shift key. Once selected,
-        you can apply labels to those events by selecting them in the left
-        sidebar.
+        Click on an event in your calendar and select a label from the list
+        on the left. You can select multiple events by hold down the Shift
+        key.
       </p>
       <p>
-        Apply some labels and then click the
-        {" "}<span className="symbol-quote">
-          <i className="fa fa-fw fa-angle-right" />
-        </span>{" "}button
-        in the upper right to continue.
+        Once you've added labels to
+        {" " + eventStr(Onboarding.LABELS_REQUIRED) + " "}
+        click {" "}<span className="symbol-quote">
+          Next{" "}<i className="fa fa-fw fa-angle-right" />
+        </span>{" "}to continue.
       </p>
-      <p>
+      <p className="esper-de-em">
         Don't see any events? Try adding some in {" "}{
           info.platform === "Nylas" ?
           <span>Microsoft Outlook</span> :
@@ -171,29 +218,24 @@ module Esper.Components {
   }
 
   export function onboardingChartsHeader() {
-    return <OnboardingHeader title="Chart Your Data" icon="fa-bar-chart">
+    return <OnboardingHeader title="Fantastic! Chart Your Data"
+            icon="fa-bar-chart">
       <p>
-        Fantastic. As you label events, you can view charts that show how
-        time is being spent. We're currently only showing data for the last
-        5 days, weeks, and months, but if you need data for a custom time
-        period, feel free to let us know by clicking the {" "}
+        Once you've labeled your events you can see how you're spending your
+        time in the charts section. Right now you can only see the last 5 days,
+        weeks, and months.
+      </p>
+      <p>
+        You can request custom reports and time periods by clicking the {" "}
         <span className="symbol-quote">Other?</span>{" "} button in
         the upper right.
       </p>
       <p>
-        It may take a few minutes for charts to update with data from newly
-        labeled events. Click the
+        That's it! Click
         {" "}<span className="symbol-quote">
-          <i className="fa fa-fw fa-refresh" />
-        </span>{" "}button in
-        the upper right to refresh.
-      </p>
-      <p>
-        That's it! Click the
-        {" "}<span className="symbol-quote">
-          <i className="fa fa-fw fa-angle-right" />
-        </span>{" "}button
-        in the upper right to conclude this tutorial and go back to labeling.
+          Finish <i className="fa fa-fw fa-angle-right" />
+        </span>{" "}
+        to enter Esper TimeStats and continue labeling.
       </p>
     </OnboardingHeader>;
   }

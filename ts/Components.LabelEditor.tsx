@@ -109,7 +109,6 @@ module Esper.Components {
       });
 
       TimeStats.intervalQuery.invalidate();
-      Onboarding.incrLabeled();
     }
 
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {

@@ -57,16 +57,19 @@ module Esper.Onboarding {
     return completedSoFar() < 2;
   }
 
-  /*
-    Simple counter for how many events have been labeled in the current
-    session
-  */
-  var eventsLabeled = new Model.StoreOne<number>();
-  export function incrLabeled() {
-    eventsLabeled.set(function(old: number) {
-      old = old || 0;
-      return old + 1;
+  // Number of events required to be labeled
+  export var LABELS_REQUIRED = 5;
+
+  // Function telling us how many more events need labeling
+  export function labelsRequired() {
+    var labeledEvents = _.filter(Events.EventStore.getAll(), (tuple) => {
+      var data = tuple[0];
+      var meta = tuple[1];
+      return data && data.labels && data.labels.length && meta &&
+        meta.dataStatus === Model.DataStatus.READY;
     });
+    var labeledEventsCount = (labeledEvents && labeledEvents.length) || 0;
+    return Math.max(LABELS_REQUIRED - labeledEventsCount, 0);
   }
 
   // How many onboarding steps have been completed so far?
@@ -75,6 +78,12 @@ module Esper.Onboarding {
     if (! teams.length) {
       teams = Login.InfoStore.val().teams;
     }
+
+    // Ignore teams being saved
+    teams = _.filter(teams, (t) => {
+      var meta = Teams.teamStore.metadata(t.teamid);
+      return !meta || meta.dataStatus === Model.DataStatus.READY;
+    });
 
     // Step 1 => Create team with calendar
     var teamWithCal = _.find(teams,
@@ -93,7 +102,7 @@ module Esper.Onboarding {
     }
 
     // Step 3 => Label some events
-    if (! eventsLabeled.val()) {
+    if (labelsRequired() > 0) {
       return 2;
     }
 

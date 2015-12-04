@@ -26,22 +26,14 @@ module Esper.Views {
     renderWithData() {
       return renderContainer(<div>
         <div className="well">
-          Welcome to TimeStats!
-          Esper TimeStats helps you label your calendar events and analyze how
-          you spend your time. We'll need to set up a few things to get
-          started. When you're ready, click the
-          {" "}<span className="symbol-quote">Next</span>{" "} button below
-          to continue.
+          Welcome to Esper TimeStats!
+          Use TimeStats to identify time sinks, spot trends, and focus on what
+          matters most to you.
         </div>
         <a href="img/TimeStats.gif" target="_blank">
-          <img src="img/TimeStats.gif"
+          <img src="img/TimeStats.gif" className="onboarding-img"
                style={{width: "100%", height: "auto"}} />
         </a>
-        <div><div className="modal-footer">
-          <button className="btn btn-default" onClick={Onboarding.next}>
-            Next
-          </button>
-        </div></div>
       </div>)
     }
   }
@@ -51,23 +43,24 @@ module Esper.Views {
       var info = Login.InfoStore.val();
       return renderContainer(<div>
         <div className="well">
-          Please select which calendar(s) you'd like to use with TimeStats.
+          Which calendars do you use to track your time?
 
-          If the calendar you’re looking for doesn’t appear in this list,
+          Don't see the calendar you want?
           {" "}{ info.platform === "Nylas" ?
             <span>
-              ask the calendar owner to share it with the Exchange or Office
-              365 account you logged in with.
+             You must own the calendar to use it.
+              If you are an assistant trying to use your executive’s calendar
+              ask them to <a href="#">verify and share</a>. If you are an
+              executive, <a href="#">invite your assistant to help</a>.
             </span> :
             <span>
-              ask the calendar owner to {" "}
+              If you don't own the calendar, you'll need the owner to {" "}
               <a href="https://support.google.com/calendar/answer/37082?hl=en">
-              share it with the Google account you logged in with</a>.
+              share it with you</a>.
             </span>
           }
         </div>
-        <Components.CalAdd onDone={Onboarding.next} doneText="Next"
-          disableDone={!Onboarding.canGoToNext()} />
+        <Components.CalAdd />
       </div>);
     }
   }
@@ -77,16 +70,15 @@ module Esper.Views {
       var info = Login.InfoStore.val();
       return renderContainer(<div>
         <div className="well">
-          Create some labels to categorize your events. You
-          can always add more later.
+          Create some labels to categorize your events.
+          {" "}<strong>Add at least 2 labels to get started.</strong>{" "}
+          You can add more at any time.
         </div>
-        <Components.LabelAdd onDone={Onboarding.next} doneText="Next"
-          disableDone={!Onboarding.canGoToNext()}
-          suggestedLabels={[
-            "Product", "Business Development", "Sales",
-            "Email", "Internal Team", "Networking",
-            "Health & Wellness", "Personal", "Travel"
-          ]} />
+        <Components.LabelAdd suggestedLabels={[
+          "Product", "Business Development", "Sales",
+          "Email", "Internal Team", "Networking",
+          "Health & Wellness", "Personal", "Travel"
+        ]} />
       </div>);
     }
   }

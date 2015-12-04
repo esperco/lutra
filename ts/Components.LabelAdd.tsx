@@ -15,7 +15,7 @@ module Esper.Components {
   interface LabelAddProps {
     disableDone?: boolean;
     doneText?: string;
-    onDone: () => void;
+    onDone?: () => void;
     suggestedLabels?: string[]
   }
 
@@ -186,6 +186,12 @@ module Esper.Components {
     renderFooter() {
       var dataStatus = Teams.dataStatus(this.state.selectedTeamId);
       var busy = dataStatus === Model.DataStatus.INFLIGHT;
+
+      // Don't render footer if no done option and we don't need to show
+      // busy indicator
+      if (!this.props.onDone && !busy) {
+        return;
+      }
 
       return <div className="clearfix modal-footer">
         { busy ?
