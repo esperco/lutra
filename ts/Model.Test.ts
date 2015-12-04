@@ -770,6 +770,16 @@ module Esper.Model {
           key: "black_rabbit"
         }]);
       });
+
+      it("should track getAll calls", function() {
+        track(() => {
+          myRabbitStore.getAll();
+        }, this.post);
+
+        expect(this.post).toHaveBeenCalledWith([{
+          store: myRabbitStore,
+        }]);
+      });
     });
 
 

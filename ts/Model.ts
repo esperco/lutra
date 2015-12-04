@@ -191,6 +191,7 @@ module Esper.Model {
 
     // Return all store objects
     getAll(): [TData, StoreMetadata][] {
+      register(this);  // Tracker registration
       return _.values<[TData, StoreMetadata]>(this.data);
     }
 
