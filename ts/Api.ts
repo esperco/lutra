@@ -291,11 +291,14 @@ module Esper.Api {
   /***** Nylas *****/
   export function getNylasLoginUrl(email: string,
                                    nonce: string,
-                                   landing_url: string):
+                                   landing_url: string,
+                                   invite?: string):
     JQueryPromise<ApiT.UrlResult> {
-    var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
+      var inviteParam = invite ? "&invite=" + invite : "";
+      var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
         "?nonce=" + encodeURIComponent(nonce) +
-        "&landing_url=" + encodeURIComponent(landing_url);
+        "&landing_url=" + encodeURIComponent(landing_url) +
+        inviteParam;
     return JsonHttp.get(url);
   }
 
