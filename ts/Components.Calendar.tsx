@@ -206,7 +206,7 @@ module Esper.Components {
         (_id) => Events.EventStore.val(_id)
       ) || [];
       var recurringEventIds = _.map(selectedEvents,
-        (e) => e.recurring_event_id
+        (e) => e && e.recurring_event_id
       );
       recurringEventIds = _.uniq(_.filter(recurringEventIds));
 
