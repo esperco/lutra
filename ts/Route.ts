@@ -232,8 +232,22 @@ module Esper.Route {
     */
     var match = frag.match(/^https?:\/\/[^/]*/);
     var domain = match && match[0];
+
     if (domain) {
-      if (authorizedDomain(domain)) {
+       /*
+        Window.location.origin may not be supported on some browsers (IE), so
+        construct from scratch
+      */
+      var origin = window.location.origin || (
+        window.location.protocol + "//" + window.location.hostname +
+        (window.location.port ? ':' + window.location.port: '')
+      );
+
+      if (domain === origin) {
+        match = frag.match(/#!.*/);
+        frag = (match && match[0]) || "";
+      }
+      else if (authorizedDomain(domain)) {
         Log.d("Route.nav.path: window.location.href = " + frag);
         window.location.href = frag;
         return;
