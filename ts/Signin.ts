@@ -394,13 +394,6 @@ module Esper.Signin {
       .done(function(loginInfo) {
         Login.setLoginInfo(loginInfo);
         clearLoginNonce();
-
-        /*
-          The following code doesn't work in context
-          with e.g. landingUrl = "http://localhost/#!"
-          resulting in a blank page at the end of a Microsoft/Nylas signin.
-          Route.nav.path(landingUrl) does work from the js console, though.
-        */
         if (landingUrl) {
           Log.d("Route.nav.path() " + landingUrl);
           Route.nav.path(landingUrl);
