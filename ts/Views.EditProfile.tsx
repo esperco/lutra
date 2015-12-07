@@ -76,9 +76,6 @@ module Esper.Views {
 
     componentDidMount() {
       this.find('.dropdown-toggle').dropdown();
-      if (this.props.header == "Create New Profile") {
-        this.find("#myModal").modal('toggle');
-      }
     }
     componentDidUpdate() {
       this.find('.dropdown-toggle').dropdown();
@@ -159,8 +156,7 @@ module Esper.Views {
         this.cleanList(s.phones), this.cleanList(s.addresses),
         this.cleanList(s.custom_entries), s.image_url, true);
       Api.setDirProfile(profile).done(function() {
-        DirProfile.Store.set(profile, { dataStatus: Model.DataStatus.READY });
-        Route.nav.path("/profile");
+        window.location.href = "/";
       });
     }
 

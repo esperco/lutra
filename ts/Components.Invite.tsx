@@ -22,8 +22,9 @@ module Esper.Components {
       var self = this;
       Api.getGoogleContacts(this.props.email)
         .done(function(contacts: ApiT.ContactInfo) {
+          $('#myModal').modal('show');
           self.setState({contactInfo:contacts} as ContactState);
-        });
+        })
     }
 
     sendInvites = () => {
