@@ -10,6 +10,7 @@ module Esper.DirProfile {
 
   export var Store = new Model.StoreOne<ApiT.DirProfile>();
   export var SearchStore = new Model.StoreOne<ApiT.DirProfileSearchResults>();
+  export var GuestStore = new Model.StoreOne<ApiT.DirProfile>();
   export var lastSearchQuery: string;
 
   var profileDeferred: JQueryDeferred<ApiT.DirProfile> = $.Deferred();
@@ -17,6 +18,7 @@ module Esper.DirProfile {
 
   export function init() {
     Store.set(null, { dataStatus: Model.DataStatus.FETCHING });
+    GuestStore.set(null, { dataStatus: Model.DataStatus.READY });
 
     var onFail = function(err: Error) {
       Store.set(null, {

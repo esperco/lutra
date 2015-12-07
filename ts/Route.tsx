@@ -23,7 +23,7 @@ module Esper.Route {
   }
 
   // Helper for displaying the directory edit profile page first time login
-  var profileRequired: PageJS.Callback = function(ctx, next) {
+  var myProfileRequired: PageJS.Callback = function(ctx, next) {
     DirProfile.profilePromise.done(next);
     DirProfile.profilePromise.fail(function(err: ApiT.Error) {
       if (err['status'] === 404) {
@@ -34,6 +34,21 @@ module Esper.Route {
     });
   }
 
+  var profileRequired: PageJS.Callback = function(ctx, next) {
+    if (ctx.params.id !== Login.InfoStore.val().uid) {
+      Api.getDirProfile(ctx.params.id).done(function(dirProfile) {
+        DirProfile.GuestStore.set(dirProfile, { dataStatus: Model.DataStatus.READY });
+        next();
+      })
+      .fail(function() {
+        nav.path("/profile");
+      });
+    } else {
+      DirProfile.GuestStore.set(DirProfile.Store.val(), { dataStatus: Model.DataStatus.READY });
+      next();
+    }
+  }
+
   var noProfile: PageJS.Callback = function(ctx, next) {
     DirProfile.profilePromise.fail(next);
     DirProfile.profilePromise.done(function() {
@@ -42,19 +57,24 @@ module Esper.Route {
   }
 
   // Index page
-  pageJs("/", function() {
+  pageJs("/", loginRequired, function() {
     nav.path("/profile");
   });
 
-  pageJs("/search", function(ctx) {
+  pageJs("/profile", loginRequired, function() {
+    var id = Login.InfoStore.val().uid;
+    nav.path("/profile/" + id);
+  });
+
+  pageJs("/search", loginRequired, function(ctx) {
     Layout.render(<Views.Search />);
   });
 
-  pageJs("/profile", loginRequired, profileRequired, function() {
+  pageJs("/profile/:id", loginRequired, myProfileRequired, profileRequired, function(ctx) {
     Layout.render(<Views.Profile />);
   });
 
-  pageJs("/edit-profile", loginRequired, profileRequired, function() {
+  pageJs("/edit-profile", loginRequired, myProfileRequired, function() {
     Layout.render(<Views.EditProfile header="Edit Profile" esperProfile={undefined} 
       dirProfile={DirProfile.Store.val()}/>);
   });
