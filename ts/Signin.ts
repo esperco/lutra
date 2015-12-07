@@ -195,11 +195,11 @@ module Esper.Signin {
         emailGroup.addClass("has-error");
       } else {
         loginBtn.prop("disabled", true);
-        Api.getNylasLoginUrl(email)
-          .then(function(result) {
-            setLoginNonce().done(function(loginNonce) {
-              var url = result.url + "&state=" + loginNonce;
-              window.location.href = url;
+        var landingUrl = "http://example.com/i-am-a-landing-url";
+        setLoginNonce().done(function(loginNonce) {
+          Api.getNylasLoginUrl(email, loginNonce, landingUrl)
+            .then(function(result) {
+              window.location.href = result.url;
             });
           }, function(err) {
             console.error(err);
