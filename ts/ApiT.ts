@@ -15,6 +15,11 @@ module Esper.ApiT {
   export interface ContactInfo {
     contact_list: Contact[];
     next_link: string;
+    prev_link: string;
+  }
+
+  export interface Invite {
+    email_list: string[];
   }
 
   export interface ChromeSupport {
