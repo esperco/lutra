@@ -140,7 +140,7 @@ module Esper.Signin {
 
         // Set handler
         button.click(function() {
-          showExchangeModal();
+          showExchangeModal(landingUrl);
           return false;
         });
 
@@ -148,7 +148,7 @@ module Esper.Signin {
       }
   };
 
-  function showExchangeModal() {
+  function showExchangeModal(landingUrl?: string) {
 '''
 <div #modal class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog short exchange-modal">
@@ -195,16 +195,18 @@ module Esper.Signin {
         emailGroup.addClass("has-error");
       } else {
         loginBtn.prop("disabled", true);
-        var landingUrl = "http://example.com/i-am-a-landing-url";
-        setLoginNonce().done(function(loginNonce) {
-          Api.getNylasLoginUrl(email, loginNonce, landingUrl)
-            .then(function(result) {
-              window.location.href = result.url;
-            });
-          }, function(err) {
-            console.error(err);
-            loginBtn.prop("disabled", false);
-            return err;
+        landingUrl = landingUrl || "#!";
+        setLoginNonce().then(
+            function(loginNonce) {
+              return Api.getNylasLoginUrl(email, loginNonce, landingUrl)
+            },
+            function(err) {
+              Log.e(err);
+              loginBtn.prop("disabled", false);
+              return err;
+            }
+          ).then(function(result) {
+            window.location.href = result.url;
           });
       }
       return false;
