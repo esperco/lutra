@@ -151,14 +151,15 @@ module Esper.Views {
       return <div id="labels-over-time-page"
                   className="esper-full-screen minus-nav">
         <div className="container-fluid"><div className="row">
-          <div className="col-sm-3 col-lg-2 esper-left-sidebar padded">
+          <div className="col-xs-5 col-sm-3 col-lg-2 esper-left-sidebar padded">
             <Components.CalSelector
               selectedTeamId={selectedTeamId}
               selectedCalId={selectedCalId}
               updateFn={updateSelection} />
             {this.renderLabels()}
           </div>
-          <div className="col-sm-9 col-lg-10 esper-right-content padded">
+          <div
+            className="col-xs-7 col-sm-9 col-lg-10 esper-right-content padded">
             <div className="esper-header clearfix">
               <h4 className="pull-left">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}
