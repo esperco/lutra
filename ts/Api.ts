@@ -118,6 +118,26 @@ module Esper.Api {
       "");
   }
 
+  /* Contacts */
+  export function getGoogleContacts(email: string):
+  JQueryPromise<ApiT.ContactInfo> {
+    var url = prefix + "/api/google/contacts/" + string(Login.myUid()) + "/" + email;
+    return JsonHttp.get(url);
+  }
+
+  export function getGoogleContactsPage(gcontact_url: string):
+  JQueryPromise<ApiT.ContactInfo> {
+    var url = prefix + "/api/google/contacts/url/" + string(Login.myUid())
+              + "/" + encodeURIComponent(gcontact_url);
+    return JsonHttp.get(url);
+  }
+
+  export function postContactsInvite(fullname: string, invite_list: ApiT.Invite):
+  JQueryPromise<void> {
+    var url = prefix + "/api/contacts/invite/" + fullname;
+    return JsonHttp.post(url, JSON.stringify(invite_list));
+  }
+
   export function random():
     JQueryPromise<ApiT.Random> {
     return JsonHttp.post(prefix + "/api/random", "");
@@ -271,11 +291,14 @@ module Esper.Api {
   /***** Nylas *****/
   export function getNylasLoginUrl(email: string,
                                    nonce: string,
-                                   landing_url: string):
+                                   landing_url: string,
+                                   invite?: string):
     JQueryPromise<ApiT.UrlResult> {
-    var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
+      var inviteParam = invite ? "&invite=" + invite : "";
+      var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
         "?nonce=" + encodeURIComponent(nonce) +
-        "&landing_url=" + encodeURIComponent(landing_url);
+        "&landing_url=" + encodeURIComponent(landing_url) +
+        inviteParam;
     return JsonHttp.get(url);
   }
 
