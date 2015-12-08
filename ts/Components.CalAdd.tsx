@@ -8,6 +8,7 @@
 /// <reference path="./Esper.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Components.RequestExec.tsx" />
 /// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
@@ -36,13 +37,31 @@ module Esper.Components {
     }
 
     renderWithData() {
-      var store = ApiC.getCalendarList.store;
-      var key = ApiC.getCalendarList.strFunc([]);
+      var info = Login.InfoStore.val();
+      var isNylas = (info.platform === "Nylas");
+      var currentTeam = Teams.get(this.state.selectedTeamId);
 
-      var calData = store.val(key);
-      var calendars = calData && calData.calendars;
-      var calMeta = store.metadata(key);
-      var dataStatus = calMeta && calMeta.dataStatus;
+      var calendars: ApiT.Calendar[];
+      var dataStatus: Model.DataStatus;
+
+      // If non-self-exec Nylas, calendar list is for current team (if set)
+      if (isNylas && currentTeam &&
+          currentTeam.team_executive !== Login.myUid())
+      {
+        calendars = currentTeam.team_calendars;
+        dataStatus = Teams.dataStatus(this.state.selectedTeamId);
+      }
+
+      // Else, fetch the list of calendars for this user
+      else {
+        var store = ApiC.getCalendarList.store;
+        var key = ApiC.getCalendarList.strFunc([]);
+
+        var calData = store.val(key);
+        calendars = calData && calData.calendars;
+        var calMeta = store.metadata(key);
+        dataStatus = calMeta && calMeta.dataStatus;
+      }
 
       if (dataStatus === Model.DataStatus.FETCH_ERROR ||
           dataStatus === Model.DataStatus.PUSH_ERROR) {
@@ -55,15 +74,60 @@ module Esper.Components {
         </div>;
       }
 
-      else if (dataStatus !== Model.DataStatus.READY) {
+      else if (dataStatus !== Model.DataStatus.READY &&
+               dataStatus !== Model.DataStatus.UNSAVED)
+      {
         return <div className="esper-spinner esper-centered esper-medium" />;
       }
 
       return <div>
         { this.renderTeamSelector() }
-        <div className="list-group">
-          { _.map(calendars, this.renderCalendar.bind(this)) }
-        </div>
+        { isNylas && currentTeam &&
+          !(currentTeam.team_approved && calendars && calendars.length) ?
+
+          // Not approved or no calendars shared
+          <div className="esper-no-content">
+            Waiting for calendar owner to grant access.
+          </div> :
+
+          // Approved (or not Nylas)
+          <div>
+            { isNylas && currentTeam &&
+              currentTeam.team_executive !== Login.myUid() ?
+              <div className="alert alert-warning">
+                You do not have permission to add calendars for this
+                account. You may remove calendars, but you will need the
+                calendar owner to log in to re-grant access to access any
+                calendars you have removed.
+              </div> : null
+            }
+            { calendars && calendars.length ?
+              // Calendars
+              <div>
+                <label>Select Calendars</label>
+                <div className="list-group">
+                  { _.map(calendars, this.renderCalendar.bind(this)) }
+                </div>
+              </div> :
+
+              // No calendars
+              <div className="esper-no-content">
+                No calendars found
+              </div>
+            }
+          </div>
+        }
+
+        { isNylas ?
+          <Components.RequestExec
+            onSave={this.changeTeamPromise.bind(this)}
+          /> :
+          <div className="well">
+            Don't see the calendar you want? Ask the owner to {" "}
+            <a href="https://support.google.com/calendar/answer/37082?hl=en">
+            share it with you on Google</a>.
+          </div>
+        }
         { this.renderFooter() }
       </div>;
     }
@@ -109,11 +173,16 @@ module Esper.Components {
 
     renderTeamSelector() {
       var allTeams = Teams.all();
+      var loginInfo = Login.InfoStore.val();
+      var isNylas = loginInfo.platform === "Nylas";
       if (allTeams && allTeams.length > 1) {
         return <div className="form-group">
-          <select className="form-control"
+          <label htmlFor={this.getId("team-select")} className="control-label">
+            { isNylas ? "Calendar Owner" : "Executive Team" }
+          </label>
+          <select id={this.getId("team-select")} className="form-control"
                   value={this.state.selectedTeamId}
-                  onChange={this.changeTeam.bind(this)}>
+                  onChange={this.changeTeamEvent.bind(this)}>
             {_.map(allTeams, (t) =>
               <option key={t.teamid} value={t.teamid}>{t.team_name}</option>
             )}
@@ -122,9 +191,15 @@ module Esper.Components {
       }
     }
 
-    changeTeam(event: Event) {
+    changeTeamEvent(event: Event) {
       var target = event.target as HTMLOptionElement;
-      this.setState({selectedTeamId: target.value})
+      this.setState({selectedTeamId: target.value});
+    }
+
+    changeTeamPromise(p: JQueryPromise<ApiT.Team>) {
+      p.done((team) => {
+        this.setState({selectedTeamId: team.teamid});
+      });
     }
 
     renderFooter() {
