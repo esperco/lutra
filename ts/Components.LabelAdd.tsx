@@ -150,7 +150,7 @@ module Esper.Components {
       input.focus();
     }
 
-    // Catch enter key on input -- other jQuery to actual examine value
+    // Catch enter key on input -- use jQuery to actual examine value
     inputKeydown(e: KeyboardEvent) {
       if (e.keyCode === 13) {
         e.preventDefault();
@@ -165,8 +165,13 @@ module Esper.Components {
 
     renderTeamSelector() {
       var allTeams = Teams.all();
+      var loginInfo = Login.InfoStore.val();
+      var isNylas = loginInfo.platform === "Nylas";
       if (allTeams && allTeams.length > 1) {
         return <div className="form-group">
+          <label htmlFor={this.getId("team-select")} className="control-label">
+            { isNylas ? "Calendar Owner" : "Executive Team" }
+          </label>
           <select className="form-control"
                   value={this.state.selectedTeamId}
                   onChange={this.changeTeam.bind(this)}>

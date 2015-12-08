@@ -67,14 +67,27 @@ module Esper.Teams {
       team_calendar_accounts: []
     }
 
-    var _id = Util.randomString();
-    teamStore.insert(team, {
-      _id: _id,
-      dataStatus: Model.DataStatus.UNSAVED
-    });
+    return upsertTeam(team);
+  }
+
+  export function upsertTeam(team: ApiT.Team): string {
+    var _id: string;
+    if (team.teamid) {
+      _id = team.teamid;
+      teamStore.upsertSafe(_id, team, {
+        dataStatus: Model.DataStatus.UNSAVED
+      });
+    } else {
+      _id = Util.randomString();
+      teamStore.insert(team, {
+        _id: _id,
+        dataStatus: Model.DataStatus.UNSAVED
+      });
+    }
 
     var currentTeamIds = _.clone(allTeamsStore.val(batchKey)) || [];
     currentTeamIds.push(_id);
+    currentTeamIds = _.uniq(currentTeamIds);
     allTeamsStore.upsertSafe(batchKey, currentTeamIds);
 
     return _id;
@@ -84,7 +97,9 @@ module Esper.Teams {
   export function saveDefaultTeam() {
     var _id = getDefaultTeamId();
     var team = _id && teamStore.val(_id);
-    if (team) {
+    if (team &&
+        teamStore.metadata(_id).dataStatus === Model.DataStatus.UNSAVED)
+    {
       return saveTeam(_id, team);
     }
   }
@@ -105,8 +120,25 @@ module Esper.Teams {
     });
   }
 
+  // Saves a Nylas team for a given exec email
+  export function saveNylasExecTeam(email: string) {
+    var req: ApiT.TeamCreationRequest = {
+      executive_name: email,
+      executive_email: email
+    };
+
+    return Api.createTeam(req).then((t) => {
+      if (t && t.teamid) {
+        upsertTeam(t);
+      }
+      return t;
+    });
+  }
+
   export function getDefaultTeamId(): string {
-    var pair = _.find(teamStore.getAll(), (p) => !p[0].teamid);
+    var pair = _.find(teamStore.getAll(),
+      (p) => p[0].team_executive === Login.myUid()
+    );
     return pair && pair[1]._id;
   }
 
@@ -208,6 +240,9 @@ module Esper.Teams {
       (t): [string, ApiT.Team] => [t.teamid, t]
     );
     allTeamsStore.batchUpsert(batchKey, tuples);
+
+    // Create default team checks for existing team before creating
+    createDefaultTeam();
   }
 
   export function init() {

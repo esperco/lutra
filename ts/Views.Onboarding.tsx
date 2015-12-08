@@ -25,7 +25,7 @@ module Esper.Views {
   export class OnboardingStart extends Component<{}, {}> {
     renderWithData() {
       return renderContainer(<div>
-        <div className="well">
+        <div className="alert alert-info">
           Welcome to Esper TimeStats!
           Use TimeStats to identify time sinks, spot trends, and focus on what
           matters most to you.
@@ -40,25 +40,9 @@ module Esper.Views {
 
   export class OnboardingAddCals extends Component<{}, {}> {
     renderWithData() {
-      var info = Login.InfoStore.val();
       return renderContainer(<div>
-        <div className="well">
+        <div className="alert alert-info">
           Which calendars do you use to track your time?
-
-          Don't see the calendar you want?
-          {" "}{ info.platform === "Nylas" ?
-            <span>
-             You must own the calendar to use it.
-              If you are an assistant trying to use your executive’s calendar
-              ask them to <a href="#">verify and share</a>. If you are an
-              executive, <a href="#">invite your assistant to help</a>.
-            </span> :
-            <span>
-              If you don't own the calendar, you'll need the owner to {" "}
-              <a href="https://support.google.com/calendar/answer/37082?hl=en">
-              share it with you</a>.
-            </span>
-          }
         </div>
         <Components.CalAdd />
       </div>);
@@ -69,7 +53,7 @@ module Esper.Views {
     renderWithData() {
       var info = Login.InfoStore.val();
       return renderContainer(<div>
-        <div className="well">
+        <div className="alert alert-info">
           Create some labels to categorize your events.
           {" "}<strong>Add at least 2 labels to get started.</strong>{" "}
           You can add more at any time.
