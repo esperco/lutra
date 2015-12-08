@@ -11,8 +11,13 @@ module Esper.Components {
     selected: { [index: string]: boolean; };
   }
 
-  export class Invite extends Component<{email: string}, ContactState> {
-    constructor(props: {email:string}) {
+  interface InviteProps {
+    name: string;
+    email: string;
+  }
+
+  export class Invite extends Component<InviteProps, ContactState> {
+    constructor(props: InviteProps) {
       super(props);
       this.state = { contactInfo:{contact_list: [], next_link: "", prev_link: "" },
                      selected:{} };
@@ -32,7 +37,7 @@ module Esper.Components {
       _.map(this.state.selected, function(v, k) {
         if (v) emailList.push(k);
       });
-      Api.postContactsInvite("Brian Griffin", {email_list:emailList});
+      Api.postContactsInvite(this.props.name, {email_list:emailList});
       $("#myModal").modal('hide');
     }
 
