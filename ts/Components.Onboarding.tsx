@@ -58,7 +58,7 @@ module Esper.Components {
       if (step === 0) {
         nextText = "Get Started";
       } else if (step >= Onboarding.paths.length - 1) {
-        nextText = "Finish";
+        nextText = "Start Trial";
       }
 
       var disabledNext = !Onboarding.canGoToNext();
@@ -233,9 +233,9 @@ module Esper.Components {
       <p>
         That's it! Click
         {" "}<span className="symbol-quote">
-          Finish <i className="fa fa-fw fa-angle-right" />
+          Start Trial <i className="fa fa-fw fa-angle-right" />
         </span>{" "}
-        to enter Esper TimeStats and continue labeling.
+        to enter Esper TimeStats and begin your 30 day trial.
       </p>
     </OnboardingHeader>;
   }

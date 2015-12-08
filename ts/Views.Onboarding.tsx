@@ -28,7 +28,7 @@ module Esper.Views {
         <div className="alert alert-info">
           Welcome to Esper TimeStats!
           Use TimeStats to identify time sinks, spot trends, and focus on what
-          matters most to you.
+          matters most to you. Begin your 30 day trial today!
         </div>
         <a href="img/TimeStats.gif" target="_blank">
           <img src="img/TimeStats.gif" className="onboarding-img"
