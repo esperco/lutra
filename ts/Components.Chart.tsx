@@ -11,6 +11,7 @@ module Esper.Components {
 
   // Set some global defaults for Chart.js
   Chart.defaults.global.responsive = true;
+  Chart.defaults.global.maintainAspectRatio = false;
 
   export abstract class ChartCanvas<P> extends Component<P,{}>
   {
