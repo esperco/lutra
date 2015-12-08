@@ -15,6 +15,7 @@ module Esper.Components {
         <div className="container-fluid padded">
           <div className="navbar-header">
             <button type="button" className="navbar-toggle collapsed"
+              onClick={this.toggleCollapse.bind(this)}
               data-toggle="collapse"
               data-target={this.getId(toggleId)}>
               <i className="fa fa-bars"></i>
@@ -35,11 +36,12 @@ module Esper.Components {
               <li>
                 <a onClick={this.openHelpModal.bind(this)}>
                   <i className="fa fa-fw fa-question-circle" />
+                  <span className="visible-xs-inline">{" "}How To</span>
                 </a>
               </li>
             </ul>
 
-            <div className="nav navbar-nav navbar-right">
+            <div className="navbar-right">
               <Components.LoginInfo />
             </div>
           </div>
@@ -50,6 +52,16 @@ module Esper.Components {
 
     openHelpModal() {
       Layout.renderModal(<Components.GifModal />);
+    }
+
+    componentDidMount() {
+      this.find('.collapse').collapse({
+        toggle: false
+      });
+    }
+
+    toggleCollapse() {
+      this.find('.collapse').collapse('toggle');
     }
   }
 
