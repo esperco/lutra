@@ -1,7 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Store.ts" />
 /// <reference path="./Views.ChangePass.tsx" />
-/// <reference path="./Components.Invite.tsx" />
+/// <reference path="../marten/ts/Components.Invite.tsx" />
 
 module Esper.Views {
 
