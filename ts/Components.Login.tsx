@@ -33,9 +33,14 @@ module Esper.Components {
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
             </a></li>
-            <li><a onClick={() => { Layout.renderModal(<Components.Invite/> ) } }>
-              Invite your contacts!
-            </a></li>
+
+            { this.state.loginInfo.platform === "Google" ?
+              <li><a onClick={
+                  () => { Layout.renderModal(<Components.Invite />) }
+                }>
+                Invite your contacts!
+              </a></li> : null
+            }
           </ul>
         </div>;
       }
