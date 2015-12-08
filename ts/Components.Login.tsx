@@ -23,7 +23,6 @@ module Esper.Components {
       }
 
       if (this.state.loginInfo) {
-        var self = this;
         return <div className="dropdown navbar-text">
           <a className="dropdown-toggle" data-toggle="dropdown">
             {this.state.loginInfo.email}{" "}
