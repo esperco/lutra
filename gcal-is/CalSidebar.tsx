@@ -96,12 +96,14 @@ module Esper.CalSidebar {
       var sidebarState = this.getSidebarState(current);
 
       // Do not render anything visible, disabled
-      if (sidebarState === ExtensionOptions.SidebarOpts.NONE) {
+      if (!Login.loggedIn() ||
+          sidebarState === ExtensionOptions.SidebarOpts.NONE)
+      {
         return <span />;
       }
 
       if (current && current.eventId) {
-        if (Login.loggedIn() && current.team) {
+        if (current.team) {
           var eventKey = CurrentEvent.getEventKey(current);
           var task = _.find(CurrentEvent.taskEventStore.batchVal(eventKey),
             (t) => t.task_teamid === current.team.teamid);
