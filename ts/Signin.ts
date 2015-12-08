@@ -124,28 +124,23 @@ module Esper.Signin {
                                  optInvite?: string,
                                  optEmail?: string):
     JQuery {
-      if (Esper.PRODUCTION) { // remove when Nylas login fully works
-        return $(`<span />`);
-      }
-      else {
 '''
 <button #button class="button-primary sign-in-btn exchange-btn">
   <div #logo class="sign-in-icon exchange-icon"/>
   <div class="sign-in-text">Microsoft Exchange</div>
 </button>
 '''
-        var exchangeIcon = $("<img class='svg-block'/>")
-          .appendTo(logo);
-        Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
+    var exchangeIcon = $("<img class='svg-block'/>")
+      .appendTo(logo);
+    Svg.loadImg(exchangeIcon, "/assets/img/exchange.svg");
 
-        // Set handler
-        button.click(function() {
-          showExchangeModal(landingUrl);
-          return false;
-        });
+    // Set handler
+    button.click(function() {
+      showExchangeModal(landingUrl);
+      return false;
+    });
 
-        return button;
-      }
+    return button;
   };
 
   function showExchangeModal(landingUrl?: string) {
