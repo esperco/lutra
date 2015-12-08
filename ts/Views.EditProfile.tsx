@@ -252,7 +252,8 @@ module Esper.Views {
           </button>
         </div>
         {(this.props.header === "Create New Profile") ?
-          <Components.Invite email={this.props.esperProfile.email}/> : ""}
+          <Components.Invite name={this.props.esperProfile.display_name}
+          email={this.props.esperProfile.email}/> : ""}
         <label>Profile Picture</label>
         <div className="media">
           <div className="media-left">
