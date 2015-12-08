@@ -9,27 +9,43 @@ module Esper.Components {
   interface ContactState {
     contactInfo: ApiT.ContactInfo;
     selected: { [index: string]: boolean; };
+    name: string;
+    email: string;
   }
 
   interface InviteProps {
-    name: string;
-    email: string;
+    name?: string;
+    email?: string;
   }
 
   export class Invite extends Component<InviteProps, ContactState> {
     constructor(props: InviteProps) {
       super(props);
       this.state = { contactInfo:{contact_list: [], next_link: "", prev_link: "" },
-                     selected:{} };
+                     selected:{},
+                     name:props.name,
+                     email:props.email };
+    }
+
+    getContacts = () => {
+      var self = this;
+      Api.getGoogleContacts(this.state.email)
+        .done(function(contacts: ApiT.ContactInfo) {
+          $('#myModal').modal('show');
+          self.setState({ contactInfo: contacts } as ContactState);
+        })
     }
 
     componentDidMount = () => {
       var self = this;
-      Api.getGoogleContacts(this.props.email)
-        .done(function(contacts: ApiT.ContactInfo) {
-          $('#myModal').modal('show');
-          self.setState({contactInfo:contacts} as ContactState);
-        })
+      if (this.props.name === undefined || this.props.email === undefined) {
+        Api.getMyProfile().done(function(profile) {
+          self.setState({ name: profile.display_name, email: profile.email } as ContactState);
+          self.getContacts();
+        });
+      } else {
+        self.getContacts();
+      }
     }
 
     sendInvites = () => {
@@ -37,7 +53,7 @@ module Esper.Components {
       _.map(this.state.selected, function(v, k) {
         if (v) emailList.push(k);
       });
-      Api.postContactsInvite(this.props.name, {email_list:emailList});
+      Api.postContactsInvite(this.state.name, {email_list:emailList});
       $("#myModal").modal('hide');
     }
 
