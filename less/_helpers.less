@@ -91,9 +91,17 @@
   // e.g. if panel is only element
   .esper-focus-message {
     height: 95%;
-    font-size: 150%;
+    font-size: 250%;
     margin: 0;
     color: @gray-light;
+
+    @media screen and (min-width: @screen-sm-min) {
+      font-size: 200%;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      font-size: 150%;
+    }
 
     > *:first-child {
       .esper-center;
@@ -105,6 +113,7 @@
 
     h2 {
       font-weight: bold;
+      font-size: 150%;
       margin-bottom: 20px;
     }
   }
