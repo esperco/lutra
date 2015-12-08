@@ -90,7 +90,7 @@ module Esper.Components {
     showContacts = (contactList: ApiT.Contact[]) => {
       var self = this;
       return _.map(contactList, function(contact) {
-        return <div className="media clickable-media"
+        return <div className="media esper-clickable-media"
                     onClick={self.clickContact.bind(self,contact.email)}>
           <div className="media-left">
             <img className="media-object" style={{ width: "64px", height: "64px"}} 
