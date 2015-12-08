@@ -4,6 +4,7 @@
 
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Components.Invite.tsx" />
 /// <reference path="./Login.ts" />
 
 module Esper.Components {
@@ -22,6 +23,7 @@ module Esper.Components {
       }
 
       if (this.state.loginInfo) {
+        var self = this;
         return <div className="dropdown navbar-text">
           <a className="dropdown-toggle" data-toggle="dropdown">
             {this.state.loginInfo.email}{" "}
@@ -31,6 +33,9 @@ module Esper.Components {
             <li><a href={Login.logoutURL()}>
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
+            </a></li>
+            <li><a onClick={() => { Layout.renderModal(<Components.Invite/> ) } }>
+              Invite your contacts!
             </a></li>
           </ul>
         </div>;
