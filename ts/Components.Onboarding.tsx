@@ -235,7 +235,7 @@ module Esper.Components {
         {" "}<span className="symbol-quote">
           Start Trial <i className="fa fa-fw fa-angle-right" />
         </span>{" "}
-        to enter Esper TimeStats and begin your 30 day trial.
+        to begin your 30 day trial.
       </p>
     </OnboardingHeader>;
   }
