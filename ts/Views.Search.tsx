@@ -28,11 +28,11 @@ export class Search extends Component<{}, SearchState> {
     }
 
     showProfile(profile: ApiT.DirProfile) {
-      DirProfile.Store.set(profile, {
+      DirProfile.GuestStore.set(profile, {
         dataStatus: Model.DataStatus.READY,
         lastError: undefined
       });
-      Route.nav.path("/profile");
+      Route.nav.path("/profile/" + profile.uid);
     }
 
     render() {

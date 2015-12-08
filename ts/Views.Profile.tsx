@@ -17,7 +17,7 @@ module Esper.Views {
   };
 
   export class Profile extends Component<{}, ProfileState> {
-    test = () => {
+    editProfile = () => {
       Route.nav.path("/edit-profile")
     }
 
@@ -31,12 +31,12 @@ module Esper.Views {
     }
 
     componentDidMount() {
-      this.setSources([DirProfile.Store]);
+      this.setSources([DirProfile.GuestStore]);
     }
 
     getState() {
-      var dirProfile = DirProfile.Store.val();
-      var metadata = DirProfile.Store.metadata();
+      var dirProfile = DirProfile.GuestStore.val();
+      var metadata = DirProfile.GuestStore.metadata();
       return {
         dirProfile: dirProfile,
         error: (metadata && metadata.lastError) || new Error("Cannot locate profile"),
@@ -78,7 +78,7 @@ module Esper.Views {
           </div>
           <table className="profile-body">
             <tr>
-              <td >
+              <td>
                 <h4>Overview</h4>
               </td>
             </tr>
@@ -96,8 +96,8 @@ module Esper.Views {
             {addressRows}
             {customRows}
           </table>
-          <button className="btn btn-primary"
-            onClick={() => this.test() }>Edit</button>
+          {profile.uid === DirProfile.Store.val().uid ? <button className="btn btn-primary"
+            onClick={this.editProfile}>Edit</button> :()=>{}}
         </div>
       </div>;
     }
