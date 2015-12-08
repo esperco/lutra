@@ -4,6 +4,7 @@
 
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Components.Invite.tsx" />
 /// <reference path="./Login.ts" />
 
 module Esper.Components {
@@ -32,6 +33,14 @@ module Esper.Components {
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
             </a></li>
+
+            { this.state.loginInfo.platform === "Google" ?
+              <li><a onClick={
+                  () => { Layout.renderModal(<Components.Invite />) }
+                }>
+                Invite your contacts!
+              </a></li> : null
+            }
           </ul>
         </div>;
       }
