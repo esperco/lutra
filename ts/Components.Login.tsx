@@ -29,7 +29,7 @@ module Esper.Components {
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
-            <li><a href={Login.logoutURL()}>
+            <li><a onClick={() => location.href=Login.logoutURL()}>
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
             </a></li>
