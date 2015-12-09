@@ -172,7 +172,7 @@ module Esper.Calendars {
           calendarIds: _.map(calendars, (c) => asGeneric(c).id)
         });
         if (teamId) {
-          return Api.putTeamCalendars(_id, calendars);
+          return Api.putTeamCalendars(teamId, calendars);
         } else {
           return Teams.saveTeam(_id, team);
         }
