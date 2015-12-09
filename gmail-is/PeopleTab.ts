@@ -828,9 +828,6 @@ module Esper.PeopleTab {
     </div>
   </div>
   <div class="esper-tab-overflow">
-    <div #preferencesSpinner class="esper-events-list-loading">
-      <div class="esper-spinner esper-list-spinner" />
-    </div>
     <div #dirProfileSection class="esper-section">
       <div #overviewHeader
            class="esper-section-header esper-clearfix">
@@ -848,7 +845,10 @@ module Esper.PeopleTab {
         </div>
       </div>
     </div>
-    <div class="esper-section">
+    <div #preferencesSpinner class="esper-events-list-loading">
+      <div class="esper-spinner esper-list-spinner" />
+    </div>
+    <div #meetingsSection class="esper-section">
       <div #meetingsHeader
            class="esper-section-header esper-clearfix esper-meetings-header">
         <span #showMeetings
@@ -959,8 +959,19 @@ module Esper.PeopleTab {
                                     profCompany,
                                     profCompanyTitle,
                                     profile);
+              if (Team.isExecutive(profile.uid, team)) {
+                displayExecPreferences();
+              } else {
+                meetingsSection.hide();
+                teamLabelsSection.hide();
+                coworkerSection.hide();
+                calendarsSection.hide();
+                notesSection.hide();
+              }
+              preferencesSpinner.hide();
             }, function(err) {
               headerSpinner.hide();
+              preferencesSpinner.hide();
               overviewSpinner.hide();
               if (err.status === 404) overviewNoProfile.show();
             });
@@ -982,77 +993,101 @@ module Esper.PeopleTab {
                             profCompany,
                             profCompanyTitle,
                             profile);
+      if (Team.isExecutive(profile.uid, team)) {
+        displayExecPreferences();
+      } else {
+        meetingsSection.hide();
+        teamLabelsSection.hide();
+        coworkerSection.hide();
+        calendarsSection.hide();
+        notesSection.hide();
+      }
+      preferencesSpinner.hide();
     }, function(err) {
       headerSpinner.hide();
+      preferencesSpinner.hide();
       overviewSpinner.hide();
       if (err.status === 404) overviewNoProfile.show();
     });
 
-    Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
-      var workplace_changes =
-        getPreferencesChanges("Workplace", changes.change_log);
-      var meeting_changes =
-        getPreferencesChanges("Meeting", changes.change_log);
-      var coworkers_changes =
-        getPreferencesChanges("Coworkers", changes.change_log);
-      var notes_changes =
-        getPreferencesChanges("Notes", changes.change_log);
+    function displayExecPreferences() {
+      Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
+        var workplace_changes =
+          getPreferencesChanges("Workplace", changes.change_log);
+        var meeting_changes =
+          getPreferencesChanges("Meeting", changes.change_log);
+        var coworkers_changes =
+          getPreferencesChanges("Coworkers", changes.change_log);
+        var notes_changes =
+          getPreferencesChanges("Notes", changes.change_log);
 
-      if (workplace_changes.length + meeting_changes.length > 0) {
-        meetingsNew.show();
-      }
-      if (coworkers_changes.length > 0) {
-        coworkersNew.show();
-      }
-      if (notes_changes.length > 0) {
-        notesNew.show();
-      }
-      preferencesSpinner.hide();
+        meetingsSection.show();
 
-      var meetingTypes = prefs.meeting_types;
-      var workplaces = prefs.workplaces;
-      populateMeetingsDropdown(meetingSelector, meetingInfo, noMeetingPrefs,
-                               meetingTypes, workplaces,
-                               meeting_changes, workplace_changes);
+        if (workplace_changes.length + meeting_changes.length > 0) {
+          meetingsNew.show();
+        }
+        if (coworkers_changes.length > 0) {
+          coworkersNew.show();
+        }
+        if (notes_changes.length > 0) {
+          notesNew.show();
+        }
+        preferencesSpinner.hide();
 
-      // If we have a workplace, display that as the starting choice.
-      if (workplaces.length > 0) {
-        meetingSelector.val("0");
-      }
+        var meetingTypes = prefs.meeting_types;
+        var workplaces = prefs.workplaces;
+        populateMeetingsDropdown(meetingSelector, meetingInfo, noMeetingPrefs,
+                                 meetingTypes, workplaces,
+                                 meeting_changes, workplace_changes);
 
-      meetingSelector.change(); // ensure this section is initialized correctly
+        // If we have a workplace, display that as the starting choice.
+        if (workplaces.length > 0) {
+          meetingSelector.val("0");
+        }
 
-      meetingSelector.click(function() {
-        Analytics.track(Analytics.Trackable.ClickPeopleTabMeetingsDropdown);
-      });
+        meetingSelector.change(); // ensure this section is initialized correctly
 
-      // NB: Triggering click event is a bit hacky since meetings show always
-      // start open, but this should be fine for now.
-      showMeetings.click();
-
-      if (team.team_labels.length > 0) {
-        team.team_labels.forEach(function(label) {
-          displayTeamLabel(teamLabelsContainer, label);
+        meetingSelector.click(function() {
+          Analytics.track(Analytics.Trackable.ClickPeopleTabMeetingsDropdown);
         });
-        showTeamLabels.click();
-      } else {
-        teamLabelsSection.hide();
-      }
 
-      if (prefs.coworkers) {
-        coworkers.text(prefs.coworkers);
-        showCoworkers.click();
-      } else {
-        coworkerSection.hide()
-      }
+        meetingsContainer.slideDown("fast");
+        showMeetings.text("Hide");
+        meetingsHeader.addClass("esper-open");
 
-      if (prefs.notes && prefs.notes.trim()) {
-        notes.text(prefs.notes);
-        showNotes.click();
-      } else {
-        notesSection.hide();
-      }
-    });
+        if (team.team_labels.length > 0) {
+          teamLabelsSection.show();
+          team.team_labels.forEach(function(label) {
+            displayTeamLabel(teamLabelsContainer, label);
+          });
+          teamLabelsContainer.slideDown("fast");
+          showTeamLabels.text("Hide");
+          teamLabelsHeader.addClass("esper-open");
+        } else {
+          teamLabelsSection.hide();
+        }
+
+        if (prefs.coworkers) {
+          coworkerSection.show();
+          coworkers.text(prefs.coworkers);
+          coworkersContainer.slideDown("fast");
+          showCoworkers.text("Hide");
+          coworkersHeader.addClass("esper-open");
+        } else {
+          coworkerSection.hide()
+        }
+
+        if (prefs.notes && prefs.notes.trim()) {
+          notesSection.show();
+          notes.text(prefs.notes);
+          notesContainer.slideDown("fast");
+          showNotes.text("Hide");
+          notesHeader.addClass("esper-open");
+        } else {
+          notesSection.hide();
+        }
+      });
+    }
 
     Sidebar.customizeSelectArrow(meetingSelector);
 
