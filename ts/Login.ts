@@ -48,12 +48,19 @@ module Esper.Login {
 
   // Ditto, but logs out user
   export function logoutURL() {
-    return Api.prefix + "/#!/logout-redirect/" + here();
+    return Api.prefix + "/#!/logout-redirect/" + home();
   }
 
   // Returns current href, but double encodes because of pageJs issue (see
   // Otter's Route.ts)
   function here() {
     return encodeURIComponent(encodeURIComponent(location.href));
+  }
+
+  // Returns current domain only, also double-encodes
+  function home() {
+    return encodeURIComponent(encodeURIComponent(
+      location.protocol + "//" + location.host
+    ));
   }
 }
