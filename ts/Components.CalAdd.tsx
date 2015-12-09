@@ -172,10 +172,10 @@ module Esper.Components {
     }
 
     renderTeamSelector() {
-      var allTeams = Teams.all();
+      var allTeamIds = Teams.allIds() || [];
       var loginInfo = Login.InfoStore.val();
       var isNylas = loginInfo.platform === "Nylas";
-      if (allTeams && allTeams.length > 1) {
+      if (allTeamIds.length > 1) {
         return <div className="form-group">
           <label htmlFor={this.getId("team-select")} className="control-label">
             { isNylas ? "Calendar Owner" : "Executive Team" }
@@ -183,9 +183,12 @@ module Esper.Components {
           <select id={this.getId("team-select")} className="form-control"
                   value={this.state.selectedTeamId}
                   onChange={this.changeTeamEvent.bind(this)}>
-            {_.map(allTeams, (t) =>
-              <option key={t.teamid} value={t.teamid}>{t.team_name}</option>
-            )}
+            {_.map(allTeamIds, (_id) => {
+              var t = Teams.get(_id);
+              if (t) {
+                return <option key={_id} value={_id}>{t.team_name}</option>;
+              }
+            })}
           </select>
         </div>;
       }

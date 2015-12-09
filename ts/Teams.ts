@@ -31,6 +31,10 @@ module Esper.Teams {
     return allTeamsStore.batchVal(batchKey) || [];
   }
 
+  export function allIds(): string[] {
+    return allTeamsStore.val(batchKey);
+  }
+
   /*
     Create an unsaved, default team for self-assisted user using loginInfo,
     stores it, and returns the _id the default team is stored under.
@@ -143,10 +147,10 @@ module Esper.Teams {
   }
 
   // Takes a comma-separated set of labels to add
-  export function addLabels(teamId: string, commaSeparatedLabels: string) {
-    var team = get(teamId);
+  export function addLabels(_id: string, commaSeparatedLabels: string) {
+    var team = get(_id);
     if (! team) {
-      Log.e("addLabels called with non-existent team - " + teamId);
+      Log.e("addLabels called with non-existent team - " + _id);
       return;
     }
 
@@ -161,13 +165,13 @@ module Esper.Teams {
 
     labels = team.team_labels.concat(labels);
     labels = normalizeLabels(labels);
-    return setTeamLabels(team, labels);
+    return setTeamLabels(_id, team, labels);
   }
 
-  export function rmLabels(teamId: string, commaSeparatedLabels: string) {
-    var team = get(teamId);
+  export function rmLabels(_id: string, commaSeparatedLabels: string) {
+    var team = get(_id);
     if (! team) {
-      Log.e("rmLabels called with non-existent team - " + teamId);
+      Log.e("rmLabels called with non-existent team - " + _id);
       return;
     }
 
@@ -178,40 +182,45 @@ module Esper.Teams {
       )
     );
 
-    return setTeamLabels(team, newLabels);
+    return setTeamLabels(_id, team, newLabels);
   }
 
-  function setTeamLabels(team: ApiT.Team, labels: string[]) {
-    /*
-      NB: By using teamid instead of an alternate, we assume that we are only
-      setting labels on existing teams, not new ones created by our
-      defaultTeam functions above.
-    */
-    var teamId = team.teamid;
-
-    var teamCopy = _.cloneDeep(team); // Store values immutable so clone
+  function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
+    // Store values immutable so clone
+    var teamCopy = _.cloneDeep(team);
     teamCopy.team_labels = labels;
-    nextLabelUpdates[teamId] = labels;
+    nextLabelUpdates[_id] = labels;
 
     /*
       Prepend team-label- because we only want to be blocking on team label
       updates, not any object with this teamid
     */
-    var p = Queue.enqueue("team-label-" + teamId, () => {
-      var labels = nextLabelUpdates[teamId];
+    var p = Queue.enqueue("team-label-" + _id, (t?: ApiT.Team) => {
+      var labels = nextLabelUpdates[_id];
       if (labels) {
-        delete nextLabelUpdates[teamId];
+        var teamId = (t && t.teamid) || team.teamid;
+
+        delete nextLabelUpdates[_id];
         Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
           numLabels: labels.length,
-          teamId: team.teamid,
+          _id: teamId,
           teamName: team.team_name,
           labels: labels
         });
-        return Api.putSyncedLabels(team.teamid, { labels: labels })
+
+        if (teamId) {
+          return Api.putSyncedLabels(teamId, { labels: labels })
+            .then(() => t || team);
+        } else {
+          return saveTeam(_id, team).then((t2: ApiT.Team) => {
+            return Api.putSyncedLabels(t2.teamid, { labels: labels })
+              .then(() => t2)
+          });
+        }
       }
     });
 
-    teamStore.push(teamId, p, teamCopy);
+    teamStore.push(_id, p, teamCopy);
   }
 
   // Given a label list, remove duplicates and near-duplicates
@@ -241,8 +250,12 @@ module Esper.Teams {
     );
     allTeamsStore.batchUpsert(batchKey, tuples);
 
-    // Create default team checks for existing team before creating
-    createDefaultTeam();
+    // createDefaultTeam checks for existing team before creating, but we
+    // should trigger for Nylas users and new users with no teams
+    if (loginResponse.platform === "Nylas" ||
+        !(loginResponse.teams && loginResponse.teams.length > 0)) {
+      createDefaultTeam();
+    }
   }
 
   export function init() {
