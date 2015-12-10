@@ -28,7 +28,7 @@ module Esper.Calendars {
   export function get(teamId: string, calId: string) {
     var list = calendarListStore.val(teamId);
     if (list) {
-      return _.find(list, (cal) => cal.id === calId);
+      return _.find(list, (cal) => cal && cal.id === calId);
     }
   }
 
@@ -107,8 +107,13 @@ module Esper.Calendars {
       };
     }
 
-    else {
+    else if (asGen) {
       return asGen;
+    }
+
+    // Weird edge case => log
+    else {
+      Log.e("asGeneric called with blank calendar")
     }
   }
 
