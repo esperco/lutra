@@ -67,6 +67,9 @@
     },
     "chartjs/chart.d.ts": {
       "commit": "f53108644c2f32b93de423d844650297fc415a8b"
+    },
+    "ravenjs/ravenjs.d.ts": {
+      "commit": "6054c1a8b163fdc1c30a8f977118a41658025922"
     }
   }
 }

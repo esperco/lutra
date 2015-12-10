@@ -112,6 +112,13 @@ module Esper.JsonHttp {
       default: /* Fallback */
         Log.e("Unknown error " + xhr.status, details);
       }
+
+      // Sanity check since Raven isn't deployed on all front-end stuff yet
+      if ((<any> Esper).Raven || (<any> window).Raven) {
+        Raven.captureException(err, {
+          extra: details
+        });
+      }
     }
 
     /*

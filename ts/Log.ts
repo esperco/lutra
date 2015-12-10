@@ -1,3 +1,4 @@
+/// <reference path="../typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.Log {
@@ -89,6 +90,21 @@ module Esper.Log {
   /* error */
   export function error(...a: any[]) {
     logBase(console.error, Level.ERROR, "E", a);
+
+    // Sanity check since Raven isn't deployed on all front-end stuff yet
+    if ((<any> Esper).Raven || (<any> window).Raven) {
+
+      /*
+        Send error to Raven if simple error or string -- else treat as more
+        complicated event that requires an explicit call to Raven
+      */
+      var r: any = (a && a.length === 1) ? a[0] : a;
+      if (r instanceof Error) {
+        Raven.captureException(r);
+      } else if (r === "string") {
+        Raven.captureMessage(r);
+      }
+    }
   }
   export var e = error;
 
