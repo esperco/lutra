@@ -293,8 +293,8 @@ module Esper.Views {
 
     openEmail() {
       Layout.renderModal(<Components.EmailModal title="Request Custom Stats">
-        <p>Want something other than the default options? Let us know and we'll
-        see if we can generate something for you.</p>
+        <p>Want something other than the default options? Give a suggestion,
+        tweet us, and we'll send you a report promptly.</p>
       </Components.EmailModal>);
     }
 
