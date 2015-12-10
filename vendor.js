@@ -139,6 +139,8 @@ Esper = (function(esperObj) {
     first.parentNode.insertBefore(script, first);
   };
 
+  $("body").append("<script>!function(d, s, id) {var js, fjs=d.getElementsByTagName(s)[0], p=/^http: /.test(d.location)?'http': 'https'; if(!d.getElementById(id)) {js = d.createElement(s);js.id=id; js.src=p+'://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); }}(document, 'script', 'twitter-wjs'); </script>");
+
   // Add a version to keep track of what's in the wild.
   analytics.SNIPPET_VERSION = '3.1.0';
 })();

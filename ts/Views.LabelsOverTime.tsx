@@ -167,6 +167,11 @@ module Esper.Views {
               </h4>
               <div className="pull-right">
                 <button className="btn btn-default"
+                    onClick={this.openEmail.bind(this) }>
+                    <b>Request Custom Report</b>
+                </button>
+                {" "}
+                <button className="btn btn-default"
                         onClick={this.refresh.bind(this)}>
                   <i className="fa fa-fw fa-refresh" title="refresh" />
                 </button>
@@ -175,10 +180,6 @@ module Esper.Views {
                   selected={this.state.selectedInterval}
                   updateFn={updateInterval} />
                 {" "}
-                <button className="btn btn-default"
-                    onClick={this.openEmail.bind(this)}>
-                  Other?
-                </button>
               </div>
             </div>
             {this.renderChart()}
@@ -292,8 +293,8 @@ module Esper.Views {
 
     openEmail() {
       Layout.renderModal(<Components.EmailModal title="Request Custom Stats">
-        <p>Want something other than the default options? Let us know and we'll
-        see if we can generate something for you.</p>
+        <p>Want something other than the default options? Give a suggestion,
+        tweet us, and we'll send you a report promptly.</p>
       </Components.EmailModal>);
     }
 

@@ -19,9 +19,22 @@ module Esper.Components {
     sending: boolean;
     success?: boolean;
     error?: boolean;
+    seeSample?: boolean;
   }
 
   export class EmailModal extends Component<EmailModalProps, EmailModalState> {
+    componentDidMount = () => {
+      twttr.widgets.createHashtagButton("Esper", $("#tweet-button").get(0), { text: "Show me how I'm spending my time @esper_co", size: "large" });
+      twttr.events.bind('click', (ev) => { this.send() });
+    }
+
+    setSampleState = () => {
+      this.setState({
+        sending: this.state.sending,
+        seeSample: true
+      });
+    }
+
     render() {
       var sending = this.state.sending;
 
@@ -29,10 +42,7 @@ module Esper.Components {
           title={this.props.title || "Send Us a Message"}
           icon="fa-envelope"
           busy={this.state.sending}
-          disableOk={this.state.sending || this.state.success}
-          dismissText="Cancel"
-          okText="Send"
-          okOnClick={this.send.bind(this)}>
+          showFooter={false}>
         {
           this.state.success ?
           <div className="alert compact alert-success" role="alert">
@@ -51,8 +61,47 @@ module Esper.Components {
           </div> : ""
         }
         {this.props.children}
+        <div id='modal-anchor'/>
         <textarea className="form-control esper-modal-focus" rows={3}
           disabled={this.state.sending || this.state.success} />
+        <br/>
+        <div id="tweet-button"></div>
+        <br/>
+        { this.state.seeSample ?
+          <div id="carousel-example-generic" className="carousel slide" data-ride="carousel">
+            <ol className="carousel-indicators">
+              <li data-target="#carousel-example-generic" data-slide-to="0" className="active"></li>
+              <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+              <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+            </ol>
+
+            <div className="carousel-inner" role="listbox">
+              <div className="item active">
+                <img src="img/eg1.PNG"/>
+              </div>
+              <div className="item">
+                <img src="img/eg2.PNG"/>
+              </div>
+              <div className="item">
+                <img src="img/eg4.PNG"/>
+              </div>
+            </div>
+
+            <a className="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+              <span className="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+              <span className="sr-only">Previous</span>
+            </a>
+            <a className="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+              <span className="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+              <span className="sr-only">Next</span>
+            </a>
+          </div> : ""
+        }
+        <div className="modal-footer">
+          <button onClick={this.setSampleState}
+                  className="btn btn-default">See Example</button>
+          <button data-dismiss="modal" className="btn btn-default">Close</button>
+        </div>
       </Modal>;
     }
 
