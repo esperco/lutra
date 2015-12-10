@@ -2,6 +2,7 @@
   Login and team management
 */
 
+/// <reference path="../marten/typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="./Login.Post.ts" />
@@ -77,6 +78,15 @@ module Esper.Login {
 
     // Identify in analytics, then post credentials AFTER alias completes
     Analytics.identify(info, true, postCredentials);
+
+    // Post context to Sentry
+    if (info) {
+      Raven.setUserContext({
+        email: info.email,
+        id: info.uid,
+        platform: info.platform
+      });
+    }
 
     // Post credentials again after timeout in case analytics errors
     // Posting credentials twice shouldn't cause any errors
