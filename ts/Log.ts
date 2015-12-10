@@ -89,8 +89,6 @@ module Esper.Log {
 
   /* error */
   export function error(...a: any[]) {
-    logBase(console.error, Level.ERROR, "E", a);
-
     // Sanity check since Raven isn't deployed on all front-end stuff yet
     if ((<any> Esper).Raven || (<any> window).Raven) {
 
@@ -101,10 +99,17 @@ module Esper.Log {
       var r: any = (a && a.length === 1) ? a[0] : a;
       if (r instanceof Error) {
         Raven.captureException(r);
-      } else if (r === "string") {
-        Raven.captureMessage(r);
+      } else if (typeof r === "string") {
+        // Create error object to log so we get a traceback
+        try {
+          throw new Error(r);
+        } catch (err) {
+          Raven.captureException(err);
+        }
       }
     }
+
+    logBase(console.error, Level.ERROR, "E", a);
   }
   export var e = error;
 
