@@ -1,3 +1,5 @@
+/// <reference path="./Variant.ts" />
+
 module Esper.ApiT {
   /*
     The following type definitions were translated manually
