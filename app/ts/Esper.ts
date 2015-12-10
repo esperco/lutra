@@ -25,7 +25,7 @@ declare module Esper {
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
   export var page: PageJS.Static;
-
+  export var twttr: Twitter;
   export var PRODUCTION: boolean;
 }
 

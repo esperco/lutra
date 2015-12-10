@@ -23,3 +23,4 @@
 /// <reference path="chartjs/chart.d.ts" />
 /// <reference path="filepicker-js/filepicker-js.d.ts" />
 /// <reference path="ravenjs/ravenjs.d.ts" />
+/// <reference path="twitter/twitter.d.ts" />
