@@ -4,11 +4,14 @@
 /// <reference path="./Route.tsx" />
 
 module Esper.Components {
-
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  export class Header extends Component<{}, {}> {
+  interface HeaderState {
+    loginInfo: ApiT.LoginResponse;
+  }
+
+  export class Header extends Component<{}, HeaderState> {
     render() {
       var toggleId = "esper-nav-toggle";
       return <nav className="navbar navbar-default navbar-fixed-top">
@@ -26,7 +29,7 @@ module Esper.Components {
           </div>
 
           <div className="collapse navbar-collapse" id={this.getId(toggleId)}>
-            <ul className="nav navbar-nav">
+            { this.state.loginInfo ? <ul className="nav navbar-nav">
               <NavLink href="/labels-over-time">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
               </NavLink>
@@ -39,7 +42,7 @@ module Esper.Components {
                   <span className="visible-xs-inline">{" "}How To</span>
                 </a>
               </li>
-            </ul>
+            </ul> : null }
 
             <div className="navbar-right">
               <Components.LoginInfo />
@@ -55,6 +58,9 @@ module Esper.Components {
     }
 
     componentDidMount() {
+      this.setSources([
+        Login.InfoStore
+      ]);
       this.find('.collapse').collapse({
         toggle: false
       });
@@ -62,6 +68,12 @@ module Esper.Components {
 
     toggleCollapse() {
       this.find('.collapse').collapse('toggle');
+    }
+
+    getState() {
+      return {
+        loginInfo: Login.InfoStore.val()
+      };
     }
   }
 
