@@ -66,7 +66,7 @@ module Esper.Components {
 
     getLabels() {
       var team = Teams.get(this.state.selectedTeamId);
-      return team.team_labels || [];
+      return (team && team.team_labels) || [];
     }
 
     renderSuggestedLabels() {
