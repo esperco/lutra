@@ -25,6 +25,7 @@ module Esper.Components {
   export class EmailModal extends Component<EmailModalProps, EmailModalState> {
     componentDidMount = () => {
       twttr.widgets.createHashtagButton("TwitterStories", $("#tweet-button").get(0), { text: "hello", size: "large" });
+      twttr.events.bind('click', (ev) => { this.send() });
     }
 
     setSampleState = () => {
