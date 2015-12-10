@@ -10,7 +10,8 @@ var Chart         = require("Chart.js"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
-    momentTz      = require("moment-timezone");
+    momentTz      = require("moment-timezone"),
+    Raven         = require("raven-js");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -50,6 +51,7 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,
+    Raven:        Raven,
     React:        react
   };
   for (var name in assignments) {
@@ -59,6 +61,12 @@ Esper = (function(esperObj) {
   }
   return esperObj;
 })(window || {});
+
+
+// Config Raven here rather than in TS so we can catch init errors
+Raven.config(
+  'https://25bf601115b44af5a451b949e036e36a@app.getsentry.com/61009'
+).install();
 
 
 ///////

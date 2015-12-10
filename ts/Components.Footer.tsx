@@ -1,4 +1,5 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 
 module Esper.Components {
 
@@ -22,11 +23,21 @@ module Esper.Components {
             <li><a href="http://esper.com/privacy-policy">Privacy</a></li>
             <li><a href="http://esper.com/terms-of-use">Terms</a></li>
           </ul>
-          <div className="pull-right navbar-text">
+          <div className="pull-right navbar-text"
+               onDoubleClick={this.testError}>
             &copy; {new Date().getFullYear()} Esper
           </div>
         </div>
       </div>;
+    }
+
+    /*
+      This function intentionally throws an error (use for testing error
+      catching
+    */
+    testError() {
+      var x: any = window;
+      x.explode();
     }
   }
 }
