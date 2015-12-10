@@ -24,9 +24,14 @@ module Esper.Components {
 
   export class EmailModal extends Component<EmailModalProps, EmailModalState> {
     componentDidMount = () => {
-      $(".modal-body").append("<script>!function(d, s, id) {var js, fjs=d.getElementsByTagName(s)[0], p=/^http: /.test(d.location)?'http': 'https'; if(!d.getElementById(id)) {js = d.createElement(s);js.id=id; js.src=p+'://platform.twitter.com/widgets.js'; fjs.parentNode.insertBefore(js, fjs); }}(document, 'script', 'twitter-wjs'); </script>");
-      $(".modal-body").append("<div id='fb-root'></div>");
-      $(".modal-body").append("<script>(function(d, s, id) {var js, fjs=d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = '//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.5&appId=1494539914148287'; fjs.parentNode.insertBefore(js, fjs);} (document, 'script', 'facebook-jssdk'));</script> ");
+      twttr.widgets.createHashtagButton("TwitterStories", $("#tweet-button").get(0), { text: "hello", size: "large" });
+    }
+
+    setSampleState = () => {
+      this.setState({
+        sending: this.state.sending,
+        seeSample: true
+      });
     }
 
     render() {
@@ -59,17 +64,7 @@ module Esper.Components {
         <textarea className="form-control esper-modal-focus" rows={3}
           disabled={this.state.sending || this.state.success} />
         <br/>
-        <div>
-          <a href="https://twitter.com/intent/tweet?text=Show%20me%20how\
-                  %20I%20spend%20my%20time%20with%20#TimeStats%20@esper_co"
-             className="twitter-hashtag-button" data-size="large">
-             Tweet #TimeStats
-          </a>
-          <div className="fb-share-button"
-               data-href="https://time.esper.com/"
-               data-layout="button">
-          </div>
-        </div>
+        <div id="tweet-button"></div>
         <br/>
         { this.state.seeSample ?
           <div id="carousel-example-generic" className="carousel slide" data-ride="carousel">
@@ -102,7 +97,7 @@ module Esper.Components {
           </div> : ""
         }
         <div className="modal-footer">
-          <button onClick={() => { this.setState({ seeSample: true } as EmailModalState) } }
+          <button onClick={this.setSampleState}
                   className="btn btn-default">See Example</button>
           <button data-dismiss="modal" className="btn btn-default">Close</button>
         </div>
