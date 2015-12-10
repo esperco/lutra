@@ -9,7 +9,8 @@ var EventEmitter  = require("eventemitter3"),
     filepicker    = require("filepicker-js-bower"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
-    momentTz      = require("moment-timezone");
+    momentTz      = require("moment-timezone"),
+    Raven         = require("raven-js");
 
 // React -> get addons
 var react         = require("./marten/vendor/react/react-with-addons.js");
@@ -51,6 +52,7 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,
+    Raven:        Raven,
     React:        react
   };
   for (var name in assignments) {
@@ -60,6 +62,12 @@ Esper = (function(esperObj) {
   }
   return esperObj;
 })(window || {});
+
+
+// Config Raven here rather than in TS so we can catch init errors
+Raven.config(
+  'https://bfc503961d394fea8f0a0df8dd98aeea@app.getsentry.com/61081'
+).install();
 
 
 ///////

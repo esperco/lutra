@@ -39,6 +39,14 @@ module Esper.Login {
             Analytics.identify(loginInfo, false, function() {
               loginDeferred.resolve(loginInfo);
             });
+
+            if (loginInfo) {
+              Raven.setUserContext({
+                email: loginInfo.email,
+                id: loginInfo.uid,
+                platform: loginInfo.platform
+              });
+            }
           }, onFail);
       } else {
         Login.setCredentials(Store.get("uid"), Store.get("api_secret"));
