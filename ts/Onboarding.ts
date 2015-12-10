@@ -82,7 +82,7 @@ module Esper.Onboarding {
     // Ignore teams being saved
     teams = _.filter(teams, (t) => {
       var meta = Teams.teamStore.metadata(t.teamid);
-      return !meta || meta.dataStatus === Model.DataStatus.READY;
+      return meta && meta.dataStatus === Model.DataStatus.READY;
     });
 
     // Step 1 => Create team with calendar
