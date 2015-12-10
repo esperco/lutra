@@ -141,9 +141,36 @@ module Esper.Signin {
     });
 
     return button;
-  };
+  }
+
+  // Returns jQuery wrapped HTML for a Nylas button with no particular brand
+  export function nylasButton(landingUrl?: string,
+                              optInvite?: string,
+                              optEmail?: string):
+    JQuery {
+'''
+<button #button class="button-primary sign-in-btn other-btn">
+  <div #logo class="sign-in-icon other-provider-icon">
+    <i class="fa fa-envelope" />
+  </div>
+  <div class="sign-in-text">Other Provider</div>
+</button>
+'''
+    // Set handler
+    button.click(function() {
+      showNylasModal(landingUrl);
+      return false;
+    });
+
+    return button;
+  }
 
   function showExchangeModal(landingUrl?: string) {
+    return showNylasModal(landingUrl,
+      "Log in with Exchange or Office 365");
+  }
+
+  function showNylasModal(landingUrl?: string, header?: string) {
 '''
 <div #modal class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog short exchange-modal">
@@ -151,13 +178,15 @@ module Esper.Signin {
       <form #emailForm class="form">
         <div class="modal-header">
           <i class="fa fa-fw fa-sign-in"></i>
-          Log in with Exchange or Office 365
+          <span #headerText>
+            Log in with your e-mail or calendar service
+          </span>
         </div>
         <div #emailGroup class="modal-body form-group">
-          <label for="exchange-email" class="control-label">
-            Exchange email address</label>
-          <input #emailInput id="exchange-email" type="text" tabindex="0"
-                 placeholder="hello@office365.com" class="form-control" />
+          <label for="nylas-email" class="control-label">
+            Email Address</label>
+          <input #emailInput id="nylas-email" type="text" tabindex="0"
+                 placeholder="hello@email.com" class="form-control" />
         </div>
         <div class="modal-footer">
           <button type="submit" #loginBtn class="button-primary modal-primary">
@@ -176,6 +205,10 @@ module Esper.Signin {
     (<any> modal).on('shown.bs.modal', function() {
       emailInput.focus();
     });
+
+    if (header) {
+      headerText.text(header)
+    }
 
     cancelBtn.click(function() {
       (<any> modal).modal('hide');
@@ -262,6 +295,7 @@ module Esper.Signin {
 
     buttonContainer.append(googleButton(landingUrl, optInvite, optEmail));
     buttonContainer.append(exchangeButton(landingUrl, optInvite, optEmail));
+    buttonContainer.append(nylasButton(landingUrl, optInvite, optEmail));
 
     rootView.removeClass("hide");
     rootView.append(view);
