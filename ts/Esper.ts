@@ -12,6 +12,7 @@
 /// <reference path="../marten/typings/page/page.d.ts" />
 /// <reference path="../marten/typings/lodash/lodash.d.ts" />
 /// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
+/// <reference path="../marten/typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="../marten/typings/react/react-global.d.ts" />
 /// <reference path="../marten/typings/filepicker-js/filepicker-js.d.ts" />
 
@@ -29,6 +30,7 @@ declare module Esper {
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
+  export var Raven: RavenStatic;
   export var React: ReactStatic;
   export var pageJs: PageJS.Static;
   export var PRODUCTION: boolean;
