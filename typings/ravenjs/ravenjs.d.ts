@@ -120,5 +120,5 @@ interface RavenStatic {
      * @param {object} user An object representing user data [optional]
      * @return {Raven}
      */
-    setUser(user?: any): RavenStatic;
+    setUserContext(user?: any): RavenStatic;
 }
