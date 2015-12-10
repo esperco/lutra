@@ -5,6 +5,29 @@ module Esper.ApiT {
     We might want to generate them with atdgen in the future.
   */
 
+  type uid = string;
+  type email = string;
+
+  type ErrorDetails = Variant.Variant;
+    /*
+      See wolverine/types/error_details.atd for the different possible cases.
+    */
+
+  /*
+    One of the possible values for ErrorDetails,
+    tagged "unauthorized_team_member"
+  */
+  interface UnauthorizedTeamMember {
+    unauthorized_uid: uid;
+    unauthorized_email: email;
+  }
+
+  export interface ClientError {
+    http_status_code: number; // 4xx
+    error_message: string;
+    error_details: ErrorDetails;
+  }
+
   export interface Contact {
     id: string;
     email: string;
