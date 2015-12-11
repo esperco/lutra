@@ -74,18 +74,22 @@
   }
 
   .esper-left-sidebar, .esper-right-content {
-    height: 100%;
-    position: relative;
+    position: absolute;
     overflow-y: auto;
     background: @body-bg;
+    top: 0;
+    bottom: 0;
     &.padded {
       .esper-padded;
     }
   }
 
   .esper-left-sidebar {
-    border-right: 1px solid @table-border-color;
-    overflow-x: hidden;
+    left: 0;
+  }
+
+  .esper-right-content {
+    right: 0;
   }
 
   // e.g. if panel is only element
