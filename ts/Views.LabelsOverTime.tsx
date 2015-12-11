@@ -150,41 +150,37 @@ module Esper.Views {
 
       return <div id="labels-over-time-page"
                   className="esper-full-screen minus-nav">
-        <div className="container-fluid"><div className="row">
-          <div className="col-xs-5 col-sm-3 col-lg-2 esper-left-sidebar padded">
-            <Components.CalSelector
-              selectedTeamId={selectedTeamId}
-              selectedCalId={selectedCalId}
-              updateFn={updateSelection} />
-            {this.renderLabels()}
-          </div>
-          <div
-            className="col-xs-7 col-sm-9 col-lg-10 esper-right-content padded">
-            <div className="esper-header clearfix">
-              <h4 className="pull-left">
-                <i className="fa fa-fw fa-bar-chart"></i>{" "}
-                Labeled Events Over Time
-              </h4>
-              <div className="pull-right">
-                <button className="btn btn-default"
-                    onClick={this.openEmail.bind(this) }>
-                    <b>Request Custom Report</b>
-                </button>
-                {" "}
-                <button className="btn btn-default"
-                        onClick={this.refresh.bind(this)}>
-                  <i className="fa fa-fw fa-refresh" title="refresh" />
-                </button>
-                {" "}
-                <Components.PeriodSelector
-                  selected={this.state.selectedInterval}
-                  updateFn={updateInterval} />
-                {" "}
-              </div>
-            </div>
-            {this.renderChart()}
+        <div className="esper-left-sidebar padded">
+          <Components.CalSelector
+            selectedTeamId={selectedTeamId}
+            selectedCalId={selectedCalId}
+            updateFn={updateSelection} />
+          {this.renderLabels()}
+        </div>
+        <div className="esper-right-content padded">
+          <div className="esper-header clearfix">
+            <h4 className="pull-left">
+              <i className="fa fa-fw fa-bar-chart"></i>{" "}
+              Labeled Events Over Time
+            </h4>
+            <div className="pull-right">
+              <button className="btn btn-default"
+                  onClick={this.openEmail.bind(this) }>
+                  <b>Request Custom Report</b>
+              </button>
+              {" "}
+              <button className="btn btn-default"
+                      onClick={this.refresh.bind(this)}>
+                <i className="fa fa-fw fa-refresh" title="refresh" />
+              </button>
+              {" "}
+              <Components.PeriodSelector
+                selected={this.state.selectedInterval}
+                updateFn={updateInterval} />
+              {" "}
             </div>
           </div>
+          {this.renderChart()}
         </div>
       </div>;
     }
