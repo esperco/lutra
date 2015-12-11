@@ -245,7 +245,7 @@ module Esper.InThreadControls {
     taskNoteElms.textarea.set(taskNotes);
 
     //Hack solution for z-index issues with quill
-    $(".nH.aHU").zIndex(100);
+    $(".nH.aHU").zIndex(1);
 
     taskNotes.focus(function() {
       Analytics.track(Analytics.Trackable.EditTaskNotes);
