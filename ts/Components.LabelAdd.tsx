@@ -129,8 +129,7 @@ module Esper.Components {
           <input type="text" className="form-control esper-modal-focus"
                  id={this.getId("new-labels")} ref={(c) => this._input = c}
                  onKeyDown={this.inputKeydown.bind(this)}
-                 placeholder={"Sharks With Laser Beams, Mr. Bigglesworth, " +
-                              "Cloning Miniature Versions of Myself"} />
+                 placeholder={"Q1 Sales Goal, Positive Meeting, Negative Meeting"} />
           <span className="input-group-btn">
             <button className="btn btn-default" type="button"
                     onClick={this.submitInput.bind(this)}>
