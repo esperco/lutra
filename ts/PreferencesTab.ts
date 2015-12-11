@@ -131,6 +131,8 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-confirmation").is(":checked"),
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
+      send_label_reminders:
+        div.find(".esper-prefs-label-reminders").is(":checked"),
       send_followup_reminders:
         div.find(".esper-prefs-followup-reminders").is(":checked"),
       double_booking_warning:
@@ -1618,6 +1620,13 @@ module Esper.PreferencesTab {
       </li>
       <li>
         <label class="checkbox esper-preference-check">
+          <input #sendLabelReminders type="checkbox"
+                 class="esper-prefs-label-reminders"/>
+          Send me reminder emails to label my calendar events
+        </label>
+      </li>
+      <li>
+        <label class="checkbox esper-preference-check">
           <input #sendFollowupReminders type="checkbox"
                  class="esper-prefs-followup-reminders"/>
           Send me followup reminder emails
@@ -1683,6 +1692,8 @@ module Esper.PreferencesTab {
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
+      if (general.send_label_reminders)
+        sendLabelReminders.prop("checked", true);
       if (general.send_followup_reminders)
         sendFollowupReminders.prop("checked", true);
       if (general.double_booking_warning)
@@ -1703,6 +1714,7 @@ module Esper.PreferencesTab {
 
     sendConfirmation.click(saveGeneralPrefs);
     sendReminder.click(saveGeneralPrefs);
+    sendLabelReminders.click(saveGeneralPrefs);
     sendFollowupReminders.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
     noLocationWarning.click(saveGeneralPrefs);
