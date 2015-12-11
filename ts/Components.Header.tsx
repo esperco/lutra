@@ -86,7 +86,7 @@ module Esper.Components {
     render() {
       var selected = Route.nav.isActive(this.props.href);
       return <li className={(selected ? "active" : "")}>
-        <a href={Route.nav.href(this.props.href)}>
+        <a onClick={() => Route.nav.path(this.props.href)}>
           {this.props.children}
         </a>
       </li>;
