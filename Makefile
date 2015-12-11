@@ -28,6 +28,10 @@ dev-rebuild: check-marten
 prod-build: check-marten
 	rm -rf pub
 	npm run build-production
+	$(MAKE) version
+
+version:
+	sed -i'' "s:@@VERSION@@:`git log --pretty=format:'%H' -n 1`:g" pub/html/*.html
 
 # Fetch libraries
 setup:
