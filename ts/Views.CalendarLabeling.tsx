@@ -96,22 +96,19 @@ module Esper.Views {
 
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
-        <div className="container-fluid"><div className="row">
-          <div className="col-xs-5 col-sm-3 col-lg-2 esper-left-sidebar padded">
-            <Components.CalSelector
-              selectedTeamId={selectedTeamId}
-              selectedCalId={selectedCalId}
-              updateFn={updateSelection}
-              minimized={this.state.minimizeCalSelector}
-              toggleMinimized={toggleMinCalSelect}
-            />
-            {this.renderLabelEditor()}
-          </div>
-          <div
-            className="col-xs-7 col-sm-9 col-lg-10 esper-right-content padded">
-            {this.renderCalendar()}
-          </div>
-        </div></div>
+        <div className="esper-left-sidebar padded">
+          <Components.CalSelector
+            selectedTeamId={selectedTeamId}
+            selectedCalId={selectedCalId}
+            updateFn={updateSelection}
+            minimized={this.state.minimizeCalSelector}
+            toggleMinimized={toggleMinCalSelect}
+          />
+          {this.renderLabelEditor()}
+        </div>
+        <div className="esper-right-content padded">
+          {this.renderCalendar()}
+        </div>
       </div>;
     }
 
