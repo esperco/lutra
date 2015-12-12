@@ -772,20 +772,20 @@ module Esper.Onboarding {
           let body: ApiT.TeamCreationRequest;
           if (supportsExecutive) {
             body = {
-              chrome_extension: true
+              chrome_extension: true,
               executive_name: request.name,
               executive_email: request.email,
               executive_address: request.address,
               executive_phone: request.phone,
-              executive_timezone: request.timezone,
+              executive_timezone: request.timezone
             }
           } else {
             body = {
-              chrome_extension: true
+              chrome_extension: true,
               executive_name: request.name,
               executive_address: request.address,
               executive_phone: request.phone,
-              executive_timezone: request.timezone,
+              executive_timezone: request.timezone
             }
           }
 
