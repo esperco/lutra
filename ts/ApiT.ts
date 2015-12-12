@@ -55,6 +55,7 @@ module Esper.ApiT {
   }
 
   export interface TeamCreationRequest {
+    chrome_extension?: boolean;
     executive_email?: string;
     executive_name: string;
     executive_first_name?: string;
