@@ -772,18 +772,20 @@ module Esper.Onboarding {
           let body: ApiT.TeamCreationRequest;
           if (supportsExecutive) {
             body = {
+              chrome_extension: true
               executive_name: request.name,
               executive_email: request.email,
               executive_address: request.address,
               executive_phone: request.phone,
-              executive_timezone: request.timezone
+              executive_timezone: request.timezone,
             }
           } else {
             body = {
+              chrome_extension: true
               executive_name: request.name,
               executive_address: request.address,
               executive_phone: request.phone,
-              executive_timezone: request.timezone
+              executive_timezone: request.timezone,
             }
           }
 
@@ -1112,18 +1114,53 @@ module Esper.Onboarding {
   // Slide 4 => videos + final stuff
   class FinishSlide extends Slide<{}> {
     render() {
+      var videoList: [string, string][] = [
+        ["Create a Task", "https://youtu.be/vQ-XcwQQDNg?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Create Events", "https://youtu.be/_mum9uSodUo?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Link Events", "https://youtu.be/oqhnF6wHY7Q?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Draft Emails", "https://youtu.be/rA-deetbleQ?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Linking Emails together with Task Notes", "https://youtu.be/e-EPFLAcOQo?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Insert Emails into the Calendar Event Description", "https://youtu.be/AnUhbTkbquU?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Send Event Invitation", "https://youtu.be/zuBE2d1YobA?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Schedule Event Reminders", "https://youtu.be/1KORUttWy1k?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Esper Agenda", "https://youtu.be/Nk2b1-msHUk?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Use Esper Workflows", "https://youtu.be/reWgAs2hE9o?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Esper TimeStats", "https://youtu.be/qSP5DcLtMqs?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"],
+        ["Supporting Multiple Executives", "https://youtu.be/f1gx4OdYbEs?list=PLSnIFyt-XjI7b9tyHHTmWI4M9Qqy2D-FA"]
+      ];
+
       var self = this;
-      var trainingEmailsPreviewUrl =
-        chrome.extension.getURL("img/training-emails-screenshot.png");
+      var videoLinks = _.map(videoList, function(tuple) {
+        var name = tuple[0];
+        var href = tuple[1];
+
+        // NB: Use onMouseDown instead of onClick because user may want to
+        // right-click and open in new tab
+        return (<li key={"video-" + name}>
+          <a href={href} target="_blank"
+             onMouseDown={self.trackOutbound.bind(self)}>
+            <i className="fa fa-fw fa-la fa-youtube-play"></i>
+            {name}
+          </a>
+        </li>);
+      });
+
       return (<div>
         <p>
-          Great! You&apos;re almost done. Learn how to use Esper
-          by opening your email.
+          To get the most out of Esper view the instructional videos below so
+          you can master all of these time-saving features.
         </p>
+
         <p>
-          <img src={trainingEmailsPreviewUrl}
-               style={{width:"100%"}} />
+          Let us know if you’re interested in a personalized training session
+          {" "}<a href="http://esper.com/request-demo" target="_blank">here</a>.
         </p>
+
+        <h4>LIST OF VIDEOS</h4>
+
+        <ol>
+          {videoLinks}
+        </ol>
       </div>);
     }
 
