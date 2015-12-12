@@ -65,9 +65,15 @@ Esper = (function(esperObj) {
 
 // Config Raven here rather than in TS so we can catch init errors
 Raven.config(
-  'https://25bf601115b44af5a451b949e036e36a@app.getsentry.com/61009'
-).install();
-
+  'https://25bf601115b44af5a451b949e036e36a@app.getsentry.com/61009', {
+    release: window.ESPER_VERSION || "dev",
+    ignoreErrors: [
+      /* Triggered by browser extensions, not our code */
+      /WrappedNative/,
+      /NPObject/
+    ],
+    ignoreUrls: [/localhost/]
+  }).install();
 
 ///////
 

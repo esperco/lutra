@@ -17,6 +17,10 @@ dev: build
 prod: clean
 	$(MAKE) check-marten
 	npm run build-production
+	$(MAKE) version
+
+version:
+	sed -i'' "s:@@VERSION@@:`git log --pretty=format:'%H' -n 1`:g" pub/*.html
 
 watch:
 	npm run watch
