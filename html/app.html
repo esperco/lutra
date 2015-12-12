@@ -25,10 +25,20 @@
     <!-- Sentry / Raven -->
     <script src="https://cdn.ravenjs.com/1.3.0/jquery,native/raven.min.js">
     </script>
-    <script>Raven.config(
-        'https://b8da7eb0a9ff467881f6ccc816f83015@app.getsentry.com/61016'
-    ).install()</script>
-
+    <script>
+      if (window.Raven) {
+        Raven.config(
+          'https://b8da7eb0a9ff467881f6ccc816f83015@app.getsentry.com/61016', {
+          release: "@@VERSION@@" || "dev",
+          ignoreErrors: [
+            /* Triggered by browser extensions, not our code */
+            /WrappedNative/,
+            /NPObject/
+          ],
+          ignoreUrls: [/localhost/]
+        }).install();
+      }
+    </script>
   </head>
 
   <body>
