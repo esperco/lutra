@@ -26,7 +26,6 @@ module Esper.LocalStore {
       beforeEach(function() {
         spyOn(localStorage, "setItem").and.throwError("Nope");
         spyOn(localStorage, "getItem").and.throwError("Nope");
-        spyOn(localStorage, "removeItem").and.throwError("Nope");
 
         // Clear cookies on current path
         var cookies = document.cookie.split(";");

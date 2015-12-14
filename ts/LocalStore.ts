@@ -32,6 +32,11 @@ module Esper.LocalStore {
     var s: string;
     try {
       s = localStorage.getItem(k);
+
+      // Check if we got anything back (in case of silent failure)
+      if (typeof s !== "string") {
+        throw new Error("localStorage failed to retrieve");
+      }
     }
     catch (err) {
       s = readCookie(k);
@@ -50,11 +55,8 @@ module Esper.LocalStore {
   };
 
   export function remove(k: string) {
-    try {
-      localStorage.removeItem(k);
-    } catch (err) {
-      createCookie(k, "");
-    }
+    localStorage.removeItem(k);
+    clearCookie(k);
   };
 
   export function clear() {
@@ -89,5 +91,10 @@ module Esper.LocalStore {
       }
     }
     return null;
+  }
+
+  // Clear old cookie value
+  function clearCookie(key: string) {
+    document.cookie = key + "=" + "; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   }
 }
