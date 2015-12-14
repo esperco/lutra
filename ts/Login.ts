@@ -4,9 +4,9 @@
 
 /// <reference path="../marten/typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="../marten/ts/Login.ts" />
+/// <reference path="../marten/ts/LocalStore.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
 /// <reference path="./Login.Post.ts" />
-/// <reference path="./Store.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.Login {
@@ -26,11 +26,11 @@ module Esper.Login {
     ensure up-to-date data).
   */
   export function initCredentials() {
-    var stored: StoredCredentials = Store.get(storedLoginKey);
+    var stored: StoredCredentials = LocalStore.get(storedLoginKey);
     if (stored && stored.uid && stored.api_secret) {  // sanity check
       setCredentials(stored.uid, stored.api_secret);
     } else {
-      Store.remove(storedLoginKey);
+      LocalStore.remove(storedLoginKey);
     }
   };
 
@@ -74,7 +74,7 @@ module Esper.Login {
       api_secret: data.api_secret,
       email: data.email
     };
-    Store.set(storedLoginKey, stored);
+    LocalStore.set(storedLoginKey, stored);
 
     // Identify in analytics, then post credentials AFTER alias completes
     Analytics.identify(info, true, postCredentials);
@@ -102,7 +102,7 @@ module Esper.Login {
     Log.d("esperMessage:", esperMessage);
     window.postMessage(esperMessage, "*");
 
-    Store.remove(storedLoginKey);
+    LocalStore.remove(storedLoginKey);
     data = undefined;
     unsetCredentials();
 

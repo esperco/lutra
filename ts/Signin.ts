@@ -35,6 +35,8 @@
 
 */
 
+/// <reference path="../marten/ts/LocalStore.ts" />
+
 module Esper.Signin {
 
   function requestGoogleAuth(url) {
@@ -51,18 +53,18 @@ module Esper.Signin {
       .then(function(x) {
         var loginNonce = x.random;
         if (loginNonce.length >= 64) {
-          Store.set("login_nonce", loginNonce);
+          LocalStore.set("login_nonce", loginNonce);
           return loginNonce;
         }
       });
   }
 
   function getLoginNonce() {
-    return Store.get("login_nonce");
+    return LocalStore.get("login_nonce");
   }
 
   function clearLoginNonce() {
-    Store.remove("login_nonce");
+    LocalStore.remove("login_nonce");
   }
 
   /* Go straight to Google Oauth page without displaying the sign-in button */

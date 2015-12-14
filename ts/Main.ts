@@ -23,7 +23,6 @@
 /// <reference path="Cache.ts"/>
 /// <reference path="Svg.ts"/>
 /// <reference path="Show.ts"/>
-/// <reference path="Store.ts"/>
 /// <reference path="ParseUrl.ts"/>
 /// <reference path="Login.ts"/>
 /// <reference path="CalPicker.ts"/>
