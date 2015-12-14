@@ -122,6 +122,18 @@ module Esper.Route {
       withLogin(undefined, undefined, undefined, data.redirect);
     },
 
+    /*
+      Variants of the above with base64 encoding (because uri-encode is buggy)
+    */
+    "login-redirect-b64/:redirect": function(data) {
+      withLogin(undefined, undefined, undefined, atob(data.redirect));
+    },
+
+    "logout-redirect-b64/:redirect": function(data) {
+      Login.clearAllLoginInfo();
+      withLogin(undefined, undefined, undefined, atob(data.redirect));
+    },
+
     /* various pages */
 
     "team-settings/:teamid/calendars": function(data) {
