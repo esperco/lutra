@@ -51,11 +51,17 @@ module Esper.Login {
     Return a login URL that redirects back to the curent page
   */
   export function loginURL() {
+    if (window.btoa) {
+      return Api.prefix + "/#!/login-redirect-b64/" + here64();
+    }
     return Api.prefix + "/#!/login-redirect/" + here();
   }
 
   // Ditto, but logs out user
   export function logoutURL() {
+    if (window.btoa) {
+      return Api.prefix + "/#!/logout-redirect-b64/" + home64();
+    }
     return Api.prefix + "/#!/logout-redirect/" + home();
   }
 
@@ -65,10 +71,18 @@ module Esper.Login {
     return encodeURIComponent(encodeURIComponent(location.href));
   }
 
+  function here64() {
+    return encodeURIComponent(btoa(location.href));
+  }
+
   // Returns current domain only, also double-encodes
   function home() {
     return encodeURIComponent(encodeURIComponent(
       location.protocol + "//" + location.host
     ));
+  }
+
+  function home64() {
+    return encodeURIComponent(btoa(location.protocol + "//" + location.host));
   }
 }
