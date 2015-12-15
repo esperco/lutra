@@ -65,7 +65,7 @@ module Esper.LocalStore {
 
 
   /*
-    LocalStorage preferable to cookies because cookies get sent automatically
+    LocalStorage is preferable to cookies because cookies get sent automatically
     to servers, but this is a fallback for systems that disable localStorage.
 
     Cookie is set to expire when browser closes -- this allows LocalStorage
