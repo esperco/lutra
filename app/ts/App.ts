@@ -2,6 +2,7 @@
 
 /// <reference path="./Esper.ts"/>
 /// <reference path="../marten/ts/Util.ts"/>
+/// <reference path="../marten/ts/LocalStore.ts"/>
 /// <reference path="../marten/ts/Log.ts"/>
 /// <reference path="../marten/ts/Emit.ts"/>
 /// <reference path="../marten/ts/Model.ts"/>
