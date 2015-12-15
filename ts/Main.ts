@@ -4,6 +4,7 @@
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/Login.Iframe.ts" />
 /// <reference path="../marten/ts/Analytics.Web.ts" />
+/// <reference path="../marten/ts/XDate.ts" />
 
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Route.tsx" />
@@ -31,3 +32,28 @@ module Esper.Main {
   Dev.ts)
 */
 window.requestAnimationFrame(Esper.Main.init);
+
+/*
+  Temporary hack to allow manual CSV access from TimeStats directly
+*/
+module Esper {
+  export function getCSV(days=30) {
+    var now = new Date();
+    var start = new Date(now.getTime() - days*86400000);
+    var q = {
+      window_start: XDate.toString(start),
+      window_end:   XDate.toString(now)
+    }
+
+    var v = Calendars.selectStore.val();
+    if (! v) {
+      Log.e("Select calendar!");
+      return;
+    }
+
+    Api.postForCalendarEventsCSV(v.teamId, v.calId, q)
+      .done(function(csv) {
+        window.open("data:text/csv;charset=utf-8," + encodeURI(csv));
+      });
+  }
+}
