@@ -21,7 +21,7 @@
 
 /// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/Login.ts" />
-/// <reference path="./Store.ts" />
+/// <reference path="../marten/ts/LocalStore.ts" />
 
 module Esper.Login {
 
@@ -57,7 +57,7 @@ module Esper.Login {
           return;
         }
 
-        var message = credentialMessage(Store.get(storedLoginKey));
+        var message = credentialMessage(LocalStore.get(storedLoginKey));
         ev.source.postMessage(message, ev.origin);
       }
     });
