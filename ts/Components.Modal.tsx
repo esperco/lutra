@@ -12,6 +12,7 @@ module Esper.Components {
     title: string;
     busy?: boolean;
     icon?: string;
+    small?: boolean;
     disableOk?: boolean;
     dismissText?: string;
     okText?: string;
@@ -23,7 +24,7 @@ module Esper.Components {
   export class Modal extends Component<ModalProps, {}> {
     render() {
       return (<div className="modal fade">
-        <div className="modal-dialog">
+        <div className={"modal-dialog" + (this.props.small ? " modal-sm" : "")}>
           <div className="modal-content">
             <div className="modal-header">
               <button type="button" className="close" data-dismiss="modal">

@@ -16,9 +16,16 @@ module Esper.TestFixtures {
   export var team2Labels = ["Label A", "Label B", "Label C"];
 
   export function mockLogin() {
-    Login.setCredentials(uid, "secret");
-    var info = mockLoginInfo();
-    Login.loginPromise = $.Deferred().resolve(info).promise();
+    spyOn(LocalStore, "get").and.returnValue({
+      uid: uid,
+      api_secret: "secret",
+      email: email
+    });
+
+    var promise = $.Deferred().resolve(mockLoginInfo()).promise();
+    spyOn(Api, "getLoginInfo").and.returnValue(promise);
+
+    Login.init();
   }
 
   export function mockLoginInfo() {

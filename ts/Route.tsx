@@ -1,4 +1,5 @@
 /// <reference path="../marten/ts/Analytics.Web.ts" />
+/// <reference path="../marten/ts/Util.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Onboarding.ts" />
@@ -14,8 +15,8 @@ module Esper.Route {
 
   // Helper for displaying the login required page
   var loginRequired: PageJS.Callback = function(ctx, next) {
-    Login.loginPromise.done(next);
-    Login.loginPromise.fail(function() {
+    Login.promise().done(next);
+    Login.promise().fail(function() {
       Layout.render(<Views.LoginRequired />);
     });
 
@@ -62,6 +63,14 @@ module Esper.Route {
       initLoad = false;
       nav.path("/labels-over-time");
     }
+  });
+
+  // OAuth login
+  route("/login-once/:uid/:hex_landing_url", function(ctx) {
+    var landingUrl = Util.hexDecode(ctx.params.hex_landing_url);
+    var uid = ctx.params.uid;
+    console.info(landingUrl);
+    Login.loginOnce(uid).done(() => nav.path(landingUrl));
   });
 
   // Graph labels over time
