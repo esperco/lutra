@@ -34,7 +34,6 @@ module Esper.Views {
 
     goToLogin() {
       Layout.renderModal(<Components.LoginModal />);
-      // location.href = Login.loginURL();
     }
   }
 }
