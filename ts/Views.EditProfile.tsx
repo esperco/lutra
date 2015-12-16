@@ -1,7 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="./Store.ts" />
-/// <reference path="./Views.ChangePass.tsx" />
 /// <reference path="../marten/ts/Components.Invite.tsx" />
+/// <reference path="./Login.ts" />
+/// <reference path="./Views.ChangePass.tsx" />
 
 module Esper.Views {
 
@@ -244,7 +244,7 @@ module Esper.Views {
       return <div className="container">
         <h1>{this.props.header}</h1>
         <div><br/></div>
-        {(Store.get("uid") === undefined) ? "" : this.editPassword()}
+        {(Login.loggedIn()) ? "" : this.editPassword()}
         <div>
           <button className="btn btn-primary"
             onClick={() => Api.removeDirProfile(Login.myUid())}>

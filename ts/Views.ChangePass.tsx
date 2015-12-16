@@ -1,6 +1,5 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Login.ts" />
-/// <reference path="./Store.ts" />
 
 module Esper.Views {
 

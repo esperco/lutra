@@ -14,8 +14,8 @@ module Esper.Route {
 
   // Helper for displaying the login required page
   var loginRequired: PageJS.Callback = function(ctx, next) {
-    Login.loginPromise.done(next);
-    Login.loginPromise.fail(function() {
+    Login.promise().done(next);
+    Login.promise().fail(function() {
         Layout.render(<Views.LoginRequired />);
     });
 
@@ -61,6 +61,13 @@ module Esper.Route {
     nav.path("/profile");
   });
 
+  // OAuth login
+  pageJs("/login-once/:uid/:hex_landing_url", function(ctx) {
+    var landingUrl = Util.hexDecode(ctx.params.hex_landing_url);
+    var uid = ctx.params.uid;
+    Login.loginOnce(uid).done(() => nav.path(landingUrl));
+  });
+
   pageJs("/profile", loginRequired, function() {
     var id = Login.InfoStore.val().uid;
     nav.path("/profile/" + id);
@@ -75,7 +82,7 @@ module Esper.Route {
   });
 
   pageJs("/edit-profile", loginRequired, myProfileRequired, function() {
-    Layout.render(<Views.EditProfile header="Edit Profile" esperProfile={undefined} 
+    Layout.render(<Views.EditProfile header="Edit Profile" esperProfile={undefined}
       dirProfile={DirProfile.Store.val()}/>);
   });
 
