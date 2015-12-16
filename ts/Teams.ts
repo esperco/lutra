@@ -259,6 +259,6 @@ module Esper.Teams {
   }
 
   export function init() {
-    Login.loginPromise.done(loadFromLoginInfo);
+    Login.onSuccess(loadFromLoginInfo);
   }
 }

@@ -1,4 +1,5 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Components.Login.tsx" />
 /// <reference path="./Login.ts" />
 
 module Esper.Views {
@@ -32,7 +33,7 @@ module Esper.Views {
     }
 
     goToLogin() {
-      location.href = Login.loginURL();
+      Layout.renderModal(<Components.LoginModal />);
     }
   }
 }

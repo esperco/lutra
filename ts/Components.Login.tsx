@@ -5,6 +5,9 @@
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/Components.Invite.tsx" />
+/// <reference path="../marten/ts/Components.Login.tsx" />
+/// <reference path="./Components.Modal.tsx" />
+/// <reference path="./Layout.tsx" />
 /// <reference path="./Login.ts" />
 
 module Esper.Components {
@@ -29,7 +32,7 @@ module Esper.Components {
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
-            <li><a onClick={() => location.href=Login.logoutURL()}>
+            <li><a onClick={() => Login.logout()}>
               <i className="fa fa-fw fa-sign-out"></i>{" "}
               Logout
             </a></li>
@@ -45,9 +48,8 @@ module Esper.Components {
         </div>;
       }
 
-      // Double encode URI because of pageJs issue (see Otter's Route.ts)
       return <button className="btn btn-default navbar-btn"
-        onClick={() => location.href=Login.loginURL()}>
+        onClick={this.showLogin.bind(this)}>
         Login / Signup
       </button>;
     }
@@ -61,12 +63,32 @@ module Esper.Components {
 
     getState() {
       var tuple = Login.InfoStore.get();
-      var loginInfo = tuple[0];
-      var metadata = tuple[1];
+      var loginInfo = tuple && tuple[0];
+      var metadata = tuple && tuple[1];
       return {
         loginInfo: loginInfo,
         busy: metadata && metadata.dataStatus !== Model.DataStatus.READY
       };
+    }
+
+    showLogin() {
+      Layout.renderModal(<LoginModal />);
+    }
+  }
+
+  export class LoginModal extends Component<{}, {}> {
+    render() {
+      return <Modal title="Login / Signup" icon="fa-sign-in" small={true}>
+        <LoginPrompt
+          showGoogle={true}
+          showExchange={true}
+          showNylas={true}>
+          <div className="alert alert-info text-center">
+            Esper requires access to your calendar to work.
+            Please login with your calendar provider to continue.
+          </div>
+        </LoginPrompt>
+      </Modal>
     }
   }
 }

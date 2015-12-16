@@ -210,6 +210,6 @@ module Esper.Calendars {
   }
 
   export function init() {
-    Login.loginPromise.done(loadFromLoginInfo);
+    Login.onSuccess(loadFromLoginInfo);
   }
 }
