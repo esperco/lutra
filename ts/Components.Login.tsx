@@ -158,7 +158,8 @@ module Esper.Components {
                  defaultValue={this.props.email}
                  placeholder="name@email.com" />
         </div>
-        <button className="btn btn-primary" disabled={this.state.busy}>
+        <button className="btn btn-primary" disabled={this.state.busy}
+                onClick={this.submitNylas.bind(this)}>
           Continue{" "}
           <i className="fa fa-fw fa-arrow-circle-right" />
         </button>
