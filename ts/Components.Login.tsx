@@ -3,8 +3,9 @@
 */
 /// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Components.Login.tsx" />
+/// <reference path="../marten/ts/Components.Modal.tsx" />
 /// <reference path="./Login.ts" />
-/// <reference path="./Store.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -17,12 +18,8 @@ module Esper.Components {
 
   export class LoginInfo extends Component<{}, LoginInfoState> {
     logout() {
-      if (Store.get("uid") === undefined) {
-        window.location.href = Login.logoutURL();
-      } else {
-        Store.clear();
-        window.location.reload();
-      }
+      Login.logout();
+      window.location.reload(); // TODO: Fix to avoid unnecessary reload
     }
 
     render() {
@@ -45,9 +42,8 @@ module Esper.Components {
         </div>;
       }
 
-      // Double encode URI because of pageJs issue (see Otter's Route.ts)
       return <button className="btn btn-default navbar-btn"
-        onClick={() => location.href=Login.loginURL()}>
+        onClick={this.showLogin.bind(this)}>
         Login / Signup
       </button>;
     }
@@ -61,12 +57,31 @@ module Esper.Components {
 
     getState() {
       var tuple = Login.InfoStore.get();
-      var loginInfo = tuple[0];
-      var metadata = tuple[1];
+      var loginInfo = tuple && tuple[0];
+      var metadata = tuple && tuple[1];
       return {
         loginInfo: loginInfo,
         busy: metadata && metadata.dataStatus !== Model.DataStatus.READY
       };
+    }
+
+    showLogin() {
+      Layout.renderModal(<LoginModal />);
+    }
+  }
+
+  export class LoginModal extends Component<{}, {}> {
+    render() {
+      return <Modal title="Login / Signup" icon="fa-sign-in" small={true}>
+        <LoginPrompt
+          showGoogle={true}
+          showExchange={true}
+          showNylas={true}>
+          <div className="alert alert-info text-center">
+            Login with your email provider to continue.
+          </div>
+        </LoginPrompt>
+      </Modal>
     }
   }
 }

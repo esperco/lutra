@@ -1,6 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Components.Login.tsx" />
+/// <reference path="./Layout.tsx" />
 /// <reference path="./Login.ts" />
-/// <reference path="./Store.ts" />
 
 module Esper.Views {
 
@@ -79,9 +80,15 @@ module Esper.Views {
         {(this.state.error === true) ? this.showError() : ""}
         {(this.state.success === true) ? this.showSuccess() : ""}
         <div>
-          <a href={Login.loginURL() }>Or Login with Google / Microsoft.</a>
+          <a onClick={this.goToLogin.bind(this)}>
+            Or Login with Google / Microsoft
+          </a>
         </div>
       </div>;
+    }
+
+    goToLogin() {
+      Layout.renderModal(<Components.LoginModal />);
     }
   }
 }

@@ -1,6 +1,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="./Components.Login.tsx" />
+/// <reference path="./Layout.tsx" />
 /// <reference path="./Login.ts" />
-/// <reference path="./Store.ts" />
 /// <reference path="./Views.Register.tsx" />
 /// <reference path="./Views.ForgotPass.tsx" />
 
@@ -32,9 +33,8 @@ module Esper.Views {
       var password = this.find("input[name='password']").val();
       Api.postDirLogin({ email, password })
         .done(function(loginResponse) {
-          Store.set("uid", loginResponse.uid);
-          Store.set("api_secret", loginResponse.api_secret);
-          window.location.reload();
+          Login.storeCredentials(loginResponse);
+          window.location.reload(); // TODO: Fix so we don't have to reload?
         })
         .fail(function(err: ApiT.Error) {
           if (err['status'] === 400) {
@@ -81,12 +81,18 @@ module Esper.Views {
           <a onClick={() => Layout.render(<Views.Register />)}>{" Sign Up Here"}</a>
           </div>
         <div>
-          <a href={Login.loginURL()}>Or Login with Google / Microsoft.</a>
+          <a onClick={this.goToLogin.bind(this)}>
+            Or Login with Google / Microsoft
+          </a>
         </div>
         <div>
           <a onClick={() => Layout.render(<Views.ForgotPass />)}>Forgot Password?</a>
           </div>
       </div>;
+    }
+
+    goToLogin() {
+      Layout.renderModal(<Components.LoginModal />);
     }
   }
 }

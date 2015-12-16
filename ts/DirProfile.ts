@@ -28,7 +28,7 @@ module Esper.DirProfile {
       profileDeferred.reject(err);
     };
 
-    Login.loginPromise.then(function() {
+    Login.promise().then(function() {
       Api.getDirProfile(Login.myUid())
         .then(function(dirProfile) {
           Store.set(dirProfile, { dataStatus: Model.DataStatus.READY });
