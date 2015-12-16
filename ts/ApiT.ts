@@ -605,7 +605,7 @@ type token_response = [
     window_end: string; // timestamp
   }
 
-  // calendar_stats2  in api.atd
+  // calendar_stats2 in api.atd
   export interface CalendarStats {
     window_start: string; // timestamp
     partition: CalendarStatEntry[];
