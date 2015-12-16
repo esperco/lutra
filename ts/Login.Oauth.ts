@@ -172,7 +172,7 @@ module Esper.Login {
     email: string;
   }
 
-  function storeCredentials(data: ApiT.LoginResponse) {
+  export function storeCredentials(data: ApiT.LoginResponse) {
     var stored: StoredCredentials = {
       uid: data.uid,
       api_secret: data.api_secret,
