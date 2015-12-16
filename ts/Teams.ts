@@ -39,8 +39,8 @@ module Esper.Teams {
     Create an unsaved, default team for self-assisted user using loginInfo,
     stores it, and returns the _id the default team is stored under.
   */
-  export function createDefaultTeam(): string {
-    var loginInfo = Login.InfoStore.val();
+  export function createDefaultTeam(loginInfo?: ApiT.LoginResponse): string {
+    loginInfo = loginInfo || Login.InfoStore.val();
     if (! loginInfo) {
       Log.e("Unabled to create default team. No login info.");
       return;
@@ -254,7 +254,7 @@ module Esper.Teams {
     // should trigger for Nylas users and new users with no teams
     if (loginResponse.platform === "Nylas" ||
         !(loginResponse.teams && loginResponse.teams.length > 0)) {
-      createDefaultTeam();
+      createDefaultTeam(loginResponse);
     }
   }
 
