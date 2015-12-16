@@ -69,7 +69,6 @@ module Esper.Route {
   route("/login-once/:uid/:hex_landing_url", function(ctx) {
     var landingUrl = Util.hexDecode(ctx.params.hex_landing_url);
     var uid = ctx.params.uid;
-    console.info(landingUrl);
     Login.loginOnce(uid).done(() => nav.path(landingUrl));
   });
 
