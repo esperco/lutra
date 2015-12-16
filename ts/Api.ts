@@ -630,7 +630,7 @@ module Esper.Api {
   // supports generic calendar
   export function postForCalendarStats(teamid: string, calid: string,
     q: ApiT.CalendarStatsRequest): JQueryPromise<ApiT.CalendarStatsResult> {
-    var url = prefix + "/api/calendar/stats/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
       + "/" + string(teamid) + "/" + string(calid);
     return JsonHttp.post(url, JSON.stringify(q));
   }
