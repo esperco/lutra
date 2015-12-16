@@ -104,5 +104,12 @@ module Esper.Util {
         expect(cmpStringify(1)).not.toEqual(cmpStringify("1"));
       });
     });
+
+    describe("hexEncode / hexDecode", function() {
+      it("should encode and decode each other", function() {
+        var s = "Hello World";
+        expect(hexDecode(hexEncode(s))).toEqual(s);
+      });
+    });
   });
 }
