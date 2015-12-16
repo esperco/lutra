@@ -24,6 +24,10 @@ module Esper.ApiT {
     unauthorized_email: email;
   }
 
+  interface ListResponse<T> {
+    items: T[]
+  }
+
   export interface ClientError {
     http_status_code: number; // 4xx
     error_message: string;
@@ -601,21 +605,18 @@ type token_response = [
     window_end: string; // timestamp
   }
 
-  export interface CalendarStatsResult {
-    stats: CalendarStats[];
-  }
+  // calendar_stats2  in api.atd
   export interface CalendarStats {
-    by_label:   CalendarStatsByLabel;
-    unlabelled: CalendarStatEntry;
-    total:      CalendarStatEntry;
+    window_start: string; // timestamp
+    partition: Array<{
+      event_labels: string[];
+      event_count: number;    // integer
+      event_duration: number; // seconds
+    }>;
   }
-  export interface CalendarStatsByLabel {
-    [index: string]: CalendarStatEntry;
-  }
-  export interface CalendarStatEntry {
-    event_count: number;
-    event_duration: number; //in seconds
-  }
+
+  // calendar_stats_result2 in api.atd
+  export type CalendarStatsResult = ListResponse<CalendarStats>;
 
   export interface Task {
     taskid: string;
