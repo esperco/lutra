@@ -67,6 +67,15 @@ module Esper.Util {
     return s;
   }
 
+  /* Reverse of above -- NB: Does not work with unicode at the moment */
+  export function hexEncode(orig: string) {
+    var hex = '';
+    for(var i = 0; i < orig.length; i++) {
+      hex += orig.charCodeAt(i).toString(16);
+    }
+    return hex;
+  }
+
   /* Stable stringification of objects for comparison */
   export function cmpStringify(o: any): string {
     return JSON.stringify(tuplify(o));

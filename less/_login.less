@@ -1,0 +1,104 @@
+/*
+  Style login componnet
+*/
+@esper-sign-in-icon-width: 50px;
+@esper-button-container-shift: 110%;
+
+#esper-login {
+  overflow-x: hidden;
+
+  #sign-in-hero-mark {
+    -webkit-animation-duration: 1.5s;
+       -moz-animation-duration: 1.5s;
+           -animation-duration: 1.5s;
+  }
+
+  .hero-mark {
+    width: 40px;
+    height: 50px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+
+  .buttons-container {
+    position: relative;
+    left: 0;
+    transition: left 0.6s;
+
+    &.shifted {
+      left: -@esper-button-container-shift;
+    }
+
+    .nylas-form {
+      position: absolute;
+      top: 0;
+      left: @esper-button-container-shift;
+      right: -@esper-button-container-shift;
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+  }
+
+  .sign-in-btn {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 300px;
+
+    display: block;
+    margin: @padding-large-vertical auto;
+
+    .sign-in-icon {
+      width: @esper-sign-in-icon-width;
+      border-right: 1px solid rgba(255,255,255,0.3);
+      float: left;
+      text-align: center;
+      line-height: 1.5em;
+
+      img {
+        height: @line-height-computed;
+        width: auto;
+      }
+    }
+
+    .sign-in-text {
+      margin-left: @esper-sign-in-icon-width;
+      text-align: center;
+      min-width: 200px;
+    }
+
+    &.google-btn {
+      border-color: #DC3921;
+      background-image: linear-gradient(to bottom, #DF4A32 0%, #DD3A22 100%);
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+
+      &:hover, &:active {
+        box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
+      }
+    }
+
+    &.exchange-btn {
+      border-color: #0173BC;
+      background-image: linear-gradient(to bottom, #0072BB 0%, #0066AA 100%);
+      box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+
+      &:hover, &:active {
+        box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
+      }
+    }
+  }
+
+  .sign-in-footer {
+    max-width: 400px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-bottom: 20px;
+    padding-top: @padding-base-vertical;
+    text-align: center;
+    color: @gray-light;
+    border-top: 1px solid @gray-lighter;
+  }
+}
+

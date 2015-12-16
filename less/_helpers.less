@@ -277,3 +277,32 @@
     opacity: 0.9;
   }
 }
+
+/////
+
+// Low-key text
+.esper-advisory {
+  color: @gray-light;
+  font-size: @font-size-small;
+
+  a, .esper-link {
+    color: @gray-light;
+    &:hover {
+      color: @gray;
+      text-decoration: underline;
+    }
+  }
+}
+
+.esper-inline-divider {
+  display: inline-block;
+  width: @padding-small-horizontal;
+  height: 1em;
+  vertical-align: middle;
+  margin-right: @padding-small-horizontal;
+  border-right: 1px solid @gray-light;
+}
+
+.esper-one-line {
+  white-space: nowrap;
+}
