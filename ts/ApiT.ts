@@ -608,11 +608,13 @@ type token_response = [
   // calendar_stats2  in api.atd
   export interface CalendarStats {
     window_start: string; // timestamp
-    partition: Array<{
-      event_labels: string[];
-      event_count: number;    // integer
-      event_duration: number; // seconds
-    }>;
+    partition: CalendarStatEntry[]
+  }
+
+  export interface CalendarStatEntry {
+    event_labels: string[];
+    event_count: number;    // integer
+    event_duration: number; // seconds
   }
 
   // calendar_stats_result2 in api.atd
