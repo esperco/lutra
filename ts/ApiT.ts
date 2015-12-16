@@ -608,7 +608,7 @@ type token_response = [
   // calendar_stats2  in api.atd
   export interface CalendarStats {
     window_start: string; // timestamp
-    partition: CalendarStatEntry[]
+    partition: CalendarStatEntry[];
   }
 
   export interface CalendarStatEntry {
