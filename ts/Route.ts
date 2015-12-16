@@ -99,6 +99,8 @@ module Esper.Route {
       if (isIOS() && landing_url == "esper:login1") {
         fallbackOnAppStore();
         window.location.href = "esper:login1/" + data.uid;
+      } else if (landing_url.indexOf(":uid") >= 0) {
+        Route.nav.path(landing_url.replace(":uid", data.uid));
       } else {
         Signin.loginOnce(data.uid, landing_url);
       }
