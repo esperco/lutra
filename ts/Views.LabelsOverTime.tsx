@@ -121,33 +121,59 @@ module Esper.Views {
 
   /////
 
-  interface LabelValues {
-    name: string;
-    total: number;
-    values: number[];
-  }
-
-  interface LabelsOverTimeState {
-    selectedCal: Calendars.CalSelection;
-    selectedLabels: string[];
-    selectedInterval: TimeStats.Interval;
-    results: TimeStats.StatResults;
-    labelValues: LabelValues[];
-    allLabels: [string, string][]; // Label + Badget Text
-  }
-
-  export class LabelsOverTime extends Component<{}, LabelsOverTimeState> {
+  export class LabelsOverTime extends Component<{}, {}> {
     constructor(props: {}) {
       setDefaults();
       super(props);
     }
 
-    render() {
-      if (this.state.selectedCal) {
-        var selectedTeamId = this.state.selectedCal.teamId;
-        var selectedCalId = this.state.selectedCal.calId;
+    getData() {
+      // Clear previous analytics view
+      trackView(null);
+
+      // Get selections and data
+      var selectedInterval = intervalSelectStore.val();
+      var selectedCal = Calendars.selectStore.val();
+      if (selectedCal && selectedCal.calId && selectedCal.teamId) {
+        // Get selected team
+        var team = Teams.get(selectedCal.teamId);
+        if (! team) { throw new Error("Selected unavailable team"); }
+
+        var queryRequest = {
+          teamId: selectedCal.teamId,
+          calId: selectedCal.calId,
+          numIntervals: NUM_INTERVALS, // Hard-coded for now
+          interval: selectedInterval
+        };
+        var results = TimeStats.intervalQuery.get(queryRequest);
+        var computed = TimeStats.getDurationsOverTime(results) || [];
+        var labelStoreVal = labelSelectStore.val();
+        var selectedLabels: string[] = labelStoreVal ?
+          labelStoreVal.labels :
+          _.map(computed.slice(0, 4), (v) => v.labelNorm);
+
+        // Analytics call
+        if (selectedLabels && selectedLabels.length) {
+          trackView(queryRequest, selectedLabels);
+        }
       }
 
+      return {
+        results: results,
+        computed: TimeStats.getDurationsOverTime(results) || [],
+        selectedLabels: selectedLabels
+      };
+    }
+
+    render() {
+      // Get selections and data
+      var selectedInterval = intervalSelectStore.val();
+      var selectedCal = Calendars.selectStore.val();
+      var selectedTeamId = selectedCal && selectedCal.teamId;
+      var selectedCalId = selectedCal && selectedCal.calId;
+      var data = this.getData();
+
+      // Render view
       return <div id="labels-over-time-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
@@ -155,7 +181,7 @@ module Esper.Views {
             selectedTeamId={selectedTeamId}
             selectedCalId={selectedCalId}
             updateFn={updateSelection} />
-          {this.renderLabels()}
+          {this.renderLabels(data.computed, data.selectedLabels)}
         </div>
         <div className="esper-right-content padded">
           <div className="esper-header clearfix">
@@ -175,18 +201,20 @@ module Esper.Views {
               </button>
               {" "}
               <Components.PeriodSelector
-                selected={this.state.selectedInterval}
+                selected={selectedInterval}
                 updateFn={updateInterval} />
               {" "}
             </div>
           </div>
-          {this.renderChart()}
+          {this.renderChart(data.results, data.computed, data.selectedLabels)}
         </div>
       </div>;
     }
 
-    renderChart() {
-      var results = this.state.results;
+    renderChart(results: TimeStats.StatResults,
+                computed: TimeStats.DurationsOverTimeResults,
+                selectedLabels: string[])
+    {
       if (! results) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-calendar"></i>{" "}
@@ -203,27 +231,30 @@ module Esper.Views {
         </div>;
       }
 
-      var horizontalLabel: string;
-      var startFormat: string;
-      switch(this.state.selectedInterval) {
-        case TimeStats.Interval.DAILY:
-          horizontalLabel = "Day"
-          startFormat = "MMM D"
-          break;
-        case TimeStats.Interval.MONTHLY:
-          horizontalLabel = "Month"
-          startFormat = "MMM"
-          break;
-        default:
-          horizontalLabel = "Week Starting";
-          startFormat = "MMM D";
-      }
+      var formmated = TimeStats.formatWindowStarts(results,
+        intervalSelectStore.val());
+      var horizontalLabel = formmated.typeLabel;
+      var columnLabels = formmated.groupLabels;
 
-      var data = this.getChartData(
-        results,
-        this.state.labelValues,
-        startFormat
-      );
+      var filtered = _.filter(computed,
+        (c) => _.contains(selectedLabels, c.labelNorm));
+      var datasets = _.map(filtered, (c) => {
+        var baseColor = Colors.getColorForLabel(c.labelNorm);
+        return {
+          label: c.displayAs,
+          fillColor: baseColor,
+          strokeColor: Colors.darken(baseColor, 0.3),
+          highlightFill: Colors.lighten(baseColor, 0.3),
+          highlightStroke: baseColor,
+          data: _.map(c.values, (value) => TimeStats.toHours(value))
+        }
+      });
+      var data = {
+        labels: columnLabels,
+        datasets: datasets
+      };
+
+      // var data = this.getChartData(results, startFormat);
       return <Components.BarChart units="Hours"
               verticalLabel="Time (Hours)"
               horizontalLabel={horizontalLabel}
@@ -240,46 +271,23 @@ module Esper.Views {
       </div>
     }
 
-    renderLabels() {
-      var results = this.state.results;
-      if (!results || !results.ready) {
+    renderLabels(computed: TimeStats.DurationsOverTimeResults,
+                 selectedLabels: string[]) {
+      if (!computed) {
         return <span></span>;
       } else {
+        var allLabels = _.map(computed, (c) => {
+          return {
+            labelNorm: c.labelNorm,
+            displayAs: c.displayAs,
+            badge: TimeStats.toHours(c.total) + "h"
+          };
+        });
         return <Components.LabelSelector
-          allLabels={this.state.allLabels}
-          selectedLabels={this.state.selectedLabels}
+          allLabels={allLabels}
+          selectedLabels={selectedLabels}
           updateFn={updateLabels} />;
       }
-    }
-
-    getChartData(results: TimeStats.StatResults,
-                 sortedLabels: LabelValues[],
-                 startFormat: string) {
-      var labels = _.map(results.starts,
-        // MMM d => Oct 4
-        (start) => moment(start).format(startFormat)
-      );
-
-      var filteredLabels = _.filter(sortedLabels, (label) =>
-        _.contains(this.state.selectedLabels, label.name)
-      )
-
-      var datasets = _.map(filteredLabels, (label) => {
-        var baseColor = Colors.getColorForLabel(label.name);
-        return {
-          label: label.name,
-          fillColor: baseColor,
-          strokeColor: Colors.darken(baseColor, 0.3),
-          highlightFill: Colors.lighten(baseColor, 0.3),
-          highlightStroke: baseColor,
-          data: _.map(label.values, (value) => TimeStats.toHours(value))
-        }
-      });
-
-      return {
-        labels: labels,
-        datasets: datasets
-      };
     }
 
     refresh() {
@@ -301,76 +309,6 @@ module Esper.Views {
         intervalSelectStore,
         TimeStats.intervalQuery
       ]);
-    }
-
-    getState(): LabelsOverTimeState {
-      // Clear previous analytics view
-      trackView(null);
-
-      var selectedInterval = intervalSelectStore.val();
-      var selectedCal = Calendars.selectStore.val();
-      if (selectedCal && selectedCal.calId && selectedCal.teamId) {
-
-        // Get selected team
-        var team = Teams.get(selectedCal.teamId);
-        if (! team) { throw new Error("Selected unavailable team"); }
-
-        var queryRequest = {
-          teamId: selectedCal.teamId,
-          calId: selectedCal.calId,
-          numIntervals: NUM_INTERVALS, // Hard-coded for now
-          interval: selectedInterval
-        };
-        var results = TimeStats.intervalQuery.get(queryRequest);
-
-        if (results && results.ready) {
-          // Aggregate time stats by label
-          var agg = TimeStats.aggregate(results.stats);
-          var labelsAgg = _.map(agg.by_label,
-            (statEntry, name) => {
-              return {
-                name: name,
-                total: statEntry.event_duration,
-                values: statEntry.durationValues
-              };
-            }
-          );
-
-          // Filter out task-related labels
-          labelsAgg = _.reject(labelsAgg, (label) =>
-            label.name === team.team_label_new ||
-            label.name === team.team_label_done ||
-            label.name === team.team_label_canceled ||
-            label.name === team.team_label_pending ||
-            label.name === team.team_label_urgent ||
-            label.name === team.team_label_in_progress
-          );
-
-          // Sort by total duration descending
-          labelsAgg.sort((a, b) => b.total - a.total);
-          var labelPairs = _.map(labelsAgg, (label): [string, string] => [
-            label.name,
-            TimeStats.toHours(label.total) + "h"
-          ]);
-
-          // If no selected labels, default to 4 most frequent labels
-          var labelStoreVal = labelSelectStore.val();
-          var selectedLabels: string[] = labelStoreVal ?
-            labelStoreVal.labels :
-            _.map(labelPairs.slice(0, 4), (pair) => pair[0]);
-
-          trackView(queryRequest, selectedLabels);
-        }
-      }
-
-      return {
-        selectedCal: selectedCal,
-        selectedLabels: selectedLabels || [],
-        selectedInterval: selectedInterval,
-        labelValues: labelsAgg,
-        results: results,
-        allLabels: labelPairs || []
-      };
     }
   }
 }
