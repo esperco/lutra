@@ -959,25 +959,34 @@ module Esper.PeopleTab {
                                     profCompany,
                                     profCompanyTitle,
                                     profile);
-              if (Team.isExecutive(profile.uid, team)) {
-                displayExecPreferences();
-              } else {
-                meetingsSection.hide();
-                teamLabelsSection.hide();
-                coworkerSection.hide();
-                calendarsSection.hide();
-                notesSection.hide();
-              }
-              preferencesSpinner.hide();
             }, function(err) {
               headerSpinner.hide();
-              preferencesSpinner.hide();
               overviewSpinner.hide();
               if (err.status === 404) overviewNoProfile.show();
+            }).always(function() {
+              Api.getTeamForExec(guest.email).then(function(teamOption) {
+                if (teamOption.team !== undefined) {
+                  displayExecPreferences(teamOption.team);
+                  preferencesSpinner.hide();
+                } else {
+                  meetingsSection.hide();
+                  teamLabelsSection.hide();
+                  coworkerSection.hide();
+                  calendarsSection.hide();
+                  notesSection.hide();
+                  preferencesSpinner.hide();
+                }
+              });
             });
           }
 
-          $("<div>").text(guest.display_name || guest.email)
+          var text;
+          if (guest.display_name !== undefined) {
+            text = guest.display_name + " <" + guest.email + ">";
+          } else {
+            text = guest.email
+          }
+          $("<div>").text(text)
                     .addClass("esper-link")
                     .click(fetchDirProfile)
                     .appendTo(profBubbles);
@@ -993,25 +1002,18 @@ module Esper.PeopleTab {
                             profCompany,
                             profCompanyTitle,
                             profile);
-      if (Team.isExecutive(profile.uid, team)) {
-        displayExecPreferences();
-      } else {
-        meetingsSection.hide();
-        teamLabelsSection.hide();
-        coworkerSection.hide();
-        calendarsSection.hide();
-        notesSection.hide();
-      }
       preferencesSpinner.hide();
     }, function(err) {
       headerSpinner.hide();
       preferencesSpinner.hide();
       overviewSpinner.hide();
       if (err.status === 404) overviewNoProfile.show();
+    }).always(function() {
+      displayExecPreferences(team);
     });
 
-    function displayExecPreferences() {
-      Api.getPreferenceChanges(team.teamid, from, until).done(function(changes) {
+    function displayExecPreferences(guestTeam: ApiT.Team) {
+      Api.getPreferenceChanges(guestTeam.teamid, from, until).done(function(changes) {
         var workplace_changes =
           getPreferencesChanges("Workplace", changes.change_log);
         var meeting_changes =
@@ -1055,9 +1057,9 @@ module Esper.PeopleTab {
         showMeetings.text("Hide");
         meetingsHeader.addClass("esper-open");
 
-        if (team.team_labels.length > 0) {
+        if (guestTeam.team_labels.length > 0) {
           teamLabelsSection.show();
-          team.team_labels.forEach(function(label) {
+          guestTeam.team_labels.forEach(function(label) {
             displayTeamLabel(teamLabelsContainer, label);
           });
           teamLabelsContainer.slideDown("fast");
