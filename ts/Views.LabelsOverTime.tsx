@@ -150,7 +150,7 @@ module Esper.Views {
         var labelStoreVal = labelSelectStore.val();
         var selectedLabels: string[] = labelStoreVal ?
           labelStoreVal.labels :
-          _.map(computed.slice(0, 4), (v) => v.label);
+          _.map(computed.slice(0, 4), (v) => v.labelNorm);
 
         // Analytics call
         if (selectedLabels && selectedLabels.length) {
@@ -235,10 +235,13 @@ module Esper.Views {
         intervalSelectStore.val());
       var horizontalLabel = formmated.typeLabel;
       var columnLabels = formmated.groupLabels;
-      var datasets = _.map(computed, (c) => {
-        var baseColor = Colors.getColorForLabel(c.label);
+
+      var filtered = _.filter(computed,
+        (c) => _.contains(selectedLabels, c.labelNorm));
+      var datasets = _.map(filtered, (c) => {
+        var baseColor = Colors.getColorForLabel(c.labelNorm);
         return {
-          label: c.label,
+          label: c.displayAs,
           fillColor: baseColor,
           strokeColor: Colors.darken(baseColor, 0.3),
           highlightFill: Colors.lighten(baseColor, 0.3),
@@ -273,10 +276,13 @@ module Esper.Views {
       if (!computed) {
         return <span></span>;
       } else {
-        var allLabels = _.map(computed, (c): [string, string] => [
-          c.label,
-          TimeStats.toHours(c.total) + "h"
-        ]);
+        var allLabels = _.map(computed, (c) => {
+          return {
+            labelNorm: c.labelNorm,
+            displayAs: c.displayAs,
+            badge: TimeStats.toHours(c.total) + "h"
+          };
+        });
         return <Components.LabelSelector
           allLabels={allLabels}
           selectedLabels={selectedLabels}

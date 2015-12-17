@@ -14,7 +14,11 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface LabelSelectorProps {
-    allLabels: [string, string][]; // Label + badge text
+    allLabels: {
+      displayAs?: string;
+      labelNorm: string;
+      badge?: string;
+    }[]; // Label + badge text
     selectedLabels: string[];
     updateFn: (selectedLabels: string[]) => void;
     minimized?: boolean;
@@ -36,22 +40,23 @@ module Esper.Components {
     }
 
     renderLabels() {
-      return _.map(this.props.allLabels, (pair) => {
-        var label = pair[0];
-        var badgeText = pair[1];
-        var selected = _.contains(this.props.selectedLabels, label);
+      return _.map(this.props.allLabels, (labelOpts) => {
+        var displayAs = labelOpts.displayAs || labelOpts.labelNorm;
+        var labelNorm = labelOpts.labelNorm;
+        var badgeText = labelOpts.badge;
+        var selected = _.contains(this.props.selectedLabels, labelNorm);
         var badgeStyle = selected ? {
-          background: Colors.getColorForLabel(label)
+          background: Colors.getColorForLabel(labelNorm)
         } : {};
         var clickHandler = () => {
-          this.handleClick(label, !selected);
+          this.handleClick(labelNorm, !selected);
         };
         return <a onClick={clickHandler}
-            key={label} className="list-group-item one-line">
+            key={labelNorm} className="list-group-item one-line">
           <span className="badge" style={badgeStyle}>{badgeText}</span>
           <i className={"fa fa-fw " +
             (selected ? "fa-check-square-o" : "fa-square-o")} />
-          {" "}{label}
+          {" "}{displayAs}
         </a>
       });
     }

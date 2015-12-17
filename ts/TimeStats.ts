@@ -125,17 +125,19 @@ module Esper.TimeStats {
 
   // Stats for a single label
   export interface StatsForLabel {
+    displayAs: string,   // Display name
     count: number,
-    duration: number // seconds
+    duration: number       // seconds
   }
 
-  // Collection of stats mapped to labels
+  // Collection of stats mapped to labels from normative label
   export interface StatsByLabel {
     [index: string]: StatsForLabel
   }
 
   export interface ValuesByLabel {
-    [index: string]: {
+    [index: string]: {          // Normalized label
+      displayAs: string,      // Display name
       totalCount: number,
       counts: number[],
       totalDuration: number,
@@ -151,14 +153,17 @@ module Esper.TimeStats {
   export function partitionByLabel(stats: ApiT.CalendarStatEntry[]) {
     var ret: StatsByLabel = {};
     _.each(stats, (s) => {
-      _.each(s.event_labels, (label) => {
+      var i = 0;
+      _.each(s.event_labels_norm, (label) => {
         var x = ret[label] = ret[label] || {
+          displayAs: s.event_labels[i],
           count: 0,
           duration: 0
         };
 
         x.count += s.event_count;
         x.duration += s.event_duration;
+        i += 1;
       });
     });
     return ret;
@@ -179,11 +184,17 @@ module Esper.TimeStats {
     var ret: StatsByLabel = {};
     _.each(stats, (s) => {
       var eventLabels = (labels ?
-        _.intersection(labels, s.event_labels) :
-        s.event_labels
+        _.intersection(labels, s.event_labels_norm) :
+        s.event_labels_norm
       );
+      var displayAsMap: {[index: string]: string} = {};
+      _.each(s.event_labels_norm, (normLabel, i) => {
+        displayAsMap[normLabel] = s.event_labels[i]
+      });
+
       _.each(eventLabels, (label) => {
         var x = ret[label] = ret[label] || {
+          displayAs: displayAsMap[label] || label,
           count: 0,
           duration: 0
         };
@@ -205,8 +216,9 @@ module Esper.TimeStats {
     var stats: StatsByLabel;
     for (var i = 0; i < statsByLabel.length; i++) {
       stats = statsByLabel[i];
-      _.each(stats, (s, label) => {
-        var labelVal = ret[label] = ret[label] || {
+      _.each(stats, (s, labelNorm) => {
+        var labelVal = ret[labelNorm] = ret[labelNorm] || {
+          displayAs: s.displayAs,
           totalCount: 0,
           counts: [],
           totalDuration: 0,
@@ -241,14 +253,14 @@ module Esper.TimeStats {
       return;
     }
 
-    var starts = _.map(results.stats, (stat) => stat.window_start);
     var labels = _.map(results.stats, (stat) =>
       partitionByLabel(stat.partition)
     );
     var valMap = valuesByLabel(labels);
-    var ret = _.map(valMap, (vals, labelName) => {
+    var ret = _.map(valMap, (vals, labelNorm) => {
       return {
-        label: labelName,
+        labelNorm: labelNorm,
+        displayAs: vals.displayAs,
         total: _.sum(vals.durations),
         values: vals.durations
       };
@@ -257,7 +269,8 @@ module Esper.TimeStats {
 
     // If teamId, filter
     if (teamId) {
-      ret = filterLabels(teamId, ret, (r) => r.label);
+      // Use displayAs since task labels don't have concept of normalization
+      ret = filterLabels(teamId, ret, (r) => r.displayAs);
     }
 
     return ret;
@@ -329,7 +342,8 @@ module Esper.TimeStats {
 
   // Calculate data for duration over time calculations
   export type DurationsOverTimeResults = {
-    label: string;
+    labelNorm: string;
+    displayAs: string;
     total: number;   // seconds
     values: number[]; // seconds
   }[];
