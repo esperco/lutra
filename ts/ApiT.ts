@@ -612,7 +612,8 @@ type token_response = [
   }
 
   export interface CalendarStatEntry {
-    event_labels: string[];
+    event_labels: string[];       // Display versions
+    event_labels_norm: string[];  // Normalized versions
     event_count: number;    // integer
     event_duration: number; // seconds
   }
