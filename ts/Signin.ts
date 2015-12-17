@@ -378,6 +378,9 @@ module Esper.Signin {
     Log.d("checkGooglePermissions " + landingUrl);
     return Api.getGoogleAuthInfo(landingUrl)
       .then(function(info) {
+        /* Temp hack for admin to turn off check Google Permission redirect */
+        if (LocalStore.get("iddqd")) return true;
+
         if (info.is_assistant && info.need_google_auth) {
           requestGoogleAuth(info.google_auth_url);
           return false;
