@@ -5,6 +5,7 @@
 /// <reference path="../marten/ts/Emit.ts" />
 /// <reference path="../marten/ts/ApiC.ts" />
 /// <reference path="../marten/ts/XDate.ts" />
+/// <reference path="./Teams.ts" />
 /// <reference path="./Esper.ts" />
 
 module Esper.TimeStats {
@@ -23,8 +24,7 @@ module Esper.TimeStats {
   }
 
   export interface StatResults {
-    starts: Date[];
-    stats: ApiT.CalendarStats[];
+    stats : ApiT.CalendarStats[];
     ready?: boolean;
     error?: Error;
   }
@@ -51,8 +51,7 @@ module Esper.TimeStats {
       var metadata = storeGet && storeGet[1];
 
       return {
-        starts: startDates,
-        stats: data && data.stats,
+        stats: data && data.items,
         ready: metadata
           && metadata.dataStatus === Model.DataStatus.READY,
         error: metadata
@@ -124,79 +123,216 @@ module Esper.TimeStats {
 
   ////
 
-  // Expand CalendarStatsEntry to contain list of values
-  export interface AggCalendarStatEntry extends ApiT.CalendarStatEntry {
-    countValues: number[];
-    durationValues: number[];
+  // Stats for a single label
+  export interface StatsForLabel {
+    count: number,
+    duration: number // seconds
   }
 
-  export interface AggCalendarStats extends ApiT.CalendarStats {
-    by_label: {
-      [index: string]: AggCalendarStatEntry
-    },
-    unlabelled: AggCalendarStatEntry,
-    total: AggCalendarStatEntry
+  // Collection of stats mapped to labels
+  export interface StatsByLabel {
+    [index: string]: StatsForLabel
   }
 
-  // Combines stat results to get aggregate data by label
-  export function aggregate(results: ApiT.CalendarStats[]): AggCalendarStats {
-    var accumulator: AggCalendarStats = {
-      by_label: {},
-      unlabelled: {
-        event_count: 0,
-        event_duration: 0,
-        countValues: [],
-        durationValues: []
-      },
-      total: {
-        event_count: 0,
-        event_duration: 0,
-        countValues: [],
-        durationValues: []
-      }
+  export interface ValuesByLabel {
+    [index: string]: {
+      totalCount: number,
+      counts: number[],
+      totalDuration: number,
+      durations: number[] // seconds
     };
-
-    return _.reduce(results, (agg: AggCalendarStats,
-                              stat: ApiT.CalendarStats,
-                              index: number) => {
-      _.each(stat.by_label, (v, name) => {
-        var statEntry: AggCalendarStatEntry = agg.by_label[name] =
-          agg.by_label[name] || {
-            event_count: 0,
-            event_duration: 0,
-            countValues: [],
-            durationValues: []
-          };
-
-        // This label may be new, so prefill 0s up to current index
-        _.times(index - statEntry.countValues.length, () => {
-          statEntry.countValues.push(0);
-          statEntry.durationValues.push(0);
-        });
-
-        addTo(statEntry, v);
-      });
-
-      // Bump up any remaining stats
-      _.each(agg.by_label, (v, name) => {
-        _.times(index + 1 - v.countValues.length, () => {
-          v.countValues.push(0);
-          v.durationValues.push(0);
-        });
-      });
-
-      addTo(agg.unlabelled, stat.unlabelled);
-      addTo(agg.total, stat.total);
-      return agg;
-    }, accumulator);
   }
 
-  function addTo(entry: AggCalendarStatEntry, plus: ApiT.CalendarStatEntry) {
-    entry.event_count += plus.event_count;
-    entry.event_duration += plus.event_duration;
-    entry.countValues.push(plus.event_count);
-    entry.durationValues.push(plus.event_duration);
+  /*
+    Adds up totals for each individual label. If an event has multiple labels,
+    the entirety of each event's duration will be attributed to each label's
+    total.
+  */
+  export function partitionByLabel(stats: ApiT.CalendarStatEntry[]) {
+    var ret: StatsByLabel = {};
+    _.each(stats, (s) => {
+      _.each(s.event_labels, (label) => {
+        var x = ret[label] = ret[label] || {
+          count: 0,
+          duration: 0
+        };
+
+        x.count += s.event_count;
+        x.duration += s.event_duration;
+      });
+    });
+    return ret;
   }
+
+  /*
+    Like partitionByLabel, but avoids double-counting events with multiple
+    labels on them by attributing only a fraction of the duration of the event
+    to each label on the event (divided equally among all labels on the event
+    by default -- can be restricted to only consider certain labels by passing
+    a list of labels as the second argument.).
+
+    Counts are unaffected.
+  */
+  export function exclusivePartitionByLabel(stats: ApiT.CalendarStatEntry[],
+                                            labels?: string[])
+  {
+    var ret: StatsByLabel = {};
+    _.each(stats, (s) => {
+      var eventLabels = (labels ?
+        _.intersection(labels, s.event_labels) :
+        s.event_labels
+      );
+      _.each(eventLabels, (label) => {
+        var x = ret[label] = ret[label] || {
+          count: 0,
+          duration: 0
+        };
+
+        x.count += s.event_count;
+        x.duration += (s.event_duration / eventLabels.length);
+      });
+    });
+    return ret;
+  }
+
+  /*
+    Returns a map from labels to list of values for each label, filling in
+    zeros as appropriate
+  */
+  export function valuesByLabel(statsByLabel: StatsByLabel[]) {
+    var ret: ValuesByLabel = {};
+    var i = 0;
+    var stats: StatsByLabel;
+    for (var i = 0; i < statsByLabel.length; i++) {
+      stats = statsByLabel[i];
+      _.each(stats, (s, label) => {
+        var labelVal = ret[label] = ret[label] || {
+          totalCount: 0,
+          counts: [],
+          totalDuration: 0,
+          durations: []
+        }
+        labelVal.totalCount += s.count;
+        labelVal.counts[i] = s.count;
+        labelVal.totalDuration += s.duration;
+        labelVal.durations[i] = s.duration;
+      });
+    }
+
+    // Normalize undefined to 0
+    _.each(ret, (v, k) => {
+      for (var j = 0; j < statsByLabel.length; j++) {
+        v.counts[j] = v.counts[j] || 0;
+        v.durations[j] = v.durations[j] || 0;
+      }
+    });
+
+    return ret;
+  }
+
+
+  /////
+
+  export function getDurationsOverTime(results: StatResults, teamId?: string)
+    : DurationsOverTimeResults
+  {
+    // Safety check
+    if (! (results && results.ready && results.stats)) {
+      return;
+    }
+
+    var starts = _.map(results.stats, (stat) => stat.window_start);
+    var labels = _.map(results.stats, (stat) =>
+      partitionByLabel(stat.partition)
+    );
+    var valMap = valuesByLabel(labels);
+    var ret = _.map(valMap, (vals, labelName) => {
+      return {
+        label: labelName,
+        total: _.sum(vals.durations),
+        values: vals.durations
+      };
+    });
+    ret = _.sortBy(ret, (x) => -x.total);
+
+    // If teamId, filter
+    if (teamId) {
+      ret = filterLabels(teamId, ret, (r) => r.label);
+    }
+
+    return ret;
+  }
+
+
+  /////
+
+  /*
+    Get formatted names for chart columns
+  */
+  export interface FormattedWindowStarts {
+    typeLabel: string; // "Day"
+    groupLabels: string[]; // "Jun 1", "Jun 2", etc.
+  }
+
+  export function formatWindowStarts(results: StatResults, interval: Interval)
+    : FormattedWindowStarts
+  {
+    var typeLabel: string;
+    var startFormat: string;
+    switch(interval) {
+      case TimeStats.Interval.DAILY:
+        typeLabel = "Day"
+        startFormat = "MMM D"
+        break;
+      case TimeStats.Interval.MONTHLY:
+        typeLabel = "Month"
+        startFormat = "MMM"
+        break;
+      default:
+        typeLabel = "Week Starting";
+        startFormat = "MMM D";
+    }
+    var groupLabels = _.map(results.stats,
+      // MMM d => Oct 4
+      (stat) => moment(stat.window_start).format(startFormat)
+    );
+
+    return {
+      typeLabel: typeLabel,
+      groupLabels: groupLabels
+    };
+  }
+
+  // Helper to filter out task labels
+  export function filterLabels<T>(teamId: string, labels: T[],
+                                  transform?: (t: T) => string)
+  {
+    var team = Teams.get(teamId);
+    if (! team) {
+      return labels;
+    }
+
+    transform = transform || _.identity;
+
+    // Filter out task-related labels
+    return _.reject(labels, (label) => {
+      var t = transform(label);
+      return
+        t === team.team_label_new ||
+        t === team.team_label_done ||
+        t === team.team_label_canceled ||
+        t === team.team_label_pending ||
+        t === team.team_label_urgent ||
+        t === team.team_label_in_progress;
+    });
+  }
+
+  // Calculate data for duration over time calculations
+  export type DurationsOverTimeResults = {
+    label: string;
+    total: number;   // seconds
+    values: number[]; // seconds
+  }[];
 
   /*
     Time stat durations are normally seconds. This normalizes to hours and
