@@ -127,7 +127,7 @@ module Esper.Views {
       super(props);
     }
 
-    getResults() {
+    getData() {
       // Clear previous analytics view
       trackView(null);
 
@@ -145,8 +145,24 @@ module Esper.Views {
           numIntervals: NUM_INTERVALS, // Hard-coded for now
           interval: selectedInterval
         };
-        return TimeStats.intervalQuery.get(queryRequest);
+        var results = TimeStats.intervalQuery.get(queryRequest);
+        var computed = TimeStats.getDurationsOverTime(results) || [];
+        var labelStoreVal = labelSelectStore.val();
+        var selectedLabels: string[] = labelStoreVal ?
+          labelStoreVal.labels :
+          _.map(computed.slice(0, 4), (v) => v.label);
+
+        // Analytics call
+        if (selectedLabels && selectedLabels.length) {
+          trackView(queryRequest, selectedLabels);
+        }
       }
+
+      return {
+        results: results,
+        computed: TimeStats.getDurationsOverTime(results) || [],
+        selectedLabels: selectedLabels
+      };
     }
 
     render() {
@@ -155,12 +171,7 @@ module Esper.Views {
       var selectedCal = Calendars.selectStore.val();
       var selectedTeamId = selectedCal && selectedCal.teamId;
       var selectedCalId = selectedCal && selectedCal.calId;
-      var results = this.getResults();
-      var computed = TimeStats.getDurationsOverTime(results) || [];
-      var labelStoreVal = labelSelectStore.val();
-      var selectedLabels: string[] = labelStoreVal ?
-        labelStoreVal.labels :
-        _.map(computed.slice(0, 4), (v) => v.label);
+      var data = this.getData();
 
       // Render view
       return <div id="labels-over-time-page"
@@ -170,7 +181,7 @@ module Esper.Views {
             selectedTeamId={selectedTeamId}
             selectedCalId={selectedCalId}
             updateFn={updateSelection} />
-          {this.renderLabels(computed, selectedLabels)}
+          {this.renderLabels(data.computed, data.selectedLabels)}
         </div>
         <div className="esper-right-content padded">
           <div className="esper-header clearfix">
@@ -195,7 +206,7 @@ module Esper.Views {
               {" "}
             </div>
           </div>
-          {this.renderChart(results, computed, selectedLabels)}
+          {this.renderChart(data.results, data.computed, data.selectedLabels)}
         </div>
       </div>;
     }

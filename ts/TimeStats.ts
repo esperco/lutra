@@ -169,7 +169,7 @@ module Esper.TimeStats {
     labels on them by attributing only a fraction of the duration of the event
     to each label on the event (divided equally among all labels on the event
     by default -- can be restricted to only consider certain labels by passing
-    a list of labels as the second argument.).
+    a list of labels as the second argument).
 
     Counts are unaffected.
   */
