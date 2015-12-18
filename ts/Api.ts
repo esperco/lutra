@@ -119,16 +119,16 @@ module Esper.Api {
   }
 
   /* Contacts */
-  export function getGoogleContacts(email: string):
+  export function getContacts():
   JQueryPromise<ApiT.ContactInfo> {
-    var url = prefix + "/api/google/contacts/" + string(Login.myUid()) + "/" + email;
+    var url = prefix + "/api/contacts/" + string(Login.myUid()) + "/0";
     return JsonHttp.get(url);
   }
 
-  export function getGoogleContactsPage(gcontact_url: string):
+  export function getContactsPage(index: number):
   JQueryPromise<ApiT.ContactInfo> {
-    var url = prefix + "/api/google/contacts/url/" + string(Login.myUid())
-              + "/" + encodeURIComponent(gcontact_url);
+    var url = prefix + "/api/contacts/" + string(Login.myUid())
+              + "/" + index;
     return JsonHttp.get(url);
   }
 
