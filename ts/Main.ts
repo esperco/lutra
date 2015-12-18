@@ -43,7 +43,7 @@ module Esper {
       window_end:   XDate.toString(now)
     }
 
-    var v = Calendars.selectStore.val();
+    var v = Calendars.SelectStore.val();
     if (! v) {
       Log.e("Select calendar!");
       return;

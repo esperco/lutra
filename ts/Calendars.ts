@@ -19,14 +19,14 @@ module Esper.Calendars {
   }
 
   // Store currently selected calendar
-  export var selectStore = new Model.StoreOne<CalSelection>();
+  export var SelectStore = new Model.StoreOne<CalSelection>();
 
   // Store list of calendars by teamId
-  export var calendarListStore =
+  export var CalendarListStore =
     new Model.CappedStore<ApiT.GenericCalendar[]>();
 
   export function get(teamId: string, calId: string) {
-    var list = calendarListStore.val(teamId);
+    var list = CalendarListStore.val(teamId);
     if (list) {
       return _.find(list, (cal) => cal && cal.id === calId);
     }
@@ -66,7 +66,7 @@ module Esper.Calendars {
         calId: retCal.google_cal_id
       };
     } else {
-      var calLists = calendarListStore.getAll();
+      var calLists = CalendarListStore.getAll();
       if (calLists && calLists[0]) {
         var cal = calLists[0][0][0];
         var meta = calLists[0][1];
@@ -79,8 +79,8 @@ module Esper.Calendars {
   }
 
   export function setDefault() {
-    if (! selectStore.isSet()) {
-      selectStore.set(defaultSelection());
+    if (! SelectStore.isSet()) {
+      SelectStore.set(defaultSelection());
     }
   }
 
@@ -145,12 +145,12 @@ module Esper.Calendars {
       );
 
       // Check if we're deselecting current calendar
-      var currentSelection = selectStore.val();
+      var currentSelection = SelectStore.val();
       if (currentSelection &&
           currentSelection.teamId === _id &&
           currentSelection.calId === asGeneric(cal).id)
       {
-        selectStore.unset();
+        SelectStore.unset();
       }
 
       queueUpdate(_id, teamCopy);
@@ -190,7 +190,7 @@ module Esper.Calendars {
     });
 
     Teams.teamStore.pushFetch(_id, p, team);
-    calendarListStore.push(_id, p, _.map(team.team_calendars, asGeneric));
+    CalendarListStore.push(_id, p, _.map(team.team_calendars, asGeneric));
   }
 
   // Track pending calendar updates for team
@@ -205,7 +205,7 @@ module Esper.Calendars {
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
     _.each(loginResponse.teams, function(t) {
       var genCals = _.map(t.team_calendars, asGeneric) || [];
-      calendarListStore.upsert(t.teamid, genCals);
+      CalendarListStore.upsert(t.teamid, genCals);
     });
   }
 

@@ -134,7 +134,7 @@ module Esper.Components {
 
     renderCalendar(cal: ApiT.Calendar) {
       var genCal = Calendars.asGeneric(cal);
-      var calList = Calendars.calendarListStore.val(this.state.selectedTeamId);
+      var calList = Calendars.CalendarListStore.val(this.state.selectedTeamId);
       var isSelected = calList &&
         !!_.find(calList,
           (c) => c.id === genCal.id
@@ -158,7 +158,7 @@ module Esper.Components {
       }
 
       var genCal = Calendars.asGeneric(cal);
-      var calList = Calendars.calendarListStore.val(this.state.selectedTeamId);
+      var calList = Calendars.CalendarListStore.val(this.state.selectedTeamId);
       var isSelected = calList &&
         !!_.find(calList,
           (c) => c.id === genCal.id

@@ -28,7 +28,7 @@ module Esper.Components {
     renderWithData() {
       var teams = Teams.all();
       var hasCalendars = !!_.find(teams, (t) => {
-        var calList = Calendars.calendarListStore.val(t.teamid);
+        var calList = Calendars.CalendarListStore.val(t.teamid);
         return calList && calList.length;
       });
       return <BorderlessSection icon="fa-calendar" title="Select Calendar"
@@ -53,7 +53,7 @@ module Esper.Components {
 
     renderTeams(teams: ApiT.Team[]) {
       return _.map(teams, (team) => {
-        var calList = Calendars.calendarListStore.val(team.teamid);
+        var calList = Calendars.CalendarListStore.val(team.teamid);
         if (! (calList && calList.length)) {
           return <span key={team.teamid} />;
         }

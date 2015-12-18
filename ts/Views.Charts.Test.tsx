@@ -6,7 +6,7 @@
 module Esper.Views {
   describe("Views.Chart", function() {
     beforeEach(function() {
-      Calendars.selectStore.reset();
+      Calendars.SelectStore.reset();
       TimeStats.RequestStore.reset();
       chartsLabelSelectStore.reset();
       chartsChartTypeStore.reset();
@@ -41,7 +41,7 @@ module Esper.Views {
 
       it("should call TimeStats.async on render with non-null calendar " +
          "selection", function() {
-        Calendars.selectStore.set({
+        Calendars.SelectStore.set({
           teamId: "team-id-2",
           calId: "rupert@esper.com"
         });

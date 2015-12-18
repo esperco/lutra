@@ -52,8 +52,8 @@ module Esper.Views {
 
   // Action to update our selection -- also triggers async calls
   function updateCalSelection(teamId: string, calId: string) {
-    var current = Calendars.selectStore.val();
-    Calendars.selectStore.set({teamId: teamId, calId: calId});
+    var current = Calendars.SelectStore.val();
+    Calendars.SelectStore.set({teamId: teamId, calId: calId});
     updateAsync();
 
     // Clear label selection and colors if switching teams (default)
@@ -110,7 +110,7 @@ module Esper.Views {
 
   // Logic for getting selection and results data
   function getSelections() {
-    var calSelect = Calendars.selectStore.val();
+    var calSelect = Calendars.SelectStore.val();
     var calId = calSelect && calSelect.calId;
     var teamId = calSelect && calSelect.teamId;
     var labelSelect = LabelSelectStore.val();

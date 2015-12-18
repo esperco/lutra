@@ -1,11 +1,12 @@
 /// <reference path="../marten/typings/jasmine/jasmine.d.ts" />
 /// <reference path="../marten/ts/Test.ts" />
 /// <reference path="Views.CalendarLabeling.tsx" />
+/// <reference path="./TestFixtures.ts" />
 
 module Esper.Views {
   describe("Views.CalendarLabeling", function() {
     beforeEach(function() {
-      Calendars.selectStore.reset();
+      Calendars.SelectStore.reset();
       TestFixtures.mockLogin();
       Test.mockAPIs();
     });

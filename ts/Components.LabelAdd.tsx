@@ -31,7 +31,7 @@ module Esper.Components {
 
       // Init state = team of selected calendar, else first team (if any)
       var selectedTeamId: string;
-      var selection = Calendars.selectStore.val();
+      var selection = Calendars.SelectStore.val();
       if (selection && selection.teamId) {
         selectedTeamId = selection.teamId;
       } else {

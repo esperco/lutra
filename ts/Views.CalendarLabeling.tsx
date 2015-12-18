@@ -10,16 +10,16 @@ module Esper.Views {
 
   // Action to update our selection
   function updateSelection(teamId: string, calId: string) {
-    var current = Calendars.selectStore.val();
+    var current = Calendars.SelectStore.val();
 
     // Update only if calendar doesn't match (to avoid clobbering events)
     if (!current || current.teamId !== teamId || current.calId !== calId) {
-      Calendars.selectStore.set({teamId: teamId, calId: calId, events: []});
+      Calendars.SelectStore.set({teamId: teamId, calId: calId, events: []});
     }
   }
 
   function updateEvent(eventId: string, eventTitle: string, add: boolean) {
-    Calendars.selectStore.set(function(oldData) {
+    Calendars.SelectStore.set(function(oldData) {
       var newData = _.cloneDeep(oldData);
       newData.events = newData.events || [];
       var selected = _.find(newData.events, (e) => e.id === eventId);
@@ -57,8 +57,8 @@ module Esper.Views {
   }
 
   function setDefaults() {
-    if (! Calendars.selectStore.isSet()) {
-      Calendars.selectStore.set(_.extend({
+    if (! Calendars.SelectStore.isSet()) {
+      Calendars.SelectStore.set(_.extend({
         events: []
       }, Calendars.defaultSelection()) as Calendars.CalSelection);
     }
@@ -154,14 +154,14 @@ module Esper.Views {
 
     componentDidMount() {
       this.setSources([
-        Calendars.selectStore,
+        Calendars.SelectStore,
         calSelectMinStore
       ]);
     }
 
     getState() {
       return {
-        selectedCal: Calendars.selectStore.val(),
+        selectedCal: Calendars.SelectStore.val(),
         minimizeCalSelector: calSelectMinStore.val()
       }
     }

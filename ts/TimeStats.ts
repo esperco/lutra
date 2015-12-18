@@ -125,12 +125,12 @@ module Esper.TimeStats {
   }
 
   function defaultTeamId() {
-    var val = Calendars.selectStore.val();
+    var val = Calendars.SelectStore.val();
     return val && val.teamId;
   }
 
   function defaultCalId() {
-    var val = Calendars.selectStore.val();
+    var val = Calendars.SelectStore.val();
     return val && val.calId;
   }
 

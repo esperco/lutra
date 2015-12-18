@@ -118,7 +118,7 @@ module Esper.Teams {
     return Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         teamStore.alias(_id, t.teamid);
-        Calendars.calendarListStore.alias(_id, t.teamid);
+        Calendars.CalendarListStore.alias(_id, t.teamid);
       }
       return t;
     });
