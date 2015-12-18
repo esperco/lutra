@@ -126,77 +126,79 @@ module Esper.TimeStats {
       });
     });
 
-    describe("getDurationsOverTime", function() {
-      function getStats(): StatResults {
-        return {
-          stats: [{
-            window_start: "2015-10-05T21:18:08.020-08:00",
-            partition: [{
-              event_labels: ["A", "B"],
-              event_labels_norm: ["a", "b"],
-              event_count: 2,
-              event_duration: 200
-            }, {
-              event_labels: ["A"],
-              event_labels_norm: ["a"],
-              event_count: 1,
-              event_duration: 100
-            }]
+    describe("getDisplayResults", function() {
+      function getStats(): ApiT.CalendarStats[] {
+        return [{
+          window_start: "2015-10-05T21:18:08.020-08:00",
+          partition: [{
+            event_labels: ["A", "B"],
+            event_labels_norm: ["a", "b"],
+            event_count: 2,
+            event_duration: 200
           }, {
-            window_start: "2015-11-05T21:18:08.020-08:00",
-            partition: [{
-              event_labels: ["B", "C"],
-              event_labels_norm: ["b", "c"],
-              event_count: 2,
-              event_duration: 200
-            }, {
-              event_labels: ["B"],
-              event_labels_norm: ["b"],
-              event_count: 1,
-              event_duration: 100
-            }]
-          }],
-          ready: true
-        }
+            event_labels: ["A"],
+            event_labels_norm: ["a"],
+            event_count: 1,
+            event_duration: 100
+          }]
+        }, {
+          window_start: "2015-11-05T21:18:08.020-08:00",
+          partition: [{
+            event_labels: ["B", "C"],
+            event_labels_norm: ["b", "c"],
+            event_count: 2,
+            event_duration: 200
+          }, {
+            event_labels: ["B"],
+            event_labels_norm: ["b"],
+            event_count: 1,
+            event_duration: 100
+          }]
+        }];
       }
 
       it("should return totals and values for each label, non-exclusively, " +
          "sorted in descending order, with display text", function()
       {
-        var val = getDurationsOverTime(getStats());
+        var val = getDisplayResults(getStats());
+        val = _.sortBy(val, (v) => -v.totalCount);
         expect(val).toEqual([{
           labelNorm: "b",
           displayAs: "B",
-          total: 500,
-          values: [200, 300]
+          totalDuration: 500,
+          durations: [200, 300],
+          totalCount: 5,
+          counts: [2, 3]
         }, {
           labelNorm: "a",
           displayAs: "A",
-          total: 300,
-          values: [300, 0]
+          totalDuration: 300,
+          durations: [300, 0],
+          totalCount: 3,
+          counts: [3, 0]
         }, {
           labelNorm: "c",
           displayAs: "C",
-          total: 200,
-          values: [0, 200]
+          totalDuration: 200,
+          durations: [0, 200],
+          totalCount: 2,
+          counts: [0, 2]
         }]);
       });
     });
 
     describe("formatWindowStarts", function() {
-      function getStarts(): StatResults {
-        return {
-          stats: [{
-            window_start: "2015-10-05T21:18:08.020-08:00",
-            partition: []
-          }, {
-            window_start: "2015-11-05T21:18:08.020-08:00",
-            partition: []
-          }, {
-            window_start: "2015-12-05T21:18:08.020-08:00",
-            partition: []
-          }]
-        }
+      function getStarts(): ApiT.CalendarStats[] {
+        return [{
+          window_start: "2015-10-05T21:18:08.020-08:00",
+          partition: []
+        }, {
+          window_start: "2015-11-05T21:18:08.020-08:00",
+          partition: []
+        }, {
+          window_start: "2015-12-05T21:18:08.020-08:00",
+          partition: []
+        }];
       }
 
       it("should format for DAILY interval", function() {

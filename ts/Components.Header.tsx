@@ -30,7 +30,7 @@ module Esper.Components {
 
           <div className="collapse navbar-collapse" id={this.getId(toggleId)}>
             { this.state.loginInfo ? <ul className="nav navbar-nav">
-              <NavLink href="/labels-over-time">
+              <NavLink href="/charts">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
               </NavLink>
               <NavLink href="/calendar-labeling">

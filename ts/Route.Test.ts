@@ -51,14 +51,14 @@ module Esper.Route {
       TestFixtures.mockLogin();
     });
 
-    it("should navigate to labels over time page with default route", function() {
+    it("should navigate to charts page with default route", function() {
       fakePage("/");
-      expectRenderWith(this.spy, Views.LabelsOverTime);
+      expectRenderWith(this.spy, Views.Charts);
     });
 
-    it("should navigate to labels over time page", function() {
-      fakePage("/labels-over-time");
-      expectRenderWith(this.spy, Views.LabelsOverTime);
+    it("should navigate to charts page", function() {
+      fakePage("/charts");
+      expectRenderWith(this.spy, Views.Charts);
     });
 
     it("should navigate to calendar page", function() {

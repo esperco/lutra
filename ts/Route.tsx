@@ -5,8 +5,8 @@
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Views.Index.tsx" />
+/// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
-/// <reference path="./Views.LabelsOverTime.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoginRequired.tsx" />
 /// <reference path="./Views.Onboarding.tsx" />
@@ -61,7 +61,7 @@ module Esper.Route {
   pageJs("", function(ctx) {
     if (initLoad || ctx.pathname.indexOf("!") >= 0) {
       initLoad = false;
-      nav.path("/labels-over-time");
+      nav.path("/charts");
     }
   });
 
@@ -72,13 +72,13 @@ module Esper.Route {
     Login.loginOnce(uid).done(() => nav.path(landingUrl));
   });
 
-  // Graph labels over time
-  route("/labels-over-time", loginRequired, onboardingRequired, function() {
-    Layout.render(<Views.LabelsOverTime />,
+  // Charts
+  route("/charts", loginRequired, onboardingRequired, function() {
+    Layout.render(<Views.Charts />,
       undefined,
       <Components.Footer hoverable={true} />
     );
-    Analytics.page(Analytics.Page.LabelsOverTime);
+    Analytics.page(Analytics.Page.TimeStatsCharts);
   });
 
   // Calendar labeling page
@@ -126,7 +126,7 @@ module Esper.Route {
 
   route("/onboarding/charts", loginRequired, function() {
     Layout.render(
-      <Views.LabelsOverTime />,
+      <Views.Charts />,
       Components.onboardingChartsHeader(),
       <Components.Footer hoverable={true} />
     );
