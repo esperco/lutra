@@ -43,8 +43,8 @@ module Esper.ApiT {
 
   export interface ContactInfo {
     contact_list: Contact[];
-    next_link: string;
-    prev_link: string;
+    next_index: number;
+    prev_index: number;
   }
 
   export interface Invite {
