@@ -3,8 +3,7 @@
   isn't necessarily to facilitate login but to provide standardized access
   to things like UID and API secret.
 
-  We should refactor more of the login code between everything, but that's
-  a more involved project than necessary at the moment.
+  See Login.Oauth for actual API calls.
 */
 module Esper.Login {
 

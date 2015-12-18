@@ -24,6 +24,10 @@ module Esper.ApiT {
     unauthorized_email: email;
   }
 
+  interface ListResponse<T> {
+    items: T[]
+  }
+
   export interface ClientError {
     http_status_code: number; // 4xx
     error_message: string;
@@ -55,6 +59,7 @@ module Esper.ApiT {
   }
 
   export interface TeamCreationRequest {
+    chrome_extension?: boolean;
     executive_email?: string;
     executive_name: string;
     executive_first_name?: string;
@@ -89,6 +94,10 @@ module Esper.ApiT {
     team_calendars: Calendar[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
+  }
+
+  export interface TeamOption {
+    team?: Team;
   }
 
   export interface GenericCalendar {
@@ -541,6 +550,7 @@ type token_response = [
   export interface GeneralPrefs {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
+    send_label_reminders: boolean;
     send_followup_reminders: boolean;
     double_booking_warning: boolean;
     no_location_warning: boolean;
@@ -599,21 +609,21 @@ type token_response = [
     window_end: string; // timestamp
   }
 
-  export interface CalendarStatsResult {
-    stats: CalendarStats[];
-  }
+  // calendar_stats2 in api.atd
   export interface CalendarStats {
-    by_label:   CalendarStatsByLabel;
-    unlabelled: CalendarStatEntry;
-    total:      CalendarStatEntry;
+    window_start: string; // timestamp
+    partition: CalendarStatEntry[];
   }
-  export interface CalendarStatsByLabel {
-    [index: string]: CalendarStatEntry;
-  }
+
   export interface CalendarStatEntry {
-    event_count: number;
-    event_duration: number; //in seconds
+    event_labels: string[];       // Display versions
+    event_labels_norm: string[];  // Normalized versions
+    event_count: number;    // integer
+    event_duration: number; // seconds
   }
+
+  // calendar_stats_result2 in api.atd
+  export type CalendarStatsResult = ListResponse<CalendarStats>;
 
   export interface Task {
     taskid: string;

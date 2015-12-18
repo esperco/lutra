@@ -145,6 +145,12 @@ module Esper.Api {
 
   /*** Esper team management ***/
 
+  export function getTeamForExec(email: string):
+    JQueryPromise<ApiT.TeamOption> {
+    return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
+      + "/email/" + string(email));
+  }
+
   export function inviteCreateTeam():
     JQueryPromise<ApiT.UrlResult> {
     var fromUid = Login.me();
@@ -630,7 +636,7 @@ module Esper.Api {
   // supports generic calendar
   export function postForCalendarStats(teamid: string, calid: string,
     q: ApiT.CalendarStatsRequest): JQueryPromise<ApiT.CalendarStatsResult> {
-    var url = prefix + "/api/calendar/stats/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
       + "/" + string(teamid) + "/" + string(calid);
     return JsonHttp.post(url, JSON.stringify(q));
   }

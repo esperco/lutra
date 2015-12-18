@@ -1,5 +1,7 @@
 /*
   Module with code for logging into app.esper.com via an invisible iFrame
+
+  Deprecated. Use Login.Oauth to login directly.
 */
 
 /// <reference path="../typings/jquery/jquery.d.ts" />

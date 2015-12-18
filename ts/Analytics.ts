@@ -127,7 +127,7 @@ module Esper.Analytics {
     TeamWorkflows,     // app.esper.com/#!/team-settings/.../workflows
     TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
     TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
-    LabelsOverTime,    // time.esper.com/#!/labels-over-time
+    TimeStatsCharts,   // time.esper.com/#!/charts
     CalendarLabeling,  // time.esper.com/#!/calendar-labeling
     TimeStatsOnboardingStart,       // time.esper.com/#!/onboarding/start
     TimeStatsOnboardingAddCals,     // time.esper.com/#!/onboarding/add-cals

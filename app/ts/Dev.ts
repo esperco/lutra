@@ -7,6 +7,7 @@
 /// <reference path="../marten/ts/ApiC.Test.ts"/>
 /// <reference path="../marten/ts/Util.Test.ts"/>
 /// <reference path="../marten/ts/Emit.Test.ts"/>
+/// <reference path="../marten/ts/LocalStore.Test.ts"/>
 /// <reference path="../marten/ts/Model.Test.ts"/>
 /// <reference path="../marten/ts/Model.Capped.Test.ts"/>
 /// <reference path="../marten/ts/Model.StoreOne.Test.ts"/>
