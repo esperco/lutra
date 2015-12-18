@@ -68,23 +68,20 @@ module Esper.TimeStats {
   export function periodRequest(start: Date, end: Date, interval: Interval)
     : TypedStatRequest
   {
-    var starts: Date[] = [];
-    var intervalStr = momentStr(interval);
-
-    // Round actual starts up/down by interval
-    var actualStart = moment(start).startOf(intervalStr);
-    var actualEnd = moment(end).endOf(intervalStr);
-
-    if (! actualEnd.isAfter(actualStart)) {
+    // Convert to moment
+    var mStart = moment(start);
+    if (! mStart.isBefore(end)) {
       throw new Error("End should be before start");
     }
 
-    var current = actualStart;
-    while (current.isBefore(actualEnd)) {
+    var starts: Date[] = [start];
+    var intervalStr = momentStr(interval);
+
+    var current = mStart.clone().startOf(intervalStr).add(1, intervalStr);
+    while (current.isBefore(end)) {
       starts.push(current.toDate());
       current = current.clone().add(1, intervalStr);
     }
-    starts.push(actualEnd.toDate());
 
     return {
       windowStarts: starts,
