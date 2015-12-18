@@ -143,7 +143,7 @@ interface BarChartOptions extends ChartOptions {
     barDatasetSpacing?: number;
 }
 
-interface RadarChartOptions {
+interface RadarChartOptions extends ChartOptions {
     scaleShowLine?: boolean;
     angleShowLineOut?: boolean;
     scaleShowLabels?: boolean;
@@ -164,7 +164,7 @@ interface RadarChartOptions {
     legendTemplate?: string;
 }
 
-interface PolarAreaChartOptions {
+interface PolarAreaChartOptions extends ChartOptions {
     scaleShowLabelBackdrop?: boolean;
     scaleBackdropColor?: string;
     scaleBeginAtZero?: boolean;
@@ -181,7 +181,7 @@ interface PolarAreaChartOptions {
     legendTemplate?: string;
 }
 
-interface PieChartOptions {
+interface PieChartOptions extends ChartOptions {
     segmentShowStroke?: boolean;
     segmentStrokeColor?: string;
     segmentStrokeWidth?: number;
