@@ -128,12 +128,12 @@ module Esper.Components {
                       style={{ float: "left" }}>Select All</button>
               <button className="btn btn-default" onClick={this.selectAll.bind(this, false)}
                       style={{ float: "left" }}>Deselect All</button>
-              {this.state.contactInfo.prev_index ?
+              {this.state.contactInfo.prev_index !== undefined ?
                 <button className="btn btn-default"
                         onClick={this.loadPage.bind(this,this.state.contactInfo.prev_index)}>
                                 {"< Prev Page"}</button>:()=>{}
               }
-              {this.state.contactInfo.next_index ?
+              {this.state.contactInfo.next_index !== undefined ?
                 <button className="btn btn-default"
                         onClick={this.loadPage.bind(this,this.state.contactInfo.next_index)}>
                         Next Page ></button>:()=>{}
