@@ -4,8 +4,8 @@
 /// <reference path="./Teams.Test.ts" />
 /// <reference path="./TimeStats.Test.ts" />
 /// <reference path="./Calendars.Test.ts" />
+/// <reference path="./Views.Charts.Test.tsx" />
 /// <reference path="./Views.CalendarLabeling.Test.tsx" />
-/// <reference path="./Views.LabelsOverTime.Test.tsx" />
 
 module Esper {
   PRODUCTION = false;

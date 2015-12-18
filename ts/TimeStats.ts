@@ -1,124 +1,167 @@
 /*
-  Module for storing and querying time-stat data
+  Module for storing, querying, and manipulating time-stats data
 */
 
-/// <reference path="../marten/ts/Emit.ts" />
 /// <reference path="../marten/ts/ApiC.ts" />
 /// <reference path="../marten/ts/XDate.ts" />
+/// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Teams.ts" />
+/// <referenec path="./Calendars.ts" />
 /// <reference path="./Esper.ts" />
 
 module Esper.TimeStats {
 
   // Use API's cache for this -- values here rarely change, so we should be
   // fine
-  export var statStore = ApiC.postForCalendarStats.store;
+  export var StatStore = ApiC.postForCalendarStats.store;
+
+  // Like ApiT.CalendarStatsRequest, but with Date types
+  export interface TypedStatRequest {
+    windowStarts: Date[];
+    windowEnd: Date;
+
+    // Additional field to make static interval explicit (if applciable)
+    interval?: Interval;
+  }
+
+  // Store for currently selected time period
+  export var RequestStore = new Model.StoreOne<TypedStatRequest>();
 
   export enum Interval { DAILY, WEEKLY, MONTHLY };
 
-  export interface StatRequest {
-    teamId: string;
-    calId: string;
-    numIntervals: number;
-    interval: Interval
+  /*
+    Returns a stat request based on recent intervals -- e.g. last 5 days
+    from today
+  */
+  export function intervalCountRequest(count: number, interval: Interval)
+    : TypedStatRequest
+  {
+    var starts: Date[] = [];
+    var addToStarts = (startM: moment.Moment) => {
+      starts.unshift(startM.clone().toDate());
+    };
+
+    // Prepend the current time period and work backwards from there
+    var intervalStr = momentStr(interval);
+    var now = moment();
+    var i = now.clone().startOf(intervalStr);
+    addToStarts(i);
+
+    if (count > 1) {
+      _.times(count - 1, () => {
+        i = i.subtract(1, intervalStr);
+        addToStarts(i);
+      });
+    }
+
+    return {
+      windowStarts: starts,
+      windowEnd: now.endOf(intervalStr).toDate(),
+      interval: interval
+    };
   }
 
-  export interface StatResults {
-    stats : ApiT.CalendarStats[];
-    ready?: boolean;
-    error?: Error;
+  /*
+    Returns a stat request based on start and end dates -- e.g. weekly
+    from June 6 to July 7
+  */
+  export function periodRequest(start: Date, end: Date, interval: Interval)
+    : TypedStatRequest
+  {
+    var starts: Date[] = [];
+    var intervalStr = momentStr(interval);
+
+    // Round actual starts up/down by interval
+    var actualStart = moment(start).startOf(intervalStr);
+    var actualEnd = moment(end).endOf(intervalStr);
+
+    if (! actualEnd.isAfter(actualStart)) {
+      throw new Error("End should be before start");
+    }
+
+    var current = actualStart;
+    while (current.isBefore(actualEnd)) {
+      starts.push(current.toDate());
+      current = current.clone().add(1, intervalStr);
+    }
+    starts.push(actualEnd.toDate());
+
+    return {
+      windowStarts: starts,
+      windowEnd: end,
+      interval: interval
+    };
   }
 
-  // Query for last X intervals of time stats
-  class IntervalQueryClass extends Emit.EmitPipeBase {
-    constructor() {
-      // This query updates when stat store does
-      super([statStore]);
+  /*
+    Synchronously returns store value for time stats data.
+    If no team, calendar, or TypedStatRequest are passed, get from default
+    select store sources.
+  */
+  export function get(teamId?: string, calId?: string, req?: TypedStatRequest)
+  {
+    teamId = teamId || defaultTeamId();
+    calId = calId || defaultCalId();
+    req = req || RequestStore.val();
+    if (!teamId || !calId || !req) {
+      return null;
     }
-
-    // Return synchronous data -- can safely be called within React render
-    // context
-    get(val: StatRequest): StatResults {
-      var startDates = this.startDates(val);
-
-      var fn = ApiC.postForCalendarStats;
-      var keyStr = fn.strFunc([
-        val.teamId, val.calId,
-        this.makeCalendarStatsRequest(startDates, val.interval)
-      ]);
-      var storeGet = fn.store.get(keyStr);
-      var data = storeGet && storeGet[0];
-      var metadata = storeGet && storeGet[1];
-
-      return {
-        stats: data && data.items,
-        ready: metadata
-          && metadata.dataStatus === Model.DataStatus.READY,
-        error: metadata
-          && metadata.dataStatus === Model.DataStatus.FETCH_ERROR
-          && metadata.lastError
-      };
-    }
-
-    // Trigger async call -- should be called outside React
-    async(val: StatRequest) {
-      ApiC.postForCalendarStats(val.teamId, val.calId,
-        this.makeCalendarStatsRequest(this.startDates(val), val.interval)
-      );
-    }
-
-    // Removes old stat data from store
-    invalidate() {
-      // Naive cache invalidation => just wipe everything for now
-      statStore.reset();
-    }
-
-    // Calculate start dates for each interval
-    startDates(val: StatRequest): Date[] {
-      var ret: Date[] = [];
-      var addToRet = (startM: moment.Moment) => {
-        ret.unshift(startM.clone().toDate());
-      };
-
-      // Prepend the current time period and work backwards from there
-      var intervalStr = this.momentStr(val.interval);
-      var i = moment().startOf(intervalStr);
-      addToRet(i);
-
-      if (val.numIntervals > 1) {
-        _.times(val.numIntervals - 1, () => {
-          i = i.subtract(1, intervalStr);
-          addToRet(i);
-        });
-      }
-
-      return ret;
-    }
-
-    makeCalendarStatsRequest(starts: Date[], interval: Interval) {
-      var end = moment(starts[starts.length - 1])
-        .clone().endOf(this.momentStr(interval))
-        .toDate();
-      return {
-        window_starts: _.map(starts, XDate.toString),
-        window_end: XDate.toString(end)
-      }
-    }
-
-    // Returns the string Moment.js uses for an interval
-    momentStr(interval: Interval): string {
-      switch(interval) {
-        case Interval.DAILY:
-          return 'day';
-        case Interval.WEEKLY:
-          return 'week';
-        default: // Monthly
-          return 'month';
-      }
-    }
+    var key = storeKey(teamId, calId, req);
+    return ApiC.postForCalendarStats.store.get(key);
   }
 
-  export var intervalQuery = new IntervalQueryClass();
+  /*
+    Asynchronously make call to server data for time stats data.
+    If no team, calendar, or TypedStatRequest are passed, get from default
+    select store sources. If no defaults set, return null.
+  */
+  export function async(teamId?: string, calId?: string,
+    req?: TypedStatRequest)
+  {
+    teamId = teamId || defaultTeamId();
+    calId = calId || defaultCalId();
+    req = req || RequestStore.val();
+    if (!teamId || !calId || !req) {
+      return null;
+    }
+    return ApiC.postForCalendarStats(teamId, calId, requestToJSON(req));
+  }
+
+  function defaultTeamId() {
+    var val = Calendars.selectStore.val();
+    return val && val.teamId;
+  }
+
+  function defaultCalId() {
+    var val = Calendars.selectStore.val();
+    return val && val.calId;
+  }
+
+  // Return string key used to access store based on vars
+  function storeKey(teamId: string, calId: string, req: TypedStatRequest) {
+    var fn = ApiC.postForCalendarStats;
+    return fn.strFunc([teamId, calId, requestToJSON(req)]);
+  }
+
+  /* Converts our typed request into stringified version for API call */
+  function requestToJSON(req: TypedStatRequest): ApiT.CalendarStatsRequest {
+    return {
+      window_starts: _.map(req.windowStarts, XDate.toString),
+      window_end: XDate.toString(req.windowEnd)
+    };
+  }
+
+  // Returns the string Moment.js uses for an interval
+  function momentStr(interval: Interval): string {
+    switch(interval) {
+      case Interval.DAILY:
+        return 'day';
+      case Interval.WEEKLY:
+        return 'week';
+      default: // Monthly
+        return 'month';
+    }
+  }
 
 
   ////
@@ -245,27 +288,30 @@ module Esper.TimeStats {
 
   /////
 
-  export function getDurationsOverTime(results: StatResults, teamId?: string)
-    : DurationsOverTimeResults
-  {
-    // Safety check
-    if (! (results && results.ready && results.stats)) {
-      return;
-    }
+  // Calculate data for duration over time calculations
+  export type DisplayResults = {
+    labelNorm: string;
+    displayAs: string;
+    totalDuration: number;   // seconds
+    durations: number[];     // seconds
+    totalCount: number;
+    counts: number[];
+  }[];
 
-    var labels = _.map(results.stats, (stat) =>
-      partitionByLabel(stat.partition)
-    );
-    var valMap = valuesByLabel(labels);
+  export function getDisplayResultsBase(stats: StatsByLabel[], teamId?: string)
+    : DisplayResults
+  {
+    var valMap = valuesByLabel(stats);
     var ret = _.map(valMap, (vals, labelNorm) => {
       return {
         labelNorm: labelNorm,
         displayAs: vals.displayAs,
-        total: _.sum(vals.durations),
-        values: vals.durations
+        totalDuration: _.sum(vals.durations),
+        durations: vals.durations,
+        totalCount: _.sum(vals.counts),
+        counts: vals.counts
       };
     });
-    ret = _.sortBy(ret, (x) => -x.total);
 
     // If teamId, filter
     if (teamId) {
@@ -274,6 +320,15 @@ module Esper.TimeStats {
     }
 
     return ret;
+  }
+
+  export function getDisplayResults(stats: ApiT.CalendarStats[],
+    teamId?: string): DisplayResults
+  {
+    var labels = _.map(stats, (stat) =>
+      partitionByLabel(stat.partition)
+    );
+    return getDisplayResultsBase(labels);
   }
 
 
@@ -287,8 +342,8 @@ module Esper.TimeStats {
     groupLabels: string[]; // "Jun 1", "Jun 2", etc.
   }
 
-  export function formatWindowStarts(results: StatResults, interval: Interval)
-    : FormattedWindowStarts
+  export function formatWindowStarts(stats: ApiT.CalendarStats[],
+    interval: Interval): FormattedWindowStarts
   {
     var typeLabel: string;
     var startFormat: string;
@@ -305,7 +360,7 @@ module Esper.TimeStats {
         typeLabel = "Week Starting";
         startFormat = "MMM D";
     }
-    var groupLabels = _.map(results.stats,
+    var groupLabels = _.map(stats,
       // MMM d => Oct 4
       (stat) => moment(stat.window_start).format(startFormat)
     );
@@ -339,14 +394,6 @@ module Esper.TimeStats {
         t === team.team_label_in_progress;
     });
   }
-
-  // Calculate data for duration over time calculations
-  export type DurationsOverTimeResults = {
-    labelNorm: string;
-    displayAs: string;
-    total: number;   // seconds
-    values: number[]; // seconds
-  }[];
 
   /*
     Time stat durations are normally seconds. This normalizes to hours and

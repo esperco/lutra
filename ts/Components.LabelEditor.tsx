@@ -108,7 +108,11 @@ module Esper.Components {
         });
       });
 
-      TimeStats.intervalQuery.invalidate();
+      /*
+        Naive invalidation of entire cache for now -- figure out something 
+        smarter if/when it matters
+      */
+      TimeStats.StatStore.reset();
     }
 
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {

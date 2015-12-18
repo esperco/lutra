@@ -113,4 +113,43 @@ module Esper.Components {
       return chartObj.Bar(this.props.data, options);
     }
   }
+
+  export interface DonutChartProps {
+    units?: string;
+    horizontalLabel?: string;
+    data: CircularChartData[];
+  }
+
+  /*
+    Because we're American and we spell it Donut rather than Doughnut dammit.
+  */
+  export class DonutChart extends ChartCanvas<DonutChartProps> {
+    _donutChart: CircularInstance;
+
+    render() {
+      var classNames=["canvas-holder"];
+      if (this.props.horizontalLabel) {
+        classNames.push("with-horizontal-label");
+      }
+      return <div className={classNames.join(" ")}>
+        {this.renderCanvas()}
+        {
+          this.props.horizontalLabel ?
+          <div className="horizontal-label">{this.props.horizontalLabel}</div> :
+          ""
+        }
+      </div>;
+    }
+
+    getChartInstance(chartObj: Chart) {
+      var options: PieChartOptions = {};
+      var suffix = (this.props.units ? (" " + this.props.units) : "");
+      options.tooltipTemplate =
+        "<%if (label){%><%=label%> - <%}%><%= value %>" + suffix;
+      options.multiTooltipTemplate =
+        "<%if (datasetLabel){%><%=datasetLabel%><%}%> - <%= value %>" + suffix;
+
+      return chartObj.Doughnut(this.props.data, options);
+    }
+  }
 }
