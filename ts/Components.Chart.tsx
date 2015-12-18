@@ -148,6 +148,8 @@ module Esper.Components {
         "<%if (label){%><%=label%> - <%}%><%= value %>" + suffix;
       options.multiTooltipTemplate =
         "<%if (datasetLabel){%><%=datasetLabel%><%}%> - <%= value %>" + suffix;
+      options.animationEasing = "easeOut";
+      options.animationSteps = 40;
 
       return chartObj.Doughnut(this.props.data, options);
     }
