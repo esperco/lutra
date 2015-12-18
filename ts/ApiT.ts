@@ -96,6 +96,10 @@ module Esper.ApiT {
     team_calendar_accounts: string[];
   }
 
+  export interface TeamOption {
+    team?: Team;
+  }
+
   export interface GenericCalendar {
     id: string;
     title: string;
