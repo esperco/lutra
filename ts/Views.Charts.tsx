@@ -6,6 +6,7 @@
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.EmailModal.tsx" />
+/// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Components.PeriodSelector.tsx" />
 /// <reference path="./Components.DurationsOverTime.tsx" />
 /// <reference path="./Components.PercentageRecent.tsx" />
@@ -258,12 +259,7 @@ module Esper.Views {
             <div className="pull-left">
               { this.renderChartSelector(selections) }
             </div>
-            <div className="pull-right">
-              <button className="btn btn-default"
-                  onClick={this.requestCustom.bind(this) }>
-                  <b>Request Custom Report</b>
-              </button>
-              {" "}
+            <div className="pull-right form-inline">
               <button className="btn btn-default"
                       onClick={refresh}>
                 <i className="fa fa-fw fa-refresh" title="refresh" />
@@ -293,26 +289,17 @@ module Esper.Views {
 
     renderPeriodSelector(selections: TimeStatsView) {
       switch (selections.chartType) {
-
         case ChartType.PercentageRecent:
-          return <Components.PeriodSelector
-            buttons={[{
-              text: "Current Week",
-              period: TimeStats.intervalCountRequest(1,
-                TimeStats.Interval.WEEKLY)
-            }, {
-              text: "Current Month",
-              period: TimeStats.intervalCountRequest(1,
-                TimeStats.Interval.MONTHLY)
-            }]}
+          return <Components.IntervalRangeSelector
             selected={selections.request}
             updateFn={updateRequestedPeriod}
           />;
 
         default:
-          return <Components.PeriodSelector
+          return <Components.IntervalRangeSelector
             selected={selections.request}
             updateFn={updateRequestedPeriod}
+            showIntervals={true}
           />;
       }
     }

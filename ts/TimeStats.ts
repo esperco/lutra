@@ -11,6 +11,9 @@
 
 module Esper.TimeStats {
 
+  // Temporary cap on max intervals to avoid weird dispalys
+  var MAX_INTERVALS = 10;
+
   // Use API's cache for this -- values here rarely change, so we should be
   // fine
   export var StatStore = ApiC.postForCalendarStats.store;
@@ -27,7 +30,7 @@ module Esper.TimeStats {
   // Store for currently selected time period
   export var RequestStore = new Model.StoreOne<TypedStatRequest>();
 
-  export enum Interval { DAILY, WEEKLY, MONTHLY };
+  export enum Interval { DAILY=1, WEEKLY, MONTHLY };
 
   /*
     Returns a stat request based on recent intervals -- e.g. last 5 days
@@ -65,7 +68,7 @@ module Esper.TimeStats {
     Returns a stat request based on start and end dates -- e.g. weekly
     from June 6 to July 7
   */
-  export function periodRequest(start: Date, end: Date, interval: Interval)
+  export function periodRequest(start: Date, end: Date, interval?: Interval)
     : TypedStatRequest
   {
     // Convert to moment
@@ -73,21 +76,30 @@ module Esper.TimeStats {
     if (! mStart.isBefore(end)) {
       throw new Error("End should be before start");
     }
-
     var starts: Date[] = [start];
-    var intervalStr = momentStr(interval);
 
-    var current = mStart.clone().startOf(intervalStr).add(1, intervalStr);
-    while (current.isBefore(end)) {
-      starts.push(current.toDate());
-      current = current.clone().add(1, intervalStr);
+    if (! _.isUndefined(interval)) {
+      var intervalStr = momentStr(interval);
+      var current = mStart.clone().startOf(intervalStr).add(1, intervalStr);
+      while (current.isBefore(end)) {
+        starts.push(current.toDate());
+        current = current.clone().add(1, intervalStr);
+      }
     }
 
-    return {
+    return capIntervals({
       windowStarts: starts,
       windowEnd: end,
       interval: interval
-    };
+    });
+  }
+
+  function capIntervals(req: TypedStatRequest) {
+    if (req.windowStarts.length > MAX_INTERVALS) {
+      req.windowEnd = req.windowStarts[MAX_INTERVALS];
+      req.windowStarts = req.windowStarts.slice(0, MAX_INTERVALS);
+    }
+    return req;
   }
 
   /*

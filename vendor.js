@@ -30,6 +30,7 @@ var page = require("marten-npm-vendors/page");
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap");
+  require("bootstrap-daterangepicker");
 });
 
 // Create a global Esper object with our vendor dependencies

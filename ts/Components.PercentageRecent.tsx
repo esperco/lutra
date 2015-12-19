@@ -25,10 +25,6 @@ module Esper.Components {
         (c) => _.contains(this.props.selectedLabels, c.labelNorm));
       var totalDurationAll = _.sum(_.map(filtered, (f) => f.totalDuration));
 
-      var formatted = TimeStats.formatWindowStarts(
-        this.props.stats,
-        this.props.request.interval);
-
       var data = _.map(filtered, (c) => {
         var baseColor = Colors.getColorForLabel(c.labelNorm);
         var percentage = (c.totalDuration / totalDurationAll) * 100;
@@ -40,8 +36,7 @@ module Esper.Components {
         }
       });
       return <div className="percentage-recent-chart">
-        <Components.DonutChart units="%" data={data}
-         horizontalLabel={formatted.groupLabels[0]} />
+        <Components.DonutChart units="%" data={data} />
       </div>;
     }
   }

@@ -82,7 +82,8 @@ module.exports = {
   // Vendor CSS files to concatenate and minimize, relative to the vendor
   // directory set in Marten's .bowerrc
   vendorCSSList: [
-    "font-awesome/css/font-awesome.css"
+    "font-awesome/css/font-awesome.css",
+    "bootstrap-daterangepicker/daterangepicker.css"
   ],
 
   // Path to CSS bundle (relative to pubDir)
