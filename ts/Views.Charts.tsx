@@ -7,7 +7,6 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.EmailModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
-/// <reference path="./Components.PeriodSelector.tsx" />
 /// <reference path="./Components.DurationsOverTime.tsx" />
 /// <reference path="./Components.PercentageRecent.tsx" />
 /// <reference path="./Layout.tsx" />
