@@ -101,6 +101,7 @@ module Esper.Analytics {
     OpenTimeStatsAddLabelsModal,
     OpenTimeStatsGifModal,
     OpenTimeStatsRequestCustomReportModal,
+    OpenTimeStatsChartTypeModal,
     RenameTaskTabTask,
     SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,
