@@ -66,11 +66,24 @@
 
   &.minus-nav {
     top: @navbar-height;
+
+    &.collapse-2x {
+      @media (max-width: @screen-sm-max) {
+        top: @navbar-height * 2;
+      }
+    }
   }
 
   &.minus-subheader, &.padded.minus-subheader {
     top: @font-size-h4 + @line-height-computed +
          @panel-body-padding + @padding-base-vertical;
+
+    &.collapse-2x {
+      @media (max-width: @screen-sm-max) {
+        top: (@font-size-h4 + @line-height-computed) * 2 +
+             @panel-body-padding + @padding-base-vertical;
+      }
+    }
   }
 
   .esper-left-sidebar, .esper-right-content {
@@ -199,6 +212,15 @@
   .pull-right {
     line-height: @input-height-base;
   }
+
+  // If row class applied to header, space columns slightly
+  &.row {
+    @media (max-width: @screen-sm-max) {
+      [class*="col-"]{
+        margin-bottom: 5px;
+      }
+    }
+  }
 }
 
 .esper-panel-section {
@@ -305,4 +327,13 @@
 
 .esper-one-line {
   white-space: nowrap;
+}
+
+.esper-subtle, a.esper-subtle {
+  color: @gray-light;
+
+  &:hover,
+  &:focus {
+    color: @gray-dark;
+  }
 }
