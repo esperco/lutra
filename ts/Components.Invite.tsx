@@ -10,26 +10,23 @@ module Esper.Components {
     contactInfo: ApiT.ContactInfo;
     selected: { [index: string]: boolean; };
     name: string;
-    email: string;
   }
 
   interface InviteProps {
     name?: string;
-    email?: string;
   }
 
   export class Invite extends Component<InviteProps, ContactState> {
     constructor(props: InviteProps) {
       super(props);
-      this.state = { contactInfo:{contact_list: [], next_link: "", prev_link: "" },
+      this.state = { contactInfo:{contact_list: [], next_index: undefined, prev_index: undefined},
                      selected:{},
-                     name:props.name,
-                     email:props.email };
+                     name:props.name };
     }
 
     getContacts = () => {
       var self = this;
-      Api.getGoogleContacts(this.state.email)
+      Api.getContacts()
         .done(function(contacts: ApiT.ContactInfo) {
           $('#myModal').modal('show');
           self.setState({ contactInfo: contacts } as ContactState);
@@ -38,9 +35,10 @@ module Esper.Components {
 
     componentDidMount = () => {
       var self = this;
-      if (this.props.name === undefined || this.props.email === undefined) {
+      if (this.props.name === undefined) {
         Api.getMyProfile().done(function(profile) {
-          self.setState({ name: profile.display_name, email: profile.email } as ContactState);
+          var sender_name = profile.display_name ? profile.display_name : profile.email;
+          self.setState({ name: sender_name } as ContactState);
           self.getContacts();
         });
       } else {
@@ -67,9 +65,9 @@ module Esper.Components {
       });
     }
 
-    loadPage = (url: string) => {
+    loadPage = (index: number) => {
       var self = this;
-      Api.getGoogleContactsPage(url)
+      Api.getContactsPage(index)
         .done(function(contacts: ApiT.ContactInfo) {
           self.setState({ contactInfo: contacts } as ContactState);
         })
@@ -130,14 +128,14 @@ module Esper.Components {
                       style={{ float: "left" }}>Select All</button>
               <button className="btn btn-default" onClick={this.selectAll.bind(this, false)}
                       style={{ float: "left" }}>Deselect All</button>
-              {this.state.contactInfo.prev_link !== "" ?
+              {this.state.contactInfo.prev_index !== undefined ?
                 <button className="btn btn-default"
-                        onClick={this.loadPage.bind(this,this.state.contactInfo.prev_link)}>
+                        onClick={this.loadPage.bind(this,this.state.contactInfo.prev_index)}>
                                 {"< Prev Page"}</button>:()=>{}
               }
-              {this.state.contactInfo.next_link !== "" ?
+              {this.state.contactInfo.next_index !== undefined ?
                 <button className="btn btn-default"
-                        onClick={this.loadPage.bind(this,this.state.contactInfo.next_link)}>
+                        onClick={this.loadPage.bind(this,this.state.contactInfo.next_index)}>
                         Next Page ></button>:()=>{}
               }
               <button className="btn btn-primary"
