@@ -5,7 +5,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelSelector.tsx" />
-/// <reference path="./Components.EmailModal.tsx" />
+/// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Components.DurationsOverTime.tsx" />
 /// <reference path="./Components.PercentageRecent.tsx" />
@@ -254,16 +254,25 @@ module Esper.Views {
           }
         </div>
         <div className="esper-right-content padded">
-          <div className="esper-header clearfix">
-            <div className="pull-left">
+          <div className="esper-header row clearfix">
+            <div className="col-xs-8 col-sm-4">
               { this.renderChartSelector(selections) }
             </div>
-            <div className="pull-right form-inline">
-              <button className="btn btn-default"
-                      onClick={refresh}>
-                <i className="fa fa-fw fa-refresh" title="refresh" />
-              </button>
-              {" "}
+            <div className="col-xs-4 col-sm-2 clearfix">
+              <div className="pull-left">
+                <a className="esper-subtle"
+                   onClick={this.openChartTypeModal.bind(this)}>
+                  <i className="fa fa-fw fa-question-circle" />
+                </a>
+              </div>
+              <div className="pull-right">
+                <button className="btn btn-default"
+                        onClick={refresh}>
+                  <i className="fa fa-fw fa-refresh" title="refresh" />
+                </button>
+              </div>
+            </div>
+            <div className="col-sm-6">
               { this.renderPeriodSelector(selections) }
             </div>
           </div>
@@ -370,11 +379,8 @@ module Esper.Views {
       updateChartType(chartType);
     }
 
-    requestCustom() {
-      Layout.renderModal(<Components.EmailModal title="Request Custom Stats">
-        <p>Want something other than the default options? Give a suggestion,
-        tweet us, and we'll send you a report promptly.</p>
-      </Components.EmailModal>);
+    openChartTypeModal() {
+      Layout.renderModal(<Components.ChartTypeModal />);
     }
   }
 }

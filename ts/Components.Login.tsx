@@ -6,7 +6,7 @@
 /// <reference path="../marten/ts/ReactHelpers.ts" />
 /// <reference path="../marten/ts/Components.Invite.tsx" />
 /// <reference path="../marten/ts/Components.Login.tsx" />
-/// <reference path="./Components.Modal.tsx" />
+/// <reference path="../marten/ts/Components.Modal.tsx" />
 /// <reference path="./Layout.tsx" />
 /// <reference path="./Login.ts" />
 

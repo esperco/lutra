@@ -3,13 +3,13 @@
 */
 
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Components.Modal.tsx" />
 /// <reference path="../marten/ts/ApiC.ts" />
 /// <reference path="../marten/ts/Queue.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Components.RequestExec.tsx" />
-/// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
