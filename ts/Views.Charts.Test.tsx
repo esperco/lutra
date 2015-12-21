@@ -39,12 +39,15 @@ module Esper.Views {
         expect(ApiC.postForCalendarStats).toHaveBeenCalled();
       });
 
-      it("should call TimeStats.async on render with non-null calendar " +
-         "selection", function() {
+      it("should call ApiC.postForCalendarStats on render with non-null " +
+         "calendar selection", function() {
         Calendars.SelectStore.set({
           teamId: "team-id-2",
           calId: "rupert@esper.com"
         });
+        chartsChartTypeStore.set(Views.ChartType.DurationsOverTime);
+        TimeStats.RequestStore.set(TimeStats.intervalCountRequest(3,
+          TimeStats.Interval.DAILY));
         Test.render(<Views.Charts />);
         expect(ApiC.postForCalendarStats).toHaveBeenCalled();
       });

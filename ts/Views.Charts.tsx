@@ -37,7 +37,7 @@ module Esper.Views {
   }
 
   // Store for current chart type
-  enum ChartType {
+  export enum ChartType {
     DurationsOverTime = 1,
     PercentageRecent
   }
@@ -84,6 +84,8 @@ module Esper.Views {
     Calendars.setDefault();
     if (! ChartTypeStore.isSet()) {
       updateChartType(ChartType.DurationsOverTime);
+    } else {
+      updateAsync();
     }
   }
 
