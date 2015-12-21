@@ -274,7 +274,7 @@ module Esper.Views {
                 </button>
               </div>
             </div>
-            <div className="col-sm-6">
+            <div className="col-xs-12 col-sm-6">
               { this.renderPeriodSelector(selections) }
             </div>
           </div>
