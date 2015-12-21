@@ -67,9 +67,13 @@ module Esper.Calendars {
       };
     } else {
       var calLists = CalendarListStore.getAll();
-      if (calLists && calLists[0]) {
-        var cal = calLists[0][0][0];
-        var meta = calLists[0][1];
+      var pair = _.find(calLists, (p) => {
+        var calList = p[0];
+        return !!calList[0];
+      });
+      if (pair) {
+        var cal = pair[0][0];
+        var meta = pair[1];
         return {
           teamId: meta._id,
           calId: cal.id
