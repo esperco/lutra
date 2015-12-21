@@ -394,13 +394,13 @@ module Esper.TimeStats {
     // Filter out task-related labels
     return _.reject(labels, (label) => {
       var t = transform(label);
-      return
+      return (
         t === team.team_label_new ||
         t === team.team_label_done ||
         t === team.team_label_canceled ||
         t === team.team_label_pending ||
         t === team.team_label_urgent ||
-        t === team.team_label_in_progress;
+        t === team.team_label_in_progress);
     });
   }
 
