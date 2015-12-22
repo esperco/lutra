@@ -90,6 +90,16 @@ module Esper.Page {
     }
   }
 
+  export var token : Loadable = {
+    load: function(token: string) {
+      pageSelector.hideAll();
+      $("#token-content").children().remove();
+      showPage("token");
+      Token.load(token);
+      Util.focus();
+    }
+  }
+
   export var usagePeriod : Loadable = {
     load: function(teamid, periodStart) {
       pageSelector.hideAll();
