@@ -248,7 +248,7 @@ module Esper.ApiT {
 
   export interface TokenInfo {
     token_is_valid: boolean;
-    token_value: any /* token_response */;
+    token_value: Variant.Variant /* token_response */;
   }
 
 /*
@@ -263,6 +263,9 @@ type token_response = [
 
   | Login of login_response
       (* One-time login; usable for password reset. *)
+
+  | Unsub_daily_agenda of unsub_email
+  | Unsub_tasks_update of unsub_email
 ]
 */
 
@@ -278,6 +281,11 @@ type token_response = [
     teamid: string;
     role: string;
     force_email?: string;
+  }
+
+  export interface UnsubEmail {
+    uid: string;
+    teamids: string[];
   }
 
   export interface GoogleAuthInfo {
