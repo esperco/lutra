@@ -82,13 +82,13 @@ module Esper.Route {
     if (isIOS()) {
       openIOSapp(token, undefined, undefined);
     } else {
-      withLogin(Page.settings.load, token, undefined);
+      Page.token.load(token);
     }
   }
 
   var paths = {
 
-    /* Generic invitation */
+    /* Generic invitations, unsubscription from emails, etc. */
     "t/:token" : function(data) {
       gotToken(data.token);
     },
