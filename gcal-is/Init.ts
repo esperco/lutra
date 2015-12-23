@@ -181,7 +181,8 @@ module Esper.Init {
   export function init() {
     if (! alreadyInitialized) {
       Log.d("Init.init()");
-      Api.init();
+      JsonHttp.esperVersion = "stoat-" + Conf.version;
+      Api.prefix = Conf.Api.url;
       esperRootUrl = $("#esper-script").attr("data-root-url");
       alreadyInitialized = true;
       listenForMessages();

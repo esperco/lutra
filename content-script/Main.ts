@@ -12,12 +12,12 @@
 /// <reference path="../marten/typings/quill/quill.d.ts" />
 
 /// <reference path="../marten/ts/Log.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
-/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
@@ -74,7 +74,8 @@ module Esper.Main {
       injectScript("gcal-is.js");
     }
 
-    Api.init();
+    JsonHttp.esperVersion = "stoat-" + Conf.version;
+    Api.prefix = Conf.Api.url;
     Update.init();
     Auth.init();
     ExtensionOptions.init();

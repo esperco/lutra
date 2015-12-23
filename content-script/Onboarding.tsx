@@ -3,11 +3,11 @@
 */
 
 /// <reference path="../common/Esper.ts" />
-/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Promise.ts" />
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Analytics.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 /// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/Model.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />

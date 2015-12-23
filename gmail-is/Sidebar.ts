@@ -437,25 +437,18 @@ module Esper.Sidebar {
   function displayTeamSidebar(rootElement) {
     var threadId = CurrentThread.threadId.get();
     Log.d("displayTeamSidebar() for thread", threadId);
-
     rootElement.children().remove();
-    Api.checkVersion().done(function(status_) {
-      if (status_.must_upgrade) {
-        displayUpdateDock(rootElement, status_.download_page);
-      } else {
-        CurrentThread.currentTeam.get().match({
-          some : function (team) {
-            Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
-              .done(function(linkedEvents) {
-                var sidebar = displaySidebar(rootElement, threadId, linkedEvents);
-                displayDock(rootElement, sidebar);
-              });
-          },
-          none : function () {
-            var sidebar = displaySidebar(rootElement, threadId, []);
+    CurrentThread.currentTeam.get().match({
+      some : function (team) {
+        Api.getLinkedEvents(team.teamid, threadId, team.team_calendars)
+          .done(function(linkedEvents) {
+            var sidebar = displaySidebar(rootElement, threadId, linkedEvents);
             displayDock(rootElement, sidebar);
-          }
-        });
+          });
+      },
+      none : function () {
+        var sidebar = displaySidebar(rootElement, threadId, []);
+        displayDock(rootElement, sidebar);
       }
     });
   }
