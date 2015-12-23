@@ -6,7 +6,6 @@
 /// <reference path="../marten/ts/Login.ts" />
 /// <reference path="../marten/ts/LocalStore.ts" />
 /// <reference path="../marten/ts/ApiT.ts" />
-/// <reference path="./Login.Post.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.Login {
@@ -19,6 +18,8 @@ module Esper.Login {
     api_secret: string;
     email: string;
   }
+
+  export var storedLoginKey = "login";
 
   /*
     Retrieve credentials from localStorage -- we only need credentials, not
