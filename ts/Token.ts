@@ -22,6 +22,9 @@ module Esper.Token {
           case "Unsub_tasks_update":
             showMessage("You've been unsubscribed from these emails.");
             break;
+          case "Unsub_label_reminder":
+            showMessage("You've been unsubscribed from these emails.");
+            break;
 
           /* Other cases are either obsolete or not supported yet */
           default:
