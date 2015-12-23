@@ -11,7 +11,7 @@
 
 /// <reference path="../marten/ts/Log.ts" />
 /// <reference path="../marten/ts/JsonHttp.ts" />
-/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../marten/ts/Api.ts" />
 /// <reference path="../marten/ts/Watchable.ts" />
 /// <reference path="../marten/ts/XDate.ts" />
 
@@ -29,7 +29,6 @@
 /// <reference path="../common/Modal.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/ReminderView.ts" />
-/// <reference path="../common/Api.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/Analytics.ts" />
 
