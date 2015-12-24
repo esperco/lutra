@@ -21,7 +21,7 @@ module Esper.Login {
       onSuccess(function(loginInfo) {
         InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
         Analytics.identify(loginInfo, true);
-        if (loginInfo) {
+        if (loginInfo && Esper.Raven) {
           Raven.setUserContext({
             email: loginInfo.email,
             id: loginInfo.uid,
