@@ -108,12 +108,12 @@ module Esper.Components {
       </button>;
     }
 
-    loginToGoogle() {
+    loginToGoogle(email?: string) {
       this.setState({busy: true, serverError: false});
       Login.loginWithGoogle({
         landingUrl: this.props.landingUrl,
         inviteCode: this.props.inviteCode,
-        email: this.props.email
+        email: email || this.props.email
       }).fail(() => this.setState({busy: false, serverError: true}))
     }
 
@@ -186,7 +186,13 @@ module Esper.Components {
           email: val,
           landingUrl: this.props.landingUrl,
           inviteCode: this.props.inviteCode
-        }).fail(() => this.setState({busy: false, serverError: true}))
+        }).fail((xhr: JQueryXHR) => {
+          if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
+            this.loginToGoogle(val);
+          } else {
+            this.setState({busy: false, serverError: true});
+          }
+        });
       } else {
         this.setState({busy: false, serverError: false, inputError: true});
       }
