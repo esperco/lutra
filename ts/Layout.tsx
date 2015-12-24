@@ -61,8 +61,7 @@ module Esper.Layout {
     $(modalContainer).renderReact(modal);
 
     window.requestAnimationFrame(function() {
-      var elm = $(modalSelector + " .modal");
-      elm.modal("show");
+      $(modalSelector + " .modal").modal("show");
     });
   }
 
