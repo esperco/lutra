@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../marten/ts/Components.ErrorMsg.tsx" />
 /// <reference path="../marten/ts/Components.Modal.tsx" />
 /// <reference path="../marten/ts/Queue.ts" />
 /// <reference path="./Esper.ts" />
@@ -35,7 +36,7 @@ module Esper.Components {
       if (selection && selection.teamId) {
         selectedTeamId = selection.teamId;
       } else {
-        selectedTeamId = Teams.first() && Teams.first().teamid
+        selectedTeamId = Teams.firstId();
       }
       this.state = {
         selectedTeamId: selectedTeamId
@@ -43,6 +44,13 @@ module Esper.Components {
     }
 
     renderWithData() {
+      var teamStatus = Teams.dataStatus(this.state.selectedTeamId);
+      if (teamStatus === Model.DataStatus.FETCH_ERROR ||
+          teamStatus === Model.DataStatus.PUSH_ERROR)
+      {
+        return <Components.ErrorMsg />;
+      }
+
       var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }

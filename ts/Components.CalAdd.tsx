@@ -40,6 +40,7 @@ module Esper.Components {
       var info = Login.InfoStore.val();
       var isNylas = (info.platform === "Nylas");
       var currentTeam = Teams.get(this.state.selectedTeamId);
+      var teamStatus = Teams.dataStatus(this.state.selectedTeamId);
 
       var calendars: ApiT.Calendar[];
       var dataStatus: Model.DataStatus;
@@ -64,14 +65,11 @@ module Esper.Components {
       }
 
       if (dataStatus === Model.DataStatus.FETCH_ERROR ||
-          dataStatus === Model.DataStatus.PUSH_ERROR) {
-        return <div className="alert compact alert-danger" role="alert">
-          <i className="fa fa-fw fa-warning"></i>{" "}
-          Whoops. Something broke.{" "}
-          <a href="http://esper.com/contact">
-            Please try contacting us at esper.com/contact.
-          </a>
-        </div>;
+          dataStatus === Model.DataStatus.PUSH_ERROR ||
+          teamStatus === Model.DataStatus.FETCH_ERROR ||
+          teamStatus === Model.DataStatus.PUSH_ERROR)
+      {
+        return <Components.ErrorMsg />;
       }
 
       else if (dataStatus !== Model.DataStatus.READY &&
