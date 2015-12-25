@@ -139,6 +139,10 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
+  export var getAllProfiles = makeC
+    <typeof Api.getAllProfiles, ApiT.ProfileList>
+    (Api.getAllProfiles);
+
   export var getCalendarList = makeC
     <typeof Api.getCalendarList, ApiT.Calendars>
     (Api.getCalendarList);

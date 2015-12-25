@@ -2,6 +2,7 @@
   Generic Bootstrap modal wrapper
 */
 
+/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
@@ -15,6 +16,7 @@ module Esper.Components {
     small?: boolean;
     disableOk?: boolean;
     dismissText?: string;
+    fixed?: boolean;
     okText?: string;
     showFooter?: boolean;
     okOnClick?: () => void;
@@ -23,13 +25,16 @@ module Esper.Components {
 
   export class Modal extends Component<ModalProps, {}> {
     render() {
-      return (<div className="modal fade">
+      return (<div className="modal fade"
+                   data-backdrop={this.props.fixed ? 'static' : 'true'}>
         <div className={"modal-dialog" + (this.props.small ? " modal-sm" : "")}>
           <div className="modal-content">
             <div className="modal-header">
-              <button type="button" className="close" data-dismiss="modal">
-                <span aria-hidden="true">&times;</span>
-              </button>
+              { this.props.fixed ? null :
+                <button type="button" className="close" data-dismiss="modal">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              }
               <h4 className="modal-title">
                 { this.props.icon ?
                   <span>
@@ -50,10 +55,12 @@ module Esper.Components {
                   <span className="esper-spinner"></span> :
                   ""
                 }
-                <button type="button" className="btn btn-default"
-                    data-dismiss="modal">
-                  {this.props.dismissText || "Close"}
-                </button>
+                { this.props.fixed ? null :
+                  <button type="button" className="btn btn-default"
+                      data-dismiss="modal">
+                    {this.props.dismissText || "Close"}
+                  </button>
+                }
                 {
                   this.props.okOnClick ?
                   <button type="button"

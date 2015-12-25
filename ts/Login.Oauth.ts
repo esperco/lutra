@@ -163,6 +163,29 @@ module Esper.Login {
     _.each(loginCallbacks, (cb) => cb(info));
   }
 
+  // Check if there are unapproved teams that exec user needs to approve
+  function needApproval(data: ApiT.LoginResponse): boolean {
+    return !!_.find(data.teams || [], (team: ApiT.Team) =>
+      team.team_executive === Login.me() && !team.team_approved
+    );
+  }
+
+  // Set this to a function to handle teams requiring approval
+  export var approvalHandler: {
+    (info: ApiT.LoginResponse): JQueryPromise<ApiT.LoginResponse>;
+  }
+
+  function runLoginChecks(loginInfo: ApiT.LoginResponse)
+    : JQueryPromise<ApiT.LoginResponse>|ApiT.LoginResponse
+  {
+    // Check if we need exec to approve teams
+    if (needApproval(loginInfo) && approvalHandler) {
+      return approvalHandler(loginInfo);
+    } else {
+      return loginInfo;
+    }
+  }
+
 
   /////
 
@@ -201,19 +224,27 @@ module Esper.Login {
     }
   }
 
+  // Used by initLogin
+  var alreadyInit = false;
+
   /*
     This function should be called when the app is initially loaded and we
-    want to check if user has stored credentials
+    want to check if user has stored credentials.
   */
   export function initLogin() {
+    if (alreadyInit) { return; }
+    alreadyInit = true;
+
     resetDeferred();
     if (initCredentials()) {
-      Api.getLoginInfo().done(function(loginInfo) {
-        handleSuccess(loginInfo);
-        resolveDeferred(loginInfo);
-      }).fail(function(err) {
-        rejectDeferred(err);
-      });
+      Api.getLoginInfo()
+        .then(runLoginChecks)
+        .then(function(loginInfo) {
+          handleSuccess(loginInfo);
+          resolveDeferred(loginInfo);
+        }, function(err) {
+          rejectDeferred(err);
+        });
     } else {
       rejectDeferred();
     }
@@ -231,6 +262,10 @@ module Esper.Login {
         setCredentials(loginInfo.uid, loginInfo.api_secret);
         storeCredentials(loginInfo);
         clearLoginNonce();
+        return loginInfo;
+      })
+      .then(runLoginChecks)
+      .then(function(loginInfo) {
         handleSuccess(loginInfo);
         resolveDeferred(loginInfo);
         return loginInfo;
