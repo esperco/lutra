@@ -27,6 +27,11 @@ module Esper.Teams {
     return all()[0];
   }
 
+  export function firstId(): string {
+    var _ids = allIds();
+    return _ids && _ids[0];
+  }
+
   export function all(): ApiT.Team[] {
     return allTeamsStore.batchVal(batchKey) || [];
   }
@@ -151,6 +156,9 @@ module Esper.Teams {
     var team = get(_id);
     if (! team) {
       Log.e("addLabels called with non-existent team - " + _id);
+      teamStore.upsertSafe(_id, null, {
+        dataStatus: Model.DataStatus.FETCH_ERROR
+      });
       return;
     }
 

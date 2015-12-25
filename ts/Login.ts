@@ -7,11 +7,24 @@
 /// <reference path="../marten/ts/Login.Oauth.ts" />
 /// <reference path="../marten/ts/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./Layout.tsx" />
 
 module Esper.Login {
   export var InfoStore = new Model.StoreOne<ApiT.LoginResponse>();
 
   var initialized = false;
+
+  // Set approval handling code for teams
+  approvalHandler = function(info: ApiT.LoginResponse)
+    : JQueryPromise<ApiT.LoginResponse>
+  {
+    var dfd = $.Deferred();
+    Layout.renderModal(React.createElement(Components.ApproveTeamsModal, {
+      info: info,
+      onApprove: (info: ApiT.LoginResponse) => dfd.resolve(info)
+    }));
+    return dfd.promise();
+  }
 
   // Set callback for when loginInfo is set
   export function init() {
@@ -38,7 +51,6 @@ module Esper.Login {
 
   export function logout() {
     clear();
-    InfoStore.set(null, { dataStatus: Model.DataStatus.READY });
     Analytics.identify(null); // Resets identity
     window.location.reload();
   }
