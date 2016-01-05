@@ -186,7 +186,7 @@ module Esper.Api {
       "/" + string(teamid) + "/true", "");
   }
 
-  export function setExecutive(teamid: string, memberUid: string): 
+  export function setExecutive(teamid: string, memberUid: string):
     JQueryPromise<void>
   {
     return JsonHttp.put(prefix + "/api/team/" + Login.me() + "/" + teamid
@@ -1357,54 +1357,6 @@ module Esper.Api {
     return JsonHttp.put(url, "");
   }
 
-  /*** Usage tracking ***/
-
-  export function getPeriodList(teamid: string):
-    JQueryPromise<ApiT.TaskUsageList> {
-    var url = prefix + "/api/usage/period-list/" + string(Login.me())
-      + "/" + string(teamid);
-    return JsonHttp.get(url);
-  }
-
-  export function getUsageEdit(teamid: string,
-    periodStart: number):
-    JQueryPromise<ApiT.TaskUsage> {
-    var url = prefix + "/api/usage/edit/" + string(Login.me())
-      + "/" + string(teamid)
-      + "/" + number(periodStart);
-    return JsonHttp.get(url);
-  }
-
-  export function putUsageEdit(tu: ApiT.TaskUsage):
-    JQueryPromise<ApiT.TaskUsage> {
-    var periodStart = Unixtime.ofRFC3339(tu.start);
-    var url = prefix + "/api/usage/edit/" + string(Login.me())
-      + "/" + string(tu.teamid)
-      + "/" + number(periodStart);
-    return JsonHttp.put(url, JSON.stringify(tu));
-  }
-
-  export function getUsageExtraCharge(teamid: string,
-    periodStart: number,
-    revision: number):
-    JQueryPromise<ApiT.ExtraCharge> {
-    var url = prefix + "/api/usage/extra-charge/" + string(Login.me())
-      + "/" + string(teamid)
-      + "/" + number(periodStart)
-      + "/" + number(revision);
-    return JsonHttp.get(url);
-  }
-
-  export function postUsageExtraCharge(teamid: string,
-    periodStart: number,
-    revision: number):
-    JQueryPromise<void> {
-    var url = prefix + "/api/usage/extra-charge/" + string(Login.me())
-      + "/" + string(teamid)
-      + "/" + number(periodStart)
-      + "/" + number(revision);
-    return JsonHttp.post(url, "");
-  }
 
   /***/
 
