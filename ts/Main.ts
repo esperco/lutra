@@ -37,10 +37,8 @@
 /// <reference path="WorkflowsTab.ts"/>
 /// <reference path="CalendarsTab.ts"/>
 /// <reference path="LabelsTab.ts"/>
-/// <reference path="UsageTab.ts"/>
 /// <reference path="AboutTab.ts"/>
 /// <reference path="TemplateTab.ts"/>
-/// <reference path="UsagePeriod.ts"/>
 /// <reference path="ApproveTeam.ts"/>
 /// <reference path="Token.ts"/>
 /// <reference path="Page.ts"/>
