@@ -100,15 +100,6 @@ module Esper.Page {
     }
   }
 
-  export var usagePeriod : Loadable = {
-    load: function(teamid, periodStart) {
-      pageSelector.hideAll();
-      showPage("usage-period");
-      UsagePeriod.load(teamid, parseInt(periodStart));
-      Util.focus();
-    }
-  }
-
   export var approveTeam: Loadable = {
     load: function() {
       pageSelector.hideAll();
