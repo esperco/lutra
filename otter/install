@@ -1,0 +1,31 @@
+#! /bin/sh
+set -e
+
+echo "INSTALL otter ($*)"
+TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
+
+case "$1" in
+    "prod"|"dev")
+        mode=$1
+        ;;
+    "")
+        mode=dev
+        ;;
+    *)
+        echo "Unknown argument $1" >&2
+        exit 1
+esac
+
+# NB: Build logic in this file moved to Marten's build process
+# This script just prints a git commit message now
+
+### Log info about this installation
+if commit=$(git log -1 2>/dev/null); then
+    echo "\
+Latest commit of the current branch of the local git repository:
+$commit"
+else
+    echo "Missing git info"
+fi
+
+echo "Installation complete."
