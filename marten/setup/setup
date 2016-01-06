@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Make sure bin dir exists
+mkdir -p $ROOT/bin
+
+# oblivion preprocessor, requires ocaml.
+# We install it manually so we don't depend on an opam setup
+cd "$ROOT"
+if [ ! -d oblivion ]; then
+    git clone git@github.com:esperco/oblivion.git
+fi
+cd oblivion
+git checkout master
+git pull --ff-only origin master
+make
+make PREFIX="$ROOT" install
