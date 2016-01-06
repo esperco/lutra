@@ -1,0 +1,73 @@
+{
+  "manifest_version": 2,
+  "name": "Esper",
+  "short_name": "Esper",
+  "version": "@@VERSION@@",
+
+  "description": "Link between Gmail and Google Calendar",
+
+  "options_ui": {
+    "page": "html/options.html",
+    "chrome_style": true
+  },
+
+  "icons": {
+    "16": "img/icon16.png",
+    "64": "img/icon64.png",
+    "128": "img/icon128.png"
+  },
+
+  "background": {
+    "scripts": ["js/vendor.js", "js/event-page.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+      "matches": [
+        "http://127.0.0.1/*",
+        "http://localhost/*",
+        "http://ec2-54-144-194-80.compute-1.amazonaws.com/*",
+        "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
+        "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
+        "https://app.esper.com/*",
+        "https://www.google.com/calendar/*",
+        "https://calendar.google.com/*",
+        "https://mail.google.com/*"
+      ],
+      "js": ["js/vendor.js", "js/content-script.js"],
+
+      "run_at": "document_end"
+    }
+  ],
+
+  "externally_connectable": {
+    "matches": [
+      "http://127.0.0.1/*",
+      "http://localhost/*",
+      "http://ec2-54-144-194-80.compute-1.amazonaws.com/*",
+      "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
+      "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
+      "https://app.esper.com/*",
+      "https://www.google.com/calendar/*",
+      "https://calendar.google.com/*",
+      "https://mail.google.com/*"
+    ]
+  },
+
+  "web_accessible_resources": [
+    "js/vendor.js",
+    "js/gmail-is.js",
+    "js/gcal-is.js",
+    "css/esper.css",
+    "css/fullCalendar.css",
+    "css/vendor.css",
+    "img/*",
+    "fonts/*"
+  ],
+
+  "permissions": [
+    "tabs",
+    "storage"
+  ]
+}

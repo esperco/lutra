@@ -1,0 +1,3095 @@
+/*
+  LESS stylesheet for the Esper Chrome extension.
+
+  All our classes either start with esper- or should be a child of an #esper
+  or .esper element.
+*/
+
+/*** Imports ***/
+
+/* Imports in our standard customized version of Boostrap, but only as applied
+   to elements within an esper-bs class. Ideally, we'd like to use
+   Bootstrap on all of our Esper components but there's a lot of legacy
+   legacy code to edit for compatability.
+*/
+.esper-bs {
+  @import "../marten/less/_custom_bootstrap";
+  // TODO: Override certain Bootstrap settings like font-family
+
+  .form-control {
+    &.esper-gmail-search-result {
+      padding: 6px 5px;
+      cursor: pointer;
+
+      .gmail-from {
+        float: left;
+        width: 20%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 0px 15px 0 0;
+      }
+      .gmail-subject {
+        float: left;
+        width: 65%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .gmail-date {
+        float: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
+      }
+    }
+  }
+  // Creates an arrow for dropdown menus
+  .dropdown-arrow-top {
+    &:before, &:after {
+      position: absolute;
+      left: 10px;
+      display: inline-block;
+      border-right: 8.5px solid transparent;
+      border-bottom: 8.5px solid #ccc;
+      border-left: 8.5px solid transparent;
+      content: '';
+    }
+
+    // Outer arrow (border / outline)
+    &:before {
+      top: -8px;
+      border-bottom-color: rgba(0, 0, 0, 0.2);
+    }
+
+    // Inner arrow (white / fill)
+    &:after {
+      top: -7px;
+      border-bottom-color: #fff;
+    }
+
+    &.dropdown-menu-right {
+      &:before {
+        left: auto;
+        right: 10px;
+      }
+
+      &:after {
+        left: auto;
+        right: 10px;
+      }
+    }
+  }
+
+  // Bootstrap uses these classes -- override some things that Google sets
+  .in {
+    color: inherit;
+    cursor: inherit;
+    font-size: inherit;
+    text-decoration: inherit;
+    white-space: normal;
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  .modal-dialog {
+    background: transparent;
+    border: 0;
+  }
+
+  hr {
+    display: block;
+  }
+
+  // Busy indicator
+  .modal-footer .esper-spinner {
+    float: left;
+    display: block;
+    height: 32px;
+    width: 32px;
+  }
+
+  .progress.skinny {
+    height: 3px;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .modal-header .esper-modal-icon {
+    line-height: @modal-title-line-height;
+    height: @font-size-h4;
+    width: auto;
+    margin-right: @modal-title-padding;
+  }
+
+  .modal-content .simple-content {
+    padding: @line-height-computed;
+    padding-bottom: (2 * @line-height-computed);
+    text-align: center;
+
+    .message {
+      font-size: @font-size-h5;
+      color: @gray;
+      margin-bottom: @line-height-computed;
+    }
+  }
+
+  .esper-dropdown-toggle {
+    overflow-x: hidden;
+    width: 100%;
+    span {
+      float: left;
+    }
+    i {
+      position: absolute;
+      right: 8px;
+    }
+  }
+
+  // Doesn't work unless we insert SVG inline (need to bring in Svg.ts)
+  .esper-brand-icon {
+    color: @brand-primary;
+    fill: @brand-primary;
+  }
+
+  label.group-heading {
+    display: block;
+  }
+
+  // Overrides
+  .radio, .checkbox {
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  // Use to add spacing within columns
+  .esper-col-spacer {
+    padding: 0 5px;
+  }
+
+  // Custom helpers
+  .form-set {
+    border-bottom: 1px solid @google_border_gray;
+    margin-bottom: @form-group-margin-bottom;
+  }
+
+  .modal-content {
+    .esper-subheading {
+      font-weight: bold;
+    }
+  }
+
+  .list-group-item input[type="checkbox"] {
+    vertical-align: text-bottom;
+    margin-right: 5px;
+  }
+
+  // Use this for adjusting height of inline spans to be the same height as
+  // buttons and whatnot
+  .inline-form-text {
+    line-height: 34px;
+  }
+
+  label.inline-form-text {
+    margin-bottom: 0;
+  }
+
+  // Style Typeahead
+  .tt-hint, .tt-input {
+    .form-control;
+  }
+
+  .tt-hint[readonly] {
+    background: white;
+    color: #ccc;
+  }
+
+  .tt-menu {
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: white;
+    width: 100%;
+  }
+
+  .tt-selectable {
+    cursor: pointer;
+    padding: 7px;
+  }
+
+  .tt-cursor, .tt-selectable:hover {
+    background: @purple;
+    color: white;
+  }
+}
+
+/* Imports in some other vendor CSS files, but only as applied to elements with
+   a .esper wrapper. Unlike Bootstrap, these CSS changes are pretty well
+   namespaced already (at least relative to our elements), so let's make
+   them available to all Esper elements without specifically needing to call
+   them out.
+*/
+.esper {
+  @import "../marten/vendor/font-awesome/less/font-awesome";
+  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
+  @import (less) "../marten/vendor/quill/dist/quill.snow.css";
+  @import (less) "../marten/vendor/quill/dist/quill.base.css";
+
+  // More spacing on font-awesome left-align icons
+  .fa.fa-la {
+    margin-right: 0.5em;
+  }
+
+  // Override some Quill theming
+  .ql-snow.ql-toolbar {
+    padding: 0; // Use surrounding div for padding
+  }
+
+  .ql-container {
+    padding: 0;
+
+    .ql-editor {
+      padding: 12px 15px;
+      min-height: 100px;
+    }
+  }
+
+  // A checkbox in which to insert fontawesome checks
+  .esper-fake-checkbox {
+    display: block;
+    height: 1.28571429em;
+    line-height: 1.28571429em;
+    width: 1.28571429em;
+    border-radius: 5px;
+    margin-right: 7px;
+    float: left;
+    box-shadow: 1px 1px 2px rgba(0,0,0,0.16);
+  }
+
+  .esper-fake-checkbox-text {
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.28571429em;
+  }
+}
+
+/*** Colors ***/
+@blue: #0080ce;
+@blue_bg: #dfeff7;
+@blue_text: #2A6496;
+@border: #ebebeb;
+@dark_gray: #282828;
+@google_bg_gray: #f5f5f5;
+@google_border_gray: #d8d8d8;
+@gray_bg: #fdfdfd;
+@gray_f8: #f8f8f8;
+@gray_f5: #f5f5f5;
+@gray_05: #f1f2f2;
+@gray_10: #e6e7e8;
+@gray_20: #d1d3d4;
+@gray_30: #bcbec0;
+@gray_40: #a7a9ac;
+@gray_60: #808285;
+@gray_80: #58595b;
+@gray_90: #414042;
+@green: #2bb673;
+@green_hover: #1e9b5c;
+@orange: #f7941e;
+@orange_bg: #f4e3d3;
+@orange_hover: #e87400;
+@orange_hover_light: #efba7a;
+@purple: #a25cc6;
+@purple_logo: #7D419C;
+@purple_active: #7d3ca0;
+@purple_bg: #FEFBFF;
+@purple_bg_hover: #F5EBF8;
+@purple_bg_active: #faf7fc;
+@purple_disabled: #ceb3e5;
+@purple_focus: #c08add;
+@purple_gradient: #a464c6;
+@purple_hover: #8c42ad;
+@purple_hover_light: #be89d7;
+@purple_text: #5F5665;
+@red: #d9534f;
+@red_disabled: #eba8a7;
+@red_hover: #d2322d;
+
+@availability_yes: #7ED470;
+@availability_maybe: #E0C208;
+@availability_no: #EA7768;
+
+/*
+  This is applied to the Gmail container containing compose and chat popups
+  when the sidebar is active.
+*/
+.esper-sidebar-active {
+  margin-right: @sidebar_width + 14;
+}
+
+/*** Element IDs ***/
+#esper-support-executive, #esper-support-myself {
+  margin-right: 4px;
+}
+
+/*** Generic classes. ***/
+
+/*
+  They can be added or removed using .removeClass and .addClass
+  on jQuery selections.
+*/
+
+/* Use appropriate cursor to indicate that an element is clickable */
+.esper-clickable {
+  cursor: pointer;
+}
+
+/* Hide and collapse any element */
+.esper-hide {
+  display: none;
+}
+
+.esper-archived {
+  text-decoration: line-through;
+}
+
+/*** General ***/
+
+@sidebar_width: 247px;
+@sidebar_tab_height: 34px;
+@sidebar_tab_count: 2;
+@sidebar_tab_base_width: floor(@sidebar_width / @sidebar_tab_count);
+@sidebar_tab_remainder_width: @sidebar_width - (
+  @sidebar_tab_base_width * (@sidebar_tab_count - 1));
+
+#esper { font-size: 13px; }
+
+#esper p {
+  margin: 10px 0;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:empty {
+    margin: 0;
+  }
+}
+
+a { text-decoration: none; }
+
+hr.esper-hr {
+  margin: 20px 0;
+  border-top: 1px solid @gray_10;
+  border-right: none;
+  border-bottom: none;
+  border-left: none;
+}
+
+ul.esper-ul, li.esper-li { list-style-type: none; }
+
+ul.esper-ul {
+  margin: 0px;
+  padding: 0px;
+}
+
+ul.esper-ul-results, ul.esper-drop-ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  background: white;
+
+  .esper-drop-ul-divider {
+    height: 1px;
+    margin: 0 10px;
+    background: @gray_20;
+  }
+}
+
+ul.esper-drop-ul {
+  display: none;
+  border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  webkit-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+         box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.esper-dropdown-wrapper { position: relative; }
+
+.esper-dropdown-section { padding: 7px 0; }
+
+.esper-dropdown {
+  display: inline-block;
+}
+
+.esper-filter-dropdown {
+  .esper-dropdown-search {
+    margin-bottom: 5px;
+    input {
+      width: 100%;
+    }
+  }
+
+  .esper-dropdown-list {
+    display: inline-block;
+    max-height: 300px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    margin: 0;
+    vertical-align: middle;
+
+    .esper-bs & {
+      margin: 0;
+
+      input[type="radio"], input[type="checkbox"] {
+        margin-top: 0;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.esper-dropdown-select {
+  &.dropdown-menu {
+    padding: 5px;
+  }
+  li label {
+    cursor: pointer;
+    width: 100%;
+  }
+}
+
+.esper-create-event-dropdown {
+  position : absolute;
+  margin: 20px 0 0 0;
+}
+
+/* The little green checkmark to choose an event from the linked
+ * events list.
+ */
+.esper-choose-event {
+  height : 12px;
+  width : 12px;
+  float : right;
+  margin-right : 2px;
+  cursor : pointer;
+}
+
+li.esper-li, a.esper-a {
+  display: block;
+  position: relative;
+  padding: 7px;
+  color: black;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  &:hover {
+    background: @purple;
+    color: white;
+  }
+  &.dropdown {
+    &.selected {
+      background: @purple;
+      color: white;
+      &:hover {
+        background: @purple;
+        color: white; 
+      }
+    }
+    &:hover {
+      background: @purple_bg_hover;
+      color: black;
+    }
+  }
+  &.esper-danger {
+    color: @red;
+    &:hover {
+      background: @red;
+      color: white;
+    }
+  }
+  &.esper-disabled, &.esper-selected {
+    cursor: default;
+    &:hover { background: none; }
+  }
+  &.esper-disabled {
+    color: @gray_30;
+    &:hover { color: @gray_30; }
+  }
+  &.esper-selected:hover { color: black; }
+}
+
+a.esper-a:hover {
+  text-decoration: none;
+}
+
+select.esper-select {
+  vertical-align: middle !important;
+  height: 32px;
+  padding: 6px 20px 6px 9px;
+  line-height: 1.2;
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  border: 1px solid #C5C5C5;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:disabled { pointer-events: none; }
+  &:hover {
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+  &.esper-select-fullwidth { width: 100%; }
+}
+
+.esper-agenda-timezone-select {
+  vertical-align: middle !important;
+  width: 280px;
+  padding: 8px;
+  background-size: calc(~"200% - 20px") 100%, cover;
+  background-repeat: no-repeat;
+  background-color: white;
+  border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  &:disabled { pointer-events: none; }
+  &:hover {
+    border: 1px solid #C6C6C6;
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:focus { border: 1px solid @purple; }
+  &.esper-select-fullwidth { width: 100%; }
+}
+
+.tt-menu {
+  background-color: white;
+  width: 280px;
+  border: 1px solid;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+object.esper-svg { pointer-events: none; }
+
+.esper-bold { font-weight: bold; }
+
+.esper-gray { color: @gray_40; }
+
+.esper-link {
+  color: @purple;
+  cursor: pointer;
+  &:hover {
+    color: @purple_hover;
+    text-decoration: underline;
+  }
+}
+.esper-link-danger {
+  color: @red;
+  cursor: pointer;
+  &:hover {
+    color: @red_hover;
+    text-decoration: underline;
+  }
+}
+.esper-link-gray {
+  color: @gray_60;
+  cursor: pointer;
+  &:hover {
+    color: @gray_80;
+    text-decoration: underline;
+  }
+}
+.esper-link-black {
+  cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+.esper-vertical-divider {
+  float: left;
+  width: 1px;
+  height: 16px;
+  margin: 4px 5px;
+  background: @gray_20;
+}
+
+.esper-clearfix:before,
+.esper-clearfix:after {
+  content: " ";
+  display: table;
+}
+
+.esper-clearfix:after {
+  clear: both;
+}
+
+
+/** Buttons **/
+
+.esper-btn {
+  padding: 6px 16px 8px 16px;
+  border-radius: 3px;
+  font-size: 13px;
+  &:disabled {
+    opacity: 0.2;
+    pointer-events: none;
+  }
+  &:focus { outline: 0 !important; }
+}
+.esper-btn-primary {
+  color: white;
+  background-image: linear-gradient(to bottom, #A75FCC 0%, #9C59BF 100%);
+  border: 1px solid #70348F;
+  &:hover {
+    color: white;
+    background-image: linear-gradient(to bottom, #A75FCC 0%, #8A4DAA 100%);
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    color: white;
+    background-image: linear-gradient(to bottom, #A75FCC 0%, #8A4DAA 100%);
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.40);
+  }
+}
+.esper-btn-secondary {
+  color: @purple_text;
+  background-image: linear-gradient(to bottom, #F5F5F5 0%, #F1F1F1 100%);
+  border: 1px solid #C5C5C5;
+  &:hover {
+    color: @purple_text;
+    background-image: linear-gradient(to bottom, #F8F8F8 0%, #F1F1F1 100%);
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    color: @purple_text;
+    background-image: linear-gradient(to bottom, #F8F8F8 0%, #F1F1F1 100%);
+    border: 1px solid #C6C6C6;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
+.esper-btn-danger {
+  color: white;
+  border: 1px solid #b9332f;
+  background-image: linear-gradient(to bottom, #d7524e 0%, #c7423e 100%);
+  &:hover {
+    background-image: linear-gradient(to bottom, #d14a48 0%, #c13a38 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    background-image: linear-gradient(to bottom, #d9534f 0%, #c9433f 100%);
+    border: 1px solid #b42e2b;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+            box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
+
+.esper-remove-button, .esper-remove-btn {
+  .esper-btn;
+  .esper-btn-secondary;
+  &::before {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    content: "\f00d";
+  }
+}
+
+.esper-remove-link {
+  cursor: pointer;
+  color: @gray_30;
+  &:hover {
+    color: @red_hover;
+  }
+}
+
+.esper-btn-safe {
+  color: white;
+  border: 1px solid #33b92f;
+  background-image: linear-gradient(to bottom, #52d74e 0%, #42c73e 100%);
+  &:hover {
+    background-image: linear-gradient(to bottom, #4ad148 0%, #3ac138 100%);
+    border: 1px solid #2eb42b;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  &:active {
+    background-image: linear-gradient(to bottom, #53d94f 0%, #43c93f 100%);
+    border: 1px solid #2eb42b;
+    -webkit-box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+    box-shadow: inset 0px 1px 2px 0px rgba(0,0,0,0.30);
+  }
+}
+
+
+/** Input **/
+.esper-input {
+  padding: 0 8px;
+  color: @purple_text;
+  border: 1px solid @gray_20;
+  border-radius: 3px;
+  box-sizing: border-box;
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+input.esper-input { height: 32px; }
+textarea.esper-input { resize: none; }
+
+/*** Esper Menu area ***/
+
+/* Container of all the Esper controls in the top navigation bar */
+.esper-menu-root {
+  height: 24px;
+  margin-top: 6px; /* ad-hoc vertical alignment with existing text */
+
+  /* stay away from the non-Esper neighbors;
+     we don't know exactly how far they are because of other extension icons,
+     so we provision more than possibly needed.
+   */
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+/* Element containing the Esper logo (right) */
+.esper-menu {
+  display: inline-block;
+  position: relative; /* serves as reference for the dropdown positioning */
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+}
+
+/* Menu adjustments */
+.esper-bs .esper-menu .dropdown-menu.dropdown-menu-right {
+  right: -8px;
+  left: auto;
+  margin-top: 5px;
+  min-width: 80px;
+}
+
+.esper-bs .esper-menu .esper-menu-hr {
+  margin: 5px 0px;
+}
+
+/* Task list button (middle) */
+.esper-tl-button {
+  display: inline;
+}
+
+/* Team switcher (left) */
+.esper-tl-switcher {
+  display: inline-block;
+  position: relative; /* serves as reference for the dropdown positioning */
+}
+
+.esper-menu-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  &.esper-menu-white {
+  }
+  &.esper-menu-black, &.esper-menu-purple {
+    opacity: 0.47;
+    &:hover { opacity: 0.85; }
+  }
+}
+
+.esper-menu-bg {
+  display: none;
+  z-index: 10;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.esper-menu-important {
+  font-weight: bold;
+}
+
+.esper-tl-team {
+  vertical-align: middle;
+}
+
+/*** Task list ***/
+
+.esper-tl-tasks-layer {
+  .esper-modal-bg;
+}
+
+.esper-tl-modal {
+  .esper-modal;
+
+  @width: 65%; /* feel free to pick an absolute width here */
+  width: @width;
+  margin-left: -@width/2;
+
+  top: 10%;
+  height: 80%;
+  max-height: 80%;
+  &.esper-modal-flexbox {
+    > .esper-modal-content {
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+  }
+}
+
+.esper-tl-task-list {
+  padding: 10px 20px 10px 20px; /* order: TRBL as in TRouBLe aka clockwise */
+}
+
+.esper-tl-list {
+}
+
+.esper-tl-task {
+  margin-bottom: 27px;
+}
+
+.esper-tl-task-title {
+  font-weight: bold;
+}
+
+.esper-tl-email {
+  position: absolute;
+  top: 45px;
+  right: 10px;
+}
+
+.esper-tl-label {
+  margin-left: 0px;
+  margin-right: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+  bottom: 2px;
+  border-radius: 2px;
+
+  background: @gray_40;
+  color: white;
+}
+
+.esper-tl-all {
+  .esper-tl-label;
+  background: @purple;
+  color: white;
+}
+
+.esper-tl-urgent {
+  .esper-tl-label;
+  background: @red;
+  color: white;
+}
+
+.esper-tl-progress {
+  .esper-tl-label;
+  select& {
+    float: right;
+  }
+  background: @purple;
+  color: white;
+}
+
+.esper-tl-shared {
+  .esper-tl-label;
+  background: @gray_60;
+  color: white;
+}
+
+.esper-tl-link {
+  color: white;
+  opacity: 0.7;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.esper-tl-selected {
+  opacity: 1;
+  text-decoration: none;
+  cursor: default;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.esper-tl-threads {
+  margin-left: 28px;
+  margin-bottom: 8px;
+  margin-top: 8px;
+}
+
+.esper-tl-thread {
+}
+
+.esper-tl-events {
+  margin-left: 28px;
+}
+
+.esper-tl-event {
+  display: inline-block;
+  padding: 2px 5px 2px 5px;
+}
+
+.esper-tl-task-notes {
+  margin-left: 28px;
+  p {
+    font-size: 14px;
+  }
+}
+
+/*** Esper Gmail / Calendar Sidebar Containers ***/
+
+.esper-cal-sidebar, .esper-gmail-sidebar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  top: 110px;
+  width: 300px;
+
+  // Set so this sits on top of every in Google Calendar except the very top
+  // One Google bar
+  z-index: 4;
+
+  // Override this in child elements to make them clickable
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+/*** Esper Dock ***/
+
+.esper-dock-container {
+  z-index: 5;
+  position: absolute;
+  right: 14px;
+  bottom: 0;
+  &.esper-team-warning {
+    .esper-dock { background: @orange; }
+    .esper-dock-wrap-left {
+      border-color: transparent transparent @orange_hover transparent;
+    }
+    .esper-dock-wrap-right {
+      border-color: transparent transparent transparent @orange_hover;
+    }
+    .esper-dock-action:hover { background: @orange_hover_light; }
+    .esper-options.esper-open { background: @orange_hover_light; }
+  }
+  &.esper-team-danger {
+    .esper-dock { background: @red; }
+    .esper-dock-wrap-left {
+      border-color: transparent transparent @red_hover transparent;
+    }
+    .esper-dock-wrap-right {
+      border-color: transparent transparent transparent @red_hover;
+    }
+    .esper-dock-action:hover { background: @red_hover; }
+    .esper-options.esper-open { background: @red_hover; }
+  }
+}
+
+.esper-dock-wrap {
+  position: absolute;
+  bottom: 36px;
+  width: @sidebar_width + 14px;
+  height: 7px;
+  opacity: 1;
+
+  transition: opacity 0.3s;
+  &.esper-hide {
+    opacity: 0;
+  }
+}
+
+.esper-dock-wrap-left {
+  float: left;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 7px 7px;
+  border-color: transparent transparent @purple_active transparent;
+}
+
+.esper-dock-wrap-right {
+  float: right;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 7px 0 0 7px;
+  border-color: transparent transparent transparent @purple_active;
+}
+
+.esper-dock {
+  height: 36px;
+  width: @sidebar_width + 14px;
+  padding: 0 4px;
+  color: white;
+  background: @purple;
+  cursor: default;
+  box-sizing: border-box;
+  &.esper-update {
+    padding: 11px;
+    background: @orange;
+    cursor: pointer;
+    text-align: center;
+    &:hover {
+      background: @orange_hover;
+      text-decoration: underline;
+    }
+  }
+}
+
+.esper-team-name {
+  float: left;
+  padding: 10px 0 0 4px;
+}
+
+.esper-team-name-danger {
+  color: @red;
+}
+
+.esper-dock-action {
+  width: 24px;
+  height: 24px;
+  margin: 6px 0;
+  padding: 7px;
+  cursor: pointer;
+  box-sizing: border-box;
+  .esper-dock-action-icon { opacity: 0.6; }
+  &:hover {
+    background: @purple_hover_light;
+    .esper-dock-action-icon { opacity: 1; }
+  }
+}
+
+.esper-options { float: left; }
+.esper-size { float: right; }
+
+.esper-options-icon {
+  width: 0;
+  height: 0;
+  margin-top: 2px;
+  border-style: solid;
+  border-width: 0 5px 6px 5px;
+  border-color: transparent transparent white transparent;
+}
+
+.esper-options.esper-open {
+  background: @purple_hover_light;
+  .esper-dock-action-icon { opacity: 1; }
+}
+
+.esper-size-icon {
+  width: 10px;
+  height: 2px;
+  background: white;
+  &.esper-minimize { margin-top: 8px; }
+}
+
+.esper-calendar-icon {
+  float: right;
+}
+
+.esper-sync-calendars {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.esper-options-menu {
+  position: relative;
+  margin: 0 20px 0 0;
+}
+
+.esper-dock .dropdown-menu {
+  width: @sidebar_width;
+
+  .esper-dropdown-footer {
+    padding: 3px 15px
+  }
+}
+
+.esper-team-checkmark {
+  float: right;
+  width: 12px;
+  height: 11px;
+  margin-top: 6px;
+}
+
+.esper-team-exec-email {
+  color: @gray_60;
+  font-size: 11px;
+}
+
+li.esper-li:hover .esper-team-exec-email { color: white; }
+li.esper-li.esper-selected:hover .esper-team-exec-email { color: @gray_60; }
+
+.esper-dropdown-footer { padding: 10px 16px; }
+
+.esper-dropdown-footer-logo {
+  width: 12px;
+  height: 15px;
+}
+
+.esper-dropdown-footer-links {
+  float: right;
+  font-size: 11px;
+  margin-top: 2px;
+  color: @gray_40;
+  a { color: @gray_40; }
+  a:hover {
+    color: @gray_60;
+    text-decoration: underline;
+  }
+}
+
+.esper-dropdown-footer-divider {
+  display: inline-block;
+  width: 7px;
+  height: 10px;
+  margin-right: 7px;
+  border-right: 1px solid @gray_10;
+}
+
+.esper-copyright { cursor: default; }
+
+
+/** Sidebar **/
+
+.esper-sidebar {
+  display: none;
+  z-index: 3;
+  width: @sidebar_width;
+  position: absolute;
+  top: 8px;
+  right: 21px;
+  bottom: 0;
+
+  // Used for simple sidebar without tabs or anything else
+  &.esper-sidebar-simple {
+    padding: 10px 10px 36px 10px;
+    background: white;
+    border: 1px solid @google_border_gray;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: top 0.3s;
+
+    // TODO: Refactor transition stuff into all sidebar code?
+    &.esper-hide {
+      top: 100%;
+    }
+
+    .esper-subheading {
+      font-weight: bold;
+      padding: 10px 0;
+      border-bottom: 1px solid @google_border_gray;
+      margin: 0 0 10px;
+
+      &:first-child {
+        padding-top: 0;
+      }
+
+      .fa-refresh {
+        .esper-link;
+        float: right;
+      }
+    }
+  }
+}
+
+.esper-tab {
+  height : 95%;
+}
+
+.esper-tabs-container {
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+}
+
+.esper-tab-links {
+  display: inline-block;
+  width: 100%;
+  margin: 1px 0 0 0;
+  padding: 0;
+  li {
+    float: left;
+    list-style: none;
+    // Make sidebar a little larger and use negative margin to get overap
+    width: (@sidebar_tab_base_width + 1);
+    margin: 0 -1px 0 0;
+    height: @sidebar_tab_height;
+    display: inline-block;
+    padding: 8px;
+    background: white;
+    border: 1px solid @purple_disabled;
+    border-bottom: 1px solid @google_border_gray;
+    color: @purple;
+    text-align: center;
+    cursor: pointer;
+    box-sizing: border-box;
+    &:hover { color: @purple_hover; }
+    &:first-child {
+      border-top-left-radius: 3px;
+    }
+    &:last-child {
+      border-top-right-radius: 3px;
+      // Don't add border width since negative right margin on last child
+      // doesn't do anything
+      width: @sidebar_tab_remainder_width;
+    }
+  }
+  li.esper-active, li.esper-active:hover {
+    color: @purple_text;
+    border: 1px solid @google_border_gray;
+    border-bottom: 0;
+    cursor: default;
+    .esper-tab-icon { opacity: 1; }
+  }
+  li.esper-active + li { border-left: 1px solid @gray_20; }
+  &:after {
+    display:block;
+    clear:both;
+    content:'';
+  }
+}
+
+.esper-tab-content {
+  position: absolute;
+  z-index: 1;
+  width: 100%;
+  top: @sidebar_tab_height;
+  bottom: 36px;
+  background: white;
+  border-color: @google_border_gray;
+  border-style: solid;
+  border-width: 0 1px 1px 1px;
+  border-bottom: none;
+  box-sizing: border-box;
+  .esper-tab { display:none; }
+  .esper-tab.esper-active { display:block; }
+}
+
+.esper-tab-container {
+  padding : 10px;
+  height : 100%;
+
+  overflow : auto;
+
+  h1 {
+    font-weight : bold;
+    font-size : 10pt;
+    margin : 0 0 4px 0;
+  }
+
+  input {
+    width : 100%;
+  }
+
+  .esper-hide-section {
+    display : inline-block;
+    float : right;
+  }
+}
+
+.esper-tab-flexbox {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Stretch everything to width/height 100% without worrying too much
+  // about parent element
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.esper-tab-header {
+  padding: 10px;
+  box-sizing: border-box;
+  border-bottom: 1px solid @google_border_gray;
+  background: white;
+  flex-grow: 0;
+  flex-shrink: 0;
+  z-index: 1;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.16);
+}
+
+.esper-tab-overflow {
+  flex-shrink: 1;
+  flex-grow: 1;
+  padding: 15px 10px 0 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: white;
+}
+
+.esper-section { margin-bottom: 15px; }
+
+.esper-section-header {
+  padding: 10px;
+  background: @gray_f5;
+  border: 1px solid @google_border_gray;
+  border-radius: 3px;
+  &.esper-open {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  h1 {
+    float : left;
+  }
+}
+
+.esper-new-marker {
+  color: @purple;
+  font-size: 10px;
+  margin-left: 5px;
+  margin-top: 2px;
+  float: left;
+}
+
+.esper-text-notes {
+  border: none;
+  width: 100%;
+  white-space: pre-wrap;
+  resize: none;
+  &:focus{ outline: 0; }
+}
+
+.esper-section-notes {
+  padding: 10px;
+  margin: 0;
+  border: 1px solid @google_border_gray;
+  border-top: none;
+  border-bottom: none;
+}
+
+.esper-subheading {
+  display: block;
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.esper-section-footer {
+  padding: 6px 10px;
+  line-height: 2.25em;
+  background: @gray_f5;
+  border: 1px solid @google_border_gray;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.esper-subsection-footer {
+  border-top: 1px solid @google_border_gray;
+  padding: 10px 0;
+}
+
+.esper-save-notes {
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.8rem;
+  line-height: 1.8em;
+  padding: 0 8px;
+  min-width: 5em;
+}
+
+.esper-save-status.esper-spinner {
+  height: 2.25em;
+  width: 2.25em;
+  float: right;
+  vertical-align: middle;
+}
+
+.esper-char-count {
+  float: left;
+  padding-top: 4px;
+  color: @gray_30;
+}
+
+.esper-workflow-gap {
+  margin-top: 10px;
+}
+
+.esper-checklist-box {
+  margin-right: 5px;
+}
+
+.esper-task-progress {
+  padding: 7px 0 0;
+}
+
+.esper-section-actions {
+  padding: 7px 0px 2px 0px;
+  text-align: center;
+  background: @purple_bg;
+  border-bottom: 1px solid @google_border_gray;
+}
+
+.esper-section-selector {
+  padding: 7px 10px;
+  background: @purple_bg;
+  border-bottom: 1px solid @google_border_gray;
+}
+
+.esper-show-selector {
+  float: left;
+  margin: 9px 5px 0 0;
+}
+
+.esper-section-container {
+  border: 1px solid @google_border_gray;
+  border-top: none;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+
+  .esper-section-content {
+    padding: 10px;
+  }
+}
+
+
+/** Group Scheduling stuff **/
+ul.esper-group-people {
+  list-style : none;
+  padding : 3px;
+  margin-top : 0;
+
+  input.esper-danger {
+    background-color : @red_disabled;
+  }
+
+  li {
+    margin-bottom : 2px;
+    padding : 4px;
+
+    background : @google_bg_gray;
+    border : 1px solid @google_border_gray;
+    border-radius : 3px;
+
+    .esper-close {
+      position : relative;
+      display : inline-block;
+      float : right;
+
+      cursor : pointer;
+
+      padding : 2px;
+      margin-right : 3px;
+      bottom : 3px;
+
+      color : #666666;
+
+      &:hover, &:active {
+        color : black;
+      }
+    }
+
+    &.esper-group-add-guests {
+      padding : 2px;
+
+      input {
+        width : 85%;
+        margin : 1px;
+
+        border : none;
+      }
+
+      .esper-close {
+        bottom : 2px;
+        font-size : 125%;
+      }
+    }
+  }
+}
+
+ul.esper-availability-graph {
+  position : relative;
+  bottom : 8px;
+
+  li {
+    display : inline-block;
+
+    margin : 0px 1px 4px 1px;
+
+    height : 16px;
+    width : 14px;
+
+    border-radius : 3px;
+
+    &::before {
+      position : relative;
+      left : 2px;
+      color : #666;
+    }
+
+    &.esper-availability-yes {
+      background : @availability_yes;
+
+      height : 19px;
+
+      &:hover { background : lighten(@availability_yes, 10%); }
+
+      &::before {
+        content : "Y";
+        top : 2px;
+      }
+    }
+
+    &.esper-availability-no {
+      background : @availability_no;
+
+      position : relative;
+      height : 19px;
+      top : 5px;
+
+      &:hover { background : lighten(@availability_no, 7%); }
+
+      &::before {
+        content : "N";
+        top : 2px;
+      }
+    }
+
+    &.esper-availability-maybe {
+      background : @availability_maybe;
+
+      &:hover { background : lighten(@availability_maybe, 6%); }
+
+      &::before {
+        content : "?";
+        left : 3px;
+      }
+    }
+  }
+}
+
+.esper-group-options {
+  ul {
+    margin : 0;
+    padding : 4px 10px;
+
+    list-style : none;
+  }
+}
+
+/** Sidebar Task Management **/
+
+.esper-task-name { width: 80%; }
+
+.esper-task-cancel {
+  height: 32px;
+  padding: 6px 9px 6px 9px;
+  font-size: 100%;
+}
+
+.esper-meeting-type { width: 80%; margin-bottom: 10px; }
+
+.esper-task-search-dropdown {
+  z-index: 2;
+  position: absolute;
+  width: 225px;
+  margin: 0;
+  box-sizing: border-box;
+
+  &.esper-template {
+    top: 34px;
+  }
+}
+
+
+/** Sidebar Events **/
+
+.esper-refresh {
+  float: left;
+  width: 16px;
+  height: 13px;
+  padding-left: 8px;
+  &.esper-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.esper-link-action {
+  float: left;
+  padding: 3px;
+  color: @purple;
+  border-radius: 3px;
+  cursor: pointer;
+  .esper-link-action-icon-container {
+    float: left;
+    padding: 3px;
+    border: 1px solid @purple;
+    border-radius: 100%;
+    box-sizing: border-box;
+  }
+  .esper-link-action-icon {
+    float: left;
+    width: 16px;
+    height: 16px;
+  }
+  .esper-link-action-text {
+    margin: 1px 0 0 21px;
+    font-weight: bold;
+  }
+  &.esper-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  &:hover { background: @purple_bg_hover; }
+}
+
+.esper-no-content {
+  padding: 50px 0;
+  font-size: 16px;
+  color: @gray_20;
+  text-align: center;
+
+  .esper-settings-link {
+    font-size: 12px;
+    display: block;
+    margin-top: 10px;
+  }
+}
+
+.esper-events-list { padding: 0 10px; }
+.esper-events-list-loading, .esper-sidebar-loading { padding: 24px 0; }
+.esper-label-list {
+  padding: 0;
+
+  .esper-subsection-footer {
+    padding-left: 10px;
+    padidng-right: 10px;
+  }
+}
+
+.esper-ev {
+  padding: 14px 0 16px 0;
+  border-bottom: 1px solid #d8d8d8;
+  &.esper-last { border: none; }
+  .esper-link-event {
+    height: 24px;
+    margin-top: 10px;
+    padding: 4px;
+    text-align: center;
+    color: white;
+    background: @purple;
+    border-radius: 12px;
+    box-sizing: border-box;
+    &:hover { background: @purple_hover; }
+  }
+  .esper-linked {
+    height: 24px;
+    margin-top: 10px;
+    padding: 4px;
+    text-align: center;
+    color: @gray_30;
+    background: @gray_10;
+    cursor: default;
+    border-radius: 12px;
+    box-sizing: border-box;
+    .esper-linked-check {
+      width: 12px;
+      height: 11px;
+    }
+  }
+}
+
+.esper-centered-container, .esper-ev-inline-container {
+  position : relative;
+
+  margin-top : 20px;
+  margin-left : auto;
+  margin-right : auto;
+
+  padding-left : 10px;
+  padding-right : 10px;
+
+  border : 1px solid @border;
+
+  .esper-modal-header {
+    padding: 16px 6px;
+    height: auto;
+  }
+  .esper-modal-footer {
+    padding: 16px 6px;
+  }
+}
+
+.esper-reminder-options {
+  margin-top : 10px;
+  margin-bottom : 5px;
+
+  span.esper-reminder-label {
+    display : inline-block;
+    width : 100px;
+
+    font-weight : bold;
+  }
+
+  input {
+    width : 2em;
+  }
+
+  input.esper-danger {
+    background : @red_disabled;
+  }
+
+  span.esper-reminder-warning {
+    display : none;
+
+    color : @red;
+  }
+
+  button {
+    margin-left : 42px;
+  }
+}
+
+.esper-ev.esper-disabled {
+  pointer-events: none;
+  .esper-ev-date,
+  .esper-ev-title,
+  .esper-ev-times,
+  .esper-ev-disclose { opacity: 0.3; }
+}
+
+.esper-ev-date {
+  float: left;
+  width: 36px;
+  height: 34px;
+  border-radius: 4px;
+  border: 1px solid @gray_30;
+  padding-top: 3px;
+  text-align: center;
+  &.esper-clickable:hover {
+    border: 1px solid @gray_60;
+    background-image: linear-gradient(to bottom, white 0%, @gray_f8 100%);
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+}
+
+.esper-ev-weekday {
+  font-size: 11px;
+  padding-bottom: 1px;
+}
+
+.esper-ev-month {
+  font-size: 11px;
+}
+
+.esper-ev-day {
+  color: @purple;
+  font-size: 18px;
+}
+
+.esper-ev-title {
+  word-wrap: break-word;
+  margin-left: 48px;
+  padding: 3px 0 1px 0;
+}
+
+.esper-ev-times {
+  color: @purple;
+  margin-left: 48px;
+  padding: 1px 0 2px 0;
+}
+
+.esper-ev-tz {
+  font-size: 9px;
+  letter-spacing: -1px;
+}
+
+.esper-ev-location {
+  color: @gray_60;
+  margin-left: 48px;
+  padding: 3px 0 1px 0;
+}
+
+.esper-ev-task-notes {
+  margin: 0;
+}
+
+.esper-ev-disclose {
+  z-index: 1;
+  float: right;
+  opacity: 0.5;
+  width: 0;
+  height: 0;
+  margin-top: 4px;
+  border-style: solid;
+  border-width: 6px 5px 0 5px;
+  border-color: @gray_60 transparent transparent transparent;
+  &:hover { opacity: 1; }
+}
+
+.esper-ev-disclose.esper-open { opacity: 1; }
+
+ul.esper-ev-dropdown {
+  z-index: 2;
+  position: absolute;
+  top: 14px;
+  right: 0;
+  max-width: 180px;
+  border-radius: 3px;
+}
+
+.esper-sync-option {
+  height: 13px;
+  padding-bottom: 0;
+}
+
+.esper-sync-option-text {
+  float: left;
+  padding-top: 1px;
+  padding-right: 8px;
+  color: black;
+}
+
+.esper-info {
+  float: left;
+  width: 14px;
+  height: 14px;
+  opacity: 0.5;
+  &:hover { opacity: 1; }
+}
+
+.esper-sync-checkbox {
+  float: right;
+  margin-left: 20px;
+}
+
+.esper-sync-note {
+  color: @gray_20;
+  font-size: 11px;
+  &:hover { color: @gray_20; }
+}
+
+
+/** Sidebar Preferences **/
+
+.esper-profile-pic {
+  float: left;
+  width: 44px;
+  height: 44px;
+  margin-top: 5px;
+  background: @gray_10;
+  background-size: 100% 100%;
+  border-radius: 100%;
+}
+
+.esper-profile-row {
+  margin-left: 54px;
+  padding: 3px 0;
+}
+
+.esper-profile-name-row {
+  padding-top: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.esper-profile-name {
+  float: left;
+  font-size: 15px;
+}
+
+.esper-profile-company, .esper-profile-company-title {
+  font-size: 11px;
+}
+
+.esper-badge {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 2px;
+  background: @purple;
+  color : white;
+
+  &.esper-active {
+    background: @green;
+  }
+
+  &.esper-suspended {
+    background: @red;
+  }
+
+  &.esper-badge-blue {
+    background: @blue;
+  }
+
+  &.esper-badge-orange {
+    background: @orange;
+  }
+}
+
+.esper-workplace-preferences,
+.esper-meeting-preferences {
+  padding: 0 10px;
+}
+
+.esper-overview-label-title {
+  margin-left: 7px;
+  font-weight: bold;
+}
+
+.esper-people-tab-overview-no-profile {
+  margin: auto;
+  padding: 10px 0;
+  width: 150px;
+  color: @gray_20;
+}
+
+.esper-preference-section {
+  padding: 12px 0;
+  border-bottom: 1px solid @gray_20;
+  &.esper-contains-list { padding-bottom: 4px; }
+  &.esper-last { border-bottom: none; }
+}
+
+.esper-preference-icon {
+  float: left;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-new-preference-icon {
+  width: 10px;
+  height: 10px;
+}
+
+.esper-ios-app-icon {
+  width: 13px;
+  height: 13px;
+}
+
+.esper-preference-title {
+  float: left;
+  margin: 2px 0 0 7px;
+}
+
+.esper-preference-text {
+  float: right;
+  margin-top: 2px;
+}
+
+.esper-preference-info { margin-left: 27px; }
+
+.esper-preference-list {
+  margin: 0;
+  padding: 0 10px 0 27px;
+  list-style: none;
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid @gray_10;
+    &.esper-empty-list {
+      color: @gray_20;
+      border-bottom: none;
+    }
+    &.esper-last { border-bottom: none; }
+  }
+}
+
+.esper-favorite-location-name { margin-right: 35px; }
+
+.esper-transportation-preferences {
+  margin: 0;
+  padding: 0 10px;
+  list-style: none;
+  li { border-bottom: 1px solid @google_border_gray; }
+  li.esper-last { border-bottom: none; }
+}
+
+.esper-transportation-type {
+  padding: 5px 0;
+}
+
+.esper-transportation-icon {
+  float: left;
+  width: 36px;
+  height: 36px;
+  opacity: 0.4;
+}
+
+.esper-transportation-title {
+  float: left;
+  margin: 10px;
+  font-size: 14px;
+}
+
+.esper-preferences-notes {
+  margin: 0;
+  padding: 10px;
+  font-family: "Arial";
+  white-space: pre-wrap;
+}
+
+.esper-preferences-general {
+  margin: 0;
+  padding: 10px;
+}
+
+.esper-red {
+  color: @red;
+}
+
+.esper-green {
+  color: @green;
+}
+
+
+/** Composition Toolbar **/
+
+.esper-composition-toolbar {
+  height: 43px;
+  padding: 5px 12px;
+  background: @purple_bg;
+  border-bottom: 1px solid #CFCFCF;
+  box-sizing: border-box;
+}
+
+.esper-composition-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  margin: 5px 5px 0 0;
+}
+
+.esper-email-logo {
+  float: left;
+  width: 16px;
+  height: 20px;
+  margin: 0px 5px 0 0;
+}
+
+.esper-composition-vertical-divider {
+  float: left;
+  width: 1px;
+  height: 20px;
+  margin: 6px 10px;
+  background: @gray_20;
+}
+
+.esper-composition-button {
+  float: left;
+  width: 32px;
+  height: 32px;
+  margin: 0 3px;
+  padding: 4px;
+  border: 1px solid @purple_bg;
+  border-radius: 3px;
+  cursor: default;
+  box-sizing: border-box;
+  &.esper-none:hover {
+    background: @purple_bg;
+    border: 1px solid @purple_bg;
+    opacity: 0.5;
+  }
+  &:hover {
+    background: linear-gradient(white, @purple_bg);
+    border: 1px solid #C6C6C6;
+    opacity: 1;
+    -webkit-box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+            box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.10);
+  }
+  object {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+  }
+  .esper-composition-badge {
+    position: absolute;
+    min-width: 14px;
+    height: 14px;
+    margin: 10px 0 0 10px;
+    padding: 1px 3px;
+    background: @purple;
+    border-radius: 7px;
+    color: white;
+    font-size: 11px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+}
+
+/* The confirm button, which is hidden by default. */
+.esper-exec-confirm {
+  display : none;
+}
+
+/* Agenda sender */
+.esper-agenda-title {
+  font-weight: 600;
+}
+
+.esper-agenda-event {
+  padding: 2px 5px 2px 5px;
+}
+
+.esper-agenda-recipient {
+  font-weight: initial;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+/** The in-thread controls which go right after the thread messages. */
+.esper-in-thread-controls {
+  margin-top : 8px;
+  z-index: 1; // To fix issue with overlapping with sidebar
+  font-size: 0.8rem;
+}
+
+.esper-cal-picker-container {
+  font-size: 1rem; // Undo previous font-size setting and defer to FC's theming
+}
+
+// Align with right edge with reply / forward (pre-click)
+.esper-task-notes-container {
+  padding-right : 14px;
+}
+
+.esper-event-control-container {
+  border-top: 1px solid @google_border_gray;
+  margin-right: 14px; // To match task notes container
+
+  &:empty {
+    border-top: 0;
+  }
+}
+
+.esper-compose-hashtags-container {
+  margin-bottom: 15px;
+
+  // Align with edges of actual compose box
+  padding-left: 35px;
+  padding-right: 9px;
+
+  &:empty {
+    margin-bottom: 0;
+  }
+}
+
+.esper-email-date-select {
+  border: 1px solid @gray_20;
+  margin-bottom: 5px;
+  outline: none;
+  width: 145px;
+  &:hover { border: 1px solid @gray_40; }
+  &:focus {
+    border-color: @purple_focus;
+    outline: 0;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.esper-agenda-format {
+  margin-left: 15px;
+}
+
+.esper-agenda-select {
+  margin-bottom: 5px;
+}
+
+.esper-agenda-error {
+  color: @red;
+  font-size: 12px;
+}
+
+.esper-agenda-send {
+  display: block;
+  float: right;
+  font-size: 12px;
+  height: 22px;
+  width: 70px;
+  padding: 4px;
+  text-align: center;
+  border-radius: 12px;
+  box-sizing: border-box;
+
+  &.enabled {
+    color: white;
+    background: @purple;
+    &:hover { background: @purple_hover; }
+  }
+
+  &.disabled {
+    color: @gray_30;
+    background: @gray_10;
+  }
+}
+
+.esper-agenda-section {
+  padding: 10px;
+}
+
+/** Linked threads **/
+
+.esper-thread-list {
+  margin: 0px;
+  padding: 6px 0px 6px 10px;
+}
+
+.esper-thread-li {
+  position: relative; /* needed to position the cross relative to it */
+  padding: 2px 0px 0px 0px;
+  &.current {
+    font-weight: bold;
+  }
+}
+
+.esper-thread-link {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  margin-right: 26px; /* room for the cross */
+}
+
+/* Cross symbol for unlinking thread */
+.esper-thread-unlink {
+  position: absolute; /* positioned relative to parent li */
+  right: 0px;
+  top: 0px;
+  font-size: 18px;
+  color: @gray_60;
+  opacity: 0.5;
+  padding: 0px 6px;
+  &:hover {
+    opacity: 1;
+  }
+}
+
+
+/** Modals **/
+
+/* Semi-transparent background of the modal, parent of the popup div */
+.esper-modal-bg {
+  z-index: 6;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+/*
+  Popup
+  Must be the child of the background of class esper-modal-bg.
+
+  The following must be specified on per-case basis:
+  - @width: ...
+  - width: @width
+  - margin-left: -@width/2
+
+  Optionally, if a fixed height is desired:
+  - top: 50%
+  - @height: ...
+  - height: @height
+  - margin-top: -@height/2
+*/
+.esper-modal {
+  /* geometry */
+  z-index: 10;
+  position: absolute;
+
+  top: 15%;
+  max-height: 70%;
+  overflow-y: auto;
+
+  left: 50%;
+  max-width: 90%;
+
+  /* appearance */
+  outline: none;
+  background-color: white;
+  border: 1px solid @gray_30;
+  border-radius: 5px;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+          box-shadow: rgba(0, 0, 0, 0.2) 0 4px 16px 0;
+
+  &.esper-modal-flexbox {
+    display: flex;
+    flex-direction: column;
+
+    > * {
+      flex-grow: 0;
+      flex-shrink: 0;
+    }
+
+    > .esper-modal-content {
+      flex-shrink: 1;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+  }
+}
+
+.esper-modal-header {
+  flex-grow: 0;
+  height: 52px;
+  padding: 16px 14px;
+  font-size: 18px;
+  border-bottom: 1px solid @gray_10;
+  box-sizing: border-box;
+
+  .esper-badge {
+    float : right;
+  }
+}
+
+.esper-modal-filter {
+  padding: 10px;
+  border-bottom: 1px solid @gray_10;
+}
+
+.esper-modal-footer {
+  flex-grow: 0;
+  padding: 20px 15px;
+  text-align: right;
+  border-top: 1px solid @gray_10;
+  box-sizing: border-box;
+  .modal-primary { float: left; }
+  .modal-cancel {
+    float: left;
+    margin-left: 6px;
+  }
+  .modal-delete {
+    float: left;
+    color: @red !important;
+  }
+}
+
+.esper-modal-close {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  font-size: 22px;
+  color: @gray_20;
+  padding: 10px;
+}
+
+
+/** Welcome Modal **/
+
+@welcome_width: 480px;
+
+.esper-welcome-modal {
+  margin-left: -@welcome_width/2;
+  width: @welcome_width;
+}
+
+.esper-about {
+  width: 100%;
+  height: 224px;
+  padding: 15px;
+  background: @gray_f8;
+  box-sizing: border-box;
+}
+
+.esper-about-text {
+  float: left;
+  width: 160px;
+  margin: 40px 0 0 15px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.esper-sidebar-screenshot {
+  float: right;
+  margin-top: 15px;
+}
+
+
+/** Description Modal **/
+
+@description_width: 640px;
+
+.esper-description-modal {
+  .esper-modal;
+  margin-left: -@description_width/2;
+  width: @description_width;
+}
+
+.esper-description-text {
+  width: 100%;
+  font-size: 13px;
+  padding: 15px;
+}
+
+textarea.esper-description-text {
+  resize: vertical;
+  height: 200px;
+}
+
+.esper-reminder-btn {
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.esper-reminder-table {
+  font-size: 16px;
+  padding-left: 10px;
+  width: 100%;
+  td {
+    vertical-align: top;
+    padding-top: 20px;
+  }
+  input[type="checkbox"] {
+    margin: 3px 5px 3px 0px;
+  }
+}
+
+.esper-reminder-recipients {
+  width: 100%;
+  font-size: 13px;
+  height: 54px;
+  padding: 8px;
+}
+
+.esper-reminder-text {
+  width: 100%;
+  font-size: 13px;
+  height : 128px;
+  padding: 8px;
+}
+
+.esper-active-reminders {
+  margin: 8px 0 8px 0;
+  .esper-close {
+    float: right;
+    font-size: 15px;
+    font-weight: bold;
+    color: @gray_60;
+  }
+}
+
+.esper-modal-default {
+  .esper-modal;
+  display: flex;
+  flex-direction: column;
+  @search_width: 640px;
+  width: @search_width;
+  margin-left: -@search_width/2;
+  padding: 10px;
+}
+
+/** Confirm Event Modal **/
+
+.esper-confirm-event-modal {
+  .esper-modal;
+  @search_width: 480px;
+  width: @search_width;
+  margin-left: -@search_width/2;
+  padding: 10px;
+}
+
+.esper-confirm-recur-modal {
+  .esper-modal;
+  @search_width: 600px;
+  width: @search_width;
+  margin-left: -@search_width/2;
+  padding: 10px;
+}
+
+/** Search Modal **/
+
+.esper-search-modal {
+  .esper-modal;
+  top: 10%;
+  max-height: 80%;
+  @search_width: 900px;
+  width: @search_width;
+  margin-left: -@search_width/2;
+}
+
+.esper-modal-content {
+  padding: 10px;
+  overflow-y: auto; // Makes header and footer of modal sticky
+}
+
+.esper-search-modal-input {
+  width: 100%;
+  padding-left: 30px;
+}
+
+.esper-ev-search-results {
+  .esper-no-results {
+    padding: 20px 10px;
+    color: @gray_20;
+    text-align: center;
+  }
+}
+
+.esper-ev-result {
+  padding: 14px 14px 16px 14px;
+  border-bottom: 1px solid #d8d8d8;
+  cursor: default;
+  &.esper-last { border-bottom: none; }
+  .esper-ev-title, .esper-ev-times { margin-right: 74px; }
+  .esper-link-event {
+    float: right;
+    color: @purple;
+    cursor: pointer;
+    margin-top: 10px;
+    &:hover {
+      color: @purple_hover;
+      text-decoration: underline;
+    }
+  }
+  .esper-linked {
+    float: right;
+    color: @gray_30;
+    cursor: default;
+    margin-top: 10px;
+    .esper-linked-check {
+      width: 12px;
+      height: 11px;
+    }
+  }
+}
+
+
+/** Modal for duplicating an event **/
+
+.esper-ev-modal {
+  .esper-modal;
+  @width: 480px;
+  width: @width;
+  margin-left: -@width/2;
+}
+
+.esper-ev-modal-content {
+  padding: 10px 15px;
+}
+
+.esper-ev-modal-row {
+  margin: 10px 0;
+  font-size: 13px;
+}
+
+.esper-ev-modal-side-by-side {
+  display : inline-block;
+  width : 38%;
+  padding: 0;
+  margin: 0;
+
+  &:first-child {
+    margin-left : 20%;
+  }
+
+  div:first-child {
+    padding-bottom: 10px;
+  }
+
+  div select {
+    width: 100%;
+  }
+}
+
+.esper-ev-modal-left {
+  float: left;
+  width: 20%;
+  padding: 9px 9px 0 0;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+.esper-ev-modal-right {
+  float: left;
+  width: 80%;
+  box-sizing: border-box;
+  input[type="text"], textarea { width: 100%; }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    li { padding-top: 9px; }
+    input[type="checkbox"] { margin-right: 4px; }
+  }
+
+  textarea {
+    padding: 9px;
+  }
+}
+
+.esper-ev-modal-small {
+  width: 40% !important;
+}
+
+/** Calendar Picker Modal **/
+
+
+.esper-calendar-modal {
+  .esper-modal;
+
+  /* Max it out */
+  top: 5%;
+  max-height: 90%;
+
+  left: 5%;
+  max-width: 90%;
+  @calendar_width: 90%;
+  width: @calendar_width;
+
+  .esper-modal-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    z-index: 1;
+  }
+}
+
+.esper-calendar-refresh {
+  float: right;
+  width: 22px;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.7;
+  &:hover { opacity: 1; }
+}
+
+.esper-calendar-modal-preferences {
+  position: absolute;
+  top: 53px;
+  bottom: 73px;
+  left: 0;
+  width: 247px;
+  font-size: 13px;
+  background: white;
+  border-right: 1px solid @gray_10;
+  .esper-calendar-checkbox {
+    padding: 10px;
+    span { margin-left: 2px; }
+  }
+}
+
+.esper .esper-calendar-grid {
+  .fc-toolbar { margin-bottom: 10px; }
+  .esper-calendar-modal-event-settings {
+    padding: 5px;
+    font-size: 13px;
+    background: @gray_f8;
+    border-bottom: 1px solid @gray_10;
+  }
+  .fc-toolbar .fc-state-active,
+  .fc-toolbar .ui-state-active {
+    z-index: 2;
+  }
+}
+
+
+/** Recurring events modal **/
+
+.esper-recur-modal-label {
+  width: 30%;
+  font-weight: bold;
+  text-align: right;
+  display: inline-block;
+  margin-right: 10px;
+}
+
+
+/** Tooltip **/
+
+@sync_info: 200px;
+
+.ui-tooltip {
+  z-index: 9999;
+  float: left;
+  background: #2a2a2a;
+  border: 1px solid white;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 8px 9px 7px 9px;
+  opacity: 1;
+  text-align: center;
+  &.esper-sync-info {
+    font-weight: normal;
+    line-height: 1.3;
+    text-align: left;
+    max-width: @sync_info;
+  }
+}
+
+.ui-tooltip-content:after, .ui-tooltip-content:before {
+  border: solid transparent;
+  content: "";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.esper-top .ui-tooltip-content:after {
+  top: 100%;
+  left: 50%;
+  border-color: rgba(42, 42, 42, 0);
+  border-top-color: #2a2a2a;
+  border-width: 5px;
+  margin-left: -5px;
+}
+
+.esper-top .ui-tooltip-content:before {
+  top: 100%;
+  left: 50%;
+  border-color: rgba(255, 255, 255, 0);
+  border-top-color: white;
+  border-width: 6px;
+  margin-left: -6px;
+}
+
+
+/** Spinner **/
+
+.esper-spinner {
+  display: none;
+  position: relative;
+  background-color: @purple;
+  border-radius: 100%;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
+  &.esper-tab-header-spinner { display: block; }
+  &.esper-list-spinner { display: block; }
+  &.esper-sidebar-spinner {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 35px auto;
+  }
+  &.esper-inline-spinner {
+    display: block;
+    width: 75px;
+    height: 75px;
+    margin: 50px auto;
+  }
+}
+
+.esper-modal-footer .esper-spinner {
+  float: left;
+  display: block;
+  height: 32px;
+  width: 32px;
+}
+
+.esper-tab-header-spinner {
+  margin: 27px auto;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-list-spinner {
+  margin: 0 auto;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-search-spinner {
+  margin: 19px auto;
+  width: 20px;
+  height: 20px;
+}
+
+.esper-link-spinner {
+  float: right;
+  width: 20px;
+  height: 20px;
+  margin-top: 10px;
+}
+
+.esper-sync-spinner {
+  float: right;
+  width: 12px;
+  height: 12px;
+  margin-left: 20px;
+}
+
+@-webkit-keyframes scaleout {
+  0% { -webkit-transform: scale(0.0) }
+  100% {
+    -webkit-transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+@keyframes scaleout {
+  0% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 100% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+
+/** Flexbox input boxes -- simple box for having everything stay static
+    with except certain elements */
+.esper-flex-row {
+  display: flex;
+
+  > * {
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  > .esper-flex-expand {
+    flex-grow: 1;
+  }
+
+  .esper-left-label {
+    min-width: 10%;
+    padding: 9px;
+    font-weight: bold;
+    text-align: right;
+  }
+
+  .esper-remove-button, .esper-remove-btn {
+    margin-left: 9px;
+  }
+}
+
+
+/** Calendar **/
+
+.esper-thread-row {
+  /* Taken from Gmail */
+  background-color: rgba(243,243,243,.85);
+  border-bottom: 1px #e5e5e5 solid;
+  height: 2.83ex;
+  outline: none;
+  padding: 3px 0 1px;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+
+  width: 537px; /* match width of the description box */
+}
+
+.esper-message {
+  /* extend clickable area to the end of the line */
+  display: inline-block;
+  width: 100%;
+}
+
+.esper-subject {
+  /* gmail color */
+  color: #222;
+}
+
+.esper-snippet {
+  /* gmail color */
+  color: #777;
+}
+
+/** Date picker dropdown **/
+
+.ui-datepicker.esper {
+  background-color: #fff;
+  border: 1px solid #66AFE9;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(102,175,233,.6);
+  display: none;
+  margin-top: 4px;
+  padding: 10px;
+  width: 240px;
+
+  a, a:hover {
+    text-decoration: none;
+    font-size: 16px;
+  }
+
+  span {
+    font-size: 16px;
+  }
+
+  .ui-datepicker-header {
+    background: none;
+    border: none;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  .ui-datepicker-title {
+    font-weight: 700;
+  }
+
+  .ui-datepicker-prev,
+  .ui-datepicker-next {
+    cursor: pointer;
+    // font-family: 'Glyphicons Halflings'; // TODO: Provision Glyphics fonts
+    -webkit-font-smoothing: antialiased;
+    font-style: normal;
+    font-weight: normal;
+    height: 20px;
+    line-height: 1;
+    margin-top: 2px;
+    width: 30px;
+    background: none;
+    border: none;
+    &:hover {
+      color: @blue_text;
+    }
+  }
+  .ui-datepicker-prev {
+    float: left;
+    text-align: left;
+  }
+  .ui-datepicker-next {
+    float: right;
+    text-align: right;
+  }
+
+  // TODO Provision Glyphicon fonts before using these
+  /* .ui-datepicker-prev:before {
+    content: "\e079";
+  }
+  .ui-datepicker-next:before {
+    content: "\e080";
+  } */
+
+  // Ugly, but works without Glyphicons
+  .ui-datepicker-prev:before {
+    content: "\21D0";
+  }
+  .ui-datepicker-next:before {
+    content: "\21D2";
+  }
+
+  .ui-icon {
+    display: none;
+  }
+  .ui-datepicker-calendar {
+    table-layout: fixed;
+    width: 100%;
+  }
+  .ui-datepicker-calendar th,
+  .ui-datepicker-calendar td {
+    text-align: center;
+    padding: 4px 0;
+  }
+  .ui-datepicker-calendar td {
+    border-radius: 4px;
+    transition: background-color 0.1s ease-in-out, color 0.1s ease-in-out;
+  }
+  .ui-datepicker-calendar td:hover {
+    background-color: #eee;
+    cursor: pointer;
+  }
+  .ui-datepicker-calendar td:hover a {
+    background: none;
+    color: @blue_text;
+    font-weight: normal;
+    transition: color 0.1s ease-in-out;
+  }
+  .ui-datepicker-calendar td a {
+    border: none;
+    background: none;
+    text-align: center;
+    text-decoration: none;
+    color: @purple;
+  }
+  .ui-datepicker-calendar .ui-datepicker-current-day {
+    background-color: @purple;
+  }
+  .ui-datepicker-calendar .ui-datepicker-current-day a {
+    background: none;
+    color: #fff;
+    font-weight: normal;
+  }
+  .ui-datepicker-calendar .ui-datepicker-unselectable:hover {
+    background-color: #fff;
+    cursor: default;
+  }
+}
+
+/*** Banner inviting the user the reload the page when needed ***/
+
+#esper-reload-banner {
+  position: absolute;
+  z-index: 2000;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 15px;
+  height: 2em;
+  line-height: 2em;
+  vertical-align: middle;
+  font-size: 1em;
+  color: @purple_text;
+  background-color: @purple_bg;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.16);
+
+  #esper-dismiss {
+    float: right;
+    font-weight: bold;
+    font-size: 1.5em;
+  }
+}
+
+.esper-google-btn {
+  background: url("../img/btn_google_signin_light_normal_web.png");
+  width: 193px;
+  height: 48px;
+  cursor: pointer;
+  border-width: 0;
+
+  &:focus {
+    outline: 0;
+  }
+
+  &:active {
+    background: url("../img/btn_google_signin_light_pressed_web.png");
+  }
+}

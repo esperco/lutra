@@ -1,0 +1,39 @@
+#! /bin/sh
+set -e
+
+echo "INSTALL stoat ($*)"
+TZ=America/Los_Angeles date '+%FT%T.%3N%:z'
+
+case "$1" in
+    "prod")
+        mode=prod
+        manifest=manifest.json.prod
+        ;;
+    "dev")
+        mode=dev
+        manifest=manifest.json.dev
+        ;;
+    "")
+        mode=dev
+        ;;
+    *)
+        echo "Unknown argument $1" >&2
+        exit 1
+esac
+
+mkdir -p pub/css pub/js pub/img pub/html
+
+### Build our own code and copy the result into the pub directory
+cp img/* pub/img
+cp "$manifest" pub/manifest.json
+
+### Log info about this installation
+if commit=$(git log -1 2>/dev/null); then
+    echo "\
+Latest commit of the current branch of the local git repository:
+$commit"
+else
+    echo "Missing git info"
+fi
+
+echo "Installation complete."
