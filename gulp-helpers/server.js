@@ -1,8 +1,9 @@
 "use strict";
 
 // Use to setup a live reload server for Gulp v4
-module.exports = function(gulp) {
+module.exports = function() {
   var ecstatic = require("ecstatic"),
+      gulp = require("gulp"),
       livereload = require("livereload"),
       http = require("http"),
       path = require("path");

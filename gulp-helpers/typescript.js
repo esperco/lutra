@@ -1,7 +1,8 @@
-module.exports = function(gulp) {
+module.exports = function() {
   'use strict';
 
   var _             = require('lodash'),
+      gulp          = require('gulp'),
       cached        = require('gulp-cached'),
       exec          = require('gulp-exec'),
       filter        = require('gulp-filter'),

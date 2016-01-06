@@ -1,9 +1,10 @@
 "use strict";
 /* Use to create LESS-related tasks for Gulp v4 */
 
-module.exports = function(gulp) {
+module.exports = function() {
   var _ = require("lodash"),
       cached = require("gulp-cached"),
+      gulp = require("gulp"),
       minify = require("gulp-minify-html"),
       path = require("path"),
       preprocess = require("gulp-preprocess");

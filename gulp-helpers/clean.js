@@ -1,8 +1,9 @@
 "use strict";
 /* Use to create tasks for cleaning out the pubDir for Gulp v4 */
 
-module.exports = function(gulp) {
-  var del = require("del");
+module.exports = function() {
+  var del = require("del"),
+      gulp = require("gulp");
 
   var exports = {};
 

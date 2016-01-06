@@ -1,10 +1,11 @@
 "use strict";
 /* Use to create LESS-related tasks for Gulp v4 */
 
-module.exports = function(gulp) {
+module.exports = function() {
   var _ = require("lodash"),
       autoprefixer = require("gulp-autoprefixer"),
       filter = require("gulp-filter"),
+      gulp = require("gulp"),
       less = require("gulp-less"),
       minifyCss = require("gulp-minify-css"),
       path = require("path"),

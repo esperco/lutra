@@ -1,8 +1,9 @@
 "use strict";
 
 /* Use to create test-related tasks for Gulp v4 */
-module.exports = function(gulp) {
+module.exports = function() {
   var _ = require("lodash"),
+      gulp = require("gulp"),
       path = require("path"),
       vendor = require("./vendor")(gulp);
 

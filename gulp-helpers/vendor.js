@@ -1,7 +1,7 @@
 "use strict";
 
 // Use to create a browserify bundle of non-global vendor files for Gulp v4
-module.exports = function(gulp) {
+module.exports = function() {
   var _ = require("lodash"),
       browserify = require("browserify"),
       buffer = require("vinyl-buffer"),
@@ -9,6 +9,7 @@ module.exports = function(gulp) {
       debowerify = require("debowerify"),
       deglobalify = require("deglobalify"),
       fs = require("fs"),
+      gulp = require("gulp"),
       gutil = require("gulp-util"),
       minifyCss = require("gulp-minify-css"),
       path = require("path"),
