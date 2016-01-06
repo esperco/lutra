@@ -786,11 +786,8 @@ module Esper.AccountTab {
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
         var plan = Plan.getPlan(customerStatus.plan);
-        if (plan) {
-          memPlan.append(plan.name);
-        } else {
-          memStatus.append(customerStatus.status);
-        }
+        memPlan.append(plan ? plan.name : "---");
+        memStatus.append(customerStatus.status || "---");
     });
 
     Api.getSubscriptionStatusLong(teamid).done(function(status) {
