@@ -2,6 +2,8 @@
   Team Settings - Account Tab
 */
 
+/// <reference path="./Plan.ts" />
+
 module Esper.AccountTab {
   declare var Stripe : any;
   declare var moment : any;
@@ -485,11 +487,8 @@ module Esper.AccountTab {
 '''
 <div #view>
   <div class="membership-name" #name />
+  <div #description />
   <div #price />
-  <div #hours />
-  <div>24/7 Availability</div>
-  <div #responseWindow class="membership-response-window"/>
-  <div #overage />
   <div #checkContainer/>
 </div>
 '''
@@ -497,33 +496,10 @@ module Esper.AccountTab {
       .appendTo(checkContainer);
     Svg.loadImg(check, "/assets/img/check.svg");
 
-    name.text(Plan.classNameOfPlan(planId));
-    switch(Plan.classOfPlan(planId)) {
-      case "lo":
-        name.text("Silver");
-        price.text("$299 / month");
-        hours.text("10 hours of service");
-        responseWindow.text("< 2 hour response");
-        overage.text("Additional hours $35 / hour")
-        break;
-      case "med":
-        name.text("Gold");
-        price.text("$699 / month");
-        hours.text("25 hours of service");
-        responseWindow.text("< 1 hour response");
-        overage.text("Additional hours $32 / hour")
-        break;
-      case "hi":
-        name.text("Executive");
-        price.text("$1499 / month");
-        hours.text("58 hours of service");
-        responseWindow.text("< 1 hour response");
-        overage.text("Additional hours $30 / hour")
-        break;
-      case "employee":
-        price.text("Free");
-        break;
-     }
+    var plan = Plan.getPlan(planId);
+    name.text(plan.name);
+    description.html(plan.description);
+    price.text(plan.price);
 
     return view;
   }
@@ -539,26 +515,15 @@ module Esper.AccountTab {
       </div>
       <div #content>
         <div class="membership-options row clearfix">
-          <div class="col-sm-4">
-            <div #planLo class="membership-option"/>
+          <div class="col-sm-6">
+            <div #planBasic class="membership-option"/>
           </div>
-          <div class="col-sm-4">
-            <div #planMed class="membership-option"/>
-          </div>
-          <div class="col-sm-4">
-            <div #planHi class="membership-option"/>
+          <div class="col-sm-6">
+            <div #planPro class="membership-option"/>
           </div>
           <div #planXWrapper class="col-sm-12 hide">
             <div #planX class="membership-option"/>
           </div>
-        </div>
-        <div class="membership-modal-check">
-          <input id="no-esper" #noEsper type="checkbox" />
-          <input #noEsperFake type="checkbox" checked="1" disabled="1" />
-          <label for="no-esper">
-            Use a custom e-mail address for your assistant
-            <span #noEsperPrice></span>
-          </label>
         </div>
       </div>
       <div class="modal-footer">
@@ -581,13 +546,12 @@ module Esper.AccountTab {
       .appendTo(iconContainer);
     Svg.loadImg(icon, "/assets/img/membership.svg");
 
+    // Map of planId to jQuery elms
+    var elmMap: { [index: string]: JQuery } = {};
+    elmMap[Plan.Basic.id] = planBasic;
+    elmMap[Plan.Pro.id] = planPro;
+
     var teamid = team.teamid;
-    var planElmPairs = [
-      { elm: planLo, planId: Plan.lo },
-      { elm: planMed, planId: Plan.med },
-      { elm: planHi, planId: Plan.hi },
-      { elm: planX, planId: Plan.employee }
-    ];
 
     /*
       Employee plan is only shown to admins and to users already under
@@ -601,11 +565,10 @@ module Esper.AccountTab {
       .done(initModal);
 
     function initModal(customerStatus) {
-      var membershipPlan = customerStatus.plan;
+      var membershipPlanId = customerStatus.plan;
       var membershipStatus = customerStatus.status &&
         customerStatus.status.toLowerCase();
-      var selectedPlanId = membershipPlan;
-      noEsperFake.hide();
+      var selectedPlanId = membershipPlanId;
 
       if (! membershipStatus) {
         content.prepend(`<div class="membership-modal-note alert alert-warning">
@@ -613,31 +576,26 @@ module Esper.AccountTab {
         </div>`);
         suspendBtn.hide();
       }
-      else if (membershipPlan === Plan.canceled) {
+      else if (membershipPlanId === Plan.Canceled.id) {
         content.prepend(`<div class="membership-modal-note alert alert-warning">
           Select a membership option below to reactivate your account.
         </div>`);
         suspendBtn.hide();
       }
-      else if (membershipPlan && !Plan.isActive(membershipPlan)) {
-        var cutOffDate = moment("2015-09-18");
-        var formatEndDate = "your next billing cycle following " +
-           cutOffDate.format("MMMM D, YYYY");;
-        if (customerStatus.current_period_end) {
-          var endDate = moment(customerStatus.current_period_end);
-          if ((endDate) < cutOffDate) {
-            endDate = endDate.add(1, 'month');
-          }
-          formatEndDate = endDate.format("MMMM D, YYYY");
-        }
+      else if (membershipPlanId && !Plan.isActive(membershipPlanId)) {
         content.prepend(
           $(`<div class="membership-modal-note alert alert-warning">
             We've updated our pricing. Please select a new membership option.
             <br />
-            Your old subscription will remain valid through ${formatEndDate}.
-            <br />If
-            you have not selected a new membership option by that time, you will
-            be downgraded to our new Flexible Membership.
+            Your old subscription will remain valid through your next billing
+            cycle.
+          </div>`));
+      }
+      else if (membershipPlanId && !Plan.isStandard(membershipPlanId)) {
+        content.prepend(
+          $(`<div class="membership-modal-note alert alert-warning">
+            You are on a custom plan. Selecting one of the plans below will
+            override your current plan settings.
           </div>`));
       }
       else if (membershipStatus === "trialing") {
@@ -680,70 +638,35 @@ module Esper.AccountTab {
 
       // Update DOM with selectedPlanId
       function selectPlan() {
-        let pair = List.find(planElmPairs, function(pair) {
-          return (pair.planId === selectedPlanId ||
-            Plan.plusPlans[pair.planId] === selectedPlanId);
-        });
-        if (pair) {
-          selectMembership(pair.elm);
-          noEsperFake.hide();
-          noEsper.show();
-
-          // If Plan is a "plus" plan
-          if (Plan.isPlus(selectedPlanId)) {
-            noEsper.prop("checked", true);
-          }
-          // If there is no "plus" option
-          else if (!Plan.plusPlans[selectedPlanId]) {
-            noEsper.hide();
-            noEsperFake.show();
-          }
-
-          // Update noEsperPrice text
-          switch (pair.planId) { // Use the base plan, not the plus
-            case Plan.lo:
-              noEsperPrice.text("for $49 / month");
-              break;
-            default:
-              noEsperPrice.text("- included");
-          }
-        } else {
+        var elm = elmMap[selectedPlanId];
+        if (! elm) {
           Log.e("Unknown plan type: ", selectedPlanId);
+          return;
         }
+        selectMembership(elm);
       }
 
       function selectMembership(option) {
         primaryBtn.prop("disabled", false);
-        List.iter(planElmPairs, function(pair) {
-          pair.elm.removeClass("selected");
+        _.each(elmMap, function(elm) {
+          elm.removeClass("selected");
         });
         option.addClass("selected");
-        noEsper.removeClass("hide");
       }
 
-      function readCheckBox() {
-        var checked = noEsper.prop("checked");
-        if (checked) {
-          var plusPlan = Plan.plusPlans[selectedPlanId];
-          if (plusPlan) {
-            selectedPlanId = plusPlan;
-          }
-        }
-      }
-
-      List.iter(planElmPairs, function(pair) {
-        pair.elm.click(function() {
-          selectedPlanId = pair.planId;
+      _.each(elmMap, function(elm, planId) {
+        elm.click(function() {
+          selectedPlanId = planId;
           selectPlan();
         });
-        pair.elm.append(viewOfMembershipOption(pair.planId));
+
+        elm.append(viewOfMembershipOption(planId));
       });
 
       primaryBtn.click(function() {
         $(".next-step-button").prop("disabled", false);
         primaryBtn.prop('disabled', true);
         primaryBtn.text('Updating');
-        readCheckBox();
         Log.d("Selected plan ID: " + selectedPlanId);
         if (selectedPlanId) {
           let setSub = function() {
@@ -862,9 +785,9 @@ module Esper.AccountTab {
 
     Api.getSubscriptionStatus(teamid)
       .done(function(customerStatus) {
-        memPlan.append(Plan.classNameOfPlan(customerStatus.plan));
-        if (customerStatus.plan === Plan.canceled) {
-          memStatus.append("Canceled");
+        var plan = Plan.getPlan(customerStatus.plan);
+        if (plan) {
+          memPlan.append(plan.name);
         } else {
           memStatus.append(customerStatus.status);
         }
@@ -918,15 +841,15 @@ module Esper.AccountTab {
   </div>
   <div class="membership-col center">
     <div><a #changeName class="link">Change display name</a></div>
-    <!-- <div class="clearfix">
+    <div class="clearfix">
       <a #changeMembership class="link" style="float:left">Change membership</a>
       <span #membershipBadge class="membership-badge"/>
     </div>
-    <div><a #changePayment class="link">Add payment method</a></div> -->
+    <div><a #changePayment class="link">Add payment method</a></div>
   </div>
-  <!-- <div class="membership-col right">
+  <div class="membership-col right">
     <div><a #cardInfo class="link">View card information</a></div>
-  </div> -->
+  </div>
 </div>
 '''
     var teamid = team.teamid;
@@ -949,56 +872,62 @@ module Esper.AccountTab {
       nameModal.displayName.click();
     });
 
-    // var cardModal = showCardModal(team);
-    // cardInfo.click(function() {
-    //   (<any> cardModal.modal).modal();
-    // });
+    var cardModal = showCardModal(team);
+    cardInfo.click(function() {
+      (<any> cardModal.modal).modal();
+    });
 
     var execUid = team.team_executive;
 
-    // Api.getSubscriptionStatus(teamid)
-    //   .done(updateStatus);
+    Api.getSubscriptionStatus(teamid)
+      .done(updateStatus);
 
-    // function updateStatus(customer) {
-    //   var mem = customer.status && customer.status.toLowerCase();
-    //   var plan = customer.plan;
+    function updateStatus(customer) {
+      var mem = customer.status && customer.status.toLowerCase();
+      var planId = customer.plan;
 
-    //   if (plan === Plan.canceled || mem === 'canceled') {
-    //     membershipBadge.text("CANCELED");
-    //     membershipBadge.addClass("suspended");
-    //   }
+      if (planId === Plan.Canceled.id || mem === 'canceled') {
+        membershipBadge.text("CANCELED");
+        membershipBadge.addClass("suspended");
+      }
 
-    //   else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
-    //     membershipBadge.text("SUSPENDED");
-    //     membershipBadge.addClass("suspended");
-    //   }
+      else if (mem == "Unpaid" || mem == "Past_due" || mem == "Canceled") {
+        membershipBadge.text("SUSPENDED");
+        membershipBadge.addClass("suspended");
+      }
 
-    //   else if (! mem) {
-    //     membershipBadge.text("NONE");
-    //     membershipBadge.addClass("suspended");
-    //   }
+      else if (! mem) {
+        membershipBadge.text("NONE");
+        membershipBadge.addClass("suspended");
+      }
 
-    //   else if (! Plan.isActive(plan)) {
-    //     membershipBadge.text("EXPIRING");
-    //     membershipBadge.addClass("suspended");
-    //   }
+      else if (! Plan.isActive(planId)) {
+        membershipBadge.text("EXPIRING");
+        membershipBadge.addClass("suspended");
+      }
 
-    //   // Membership must be trialing or active to get here
-    //   else if (mem === "trialing") {
-    //     membershipBadge.text("TRIALING");
-    //     membershipBadge.addClass("active");
-    //   }
+      else if (! Plan.isStandard(planId)) {
+        membershipBadge.text("CUSTOM");
+        membershipBadge.addClass("active");
+      }
 
-    //   else { // active
-    //     membershipBadge.text(Plan.classNameOfPlan(plan).toUpperCase());
-    //     membershipBadge.addClass("active");
-    //   }
+      // Membership must be trialing or active to get here
+      else if (mem === "trialing") {
+        membershipBadge.text("TRIALING");
+        membershipBadge.addClass("active");
+      }
 
-    //   changeMembership.click(function() { showMembershipModal(team); });
-    //   changePayment.click(function() {
-    //     showPaymentModal("Change", team, null)
-    //   });
-    // }
+      else { // active
+        var plan = Plan.getPlan(planId);
+        membershipBadge.text(plan ? plan.name.toUpperCase() : "CUSTOM");
+        membershipBadge.addClass("active");
+      }
+
+      changeMembership.click(function() { showMembershipModal(team); });
+      changePayment.click(function() {
+        showPaymentModal("Change", team, null)
+      });
+    }
 
     return view;
   }
