@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Esper</title>
+    <script type="text/javascript">
+      /*
+        Purpose of this page is to enable cross-domain analytics tracking of
+        anonymous users. Mixpanel and Segment may have cookies or other
+        domain-specific variables stored that link the current logged in
+        user to an anonymous or distinct id, so we need to open a page under
+        the esper.com domain to properly track.
+
+        Page should be called with a writeKey query param specifying the
+        proper Segment key to use.
+
+        Once opened, the page will use window.post to post a message to the
+        parent or opener to notify that the script is ready. Window requesting
+        analytics to be sent should respond by posting a response in the
+        following form:
+
+        {
+          sender: "Esper",
+          type: "Analytics",
+          value: {
+            page: "...",    // Name of page to track using analytics.page
+            category: "..." // Optional page category
+            event: "..."    // Event to track using analytics.track. Mutually
+                            // exclusive with the page param
+
+            // Additional properties to send with page or track call
+            properties: { ... }
+          }
+        }
+      */
+
+      // Load Analytics.js
+      /* jshint ignore:start */
+      !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","page","once","off","on"];analytics.factory=function(t){return function(){var e=Array.prototype.slice.call(arguments);e.unshift(t);analytics.push(e);return analytics}};for(var t=0;t<analytics.methods.length;t++){var e=analytics.methods[t];analytics[e]=analytics.factory(e)}analytics.load=function(t){var e=document.createElement("script");e.type="text/javascript";e.async=!0;e.src=("https:"===document.location.protocol?"https://":"http://")+"cdn.segment.com/analytics.js/v1/"+t+"/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};analytics.SNIPPET_VERSION="3.1.0";
+      }}();
+      /* jshint ignore:end */
+
+      /* jshint browser: true */
+      /* global analytics: true */
+      (function() {
+        "use strict";
+
+        // Load the specified Segment write key
+        function getParameterByName(name) {
+          name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+          var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+              results = regex.exec(window.location.search);
+          return (results === null ? "" :
+            decodeURIComponent(results[1].replace(/\+/g, " ")));
+        }
+        analytics.load(getParameterByName("writeKey"));
+
+        // Listen for message to post analytics to Segment
+        window.addEventListener("message", function(ev) {
+          if (ev.data && ev.data.sender === "Esper" &&
+              ev.data.type === "Analytics") {
+            var val = ev.data.value;
+
+            var page = val.page;
+            var category = val.category;
+            var event = val.event;
+            var props = val.properties || {};
+
+            // To filter out possible weirdness with non-Esper sites calling
+            // this page
+            props.analyticsCaller = ev.origin;
+
+            if (page) {
+              if (category) {
+                analytics.page(category, page, props);
+              }
+              analytics.page(page, props);
+            }
+
+            else if (event) {
+              analytics.track(event, props);
+            }
+          }
+        });
+
+        /*
+          Notify parent or opener window that we're good to go.
+        */
+        var windowObj = window.opener || window.parent;
+        if (windowObj && windowObj !== window) {
+          windowObj.postMessage({
+            sender: "Esper Analytics",
+            type: "Ready"
+          }, "*");
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+  </body>
+</html>
