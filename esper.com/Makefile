@@ -21,6 +21,10 @@ prod:
 s3: prod
 	./s3-install
 
+# Setup is actually in parent directory
+setup:
+	cd .. && npm install
+
 clean:
 	rm -f *~ */*~
 	gulp clean
