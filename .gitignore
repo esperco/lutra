@@ -1,2 +1,6 @@
+.DS_Store
+*~
+pub
 node_modules
+*.log
 

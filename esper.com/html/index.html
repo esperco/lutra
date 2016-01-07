@@ -1,34 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Esper</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" href="css/bootstrap.css" media"screen">
-<link rel="stylesheet" href="css/default.css" media="screen">
-<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-<link rel="stylesheet" href="css/animate.min.css">
-<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-<link rel="icon" href="img/favicon.ico" type="image/x-icon">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<script src="js/global.js"></script>
-</head>
+{% extends "_base.html" %}
 
-<!-- Navbar -->
-<div class="navbar-container"></div>
-<ul class="nav-menu"></ul>
-
+{% block main %}
 <!-- Splash -->
-<body>
 <div class="splash-content large" style="background-image:url(img/splash_home.jpg)">
   <div class="splash-text-container" align="center">
     <div class="splash-text" style="padding-bottom: 30px">
       <h1 style="padding-bottom: 30px"><b>Make time great again.</b></h1>
-      <h2 class="splash-text-subheader" style="font-size:24px">View your calendar breakdown. Get actionable insights.</h2>
+      <h2 class="splash-text-subheader" style="font-size:24px">
+      View your calendar breakdown. Get actionable insights.</h2>
     </div>
      <a href="https://time.esper.com">
       <button class="button-primary index green">
@@ -69,8 +48,11 @@
       <img src="img/TimeStats_gif.gif">
     </div>
     <div class="feature-text left-col">
-      <h3 class="section-title" style="margin-top: 0px;">Categorize calendar events.</h3>
-      <p>Take the hassle out of time tracking. Esper lets you quickly label your calendar events and assign the semantic meaning missing from your calendar.</p><br>
+      <h3 class="section-title" style="margin-top: 0px;">
+        Categorize calendar events.</h3>
+      <p>Take the hassle out of time tracking. Esper lets you quickly label
+      your calendar events and assign the semantic meaning missing from your
+      calendar.</p><br>
       <a href="https://time.esper.com">
         <center><button class="button-primary green index">
           Try it free</i></center>
@@ -80,7 +62,7 @@
   </div>
 </div>
 
-<!-- Built-in Organization 
+<!-- Built-in Organization
 <a name="learn"></a>
 <div class="section-container gray">
   <div class="section-content narrow index">
@@ -95,8 +77,11 @@
       <img src="img/stacked_bar_chart.png">
     </div>
     <div class="feature-text right-col">
-      <h3 class="section-title" style="margin-top: 0px;">View your calendar breakdown.</h3>
-      <p>Get a visual representation of how you spend your time. Transform your calendar into sleek charts using your own categories. Stop using spreadsheets to chart your data. We'll do it for you.</p><br>
+      <h3 class="section-title" style="margin-top: 0px;">View your calendar
+      breakdown.</h3>
+      <p>Get a visual representation of how you spend your time. Transform your
+      calendar into sleek charts using your own categories. Stop using
+      spreadsheets to chart your data. We'll do it for you.</p><br>
       <a href="https://time.esper.com">
         <center><button class="button-primary green index">
           Try it free</i>
@@ -113,8 +98,11 @@
       <img src="img/pie_chart.png">
     </div>
     <div class="left-col feature-text">
-       <h3 class="section-title" style="margin-top: 0px;">Gain actionable insights.</h3>
-      <p>Request custom reports to identify time sinks, see trends, and make smart scheduling decisions. We'll help you understand where the hours went and how to get them back.</p><br>
+       <h3 class="section-title" style="margin-top: 0px;">
+        Gain actionable insights.</h3>
+      <p>Request custom reports to identify time sinks, see trends, and make
+      smart scheduling decisions. We'll help you understand where the hours
+      went and how to get them back.</p><br>
       <a href="https://time.esper.com">
         <center><button class="button-primary green index">
           Try it free</i>
@@ -124,7 +112,7 @@
   </div>
 </div>
 
-<!-- Feature 4 
+<!-- Feature 4
 <div class="section-container gray">
   <div class="feature-container">
     <div class="feature-image right-col">
@@ -143,19 +131,23 @@
 </div>
 -->
 
-<!-- Streamlined Communication 
+<!-- Streamlined Communication
 <div class="section-container">
   <div class="section-content narrow index">
     <h3 class="section-title">STREAMLINED COMMUNICATION</h3>
   </div>
 </div>-->
 
-<!-- Feature 5 
+<!-- Feature 5
 <div class="section-container">
   <div class="feature-container">
     <div class="feature-text-left-col-small">
       <h3 class="section-title">Esper Executive iOS App.</h3>
-      <p>With the Esper Executive App, Executives can send new tasks, answer questions with a single touch, and receive all the context needed before each meeting. Best of all, the Esper Executive App dovetails directly with Esper for Executive Assistants into one cohesive communication system for your team.</p><br>
+      <p>With the Esper Executive App, Executives can send new tasks, answer
+      questions with a single touch, and receive all the context needed before
+      each meeting. Best of all, the Esper Executive App dovetails directly
+      with Esper for Executive Assistants into one cohesive communication
+      system for your team.</p><br>
       <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
         <button class="button-primary green index">
           Get Started</i>
@@ -168,12 +160,14 @@
   </div>
 </div>-->
 
-<!-- Feature 6 
+<!-- Feature 6
 <div class="section-container">
   <div class="feature-container">
     <div class="feature-text-right-col-small">
       <h3 class="section-title">Esper Agenda Keeps You Connected.</h3>
-      <p>With Esper Agenda, quickly draft agendas so everyone knows where they are supposed to be. Schedule daily agendas to automatically be sent or edit first and then send it along.</p><br>
+      <p>With Esper Agenda, quickly draft agendas so everyone knows where they
+      are supposed to be. Schedule daily agendas to automatically be sent or
+      edit first and then send it along.</p><br>
       <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
         <button class="button-primary green index">
           Get Started</i>
@@ -191,7 +185,10 @@
 <!-- <div class="section-containeri">
   <div class="section-content narrow">
     <h3 class="section-title">THE GOLD STANDARD</h3>
-    <p>We're endlessly committed to improving your productivity. Our service was designed using the industry's best practices, and we're raising the bar even higher by integrating new insights from our users. We not only strive to create better software, but also a better human experience.</p>
+    <p>We're endlessly committed to improving your productivity. Our service
+    was designed using the industry's best practices, and we're raising the bar
+    even higher by integrating new insights from our users. We not only strive
+    to create better software, but also a better human experience.</p>
   </div>
 </div> -->
 
@@ -204,24 +201,32 @@
 		<div class="col-sm-4">
 			<center><img src="img/janelle_headshot.png"></center>
 			<h3><span class="attribution">- Janelle, Code for America</span></h3>
-			<center><p><i>“I no longer have to waste time searching through email threads for important information because everything I need is all in one place!”</i></p></center>
+			<center><p><i>“I no longer have to waste time searching through email
+      threads for important information because everything I need is all in
+      one place!”</i></p></center>
 		</div>
 			-->
 		<div class="col-sm-6">
 			<center><img src="img/laurel_headshot.png"></center>
 			<h3><span class="attribution">- Laurel, UserVoice</span></h3>
-			<center><p><i>“Esper is a must-have tool for any executive assistant looking to streamline their workflow for scheduling and calendar management.”</i></p></center>
+			<center><p><i>“Esper is a must-have tool for any executive assistant
+      looking to streamline their workflow for scheduling and calendar
+      management.”</i></p></center>
 		</div>
 		<div class="col-sm-6">
 			<center><img src="img/brandi_headshot.png"></center>
 			<h3><span class="attribution">- Brandi, Dropbox</span></h3>
-			<center><p><i>“It gives the EA the metrics and charts they need to develop a narrative about how his/her lead spends their time...Numbers don't lie!”</i></p></center>
+			<center><p><i>“It gives the EA the metrics and charts they need to
+      develop a narrative about how his/her lead spends their time
+      &hellip; Numbers don't lie!”</i></p></center>
 		</div>
 		<!--
 		<div class="col-sm-4">
 			<center><img src="img/alex_headshot.png"></center>
 			<h3><span class="attribution">- Alex, Kiip</span></h3>
-			<center><p><i>“We have 4 offices in 3 different time zones. With Esper I can see the schedules of each office head, color coded, in their local time all in one place.”</i></p></center>
+			<center><p><i>“We have 4 offices in 3 different time zones. With Esper I
+      can see the schedules of each office head, color coded, in their local
+      time all in one place.”</i></p></center>
 		</div>
 			-->
 	</div>
@@ -229,7 +234,8 @@
 
 <div class="section-container dark">
   <div class="section-content narrow">
-    <h2 class="splash-text-subheader" style="color:white;font-style:italic">Maximize your productivity with Esper.</h2>
+    <h2 class="splash-text-subheader" style="color:white;font-style:italic">
+      Maximize your productivity with Esper.</h2>
     <h2></h2>
     <h2></h2>
     <a href="https://time.esper.com">
@@ -245,33 +251,4 @@
     </a>
   </div>
 </div>
-
-
-
-<!-- Footer -->
-<div class="footer-container"></div>
-
-<!-- begin olark code -->
-<script data-cfasync="false" type='text/javascript'>/*<![CDATA[*/window.olark||(function(c){var f=window,d=document,l=f.location.protocol=="https:"?"https:":"http:",z=c.name,r="load";var nt=function(){
-f[z]=function(){
-(a.s=a.s||[]).push(arguments)};var a=f[z]._={
-},q=c.methods.length;while(q--){(function(n){f[z][n]=function(){
-f[z]("call",n,arguments)}})(c.methods[q])}a.l=c.loader;a.i=nt;a.p={
-0:+new Date};a.P=function(u){
-a.p[u]=new Date-a.p[0]};function s(){
-a.P(r);f[z](r)}f.addEventListener?f.addEventListener(r,s,false):f.attachEvent("on"+r,s);var ld=function(){function p(hd){
-hd="head";return["<",hd,"></",hd,"><",i,' onl' + 'oad="var d=',g,";d.getElementsByTagName('head')[0].",j,"(d.",h,"('script')).",k,"='",l,"//",a.l,"'",'"',"></",i,">"].join("")}var i="body",m=d[i];if(!m){
-return setTimeout(ld,100)}a.P(1);var j="appendChild",h="createElement",k="src",n=d[h]("div"),v=n[j](d[h](z)),b=d[h]("iframe"),g="document",e="domain",o;n.style.display="none";m.insertBefore(n,m.firstChild).id=z;b.frameBorder="0";b.id=z+"-loader";if(/MSIE[ ]+6/.test(navigator.userAgent)){
-b.src="javascript:false"}b.allowTransparency="true";v[j](b);try{
-b.contentWindow[g].open()}catch(w){
-c[e]=d[e];o="javascript:var d="+g+".open();d.domain='"+d.domain+"';";b[k]=o+"void(0);"}try{
-var t=b.contentWindow[g];t.write(p());t.close()}catch(x){
-b[k]=o+'d.write("'+p().replace(/"/g,String.fromCharCode(92)+'"')+'");d.close();'}a.P(2)};ld()};nt()})({
-loader: "static.olark.com/jsclient/loader0.js",name:"olark",methods:["configure","extend","declare","identify"]});
-/* custom configuration goes here (www.olark.com/documentation) */
-olark.identify('3423-184-10-1239');/*]]>*/</script><noscript><a href="https://www.olark.com/site/3423-184-10-1239/contact" title="Contact us" target="_blank">Questions? Feedback?</a> powered by <a href="http://www.olark.com?welcome" title="Olark live chat software">Olark live chat software</a></noscript>
-<!-- end olark code -->
-
-</body>
-</html>
-
+{% endblock %}

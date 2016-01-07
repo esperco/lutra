@@ -1,0 +1,20 @@
+<html>
+  <head>
+    <title>Esper</title>
+    <script type="text/javascript">
+      /* globals redirect: true */
+      redirect = "{% block redirect %}http://esper.com/{% endblock %}";
+      window.location = redirect;
+    </script>
+  </head>
+  <body style="background:#FEFBFF">
+    Loading &hellip;
+    <script type="text/javascript">
+      /* jshint strict: false */
+      /* jshint browser: true */
+      /* globals redirect: false */
+      document.body.innerHTML = "If you are redirected within 5 seconds," +
+        "please click <a href=\"" + redirect + "\">here</a>.";
+    </script>
+  </body>
+</html>

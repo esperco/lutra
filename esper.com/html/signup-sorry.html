@@ -1,61 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Sign Up | Esper</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-<link rel="stylesheet" href="css/default.css" media="screen">
-<link rel="stylesheet" href="css/animate.min.css">
-<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-<link rel="icon" href="img/favicon.ico" type="image/x-icon">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<script src="js/global.js"></script>
+{% extends "_base.html" %}
 
-</head>
+{% block title %}Sign Up | Esper{% endblock %}
 
-<body>
+{% block main %}
+  <div class="splash-content splash-purple fullscreen">
+    <div class="splash-navbar clearfix"></div>
+    <div class="container">
+      <h2>Thank you for your interest!</h2><br>
+      <div>
+        We've put you on our mailing list and will contact you as soon as we can
+        support your mail client.<br /><br />
+        <b>Please confirm through the email we just sent you that this is
+        okay.</b><br /><br />
 
-<!-- Navbar -->
-<div class="navbar-container"></div>
-<ul class="nav-menu"></ul>
-
-<!-- Splash -->
-
-<div class="splash-content splash-purple fullscreen">
-  <div class="splash-navbar clearfix"></div>
-  <div class="container">
-    <h2>Thank you for your interest!</h2><br>
-    <div>
-      We've put you on our mailing list and will contact you as soon as we can
-      support your mail client.<br /><br />
-      <b>Please confirm through the email we just sent you that this is
-      okay.</b><br /><br />
-
-      In the mean time, feel free to visit the rest of our site or email us at
-      <b><a href="mailto:support@esper.com">support@esper.com</a></b> if you
-      have any questions.<br /><br />
+        In the mean time, feel free to visit the rest of our site or email us at
+        <b><a href="mailto:support@esper.com">support@esper.com</a></b> if you
+        have any questions.<br /><br />
 
 
-      Yours gratefully,<br />
-      Team Esper
+        Yours gratefully,<br />
+        Team Esper
+      </div>
+
     </div>
-
   </div>
-</div>
-</div>
-
-
-</div>
-<!-- Footer -->
-<div class="footer-container"></div>
-
-</body>
-</html>
-
+{% endblock %}
 

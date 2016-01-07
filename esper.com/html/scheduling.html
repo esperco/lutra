@@ -1,240 +1,190 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Esper</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" href="css/bootstrap.css" media"screen">
-<link rel="stylesheet" href="css/default.css" media="screen">
-<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-<link rel="stylesheet" href="css/animate.min.css">
-<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-<link rel="icon" href="img/favicon.ico" type="image/x-icon">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
-<script src="js/global.js"></script>
-</head>
+{% extends "_base.html" %}
 
-<!--Note for Andrew Fong: For the new fixed navbar to look nice, navbar must be -before- the body section-->
-<!-- Navbar -->
-<div class="navbar-container"></div>
-<ul class="nav-menu"></ul>
+{% block title %}Scheduling | Esper{% endblock %}
 
-<!-- Splash -->
-<body>
-<div class="splash-content large" style="background-image:url(img/splash_discover.jpg)">
-  <div class="splash-text-container" align="center" >
-    <div class="splash-text" style="padding-bottom: 30px">
-      <h1 style="padding-bottom: 30px"><b>Take it to the next level</b></h1>
-      <h2 class="splash-text-subheader" style="font-size:24px">In addition try Esper Scheduling to become a pro user.</h2>
-    </div>
-     <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-      <button class="button-primary index green">
-       Try it free
-      </button>
-    </a>
-    <span class="xs-spacer"></span>
-    <!--<a href="index">
-      <button class="button-tertiary index">
-        Esper
-      </button>
-    </a> -->
-    <br/>
-    <br/>
-  </div>
-</div>
-
-<!-- Supercharge your inbox 
-<a name="learn"></a>
-<div class="section-container">
-  <div class="section-content narrow index">
-    <h3 class="section-title">SCHEDULING MADE EASY</h3>
-  </div>
-</div>
--->
-
-<!-- Feature 1 -->
-<div class="section-container">
-  <div class="feature-container">
-    <div class="feature-image right-col">
-      <img class="feature-image-small" src="img/SchedulingFlow_gif.gif">
-    </div>	  
-    <div class="feature-text left-col">
-      <h3 class="section-title">Your inbox. Your calendar. Synchronized.</h3>
-      <p>With Esper Calendaring, get an integrated view of your calendar within your inbox. Create, view, edit, and send invites directly from your email.</p><br>
-      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-        <center><button class="button-primary green index">
-          Try it free</i>
-        </button></center>
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Feature 2 -->
-<div class="section-container gray">
-  <div class="feature-container">
-    <div class="feature-image left-col">
-      <img class="feature-image-small" src="img/Feature_Scheduling.png">
-    </div>
-    <div class="feature-text right-col">
-      <h3 class="section-title">Don’t sweat the small stuff.</h3>
-      <p>Forget calculating time zones, writing routine emails, and remembering to send event reminders. Esper Scheduling tools put time zone conversions, one-click customizable email templates, and set-and-forget reminder emails at your fingertips. </p><br>
-      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-        <center><button class="button-primary green index">
-          Try it free</i></center>
+{% block main %}
+  <div class="splash-content large" style="background-image:url(img/splash_discover.jpg)">
+    <div class="splash-text-container" align="center" >
+      <div class="splash-text" style="padding-bottom: 30px">
+        <h1 style="padding-bottom: 30px"><b>Take it to the next level</b></h1>
+        <h2 class="splash-text-subheader" style="font-size:24px">In addition try Esper Scheduling to become a pro user.</h2>
+      </div>
+       <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+        <button class="button-primary index green">
+         Try it free
         </button>
       </a>
-    </div>
-  </div>
-</div>
-
-<!-- Built-in Organization 
-<a name="learn"></a>
-<div class="section-container gray">
-  <div class="section-content narrow index">
-    <h3 class="section-title">BUILT-IN ORGANIZATION</h3>
-  </div>
-</div>
--->
-
-<!-- Feature 3 -->
-<div class="section-container">
-  <div class="feature-container">
-    <div class="feature-image right-col">
-      <img class="feature-image-small" src="img/Feature_TaskNotes.png">
-    </div>	  
-    <div class="feature-text left-col">
-      <h3 class="section-title">Private Notes Right In Your Inbox.</h3>
-      <p>No need to search long email threads or switch between screens for context. Esper Task Notes let you save critical information inside your email.</p><br>
-      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-        <center><button class="button-primary green index">
-          Try it free</i></center>
+      <span class="xs-spacer"></span>
+      <!--<a href="index">
+        <button class="button-tertiary index">
+          Esper
         </button>
-      </a>
+      </a> -->
+      <br/>
+      <br/>
     </div>
   </div>
-</div>
 
-<!-- Feature 4 -->
-<div class="section-container gray">
-  <div class="feature-container">
-    <div class="feature-image left-col">
-      <img class="feature-image-small" src="img/Feature_TaskList.png">
-    </div>	  
-    <div class="feature-text right-col">
-      <h3 class="section-title">Always Know What Is On Your Plate.</h3>
-      <p>With Esper Task List, you always know what is going on. Task List compiles all of your work into one central list with the click of a button -- combining emails, calendar events, and Task Notes.</p><br>
+  <!-- Supercharge your inbox
+  <a name="learn"></a>
+  <div class="section-container">
+    <div class="section-content narrow index">
+      <h3 class="section-title">SCHEDULING MADE EASY</h3>
+    </div>
+  </div>
+  -->
+
+  <!-- Feature 1 -->
+  <div class="section-container">
+    <div class="feature-container">
+      <div class="feature-image right-col">
+        <img class="feature-image-small" src="img/SchedulingFlow_gif.gif">
+      </div>
+      <div class="feature-text left-col">
+        <h3 class="section-title">Your inbox. Your calendar. Synchronized.</h3>
+        <p>With Esper Calendaring, get an integrated view of your calendar within your inbox. Create, view, edit, and send invites directly from your email.</p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i>
+          </button></center>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 2 -->
+  <div class="section-container gray">
+    <div class="feature-container">
+      <div class="feature-image left-col">
+        <img class="feature-image-small" src="img/Feature_Scheduling.png">
+      </div>
+      <div class="feature-text right-col">
+        <h3 class="section-title">Don’t sweat the small stuff.</h3>
+        <p>Forget calculating time zones, writing routine emails, and remembering to send event reminders. Esper Scheduling tools put time zone conversions, one-click customizable email templates, and set-and-forget reminder emails at your fingertips. </p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i></center>
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Built-in Organization
+  <a name="learn"></a>
+  <div class="section-container gray">
+    <div class="section-content narrow index">
+      <h3 class="section-title">BUILT-IN ORGANIZATION</h3>
+    </div>
+  </div>
+  -->
+
+  <!-- Feature 3 -->
+  <div class="section-container">
+    <div class="feature-container">
+      <div class="feature-image right-col">
+        <img class="feature-image-small" src="img/Feature_TaskNotes.png">
+      </div>
+      <div class="feature-text left-col">
+        <h3 class="section-title">Private Notes Right In Your Inbox.</h3>
+        <p>No need to search long email threads or switch between screens for context. Esper Task Notes let you save critical information inside your email.</p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i></center>
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 4 -->
+  <div class="section-container gray">
+    <div class="feature-container">
+      <div class="feature-image left-col">
+        <img class="feature-image-small" src="img/Feature_TaskList.png">
+      </div>
+      <div class="feature-text right-col">
+        <h3 class="section-title">Always Know What Is On Your Plate.</h3>
+        <p>With Esper Task List, you always know what is going on. Task List compiles all of your work into one central list with the click of a button -- combining emails, calendar events, and Task Notes.</p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i>
+          </button></center>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Streamlined Communication
+  <div class="section-container">
+    <div class="section-content narrow index">
+      <h3 class="section-title">STREAMLINED COMMUNICATION</h3>
+    </div>
+  </div>
+  -->
+
+  <!-- Feature 5 -->
+  <div class="section-container">
+    <div class="feature-container">
+      <div class="feature-image right-col">
+        <img class="feature-image-small" src="img/Feature_ExecutiveApp.jpg">
+      </div>
+      <div class="feature-text left-col">
+        <h3 class="section-title">Esper Executive iOS App.</h3>
+        <p>With the Esper Executive App, Executives can send new tasks, answer questions with a single touch, and receive all the context needed before each meeting. Best of all, the Esper Executive App dovetails directly with Esper for Executive Assistants into one cohesive communication system for your team.</p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i>
+          </button></center>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feature 6 -->
+  <div class="section-container gray">
+    <div class="feature-container">
+      <div class="feature-image left-col">
+        <img class="feature-image-small" src="img/Feature_Agenda.png">
+      </div>
+      <div class="feature-text right-col">
+        <h3 class="section-title">Esper Agenda Keeps You Connected.</h3>
+        <p>With Esper Agenda, quickly draft agendas so everyone knows where they are supposed to be. Schedule daily agendas to automatically be sent or edit first and then send it along.</p><br>
+        <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
+          <center><button class="button-primary green index">
+            Try it free</i></center>
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- The Gold Standard -->
+  <!-- <div class="section-containeri">
+    <div class="section-content narrow">
+      <h3 class="section-title">THE GOLD STANDARD</h3>
+      <p>We're endlessly committed to improving your productivity. Our service was designed using the industry's best practices, and we're raising the bar even higher by integrating new insights from our users. We not only strive to create better software, but also a better human experience.</p>
+    </div>
+  </div> -->
+
+  <!--Waiting List -->
+  <div class="section-container dark">
+    <div class="section-content narrow">
+      <h2 class="splash-text-subheader" style="color:white;font-style:italic">Maximize your productivity with Esper.</h2>
+      <h2></h2>
+      <h2></h2>
       <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
         <center><button class="button-primary green index">
-          Try it free</i>
+         Try it free</i>
         </button></center>
       </a>
-    </div>
-  </div>
-</div>
-
-<!-- Streamlined Communication 
-<div class="section-container">
-  <div class="section-content narrow index">
-    <h3 class="section-title">STREAMLINED COMMUNICATION</h3>
-  </div>
-</div>
--->
-
-<!-- Feature 5 -->
-<div class="section-container">
-  <div class="feature-container">
-    <div class="feature-image right-col">
-      <img class="feature-image-small" src="img/Feature_ExecutiveApp.jpg">
-    </div>
-    <div class="feature-text left-col">
-      <h3 class="section-title">Esper Executive iOS App.</h3>
-      <p>With the Esper Executive App, Executives can send new tasks, answer questions with a single touch, and receive all the context needed before each meeting. Best of all, the Esper Executive App dovetails directly with Esper for Executive Assistants into one cohesive communication system for your team.</p><br>
-      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-        <center><button class="button-primary green index">
-          Try it free</i>
-        </button></center>
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Feature 6 -->
-<div class="section-container gray">
-  <div class="feature-container">
-    <div class="feature-image left-col">
-      <img class="feature-image-small" src="img/Feature_Agenda.png">
-    </div>	  
-    <div class="feature-text right-col">
-      <h3 class="section-title">Esper Agenda Keeps You Connected.</h3>
-      <p>With Esper Agenda, quickly draft agendas so everyone knows where they are supposed to be. Schedule daily agendas to automatically be sent or edit first and then send it along.</p><br>
-      <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-        <center><button class="button-primary green index">
-          Try it free</i></center>
+      <span class="xs-spacer"></span>
+      <!--<a href="request-demo">
+        <button class="button-tertiary index">
+          Request Demo
         </button>
-      </a>
+      </a>-->
     </div>
   </div>
-</div>
-
-
-<!-- The Gold Standard -->
-<!-- <div class="section-containeri">
-  <div class="section-content narrow">
-    <h3 class="section-title">THE GOLD STANDARD</h3>
-    <p>We're endlessly committed to improving your productivity. Our service was designed using the industry's best practices, and we're raising the bar even higher by integrating new insights from our users. We not only strive to create better software, but also a better human experience.</p>
-  </div>
-</div> -->
-
-<!--Waiting List -->
-<div class="section-container dark">
-  <div class="section-content narrow">
-    <h2 class="splash-text-subheader" style="color:white;font-style:italic">Maximize your productivity with Esper.</h2>
-    <h2></h2>
-    <h2></h2>
-    <a href="https://chrome.google.com/webstore/detail/esper/jabkchbdomjjlbahjdjemnnghkakfcog">
-      <center><button class="button-primary green index">
-       Try it free</i>
-      </button></center>
-    </a>
-    <span class="xs-spacer"></span>
-    <!--<a href="request-demo">
-      <button class="button-tertiary index">
-        Request Demo
-      </button>
-    </a>-->
-  </div>
-</div>
-
-
-
-<!-- Footer -->
-<div class="footer-container"></div>
-
-<!-- begin olark code -->
-<script data-cfasync="false" type='text/javascript'>/*<![CDATA[*/window.olark||(function(c){var f=window,d=document,l=f.location.protocol=="https:"?"https:":"http:",z=c.name,r="load";var nt=function(){
-f[z]=function(){
-(a.s=a.s||[]).push(arguments)};var a=f[z]._={
-},q=c.methods.length;while(q--){(function(n){f[z][n]=function(){
-f[z]("call",n,arguments)}})(c.methods[q])}a.l=c.loader;a.i=nt;a.p={
-0:+new Date};a.P=function(u){
-a.p[u]=new Date-a.p[0]};function s(){
-a.P(r);f[z](r)}f.addEventListener?f.addEventListener(r,s,false):f.attachEvent("on"+r,s);var ld=function(){function p(hd){
-hd="head";return["<",hd,"></",hd,"><",i,' onl' + 'oad="var d=',g,";d.getElementsByTagName('head')[0].",j,"(d.",h,"('script')).",k,"='",l,"//",a.l,"'",'"',"></",i,">"].join("")}var i="body",m=d[i];if(!m){
-return setTimeout(ld,100)}a.P(1);var j="appendChild",h="createElement",k="src",n=d[h]("div"),v=n[j](d[h](z)),b=d[h]("iframe"),g="document",e="domain",o;n.style.display="none";m.insertBefore(n,m.firstChild).id=z;b.frameBorder="0";b.id=z+"-loader";if(/MSIE[ ]+6/.test(navigator.userAgent)){
-b.src="javascript:false"}b.allowTransparency="true";v[j](b);try{
-b.contentWindow[g].open()}catch(w){
-c[e]=d[e];o="javascript:var d="+g+".open();d.domain='"+d.domain+"';";b[k]=o+"void(0);"}try{
-var t=b.contentWindow[g];t.write(p());t.close()}catch(x){
-b[k]=o+'d.write("'+p().replace(/"/g,String.fromCharCode(92)+'"')+'");d.close();'}a.P(2)};ld()};nt()})({
-loader: "static.olark.com/jsclient/loader0.js",name:"olark",methods:["configure","extend","declare","identify"]});
-/* custom configuration goes here (www.olark.com/documentation) */
-olark.identify('3423-184-10-1239');/*]]>*/</script><noscript><a href="https://www.olark.com/site/3423-184-10-1239/contact" title="Contact us" target="_blank">Questions? Feedback?</a> powered by <a href="http://www.olark.com?welcome" title="Olark live chat software">Olark live chat software</a></noscript>
-<!-- end olark code -->
-
-</body>
-</html>
+{% endblock %}
