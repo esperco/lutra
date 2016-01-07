@@ -1,0 +1,30 @@
+{#
+  This is the default base template used by all HTML pages. Defaults are
+  are intended for use in landing pages, but you can override pretty much
+  everything else via block extensions.
+
+#}<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Esper{% endblock %}</title>
+  {% block head %}
+    {% include "_head.html" %}
+  {% endblock %}
+</head>
+
+<body>{% block body %}
+  {% block header %}
+    {% include "_navbar.html" %}
+    {% include "_nav-menu.html" %}
+  {% endblock %}
+
+  {% block main %}{% endblock %}
+
+  {% block footer %}
+    {% include "_footer.html" %}
+  {% endblock %}
+
+  {% include "_olark.html" %}
+{% endblock %}</body>
+</html>
