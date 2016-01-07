@@ -1,14 +1,10 @@
-.PHONY: default install local-install s3 clean
+.PHONY: default install local-install s3 clean setup
 
 # Put gulp in path
 export PATH := ../node_modules/.bin:$(PATH)
 
 default: local-install
 install: s3
-
-# Install dependencies
-setup:
-	npm install
 
 # Copy public files into pub/
 local-install:
