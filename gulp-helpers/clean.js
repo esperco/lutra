@@ -1,21 +1,14 @@
 "use strict";
 /* Use to create tasks for cleaning out the pubDir for Gulp v4 */
 
-module.exports = function() {
-  var del = require("del"),
-      gulp = require("gulp");
+var del = require("del");
 
-  var exports = {};
+/*
+  Deletes a pub dir
 
-  /* Wipe out pubDir */
-  exports.clean = function(name, config) {
-    name = name || "clean";
-    return gulp.task(name, function(cb) {
-      del(config.pubDir, cb);
-    });
-  };
-
-  return exports;
+  pubDir: string - Pub directory to clean
+  cb: () => any - Callback for when task is complete
+*/
+module.exports = function(pubDir, cb) {
+  del(pubDir, cb);
 };
-
-

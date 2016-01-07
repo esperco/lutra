@@ -1,51 +1,63 @@
 "use strict";
-/* Use to create LESS-related tasks for Gulp v4 */
+/*  */
 
-module.exports = function() {
-  var _ = require("lodash"),
-      cached = require("gulp-cached"),
-      gulp = require("gulp"),
-      minify = require("gulp-minify-html"),
-      path = require("path"),
-      preprocess = require("gulp-preprocess");
+var data = require("gulp-data"),
+    deglob = require("./deglob"),
+    gulp = require("gulp"),
+    gutil = require("gulp-util"),
+    minify = require("gulp-minify-html"),
+    nunjucksRender = require("gulp-nunjucks-render"),
+    rename = require("gulp-rename"),
+    watch = require("./watch");
+/*
+  Compile HTML templates using nunjucks (Jinja) syntax
 
-  var exports = {};
+  globs: string[] - Paths to HTML globs
+  out: string - Pub dir
+  opts.data: any - Data to pass to nunjucks
+  opts.production: boolean - Production mode?
+*/
+module.exports = function(globs, out, opts) {
+  opts = opts || {};
+  if (! globs instanceof Array) {
+    globs = [globs];
+  }
 
-  // Returns HTML globs based on htmlDir(s) props in the config object
-  var getHtmlGlobs = function(config) {
-    var htmlDirs = config.htmlDirs || [config.htmlDir];
-    return _.map(htmlDirs, function(dir) {
-      return path.join(dir, "**/*.html");
-    });
-  };
+  // Pass search paths to nunjucks based on globs
+  var baseDirs = deglob(globs);
+  nunjucksRender.nunjucks.configure(baseDirs, {
+    watch: !!watch.watchMode
+  });
 
-  /* Minify HTML files and run pre-processor with config */
-  var buildName; // Set so watch-html can find
-  exports.build = function(name, config) {
-    buildName = name || "build-html";
-    var outDir = (config.htmlOutDir ?
-      path.join(config.pubDir, config.htmlOutDir): config.pubDir);
-    return gulp.task(buildName, function() {
-      var ret = gulp.src(getHtmlGlobs(config))
-        .pipe(cached(buildName))
-        .pipe(preprocess({context: config}));
-      if (config.production) {
-        ret = ret.pipe(minify());
-      }
-      return ret.pipe(gulp.dest(outDir));
-    });
-  };
+  // Don't create stand-alone files for partials. Nunjucks checks filesystem
+  // directly for partial resolution, so no need to filter mid-stream.
+  //
+  // Concat rather than push to avoid mutation
+  globs = globs.concat(["!**/_*.html"]);
 
-  // Watch HTML directory for changes
-  exports.watch = function(name, config) {
-    name = name || "watch-html";
-    return gulp.task(name, function(cb) {
-      gulp.watch(getHtmlGlobs(config), gulp.series(buildName));
-      cb();
-    });
-  };
+  var ret = gulp.src(globs)
+    .pipe(data(function() { return opts.data || {}; }))
+    .pipe(nunjucksRender()
+    .on("error", function(err) {
+      gutil.log(gutil.colors.red(err.name),
+        "in", err.fileName, ":", err.message);
+    }));
 
-  return exports;
+  if (opts.production) {
+    ret = ret.pipe(minify());
+  }
+
+  /*
+    Save file twice -- once with .html extension and once without. So long as
+    server specifies correct mime-type, end-user can access pages with or
+    without the .html extension. Ideally, we'd like to use redirects to
+    a canonical path, but this is a "good-enough" solution we can use with
+    "dumb" hosting solutions like Amazon S3.
+  */
+  return ret
+    .pipe(gulp.dest(out))
+    .pipe(rename({ extname: "" }))
+    .pipe(gulp.dest(out))
 };
 
 
