@@ -3,6 +3,7 @@
 // For helpers used by gulpfile
 module.exports = {
   assets: require("./assets"),
+  bundle: require("./bundle"),
   clean: require("./clean"),
   html: require("./html"),
   js: require("./js"),
@@ -11,6 +12,5 @@ module.exports = {
   setProduction: require("./production").set,
   test: require("./test"),
   typescript: require("./typescript"),
-  vendor: require("./vendor"),
   watch: require("./watch")
 };
