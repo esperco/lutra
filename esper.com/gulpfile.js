@@ -16,6 +16,10 @@ var config = {
   imgOut: "pub/img",
 
   jsGlobs: ["js/**/*.js"],
+  jsBundles: [
+    "bundles/react-simple-vendor.js",
+    "bundles/timestats-vendor.js"
+  ],
   jsOut: "pub/js",
 
   lessGlobs: ["css/**/*.less", "css/**/*.css"],
@@ -53,6 +57,16 @@ gulp.task("build-html", function() {
 
 gulp.task("watch-html", watch(config.htmlGlobs, "build-html"));
 
+gulp.task("build-bundles", function() {
+  return helpers.bundle(config.jsBundles, config.jsOut);
+});
+
+// NB: Watching Browserify bundles just means passing an extra boolean to
+// build step. Gulp's watcher is not required.
+gulp.task("watch-bundles", function() {
+  return helpers.bundle(config.jsBundles, config.jsOut, true);
+});
+
 gulp.task("server", function(cb) {
   return helpers.server(config.pubDir, cb, {
     port: config.serverPort,
@@ -62,6 +76,7 @@ gulp.task("server", function(cb) {
 
 gulp.task("build", gulp.parallel("build-html",
                                  "build-js",
+                                 "build-bundles",
                                  "build-less",
                                  "build-img"));
 
@@ -79,6 +94,7 @@ gulp.task("watch", gulp.series("clean", "build",
     "watch-html",
     "watch-img",
     "watch-js",
+    "watch-bundles",
     "watch-less"
   )
 ));
