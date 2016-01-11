@@ -7,6 +7,7 @@ var data = require("gulp-data"),
     gutil = require("gulp-util"),
     minify = require("gulp-minify-html"),
     nunjucksRender = require("gulp-nunjucks-render"),
+    production = require("./production"),
     rename = require("gulp-rename"),
     watch = require("./watch");
 /*
@@ -14,11 +15,9 @@ var data = require("gulp-data"),
 
   globs: string[] - Paths to HTML globs
   out: string - Pub dir
-  opts.data: any - Data to pass to nunjucks
-  opts.production: boolean - Production mode?
+  context: any - Data to pass to nunjucks
 */
-module.exports = function(globs, out, opts) {
-  opts = opts || {};
+module.exports = function(globs, out, context) {
   if (! globs instanceof Array) {
     globs = [globs];
   }
@@ -35,15 +34,19 @@ module.exports = function(globs, out, opts) {
   // Concat rather than push to avoid mutation
   globs = globs.concat(["!**/_*.html"]);
 
+  // Add production to context by default
+  context = context || {};
+  context.PRODUCTION = production.isSet();
+
   var ret = gulp.src(globs)
-    .pipe(data(function() { return opts.data || {}; }))
+    .pipe(data(function() { return context; }))
     .pipe(nunjucksRender()
     .on("error", function(err) {
       gutil.log(gutil.colors.red(err.name),
         "in", err.fileName, ":", err.message);
     }));
 
-  if (opts.production) {
+  if (production.isSet()) {
     ret = ret.pipe(minify());
   }
 

@@ -4,7 +4,7 @@
 // work with Gulp 3.x or below.
 var _ = require("lodash"),
     gulp = require("gulp"),
-    helpers = require("../gulp-helpers"),
+    helpers = require("../build-helpers/gulp"),
     watch = helpers.watch(gulp);
 
 /* Config vars */
@@ -27,24 +27,16 @@ var config = {
   liveReloadPort: 35729
 };
 
-// This var gets set to true by production task
-var production = false;
-
-
 /* Gulp tasks */
 
 gulp.task("build-less", function() {
-  return helpers.less(config.lessGlobs, config.lessOut, {
-    production: production
-  });
+  return helpers.less(config.lessGlobs, config.lessOut);
 });
 
 gulp.task("watch-less", watch(config.lessGlobs, "build-less"));
 
 gulp.task("build-js", function() {
-  return helpers.js(config.jsGlobs, config.jsOut, {
-    production: production
-  });
+  return helpers.js(config.jsGlobs, config.jsOut);
 });
 
 gulp.task("watch-js", watch(config.jsGlobs, "build-js"));
@@ -56,12 +48,7 @@ gulp.task("build-img", function() {
 gulp.task("watch-img", watch(config.imgGlobs, "build-img"));
 
 gulp.task("build-html", function() {
-  return helpers.html(config.htmlGlobs, config.htmlOut, {
-    production: production,
-    data: {
-      PRODUCTION: !!production
-    }
-  });
+  return helpers.html(config.htmlGlobs, config.htmlOut);
 });
 
 gulp.task("watch-html", watch(config.htmlGlobs, "build-html"));
@@ -82,10 +69,7 @@ gulp.task("clean", function(cb) {
   helpers.clean(config.pubDir, cb);
 });
 
-gulp.task("production", function(cb) {
-  production = true;
-  cb();
-});
+gulp.task("production", helpers.setProduction);
 
 gulp.task("build-production", gulp.series("production", "clean", "build"))
 
