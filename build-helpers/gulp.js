@@ -1,8 +1,6 @@
 "use strict";
 
-// For helpers we should use the gulp module installed by the requesting
-// package, not our own. Should be required with a referene to correct
-// gulp module
+// For helpers used by gulpfile
 module.exports = {
   assets: require("./assets"),
   clean: require("./clean"),
@@ -10,6 +8,7 @@ module.exports = {
   js: require("./js"),
   less: require("./less"),
   server: require("./server"),
+  setProduction: require("./production").set,
   test: require("./test"),
   typescript: require("./typescript"),
   vendor: require("./vendor"),

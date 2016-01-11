@@ -2,6 +2,7 @@
 var cached = require("gulp-cached"),
     gulp = require("gulp"),
     gutil = require("gulp-util"),
+    production = require("./production"),
     uglify = require("gulp-uglify");
 
 /*
@@ -10,11 +11,8 @@ var cached = require("gulp-cached"),
 
   src: string|string[] - source glob(s) (e.g "src/img/*.*")
   dest: string - pub dir (e.g. "pub/img")
-  opts.production: boolean - Production mode?
 */
-module.exports = function(src, dest, opts) {
-  opts = opts || {};
-
+module.exports = function(src, dest) {
   var ret = gulp.src(src)
     .pipe(cached(src, {
       // For static assets like images, cache MD5 rather than entire file
@@ -22,7 +20,7 @@ module.exports = function(src, dest, opts) {
     }));
 
   // Minimization
-  if (opts.production) {
+  if (production.isSet()) {
     ret = ret.pipe(uglify({
       output: {
         // Messing with unicode isn't fun

@@ -50,3 +50,27 @@ Once Node is properly installed, run `make setup`.
 See readme files from within the individual repos for instructions on building
 and deploying.
 
+
+Vendor Files
+------------
+We use NPM as our package manager because this works well with Browserify (we
+previously used Bower for some non-JS assets, but an increasing number of
+libraries are bundling non-JS assets in their NPM packages, so we're just 
+defaulting to using NPM).
+
+`npm install <package> --save` to add a new dependency. Depenencies are saved
+in `node_modules` (or via the symlink `vendor`).
+
+
+Typings
+-------
+TypeScript typings are installed via
+[TSD](https://github.com/DefinitelyTyped/tsd). To use, install TSD globally
+with `npm install tsd -g` or use the binary in the `node_modules/.bin`
+directory created after `make setup`.
+
+Do not modify d.ts files in `typings` directory directly. Modify
+typings in https://github.com/esperco/DefinitelyTyped (`tsd.json` is set
+to pull definitions from there instead of the official DefinitelyTyped repo).
+This makes it easier for us to merge upstream later if we want to open-source
+our definitions.

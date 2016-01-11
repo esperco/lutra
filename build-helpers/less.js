@@ -7,6 +7,7 @@ var _ = require("lodash"),
     less = require("gulp-less"),
     minifyCss = require("gulp-minify-css"),
     path = require("path"),
+    production = require("./production"),
     sourcemaps = require("gulp-sourcemaps");
 
 /*
@@ -15,11 +16,8 @@ var _ = require("lodash"),
 
   globs: string[] - Globs to LESS files
   out: string - Directory to output compiled CSS
-  opts.production: boolean - Production mode?
 */
-module.exports = function(globs, out, opts) {
-  opts = opts || {};
-
+module.exports = function(globs, out) {
   var partialFilter = filter(['*', '!_*.less']);
   var baseDirs = deglob(globs);
 
@@ -31,7 +29,7 @@ module.exports = function(globs, out, opts) {
     }))
     .pipe(autoprefixer());
 
-  if (opts.production) {
+  if (production.isSet()) {
     // External source maps + minimize
     ret = ret.pipe(minifyCss())
              .pipe(sourcemaps.write("./"));
