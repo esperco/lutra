@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "outFile": "test.js"
+  },
+
+  "files": [],
+
+  "devFiles": [
+    "test.js.ts",
+    "../../../lib-ts/Test.ts",
+    "../../../lib-ts/ApiC.Test.ts",
+    "../../../lib-ts/Util.Test.ts",
+    "../../../lib-ts/Emit.Test.ts",
+    "../../../lib-ts/LocalStore.Test.ts",
+    "../../../lib-ts/Model.Test.ts",
+    "../../../lib-ts/Model.Capped.Test.ts",
+    "../../../lib-ts/Model.StoreOne.Test.ts",
+    "../../../lib-ts/Model.Batch.Test.ts",
+    "../../../lib-ts/JQStore.Test.ts",
+    "../../../lib-ts/Queue.Test.ts",
+    "../../../lib-ts/ReactHelpers.Test.ts"
+  ],
+
+  "prodFiles": []
+}
