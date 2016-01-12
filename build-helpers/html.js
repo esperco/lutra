@@ -9,6 +9,7 @@ var data = require("gulp-data"),
     nunjucksRender = require("gulp-nunjucks-render"),
     production = require("./production"),
     rename = require("gulp-rename"),
+    version = require("./version"),
     watch = require("./watch");
 /*
   Compile HTML templates using nunjucks (Jinja) syntax
@@ -37,6 +38,7 @@ module.exports = function(globs, out, context) {
   // Add production to context by default
   context = context || {};
   context.PRODUCTION = production.isSet();
+  context.VERSION = context.VERSION || version();
 
   var ret = gulp.src(globs)
     .pipe(data(function() { return context; }))

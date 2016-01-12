@@ -22,6 +22,18 @@ var config = {
   ],
   jsOut: "pub/js",
 
+  jasmineDir: "pub/jasmine",
+
+  tsGlobs: [
+    "../lib-ts/**/*.{ts,tsx}",
+    "../typings/**/*.d.ts",
+    "ts/**/*.{ts,tsx}"
+  ],
+  tsProjects: [
+    "ts/test.js/tsconfig.json",
+    "ts/login.js/tsconfig.json"
+  ],
+
   lessGlobs: ["css/**/*.less", "css/**/*.css"],
   lessOut: "pub/css",
 
@@ -39,11 +51,23 @@ gulp.task("build-less", function() {
 
 gulp.task("watch-less", watch(config.lessGlobs, "build-less"));
 
+gulp.task("build-jasmine", function() {
+  return helpers.jasmine(config.jasmineDir);
+});
+
 gulp.task("build-js", function() {
   return helpers.js(config.jsGlobs, config.jsOut);
 });
 
 gulp.task("watch-js", watch(config.jsGlobs, "build-js"));
+
+gulp.task("build-ts", function() {
+  return helpers.typescript(config.tsGlobs,
+                            config.tsProjects,
+                            config.jsOut);
+});
+
+gulp.task("watch-ts", watch(config.tsGlobs, "build-ts"));
 
 gulp.task("build-img", function() {
   return helpers.assets(config.imgGlobs, config.imgOut);
@@ -75,10 +99,12 @@ gulp.task("server", function(cb) {
 });
 
 gulp.task("build", gulp.parallel("build-html",
+                                 "build-img",
+                                 "build-jasmine",
                                  "build-js",
                                  "build-bundles",
-                                 "build-less",
-                                 "build-img"));
+                                 "build-ts",
+                                 "build-less"));
 
 gulp.task("clean", function(cb) {
   helpers.clean(config.pubDir, cb);
@@ -95,6 +121,7 @@ gulp.task("watch", gulp.series("clean", "build",
     "watch-img",
     "watch-js",
     "watch-bundles",
+    "watch-ts",
     "watch-less"
   )
 ));

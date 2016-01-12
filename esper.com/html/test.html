@@ -1,0 +1,91 @@
+{#
+  Test runner page for TS libraries
+#}
+
+{% extends "_base.html" %}
+
+{% block title %}Esper | Jasmine Spec Runner{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="/jasmine/jasmine.css">
+  <script src="/jasmine/jasmine.js"></script>
+  <script src="/jasmine/jasmine-html.js"></script>
+  <script src="/jasmine/boot.js"></script>
+  <script type="text/javascript">
+    function toggleTestFrame() {
+      "use strict"; /* global document */
+      var frame = document.getElementById("esper-test-frame");
+      frame.className = frame.className ? "" : "hide";
+    }
+  </script>
+  <style>
+    body {
+      padding-bottom: 50px;
+    }
+
+    #esper-test-frame-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+    }
+
+    #esper-test-frame-container button {
+      float: right;
+      background: #007069;
+      padding: 5px 10px;
+      border: 0;
+      color: white;
+      cursor: pointer;
+    }
+
+    /*
+      Force test frame to always technically be visible because some tests
+      depend on jQuery's concept of visibility
+    */
+    #esper-test-frame.hide {
+      position: absolute;
+      right: -100000%;
+      display: block !important;
+    }
+
+    #esper-test-frame {
+      resize: both;
+      overflow: auto;
+      display: block;
+      clear: both;
+      border: 1px solid #007069;
+    }
+
+    .jasmine_html-reporter {
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <!--
+    Our test page loads the entire actual app.js used by the rest of the
+    site for unit-testing / integration-testing purposes. This means things
+    may bug out if certain DOM elements aren't present.
+
+    Don't use these for actual testing (use the test frame or use a unit
+    test that doesn't rely on the DOM), but let's leave these here so the
+    setup script doesn't crash.
+  -->
+  <div style="display:none">
+    <div id="esper-header"></div>
+    <div id="esper-main" class="container">
+      <div class="init-loading">
+        Loading &hellip;
+      </div>
+    </div>
+    <div id="esper-footer"></div>
+  </div>
+
+  <div id="esper-test-frame-container">
+    <button onclick="toggleTestFrame();">Test Frame</button>
+    <iframe id="esper-test-frame" class="hide"></iframe>
+  </div>
+  <script type="text/javascript" src="/js/react-simple-vendor.js"></script>
+  <script type="text/javascript" src="/js/test.js"></script>
+{% endblock %}

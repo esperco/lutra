@@ -35,6 +35,7 @@ Esper = (function(esperObj) {
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
+    PRODUCTION:   (process.env.NODE_ENV === "production"),
     React:        React,
     ReactDOM:     ReactDOM
   };
