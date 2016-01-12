@@ -1,0 +1,15 @@
+{% if PRODUCTION %}
+<script src="https://cdn.ravenjs.com/2.0.4/raven.min.js"></script>
+<script type="text/javascript">
+  Raven.config(
+    'https://e5417c86b25a412c9fd6fc1d33c363b6@app.getsentry.com/63404', {
+      release: "{{ VERSION }}" || "dev",
+      ignoreErrors: [
+        /* Triggered by browser extensions, not our code */
+        /WrappedNative/,
+        /NPObject/
+      ],
+      ignoreUrls: [/localhost/]
+    }).install();
+</script>
+{% endif %}
