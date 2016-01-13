@@ -18,6 +18,7 @@ var config = {
   jsGlobs: ["js/**/*.js"],
   jsBundles: [
     "bundles/react-simple-vendor.js",
+    "bundles/test-vendor.js",
     "bundles/timestats-vendor.js"
   ],
   jsOut: "pub/js",
