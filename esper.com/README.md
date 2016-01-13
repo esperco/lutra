@@ -1,21 +1,9 @@
-In most cases, HoneyBadger doesn't care. In this case, this directory contains
-the files to run the front-end Esper website (including our jobs page,
-privacy policy, contact us, etc.)
-
-![Honey badger](https://c1.staticflickr.com/3/2814/9658682358_f52236c48c.jpg)
+This directory contains all of the front-end code hosted at esper.com.
 
 Prerequisites
 -------------
 
-You need Node and NPM installed (see instructions at
-https://github.com/esperco/stoat).
-
-Call `make setup` to install dependencies.
-
-Call `npm run watch` to set up a development server that watches source
-files for change.
-
-For production builds, you'll also need to install `s3tools` to upload to
+For production builds, you'll need to install `s3tools` to upload to
 Amazon S3. On a Mac, this is:
 ```
 brew install s3cmd
@@ -31,20 +19,13 @@ s3cmd --configure
 
 Now you are set up for uploading files to S3 using `s3cmd`.
 
-
-Build and install
+Build and Install
 -----------------
 
-It's a two-step process.
+Call `make` to build the entire site and place in the `pub/` directory. This
+allows you to check locally what the site looks like before going live.
 
-```
-$ make
-```
-builds what needs to be built and puts the files into the `pub/`
-directory. This allows you to check locally what the site looks like
-before going live.
+Call `make watch` to launch a development server at `localhost:5000`.
 
-```
-$ make install
-```
-will copy files into our S3 bucket used to host the Esper website.
+Call `make install` to copy the files in `pub/` to the S3 bucket used to host
+the Esper website.
