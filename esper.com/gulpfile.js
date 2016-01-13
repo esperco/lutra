@@ -45,7 +45,7 @@ var config = {
 
   pubDir: "pub",
 
-  serverPort: 5000,
+  serverPort: 5001,
   liveReloadPort: 35729
 };
 
