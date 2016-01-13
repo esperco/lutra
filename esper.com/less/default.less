@@ -1,3 +1,5 @@
+/* CSS file used on landing pages */
+
 /*** Colors ***/
 @blue: #0080ce;
 @blue_bg: #dfeff7;
@@ -315,10 +317,10 @@ input.incorrect{
   height: 75px;
 }
 
-.navbar, .splash-navbar { font-size: 14px; }
-
-.navbar, .splash-navbar, .about-navbar {
+.navbar, .splash-navbar {
+  font-size: 14px;
   margin: 0 auto;
+  border-bottom: 0;
 }
 
 .desktop-nav-links, .nav-menu-toggle { display: none; }
@@ -348,12 +350,7 @@ input.incorrect{
   @media (max-width:767px) { padding: 28px 18px 14px 18px; }
 }
 
-.about-navbar {
-  @media (min-width:768px) { padding: 0 36px; }
-  @media (max-width:767px) { padding: 0 18px; }
-}
-
-.navbar a, .splash-navbar a, .about-navbar a {
+.navbar a, .splash-navbar a {
   text-decoration: none;
   -webkit-transition:.2s;
      -moz-transition:.2s;
@@ -1226,7 +1223,7 @@ select.incorrect{
     color: @gray_60;
     font-size: 90%;
   }
-  
+
   .headshot
   {
       border-width: 10px;

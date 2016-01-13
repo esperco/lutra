@@ -1,0 +1,340 @@
+@import "./_bootstrap-variables";
+
+/*
+  Helper classes -- NB: Use esper- prefix here in case we want to move these
+  out into Marten for reuse with Chrome extension
+*/
+.esper-simple-content {
+  margin: 50px auto;
+  max-width: 800px;
+}
+
+///////
+
+.esper-padded {
+  padding: @padding-base-vertical @padding-base-horizontal
+           @padding-large-vertical;
+}
+
+///////
+
+/*
+  full-screen => intended for covering all or most of the screen
+  expanded => intended for expanding to the edges of a given container
+
+  These are mostly identical but differ in how padding is handled.
+*/
+.esper-full-screen.padded {
+  .esper-padded;
+}
+
+.esper-expanded.padded {
+  top: @padding-large-vertical;
+  bottom: @padding-large-vertical;
+  left: @padding-base-horizontal;
+  right: @padding-base-horizontal;
+}
+
+// Use for absolutely positioning a center div on screen
+.esper-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 80%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+
+  // Modal-ish message
+  &.esper-msg {
+    padding: @modal-inner-padding;
+    z-index: 5;
+    background: @body-bg;
+    border: 1px solid @component-active-bg;
+    border-radius: @border-radius-base;
+    min-width: 42%;
+  }
+
+  .esper-full-screen &, .esper-expanded  & {
+    top: 42%; // Intentionally nudge a little higher because of header margins
+  }
+}
+
+.esper-full-screen, .esper-expanded {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  background: @body-bg;
+
+  &.minus-nav {
+    top: @navbar-height;
+
+    &.collapse-2x {
+      @media (max-width: @screen-xs-max) {
+        top: @navbar-height * 2;
+      }
+    }
+  }
+
+  &.minus-subheader, &.padded.minus-subheader {
+    top: @font-size-h4 + @line-height-computed +
+         @panel-body-padding + @padding-base-vertical;
+
+    &.collapse-2x {
+      @media (max-width: @screen-xs-max) {
+        top: (@font-size-h4 + @line-height-computed) * 2 +
+             @panel-body-padding + @padding-base-vertical;
+      }
+    }
+  }
+
+  .esper-left-sidebar, .esper-right-content {
+    position: absolute;
+    overflow-y: auto;
+    background: @body-bg;
+    top: 0;
+    bottom: 0;
+    &.padded {
+      .esper-padded;
+    }
+  }
+
+  .esper-left-sidebar {
+    left: 0;
+  }
+
+  .esper-right-content {
+    right: 0;
+  }
+
+  // e.g. if panel is only element
+  .esper-focus-message {
+    height: 95%;
+    font-size: 250%;
+    margin: 0;
+    color: @gray-light;
+
+    @media screen and (min-width: @screen-sm-min) {
+      font-size: 200%;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      font-size: 150%;
+    }
+
+    > *:first-child {
+      .esper-center;
+    }
+
+    &.panel {
+      font-size: @font-size-large;
+    }
+
+    h2 {
+      font-weight: bold;
+      font-size: 150%;
+      margin-bottom: 20px;
+    }
+  }
+}
+
+/////
+
+@keyframes scaleout {
+  0% {
+    transform: scale(0.0);
+  } 100% {
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+.esper-spinner {
+  display: block;
+  position: relative;
+  background-color: @purple;
+  border-radius: 100%;
+  animation: scaleout 1.0s ease-in-out 0s infinite;
+  height: @line-height-computed;
+  width: @line-height-computed;
+
+  &.esper-centered, .esper-center &, .esper-left-sidebar & {
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: @padding-large-vertical * 2;
+    margin-bottom: @padding-large-vertical * 2;
+  }
+
+  .modal-footer & {
+    float: left;
+    display: block;
+    height: 32px;
+    width: 32px;
+  }
+
+  .navbar & {
+    height: @navbar-height - 14;
+    width: @navbar-height - 14;
+    margin: 7px;
+  }
+
+  &.esper-inline {
+    display: inline-block;
+    margin: 0 @padding-xs-horizontal;
+    line-height: @line-height-computed;
+    vertical-align: middle;
+  }
+
+  &.esper-medium {
+    height: 40px;
+    width: 40px;
+  }
+
+  &.esper-large {
+    height: 65px;
+    width: 65px;
+  }
+}
+
+////
+
+.esper-header {
+  line-height: @input-height-base;
+  vertical-align: middle;
+  margin-top: @padding-small-vertical;
+
+  // Z-index relative to .esper-expanded
+  position: relative;
+  z-index: 2;
+
+  .min-icon {
+    cursor: pointer;
+  }
+
+  .pull-right {
+    line-height: @input-height-base;
+  }
+
+  // If row class applied to header, space columns slightly
+  &.row {
+    @media (max-width: @screen-sm-max) {
+      [class*="col-"]{
+        margin-bottom: 5px;
+      }
+    }
+  }
+}
+
+.esper-panel-section {
+  margin-bottom: 20px; // To match well
+}
+
+.esper-borderless-section {
+  .esper-header {
+    border-bottom: 1px solid @panel-default-border;
+    padding-bottom: @panel-body-padding;
+  }
+
+  .esper-subheader {
+    font-weight: bold;
+  }
+
+  &.padded {
+    .esper-padded;
+  }
+
+  &:last-child {
+    margin-bottom: @panel-body-padding;
+  }
+
+  .esper-subsection-footer {
+    padding: 0 @padding-base-horizontal @padding-base-vertical;
+  }
+
+  & + .esper-borderless-section {
+    .esper-header {
+      border-top: 1px solid @panel-default-border;
+      padding-top: @panel-body-padding;
+    }
+  }
+
+  &.minimized + .esper-borderless-section {
+    .esper-header {
+      border-top: 0;
+      padding-top: 0;
+    }
+  }
+}
+
+.esper-footer-text {
+  line-height: 32px;
+  vertical-align: middle;
+  padding: 0 @padding-base-horizontal;
+}
+
+.esper-no-content {
+  text-align: center;
+  padding: @panel-body-padding;
+  font-size: @font-size-large;
+  color: @panel-default-border;
+  border: 1px solid @panel-default-border;
+  border-radius: @panel-border-radius;
+  text-align: center;
+  margin-bottom: @padding-large-vertical;
+}
+
+.esper-wide-button {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.esper-de-em {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.esper-clickable-media {
+  &:hover {
+    cursor: pointer;
+    background-color: lavender;
+    opacity: 0.9;
+  }
+}
+
+/////
+
+// Low-key text
+.esper-advisory {
+  color: @gray-light;
+  font-size: @font-size-small;
+
+  a, .esper-link {
+    color: @gray-light;
+    &:hover {
+      color: @gray;
+      text-decoration: underline;
+    }
+  }
+}
+
+.esper-inline-divider {
+  display: inline-block;
+  width: @padding-small-horizontal;
+  height: 1em;
+  vertical-align: middle;
+  margin-right: @padding-small-horizontal;
+  border-right: 1px solid @gray-light;
+}
+
+.esper-one-line {
+  white-space: nowrap;
+}
+
+.esper-subtle, a.esper-subtle {
+  color: @gray-light;
+
+  &:hover,
+  &:focus {
+    color: @gray-dark;
+  }
+}
