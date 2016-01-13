@@ -10,6 +10,7 @@ var inject        = require("../../build-helpers/depends").inject;
 var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
+    polyfill      = require("./polyfill"),
     React         = require("react"),
     ReactDOM      = require("react-dom");
 
