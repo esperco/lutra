@@ -1,11 +1,6 @@
 /* Bootstrap + overrides - consider moving overrides into footer */
-@import "../marten/less/_custom_bootstrap";
-@import "../marten/less/_helpers";
-@navbar-height: 50px;
-@navbar-default-bg: @body-bg;
-@navbar-default-border: @brand-bg;
-@navbar-padding-vertical: 15px;
-@navbar-padding-horizontal: 10px;
+@import "../lib/_bootstrap-variables";
+@import "../lib/_helpers";
 
 /* New variables */
 @footer-bg: @panel-default-heading-bg;
@@ -24,13 +19,13 @@
 
 
 /* Project-specific imports */
-@import "../marten/less/_login";
+@import "./login";
 @import "./_loading";
-@import "./_onboarding";
-@import "./_chart";
-@import "./_calendar";
-@import "./_labeling";
 @import "./_loginRequired";
+@import "./time/_onboarding";
+@import "./time/_chart";
+@import "./time/_calendar";
+@import "./time/_labeling";
 
 
 /* Header and footer animations */
