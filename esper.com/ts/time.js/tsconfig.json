@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "outFile": "time.js"
+  },
+
+  "files": [
+    "time.js.tsx"
+  ]
+}
