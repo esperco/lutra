@@ -13,8 +13,16 @@
 
 module Esper.Api {
 
-  // Change prefix in init code depending on where API server is
+  // Can change prefix in init code depending on where API server is
   export var prefix = "";
+
+  // Initialize defaults depending on whether we're in production mode
+  if (Esper.PRODUCTION) {
+    prefix = "https://app.esper.com";
+  } else {
+    // No port (assume API server is on Port 80)
+    prefix = window.location.protocol + "//" + window.location.hostname;
+  }
 
   export function echo(serializable: any) {
     return JsonHttp.post(prefix + "/echo",
