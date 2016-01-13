@@ -1,0 +1,13 @@
+{% extends "_app.html" %}
+
+{% block head %}
+  <link rel="stylesheet" href="css/custom-bootstrap.css" media="screen" />
+  <link rel="stylesheet" href="css/font-awesome.css" media="screen" />
+  <link rel="stylesheet" href="css/login.css" media="screen" />
+{% endblock %}
+
+{% block postscripts %}
+  {{ super() }}
+  <script type="text/javascript" src="/js/react-simple-vendor.js"></script>
+  <script type="text/javascript" src="/js/login.js"></script>
+{% endblock %}
