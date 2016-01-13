@@ -16,16 +16,11 @@ module Esper.LocalStore {
     var vStr = JSON.stringify(v);
     try {
       localStorage.setItem(k, vStr);
-
-      // Check that it was actually stored (in case of silent failure)
-      if (typeof localStorage.getItem(k) !== "string") {
-        throw new Error("localStorage failed to save");
-      }
     }
 
-    catch (err) {
-      createCookie(k, vStr);
-    }
+    // Ignore error => always create cookie as backup
+    catch (err) {}
+    createCookie(k, vStr);
   };
 
   export function get(k: string): any {
@@ -62,7 +57,9 @@ module Esper.LocalStore {
   };
 
   export function clear() {
-    localStorage.clear();
+    if (window.localStorage && localStorage.clear) {
+      localStorage.clear();
+    }
   };
 
 
