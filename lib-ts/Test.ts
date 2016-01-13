@@ -44,12 +44,12 @@ module Esper.Test {
   export function render(elm: React.ReactElement<any>) {
     var container = document.createElement('div')
     renderContainers.push(container);
-    return React.render(elm, container);
+    return ReactDOM.render(elm, container);
   };
 
   export function cleanupRenders() {
     _.each(renderContainers || [], (container) => {
-      React.unmountComponentAtNode(container)
+      ReactDOM.unmountComponentAtNode(container)
     });
     renderContainers = [];
   }

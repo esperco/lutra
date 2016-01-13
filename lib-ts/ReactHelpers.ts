@@ -39,7 +39,7 @@ module Esper.ReactHelpers {
       if (! this.data("react-component")) {
         this.off('destroyed');
         this.bind('destroyed', function() {
-          React.unmountComponentAtNode(self.get(0));
+          ReactDOM.unmountComponentAtNode(self.get(0));
           unmounted = true;
         });
       }
@@ -72,7 +72,7 @@ module Esper.ReactHelpers {
       } else {
         elm = elmOrCls;
       }
-      this.data("react-component", React.render(elm, this.get(0)));
+      this.data("react-component", ReactDOM.render(elm, this.get(0)));
 
       return this;
     },
@@ -125,7 +125,7 @@ module Esper.ReactHelpers {
 
     // Reference to JQuery-wrapped parent node
     jQuery(): JQuery {
-      return $(React.findDOMNode(this));
+      return $(ReactDOM.findDOMNode(this));
     }
 
     // Use JQuery to find a DOM element within this compoent

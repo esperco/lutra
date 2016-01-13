@@ -45,10 +45,10 @@
       "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
     "react/react.d.ts": {
-      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
     },
     "react/react-global.d.ts": {
-      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
     },
     "eventemitter3/eventemitter3.d.ts": {
       "commit": "f53108644c2f32b93de423d844650297fc415a8b"
@@ -75,6 +75,33 @@
       "commit": "6054c1a8b163fdc1c30a8f977118a41658025922"
     },
     "quill/quill.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-dom.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-create-fragment.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-css-transition-group.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-transition-group.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-linked-state-mixin.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-perf.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-pure-render-mixin.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-test-utils.d.ts": {
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "react/react-addons-update.d.ts": {
       "commit": "b5000efa7905758a842aca9f3111d582cf030128"
     }
   }
