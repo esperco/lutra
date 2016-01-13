@@ -2,12 +2,12 @@
   Refactored Login widget with various login options
 */
 
-/// <reference path="./ReactHelpers.ts" />
-/// <reference path="./Components.Modal.tsx" />
-/// <reference path="./Components.ErrorMsg.tsx" />
-/// <reference path="./Login.Oauth.ts" />
-/// <reference path="./ApiC.ts" />
-/// <reference path="./Util.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Components.Modal.tsx" />
+/// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <reference path="../lib/ApiC.ts" />
+/// <reference path="../lib/Util.ts" />
+/// <reference path="../common/Login.Oauth.ts" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -40,7 +40,7 @@ module Esper.Components {
   }
 
   export class LoginPrompt extends Component<LoginProps, LoginState> {
-    _nylasInput: React.Component<any, any>;
+    _nylasInput: HTMLInputElement;
 
     constructor(props: LoginProps) {
       super(props);
@@ -172,17 +172,17 @@ module Esper.Components {
     showNylasInput() {
       this.setState({showNylasInput: true, inputError: false});
       window.requestAnimationFrame(() => {
-        $(React.findDOMNode(this._nylasInput)).focus();
+        $(this._nylasInput).focus();
       })
     }
 
     hideNylasInput() {
       this.setState({showNylasInput: false});
-      $(React.findDOMNode(this._nylasInput)).blur();
+      $(this._nylasInput).blur();
     }
 
     submitNylas() {
-      var val = $(React.findDOMNode(this._nylasInput)).val();
+      var val = $(this._nylasInput).val();
       if (Util.validateEmailAddress(val)) {
         this.setState({busy: true, serverError: false, inputError: false});
         Login.loginWithNylas({
