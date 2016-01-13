@@ -2,9 +2,9 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
-/// <reference path="./Api.ts" />
-/// <reference path="./LocalStore.ts" />
-/// <reference path="./Login.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/LocalStore.ts" />
+/// <reference path="../lib/Login.ts" />
 
 module Esper.Login {
   var nonceKey = "login_nonce";

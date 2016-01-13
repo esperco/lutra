@@ -6,9 +6,9 @@
 
 /// <reference path="../typings/moment/moment.d.ts" />
 /// <reference path="../typings/segment-analytics/segment-analytics.d.ts" />
-/// <reference path="./Analytics.ts" />
-/// <reference path="./Login.ts" />
-/// <reference path="./ApiT.ts" />
+/// <reference path="../lib/Analytics.ts" />
+/// <reference path="../lib/Login.ts" />
+/// <reference path="../lib/ApiT.ts" />
 
 module Esper.Analytics {
   export function init(key: string) {

@@ -9,18 +9,18 @@
 
   "devFiles": [
     "test.js.ts",
-    "../../../lib-ts/Test.ts",
-    "../../../lib-ts/ApiC.Test.ts",
-    "../../../lib-ts/Util.Test.ts",
-    "../../../lib-ts/Emit.Test.ts",
-    "../../../lib-ts/LocalStore.Test.ts",
-    "../../../lib-ts/Model.Test.ts",
-    "../../../lib-ts/Model.Capped.Test.ts",
-    "../../../lib-ts/Model.StoreOne.Test.ts",
-    "../../../lib-ts/Model.Batch.Test.ts",
-    "../../../lib-ts/JQStore.Test.ts",
-    "../../../lib-ts/Queue.Test.ts",
-    "../../../lib-ts/ReactHelpers.Test.ts"
+    "../lib/Test.ts",
+    "../lib/ApiC.Test.ts",
+    "../lib/Util.Test.ts",
+    "../lib/Emit.Test.ts",
+    "../lib/LocalStore.Test.ts",
+    "../lib/Model.Test.ts",
+    "../lib/Model.Capped.Test.ts",
+    "../lib/Model.StoreOne.Test.ts",
+    "../lib/Model.Batch.Test.ts",
+    "../lib/JQStore.Test.ts",
+    "../lib/Queue.Test.ts",
+    "../lib/ReactHelpers.Test.ts"
   ],
 
   "prodFiles": []

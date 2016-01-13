@@ -26,8 +26,6 @@ var config = {
   jasmineDir: "pub/jasmine",
 
   tsGlobs: [
-    "../lib-ts/**/*.{ts,tsx}",
-    "../typings/**/*.d.ts",
     "ts/**/*.{ts,tsx}"
   ],
   tsProjects: [

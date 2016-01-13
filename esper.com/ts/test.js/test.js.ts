@@ -1,6 +1,6 @@
 /* Define external libs used by test.js */
 
-/// <reference path="../../../typings/tsd.d.ts"/>
+/// <reference path="../typings/tsd.d.ts"/>
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
