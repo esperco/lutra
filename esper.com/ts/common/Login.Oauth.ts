@@ -47,11 +47,11 @@ module Esper.Login {
   export function loginWithGoogle(opts?: LoginOpts)
   {
     opts = opts || {};
-    opts.landingUrl = opts.landingUrl || getPath();
+    var landingUrl = opts.landingUrl || getPath();
 
     return setLoginNonce()
       .then(function(loginNonce) {
-        return Api.getGoogleAuthUrl(encodeLandingUrl(opts.landingUrl),
+        return Api.getGoogleAuthUrl(landingUrl,
           loginNonce, opts.inviteCode, opts.email);
       })
       .then(function(x) {
@@ -63,12 +63,12 @@ module Esper.Login {
   // Redirect to Nylas OAuth
   export function loginWithNylas(opts?: LoginOpts) {
     opts = opts || {};
-    opts.landingUrl = opts.landingUrl || getPath();
+    var landingUrl = opts.landingUrl || getPath();
 
     return setLoginNonce()
       .then(function(loginNonce) {
         return Api.getNylasLoginUrl(opts.email, loginNonce,
-          encodeLandingUrl(opts.landingUrl), opts.inviteCode);
+          landingUrl, opts.inviteCode);
       })
       .then(function(x) {
         Log.d("Going off to " + x.url);
@@ -76,33 +76,14 @@ module Esper.Login {
       });
   }
 
-  /*
-    OAuth redirects currently go through Otter, so encode URLs in a form
-    Otter understands to send back to external app
-  */
-  function encodeLandingUrl(path: string) {
-    return getOrigin() + "/#!/login-once/:uid/" + Util.hexEncode(path);
-  }
-
-  function getOrigin() {
-    return window.location.origin || (
-      window.location.protocol + "//" + window.location.hostname +
-      (window.location.port ? ':' + window.location.port: '')
-    );
-  }
-
+  // Use current pathname as default
   function getPath() {
-    var ret = location.href.slice(getOrigin().length);
-
-    // Don't include hashbang in path
-    if (ret.indexOf("/#!") === 0) {
-      ret = ret.slice(3);
-    } else if (ret.indexOf("#!") === 0) {
-      ret = ret.slice(2);
+    var path = location.pathname;
+    if (path[0] === "/") {
+      path = path.slice(1);
     }
-    return ret;
+    return path;
   }
-
 
   /////
 
@@ -257,6 +238,11 @@ module Esper.Login {
   export function loginOnce(uid: string) {
     resetDeferred();
     var loginNonce = getLoginNonce();
+    if (! loginNonce) {
+      Log.e("Login nonce missing");
+      rejectDeferred();
+      return $.Deferred().reject();
+    }
     return Api.loginOnce(uid, loginNonce)
       .then(function(loginInfo) {
         setCredentials(loginInfo.uid, loginInfo.api_secret);

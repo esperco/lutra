@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "outFile": "login.js"
+  },
+
+  "files": [
+    "login.js.tsx"
+  ]
+}

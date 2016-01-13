@@ -1,7 +1,12 @@
 /// <reference path="../typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="./Util.ts" />
 
+declare module Esper {
+  export var PRODUCTION: boolean;
+}
+
 module Esper.Log {
+
   /*
     Change this tag to distinguish between different scripts
     logging to the same console.

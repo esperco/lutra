@@ -98,4 +98,16 @@ module Esper.Util {
       return [k, tuplify(o[k])];
     });
   }
+
+  /*
+    Get value of query string
+    http://stackoverflow.com/a/901144
+  */
+  export function getParamByName(name: string): string {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return (results === null ? "" :
+      decodeURIComponent(results[1].replace(/\+/g, " ")));
+  }
 }

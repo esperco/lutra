@@ -1,0 +1,24 @@
+{# Base template for complex "app" pages with lots of JavaScript and stuff #}
+{% extends '_base.html' %}
+
+{% block body %}
+  <div id="esper-header"></div>
+
+  <div id="esper-main"></div>
+
+  <div id="esper-footer"></div>
+
+  <div id="esper-loading">
+    <div class="esper-center">
+      <div class="esper-spinner"></div>
+    </div>
+  </div>
+
+  <div id="esper-modal"></div>
+
+  {% block postscripts %}
+    {% include "_segment.html" %}
+    {% include "_olark.html" %}
+    {% include "_raven.html" %}
+  {% endblock %}
+{% endblock %}
