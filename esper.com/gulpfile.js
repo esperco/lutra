@@ -12,8 +12,12 @@ var config = {
   htmlGlobs: ["html/**/*.html"],
   htmlOut: "pub", // HTML goes to root rather than subdir
 
-  imgGlobs: ["img/**/*.*"],
-  imgOut: "pub/img",
+  assetMap: {
+    "img/**/*.*": "pub/img",
+    "img/favicon.ico": "pub",
+    "../node_modules/bootstrap/fonts/*.*": "pub/fonts",
+    "../node_modules/font-awesome/fonts/*.*": "pub/fonts"
+  },
 
   jsGlobs: ["js/**/*.js"],
   jsBundles: [
@@ -33,7 +37,11 @@ var config = {
     "ts/login.js/tsconfig.json"
   ],
 
-  lessGlobs: ["css/**/*.less", "css/**/*.css"],
+  lessGlobs: [
+    "css/**/*.less",
+    "css/**/*.css",
+    "../node_modules/font-awesome/css/font-awesome.css"
+  ],
   lessOut: "pub/css",
 
   pubDir: "pub",
@@ -68,11 +76,11 @@ gulp.task("build-ts", function() {
 
 gulp.task("watch-ts", watch(config.tsGlobs, "build-ts"));
 
-gulp.task("build-img", function() {
-  return helpers.assets(config.imgGlobs, config.imgOut);
+gulp.task("build-assets", function() {
+  return helpers.assets(config.assetMap);
 });
 
-gulp.task("watch-img", watch(config.imgGlobs, "build-img"));
+gulp.task("watch-assets", watch(_.keys(config.assetMap), "build-assets"));
 
 gulp.task("build-html", function() {
   return helpers.html(config.htmlGlobs, config.htmlOut);
@@ -98,7 +106,7 @@ gulp.task("server", function(cb) {
 });
 
 gulp.task("build", gulp.parallel("build-html",
-                                 "build-img",
+                                 "build-assets",
                                  "build-jasmine",
                                  "build-js",
                                  "build-bundles",
@@ -117,7 +125,7 @@ gulp.task("watch", gulp.series("clean", "build",
   gulp.parallel(
     "server",
     "watch-html",
-    "watch-img",
+    "watch-assets",
     "watch-js",
     "watch-bundles",
     "watch-ts",
