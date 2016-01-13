@@ -12,6 +12,7 @@ var EventEmitter  = require("eventemitter3"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
+    polyfill      = require("./polyfill"),
     React         = require("react"),
     ReactDOM      = require("react-dom");
 
