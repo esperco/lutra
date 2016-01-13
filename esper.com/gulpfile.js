@@ -120,13 +120,14 @@ gulp.task("production", helpers.setProduction);
 
 gulp.task("build-production", gulp.series("production", "clean", "build"))
 
-gulp.task("watch", gulp.series("clean", "build",
+gulp.task("watch", gulp.series("build",
   gulp.parallel(
     "server",
     "watch-html",
     "watch-assets",
     "watch-js",
-    "watch-bundles",
+    // "watch-bundles", // Skipping since bundling is expensive
+                        // If you need to re-bundle, clean and restart.
     "watch-ts",
     "watch-less"
   )

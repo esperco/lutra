@@ -3,6 +3,7 @@ var _ = require("lodash"),
     browserify = require("browserify"),
     buffer = require("vinyl-buffer"),
     envify = require("envify/custom"),
+    fs = require("fs"),
     gulp = require("gulp"),
     gutil = require("gulp-util"),
     merge = require("merge-stream"),
@@ -30,6 +31,17 @@ module.exports = function(entryFiles, outDir, watch) {
 
 // Helper function used above
 var createBundle = function(entryFile, outDir, watch) {
+  var bundleName = path.basename(entryFile);
+
+  /*
+    Bundling is an expensive process, so if bundle already exists and is newer
+    than entryFile, skip build
+  */
+  if (!watch && checkBundle(entryFile, path.join(outDir, bundleName))) {
+    console.log(entryFile + " exists -- skipping");
+    return gulp.src("*.empty-stream");
+  }
+
   var opts = {
     entries: [entryFile],
 
@@ -59,7 +71,7 @@ var createBundle = function(entryFile, outDir, watch) {
   function rebundle() {
     var stream = bundler.bundle()
       .on('error', gutil.log)
-      .pipe(source(path.basename(entryFile)))
+      .pipe(source(bundleName))
       .pipe(buffer());
 
     if (production.isSet()) {
@@ -89,4 +101,16 @@ var createBundle = function(entryFile, outDir, watch) {
   bundler.on('error', gutil.log)
   bundler.on('log', gutil.log); // output build logs to terminal
   return rebundle();
+}
+
+// Returns true if a bundle file exists and is newer than its source
+function checkBundle(entryFile, bundleFile) {
+  var entryStat, bundleStat;
+  entryStat = fs.statSync(entryFile);
+  try {
+    bundleStat = fs.statSync(bundleFile);
+  } catch (err) {
+    return false;
+  }
+  return bundleStat.mtime.getTime() > entryStat.mtime.getTime();
 }
