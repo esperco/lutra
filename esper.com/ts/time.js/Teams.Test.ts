@@ -6,8 +6,8 @@
 module Esper.Teams {
   describe("Default teams", function() {
     beforeEach(function() {
-      TestFixtures.mockLoginInfo();
       Test.mockAPIs();
+      TestFixtures.mockLogin();
 
       this.fakeTeamId = "my-team-id";
       this.fakeTeam = {

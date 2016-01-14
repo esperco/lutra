@@ -59,8 +59,8 @@ module Esper.Login {
     This function should be called when the app is initially loaded and we
     want to check if user has stored credentials.
   */
-  export function init() {
-    if (alreadyInit) { return; }
+  export function init(force=false) {
+    if (alreadyInit && !force) { return; }
     alreadyInit = true;
 
     if (initCredentials()) {

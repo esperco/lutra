@@ -151,9 +151,13 @@ module Esper.Route {
   });
 
 
+  // Use to set base path
+  export function setBase(base: string) {
+    pageJs.base(base);
+  }
+
   // Turn on router
   export function init() {
-    pageJs.base("/time");
     pageJs({
       click: false,
       hashbang: true

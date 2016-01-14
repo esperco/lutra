@@ -80,9 +80,11 @@ module Esper.Components {
       var presets = this.props.presets || this.getDefaultPresets();
       if (presets) { opts.ranges = presets; }
 
-      $(this._input)
-        .daterangepicker(opts)
-        .on('apply.daterangepicker', this.handleApply.bind(this))
+      var inputElm = $(this._input);
+      if (inputElm.is(":visible")) {
+        inputElm.daterangepicker(opts)
+                .on('apply.daterangepicker', this.handleApply.bind(this))
+      }
     }
 
     componentDidUpdate() {

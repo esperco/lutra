@@ -25,7 +25,7 @@ module Esper.TestFixtures {
     var promise = $.Deferred().resolve(mockLoginInfo()).promise();
     spyOn(Api, "getLoginInfo").and.returnValue(promise);
 
-    Login.init();
+    Login.init(true);
   }
 
   export function mockLoginInfo() {
