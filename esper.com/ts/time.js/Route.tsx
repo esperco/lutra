@@ -14,13 +14,17 @@
 
 module Esper.Route {
 
-  // Change defaults for rendering
-  Layout.defaultHeader = function() {
-    return <Components.Header />;
-  }
-
-  Layout.defaultFooter = function() {
-    return <Components.Footer />;
+  // Set defaults for header and footer render
+  function render(main: React.ReactElement<any>,
+                  header?: React.ReactElement<any>,
+                  footer?: React.ReactElement<any>) {
+    if (header !== null) { // Null => intentionally blank
+      header = header || <Components.Header />;
+    }
+    if (footer !== null) {
+      footer = footer || <Components.Footer />;
+    }
+    Layout.render(main, header, footer);
   }
 
   // Check if we need to launch onboarding
@@ -76,7 +80,7 @@ module Esper.Route {
 
   // Charts
   route("/charts", onboardingRequired, function() {
-    Layout.render(<Views.Charts />,
+    render(<Views.Charts />,
       undefined,
       <Components.Footer hoverable={true} />
     );
@@ -85,7 +89,7 @@ module Esper.Route {
 
   // Calendar labeling page
   route("/calendar-labeling", onboardingRequired, function() {
-    Layout.render(<Views.CalendarLabeling />,
+    render(<Views.CalendarLabeling />,
       undefined,
       <Components.Footer hoverable={true} />
     );
@@ -94,7 +98,7 @@ module Esper.Route {
 
   // Onboarding steps
   route("/onboarding/start", function() {
-    Layout.render(
+    render(
       <Views.OnboardingStart />,
       Components.onboardingStartHeader()
     );
@@ -102,7 +106,7 @@ module Esper.Route {
   });
 
   route("/onboarding/add-cals", function() {
-    Layout.render(
+    render(
       <Views.OnboardingAddCals />,
       Components.onboardingAddCalsHeader()
     );
@@ -110,7 +114,7 @@ module Esper.Route {
   });
 
   route("/onboarding/add-labels", function() {
-    Layout.render(
+    render(
       <Views.OnboardingAddLabels />,
       Components.onboardingAddLabelsHeader()
     );
@@ -118,7 +122,7 @@ module Esper.Route {
   });
 
   route("/onboarding/label-events", function() {
-    Layout.render(
+    render(
       <Views.CalendarLabeling />,
       Components.onboardingLabelEventsHeader(),
       <Components.Footer hoverable={true} />
@@ -127,7 +131,7 @@ module Esper.Route {
   });
 
   route("/onboarding/charts", function() {
-    Layout.render(
+    render(
       <Views.Charts />,
       Components.onboardingChartsHeader(),
       <Components.Footer hoverable={true} />
@@ -142,7 +146,7 @@ module Esper.Route {
       nav.path(ctx.path.slice(1));
     } else {
       Log.e(ctx);
-      Layout.render(<Views.NotFound />, null, null);
+      render(<Views.NotFound />, null, null);
     }
   });
 
