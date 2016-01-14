@@ -9,13 +9,14 @@ module Esper {
   var DEFAULT_REDIRECT = "time";
 
   export function init() {
-    if (Util.getParamByName(Login.logoutParam)) {
-      Login.logout();
-    }
-
     var uid = Util.getParamByName(Login.uidParam);
     var message = Util.getParamByName(Login.messageParam);
     var error = Util.getParamByName(Login.errorParam);
+
+    if (Util.getParamByName(Login.logoutParam)) {
+      Login.logout();
+      message = message || "You have been logged out.";
+    }
 
     if (uid) {
       Login.loginOnce(uid)
@@ -23,7 +24,7 @@ module Esper {
           Login.setCredentials(response.uid, response.api_secret);
           if (Login.needApproval(response)) {
             Layout.renderModal(<Components.ApproveTeamsModal
-              info={response} onApprove={redirect} />)
+              info={response} onApprove={redirect} onReject={onReject} />)
           } else {
             redirect(response);
           }
@@ -33,7 +34,7 @@ module Esper {
           if (err === Login.MISSING_NONCE) {
             errMsg += (" If you are using Safari, please try using a " +
               "different browser. If you are in Incognito or Private Mode, " +
-              "please try disabling that mode.");
+              "please try disabling it.");
             Log.e("Missing nonce");
           }
           renderLogin("", errMsg);
@@ -51,6 +52,12 @@ module Esper {
       </div>
     </div>);
     location.href = "/" + getLandingUrl();
+  }
+
+  function onReject(response: ApiT.LoginResponse, removedTeams: ApiT.Team[]) {
+    var teamIds = _.map(removedTeams, (t) => t.teamid);
+    Login.ignoreTeamIds(teamIds);
+    redirect(response);
   }
 
   function getLandingUrl() {
@@ -76,6 +83,11 @@ module Esper {
               you insight into how you spend your time. Please log in with your
               calendar provider to continue.
             </span>
+         }{
+           error ? <span>
+             {" "}Please {" "}<a href="/contact">contact us</a> if this
+             continues to happen.
+           </span> : ""
          }</div>
       </Components.LoginPrompt>
     </div>);

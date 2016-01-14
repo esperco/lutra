@@ -17,6 +17,10 @@ module Esper.Components {
   interface ApproveProps {
     info: ApiT.LoginResponse;
     onApprove: (info: ApiT.LoginResponse) => void;
+
+    // onReject gets passed info with unapproved teams removed.
+    // If not set, onApprove is called with the missing teams removed.
+    onReject?: (info: ApiT.LoginResponse, removedTeams: ApiT.Team[]) => void;
   };
 
   export class ApproveTeams extends Component<ApproveProps, {
@@ -90,13 +94,13 @@ module Esper.Components {
       </div>;
     }
 
-    getUnapprovedTeams(info?: ApiT.LoginResponse) {
+    getUnapprovedTeams(info: ApiT.LoginResponse) {
       return _.filter(info.teams,
         (team) => team.team_executive === Login.me() && !team.team_approved
       );
     }
 
-    getApprovedTeams(info?: ApiT.LoginResponse) {
+    getApprovedTeams(info: ApiT.LoginResponse) {
       return _.difference(info.teams, this.getUnapprovedTeams(info));
     }
 
@@ -167,7 +171,12 @@ module Esper.Components {
         `Shenanigans may be afoot. Please investigate.`;
       Api.sendSupportEmail(msg)
         .done(() => {
-          this.props.onApprove(infoWithRejected);
+          if (this.props.onReject) {
+            this.props.onReject(infoWithRejected,
+              this.getUnapprovedTeams(this.props.info))
+          } else {
+            this.props.onApprove(infoWithRejected);
+          }
         })
         .fail(this.makeError.bind(this));
     }

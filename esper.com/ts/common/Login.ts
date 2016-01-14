@@ -71,6 +71,12 @@ module Esper.Login {
   }
 
   function onLoginSuccess(loginInfo: ApiT.LoginResponse) {
+    // Remove ignored teams
+    var teamIds = getIgnoredTeams();
+    loginInfo.teams = _.filter(loginInfo.teams, (t) => {
+      return !_.contains(teamIds, t.teamid);
+    })
+
     if (needApproval(loginInfo)) {
       goToLogin(null, "For security reasons, please log in again.");
     } else {
@@ -100,6 +106,29 @@ module Esper.Login {
       team.team_executive === Login.me() && !team.team_approved
     );
   }
+
+
+  /////
+
+  // Store a list of ignored team ids (e.g. rejected for lack of approval)
+  // We eventually want to review and remove these teams from the DB (but
+  // this lets a user with unapproved teams continue to use the site)
+
+  var ignoredTeamsKey = "ignored";
+  export function ignoreTeamIds(teamIds: string[]) {
+    LocalStore.set(ignoredTeamsKey, teamIds);
+  }
+
+  export function getIgnoredTeams() {
+    return LocalStore.get(ignoredTeamsKey) || [];
+  }
+
+  export function clearIgnoredTeams() {
+    LocalStore.remove(ignoredTeamsKey);
+  }
+
+
+  //////
 
   // Params for redirect
   export var uidParam = "uid";
