@@ -1,7 +1,8 @@
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Layout.tsx" />
-/// <reference path="../common/Login.Oauth.ts" />
+/// <reference path="./Login.Oauth.ts" />
 /// <reference path="./Components.Login.tsx" />
+/// <reference path="./Components.ApproveTeam.tsx" />
 
 module Esper {
   // Where to redirect
@@ -18,21 +19,38 @@ module Esper {
 
     if (uid) {
       Login.loginOnce(uid)
-        .done(function() {
-          Layout.render(<div className="esper-full-screen">
-            <div className="esper-center">
-              <div className="esper-spinner"></div>
-            </div>
-          </div>);
-          location.href = "/" + getLandingUrl();
-        })
-        .fail(function() {
+        .then(function(response) {
+          Login.setCredentials(response.uid, response.api_secret);
+          if (Login.needApproval(response)) {
+            Layout.renderModal(<Components.ApproveTeamsModal
+              info={response} onApprove={redirect} />)
+          } else {
+            redirect(response);
+          }
+        }, function(err) {
           Log.e("Unable to login");
-          renderLogin("", "There was an error logging in. Please try again.");
+          var errMsg = "There was an error logging you in."
+          if (err === Login.MISSING_NONCE) {
+            errMsg += (" If you are using Safari, please try using a " +
+              "different browser. If you are in Incognito or Private Mode, " +
+              "please try disabling that mode.");
+            Log.e("Missing nonce");
+          }
+          renderLogin("", errMsg);
         });
     } else {
       renderLogin(message, error)
     }
+  }
+
+  function redirect(response: ApiT.LoginResponse) {
+    Login.storeCredentials(response);
+    Layout.render(<div className="esper-full-screen">
+      <div className="esper-center">
+        <div className="esper-spinner"></div>
+      </div>
+    </div>);
+    location.href = "/" + getLandingUrl();
   }
 
   function getLandingUrl() {

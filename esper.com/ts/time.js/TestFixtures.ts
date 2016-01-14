@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
-/// <reference path="../common/Login.OAuth.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="./Teams.ts" />
 

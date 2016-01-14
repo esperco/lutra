@@ -5,7 +5,7 @@
 /// <reference path="../lib/Model.Batch.ts" />
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/Util.ts" />
-/// <reference path="../common/Login.OAuth.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Calendars.ts" />
 

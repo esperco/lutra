@@ -1,6 +1,6 @@
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Layout.tsx" />
-/// <reference path="../common/Login.OAuth.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Onboarding.ts" />

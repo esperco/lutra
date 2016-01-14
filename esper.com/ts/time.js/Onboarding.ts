@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../lib/Model.StoreOne.ts" />
-/// <reference path="../common/Login.OAuth.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Route.tsx" />
 

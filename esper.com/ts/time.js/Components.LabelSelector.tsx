@@ -4,7 +4,7 @@
 
 /// <reference path="../lib/ApiT.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Login.OAuth.ts" />
+/// <reference path="../common/Login.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Colors.ts" />
 /// <reference path="./Components.Section.tsx" />
