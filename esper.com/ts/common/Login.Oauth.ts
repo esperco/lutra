@@ -145,13 +145,8 @@ module Esper.Login {
     if (alreadyInit) { return; }
     alreadyInit = true;
 
-    // Check query param for uid
-    var uid = Util.getParamByName("uid");
-
-    if (initCredentials() && (!uid || Login.myUid() === uid)) {
+    if (initCredentials()) {
       Api.getLoginInfo().then(onLoginSuccess, onLoginFailure);
-    } else if (uid) {
-      loginOnce(uid);
     } else {
       goToLogin();
     }
@@ -161,6 +156,7 @@ module Esper.Login {
     if (needApproval(loginInfo) && !allowUnapproved) {
       goToApproveTeams();
     } else {
+      storeCredentials(loginInfo);
       Analytics.identify(loginInfo, true);
       if ((<any> window).Raven) {
         Raven.setUserContext({
@@ -171,6 +167,7 @@ module Esper.Login {
       }
       InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
       loginDeferred.resolve(loginInfo);
+      return loginInfo;
     }
   }
 
@@ -188,7 +185,7 @@ module Esper.Login {
 
   /*
     This should be triggered after callback from OAuth -- returns promise
-    with loginInfo
+    with loginInfo. Used as an alternate to Login.init.
   */
   export function loginOnce(uid: string) {
     var loginNonce = getLoginNonce();
@@ -214,14 +211,26 @@ module Esper.Login {
   export var logoutPath = "/login?logout=1"
   export var approveTeamsPath = "/approve-teams";
 
+  // Params for redirect
+  export var uidParam = "uid";
+  export var redirectParam = "redirect";
+  export var messageParam = "msg";
+  export var errorParam = "err";
+  export var logoutParam = "logout";
+
   export function goToLogin(message?: string, error?: string) {
     var path = loginPath;
+    var redirect = location.pathname + location.hash;
     var params: string[] = [];
+    if (redirect) {
+      params.push(redirectParam + "=" +
+        encodeURIComponent(Util.hexEncode(redirect)));
+    }
     if (message) {
-      params.push("message=" + encodeURIComponent(message));
+      params.push(messageParam + "=" + encodeURIComponent(message));
     }
     if (error) {
-      params.push("error=" + encodeURIComponent(error));
+      params.push(errorParam + "=" + encodeURIComponent(error));
     }
     if (params.length) {
       path += "?" + params.join("&");
@@ -232,7 +241,7 @@ module Esper.Login {
   export function goToLogout(message?: string) {
     var path = logoutPath;
     if (message) {
-      path += "?message" + encodeURIComponent(message);
+      path += "?" + messageParam + encodeURIComponent(message);
     }
     location.href = path;
   }

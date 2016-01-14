@@ -8,45 +8,57 @@ module Esper {
   var DEFAULT_REDIRECT = "time";
 
   export function init() {
-    var uid = Util.getParamByName("uid");
+    if (Util.getParamByName(Login.logoutParam)) {
+      Login.logout();
+    }
+
+    var uid = Util.getParamByName(Login.uidParam);
+    var message = Util.getParamByName(Login.messageParam);
+    var error = Util.getParamByName(Login.errorParam);
 
     if (uid) {
       Login.loginOnce(uid)
         .done(function() {
-          Layout.render(<div>
-            You are logged in. Redirecting &hellip;
+          Layout.render(<div className="esper-full-screen">
+            <div className="esper-center">
+              <div className="esper-spinner"></div>
+            </div>
           </div>);
-          location.href = "/" + DEFAULT_REDIRECT;
+          location.href = "/" + getLandingUrl();
         })
         .fail(function() {
           Log.e("Unable to login");
-          renderLogin();
+          renderLogin("", "There was an error logging in. Please try again.");
         });
     } else {
-      renderLogin()
+      renderLogin(message, error)
     }
   }
 
   function getLandingUrl() {
-    var r = Util.getParamByName("redirect") || DEFAULT_REDIRECT;
+    var r = Util.getParamByName(Login.redirectParam);
+    r = (r ? Util.hexDecode(r) : DEFAULT_REDIRECT);
     if (r[0] === "/") {
       r = r.slice(1);
     }
     return r;
   }
 
-  function renderLogin() {
+  function renderLogin(message?: string, error?: string) {
     Layout.render(<div id="esper-login-container">
       <Components.LoginPrompt
         landingUrl={getLandingUrl()}
         showGoogle={true}
         showExchange={true}
         showNylas={true}>
-        <div className="alert alert-info text-center">
-          Esper uses data from your calendar and other sources to provide you
-          insight into how you spend your time. Please login with your calendar
-          provider to continue.
-        </div>
+        <div className={
+          "alert text-center alert-" + (error ? "danger" : "info")
+        }>{ error || message || <span>
+              Esper uses data from your calendar and other sources to provide
+              you insight into how you spend your time. Please log in with your
+              calendar provider to continue.
+            </span>
+         }</div>
       </Components.LoginPrompt>
     </div>);
   }
