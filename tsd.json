@@ -59,6 +59,9 @@
     "bootstrap/bootstrap.d.ts": {
       "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
+    "bootstrap-daterangepicker/bootstrap-daterangepicker.d.ts": {
+      "commit": "95c9b8d2d4070c35f40295a45efef95af6913579"
+    },
     "analytics-node/analytics-node.d.ts": {
       "commit": "f53108644c2f32b93de423d844650297fc415a8b"
     },
@@ -66,10 +69,10 @@
       "commit": "9fb83ae4f6aee92fc14f73ee61a0efab3d1b5aef"
     },
     "chartjs/chart.d.ts": {
-      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
+      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
     },
     "ravenjs/ravenjs.d.ts": {
-      "commit": "6054c1a8b163fdc1c30a8f977118a41658025922"
+      "commit": "02bc2983507f9ae82fa67300848f070fd88fd11a"
     },
     "twitter/twitter.d.ts": {
       "commit": "6054c1a8b163fdc1c30a8f977118a41658025922"
