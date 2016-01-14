@@ -41,7 +41,8 @@ module Esper.Analytics {
 
           // Identify user regardless of previous login status
           analytics.identify(Login.myUid(), {
-            email: loginInfo.email
+            email: loginInfo.email,
+            platform: loginInfo.platform
           }, cbWrap);
         }
       } else {

@@ -62,13 +62,12 @@ var build = function(globs, tsConfigPath, outDir) {
   }
 
   // Get entry points from config files
-  var files = [];
+  var files = config.files || [];
   if (production.isSet()) {
     files = files.concat(config.prodFiles || []);
   } else {
     files = files.concat(config.devFiles || []);
   }
-  files = files.concat(config.files || []);
 
   // Files are relative to tsconfig.json file. Adjust paths so they're
   // relative to cwd

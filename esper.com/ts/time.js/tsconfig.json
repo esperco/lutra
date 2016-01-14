@@ -6,6 +6,14 @@
   },
 
   "files": [
-    "time.js.tsx"
+    "Main.ts"
+  ],
+
+  "devFiles": [
+
+  ],
+
+  "prodFiles": [
+
   ]
 }

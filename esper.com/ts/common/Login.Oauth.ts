@@ -2,9 +2,13 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
+/// <reference path="../typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Login.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/Util.ts" />
+/// <reference path="./Analytics.Web.ts" />
 
 module Esper.Login {
   var nonceKey = "login_nonce";
@@ -85,88 +89,6 @@ module Esper.Login {
     return path;
   }
 
-  /////
-
-  var loginDeferred: JQueryDeferred<ApiT.LoginResponse>;
-
-  /*
-    Reset the loginDeferred object for a new login attempt, unless current
-    deferred is pending.
-  */
-  function resetDeferred() {
-    if (!loginDeferred || loginDeferred.state() !== "pending") {
-      loginDeferred = $.Deferred();
-    }
-  }
-
-  /*
-    When resolving deferred, reset the deferred object if previously rejected.
-    This fixes situation where there may be multiple ongoing log in attempts.
-  */
-  function resolveDeferred(info: ApiT.LoginResponse) {
-    resetDeferred();
-    loginDeferred.resolve(info);
-  }
-
-  /*
-    Reject deferred, but not if we've already successfully logged in otherwise.
-    This helps avoids race conditions with multiple ongoing log in attempts.
-  */
-  function rejectDeferred(err?: Error) {
-    if (loginDeferred.state() === "pending") {
-      loginDeferred.reject(err);
-    }
-  }
-
-  /*
-    Returns a promise for the current login attempt in progress.
-    Promise resolves if login is successful, fails otherwise.
-    Automatically initiates a login attempt if called.
-  */
-  export function promise() {
-    if (! loginDeferred) {
-      initLogin();
-    }
-    return loginDeferred.promise();
-  }
-
-  /*
-    Registers a callback for login success -- unlike promise, these are called
-    on each successful login.
-  */
-  export function onSuccess(cb: (info: ApiT.LoginResponse) => void) {
-    loginCallbacks.push(cb);
-  }
-  var loginCallbacks: Array<(info: ApiT.LoginResponse) => void> = [];
-
-  // Handle success callbacks
-  function handleSuccess(info: ApiT.LoginResponse) {
-    _.each(loginCallbacks, (cb) => cb(info));
-  }
-
-  // Check if there are unapproved teams that exec user needs to approve
-  function needApproval(data: ApiT.LoginResponse): boolean {
-    return !!_.find(data.teams || [], (team: ApiT.Team) =>
-      team.team_executive === Login.me() && !team.team_approved
-    );
-  }
-
-  // Set this to a function to handle teams requiring approval
-  export var approvalHandler: {
-    (info: ApiT.LoginResponse): JQueryPromise<ApiT.LoginResponse>;
-  }
-
-  function runLoginChecks(loginInfo: ApiT.LoginResponse)
-    : JQueryPromise<ApiT.LoginResponse>|ApiT.LoginResponse
-  {
-    // Check if we need exec to approve teams
-    if (needApproval(loginInfo) && approvalHandler) {
-      return approvalHandler(loginInfo);
-    } else {
-      return loginInfo;
-    }
-  }
-
 
   /////
 
@@ -205,30 +127,63 @@ module Esper.Login {
     }
   }
 
-  // Used by initLogin
+  var loginDeferred: JQueryDeferred<ApiT.LoginResponse> = $.Deferred();
+  export var promise = loginDeferred.promise();
+  export var InfoStore = new Model.StoreOne<ApiT.LoginResponse>();
+
+  // Used by init
   var alreadyInit = false;
+
+  // Change before calling init for approve-teams page
+  export var allowUnapproved = false;
 
   /*
     This function should be called when the app is initially loaded and we
     want to check if user has stored credentials.
   */
-  export function initLogin() {
+  export function init() {
     if (alreadyInit) { return; }
     alreadyInit = true;
 
-    resetDeferred();
-    if (initCredentials()) {
-      Api.getLoginInfo()
-        .then(runLoginChecks)
-        .then(function(loginInfo) {
-          handleSuccess(loginInfo);
-          resolveDeferred(loginInfo);
-        }, function(err) {
-          rejectDeferred(err);
-        });
+    // Check query param for uid
+    var uid = Util.getParamByName("uid");
+
+    if (initCredentials() && (!uid || Login.myUid() === uid)) {
+      Api.getLoginInfo().then(onLoginSuccess, onLoginFailure);
+    } else if (uid) {
+      loginOnce(uid);
     } else {
-      rejectDeferred();
+      goToLogin();
     }
+  }
+
+  function onLoginSuccess(loginInfo: ApiT.LoginResponse) {
+    if (needApproval(loginInfo) && !allowUnapproved) {
+      goToApproveTeams();
+    } else {
+      Analytics.identify(loginInfo, true);
+      if ((<any> window).Raven) {
+        Raven.setUserContext({
+          email: loginInfo.email,
+          id: loginInfo.uid,
+          platform: loginInfo.platform
+        });
+      }
+      InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+      loginDeferred.resolve(loginInfo);
+    }
+  }
+
+  function onLoginFailure(err?: Error) {
+    Log.e(err);
+    goToLogin(null, "There was an error logging you in. Please try again.");
+  }
+
+  // Check if there are unapproved teams that exec user needs to approve
+  function needApproval(data: ApiT.LoginResponse): boolean {
+    return !!_.find(data.teams || [], (team: ApiT.Team) =>
+      team.team_executive === Login.me() && !team.team_approved
+    );
   }
 
   /*
@@ -236,34 +191,53 @@ module Esper.Login {
     with loginInfo
   */
   export function loginOnce(uid: string) {
-    resetDeferred();
     var loginNonce = getLoginNonce();
     if (! loginNonce) {
       Log.e("Login nonce missing");
-      rejectDeferred();
-      return $.Deferred().reject();
+      goToLogin();
     }
-    return Api.loginOnce(uid, loginNonce)
-      .then(function(loginInfo) {
-        setCredentials(loginInfo.uid, loginInfo.api_secret);
-        storeCredentials(loginInfo);
-        clearLoginNonce();
-        return loginInfo;
-      })
-      .then(runLoginChecks)
-      .then(function(loginInfo) {
-        handleSuccess(loginInfo);
-        resolveDeferred(loginInfo);
-        return loginInfo;
-      }, rejectDeferred);
+    return Api.loginOnce(uid, loginNonce).then(onLoginSuccess, onLoginFailure);
   }
 
   /*
-    Call on logout to clear login data
+    Clear login data
   */
-  export function clear() {
+  export function logout() {
     unsetCredentials(); // Clear from memory
     clearCredentials(); // Clear from storage
-    resetDeferred();
+    Analytics.identify(null); // Resets identity
+  }
+
+
+  // Redirects
+  export var loginPath = "/login";
+  export var logoutPath = "/login?logout=1"
+  export var approveTeamsPath = "/approve-teams";
+
+  export function goToLogin(message?: string, error?: string) {
+    var path = loginPath;
+    var params: string[] = [];
+    if (message) {
+      params.push("message=" + encodeURIComponent(message));
+    }
+    if (error) {
+      params.push("error=" + encodeURIComponent(error));
+    }
+    if (params.length) {
+      path += "?" + params.join("&");
+    }
+    location.href = path;
+  }
+
+  export function goToLogout(message?: string) {
+    var path = logoutPath;
+    if (message) {
+      path += "?message" + encodeURIComponent(message);
+    }
+    location.href = path;
+  }
+
+  export function goToApproveTeams() {
+    location.href = approveTeamsPath;
   }
 }
