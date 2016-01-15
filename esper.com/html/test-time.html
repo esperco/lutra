@@ -1,0 +1,13 @@
+{#
+  Test runner page for TS libraries
+#}
+
+{% extends "_test.html" %}
+
+{% block testscripts %}
+  <script type="text/javascript" src="/js/timestats-vendor.js"></script>
+  <script type="text/javascript">
+    Esper.TESTING = true;
+  </script>
+  <script type="text/javascript" src="/js/time.js"></script>
+{% endblock %}

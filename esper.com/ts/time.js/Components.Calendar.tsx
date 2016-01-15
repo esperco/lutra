@@ -1,0 +1,256 @@
+/*
+  Component for a FullCalendar rendering
+*/
+
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./Esper.ts" />
+/// <reference path="./Events.ts" />
+/// <reference path="./Calendars.ts" />
+
+module Esper.Components {
+  // Shorten references to React Component class
+  var Component = ReactHelpers.Component;
+
+  interface CalendarProps {
+    teamId: string;
+    calId: string;
+    eventIds?: string[];
+    updateFn: (eventId: string, eventTitle: string, add: boolean) => void;
+  }
+
+  interface CalendarState {
+    showBusy?: boolean;
+    showError?: boolean;
+  }
+
+  export abstract class Calendar extends Component<CalendarProps, CalendarState>
+  {
+    _fcDiv: HTMLElement;
+    _currentStart: number;  // Unix time
+    _currentEnd: number;    // Unix time
+
+    constructor(props: CalendarProps) {
+      super(props);
+      this.state = {};
+    }
+
+    render() {
+      return <div className="fullcalendar-holder">
+        <div ref={(c) => this._fcDiv = c}></div>
+        {this.renderMessage()}
+      </div>;
+    }
+
+    renderMessage() {
+      var msg: JSX.Element;
+      if (this.state.showBusy) {
+        msg = <span>
+          <span className="esper-spinner esper-inline" />{" "}
+          Loading &hellip;
+        </span>;
+      }
+
+      else if (this.state.showError) {
+        msg = <span>
+          <i className="fa fa-fw fa-warning" />{" "}
+          There was an error loading calendar data.
+        </span>;
+      }
+
+      else {
+        // No message state, don't render message
+        return <span />;
+      }
+
+      // Render message in wrapper
+      return <div className="esper-center esper-msg">{msg}</div>;
+    }
+
+    /*
+      Where fullCalendar gets initially invoked
+    */
+    componentDidMount() {
+      var fcDiv = $(this._fcDiv);
+      fcDiv.fullCalendar({
+        header: {
+          left: 'today prev,next',
+          center: 'title',
+          right: 'agendaDay,agendaWeek,month'
+        },
+        defaultView: 'agendaWeek',
+        snapDuration: "00:15:00",
+        events: this.getSync.bind(this),
+        viewRender:this.fetchAsync.bind(this),
+        eventClick: this.toggleEvent.bind(this),
+        height: fcDiv.parent().height() - 10,
+        windowResize: () => {
+          fcDiv.fullCalendar('option', 'height', fcDiv.parent().height() - 10);
+        }
+      });
+      this.insertRefreshButton();
+
+      this.setSources([Events.EventStore]);
+    }
+
+    /*
+      Inserts a refresh button using jQuery -- ideally we'd prefer for React to
+      do this for us, but that's hard to make work with FullCalendar
+    */
+    insertRefreshButton() {
+      var btnId = "esper-fc-refresh";
+      var fcDiv = $(this._fcDiv);
+      var container = fcDiv.find(".fc-right");
+
+      // Sanity check
+      if (!container || !container.length) {
+        Log.e("Unable to locate FC container for reresh button");
+        return;
+      }
+
+      // Only insert if refresh button is already there
+      if (!container.find("#" + btnId).length) {
+        var btn = $("<button type=\"button\" />");
+        btn.append($("<i class=\"fa fa-fw fa-refresh\" />"));
+        btn.addClass("fc-button fc-state-default");
+        btn.addClass("fc-corner-left fc-corner-right");
+        btn.attr("id", btnId);
+        btn.click(() => {
+          Events.invalidate();
+          this.updateCurrentView();
+        });
+        container.prepend(btn);
+      }
+    }
+
+    // Return something so setSources works
+    getState(props: CalendarProps) {
+      return this.state || {};
+    }
+
+    componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
+      $(this._fcDiv).fullCalendar('refetchEvents');
+      if (! _.eq(prevProps, this.props)) {
+        this.updateCurrentView();
+      }
+    }
+
+    // Offset range to handle timezone weirdness -- doesn't mutate
+    getRange(start: moment.Moment, end: moment.Moment) {
+      return [
+        start.clone().subtract(1, 'day'),
+        end.clone().add(1, 'day')
+      ];
+    }
+
+    // Makes async calls to update current calendar view
+    updateCurrentView() {
+      var view = $(this._fcDiv).fullCalendar('getView');
+      this.fetchAsync(view);
+    }
+
+    // Asynchronusly make calls to update stores
+    fetchAsync(view: FullCalendar.View) {
+      var range = this.getRange(moment(view.start), moment(view.end));
+      var momentStart = range[0];
+      var momentEnd = range[1];
+
+      /*
+        Remember currrent interval start/stop for callback purposes -- used
+        to avoid situation where navigating between multiple views quickly
+        causes state to be improperly updated. Use unix time to avoid
+        mutation issues.
+      */
+      var currentStart = this._currentStart = momentStart.unix();
+      var currentEnd = this._currentEnd = momentEnd.unix();
+
+      var apiDone = false;
+      Events.fetch(this.props.teamId, this.props.calId,
+        momentStart.toDate(), momentEnd.toDate()
+      ).done(() => {
+        // Only update state if we're still looking at the same interval
+        if (this._currentStart === currentStart &&
+            this._currentEnd === currentEnd) {
+          this.setState({showBusy: false, showError: false});
+        }
+      }).fail(() => {
+        this.setState({showBusy: false, showError: true});
+      }).always(() => {
+        apiDone = true;
+      });
+
+      // Promise will return synchronously if already complete and update
+      // state accordingly -- so only update to busy and avoid React re-render
+      // if API call hasn't compelted yet
+      if (! apiDone) {
+        this.setState({showBusy: true, showError: false});
+      }
+    }
+
+    // Synchronously fetch from stores
+    getSync(momentStart: moment.Moment, momentEnd: moment.Moment,
+            tz: string|boolean,
+            callback: (events: FullCalendar.EventObject[]) => void): void
+    {
+      var range = this.getRange(momentStart, momentEnd);
+      momentStart = range[0];
+      momentEnd = range[1];
+
+      var events = Events.get(this.props.teamId, this.props.calId,
+        momentStart.toDate(), momentEnd.toDate()
+      );
+      events = _.filter(events);
+
+      // For inferring which events are "selected" by virtue of being a
+      // recurring event
+      var selectedEvents = _.map(this.props.eventIds,
+        (_id) => Events.EventStore.val(_id)
+      ) || [];
+      var recurringEventIds = _.map(selectedEvents,
+        (e) => e && e.recurring_event_id
+      );
+      recurringEventIds = _.uniq(_.filter(recurringEventIds));
+
+      callback(_.map(events, (event): FullCalendar.EventObject => {
+        var eventId = Events.storeId(event);
+        var classNames: string[] = ["selectable"];
+        if (_.contains(this.props.eventIds || [], eventId)) {
+          classNames.push("active");
+        }
+        if (_.contains(recurringEventIds, event.recurring_event_id)) {
+          classNames.push("recurring-active");
+        }
+        if (event.recurring_event_id) {
+          classNames.push("recurring");
+        }
+        if (event.labels && event.labels.length) {
+          classNames.push("labeled");
+        }
+        return {
+          id: eventId,
+          title: event.title || "",
+          allDay: event.all_day,
+          start: this.adjustTz(event.start, event.timezone),
+          end: this.adjustTz(event.end, event.timezone),
+          editable: false,
+          className: classNames.join(" ")
+        };
+      }));
+    }
+
+    // Adjust a timetamp based on the currently selected event'ss timezone
+    adjustTz(timestamp: string, timezone?: string) {
+      if (timezone) {
+        return moment.tz(timestamp, timezone).toDate()
+      } else {
+        return moment(timestamp).toDate();
+      }
+    }
+
+    // Handle event selection, toggle
+    toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
+      var currentlySelected = _.contains(this.props.eventIds || [], event.id);
+      this.props.updateFn(event.id, event.title,
+        jsEvent.shiftKey || jsEvent.ctrlKey);
+    }
+  }
+}

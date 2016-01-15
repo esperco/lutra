@@ -1,0 +1,12 @@
+{% extends "_app.html" %}
+
+{% block head %}
+  <link rel="stylesheet" href="css/font-awesome.css" media="screen" />
+  <link rel="stylesheet" href="css/time.css" media="screen" />
+{% endblock %}
+
+{% block postscripts %}
+  {{ super() }}
+  <script type="text/javascript" src="/js/timestats-vendor.js"></script>
+  <script type="text/javascript" src="/js/time.js"></script>
+{% endblock %}

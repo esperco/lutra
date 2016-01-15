@@ -33,8 +33,9 @@ var config = {
     "ts/**/*.{ts,tsx}"
   ],
   tsProjects: [
+    "ts/login.js/tsconfig.json",
     "ts/test.js/tsconfig.json",
-    "ts/login.js/tsconfig.json"
+    "ts/time.js/tsconfig.json"
   ],
 
   lessGlobs: [

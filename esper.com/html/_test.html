@@ -1,0 +1,72 @@
+{#
+  Test runner page base
+#}
+
+{% extends "_base.html" %}
+
+{% block title %}Esper | Jasmine Spec Runner{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="/jasmine/jasmine.css">
+  <script src="/jasmine/jasmine.js"></script>
+  <script src="/jasmine/jasmine-html.js"></script>
+  <script src="/jasmine/boot.js"></script>
+  <script type="text/javascript">
+    function toggleTestFrame() {
+      "use strict"; /* global document */
+      var frame = document.getElementById("esper-test-frame");
+      frame.className = frame.className ? "" : "hide";
+    }
+  </script>
+  <style>
+    body {
+      padding-bottom: 50px;
+    }
+
+    #esper-test-frame-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+    }
+
+    #esper-test-frame-container button {
+      float: right;
+      background: #007069;
+      padding: 5px 10px;
+      border: 0;
+      color: white;
+      cursor: pointer;
+    }
+
+    /*
+      Force test frame to always technically be visible because some tests
+      depend on jQuery's concept of visibility
+    */
+    #esper-test-frame.hide {
+      position: absolute;
+      right: -100000%;
+      display: block !important;
+    }
+
+    #esper-test-frame {
+      resize: both;
+      overflow: auto;
+      display: block;
+      clear: both;
+      border: 1px solid #007069;
+    }
+
+    .jasmine_html-reporter {
+      margin: 0;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+  <div id="esper-test-frame-container">
+    <button onclick="toggleTestFrame();">Test Frame</button>
+    <iframe id="esper-test-frame" class="hide"></iframe>
+  </div>
+
+  {% block testscripts %}{% endblock %}
+{% endblock %}

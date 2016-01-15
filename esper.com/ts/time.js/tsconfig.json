@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "outFile": "time.js"
+  },
+
+  "files": [
+    "Main.ts"
+  ],
+
+  "devFiles": [
+    "../common/JasmineStub.ts",
+    "Calendars.Test.ts",
+    "Route.Test.ts",
+    "Teams.Test.ts",
+    "TimeStats.Test.ts",
+    "Views.Charts.Test.tsx",
+    "Views.CalendarLabeling.Test.tsx"
+  ],
+
+  "prodFiles": [
+
+  ]
+}

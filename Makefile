@@ -10,7 +10,6 @@ setup: vendor
 	$(MAKE) -C grison setup
 	$(MAKE) -C otter setup
 	$(MAKE) -C stoat setup
-	$(MAKE) -C zorilla setup
 
 vendor:
 	npm install
@@ -23,4 +22,4 @@ clean:
 	$(MAKE) -C esper.com clean
 	$(MAKE) -C otter clean
 	$(MAKE) -C stoat clean
-	$(MAKE) -C zorilla clean
+	rm -rf zorilla

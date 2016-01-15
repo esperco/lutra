@@ -55,15 +55,6 @@ module Esper.Layout {
     });
   }
 
-  // Override these functions to change behavior
-  export function defaultHeader() {
-    return <span />;
-  }
-
-  export function defaultFooter() {
-    return <span />;
-  }
-
   // Hide the loading screen
   function hideLoader() {
     var loading = $(loadingSelector);

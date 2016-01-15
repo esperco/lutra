@@ -1,0 +1,137 @@
+@import "./lib/_custom-bootstrap";
+@import "./lib/_helpers";
+
+/* New variables */
+@footer-bg: @panel-default-heading-bg;
+@footer-border: @panel-default-border;
+@footer-default-color: @text-color;
+@footer-default-link-color: @brand-bg;
+
+/*
+  Not ideal to have < 100% for mobile but functional until we figure out
+  a better mobile UI
+*/
+@sidebar-xs-width: 42%;
+@sidebar-sm-width: 33%;
+@sidebar-md-width: 25%;
+@sidebar-lg-width: 17%;
+
+
+/* Project-specific imports */
+@import "./login";
+@import "./_loading";
+@import "./_loginRequired";
+@import "./time/_onboarding";
+@import "./time/_chart";
+@import "./time/_calendar";
+@import "./time/_labeling";
+
+
+/* Header and footer animations */
+@keyframes dropdown-nav {
+  0% {
+    top: -@navbar-height;
+  }
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes footer-peek {
+  50% {
+    max-height: 100%;
+  }
+}
+
+/* Basic Layout */
+body, .footer {
+  background: @footer-bg;
+}
+.navbar {
+  animation: dropdown-nav 0.6s;
+}
+#esper-main {
+  background: @body-bg;
+  padding: @navbar-height 0;
+  min-height: 50%;
+}
+
+// Other props for left/right set in marten/less/_helpers.less
+.esper-left-sidebar {
+  border-right: 1px solid @table-border-color;
+  overflow-x: hidden;
+  width: @sidebar-xs-width;
+
+  @media (min-width: @screen-sm-min) {
+    width: @sidebar-sm-width;
+  }
+
+  @media (min-width: @screen-md-min) {
+    width: @sidebar-md-width;
+  }
+
+  @media (min-width: @screen-lg-min) {
+    width: @sidebar-lg-width;
+  }
+}
+.esper-right-content {
+  /* xs-width -- not ideal but function until we
+     figure out a better mobile UI */
+  width: 100% - @sidebar-xs-width;
+
+  @media (min-width: @screen-sm-min) {
+    width: 100% - @sidebar-sm-width;
+  }
+
+  @media (min-width: @screen-md-min) {
+    width: 100% - @sidebar-md-width;
+  }
+
+  @media (min-width: @screen-lg-min) {
+    width: 100% - @sidebar-lg-width;
+  }
+}
+
+.footer {
+  margin: 0 auto;
+  padding: 0;
+  color: @footer-default-color;
+  border-top: 1px solid @footer-border;
+  background: @footer-bg;
+  ul, li{
+    list-style-type: none;
+  }
+
+  &.hoverable {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: @padding-large-vertical;
+    animation: footer-peek 2s 1.2s;
+    overflow: hidden;
+    z-index: 10;
+
+    &:hover, &:focus {
+      max-height: 100%;
+    }
+
+    // NB: max-height instad of height because height => auto doesn't
+    // animate well
+    transition: max-height 0.6s;
+  }
+
+  a, a:hover, a:visited, a:active {
+    color: @footer-default-link-color;
+  }
+
+  .footer-links {
+    padding-top: (@navbar-height -
+      (extract(@nav-link-padding, 1) * 2) -
+      @line-height-computed) / 2;
+
+    a {
+      padding-right: @padding-large-horizontal;
+    }
+  }
+}

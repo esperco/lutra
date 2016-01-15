@@ -11,12 +11,15 @@
 /// <reference path="../lib/ApiT.ts" />
 
 module Esper.Analytics {
-  export function init(key: string) {
-    writeKey = key; // Sets module-level variable used elsewhere
-
-    // Init with write key
-    analytics.load(writeKey);
-  };
+  // Stub in case Segment doesn't load (e.g. ad-blocker)
+  if (! (<any> window).analytics) {
+    (<any> window).analytics = {
+      ready: function() {},
+      user: function() {},
+      track: function() {},
+      page: function() {}
+    }
+  }
 
   export function identify(loginInfo?: ApiT.LoginResponse,
                            alias=false, cb=function() {}) {
@@ -41,7 +44,8 @@ module Esper.Analytics {
 
           // Identify user regardless of previous login status
           analytics.identify(Login.myUid(), {
-            email: loginInfo.email
+            email: loginInfo.email,
+            platform: loginInfo.platform
           }, cbWrap);
         }
       } else {
