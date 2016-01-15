@@ -337,7 +337,7 @@ module Esper.CalPicker {
 '''
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/availability.svg");
+    Svg.loadImg(icon, "/img/availability.svg");
 
     title.text("Customize Availability for " + name);
 

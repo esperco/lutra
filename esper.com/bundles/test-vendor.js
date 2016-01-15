@@ -6,7 +6,6 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-// Bower packages
 var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),

@@ -6,7 +6,6 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-// Bower packages
 var Chart         = require("chart.js"),
     EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),

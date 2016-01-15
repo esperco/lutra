@@ -116,7 +116,7 @@ module Esper.AccountTab {
 '''
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/displayname.svg");
+    Svg.loadImg(icon, "/img/displayname.svg");
 
     signature.val(currentSig);
 
@@ -162,7 +162,7 @@ module Esper.AccountTab {
       if (!profile.google_access) {
         var warning = $("<img class='svg-block'/>")
           .appendTo(statusContainer);
-        Svg.loadImg(warning, "/assets/img/warning.svg");
+        Svg.loadImg(warning, "/img/warning.svg");
         (<any> statusContainer).tooltip(); // FIXME
       }
 
@@ -459,7 +459,7 @@ module Esper.AccountTab {
 
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/creditcard.svg");
+    Svg.loadImg(icon, "/img/creditcard.svg");
 
     var refs = getPaymentForm(team, membership, function(err) {
       if (err) {
@@ -494,7 +494,7 @@ module Esper.AccountTab {
 '''
     var check = $("<img class='svg-block membership-option-check'/>")
       .appendTo(checkContainer);
-    Svg.loadImg(check, "/assets/img/check.svg");
+    Svg.loadImg(check, "/img/check.svg");
 
     var plan = Plan.getPlan(planId);
     name.text(plan.name);
@@ -544,7 +544,7 @@ module Esper.AccountTab {
 '''
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/membership.svg");
+    Svg.loadImg(icon, "/img/membership.svg");
 
     // Map of planId to jQuery elms
     var elmMap: { [index: string]: JQuery } = {};
@@ -735,7 +735,7 @@ module Esper.AccountTab {
 '''
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/displayname.svg");
+    Svg.loadImg(icon, "/img/displayname.svg");
 
     if (team.team_name !== undefined)
       displayName.val(team.team_name);
@@ -819,7 +819,7 @@ module Esper.AccountTab {
 
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/membership.svg");
+    Svg.loadImg(icon, "/img/membership.svg");
 
     cancelBtn.click(function() {
       (<any> modal).modal("hide"); // FIXME
@@ -971,7 +971,7 @@ module Esper.AccountTab {
 '''
     var emailIcon = $("<img class='svg-block invite-icon'/>")
       .appendTo(emailContainer);
-    Svg.loadImg(emailIcon, "/assets/img/email.svg");
+    Svg.loadImg(emailIcon, "/img/email.svg");
 
     membership.append(displayMembership(team));
 

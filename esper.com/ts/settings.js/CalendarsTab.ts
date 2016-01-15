@@ -104,15 +104,16 @@ module Esper.CalendarsTab {
 '''
 <div #view>
   <h4>Team Calendars <small>(Uncheck All to Unshare)</small></h4>
-  <table #teamCals class="table">
-    <tr>
+  <table class="table">
+    <thead><tr>
       <th>View</th>
       <th>Write</th>
       <th>Agenda</th>
       <th>Guest Duplicates</th>
       <th></th>
       <th></th>
-    </tr>
+    </tr></thead>
+    <tbody #teamCals />
   </table>
   <hr />
   <button #saveCals class="button-primary">Save Team Calendars</button>

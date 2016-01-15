@@ -1,30 +1,20 @@
 /* jshint strict: false */
 
 // Helpers
-var inject        = require("marten-npm-vendors/depends").inject;
+var inject        = require("../../build-helpers/depends").inject;
 
-// Bower packages
 var EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
+    page          = require("page"),
+    polyfill      = require("./polyfill"),
     quill         = require("quill");
 
-// React -> get addons
-var react         = require("./marten/vendor/react/react-with-addons.js");
-
 // CryptoJS -> only need SHA-1
-var SHA1          = require("./marten/vendor/crypto-js/sha1.js");
-
-// NB: NPM, not Bower package. Bower package doesn't work well with
-// Browserify unless we want to rewrite its import code.
-//
-// TODO: Look into finding a way to easily freeze NPM dependencies without
-// having to freeze the entire node_modules directory.
-//
-var page = require("marten-npm-vendors/page");
+var SHA1          = require("crypto-js/sha1.js");
 
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
@@ -50,7 +40,6 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,
-    React:        react,
     quill:        quill
   };
   for (var name in assignments) {

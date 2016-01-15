@@ -15,12 +15,11 @@ module Esper.Page {
     "preferences": {ids:["preferences-page"]},
     "usage": {ids:["usage-page"]},
     "usage-period": {ids:["usage-period-page"]},
-    "approve-team": {ids:["approve-team"]},
     "not-found": {ids:["not-found-page"]}
   }, undefined);
 
   function showPage(k) {
-    $('#init-loading').fadeOut(600);
+    $('#esper-loading').fadeOut(600);
     pageSelector.show(k);
   }
 
@@ -97,14 +96,6 @@ module Esper.Page {
       showPage("token");
       Token.load(token);
       Util.focus();
-    }
-  }
-
-  export var approveTeam: Loadable = {
-    load: function() {
-      pageSelector.hideAll();
-      showPage("approve-team");
-      ApproveTeam.load();
     }
   }
 

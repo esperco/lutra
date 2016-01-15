@@ -87,8 +87,8 @@ module Esper.Test {
 
   function tests() {
     return [
-      ["List", List.tests],
-      ["Util", Util.tests]
+      ["List", List.tests()],
+      ["Util", Util.tests()]
     ];
   }
 

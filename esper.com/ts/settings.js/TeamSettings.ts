@@ -190,7 +190,7 @@ module Esper.TeamSettings {
     if (error) {
       var warning = $("<img class='svg-block'/>")
         .appendTo(statusContainer);
-      Svg.loadImg(warning, "/assets/img/warning.svg");
+      Svg.loadImg(warning, "/img/warning.svg");
       statusContainer.tooltip();
     }
   }
@@ -232,11 +232,11 @@ module Esper.TeamSettings {
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
-    Svg.loadImg(logo, "/assets/img/logo.svg");
+    Svg.loadImg(logo, "/img/logo.svg");
 
     var arrowEast = $("<img class='svg-block arrow-east'/>")
       .appendTo(arrowContainer);
-    Svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
+    Svg.loadImg(arrowEast, "/img/arrow-east.svg");
 
     var selectedTeam : ApiT.Team =
       List.find(Login.getTeams(), function(team : ApiT.Team) {
@@ -260,7 +260,7 @@ module Esper.TeamSettings {
     main.append(showTeamSettings(selectedTeam, viewId));
     footer.append(Footer.load());
 
-    signOut.click(Login.logout);
+    signOut.click(function() { Login.goToLogout() });
     trackPage(viewId);
   }
 

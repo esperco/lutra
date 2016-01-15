@@ -230,7 +230,7 @@ module Esper.List {
   var l1 = ["a", "c", "a", "b", "d"];
   var l2 = ["c", "w", "c", "y"];
 
-  export var tests = [
+  export function tests() { return [
     Test.expect("concat",
                 function() { return concat([l1, l2]); }, null,
                 ["a", "c", "a", "b", "d", "c", "w", "c", "y"]),
@@ -252,5 +252,5 @@ module Esper.List {
                     return x === "a" && i > 0;
                   });
                 }, null, ["a", "c", "X", "b", "d"])
-  ];
+  ]};
 }

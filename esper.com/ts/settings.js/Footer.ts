@@ -42,7 +42,7 @@ export function load(onboarding = false) {
 '''
     var wordMark = $("<img class='svg-block word-mark'/>")
       .appendTo(wordMarkContainer);
-    Svg.loadImg(wordMark, "/assets/img/word-mark.svg");
+    Svg.loadImg(wordMark, "/img/word-mark.svg");
 
     if (onboarding) {
       view.hide();

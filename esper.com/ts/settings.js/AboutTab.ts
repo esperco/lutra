@@ -51,7 +51,7 @@ module Esper.AboutTab {
     </li>
     <li class="table-row clearfix">
       <div class="no-whitespace">
-        <img src="/assets/img/sample-calendar.png" alt="Sample calendar">
+        <img src="/img/sample-calendar.png" alt="Sample calendar">
       </div>
     </li>
     <li class="table-row clearfix">

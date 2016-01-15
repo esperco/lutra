@@ -2,7 +2,7 @@
   Various simple utilities
 */
 
-/// <reference path="../marten/ts/Util.ts" />
+/// <reference path="../lib/Util.ts" />
 
 module Esper.Util {
 
@@ -111,7 +111,7 @@ module Esper.Util {
     }
   };
 
-  export var tests = [
+  export function tests() { return [
     Test.expect(
       "mergeObjects",
       function() {
@@ -130,5 +130,5 @@ module Esper.Util {
     Test.expect("intOfString 0", intOfString, 0, 0),
     Test.expect("intOfString null", intOfString, null, NaN),
     Test.expect("intOfString undefined", intOfString, undefined, NaN),
-  ];
+  ] };
 }

@@ -87,11 +87,12 @@ var build = function(globs, tsConfigPath, outDir) {
     code, but a lot of existing TS code uses Oblivion, so keep support for now.
   */
   if (config.oblivion) {
+    var oblivionPath = path.resolve(__dirname, "..", OBLIVION_BIN)
     var filterDefs = filter(['**/*.ts', '!**/*.d.ts'], {restore: true});
     ret = ret
-      .pipe(cached(buildName + " oblivion"))
+      .pipe(cached(tsConfigPath + " oblivion"))
       .pipe(filterDefs)
-      .pipe(exec(OBLIVION_BIN + " -ts <%= file.path %>", {
+      .pipe(exec(oblivionPath + " -ts <%= file.path %>", {
         continueOnError: true,
         pipeStdout: true
       }))
@@ -99,7 +100,7 @@ var build = function(globs, tsConfigPath, outDir) {
         stdout: false   // Don't report stdout, just pipe to output
       }))
       .pipe(filterDefs.restore)
-      .pipe(remember(buildName + " oblivion"));
+      .pipe(remember(tsConfigPath + " oblivion"));
   }
 
   // Use file lists to filter out un-needed files

@@ -16,5 +16,3 @@ module Esper.Conf {
     "https://dir-staging.esper.com"
   ];
 }
-
-Esper.PRODUCTION = true;

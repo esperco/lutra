@@ -627,7 +627,7 @@ module Esper.PreferencesTab {
 
     var icon = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/" + type + ".svg");
+    Svg.loadImg(icon, "/img/" + type + ".svg");
 
     (<any> modal).modal({}); // FIXME
   }
@@ -1028,7 +1028,7 @@ module Esper.PreferencesTab {
 
     var edit = $("<img class='svg-block'/>")
       .appendTo(editIcon);
-    Svg.loadImg(edit, "/assets/img/edit_purple.svg");
+    Svg.loadImg(edit, "/img/edit_purple.svg");
 
     editIcon.hover(function(){
       infoContainer.addClass("edit-hover");
@@ -1056,7 +1056,7 @@ module Esper.PreferencesTab {
 '''
     var location = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(locationContainer);
-    Svg.loadImg(location, "/assets/img/location.svg");
+    Svg.loadImg(location, "/img/location.svg");
 
     List.iter(defaults.favorites, function(fav) {
       locations.append(viewOfInfo("location",
@@ -1084,7 +1084,7 @@ module Esper.PreferencesTab {
 '''
     var video = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(videoContainer);
-    Svg.loadImg(video, "/assets/img/video.svg");
+    Svg.loadImg(video, "/img/video.svg");
 
     List.iter(defaults.accounts, function(acct) {
       usernames.append(viewOfInfo("video",
@@ -1112,7 +1112,7 @@ module Esper.PreferencesTab {
 '''
     var phone = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(phoneContainer);
-    Svg.loadImg(phone, "/assets/img/phone.svg");
+    Svg.loadImg(phone, "/img/phone.svg");
 
     List.iter(defaults.phones, function(ph) {
       numbers.append(viewOfInfo("phone",
@@ -1171,19 +1171,19 @@ module Esper.PreferencesTab {
 
     var duration = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(durationContainer);
-    Svg.loadImg(duration, "/assets/img/duration.svg");
+    Svg.loadImg(duration, "/img/duration.svg");
 
     var buffer = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(bufferContainer);
-    Svg.loadImg(buffer, "/assets/img/buffer.svg");
+    Svg.loadImg(buffer, "/img/buffer.svg");
 
     var bufferInfoIcon = $("<img class='svg-block info-icon'/>")
       .appendTo(bufferInfo);
-    Svg.loadImg(bufferInfoIcon, "/assets/img/info.svg");
+    Svg.loadImg(bufferInfoIcon, "/img/info.svg");
 
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
-    Svg.loadImg(availability, "/assets/img/availability.svg");
+    Svg.loadImg(availability, "/img/availability.svg");
 
     durationCol.append(
       createDurationSelector(defaults.duration, save)
@@ -1383,11 +1383,11 @@ module Esper.PreferencesTab {
 
     var icon = $("<img class='svg-block preference-transportation-icon'/>")
       .appendTo(iconContainer);
-    Svg.loadImg(icon, "/assets/img/" + lowerType + ".svg");
+    Svg.loadImg(icon, "/img/" + lowerType + ".svg");
 
     var check = $("<img class='svg-block preference-transportation-check'/>")
       .appendTo(checkContainer);
-    Svg.loadImg(check, "/assets/img/check.svg");
+    Svg.loadImg(check, "/img/check.svg");
 
     function enable() {
       transportation.removeClass("off");
@@ -1439,7 +1439,7 @@ module Esper.PreferencesTab {
   function viewOfWorkplace(defaults : ApiT.Workplace, teamid) {
 '''
 <li #view class="workplace">
-  <img src="/assets/img/workplace-map.png" class="workplace-map"/>
+  <img src="/img/workplace-map.png" class="workplace-map"/>
   <div #details class="workplace-details">
     <div #editIcon class="img-container-right"/>
     <div #title class="esper-prefs-workplace-name semibold"/>
@@ -1493,31 +1493,31 @@ module Esper.PreferencesTab {
 
     var edit = $("<img class='svg-block workplace-edit'/>")
       .appendTo(editIcon);
-    Svg.loadImg(edit, "/assets/img/edit_white.svg");
+    Svg.loadImg(edit, "/img/edit_white.svg");
 
     var duration = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(durationContainer);
-    Svg.loadImg(duration, "/assets/img/duration.svg");
+    Svg.loadImg(duration, "/img/duration.svg");
 
     var buffer = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(bufferContainer);
-    Svg.loadImg(buffer, "/assets/img/buffer.svg");
+    Svg.loadImg(buffer, "/img/buffer.svg");
 
     var bufferInfoIcon = $("<img class='svg-block info-icon'/>")
       .appendTo(bufferInfo);
-    Svg.loadImg(bufferInfoIcon, "/assets/img/info.svg");
+    Svg.loadImg(bufferInfoIcon, "/img/info.svg");
 
     var distance = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(distanceContainer);
-    Svg.loadImg(distance, "/assets/img/distance.svg");
+    Svg.loadImg(distance, "/img/distance.svg");
 
     var distanceInfoIcon = $("<img class='svg-block info-icon'/>")
       .appendTo(distanceInfo);
-    Svg.loadImg(distanceInfoIcon, "/assets/img/info.svg");
+    Svg.loadImg(distanceInfoIcon, "/img/info.svg");
 
     var availability = $("<img class='svg-block preference-option-icon'/>")
       .appendTo(availabilityContainer);
-    Svg.loadImg(availability, "/assets/img/availability.svg");
+    Svg.loadImg(availability, "/img/availability.svg");
 
     editIcon.hover(function(){
       details.addClass("edit-hover");

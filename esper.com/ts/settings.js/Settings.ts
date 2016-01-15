@@ -69,7 +69,7 @@ module Esper.Settings {
     if (error) {
       var warning = $("<img class='svg-block'/>")
         .appendTo(statusContainer);
-      Svg.loadImg(warning, "/assets/img/warning.svg");
+      Svg.loadImg(warning, "/img/warning.svg");
       statusContainer.tooltip();
     }
   }
@@ -96,7 +96,7 @@ module Esper.Settings {
 '''
     var cog = $("<img class='svg-block team-cog clickable'/>")
       .appendTo(cogContainer);
-    Svg.loadImg(cog, "/assets/img/cog.svg");
+    Svg.loadImg(cog, "/img/cog.svg");
 
     var members =
       List.union([team.team_executive], team.team_assistants, undefined);
@@ -216,7 +216,7 @@ module Esper.Settings {
 </div>
 '''
     loginButton.click(function() {
-      Signin.loginAs(loginEmail.val());
+      Login.loginAs(loginEmail.val());
     });
 
     generateButton.click(function() {
@@ -229,7 +229,7 @@ module Esper.Settings {
         });
     });
 
-    clearSync.click(Login.logout);
+    clearSync.click(function() { Login.goToLogout() });
 
     return view;
   }
@@ -300,19 +300,19 @@ module Esper.Settings {
 
     var logo = $("<img class='svg-block header-logo'/>")
       .appendTo(logoContainer);
-    Svg.loadImg(logo, "/assets/img/logo.svg");
+    Svg.loadImg(logo, "/img/logo.svg");
 
     var close = $("<img class='svg-block'/>")
       .appendTo(closeContainer);
-    Svg.loadImg(close, "/assets/img/close.svg");
+    Svg.loadImg(close, "/img/close.svg");
 
     var chrome = $("<img class='svg-block chrome-logo'/>")
       .appendTo(chromeLogoContainer);
-    Svg.loadImg(chrome, "/assets/img/chrome.svg");
+    Svg.loadImg(chrome, "/img/chrome.svg");
 
     var arrowEast = $("<img class='svg-block arrow-east'/>")
       .appendTo(arrowContainer);
-    Svg.loadImg(arrowEast, "/assets/img/arrow-east.svg");
+    Svg.loadImg(arrowEast, "/img/arrow-east.svg");
 
     Api.getMyProfile()
       .done(function(profile){
@@ -350,7 +350,7 @@ module Esper.Settings {
 
     footer.append(Footer.load());
 
-    signOut.click(Login.logout);
+    signOut.click(function() { Login.goToLogout() });
 
     closeContainer.click(function() { installContainer.slideUp(); });
 

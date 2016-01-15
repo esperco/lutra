@@ -96,6 +96,7 @@ module Esper.Login {
         });
       }
       InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+      Login.data = loginInfo; // Compat with legacy code
       loginDeferred.resolve(loginInfo);
       return loginInfo;
     }
@@ -111,6 +112,18 @@ module Esper.Login {
     return !!_.find(data.teams || [], (team: ApiT.Team) =>
       team.team_executive === Login.me() && !team.team_approved
     );
+  }
+
+
+  /////
+
+  // Requires admin permission
+  export function loginAs(email: string) {
+    Api.loginAs(email)
+      .done(function(loginResponse) {
+        storeCredentials(loginResponse);
+        location.reload();
+      });
   }
 
 
@@ -156,7 +169,7 @@ module Esper.Login {
 
   export function goToLogout(message?: string) {
     var params: {[index: string]: string} = {};
-    params[messageParam] = message;
+    if (message) { params[messageParam] = message; }
     params[logoutParam] = "1";
     goToLoginParams(params);
   }
