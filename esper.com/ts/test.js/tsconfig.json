@@ -20,7 +20,9 @@
     "../lib/Model.Batch.Test.ts",
     "../lib/JQStore.Test.ts",
     "../lib/Queue.Test.ts",
-    "../lib/ReactHelpers.Test.ts"
+    "../lib/ReactHelpers.Test.ts",
+    "Integration.Login.ts",
+    "Integration.Time.ts"
   ],
 
   "prodFiles": []

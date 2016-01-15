@@ -19,7 +19,13 @@ module Esper.Login {
     email: string;
   }
 
-  export function storeCredentials(data: ApiT.LoginResponse) {
+  interface CredentialsObj {
+    uid: string;
+    api_secret: string;
+    email: string;
+  }
+
+  export function storeCredentials(data: ApiT.LoginResponse|CredentialsObj) {
     var stored: StoredCredentials = {
       uid: data.uid,
       api_secret: data.api_secret,
@@ -37,7 +43,7 @@ module Esper.Login {
     the rest of the login_response (which we should refetch on login to
     ensure up-to-date data).
   */
-  function initCredentials() {
+  export function initCredentials() {
     var stored: StoredCredentials = LocalStore.get(storedLoginKey);
     if (stored && stored.uid && stored.api_secret) {  // sanity check
       setCredentials(stored.uid, stored.api_secret);

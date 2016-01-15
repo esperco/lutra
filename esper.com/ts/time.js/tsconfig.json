@@ -10,6 +10,7 @@
   ],
 
   "devFiles": [
+    "../common/JasmineStub.ts",
     "Calendars.Test.ts",
     "Route.Test.ts",
     "Teams.Test.ts",
