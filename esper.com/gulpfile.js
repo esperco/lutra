@@ -22,6 +22,7 @@ var config = {
   jsGlobs: ["js/**/*.js"],
   jsBundles: [
     "bundles/react-simple-vendor.js",
+    "bundles/settings-vendor.js",
     "bundles/test-vendor.js",
     "bundles/timestats-vendor.js"
   ],
@@ -34,6 +35,7 @@ var config = {
   ],
   tsProjects: [
     "ts/login.js/tsconfig.json",
+    "ts/settings.js/tsconfig.json",
     "ts/test.js/tsconfig.json",
     "ts/time.js/tsconfig.json"
   ],

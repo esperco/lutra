@@ -2,19 +2,29 @@
 {% extends '_base.html' %}
 
 {% block body %}
-  <div id="esper-header"></div>
+  {% block header %}
+    <div id="esper-header"></div>
+  {% endblock %}
 
-  <div id="esper-main"></div>
+  {% block main %}
+    <div id="esper-main"></div>
+  {% endblock %}
 
-  <div id="esper-footer"></div>
+  {% block footer %}
+    <div id="esper-footer"></div>
+  {% endblock %}
 
-  <div id="esper-loading">
-    <div class="esper-center">
-      <div class="esper-spinner"></div>
+  {% block loading %}
+    <div id="esper-loading">
+      <div class="esper-center">
+        <div class="esper-spinner"></div>
+      </div>
     </div>
-  </div>
+  {% endblock %}
 
-  <div id="esper-modal"></div>
+  {% block modal %}
+    <div id="esper-modal"></div>
+  {% endblock %}
 
   {% block postscripts %}
     {% include "_segment.html" %}

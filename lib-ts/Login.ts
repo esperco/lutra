@@ -5,6 +5,8 @@
 
   See Login.Oauth for actual API calls.
 */
+/// <reference path="./ApiT.ts" />
+
 module Esper.Login {
 
   export interface Credentials {
@@ -40,4 +42,61 @@ module Esper.Login {
   export function unsetCredentials() {
     credentials = null;
   }
+
+
+  /* Utilities mostly used by Otter */
+
+  // Must be set before utils become useful
+  export var data: ApiT.LoginResponse;
+
+  export function isAdmin() {
+    if (! _.isUndefined(data))
+      return data.is_admin === true;
+    else
+      return false;
+  };
+
+  export function isAlias() {
+    if (! _.isUndefined(data))
+      return data.is_alias === true;
+    else
+      return false;
+  };
+
+  export function usesGoogle() {
+    if (! _.isUndefined(data))
+      return data.platform === "Google";
+    else
+      return false;
+  };
+
+  export function usesNylas() {
+    if (! _.isUndefined(data))
+      return data.platform === "Nylas";
+    else
+      return false;
+  };
+
+  export function isExecCustomer(team: ApiT.Team) {
+    if (! _.isUndefined(data))
+      return data.uid === team.team_executive
+        && !isAdmin()
+        && !isAlias();
+    else
+      return false;
+  };
+
+  export function myEmail() {
+    if (! _.isUndefined(data))
+      return data.email;
+    else
+      return;
+  };
+
+  export function getTeams(): ApiT.Team[] {
+    if (! _.isUndefined(data))
+      return data.teams;
+    else
+      return [];
+  };
 }
