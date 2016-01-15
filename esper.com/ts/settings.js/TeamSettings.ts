@@ -212,9 +212,9 @@ module Esper.TeamSettings {
 <div #view class="settings-container">
   <div #headerDiv class="header clearfix">
     <span #signOut class="header-signout clickable">Sign out</span>
-    <a #logoContainer href="#!"
+    <a #logoContainer href="/"
        class="img-container-left"/>
-    <a href="#" #headerTitle class="header-title">Settings</a>
+    <a href="#!" #headerTitle class="header-title">Settings</a>
     <span #arrowContainer class="img-container-left"/>
     <div class="header-exec">
       <div #profilePic class="profile-pic"/>
@@ -245,7 +245,7 @@ module Esper.TeamSettings {
 
     Api.getProfile(selectedTeam.team_executive, selectedTeam.teamid)
       .done(function(exec) {
-        document.title = "Sign Up | Esper"
+        document.title = "Esper"
         profilePic.css("background-image", "url('" + exec.image_url + "')");
         teamName.text(selectedTeam.team_name);
       });

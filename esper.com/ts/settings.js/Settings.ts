@@ -240,7 +240,7 @@ module Esper.Settings {
 '''
 <div #view class="settings-container">
   <div class="header clearfix">
-    <a #logoContainer href="#"
+    <a #logoContainer href="/"
        class="img-container-left"/>
     <div class="header-title">Settings</div>
     <span #signOut class="header-signout clickable">Sign out</span>
