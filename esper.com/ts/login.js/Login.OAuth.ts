@@ -101,15 +101,63 @@ module Esper.Login {
         .reject(MISSING_NONCE)
         .promise();
     }
-    return Api.loginOnce(uid, loginNonce);
+    return Api.loginOnce(uid, loginNonce)
+      .then(function(x) {
+        postCredentials(x);
+        return x;
+      });
   }
 
   /*
     Clear login data
   */
   export function logout() {
-    unsetCredentials(); // Clear from memory
-    clearCredentials(); // Clear from storage
+    unsetCredentials();  // Clear from memory
+    clearCredentials();  // Clear from storage
+    clearAllLoginInfo(); // Log out extension users
     Analytics.identify(null); // Resets identity
   }
+
+
+  /* Esper extension management */
+
+  // Pass UID and API secret to the Esper extension
+  function postCredentials(x: ApiT.LoginResponse) {
+    Log.d("postCredentials:", x);
+    if (_.isObject(x)
+        && usesGoogle(x)
+        && _.isString(x.api_secret)
+        && _.isString(x.uid)) {
+      var esperMessage = {
+        sender: "Esper",
+        type: "Account",
+        value: {
+          googleAccountId: x.email,
+          credentials: {
+            apiSecret: x.api_secret,
+            uid: x.uid
+          },
+          declined: false
+        }
+      };
+      Log.d("esperMessage:", esperMessage);
+
+      // Post only to same domain (this is readable by the Chrome Extension
+      // but not by a hostile iFrame)
+      var target = window.location.protocol + "//" + window.location.host;
+      window.postMessage(esperMessage, target);
+    }
+  }
+
+  // Clear all logged in users in the extension
+  export function clearAllLoginInfo() {
+    var esperMessage = {
+      sender: "Esper",
+      type: "ClearSyncStorage",
+      value: {}
+    };
+    Log.d("esperMessage:", esperMessage);
+
+    window.postMessage(esperMessage, "*");
+  };
 }

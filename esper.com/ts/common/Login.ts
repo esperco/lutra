@@ -155,6 +155,9 @@ module Esper.Login {
   export var messageParam = "msg";
   export var errorParam = "err";
   export var logoutParam = "logout";
+  export var emailParam = "email";
+  export var inviteParam = "invite";
+  export var autoParam = "auto";
 
   // Redirects
   export var loginPath = "/login";
@@ -171,6 +174,14 @@ module Esper.Login {
     var params: {[index: string]: string} = {};
     if (message) { params[messageParam] = message; }
     params[logoutParam] = "1";
+    goToLoginParams(params);
+  }
+
+  // For Google extension users only
+  export function autoLogin(email: string) {
+    var params: {[index: string]: string} = {};
+    params[emailParam] = email;
+    params[autoParam] = "1";
     goToLoginParams(params);
   }
 

@@ -11,6 +11,7 @@ module Esper {
   export function init() {
     var uid = Util.getParamByName(Login.uidParam);
     var message = Util.getParamByName(Login.messageParam);
+    var email = Util.getParamByName(Login.emailParam);
     var error = Util.getParamByName(Login.errorParam);
 
     if (Util.getParamByName(Login.logoutParam)) {
@@ -73,6 +74,9 @@ module Esper {
     Layout.render(<div id="esper-login-container">
       <Components.LoginPrompt
         landingUrl={getLandingUrl()}
+        inviteCode={Util.getParamByName(Login.inviteParam)}
+        email={Util.getParamByName(Login.emailParam)}
+        auto={!!Util.getParamByName(Login.autoParam)}
         showGoogle={true}
         showExchange={true}
         showNylas={true}>

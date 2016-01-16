@@ -46,38 +46,43 @@ module Esper.Login {
 
   /* Utilities mostly used by Otter */
 
-  // Must be set before utils become useful
+  // Set to provide default for utils
   export var data: ApiT.LoginResponse;
 
-  export function isAdmin() {
+  export function isAdmin(x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.is_admin === true;
     else
       return false;
   };
 
-  export function isAlias() {
+  export function isAlias(x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.is_alias === true;
     else
       return false;
   };
 
-  export function usesGoogle() {
+  export function usesGoogle(x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.platform === "Google";
     else
       return false;
   };
 
-  export function usesNylas() {
+  export function usesNylas(x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.platform === "Nylas";
     else
       return false;
   };
 
-  export function isExecCustomer(team: ApiT.Team) {
+  export function isExecCustomer(team: ApiT.Team, x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.uid === team.team_executive
         && !isAdmin()
@@ -86,14 +91,16 @@ module Esper.Login {
       return false;
   };
 
-  export function myEmail() {
+  export function myEmail(x?: ApiT.LoginResponse) {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.email;
     else
       return;
   };
 
-  export function getTeams(): ApiT.Team[] {
+  export function getTeams(x?: ApiT.LoginResponse): ApiT.Team[] {
+    x = x || data;
     if (! _.isUndefined(data))
       return data.teams;
     else

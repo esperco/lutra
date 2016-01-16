@@ -27,6 +27,9 @@ module Esper.Components {
     // Variables passed along to handle token issues or login prompt
     inviteCode?: string;
     email?: string;
+
+    // Automatically log in (for extension users -- Google only)
+    auto?: boolean;
   }
 
   interface LoginState {
@@ -46,6 +49,16 @@ module Esper.Components {
       };
     }
 
+    componentDidMount() {
+      if (this.props.auto) {
+        if (this.props.email) {
+          this.loginToGoogle(this.props.email);
+        } else {
+          Log.e("Auto-login requires e-mail address");
+        }
+      }
+    }
+
     render() {
       return <div id="esper-login">
         { this.state.busy ?
@@ -63,8 +76,10 @@ module Esper.Components {
         <div className={"buttons-container" +
                         (this.state.showNylasInput ? " shifted" : "")}>
           { this.props.showGoogle ? this.renderGoogleButton() : null }
-          { this.props.showExchange ? this.renderExchangeButton() : null }
-          { this.props.showNylas ? this.renderNylasButton() : null }
+          { (!this.props.auto && this.props.showExchange) ?
+              this.renderExchangeButton() : null }
+          { (!this.props.auto && this.props.showNylas) ?
+              this.renderNylasButton() : null }
           { this.renderNylasInput() }
         </div>
 
@@ -111,9 +126,9 @@ module Esper.Components {
     loginToGoogle(email?: string) {
       this.setState({busy: true, serverError: false});
       Login.loginWithGoogle({
-        landingUrl: this.props.landingUrl,
-        inviteCode: this.props.inviteCode,
-        email: email || this.props.email
+        landingUrl: Util.nullify(this.props.landingUrl),
+        inviteCode: Util.nullify(this.props.inviteCode),
+        email: email || Util.nullify(this.props.email)
       }).fail(() => this.setState({busy: false, serverError: true}))
     }
 
@@ -184,8 +199,8 @@ module Esper.Components {
         this.setState({busy: true, serverError: false, inputError: false});
         Login.loginWithNylas({
           email: val,
-          landingUrl: this.props.landingUrl,
-          inviteCode: this.props.inviteCode
+          landingUrl: Util.nullify(this.props.landingUrl),
+          inviteCode: Util.nullify(this.props.inviteCode)
         }).fail((xhr: JQueryXHR) => {
           if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
             this.loginToGoogle(val);
