@@ -51,40 +51,40 @@ module Esper.Login {
 
   export function isAdmin(x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.is_admin === true;
+    if (! _.isUndefined(x))
+      return x.is_admin === true;
     else
       return false;
   };
 
   export function isAlias(x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.is_alias === true;
+    if (! _.isUndefined(x))
+      return x.is_alias === true;
     else
       return false;
   };
 
   export function usesGoogle(x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.platform === "Google";
+    if (! _.isUndefined(x))
+      return x.platform === "Google";
     else
       return false;
   };
 
   export function usesNylas(x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.platform === "Nylas";
+    if (! _.isUndefined(x))
+      return x.platform === "Nylas";
     else
       return false;
   };
 
   export function isExecCustomer(team: ApiT.Team, x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.uid === team.team_executive
+    if (! _.isUndefined(x))
+      return x.uid === team.team_executive
         && !isAdmin()
         && !isAlias();
     else
@@ -93,16 +93,16 @@ module Esper.Login {
 
   export function myEmail(x?: ApiT.LoginResponse) {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.email;
+    if (! _.isUndefined(x))
+      return x.email;
     else
       return;
   };
 
   export function getTeams(x?: ApiT.LoginResponse): ApiT.Team[] {
     x = x || data;
-    if (! _.isUndefined(data))
-      return data.teams;
+    if (! _.isUndefined(x))
+      return x.teams;
     else
       return [];
   };
