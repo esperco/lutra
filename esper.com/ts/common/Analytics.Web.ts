@@ -21,40 +21,28 @@ module Esper.Analytics {
     }
   }
 
-  export function identify(loginInfo?: ApiT.LoginResponse,
-                           alias=false, cb=function() {}) {
-    var cbCalled = false;
-    var cbWrap = () => {
-      if (! cbCalled) {
-        cbCalled = true;
-        cb();
-      }
-    };
-
+  export function identify(loginInfo?: ApiT.LoginResponse) {
     analytics.ready(function() {
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid() && loginInfo) {
 
           // Alias user if new account
-          if (alias && loginInfo.account_created &&
+          if (loginInfo.account_created &&
               moment().diff(moment(loginInfo.account_created)) < 300000)
           {
-            analytics.alias(Login.myUid(), cbWrap);
+            analytics.alias(Login.myUid());
           }
 
           // Identify user regardless of previous login status
           analytics.identify(Login.myUid(), {
             email: loginInfo.email,
             platform: loginInfo.platform
-          }, cbWrap);
+          });
         }
       } else {
         reset();
       }
     });
-
-    // Schedule timeout to auto-call cb in case Analytics.js fails
-    setTimeout(cbWrap, 2000);
   }
 
   // Clear tracking IDs
