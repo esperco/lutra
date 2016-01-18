@@ -9,6 +9,7 @@ var inject        = require("../../build-helpers/depends").inject;
 var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
+    moment        = require("moment"),
     polyfill      = require("./polyfill"),
     React         = require("react"),
     ReactDOM      = require("react-dom");
@@ -35,6 +36,7 @@ Esper = (function(esperObj) {
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
+    moment:       moment,
     PRODUCTION:   (process.env.NODE_ENV === "production"),
     React:        React,
     ReactDOM:     ReactDOM
