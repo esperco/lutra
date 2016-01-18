@@ -49,7 +49,7 @@ module Esper.Route {
     // Here to make backwards compatability simpler -- just redirects to
     // login page
     "login/:email" : function(data) {
-      Login.autoLogin(data.email);
+      Login.extLogin(data.email);
     },
 
     /* various pages */

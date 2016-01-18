@@ -62,6 +62,27 @@ module Esper.Login {
       });
   }
 
+  // Second check to see if we need more Google Oauth permissions
+  export function checkGooglePermissions(landingUrl: string) {
+    // Landing URL => prefix with base URL (landingUrl format for
+    // getGoogleAuthInfo is a little different than getGoogleAuthUrl)
+    landingUrl = location.origin + "/" + landingUrl;
+
+    return Api.getGoogleAuthInfo(landingUrl)
+      .then(function(info) {
+        if (info.need_google_auth) {
+          Log.d("Going off to " + info.google_auth_url);
+          location.href = info.google_auth_url;
+
+          // Return promise that never resolves so callbacks don't trigger
+          // while redirect is happening
+          return $.Deferred().promise();
+        }
+        else
+          return true;
+      });
+  }
+
   // Redirect to Nylas OAuth
   export function loginWithNylas(opts?: LoginOpts) {
     opts = opts || {};
@@ -101,11 +122,7 @@ module Esper.Login {
         .reject(MISSING_NONCE)
         .promise();
     }
-    return Api.loginOnce(uid, loginNonce)
-      .then(function(x) {
-        postCredentials(x);
-        return x;
-      });
+    return Api.loginOnce(uid, loginNonce);
   }
 
   /*
@@ -114,50 +131,6 @@ module Esper.Login {
   export function logout() {
     unsetCredentials();  // Clear from memory
     clearCredentials();  // Clear from storage
-    clearAllLoginInfo(); // Log out extension users
     Analytics.identify(null); // Resets identity
   }
-
-
-  /* Esper extension management */
-
-  // Pass UID and API secret to the Esper extension
-  function postCredentials(x: ApiT.LoginResponse) {
-    Log.d("postCredentials:", x);
-    if (_.isObject(x)
-        && usesGoogle(x)
-        && _.isString(x.api_secret)
-        && _.isString(x.uid)) {
-      var esperMessage = {
-        sender: "Esper",
-        type: "Account",
-        value: {
-          googleAccountId: x.email,
-          credentials: {
-            apiSecret: x.api_secret,
-            uid: x.uid
-          },
-          declined: false
-        }
-      };
-      Log.d("esperMessage:", esperMessage);
-
-      // Post only to same domain (this is readable by the Chrome Extension
-      // but not by a hostile iFrame)
-      var target = window.location.protocol + "//" + window.location.host;
-      window.postMessage(esperMessage, target);
-    }
-  }
-
-  // Clear all logged in users in the extension
-  export function clearAllLoginInfo() {
-    var esperMessage = {
-      sender: "Esper",
-      type: "ClearSyncStorage",
-      value: {}
-    };
-    Log.d("esperMessage:", esperMessage);
-
-    window.postMessage(esperMessage, "*");
-  };
 }

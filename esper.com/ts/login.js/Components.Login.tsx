@@ -27,9 +27,6 @@ module Esper.Components {
     // Variables passed along to handle token issues or login prompt
     inviteCode?: string;
     email?: string;
-
-    // Automatically log in (for extension users -- Google only)
-    auto?: boolean;
   }
 
   interface LoginState {
@@ -49,16 +46,6 @@ module Esper.Components {
       };
     }
 
-    componentDidMount() {
-      if (this.props.auto) {
-        if (this.props.email) {
-          this.loginToGoogle(this.props.email);
-        } else {
-          Log.e("Auto-login requires e-mail address");
-        }
-      }
-    }
-
     render() {
       return <div id="esper-login">
         { this.state.busy ?
@@ -76,10 +63,8 @@ module Esper.Components {
         <div className={"buttons-container" +
                         (this.state.showNylasInput ? " shifted" : "")}>
           { this.props.showGoogle ? this.renderGoogleButton() : null }
-          { (!this.props.auto && this.props.showExchange) ?
-              this.renderExchangeButton() : null }
-          { (!this.props.auto && this.props.showNylas) ?
-              this.renderNylasButton() : null }
+          { this.props.showExchange ? this.renderExchangeButton() : null }
+          { this.props.showNylas ? this.renderNylasButton() : null }
           { this.renderNylasInput() }
         </div>
 

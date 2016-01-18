@@ -36,7 +36,11 @@ module Esper.Login {
 
   export function clearCredentials() {
     LocalStore.remove(storedLoginKey);
-  };
+  }
+
+  export function getCredentials(): StoredCredentials {
+    return LocalStore.get(storedLoginKey);
+  }
 
   /*
     Retrieve credentials from localStorage -- we only need credentials, not
@@ -44,7 +48,7 @@ module Esper.Login {
     ensure up-to-date data).
   */
   export function initCredentials() {
-    var stored: StoredCredentials = LocalStore.get(storedLoginKey);
+    var stored = getCredentials();
     if (stored && stored.uid && stored.api_secret) {  // sanity check
       setCredentials(stored.uid, stored.api_secret);
       return true;
@@ -76,6 +80,20 @@ module Esper.Login {
     }
   }
 
+  // Set scope for use in other
+  export function setLoginInfo(loginInfo: ApiT.LoginResponse) {
+    Analytics.identify(loginInfo);
+    if ((<any> window).Raven) {
+      Raven.setUserContext({
+        email: loginInfo.email,
+        id: loginInfo.uid,
+        platform: loginInfo.platform
+      });
+    }
+    InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+    Login.data = loginInfo; // Compat with legacy code
+  }
+
   function onLoginSuccess(loginInfo: ApiT.LoginResponse) {
     // Remove ignored teams
     var teamIds = getIgnoredTeams();
@@ -86,17 +104,7 @@ module Esper.Login {
     if (needApproval(loginInfo)) {
       goToLogin(null, "For security reasons, please log in again.");
     } else {
-      storeCredentials(loginInfo);
-      Analytics.identify(loginInfo, true);
-      if ((<any> window).Raven) {
-        Raven.setUserContext({
-          email: loginInfo.email,
-          id: loginInfo.uid,
-          platform: loginInfo.platform
-        });
-      }
-      InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
-      Login.data = loginInfo; // Compat with legacy code
+      setLoginInfo(loginInfo);
       loginDeferred.resolve(loginInfo);
       return loginInfo;
     }
@@ -157,7 +165,7 @@ module Esper.Login {
   export var logoutParam = "logout";
   export var emailParam = "email";
   export var inviteParam = "invite";
-  export var autoParam = "auto";
+  export var extParam = "ext";
 
   // Redirects
   export var loginPath = "/login";
@@ -178,10 +186,10 @@ module Esper.Login {
   }
 
   // For Google extension users only
-  export function autoLogin(email: string) {
+  export function extLogin(email: string) {
     var params: {[index: string]: string} = {};
     params[emailParam] = email;
-    params[autoParam] = "1";
+    params[extParam] = "1";
     goToLoginParams(params);
   }
 
