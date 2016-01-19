@@ -3,6 +3,7 @@
 /// <reference path="./Login.Oauth.ts" />
 /// <reference path="./Components.Login.tsx" />
 /// <reference path="./Components.ApproveTeam.tsx" />
+/// <reference path="./Token.ts" />
 
 module Esper {
   // Where to redirect
@@ -16,6 +17,7 @@ module Esper {
     var message = Util.getParamByName(Login.messageParam);
     var error = Util.getParamByName(Login.errorParam);
     var extLogin = Util.getParamByName(Login.extParam);
+    var token = Util.getParamByName(Login.tokenParam);
     var email = getEmail();
 
     if (Util.getParamByName(Login.logoutParam)) {
@@ -87,6 +89,16 @@ module Esper {
             Log.e("Missing nonce");
           }
           renderLogin("", errMsg);
+        });
+    }
+
+    else if (token) {
+      Token.handle(token)
+        .done(function(msg: string) {
+          renderLogin(msg)
+        })
+        .fail(function(err: string) {
+          renderLogin("", err);
         });
     }
 
