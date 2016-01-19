@@ -13,6 +13,7 @@ module Esper.Analytics {
   var iframeOrigin = "https://esper.com";
 
   interface AnalyticsMessage {
+    uid?: string;
     page?: string;
     event?: string;
     properties?: any;
@@ -45,6 +46,14 @@ module Esper.Analytics {
     callQueue.push({
       page: Page[page],
       properties: properties
+    });
+    initEventListener();
+  }
+
+  export function identifyViaIframe(uid: string, traits?: any) {
+    callQueue.push({
+      uid: uid,
+      properties: traits
     });
     initEventListener();
   }

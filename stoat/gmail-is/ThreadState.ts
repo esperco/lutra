@@ -4,7 +4,7 @@
 
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="../common/Message.ts" />
-/// <reference path="../marten/ts/Model.Capped.ts" />
+/// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="./CurrentThread.ts" />
 
 module Esper.ThreadState {

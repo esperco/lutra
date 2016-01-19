@@ -13,7 +13,7 @@
    legacy code to edit for compatability.
 */
 .esper-bs {
-  @import "../marten/less/_custom_bootstrap";
+  @import "./lib/_custom-bootstrap";
   // TODO: Override certain Bootstrap settings like font-family
 
   .form-control {
@@ -232,10 +232,10 @@
    them out.
 */
 .esper {
-  @import "../marten/vendor/font-awesome/less/font-awesome";
-  @import (less) "../marten/vendor/fullcalendar/dist/fullcalendar.css";
-  @import (less) "../marten/vendor/quill/dist/quill.snow.css";
-  @import (less) "../marten/vendor/quill/dist/quill.base.css";
+  @import "../../node_modules/font-awesome/less/font-awesome";
+  @import (less) "../../node_modules/fullcalendar/dist/fullcalendar.css";
+  @import (less) "../../node_modules/quill/dist/quill.snow.css";
+  @import (less) "../../node_modules/quill/dist/quill.base.css";
 
   // More spacing on font-awesome left-align icons
   .fa.fa-la {
@@ -497,7 +497,7 @@ li.esper-li, a.esper-a {
       color: white;
       &:hover {
         background: @purple;
-        color: white; 
+        color: white;
       }
     }
     &:hover {

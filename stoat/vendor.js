@@ -1,9 +1,8 @@
 /* jshint strict: false */
 
 // Helpers
-var inject        = require("marten-npm-vendors/depends").inject;
+var inject        = require("../build-helpers/depends").inject;
 
-// Bower packages
 var EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
     gmailJs       = require("gmail.js"),
@@ -11,13 +10,12 @@ var EventEmitter  = require("eventemitter3"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
     momentTz      = require("moment-timezone"),
-    quill         = require("quill");
-
-// React -> get addons
-var react         = require("./marten/vendor/react/react-with-addons.js");
+    quill         = require("quill"),
+    React         = require("react"),
+    ReactDOM      = require("react-dom");
 
 // CryptoJS -> only need SHA-1
-var SHA1          = require("./marten/vendor/crypto-js/sha1.js");
+var SHA1          = require("crypto-js/sha1.js");
 
 var typehead;
 
@@ -32,9 +30,6 @@ inject({jQuery: jQuery, $: jQuery}, function() {
   jQuery.fn.tooltip.noConflict();
 });
 
-// Dependencies that use NPM packages
-var analytics = require("marten-npm-vendors/analytics");
-
 // Create a global Esper object with our vendor dependencies
 /* global Esper: true */
 /* global window: false */
@@ -43,7 +38,6 @@ Esper = (function(esperObj) {
     _:            lodash,
     $:            jQuery,
     jQuery:       jQuery,
-    AnalyticsJs:  analytics,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,

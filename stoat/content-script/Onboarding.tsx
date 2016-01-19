@@ -7,12 +7,12 @@
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Analytics.ts" />
-/// <reference path="../marten/ts/Api.ts" />
-/// <reference path="../marten/ts/Log.ts" />
-/// <reference path="../marten/ts/Model.ts" />
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/ApiC.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Log.ts" />
+/// <reference path="../lib/Model.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/ApiC.ts" />
 /// <reference path="./Auth.ts" />
 
 module Esper.Onboarding {

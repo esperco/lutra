@@ -1,4 +1,4 @@
-/// <reference path="../marten/ts/Util.ts" />
+/// <reference path="../lib/Util.ts" />
 
 module Esper.Util {
   function unsafePreparePrintable(x : any, parents, maxDepth: number) {

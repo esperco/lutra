@@ -4,17 +4,16 @@
   as required by gmail.js.
 */
 
-/// <reference path="../marten/ts/Log.ts" />
-/// <reference path="../marten/ts/JsonHttp.ts" />
-/// <reference path="../marten/ts/Api.ts" />
-/// <reference path="../marten/ts/Watchable.ts" />
-/// <reference path="../marten/ts/XDate.ts" />
+/// <reference path="../lib/Log.ts" />
+/// <reference path="../lib/JsonHttp.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Watchable.ts" />
+/// <reference path="../lib/XDate.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
-/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Lazy.ts" />
 /// <reference path="../common/Option.ts" />

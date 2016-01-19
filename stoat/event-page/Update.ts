@@ -2,7 +2,7 @@
   Manually request updates to latest Chrome E
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="../common/Message.Chrome.ts" />
 
 module Esper.Update {

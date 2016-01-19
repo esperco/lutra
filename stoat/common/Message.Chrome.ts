@@ -4,7 +4,7 @@
 */
 
 /// <reference path="./Message.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
 
 module Esper.Message {
 

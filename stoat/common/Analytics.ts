@@ -2,8 +2,8 @@
   Shared code between extension and injected script analytics
 */
 
-/// <reference path="../marten/ts/Analytics.ts" />
-/// <reference path="../marten/ts/ApiT.ts" />
+/// <reference path="../lib/Analytics.ts" />
+/// <reference path="../lib/ApiT.ts" />
 /// <reference path="../common/Message.Chrome.ts" />
 /// <reference path="../common/Login.ts" />
 

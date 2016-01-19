@@ -3,9 +3,9 @@
 */
 
 /// <reference path="./Esper.ts" />
-/// <reference path="../marten/ts/Model.ts" />
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../lib/Model.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Dropdown {
   var React = Esper.React;
@@ -135,9 +135,9 @@ module Esper.Dropdown {
   }
 
   class Item extends ReactHelpers.Component<ItemProps, {}> {
-    onSelectTimezoneHandler(c) {
+    onSelectTimezoneHandler(c: HTMLInputElement) {
       var self = this;
-      $(React.findDOMNode(c)).unbind().change(function(e) {
+      $(c).unbind().change(function(e) {
         self.props.selectedOption.set(this.value);
         if (self.props.onSelect !== undefined) self.props.onSelect();
       });

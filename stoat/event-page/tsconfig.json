@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "outFile": "event-page.js",
+    "jsx": "react"
+  },
+
+  "oblivion": true,
+
+  "files": [
+    "Main.ts"
+  ],
+
+  "devFiles": [
+    "../common/DevConf.ts"
+  ],
+
+  "prodFiles": [
+    "../common/ProdConf.ts"
+  ]
+}
+

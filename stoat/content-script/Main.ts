@@ -5,20 +5,20 @@
     https://developer.chrome.com/extensions/content_scripts
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../marten/typings/quill/quill.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../typings/quill/quill.d.ts" />
 
-/// <reference path="../marten/ts/Log.ts" />
-/// <reference path="../marten/ts/Api.ts" />
+/// <reference path="../lib/Log.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
 
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
-/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
 /// <reference path="../common/LRU.ts" />
@@ -30,7 +30,6 @@
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
 /// <reference path="../common/Dropdown.tsx" />
 /// <reference path="../common/Timezone.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
 
 /// <reference path="./Update.ts" />
 /// <reference path="./Auth.ts" />

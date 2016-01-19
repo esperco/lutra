@@ -2,7 +2,7 @@
   Gmail thread view
 */
 
-/// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../lib/JQStore.ts" />
 
 module Esper.Sidebar {
   // TODO: ditto

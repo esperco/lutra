@@ -1,7 +1,7 @@
 // Sync ThreadState with local Chrome profile data
 
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/ts/Util.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../lib/Util.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/Message.ts" />
 

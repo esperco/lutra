@@ -2,7 +2,7 @@
   Calendar-specific implentation of EventLabels widget
 */
 
-/// <reference path="../marten/ts/EventLabels.tsx" />
+/// <reference path="../lib/EventLabels.tsx" />
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="./CurrentEvent.ts" />
 

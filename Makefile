@@ -8,7 +8,6 @@ export PATH := node_modules/.bin:$(PATH)
 setup: vendor
 	$(MAKE) -C setup setup
 	$(MAKE) -C grison setup
-	$(MAKE) -C stoat setup
 
 vendor:
 	npm install

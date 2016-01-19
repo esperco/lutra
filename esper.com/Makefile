@@ -19,7 +19,7 @@ s3: prod
 
 # Setup is actually in parent directory
 setup:
-	cd .. && npm install
+	$(MAKE) -C ../ setup
 
 clean:
 	rm -f *~ */*~

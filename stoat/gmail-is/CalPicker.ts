@@ -12,7 +12,15 @@ module Esper.CalPicker {
   // validation has failed that we can pass via callback -- this is used
   // to turn off the busy spinner. Use to distinguish from a server or other
   // error.
-  class HaltEventSave extends Error {}
+  class HaltEventSave extends Error {
+    // For some reason, TS isn't picking up that Error can take an argument
+    // in its constructor, so manually define
+    constructor(x: any) {
+      super(x);
+    }
+  }
+
+  // Fix type error
 
   // The team calendars whose events are currently displayed
   var showCalendars : { [calid : string] : string /* tz */ } = {};
@@ -333,7 +341,7 @@ module Esper.CalPicker {
     execTzValue.text(Timezone.getValueFromId(showTimezone));
     Timezone.appendDropdownMenu(execTzMenu,
       "calpicker-exec-timezone",
-      showTimezone, 
+      showTimezone,
       function() {
         var tzVal = (<Dropdown.Menu> execTzMenu.reactComponent()).getSelectedOption();
         var tz = Timezone.getIdFromValue(tzVal);
@@ -462,7 +470,7 @@ module Esper.CalPicker {
     });
   }
 
-  function fetchEvents(team: ApiT.Team, 
+  function fetchEvents(team: ApiT.Team,
                        calendars: ApiT.Calendar[],
                        picker, momentStart, momentEnd, tz, callback) {
     var start = momentStart.toDate();

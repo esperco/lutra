@@ -2,7 +2,7 @@
   Code for making displaying task labels work in Gmail
 */
 
-/// <reference path="../marten/ts/EventLabels.tsx" />
+/// <reference path="../lib/EventLabels.tsx" />
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="./CurrentThread.ts" />
 
