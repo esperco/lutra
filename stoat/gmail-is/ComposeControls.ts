@@ -179,7 +179,8 @@ module Esper.ComposeControls {
     function getTemplates() {
       CurrentThread.currentTeam.get().match({
         some: function(team) {
-          var noPrefsURL = Conf.Api.url + "/#!team-settings/" + team.teamid + "/templates/";
+          var noPrefsURL = Conf.Settings.url + "#!team-settings/" +
+            team.teamid + "/templates/";
           customizeTemplates.click(function(e) {
             e.stopPropagation();
             window.open(noPrefsURL);
@@ -281,7 +282,7 @@ module Esper.ComposeControls {
             var filledTemplate =
               editor.getHTML().replace(/\{EVENT\}/g, entry)
               .replace(/\{EXEC\}/g, execName);
-            
+
             composeControls.insertAtCaret(filledTemplate);
             Analytics.track(Analytics.Trackable.ClickComposeBarTemplateIcon);
           },

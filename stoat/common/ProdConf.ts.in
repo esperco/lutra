@@ -6,7 +6,15 @@ module Esper.Conf {
     export var url = "https://app.esper.com";
   }
   export module TimeStats {
-    export var url = "https://time.esper.com";
+    export var url = "https://esper.com/time";
+  }
+  export module Settings {
+    export var url = "https://esper.com/settings";
+  }
+  export module Login {
+    export function getUrl(email: string) {
+      return "https://esper.com/login?ext=1&email=" + encodeURIComponent(email);
+    }
   }
 }
 

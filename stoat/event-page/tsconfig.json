@@ -8,15 +8,16 @@
   "oblivion": true,
 
   "files": [
-    "Main.ts"
   ],
 
   "devFiles": [
-    "../common/DevConf.ts"
+    "../common/DevConf.ts",
+    "Main.ts"
   ],
 
   "prodFiles": [
-    "../common/ProdConf.ts"
+    "../common/ProdConf.ts",
+    "Main.ts"
   ]
 }
 

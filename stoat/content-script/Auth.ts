@@ -68,7 +68,7 @@ module Esper.Auth {
 
   export function openLoginTab(googleAccountId) {
     loginInProgressFor = googleAccountId;
-    var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
+    var url = Conf.Login.getUrl(googleAccountId);
     Log.d("Going off to " + url);
     loginWindow = window.open(url, '_blank');
     loginWindow.focus();

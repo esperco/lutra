@@ -14,6 +14,7 @@
 
 declare module Esper.Conf {
   export var version: string;
+  export var segmentKey: string;
 }
 
 module Esper.Analytics {
@@ -23,6 +24,8 @@ module Esper.Analytics {
 
     // Listen for posted messages to identify
     Message.listenToExtension(Message.Type.Identify, identifyChrome);
+
+    writeKey = Esper.Conf.segmentKey;
   }
 
   // If we have a UID, identify ourselves -- should be called after login

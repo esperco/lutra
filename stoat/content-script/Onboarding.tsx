@@ -433,7 +433,7 @@ module Esper.Onboarding {
   class WelcomeSlide extends Slide<{}> {
     render() {
       return (<div>
-        <p>
+        <div>
           We are here to supercharge your inbox so you can quickly and expertly
           handle any task. With Esper, you can now:
           <ul>
@@ -443,7 +443,7 @@ module Esper.Onboarding {
             Lists</li>
             <li>See how you allocate time with TimeStats</li>
           </ul>
-        </p>
+        </div>
         <p>
           To get started, Esper needs your permission to sync with your Google
           Calendar and Gmail. {" "}

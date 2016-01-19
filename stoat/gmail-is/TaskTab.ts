@@ -915,7 +915,7 @@ module Esper.TaskTab {
 '''
     var taskTabView = currentTaskTab = <TaskTabView> _view;
 
-    workflowLink.attr("href", Conf.Api.url + "/#!/team-settings/" +
+    workflowLink.attr("href", Conf.Settings.url + "#!/team-settings/" +
       team.teamid + "/workflows");
 
     function updateTaskHeaders(task: ApiT.Task, isValid: boolean,

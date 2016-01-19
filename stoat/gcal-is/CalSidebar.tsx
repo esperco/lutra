@@ -329,7 +329,7 @@ module Esper.CalSidebar {
     }
 
     openSettings() {
-      window.open(Conf.Api.url);
+      window.open(Conf.Settings.url);
     }
 
     openHelp() {

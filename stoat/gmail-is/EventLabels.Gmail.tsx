@@ -36,12 +36,16 @@ module Esper.EventLabels {
         };
       });
 
+      var labelSettingsUrl = Conf.Settings.url + "#!/team-settings/" +
+        this.state.team.teamid + "/labels";
+
       if (events && events.length > 0) {
         return <EventLabels.LabelList
           listClasses="list-group compact"
           itemClasses="list-group-item"
           team={this.state.team}
           events={events}
+          editLabelsFn={() => window.open(labelSettingsUrl)}
           callback={this.toggleLabelCallback.bind(this)}
           callbackAll={this.analyticsCallback.bind(this)} />
       }

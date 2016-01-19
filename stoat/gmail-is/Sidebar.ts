@@ -308,7 +308,7 @@ module Esper.Sidebar {
     options.click(toggleOptions);
     size.click(toggleSidebar);
     settings.click(function() {
-      window.open(Conf.Api.url);
+      window.open(Conf.Settings.url);
       Analytics.track(Analytics.Trackable.ClickSidebarOptionsSettings);
     })
     signOut.click(function() {

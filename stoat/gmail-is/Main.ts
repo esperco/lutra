@@ -77,4 +77,4 @@ module Esper.Main {
 }
 
 /* Called once per page */
-Esper.Main.init();
+window.requestAnimationFrame(Esper.Main.init);
