@@ -16,7 +16,6 @@
 /// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
 /// <reference path="../typings/react/react-global.d.ts" />
-/// <reference path="../typings/analytics-node/analytics-node.d.ts" />
 /// <reference path="../typings/quill/quill.d.ts" />
 /// <reference path="../typings/typeahead/typeahead.d.ts" />
 
@@ -30,7 +29,6 @@ type EventEmitterType = typeof EventEmitter3.EventEmitter;
 declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
-  export var AnalyticsJs: typeof AnalyticsNode.Analytics;
   export var EventEmitter: EventEmitterType;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;

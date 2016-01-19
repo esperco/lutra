@@ -10,6 +10,7 @@ setup: vendor
 
 vendor:
 	npm install
+	rm -f typings/tsd.d.ts
 	tsd reinstall -so
 
 # Remove derived files

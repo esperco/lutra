@@ -62,9 +62,6 @@
     "bootstrap-daterangepicker/bootstrap-daterangepicker.d.ts": {
       "commit": "95c9b8d2d4070c35f40295a45efef95af6913579"
     },
-    "analytics-node/analytics-node.d.ts": {
-      "commit": "f53108644c2f32b93de423d844650297fc415a8b"
-    },
     "typeahead/typeahead.d.ts": {
       "commit": "7c749215797e4a18066f3a5e6fc99d82d7bf144e"
     },
