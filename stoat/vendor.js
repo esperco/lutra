@@ -44,6 +44,7 @@ Esper = (function(esperObj) {
     gmailJs:      gmailJs,
     moment:       moment,
     momentTz:     momentTz,
+    PRODUCTION:   (process.env.NODE_ENV === "production"),
     React:        React,
     ReactDOM:     ReactDOM,
     quill:        quill,
