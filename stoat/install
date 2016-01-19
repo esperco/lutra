@@ -21,10 +21,7 @@ case "$1" in
         exit 1
 esac
 
-mkdir -p pub/css pub/js pub/img pub/html
-
 ### Build our own code and copy the result into the pub directory
-cp img/* pub/img
 cp "$manifest" pub/manifest.json
 
 ### Log info about this installation

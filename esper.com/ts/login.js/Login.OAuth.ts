@@ -43,6 +43,7 @@ module Esper.Login {
     landingUrl?: string;
     inviteCode?: string;
     email?: string;
+    extension?: boolean;
   }
 
   // Redirect to Google OAuth
@@ -54,7 +55,7 @@ module Esper.Login {
     return setLoginNonce()
       .then(function(loginNonce) {
         return Api.getGoogleAuthUrl(landingUrl,
-          loginNonce, opts.inviteCode, opts.email);
+          loginNonce, opts.inviteCode, opts.email, opts.extension);
       })
       .then(function(x) {
         Log.d("Going off to " + x.url);

@@ -11,17 +11,16 @@
   CSPs (which occasionally affect Content Scripts for some reason)
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
 
-/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="../lib/Log.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
-/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
 /// <reference path="../common/LRU.ts" />

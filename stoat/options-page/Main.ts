@@ -2,10 +2,10 @@
   Entry point for the options.js script
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/lodash/lodash.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../typings/lodash/lodash.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
@@ -152,4 +152,4 @@ module Esper.Main {
 }
 
 /* Called once per page */
-Esper.Main.init();
+window.requestAnimationFrame(Esper.Main.init);

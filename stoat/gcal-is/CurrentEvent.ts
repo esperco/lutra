@@ -2,11 +2,11 @@
   Watch and respond to current event in Google Calendar
 */
 
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
-/// <reference path="../marten/ts/Model.Batch.ts" />
-/// <reference path="../marten/ts/Model.Capped.ts" />
-/// <reference path="../marten/ts/Watchable.ts" />
-/// <reference path="../marten/ts/Api.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/Model.Batch.ts" />
+/// <reference path="../lib/Model.Capped.ts" />
+/// <reference path="../lib/Watchable.ts" />
+/// <reference path="../lib/Api.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Message.ts" />
 /// <reference path="../common/Promise.ts" />

@@ -1,8 +1,8 @@
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/ts/Api.ts" />
-/// <reference path="../marten/ts/ApiT.ts" />
-/// <reference path="../marten/ts/Watchable.ts" />
-/// <reference path="../marten/ts/Login.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/ApiT.ts" />
+/// <reference path="../lib/Watchable.ts" />
+/// <reference path="../lib/Login.ts" />
 /// <reference path="../common/Types.ts" />
 
 module Esper.Login {

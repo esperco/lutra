@@ -2,7 +2,7 @@
   Calendar-specific implentation of EventLabels widget
 */
 
-/// <reference path="../marten/ts/EventLabels.tsx" />
+/// <reference path="../lib/EventLabels.tsx" />
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="./CurrentEvent.ts" />
 
@@ -37,6 +37,9 @@ module Esper.EventLabels {
         transparent: this.props.event.transparent
       };
 
+      var labelSettingsUrl = Conf.Settings.url + "#!/team-settings/" +
+        this.props.team.teamid + "/labels";
+
       return (<div>
         <div className="esper-subheading">
           <i className="fa fa-fw fa-tag" />
@@ -53,6 +56,7 @@ module Esper.EventLabels {
             itemClasses="list-group-item"
             team={this.props.team}
             events={[genericEvent]}
+            editLabelsFn={() => window.open(labelSettingsUrl)}
             callback={this.toggleLabelCallback.bind(this)}
             callbackAll={this.analyticsCallback.bind(this)} />
         }

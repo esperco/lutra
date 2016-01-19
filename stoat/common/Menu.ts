@@ -58,7 +58,7 @@ module Esper.Menu {
     var signOutLink = makeActionLink("Sign out", Login.logout)
 
     function openSettings() {
-      window.open(Conf.Api.url);
+      window.open(Conf.Settings.url);
       Analytics.track(Analytics.Trackable.ClickMenuEditSettings);
     }
 

@@ -3,7 +3,7 @@
  *  to be integrated into the assistant's main flow.
  */
 
-/// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../lib/JQStore.ts" />
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="./CurrentThread.ts" />
 

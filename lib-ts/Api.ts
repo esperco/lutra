@@ -256,7 +256,8 @@ module Esper.Api {
   export function getGoogleAuthUrl(optAuthLandingUrl: string,
     optLoginNonce: string,
     optInvite: string,
-    optEmail: string): JQueryPromise<ApiT.UrlResult>
+    optEmail: string,
+    optGmail?: boolean): JQueryPromise<ApiT.UrlResult>
   {
     var url = prefix + "/api/google-auth-url";
     var q: string[] = [];
@@ -268,6 +269,9 @@ module Esper.Api {
       q.push("invite=" + encodeURIComponent(optInvite));
     if (_.isString(optEmail))
       q.push("login_hint=" + encodeURIComponent(optEmail));
+    if (optGmail) {
+      q.push("gmail=true")
+    }
     url = url + JsonHttp.makeQuery(q);
     return JsonHttp.get(url);
   }

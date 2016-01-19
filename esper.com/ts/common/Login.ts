@@ -232,4 +232,69 @@ module Esper.Login {
     }
     location.href = path;
   }
+
+
+
+  /* Utilities mostly used by Otter */
+
+  // Set to provide default for utils
+  export var data: ApiT.LoginResponse;
+
+  export function isAdmin(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.is_admin === true;
+    else
+      return false;
+  };
+
+  export function isAlias(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.is_alias === true;
+    else
+      return false;
+  };
+
+  export function usesGoogle(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.platform === "Google";
+    else
+      return false;
+  };
+
+  export function usesNylas(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.platform === "Nylas";
+    else
+      return false;
+  };
+
+  export function isExecCustomer(team: ApiT.Team, x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.uid === team.team_executive
+        && !isAdmin()
+        && !isAlias();
+    else
+      return false;
+  };
+
+  export function myEmail(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.email;
+    else
+      return;
+  };
+
+  export function getTeams(x?: ApiT.LoginResponse): ApiT.Team[] {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.teams;
+    else
+      return [];
+  };
 }

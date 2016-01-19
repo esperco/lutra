@@ -4,24 +4,25 @@
   Esper module.
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../marten/typings/moment/moment.d.ts" />
-/// <reference path="../marten/typings/moment-timezone/moment-timezone.d.ts" />
-/// <reference path="../marten/typings/fullCalendar/fullCalendar.d.ts" />
-/// <reference path="../marten/typings/page/page.d.ts" />
-/// <reference path="../marten/typings/lodash/lodash.d.ts" />
-/// <reference path="../marten/typings/eventemitter3/eventemitter3.d.ts" />
-/// <reference path="../marten/typings/react/react-global.d.ts" />
-/// <reference path="../marten/typings/analytics-node/analytics-node.d.ts" />
-/// <reference path="../marten/typings/quill/quill.d.ts" />
-/// <reference path="../marten/typings/typeahead/typeahead.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../typings/moment/moment.d.ts" />
+/// <reference path="../typings/moment-timezone/moment-timezone.d.ts" />
+/// <reference path="../typings/fullCalendar/fullCalendar.d.ts" />
+/// <reference path="../typings/page/page.d.ts" />
+/// <reference path="../typings/lodash/lodash.d.ts" />
+/// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
+/// <reference path="../typings/react/react-global.d.ts" />
+/// <reference path="../typings/analytics-node/analytics-node.d.ts" />
+/// <reference path="../typings/quill/quill.d.ts" />
+/// <reference path="../typings/typeahead/typeahead.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
+type ReactDOMStatic = typeof ReactDOM;
 
 // For classes, refer to class's type
 type EventEmitterType = typeof EventEmitter3.EventEmitter;
@@ -35,6 +36,7 @@ declare module Esper {
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
+  export var ReactDOM: ReactDOMStatic;
   export var page: PageJS.Static;
   export var quill: QuillStatic;
   export var bloodhound: typeof Bloodhound;

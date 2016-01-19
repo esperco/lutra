@@ -7,12 +7,12 @@
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Analytics.ts" />
-/// <reference path="../marten/ts/Api.ts" />
-/// <reference path="../marten/ts/Log.ts" />
-/// <reference path="../marten/ts/Model.ts" />
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/ApiC.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Log.ts" />
+/// <reference path="../lib/Model.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/ApiC.ts" />
 /// <reference path="./Auth.ts" />
 
 module Esper.Onboarding {
@@ -433,7 +433,7 @@ module Esper.Onboarding {
   class WelcomeSlide extends Slide<{}> {
     render() {
       return (<div>
-        <p>
+        <div>
           We are here to supercharge your inbox so you can quickly and expertly
           handle any task. With Esper, you can now:
           <ul>
@@ -443,7 +443,7 @@ module Esper.Onboarding {
             Lists</li>
             <li>See how you allocate time with TimeStats</li>
           </ul>
-        </p>
+        </div>
         <p>
           To get started, Esper needs your permission to sync with your Google
           Calendar and Gmail. {" "}

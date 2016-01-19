@@ -23,6 +23,7 @@
           sender: "Esper",
           type: "Analytics",
           value: {
+            uid: "...",     // UID of user -- Alias and identify if present
             page: "...",    // Name of page to track using analytics.page
             category: "..." // Optional page category
             event: "..."    // Event to track using analytics.track. Mutually
@@ -61,6 +62,7 @@
               ev.data.type === "Analytics") {
             var val = ev.data.value;
 
+            var uid = val.uid;
             var page = val.page;
             var category = val.category;
             var event = val.event;
@@ -70,7 +72,12 @@
             // this page
             props.analyticsCaller = ev.origin;
 
-            if (page) {
+            if (uid) {
+              analytics.alias(uid);
+              analytics.identify(uid, props);
+            }
+
+            else if (page) {
               if (category) {
                 analytics.page(category, page, props);
               }

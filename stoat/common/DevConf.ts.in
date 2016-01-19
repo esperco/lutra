@@ -6,7 +6,16 @@ module Esper.Conf {
     export var url = "http://localhost";
   }
   export module TimeStats {
-    export var url = "http://localhost:5000";
+    export var url = "http://localhost:5001/time";
+  }
+  export module Settings {
+    export var url = "http://localhost:5001/settings";
+  }
+  export module Login {
+    export function getUrl(email: string) {
+      return "http://localhost:5001/login?ext=1&email=" +
+        encodeURIComponent(email);
+    }
   }
 }
 

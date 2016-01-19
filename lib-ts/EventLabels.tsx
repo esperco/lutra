@@ -36,7 +36,7 @@ module Esper.EventLabels {
     itemClasses?: string;
 
     // Change behavior of configure labels link
-    editLabelsFn?: () => void;
+    editLabelsFn?: (e: React.SyntheticEvent) => void;
   }
 
   interface LabelListState {
@@ -61,15 +61,6 @@ module Esper.EventLabels {
         this.getAllLabels(),
         this.renderLabel.bind(this));
 
-      var labelSettingsUrl = Api.prefix + "/#!/team-settings/" +
-        this.props.team.teamid + "/labels";
-      var editLabelsFn = (e: React.SyntheticEvent) => {
-        if (this.props.editLabelsFn) {
-          e.preventDefault();
-          this.props.editLabelsFn();
-        }
-      };
-
       return (<div className="esper-bs esper">
         {
           this.state.hasError ?
@@ -89,10 +80,12 @@ module Esper.EventLabels {
               <span className="esper-spinner esper-inline" />
               {" "}Saving &hellip;
             </span> :
-            <a href={labelSettingsUrl} target="_blank" onClick={editLabelsFn}>
-              <i className="fa fa-fw fa-cog"></i>
-              {" "}Configure Labels
-            </a>
+            ( this.props.editLabelsFn ?
+              <a className="esper-link" target="_blank"
+                 onClick={this.props.editLabelsFn}>
+                <i className="fa fa-fw fa-cog"></i>
+                {" "}Configure Labels
+              </a> : null )
           }
         </div>
       </div>);

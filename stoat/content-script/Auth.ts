@@ -1,6 +1,6 @@
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/Login.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="./Onboarding.tsx" />
 
@@ -68,7 +68,7 @@ module Esper.Auth {
 
   export function openLoginTab(googleAccountId) {
     loginInProgressFor = googleAccountId;
-    var url = Conf.Api.url + "/#!login/" + encodeURIComponent(googleAccountId);
+    var url = Conf.Login.getUrl(googleAccountId);
     Log.d("Going off to " + url);
     loginWindow = window.open(url, '_blank');
     loginWindow.focus();

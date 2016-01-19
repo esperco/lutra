@@ -2,11 +2,11 @@
   Calendar sidebar (differs a bit from Gmail sidebar)
 */
 
-/// <reference path="../marten/typings/bootstrap/bootstrap.d.ts" />
-/// <reference path="../marten/ts/Model.Capped.ts" />
-/// <reference path="../marten/ts/ReactHelpers.ts" />
-/// <reference path="../marten/ts/JQStore.ts" />
-/// <reference path="../marten/ts/Api.ts" />
+/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
+/// <reference path="../lib/Model.Capped.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/JQStore.ts" />
+/// <reference path="../lib/Api.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/ExtensionOptions.Model.ts" />
 /// <reference path="./EventLabels.Gcal.tsx" />
@@ -329,7 +329,7 @@ module Esper.CalSidebar {
     }
 
     openSettings() {
-      window.open(Conf.Api.url);
+      window.open(Conf.Settings.url);
     }
 
     openHelp() {

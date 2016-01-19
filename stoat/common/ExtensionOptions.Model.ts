@@ -3,7 +3,7 @@
 */
 
 /// <reference path="./ExtensionOptions.ts" />
-/// <reference path="../marten/ts/Model.StoreOne.ts" />
+/// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Message.ts" />
 
 module Esper.ExtensionOptions {

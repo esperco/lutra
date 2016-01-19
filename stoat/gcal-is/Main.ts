@@ -4,21 +4,20 @@
   as required by gmail.js.
 */
 
-/// <reference path="../marten/typings/jquery/jquery.d.ts" />
-/// <reference path="../marten/typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../marten/typings/chrome/chrome.d.ts" />
-/// <reference path="../marten/typings/cryptojs/cryptojs.d.ts" />
+/// <reference path="../typings/jquery/jquery.d.ts" />
+/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
+/// <reference path="../typings/chrome/chrome.d.ts" />
+/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
 
-/// <reference path="../marten/ts/Log.ts" />
-/// <reference path="../marten/ts/JsonHttp.ts" />
-/// <reference path="../marten/ts/Api.ts" />
-/// <reference path="../marten/ts/Watchable.ts" />
-/// <reference path="../marten/ts/XDate.ts" />
+/// <reference path="../lib/Log.ts" />
+/// <reference path="../lib/JsonHttp.ts" />
+/// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Watchable.ts" />
+/// <reference path="../lib/XDate.ts" />
 
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
-/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Util.ts" />
 /// <reference path="../common/Promise.ts" />
@@ -53,4 +52,4 @@ module Esper.Main {
 }
 
 /* Called once per page */
-Esper.Main.init();
+window.requestAnimationFrame(Esper.Main.init);

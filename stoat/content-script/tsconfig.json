@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "outFile": "content-script.js",
+    "jsx": "react"
+  },
+
+  "oblivion": true,
+
+  "files": [
+    "Main.ts"
+  ],
+
+  "devFiles": [
+    "../common/DevConf.ts"
+  ],
+
+  "prodFiles": [
+    "../common/ProdConf.ts"
+  ]
+}
+

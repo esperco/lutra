@@ -2,7 +2,7 @@
  *  active account.
  */
 
-/// <reference path="../marten/ts/Log.ts" />
+/// <reference path="../lib/Log.ts" />
 /// <reference path="./Login.ts" />
 /// <reference path="./Profile.ts" />
 /// <reference path="./Promise.ts" />

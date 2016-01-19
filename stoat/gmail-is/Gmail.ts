@@ -2,7 +2,7 @@
   Extraction of data from the Gmail document and JavaScript environment.
 */
 
-/// <reference path="../marten/ts/JQStore.ts" />
+/// <reference path="../lib/JQStore.ts" />
 /// <reference path="./gmail.d.ts" />
 
 module Esper.Gmail {
