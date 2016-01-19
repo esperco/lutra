@@ -34,7 +34,6 @@
     "watchify": "^3.7.0"
   },
   "dependencies": {
-    "analytics-node": "^2.0.1",
     "bootstrap": "^3.3.6",
     "bootstrap-daterangepicker": "git://github.com/esperco/bootstrap-daterangepicker.git",
     "chart.js": "^1.0.2",
