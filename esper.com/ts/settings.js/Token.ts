@@ -5,13 +5,15 @@
   for a one-time action or piece of data.
 */
 
+/// <reference path="../common/Login.ts" />
+
 module Esper.Token {
   export function load(token: string) {
     Api.postToken(token)
       .done(function(info: ApiT.TokenInfo) {
         if (! info.token_is_valid) {
           Log.e("Invalid token " + token);
-          showMessage("This URL is no longer valid.");
+          invalidTokenMsg();
         }
         else {
           var x = info.token_value;
@@ -36,11 +38,19 @@ module Esper.Token {
       .fail(function() {
         /* Possibly a 404 because the token was already consumed */
         Log.e("HTTP error with token " + token);
-        Route.nav.home();
+        invalidTokenMsg();
       });
   }
 
-  export function showMessage(msg: string) {
+  function invalidTokenMsg() {
+    Login.goToLogin({
+      error: "This URL is no longer valid.",
+      redirect: "" // Empty redirect because we don't want to redirect
+                   // back to this page necessarily
+    });
+  }
+
+  function showMessage(msg: string) {
 '''
 <div #view>
   <p #msgContainer></p>
