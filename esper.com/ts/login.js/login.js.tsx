@@ -81,7 +81,6 @@ module Esper {
         .then(function(response) {
           redirect(response);
         }, function(err) {
-          Log.e("Unable to login");
           var errMsg = "There was an error logging you in."
           if (err === Login.MISSING_NONCE) {
             errMsg += (" If you are using Safari, please try using a " +
