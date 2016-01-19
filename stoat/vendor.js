@@ -17,18 +17,18 @@ var EventEmitter  = require("eventemitter3"),
 // CryptoJS -> only need SHA-1
 var SHA1          = require("crypto-js/sha1.js");
 
-var typehead;
-
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("jquery-ui");
-  typeahead = require("typeahead.js");
+  require("typeahead.js");
 
   // Bootstrap has some conflicts with jQuery-UI. Default to jQuery-UI's
   // version for now
   require("bootstrap");
   jQuery.fn.tooltip.noConflict();
 });
+
+var bloodhound = require("typeahead.js/dist/bloodhound.js");
 
 // Create a global Esper object with our vendor dependencies
 /* global Esper: true */
@@ -44,9 +44,10 @@ Esper = (function(esperObj) {
     gmailJs:      gmailJs,
     moment:       moment,
     momentTz:     momentTz,
-    React:        react,
+    React:        React,
+    ReactDOM:     ReactDOM,
     quill:        quill,
-    bloodhound:   typeahead.Bloodhound
+    bloodhound:   bloodhound
   };
   for (var name in assignments) {
     if (assignments.hasOwnProperty(name)) {

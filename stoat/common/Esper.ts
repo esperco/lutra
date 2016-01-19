@@ -22,6 +22,7 @@
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
+type ReactDOMStatic = typeof ReactDOM;
 
 // For classes, refer to class's type
 type EventEmitterType = typeof EventEmitter3.EventEmitter;
@@ -35,6 +36,7 @@ declare module Esper {
   export var moment: moment.MomentStatic;
   export var CryptoJS: CryptoJS.CryptoJSStatic;
   export var React: ReactStatic;
+  export var ReactDOM: ReactDOMStatic;
   export var page: PageJS.Static;
   export var quill: QuillStatic;
   export var bloodhound: typeof Bloodhound;
