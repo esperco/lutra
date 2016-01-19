@@ -46,6 +46,7 @@ Esper = (function(esperObj) {
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,
+    PRODUCTION:   (process.env.NODE_ENV === "production"),
     React:        React,
     ReactDOM:     ReactDOM
   };
