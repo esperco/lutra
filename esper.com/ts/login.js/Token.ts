@@ -5,52 +5,40 @@
   for a one-time action or piece of data.
 */
 
+/// <reference path="../lib/Api.ts" />
+
 module Esper.Token {
-  export function load(token: string) {
-    Api.postToken(token)
-      .done(function(info: ApiT.TokenInfo) {
+
+  // Processes a token, returns a promise that resolves with a message
+  export function handle(token: string) {
+    return Api.postToken(token)
+      .then(function(info: ApiT.TokenInfo) {
         if (! info.token_is_valid) {
           Log.e("Invalid token " + token);
-          showMessage("This URL is no longer valid.");
+          return "That link is no longer valid.";
         }
         else {
           var x = info.token_value;
           switch (Variant.tag(x)) {
           case "Unsub_daily_agenda":
-            showMessage("You've been unsubscribed from these emails.");
+            return "You've been unsubscribed from these emails.";
             break;
           case "Unsub_tasks_update":
-            showMessage("You've been unsubscribed from these emails.");
+            return "You've been unsubscribed from these emails.";
             break;
           case "Unsub_label_reminder":
-            showMessage("You've been unsubscribed from these emails.");
+            return "You've been unsubscribed from these emails.";
             break;
 
           /* Other cases are either obsolete or not supported yet */
           default:
             Log.e("Case not supported: " + Variant.tag(x));
-            Route.nav.home();
           }
         }
-      })
-      .fail(function() {
+      }, function() {
         /* Possibly a 404 because the token was already consumed */
         Log.e("HTTP error with token " + token);
-        Route.nav.home();
+        return "That link is no longer valid.";
       });
-  }
-
-  export function showMessage(msg: string) {
-'''
-<div #view>
-  <p #msgContainer></p>
-</div>
-'''
-    var root = $("#token-page");
-    root.children().remove();
-    root.append(view);
-    document.title = "Esper";
-
-    msgContainer.text(msg);
   }
 }

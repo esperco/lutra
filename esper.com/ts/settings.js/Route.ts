@@ -7,44 +7,7 @@
 /// <reference path="../common/Route.ts" />
 
 module Esper.Route {
-  function isIOS() {
-    var os = window.navigator.platform;
-    return os === "iPhone" || os === "iPad" || os === "iPod";
-  }
-
-  function fallbackOnAppStore() {
-    var appUrl = "https://itunes.apple.com/us/app/esper-executive-assistant/id969190370";
-    // Go to App Store if we fail to open the app in half a second.
-    window.setTimeout(function(){ window.location.href = appUrl; }, 500);
-  }
-
-  function openIOSapp(inviteCode: string,
-                      optEmail?: string,
-                      optName?: string) {
-    var email = optEmail == undefined ? "" : optEmail;
-    var name  = optName  == undefined ? "" : optName;
-
-    fallbackOnAppStore();
-
-    window.location.href = "esper:token/" + encodeURIComponent(inviteCode)
-                         + "/" + encodeURIComponent(email)
-                         + "/" + encodeURIComponent(name);
-  }
-
-  function gotToken(token) {
-    if (isIOS()) {
-      openIOSapp(token, undefined, undefined);
-    } else {
-      Page.token.load(token);
-    }
-  }
-
   var paths = {
-
-    /* Generic invitations, unsubscription from emails, etc. */
-    "t/:token" : function(data) {
-      gotToken(data.token);
-    },
 
     // Here to make backwards compatability simpler -- just redirects to
     // login page

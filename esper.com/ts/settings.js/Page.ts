@@ -11,7 +11,6 @@ module Esper.Page {
     "team-settings": {ids:["team-settings-page"]},
     "login": { ids: ["login-interface"] },
     "test": {ids:["test-page"]},
-    "token": {ids:["token-page"]},
     "preferences": {ids:["preferences-page"]},
     "usage": {ids:["usage-page"]},
     "usage-period": {ids:["usage-period-page"]},
@@ -85,16 +84,6 @@ module Esper.Page {
       $("#test-content").children().remove();
       showPage("test");
       Test.load();
-      Util.focus();
-    }
-  }
-
-  export var token : Loadable = {
-    load: function(token: string) {
-      pageSelector.hideAll();
-      $("#token-content").children().remove();
-      showPage("token");
-      Token.load(token);
       Util.focus();
     }
   }

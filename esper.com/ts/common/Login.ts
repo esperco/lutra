@@ -102,7 +102,7 @@ module Esper.Login {
     })
 
     if (needApproval(loginInfo)) {
-      goToLogin(null, "For security reasons, please log in again.");
+      goToLogin({error: "For security reasons, please log in again."});
     } else {
       setLoginInfo(loginInfo);
       loginDeferred.resolve(loginInfo);
@@ -112,7 +112,7 @@ module Esper.Login {
 
   function onLoginFailure(err?: Error) {
     Log.e(err);
-    goToLogin(null, "There was an error logging you in. Please try again.");
+    goToLogin({error: "There was an error logging you in. Please try again."});
   }
 
   // Check if there are unapproved teams that exec user needs to approve
@@ -165,16 +165,37 @@ module Esper.Login {
   export var logoutParam = "logout";
   export var emailParam = "email";
   export var inviteParam = "invite";
+  export var tokenParam = "token";
   export var extParam = "ext";
 
   // Redirects
   export var loginPath = "/login";
 
-  export function goToLogin(message?: string, error?: string) {
+  export function goToLogin(opts: {
+      message?: string,
+      error?: string,
+      email?: string,
+      invite?: string,
+      redirect?: string,
+      token?: string
+    } = {})
+  {
     var params: {[index: string]: string} = {};
-    params[messageParam] = message;
-    params[errorParam] = error;
-    params[redirectParam] = getRedirectParam();
+    params[messageParam] = opts.message;
+    params[errorParam] = opts.error;
+    params[emailParam] = opts.email;
+    params[inviteParam] = opts.invite;
+
+    // Absence of redirect property means default to current path
+    // If redirect is present but falsey, then we just use the login page's
+    // default redirect option
+    if (opts.hasOwnProperty("redirect")) {
+      params[redirectParam] = opts.redirect;
+    } else {
+      params[redirectParam] = getRedirectParam();
+    }
+
+    params[tokenParam] = opts.token;
     goToLoginParams(params);
   }
 

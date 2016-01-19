@@ -32,7 +32,6 @@
     "LabelsTab.ts",
     "AboutTab.ts",
     "TemplateTab.ts",
-    "Token.ts",
     "Page.ts",
     "Route.ts",
     "Main.ts"
