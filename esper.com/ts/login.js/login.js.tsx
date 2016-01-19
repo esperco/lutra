@@ -28,7 +28,8 @@ module Esper {
         Login.loginWithGoogle({
           landingUrl: getLandingUrl(),
           email: email,
-          inviteCode: getInviteCode()
+          inviteCode: getInviteCode(),
+          extension: true
         });
       } else {
         Log.e("Extension login requires e-mail address");
