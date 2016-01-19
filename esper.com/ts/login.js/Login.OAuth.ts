@@ -62,6 +62,27 @@ module Esper.Login {
       });
   }
 
+  // Second check to see if we need more Google Oauth permissions
+  export function checkGooglePermissions(landingUrl: string) {
+    // Landing URL => prefix with base URL (landingUrl format for
+    // getGoogleAuthInfo is a little different than getGoogleAuthUrl)
+    landingUrl = location.origin + "/" + landingUrl;
+
+    return Api.getGoogleAuthInfo(landingUrl)
+      .then(function(info) {
+        if (info.need_google_auth) {
+          Log.d("Going off to " + info.google_auth_url);
+          location.href = info.google_auth_url;
+
+          // Return promise that never resolves so callbacks don't trigger
+          // while redirect is happening
+          return $.Deferred().promise();
+        }
+        else
+          return true;
+      });
+  }
+
   // Redirect to Nylas OAuth
   export function loginWithNylas(opts?: LoginOpts) {
     opts = opts || {};
@@ -108,8 +129,8 @@ module Esper.Login {
     Clear login data
   */
   export function logout() {
-    unsetCredentials(); // Clear from memory
-    clearCredentials(); // Clear from storage
+    unsetCredentials();  // Clear from memory
+    clearCredentials();  // Clear from storage
     Analytics.identify(null); // Resets identity
   }
 }

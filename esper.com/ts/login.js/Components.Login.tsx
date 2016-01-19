@@ -111,9 +111,9 @@ module Esper.Components {
     loginToGoogle(email?: string) {
       this.setState({busy: true, serverError: false});
       Login.loginWithGoogle({
-        landingUrl: this.props.landingUrl,
-        inviteCode: this.props.inviteCode,
-        email: email || this.props.email
+        landingUrl: Util.nullify(this.props.landingUrl),
+        inviteCode: Util.nullify(this.props.inviteCode),
+        email: email || Util.nullify(this.props.email)
       }).fail(() => this.setState({busy: false, serverError: true}))
     }
 
@@ -184,8 +184,8 @@ module Esper.Components {
         this.setState({busy: true, serverError: false, inputError: false});
         Login.loginWithNylas({
           email: val,
-          landingUrl: this.props.landingUrl,
-          inviteCode: this.props.inviteCode
+          landingUrl: Util.nullify(this.props.landingUrl),
+          inviteCode: Util.nullify(this.props.inviteCode)
         }).fail((xhr: JQueryXHR) => {
           if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
             this.loginToGoogle(val);

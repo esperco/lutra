@@ -16,11 +16,10 @@ module Esper.Components {
   */
   interface ApproveProps {
     info: ApiT.LoginResponse;
-    onApprove: (info: ApiT.LoginResponse) => void;
 
-    // onReject gets passed info with unapproved teams removed.
-    // If not set, onApprove is called with the missing teams removed.
-    onReject?: (info: ApiT.LoginResponse, removedTeams: ApiT.Team[]) => void;
+    // Callback gets passed info with rejected teams removed, as well as a
+    // list of the rejected teams
+    callback: (info: ApiT.LoginResponse, removedTeams: ApiT.Team[]) => void;
   };
 
   export class ApproveTeams extends Component<ApproveProps, {
@@ -150,7 +149,7 @@ module Esper.Components {
 
       $.when.apply($, calls)
         .done(() => {
-          this.props.onApprove(infoWithAccepted);
+          this.props.callback(infoWithAccepted, []);
         })
         .fail(this.makeError.bind(this));
     }
@@ -171,12 +170,8 @@ module Esper.Components {
         `Shenanigans may be afoot. Please investigate.`;
       Api.sendSupportEmail(msg)
         .done(() => {
-          if (this.props.onReject) {
-            this.props.onReject(infoWithRejected,
-              this.getUnapprovedTeams(this.props.info))
-          } else {
-            this.props.onApprove(infoWithRejected);
-          }
+          this.props.callback(infoWithRejected,
+            this.getUnapprovedTeams(this.props.info))
         })
         .fail(this.makeError.bind(this));
     }
@@ -196,14 +191,15 @@ module Esper.Components {
   export class ApproveTeamsModal extends Component<ApproveProps, {}> {
     render() {
       // Wrap onApprove to close modal
-      var onApprove = (info: ApiT.LoginResponse) => {
-        this.props.onApprove(info);
+      var callback = (info: ApiT.LoginResponse,
+                      removedTeams: ApiT.Team[]) => {
+        this.props.callback(info, removedTeams);
         this.jQuery().modal('hide');
       };
 
       return <Modal title="Approve Access" icon="fa-warning" fixed={true}>
         { React.createElement(ApproveTeams, _.extend({}, this.props, {
-            onApprove: onApprove
+            callback: callback
           }) as ApproveProps)
         }
       </Modal>

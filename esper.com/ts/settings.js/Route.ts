@@ -46,9 +46,10 @@ module Esper.Route {
       gotToken(data.token);
     },
 
+    // Here to make backwards compatability simpler -- just redirects to
+    // login page
     "login/:email" : function(data) {
-      // TODO: Redirect
-      // withLogin(undefined, undefined, data.email, "#!");
+      Login.extLogin(data.email);
     },
 
     /* various pages */

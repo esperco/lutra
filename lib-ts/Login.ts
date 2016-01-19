@@ -46,56 +46,63 @@ module Esper.Login {
 
   /* Utilities mostly used by Otter */
 
-  // Must be set before utils become useful
+  // Set to provide default for utils
   export var data: ApiT.LoginResponse;
 
-  export function isAdmin() {
-    if (! _.isUndefined(data))
-      return data.is_admin === true;
+  export function isAdmin(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.is_admin === true;
     else
       return false;
   };
 
-  export function isAlias() {
-    if (! _.isUndefined(data))
-      return data.is_alias === true;
+  export function isAlias(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.is_alias === true;
     else
       return false;
   };
 
-  export function usesGoogle() {
-    if (! _.isUndefined(data))
-      return data.platform === "Google";
+  export function usesGoogle(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.platform === "Google";
     else
       return false;
   };
 
-  export function usesNylas() {
-    if (! _.isUndefined(data))
-      return data.platform === "Nylas";
+  export function usesNylas(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.platform === "Nylas";
     else
       return false;
   };
 
-  export function isExecCustomer(team: ApiT.Team) {
-    if (! _.isUndefined(data))
-      return data.uid === team.team_executive
+  export function isExecCustomer(team: ApiT.Team, x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.uid === team.team_executive
         && !isAdmin()
         && !isAlias();
     else
       return false;
   };
 
-  export function myEmail() {
-    if (! _.isUndefined(data))
-      return data.email;
+  export function myEmail(x?: ApiT.LoginResponse) {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.email;
     else
       return;
   };
 
-  export function getTeams(): ApiT.Team[] {
-    if (! _.isUndefined(data))
-      return data.teams;
+  export function getTeams(x?: ApiT.LoginResponse): ApiT.Team[] {
+    x = x || data;
+    if (! _.isUndefined(x))
+      return x.teams;
     else
       return [];
   };

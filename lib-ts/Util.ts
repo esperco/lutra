@@ -110,4 +110,9 @@ module Esper.Util {
     return (results === null ? "" :
       decodeURIComponent(results[1].replace(/\+/g, " ")));
   }
+
+  // Normalize falsey values to null
+  export function nullify<T>(a: T): T {
+    return a ? a : null;
+  }
 }
