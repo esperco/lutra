@@ -112,6 +112,7 @@ module Esper.Analytics {
     SelectTaskTabWorkflow,
     SetTimeStatsCalendars,
     SetTimeStatsLabels,
+    SkipTimeStatsOnboarding,
     UnarchiveTaskTabTask,
     UnlinkTaskTabFromExistingTask,
     ViewTimeStats                // Viewed a particular set of time stats
