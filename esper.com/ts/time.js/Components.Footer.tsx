@@ -1,5 +1,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Api.ts" />
+/// <reference path="../common/Login.ts" />
 
 module Esper.Components {
 
@@ -22,6 +23,7 @@ module Esper.Components {
             <li><a href="http://esper.com/contact">Contact</a></li>
             <li><a href="http://esper.com/privacy-policy">Privacy</a></li>
             <li><a href="http://esper.com/terms-of-use">Terms</a></li>
+            <li><a onClick={() => Login.goToLogout()}>Log Out</a></li>
           </ul>
           <div className="pull-right navbar-text"
                onDoubleClick={this.testError}>
