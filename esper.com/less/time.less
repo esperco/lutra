@@ -1,5 +1,7 @@
-@import "./lib/_custom-bootstrap";
+@import "./lib/_bootstrap-variables";
 @import "./lib/_helpers";
+@import (less)
+  "../../node_modules/bootstrap-daterangepicker/daterangepicker.css";
 
 /* New variables */
 @footer-bg: @panel-default-heading-bg;
@@ -24,7 +26,6 @@
 @import "./time/_chart";
 @import "./time/_calendar";
 @import "./time/_labeling";
-
 
 /* Header and footer animations */
 @keyframes dropdown-nav {
