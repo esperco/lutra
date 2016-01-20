@@ -16,6 +16,9 @@ module Esper.Onboarding {
     "onboarding/charts"
   ];
 
+  // Change this to true to allow skipping
+  export var skip = false;
+
   // Go to previous step in onboarding
   export function prev() {
     var prev = paths[current() - 1];
@@ -45,11 +48,14 @@ module Esper.Onboarding {
 
   // Are we allowed to go to the next step?
   export function canGoToNext() {
+    if (skip) { return true; }
     return completedSoFar() + 1 > current();
   }
 
   // Should we launch onboarding?
   export function required() {
+    if (skip) { return false; }
+
     /*
       Only if no team or labels -- we could check to see if events are labeled
       but that's hard to do without fetching a whole lot of events

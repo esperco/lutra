@@ -79,6 +79,10 @@ module Esper.Components {
               </a> : null
             }
             <div className="pull-right">
+              <button type="button" className="btn navbar-btn btn-default"
+                  onClick={this.skip.bind(this)}>
+                Skip
+              </button>{" "}
               <div className="btn-group">
                 { step > 0 ?
                   <button type="button" className="btn navbar-btn btn-default"
@@ -143,6 +147,11 @@ module Esper.Components {
           {this.props.children}
         </Modal>);
       }
+    }
+
+    skip() {
+      Onboarding.skip = true;
+      Route.nav.home();
     }
   }
 
