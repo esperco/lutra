@@ -21,10 +21,14 @@ var Chart         = require("chart.js"),
 // CryptoJS -> only need SHA-1
 var SHA1          = require("crypto-js/sha1.js");
 
+var highcharts;
+
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap");
   require("bootstrap-daterangepicker");
+
+  highcharts = require("highcharts");
 });
 
 // Create a global Esper object with our vendor dependencies
@@ -43,6 +47,7 @@ Esper = (function(esperObj) {
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,
+    Highcharts:   highcharts,
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,

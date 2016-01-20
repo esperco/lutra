@@ -43,6 +43,7 @@
     "font-awesome": "^4.5.0",
     "fullcalendar": "^2.6.0",
     "gmail.js": "git://github.com/esperco/gmail.js.git",
+    "highcharts": "^4.2.1",
     "jasmine-core": "^2.4.1",
     "jquery": "^2.2.0",
     "jquery-ui": "^1.10.5",
