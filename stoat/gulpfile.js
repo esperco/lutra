@@ -10,7 +10,7 @@ var _ = require("lodash"),
 /* Config vars */
 var config = {
   htmlGlobs: ["options-page/html/**/*.html"],
-  htmlOut: "pub", // HTML goes to root rather than subdir
+  htmlOut: "pub/html", // HTML goes to root rather than subdir
 
   assetMap: {
     "img/**/*.*": "pub/img",
