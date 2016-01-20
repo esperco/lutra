@@ -115,9 +115,16 @@ module Esper.JsonHttp {
 
       // Sanity check since Raven isn't deployed on all front-end stuff yet
       if ((<any> Esper).Raven || (<any> window).Raven) {
-        Raven.captureException(err, {
-          extra: details
-        });
+        /*
+          Status code == 0 means URL is unreachable -- probably a client
+          connectivity or DNS issue. We should use a service like Pingdom
+          to ensure our server is up rather than report to Sentry.
+        */
+        if (details.code !== 0) {
+          Raven.captureException(err, {
+            extra: details
+          });
+        }
       }
     }
 

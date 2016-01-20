@@ -11,16 +11,12 @@ module Esper.Update {
     $("#esper-reload-banner").remove();
 '''
 <div #view id="esper-reload-banner">
-  A new version of Esper is available.
-  <a #reload href="#" title="Reload page" class="esper-link">
-    Click here to reload and install.
-  </a>
+  A new version of Esper is available. Please restart Chrome to install.
   <a #dismiss id="esper-dismiss" class="esper-link"  href="#">
     &times;
   </a>
 </div>
 '''
-    reload.click(function() { location.reload(); });
     dismiss.click(function() { view.remove(); });
     $("body").append(view);
   }

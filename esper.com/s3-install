@@ -1,12 +1,13 @@
-#! /bin/sh
+#!/usr/bin/env bash
 set -e
 
-s3_bucket=esper.com
+target="$1"
+s3_bucket="$2"
 
-# Copy the pub/ directory into our S3 bucket used by http://esper.co/
+# Copy the pub/ directory into the S3 bucket specified
 
 # Do CSS files first with forced mime (mime-magic guesses this incorrectly)
-(cd pub && \
+(cd $target && \
     s3cmd put \
       --mime-type=text/css \
       --exclude="*" \
@@ -15,7 +16,7 @@ s3_bucket=esper.com
       --recursive * s3://$s3_bucket )
 
 # Do SVG files next with forced mime (mime-magic guesses this incorrectly)
-(cd pub && \
+(cd $target && \
     s3cmd put \
       --mime-type=image/svg+xml \
       --exclude="*" \
@@ -23,7 +24,7 @@ s3_bucket=esper.com
       --recursive * s3://$s3_bucket )
 
 # Do remainder with guessed mime, defaulting to HTML (because of blanks)
-(cd pub && \
+(cd $target && \
     s3cmd put \
       --guess-mime-type \
       --exclude="*.css" \

@@ -19,7 +19,7 @@ s3cmd --configure
 
 Now you are set up for uploading files to S3 using `s3cmd`.
 
-Build and Install
+Development Build
 -----------------
 
 Call `make` to build the entire site and place in the `pub/` directory. This
@@ -27,5 +27,8 @@ allows you to check locally what the site looks like before going live.
 
 Call `make watch` to launch a development server at `localhost:5000`.
 
-Call `make install` to copy the files in `pub/` to the S3 bucket used to host
-the Esper website.
+Production Release
+------------------
+
+Merge the commits for release into the `release/esper.com` branch. Once the 
+branch is usable and a candidate for a release, call `make install`.

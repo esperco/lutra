@@ -15,7 +15,10 @@ prod:
 
 # Copy pub/ into S3 bucket
 s3: prod
-	./s3-install
+	./s3-install pub esper.com
+
+staging: prod
+	./s3-install pub staging.esper.com
 
 # Setup is actually in parent directory
 setup:
