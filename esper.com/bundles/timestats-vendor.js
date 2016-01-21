@@ -6,8 +6,7 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-var Chart         = require("chart.js"),
-    EventEmitter  = require("eventemitter3"),
+var EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
@@ -43,7 +42,6 @@ Esper = (function(esperObj) {
     _:            lodash,
     $:            jQuery,
     jQuery:       jQuery,
-    Chart:        Chart,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,
