@@ -350,7 +350,7 @@ module Esper.Views {
             {elm}
           </div>
         </div>
-      </div>
+      </div>;
     }
 
     renderChart(selections: TimeStatsView, results: TimeStatsResults) {

@@ -1,6 +1,6 @@
 @import "../lib/_helpers";
 
-.canvas-holder {
+.chart-holder {
   .esper-expanded;
   .esper-expanded.padded;
   .esper-expanded.minus-subheader;
@@ -9,40 +9,11 @@
     .esper-expanded.minus-subheader.collapse-2x;
   }
 
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  &.with-vertical-label {
-    left: @padding-base-horizontal + @line-height-computed * 1.25;
-
-    .vertical-label {
-      display: block;
-      position: absolute;
-      top: 50%; left: 0;
-      transform: rotate(-90deg) translateX(-50%) translateY(-125%);
-      transform-origin: top left;
-    }
-  }
-
-  &.with-horizontal-label {
-    bottom: @padding-large-vertical + @line-height-computed * 1.25;
-
-    .horizontal-label {
-      text-align: center;
-    }
-  }
-
-  .horizontal-label, .vertical-label {
-    font-size: @font-size-small;
-    line-height: @line-height-computed;
-    font-weight: 600;
-  }
+  padding-top: @padding-base-vertical;
 
   .percentage-recent-chart & {
-    margin: 10% auto;
-    max-width: 65%;
-    max-height: 65%;
+    margin: 5% auto;
+    max-width: 85%;
+    max-height: 85%;
   }
 }

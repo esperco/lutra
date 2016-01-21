@@ -3,6 +3,7 @@
 /// <reference path="../typings/chartjs/chart.d.ts" />
 /// <reference path="../typings/cryptojs/cryptojs.d.ts" />
 /// <reference path="../typings/fullCalendar/fullCalendar.d.ts" />
+/// <reference path="../typings/highcharts/highcharts.d.ts" />
 /// <reference path="../typings/moment/moment.d.ts" />
 /// <reference path="../typings/moment-timezone/moment-timezone.d.ts" />
 /// <reference path="../typings/page/page.d.ts" />
@@ -23,6 +24,7 @@ declare module Esper {
   export var _: _.LoDashStatic;
   export var $: JQueryStatic;
   export var EventEmitter: EventEmitterType;
+  export var Highcharts: HighchartsStatic;
   export var jQuery: JQueryStatic;
   export var moment: moment.MomentStatic;
   export var Chart: ChartStatic;

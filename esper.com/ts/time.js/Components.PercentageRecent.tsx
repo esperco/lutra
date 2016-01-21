@@ -4,7 +4,7 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.TimeStatsChart.tsx" />
-/// <reference path="./Components.Chart.tsx" />
+/// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
@@ -29,14 +29,28 @@ module Esper.Components {
         var baseColor = Colors.getColorForLabel(c.labelNorm);
         var percentage = (c.totalDuration / totalDurationAll) * 100;
         return {
-          label: c.displayAs,
+          name: c.displayAs,
           color: baseColor,
-          highlight: Colors.lighten(baseColor, 0.3),
-          value: Number(percentage.toFixed(2))
+          y: Number(percentage.toFixed(2))
         }
       });
       return <div className="percentage-recent-chart">
-        <Components.DonutChart units="%" data={data} />
+        <Components.Highchart opts={{
+          chart: {
+            type: 'pie'
+          },
+
+          plotOptions: {
+            pie: {
+              allowPointSelect: true,
+              cursor: 'pointer'
+            }
+          },
+
+          series: [{
+            data: data
+          }]
+        }} units="%" />
       </div>;
     }
   }

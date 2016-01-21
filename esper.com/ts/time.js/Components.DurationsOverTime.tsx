@@ -4,7 +4,7 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.TimeStatsChart.tsx" />
-/// <reference path="./Components.Chart.tsx" />
+/// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
@@ -26,26 +26,34 @@ module Esper.Components {
       var filtered = _.filter(durationOverTimeData,
         (c) => _.contains(this.props.selectedLabels, c.labelNorm));
 
-      var datasets = _.map(filtered, (c) => {
-        var baseColor = Colors.getColorForLabel(c.labelNorm);
+      var series = _.map(filtered, (c) => {
         return {
-          label: c.displayAs,
-          fillColor: baseColor,
-          strokeColor: Colors.darken(baseColor, 0.3),
-          highlightFill: Colors.lighten(baseColor, 0.3),
-          highlightStroke: baseColor,
+          name: c.displayAs,
+          color: Colors.getColorForLabel(c.labelNorm),
           data: _.map(c.durations, (value) => TimeStats.toHours(value))
         }
       });
-      var data = {
-        labels: columnLabels,
-        datasets: datasets
-      };
 
-      return <Components.BarChart units="Hours"
-              verticalLabel="Time (Hours)"
-              horizontalLabel={horizontalLabel}
-              data={data} />;
+      // No data
+      if (!series || !series.length) {
+        return this.renderNoData();
+      }
+
+      return <Components.Highchart opts={{
+        chart: {
+          type: 'column'
+        },
+
+        xAxis: {
+          categories: columnLabels
+        },
+
+        yAxis: {
+          title: { text: "Time (Hours)" }
+        },
+
+        series: series
+      }} units="Hours" />;
     }
   }
 }

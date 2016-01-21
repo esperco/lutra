@@ -6,8 +6,7 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-var Chart         = require("chart.js"),
-    EventEmitter  = require("eventemitter3"),
+var EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
@@ -21,10 +20,14 @@ var Chart         = require("chart.js"),
 // CryptoJS -> only need SHA-1
 var SHA1          = require("crypto-js/sha1.js");
 
+var highcharts;
+
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap");
   require("bootstrap-daterangepicker");
+
+  highcharts = require("highcharts");
 });
 
 // Create a global Esper object with our vendor dependencies
@@ -39,10 +42,10 @@ Esper = (function(esperObj) {
     _:            lodash,
     $:            jQuery,
     jQuery:       jQuery,
-    Chart:        Chart,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
     fullCalendar: fullCalendar,
+    Highcharts:   highcharts,
     moment:       moment,
     momentTz:     momentTz,
     pageJs:       page,

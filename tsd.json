@@ -65,9 +65,6 @@
     "typeahead/typeahead.d.ts": {
       "commit": "7c749215797e4a18066f3a5e6fc99d82d7bf144e"
     },
-    "chartjs/chart.d.ts": {
-      "commit": "b5000efa7905758a842aca9f3111d582cf030128"
-    },
     "ravenjs/ravenjs.d.ts": {
       "commit": "02bc2983507f9ae82fa67300848f070fd88fd11a"
     },
@@ -103,6 +100,9 @@
     },
     "react/react-addons-update.d.ts": {
       "commit": "b5000efa7905758a842aca9f3111d582cf030128"
+    },
+    "highcharts/highcharts.d.ts": {
+      "commit": "7c749215797e4a18066f3a5e6fc99d82d7bf144e"
     }
   }
 }
