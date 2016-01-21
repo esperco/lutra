@@ -23,15 +23,11 @@ module Esper.Components {
       results = _.sortBy(results, (x) => -x.totalDuration);
       var filtered = _.filter(results,
         (c) => _.contains(this.props.selectedLabels, c.labelNorm));
-      var totalDurationAll = _.sum(_.map(filtered, (f) => f.totalDuration));
-
       var data = _.map(filtered, (c) => {
-        var baseColor = Colors.getColorForLabel(c.labelNorm);
-        var percentage = (c.totalDuration / totalDurationAll) * 100;
         return {
           name: c.displayAs,
-          color: baseColor,
-          y: Number(percentage.toFixed(2))
+          color: Colors.getColorForLabel(c.labelNorm),
+          y: TimeStats.toHours(c.totalDuration)
         }
       });
       return <div className="percentage-recent-chart">
@@ -43,14 +39,23 @@ module Esper.Components {
           plotOptions: {
             pie: {
               allowPointSelect: true,
-              cursor: 'pointer'
+              cursor: 'pointer',
+              dataLabels: {
+                enabled: true,
+                formatter: function() {
+                  if (this.percentage) {
+                    return `${this.point.name} ` +
+                      `(${this.percentage.toFixed(2)}%)`;
+                  }
+                }
+              }
             }
           },
 
           series: [{
             data: data
           }]
-        }} units="%" />
+        }} units="Adjusted Hours" />
       </div>;
     }
   }
