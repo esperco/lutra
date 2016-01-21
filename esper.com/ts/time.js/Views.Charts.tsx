@@ -10,6 +10,7 @@
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Components.DurationsOverTime.tsx" />
 /// <reference path="./Components.PercentageRecent.tsx" />
+/// <reference path="./Components.PercentageOverTime.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
@@ -39,7 +40,8 @@ module Esper.Views {
   // Store for current chart type
   export enum ChartType {
     DurationsOverTime = 1,
-    PercentageRecent
+    PercentageRecent,
+    PercentageOverTime
   }
   var ChartTypeStore = new Model.StoreOne<ChartType>();
   export var chartsChartTypeStore = ChartTypeStore;
@@ -294,6 +296,9 @@ module Esper.Views {
         <option value={ChartType.PercentageRecent.toString()}>
           Percentage Allocation
         </option>
+        <option value={ChartType.PercentageOverTime.toString()}>
+          Percentage Over Time
+        </option>
       </select>;
     }
 
@@ -368,6 +373,9 @@ module Esper.Views {
       switch (chartType) {
         case ChartType.PercentageRecent:
           ret = Components.PercentageRecent;
+          break;
+        case ChartType.PercentageOverTime:
+          ret = Components.PercentageOverTime;
           break;
         default:
           ret = Components.DurationsOverTime

@@ -24,16 +24,27 @@ module Esper.Components {
     }
 
     getOpts(): HighchartsOptions {
+      var units = this.props.units;
       var defaults: HighchartsOptions = {
         credits: { enabled: false },
         title: { text: "" },
         tooltip: {
-          pointFormat: (
-            `<span style="color:{point.color}">{series.name}:</span> ` +
-            `{point.y}` + (this.props.units ? " " + this.props.units : "") +
-            `<br/>`)
+          formatter: function() {
+            return `<b>${this.series.name}:</b> ${this.y} ${units}` +
+              (this.percentage ? ` (${this.percentage.toFixed(2)}%)` : "");
+          },
+          backgroundColor: {
+            linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
+            stops: [
+                [0, '#FFFFFF'],
+                [1, '#FCFCFC']
+            ]
+          },
+          borderWidth: 0,
+          borderRadius: 1
         }
       };
+
       return _.extend(defaults, this.props.opts)
     }
 

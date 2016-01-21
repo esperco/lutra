@@ -30,7 +30,18 @@ module Esper.Components {
           was spent on Sales Meetings between November 1 and December 1?</p>
           <p>If an event was assigned multiple labels, the time for that
           event is divided evenly between each <i>visible</i> label for the
-          purpose of calculating percentages.</p>
+          purpose of calculating percentages. Divided time will be labeled with
+          a unit of "adjusted hours".</p>
+        </div>
+
+        <div>
+          <h4><strong>Percentage Over Time</strong></h4>
+          <p>This stacked bar chart shows how the percentage of time you
+          allocate between different categories changes over a fixed interval
+          -- e.g. how did the percentage of time you spend on Sales Meetings
+          change between November and December?</p>
+          <p>This chart will use adjusted hours if an event was assigned
+          multiple labels.</p>
         </div>
 
         <div>

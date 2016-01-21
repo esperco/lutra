@@ -18,8 +18,6 @@ module Esper.Components {
       var formatted = TimeStats.formatWindowStarts(
         this.props.stats,
         this.props.request.interval);
-      var horizontalLabel = formatted.typeLabel;
-      var columnLabels = formatted.groupLabels;
 
       var durationOverTimeData = this.props.displayResults ||
         TimeStats.getDisplayResults(this.props.stats);
@@ -41,11 +39,17 @@ module Esper.Components {
 
       return <Components.Highchart opts={{
         chart: {
-          type: 'column'
+          type: 'column',
+        },
+
+        plotOptions: {
+          column: {
+            borderWidth: 0
+          }
         },
 
         xAxis: {
-          categories: columnLabels
+          categories: formatted.groupLabels
         },
 
         yAxis: {
