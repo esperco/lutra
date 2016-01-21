@@ -30,10 +30,18 @@ module Esper.Components {
         title: { text: "" },
         tooltip: {
           formatter: function() {
-            return `<span style="color:${this.color}">${this.series.name}:` +
-              `</span> ${this.y} ${units} ` + (this.percentage ?
-              `(${this.percentage.toFixed(2)}%)` : "") + `<br />`;
-          }
+            return `<b>${this.series.name}:</b> ${this.y} ${units}` +
+              (this.percentage ? ` (${this.percentage.toFixed(2)}%)` : "");
+          },
+          backgroundColor: {
+            linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
+            stops: [
+                [0, '#FFFFFF'],
+                [1, '#FCFCFC']
+            ]
+          },
+          borderWidth: 0,
+          borderRadius: 1
         }
       };
 

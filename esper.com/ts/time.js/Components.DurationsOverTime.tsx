@@ -42,6 +42,12 @@ module Esper.Components {
           type: 'column',
         },
 
+        plotOptions: {
+          column: {
+            borderWidth: 0
+          }
+        },
+
         xAxis: {
           categories: formatted.groupLabels
         },

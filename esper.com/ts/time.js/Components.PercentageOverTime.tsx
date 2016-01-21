@@ -43,13 +43,7 @@ module Esper.Components {
           plotOptions: {
             column: {
               stacking: 'percent',
-              dataLabels: {
-                enabled: true,
-                formatter: function() {
-                  return this.percentage ?
-                    this.percentage.toFixed(2) + "%" : "";
-                }
-              }
+              borderWidth: 1
             }
           },
 
