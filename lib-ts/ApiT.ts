@@ -633,6 +633,42 @@ type token_response = [
   // calendar_stats_result2 in api.atd
   export type CalendarStatsResult = ListResponse<CalendarStats>;
 
+  export interface CalendarAndTeam {
+    calid: string;
+    teamid: string;
+  }
+
+  export interface DailyStatsRequest {
+    window_start: string; // timestamp
+    window_end: string; // timestamp
+    calendars: CalendarTime[];
+  }
+
+  export interface DailyStatsResponse {
+    top_guests: TopGuest[];
+    top_guest_domains: TopGuest[];
+    daily_stats: string[];
+  }
+
+  export interface TopGuest {
+    id: string; // Email address or domain name for guest(s)
+    name?: string;      // Real-name if applicable
+    split_time: number; // Seconds
+    count: number;
+    time: number;       // Seconds
+  }
+
+  export interface DailyStats {
+    window_start: string;         // timestamp
+    scheduled: number[];          // Seconds list
+    with_guests: number[];        // Seconds list
+    internal?: number[];          // Seconds list
+    external?: number[];          // Seconds list
+    chunks: number[];             // Seconds list
+    chunks_compl: number[];       // Seconds list
+    chunks_with_guests: number[]; // Seconds list
+  }
+
   export interface Task {
     taskid: string;
     task_teamid: string;
