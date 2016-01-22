@@ -641,7 +641,7 @@ type token_response = [
   export interface DailyStatsRequest {
     window_start: string; // timestamp
     window_end: string; // timestamp
-    calendars: CalendarTime[];
+    calendars: CalendarAndTeam[];
   }
 
   export interface DailyStatsResponse {
