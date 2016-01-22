@@ -159,6 +159,12 @@ module Esper.ApiC {
       store: new Model.CappedStore<ApiT.CalendarStatsResult>()
     });
 
+  export var postForDailyStats = makeC
+    <typeof Api.postForDailyStats, ApiT.DailyStatsResponse>
+    (Api.postForDailyStats, {
+      store: new Model.CappedStore<ApiT.DailyStatsResponse>()
+    });
+
   export var getTaskListForEvent = makeC
     <typeof Api.getTaskListForEvent, ApiT.Task[]>
     (Api.getTaskListForEvent, {
