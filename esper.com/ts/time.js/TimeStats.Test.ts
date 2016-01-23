@@ -22,175 +22,177 @@ module Esper.TimeStats {
 
   describe("TimeStats", function() {
 
-    describe("intervalCountRequest", function() {
-      beforeEach(function() {
-        jasmine.clock().install();
-      });
+    // describe("intervalCountRequest", function() {
+    //   beforeEach(function() {
+    //     jasmine.clock().install();
+    //   });
 
-      afterEach(function() {
-        jasmine.clock().uninstall();
-      });
+    //   afterEach(function() {
+    //     jasmine.clock().uninstall();
+    //   });
 
-      describe("daily", function() {
-        it("should be able to return a fixed count dating back from today",
-          function()
-        {
-          jasmine.clock().mockDate(new Date(2015, 10, 5, 23, 59, 59, 999));
-          var val = intervalCountRequest(3, Interval.DAILY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 10, 3),
-              new Date(2015, 10, 4),
-              new Date(2015, 10, 5)],
-            windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
-            interval: Interval.DAILY
-          });
-        });
+    //   describe("daily", function() {
+    //     it("should be able to return a fixed count dating back from today",
+    //       function()
+    //     {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 5, 23, 59, 59, 999));
+    //       var val = intervalCountRequest(3, Interval.DAILY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 10, 3),
+    //           new Date(2015, 10, 4),
+    //           new Date(2015, 10, 5)],
+    //         windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
+    //         interval: Interval.DAILY
+    //       });
+    //     });
 
-        it("should round to the end of the day", function() {
-          jasmine.clock().mockDate(new Date(2015, 10, 5, 23));
-          var val = intervalCountRequest(3, Interval.DAILY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 10, 3),
-              new Date(2015, 10, 4),
-              new Date(2015, 10, 5)],
-            windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
-            interval: Interval.DAILY
-          });
-        });
-      });
+    //     it("should round to the end of the day", function() {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 5, 23));
+    //       var val = intervalCountRequest(3, Interval.DAILY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 10, 3),
+    //           new Date(2015, 10, 4),
+    //           new Date(2015, 10, 5)],
+    //         windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
+    //         interval: Interval.DAILY
+    //       });
+    //     });
+    //   });
 
-      describe("weekly", function() {
-        it("should be able to return a fixed count dating back from today",
-          function()
-        {
-          jasmine.clock().mockDate(new Date(2015, 10, 7, 23, 59, 59, 999));
-          var val = intervalCountRequest(3, Interval.WEEKLY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 9, 18),
-              new Date(2015, 9, 25),
-              new Date(2015, 10, 1)],
-            windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
-            interval: Interval.WEEKLY
-          });
-        });
+    //   describe("weekly", function() {
+    //     it("should be able to return a fixed count dating back from today",
+    //       function()
+    //     {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 7, 23, 59, 59, 999));
+    //       var val = intervalCountRequest(3, Interval.WEEKLY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 9, 18),
+    //           new Date(2015, 9, 25),
+    //           new Date(2015, 10, 1)],
+    //         windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
+    //         interval: Interval.WEEKLY
+    //       });
+    //     });
 
-        it("should round to the end of the week (Saturday)", function() {
-          jasmine.clock().mockDate(new Date(2015, 10, 5));
-          var val = intervalCountRequest(3, Interval.WEEKLY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 9, 18),
-              new Date(2015, 9, 25),
-              new Date(2015, 10, 1)],
-            windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
-            interval: Interval.WEEKLY
-          });
-        });
-      });
+    //     it("should round to the end of the week (Saturday)", function() {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 5));
+    //       var val = intervalCountRequest(3, Interval.WEEKLY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 9, 18),
+    //           new Date(2015, 9, 25),
+    //           new Date(2015, 10, 1)],
+    //         windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
+    //         interval: Interval.WEEKLY
+    //       });
+    //     });
+    //   });
 
-      describe("monthly", function() {
-        it("should be able to return a fixed count dating back from today",
-          function()
-        {
-          jasmine.clock().mockDate(new Date(2015, 10, 30, 23, 59, 59, 999));
-          var val = intervalCountRequest(3, Interval.MONTHLY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 8, 1),
-              new Date(2015, 9, 1),
-              new Date(2015, 10, 1)],
-            windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
-            interval: Interval.MONTHLY
-          });
-        });
+    //   describe("monthly", function() {
+    //     it("should be able to return a fixed count dating back from today",
+    //       function()
+    //     {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 30, 23, 59, 59, 999));
+    //       var val = intervalCountRequest(3, Interval.MONTHLY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 8, 1),
+    //           new Date(2015, 9, 1),
+    //           new Date(2015, 10, 1)],
+    //         windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
+    //         interval: Interval.MONTHLY
+    //       });
+    //     });
 
-        it("should round to the end of the month", function() {
-          jasmine.clock().mockDate(new Date(2015, 10, 5));
-          var val = intervalCountRequest(3, Interval.MONTHLY);
-          expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 8, 1),
-              new Date(2015, 9, 1),
-              new Date(2015, 10, 1)],
+    //     it("should round to the end of the month", function() {
+    //       jasmine.clock().mockDate(new Date(2015, 10, 5));
+    //       var val = intervalCountRequest(3, Interval.MONTHLY);
+    //       expect(val).toEqual({
+    //         windowStarts: [
+    //           new Date(2015, 8, 1),
+    //           new Date(2015, 9, 1),
+    //           new Date(2015, 10, 1)],
 
-            /*
-              In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-              why the end of the month is the 30th, not the 31st.
-            */
-            windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
-            interval: Interval.MONTHLY
-          });
-        });
-      });
-    });
+    //         /*
+    //           In JS, Date(2015, 10, 5) is November 5, not October 5, hence
+    //           why the end of the month is the 30th, not the 31st.
+    //         */
+    //         windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
+    //         interval: Interval.MONTHLY
+    //       });
+    //     });
+    //   });
+    // });
 
-    describe("periodRequest", function() {
-      it("should return unrounded daily intervals between start and end " +
-         "dates", function()
-      {
-        var val = periodRequest(new Date(2015, 10, 1, 12),
-                                new Date(2015, 10, 3, 12),
-                                Interval.DAILY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 10, 1, 12),
-            new Date(2015, 10, 2),
-            new Date(2015, 10, 3)],
 
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 10, 3, 12),
-          interval: Interval.DAILY
-        });
-      });
 
-      it("should return unrounded daily intervals between start and end " +
-         "weeks", function()
-      {
-        var val = periodRequest(new Date(2015, 9, 20),
-                                new Date(2015, 10, 5),
-                                Interval.WEEKLY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 9, 20),
-            new Date(2015, 9, 25),
-            new Date(2015, 10, 1)],
+    // describe("periodRequest", function() {
+    //   it("should return unrounded daily intervals between start and end " +
+    //      "dates", function()
+    //   {
+    //     var val = periodRequest(new Date(2015, 10, 1, 12),
+    //                             new Date(2015, 10, 3, 12),
+    //                             Interval.DAILY);
+    //     expect(val).toEqual({
+    //       windowStarts: [
+    //         new Date(2015, 10, 1, 12),
+    //         new Date(2015, 10, 2),
+    //         new Date(2015, 10, 3)],
 
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 10, 5),
-          interval: Interval.WEEKLY
-        });
-      });
+    //       /*
+    //         In JS, Date(2015, 10, 5) is November 5, not October 5, hence
+    //         why the end of the month is the 30th, not the 31st.
+    //       */
+    //       windowEnd: new Date(2015, 10, 3, 12),
+    //       interval: Interval.DAILY
+    //     });
+    //   });
 
-      it("should return unrounded daily intervals between start and end " +
-         "months", function()
-      {
-        var val = periodRequest(new Date(2015, 9, 5),
-                                new Date(2015, 11, 5),
-                                Interval.MONTHLY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 9, 5),
-            new Date(2015, 10, 1),
-            new Date(2015, 11, 1)],
+    //   it("should return unrounded daily intervals between start and end " +
+    //      "weeks", function()
+    //   {
+    //     var val = periodRequest(new Date(2015, 9, 20),
+    //                             new Date(2015, 10, 5),
+    //                             Interval.WEEKLY);
+    //     expect(val).toEqual({
+    //       windowStarts: [
+    //         new Date(2015, 9, 20),
+    //         new Date(2015, 9, 25),
+    //         new Date(2015, 10, 1)],
 
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 11, 5),
-          interval: Interval.MONTHLY
-        });
-      });
-    });
+    //       /*
+    //         In JS, Date(2015, 10, 5) is November 5, not October 5, hence
+    //         why the end of the month is the 30th, not the 31st.
+    //       */
+    //       windowEnd: new Date(2015, 10, 5),
+    //       interval: Interval.WEEKLY
+    //     });
+    //   });
+
+    //   it("should return unrounded daily intervals between start and end " +
+    //      "months", function()
+    //   {
+    //     var val = periodRequest(new Date(2015, 9, 5),
+    //                             new Date(2015, 11, 5),
+    //                             Interval.MONTHLY);
+    //     expect(val).toEqual({
+    //       windowStarts: [
+    //         new Date(2015, 9, 5),
+    //         new Date(2015, 10, 1),
+    //         new Date(2015, 11, 1)],
+
+    //       /*
+    //         In JS, Date(2015, 10, 5) is November 5, not October 5, hence
+    //         why the end of the month is the 30th, not the 31st.
+    //       */
+    //       windowEnd: new Date(2015, 11, 5),
+    //       interval: Interval.MONTHLY
+    //     });
+    //   });
+    // });
 
     describe("partitionByLabel", function() {
       it("should sum up counts and durations for each event", function() {

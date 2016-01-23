@@ -11,8 +11,8 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface RangeProps {
-    selected: TimeStats.TypedStatRequest;
-    updateFn(value: TimeStats.TypedStatRequest): void;
+    selected: TimeStats.RequestPeriod;
+    updateFn(value: TimeStats.RequestPeriod): void;
 
     // Preset ranges
     presets?: { [index: string]: [Date, Date] };
@@ -68,9 +68,8 @@ module Esper.Components {
         maxDate: moment().add(6, 'months')
       };
       if (this.props.selected) {
-        var windowStarts = this.props.selected.windowStarts;
-        if (windowStarts && windowStarts[0]) {
-          opts.startDate = windowStarts[0];
+        if (this.props.selected.windowEnd) {
+          opts.startDate = this.props.selected.windowStart;
         }
 
         if (this.props.selected.windowEnd) {
@@ -89,15 +88,14 @@ module Esper.Components {
 
     componentDidUpdate() {
       if (this.props.selected &&
-          this.props.selected.windowStarts &&
-          this.props.selected.windowStarts[0])
+          this.props.selected.windowStart)
       {
         var picker = this.getPicker();
         if (picker) {
           if (! _.isEqual(picker.startDate,
-                          this.props.selected.windowStarts[0]))
+                          this.props.selected.windowStart))
           {
-            picker.setStartDate(this.props.selected.windowStarts[0]);
+            picker.setStartDate(this.props.selected.windowStart);
           }
           if (! _.isEqual(picker.endDate, this.props.selected.windowEnd)) {
             picker.setEndDate(this.props.selected.windowEnd);
@@ -116,18 +114,27 @@ module Esper.Components {
 
     getDefaultPresets() {
       if (_.isUndefined(this.props.presets)) {
-        var m2 = TimeStats.intervalCountRequest(2, TimeStats.Interval.MONTHLY);
-        var w2 = TimeStats.intervalCountRequest(2, TimeStats.Interval.WEEKLY);
-        var d30 = TimeStats.intervalCountRequest(30, TimeStats.Interval.DAILY);
+        var month = 'month';
+        var week = 'week';
+        var day = 'day';
 
-        var ret: {[index: string]: [Date, Date]} = {
-          "This Month": [m2.windowStarts[1], m2.windowEnd],
-          "Last Month": [m2.windowStarts[0], m2.windowStarts[1]],
-          "Last 30 Days": [d30.windowStarts[0], d30.windowEnd],
-          "This Week": [w2.windowStarts[1], w2.windowEnd],
-          "Last Week": [w2.windowStarts[0], w2.windowStarts[1]],
-          "Last 7 Days": [d30.windowStarts[23], d30.windowEnd]
+        var m: {[index: string]: [moment.Moment, moment.Moment]} = {
+          "This Month": [ moment().startOf(month), moment().endOf(month) ],
+          "Last Month": [ moment().startOf(month).subtract(1, month),
+                          moment().endOf(month).subtract(1, month) ],
+          "Last 30 Days": [ moment().startOf(day).subtract(30, day),
+                            moment().endOf(day) ],
+          "This Week": [ moment().startOf(week), moment().endOf(week) ],
+          "Last Week": [ moment().startOf(week).subtract(1, week),
+                         moment().endOf(week).subtract(1, week) ],
+          "Last 7 Days": [ moment().startOf(day).subtract(7, day),
+                           moment().endOf(day) ]
         };
+
+        var ret: {[index: string]: [Date, Date]} = {};
+        _.each(m, (v, k) => {
+          ret[k] = [v[0].toDate(), v[1].toDate()];
+        })
 
         return ret;
       }
@@ -150,9 +157,11 @@ module Esper.Components {
       // Round to beginning / end of days
       var start = picker.startDate.clone().startOf('day');
       var end = picker.endDate.clone().endOf('day');
-      var req = TimeStats.periodRequest(start.toDate(), end.toDate(),
-                                        interval);
-      this.props.updateFn(req);
+      this.props.updateFn({
+        windowStart: start.toDate(),
+        windowEnd: end.toDate(),
+        interval: interval
+      });
     }
   }
 }

@@ -1,5 +1,6 @@
 /*
-  Module for storing, querying, and manipulating time-stats data
+  Module for storing, querying, and manipulating time-stats data for
+  labeled calendar data
 */
 
 /// <reference path="../lib/ApiC.ts" />
@@ -18,17 +19,12 @@ module Esper.TimeStats {
   // fine
   export var StatStore = ApiC.postForCalendarStats.store;
 
-  // Like ApiT.CalendarStatsRequest, but with Date types
-  export interface TypedStatRequest {
-    windowStarts: Date[];
+  // Use for specifying a time period to request data from
+  export interface RequestPeriod {
+    windowStart: Date;
     windowEnd: Date;
-
-    // Additional field to make static interval explicit (if applciable)
     interval?: Interval;
   }
-
-  // Store for currently selected time period
-  export var RequestStore = new Model.StoreOne<TypedStatRequest>();
 
   export enum Interval { DAILY=1, WEEKLY, MONTHLY };
 
@@ -37,84 +33,30 @@ module Esper.TimeStats {
     from today
   */
   export function intervalCountRequest(count: number, interval: Interval)
-    : TypedStatRequest
+    : RequestPeriod
   {
-    var starts: Date[] = [];
-    var addToStarts = (startM: moment.Moment) => {
-      starts.unshift(startM.clone().toDate());
-    };
-
-    // Prepend the current time period and work backwards from there
-    var intervalStr = momentStr(interval);
-    var now = moment();
-    var i = now.clone().startOf(intervalStr);
-    addToStarts(i);
-
-    if (count > 1) {
-      _.times(count - 1, () => {
-        i = i.subtract(1, intervalStr);
-        addToStarts(i);
-      });
+    if (count < 1) {
+      throw new Error("Interval count must be > 0");
     }
+
+    var now = moment();
+    var intervalStr = momentStr(interval);
+
+    var end = now.clone().endOf(intervalStr);
+    var start = now.startOf(intervalStr).subtract(count - 1, intervalStr);
 
     return {
-      windowStarts: starts,
-      windowEnd: now.endOf(intervalStr).toDate(),
+      windowStart: start.toDate(),
+      windowEnd: end.toDate(),
       interval: interval
     };
-  }
-
-  /*
-    Returns a stat request based on start and end dates -- e.g. weekly
-    from June 6 to July 7
-  */
-  export function periodRequest(start: Date, end: Date, interval?: Interval)
-    : TypedStatRequest
-  {
-    // Convert to moment
-    var mStart = moment(start);
-    if (! mStart.isBefore(end)) {
-      throw new Error("End should be before start");
-    }
-    var starts: Date[] = [start];
-
-    if (! _.isUndefined(interval)) {
-      var intervalStr = momentStr(interval);
-      var current = mStart.clone().startOf(intervalStr).add(1, intervalStr);
-      while (current.isBefore(end)) {
-        starts.push(current.toDate());
-        current = current.clone().add(1, intervalStr);
-      }
-    }
-
-    return capIntervals({
-      windowStarts: starts,
-      windowEnd: end,
-      interval: interval
-    });
-  }
-
-  function capIntervals(req: TypedStatRequest) {
-    if (req.windowStarts.length > MAX_INTERVALS) {
-      req.windowEnd = req.windowStarts[MAX_INTERVALS];
-      req.windowStarts = req.windowStarts.slice(0, MAX_INTERVALS);
-    }
-    return req;
   }
 
   /*
     Synchronously returns store value for time stats data.
-    If no team, calendar, or TypedStatRequest are passed, get from default
-    select store sources.
   */
-  export function get(teamId?: string, calId?: string, req?: TypedStatRequest)
+  export function get(teamId: string, calId: string, req: RequestPeriod)
   {
-    teamId = teamId || defaultTeamId();
-    calId = calId || defaultCalId();
-    req = req || RequestStore.val();
-    if (!teamId || !calId || !req) {
-      return null;
-    }
     var key = storeKey(teamId, calId, req);
     return ApiC.postForCalendarStats.store.get(key);
   }
@@ -124,38 +66,48 @@ module Esper.TimeStats {
     If no team, calendar, or TypedStatRequest are passed, get from default
     select store sources. If no defaults set, return null.
   */
-  export function async(teamId?: string, calId?: string,
-    req?: TypedStatRequest)
+  export function async(teamId: string, calId: string, req: RequestPeriod)
   {
-    teamId = teamId || defaultTeamId();
-    calId = calId || defaultCalId();
-    req = req || RequestStore.val();
-    if (!teamId || !calId || !req) {
-      return null;
-    }
     return ApiC.postForCalendarStats(teamId, calId, requestToJSON(req));
   }
 
-  function defaultTeamId() {
-    var val = Calendars.SelectStore.val();
-    return val && val.teamId;
-  }
-
-  function defaultCalId() {
-    var val = Calendars.SelectStore.val();
-    return val && val.calId;
-  }
-
   // Return string key used to access store based on vars
-  function storeKey(teamId: string, calId: string, req: TypedStatRequest) {
+  function storeKey(teamId: string, calId: string, req: RequestPeriod) {
     var fn = ApiC.postForCalendarStats;
     return fn.strFunc([teamId, calId, requestToJSON(req)]);
   }
 
-  /* Converts our typed request into stringified version for API call */
-  function requestToJSON(req: TypedStatRequest): ApiT.CalendarStatsRequest {
+  /*
+    Converts our request period into stringified list of windows version for
+    API call
+  */
+  function requestToJSON(req: RequestPeriod): ApiT.CalendarStatsRequest {
+    // Convert to moment
+    var mStart = moment(req.windowStart);
+    if (! mStart.isBefore(req.windowEnd)) {
+      throw new Error("End should be before start");
+    }
+
+    var starts: Date[] = [req.windowStart];
+    var end = req.windowEnd;
+
+    if (! _.isUndefined(req.interval)) {
+      var intervalStr = momentStr(req.interval);
+      var current = mStart.clone().startOf(intervalStr).add(1, intervalStr);
+      while (current.isBefore(req.windowEnd)) {
+        starts.push(current.toDate());
+        current = current.clone().add(1, intervalStr);
+      }
+
+      // Cap intervals
+      if (starts.length > MAX_INTERVALS) {
+        end = starts[MAX_INTERVALS];
+        starts = starts.slice(0, MAX_INTERVALS);
+      }
+    }
+
     return {
-      window_starts: _.map(req.windowStarts, XDate.toString),
+      window_starts: _.map(starts, XDate.toString),
       window_end: XDate.toString(req.windowEnd)
     };
   }
@@ -336,6 +288,16 @@ module Esper.TimeStats {
   {
     var labels = _.map(stats, (stat) =>
       partitionByLabel(stat.partition)
+    );
+    return getDisplayResultsBase(labels);
+  }
+
+  // Like getDisplayResults, but using exclusivePartitionByLabel
+  export function getExclusiveDisplayResults(stats: ApiT.CalendarStats[],
+    teamId?: string): DisplayResults
+  {
+    var labels = _.map(stats, (stat) =>
+      exclusivePartitionByLabel(stat.partition)
     );
     return getDisplayResultsBase(labels);
   }
