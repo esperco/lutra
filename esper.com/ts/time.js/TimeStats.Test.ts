@@ -22,6 +22,78 @@ module Esper.TimeStats {
 
   describe("TimeStats", function() {
 
+    describe("requestToJSON", function() {
+      it("should use start of day for new daily interval partition",
+        function()
+      {
+        var period = {
+          windowStart: new Date(2015, 10, 3, 12),
+          windowEnd: new Date(2015, 10, 5, 23),
+          interval: Interval.DAILY
+        };
+
+        expect(TimeStats.requestToJSON(period)).toEqual({
+          window_starts: [
+            XDate.toString(period.windowStart),
+            XDate.toString(new Date(2015, 10, 4)),
+            XDate.toString(new Date(2015, 10, 5))
+          ],
+          window_end: XDate.toString(period.windowEnd)
+        });
+      });
+
+      it("should create partitions when given a weekly interval",
+        function()
+      {
+        var period = {
+          windowStart: new Date(2015, 9, 18),
+          windowEnd: new Date(2015, 10, 5),
+          interval: Interval.WEEKLY
+        };
+
+        expect(TimeStats.requestToJSON(period)).toEqual({
+          window_starts: [
+            XDate.toString(period.windowStart),
+            XDate.toString(new Date(2015, 9, 25)),
+            XDate.toString(new Date(2015, 10, 1))
+          ],
+          window_end: XDate.toString(period.windowEnd)
+        });
+      });
+
+      it("should create partitions when given a monthly interval",
+        function()
+      {
+        var period = {
+          windowStart: new Date(2015, 8, 1),
+          windowEnd: new Date(2015, 10, 30),
+          interval: Interval.MONTHLY
+        };
+
+        expect(TimeStats.requestToJSON(period)).toEqual({
+          window_starts: [
+            XDate.toString(period.windowStart),
+            XDate.toString(new Date(2015, 9, 1)),
+            XDate.toString(new Date(2015, 10, 1))
+          ],
+          window_end: XDate.toString(period.windowEnd)
+        });
+      });
+
+      it("should cap large numbers of intervals", function() {
+        var period = {
+          windowStart: new Date(2015, 8, 1),
+          windowEnd: new Date(2015, 12, 1),
+          interval: Interval.DAILY
+        };
+
+        var ret = TimeStats.requestToJSON(period);
+        expect(ret.window_starts[0])
+          .toEqual(XDate.toString(period.windowStart));
+        expect(ret.window_starts.length).toEqual(MAX_INTERVALS);
+      });
+    });
+
     describe("intervalCountRequest", function() {
       beforeEach(function() {
         jasmine.clock().install();
@@ -38,10 +110,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 5, 23, 59, 59, 999));
           var val = intervalCountRequest(3, Interval.DAILY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 10, 3),
-              new Date(2015, 10, 4),
-              new Date(2015, 10, 5)],
+            windowStart: new Date(2015, 10, 3),
             windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
             interval: Interval.DAILY
           });
@@ -51,10 +120,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 5, 23));
           var val = intervalCountRequest(3, Interval.DAILY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 10, 3),
-              new Date(2015, 10, 4),
-              new Date(2015, 10, 5)],
+            windowStart: new Date(2015, 10, 3),
             windowEnd: new Date(2015, 10, 5, 23, 59, 59, 999),
             interval: Interval.DAILY
           });
@@ -68,10 +134,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 7, 23, 59, 59, 999));
           var val = intervalCountRequest(3, Interval.WEEKLY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 9, 18),
-              new Date(2015, 9, 25),
-              new Date(2015, 10, 1)],
+            windowStart: new Date(2015, 9, 18),
             windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
             interval: Interval.WEEKLY
           });
@@ -81,10 +144,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 5));
           var val = intervalCountRequest(3, Interval.WEEKLY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 9, 18),
-              new Date(2015, 9, 25),
-              new Date(2015, 10, 1)],
+            windowStart: new Date(2015, 9, 18),
             windowEnd: new Date(2015, 10, 7, 23, 59, 59, 999),
             interval: Interval.WEEKLY
           });
@@ -98,10 +158,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 30, 23, 59, 59, 999));
           var val = intervalCountRequest(3, Interval.MONTHLY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 8, 1),
-              new Date(2015, 9, 1),
-              new Date(2015, 10, 1)],
+            windowStart: new Date(2015, 8, 1),
             windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
             interval: Interval.MONTHLY
           });
@@ -111,10 +168,7 @@ module Esper.TimeStats {
           jasmine.clock().mockDate(new Date(2015, 10, 5));
           var val = intervalCountRequest(3, Interval.MONTHLY);
           expect(val).toEqual({
-            windowStarts: [
-              new Date(2015, 8, 1),
-              new Date(2015, 9, 1),
-              new Date(2015, 10, 1)],
+            windowStart: new Date(2015, 8, 1),
 
             /*
               In JS, Date(2015, 10, 5) is November 5, not October 5, hence
@@ -123,71 +177,6 @@ module Esper.TimeStats {
             windowEnd: new Date(2015, 10, 30, 23, 59, 59, 999),
             interval: Interval.MONTHLY
           });
-        });
-      });
-    });
-
-    describe("periodRequest", function() {
-      it("should return unrounded daily intervals between start and end " +
-         "dates", function()
-      {
-        var val = periodRequest(new Date(2015, 10, 1, 12),
-                                new Date(2015, 10, 3, 12),
-                                Interval.DAILY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 10, 1, 12),
-            new Date(2015, 10, 2),
-            new Date(2015, 10, 3)],
-
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 10, 3, 12),
-          interval: Interval.DAILY
-        });
-      });
-
-      it("should return unrounded daily intervals between start and end " +
-         "weeks", function()
-      {
-        var val = periodRequest(new Date(2015, 9, 20),
-                                new Date(2015, 10, 5),
-                                Interval.WEEKLY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 9, 20),
-            new Date(2015, 9, 25),
-            new Date(2015, 10, 1)],
-
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 10, 5),
-          interval: Interval.WEEKLY
-        });
-      });
-
-      it("should return unrounded daily intervals between start and end " +
-         "months", function()
-      {
-        var val = periodRequest(new Date(2015, 9, 5),
-                                new Date(2015, 11, 5),
-                                Interval.MONTHLY);
-        expect(val).toEqual({
-          windowStarts: [
-            new Date(2015, 9, 5),
-            new Date(2015, 10, 1),
-            new Date(2015, 11, 1)],
-
-          /*
-            In JS, Date(2015, 10, 5) is November 5, not October 5, hence
-            why the end of the month is the 30th, not the 31st.
-          */
-          windowEnd: new Date(2015, 11, 5),
-          interval: Interval.MONTHLY
         });
       });
     });

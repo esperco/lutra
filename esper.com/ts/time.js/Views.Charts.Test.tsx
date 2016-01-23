@@ -1,5 +1,6 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
+/// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./TestFixtures.ts" />
 
@@ -7,9 +8,9 @@ module Esper.Views {
   describe("Views.Chart", function() {
     beforeEach(function() {
       Calendars.SelectStore.reset();
-      TimeStats.RequestStore.reset();
-      chartsLabelSelectStore.reset();
-      chartsChartTypeStore.reset();
+      Esper.Charts.LabelSelectStore.reset();
+      RequestStore.reset();
+      ChartTypeStore.reset();
       TestFixtures.mockLogin();
       Test.mockAPIs();
     });
@@ -21,12 +22,13 @@ module Esper.Views {
     it("should not render chart with null default selection", function() {
       spyOn(Calendars, "setDefault").and.returnValue(null);
       spyOn(ApiC, "postForCalendarStats");
-      spyOn(Views.Charts.prototype, "renderChart").and.returnValue(<span />);
+      spyOn(Components.Highchart.prototype, "render")
+        .and.returnValue(<span />);
       var component = Test.render(<Views.Charts />);
 
       expect(Calendars.setDefault).toHaveBeenCalled();
       expect(ApiC.postForCalendarStats).not.toHaveBeenCalled();
-      expect(Views.Charts.prototype.renderChart).not.toHaveBeenCalled();
+      expect(Components.Highchart.prototype.render).not.toHaveBeenCalled();
     });
 
     describe("with non-null default selection", function() {
@@ -45,8 +47,9 @@ module Esper.Views {
           teamId: "team-id-2",
           calId: "rupert@esper.com"
         });
-        chartsChartTypeStore.set(Views.ChartType.DurationsOverTime);
-        TimeStats.RequestStore.set(TimeStats.intervalCountRequest(3,
+        ChartTypeStore.set(_.findIndex(chartTypes,
+          (c) => c === Esper.Charts.DurationsOverTime));
+        RequestStore.set(TimeStats.intervalCountRequest(3,
           TimeStats.Interval.DAILY));
         Test.render(<Views.Charts />);
         expect(ApiC.postForCalendarStats).toHaveBeenCalled();

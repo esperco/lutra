@@ -1,28 +1,23 @@
 /*
-  Bar chart for show label durations over time
+  Pie chart for showing label percentages using split time
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Components.TimeStatsChart.tsx" />
+/// <reference path="./Charts.LabelChart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
-/// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
-module Esper.Components {
-  // Shorten references to React Component class
-  var Component = ReactHelpers.Component;
+module Esper.Charts {
+  export class PercentageRecent extends LabelChart {
+    static displayName = "Label Allocation Percentage";
 
-  export class PercentageRecent extends TimeStatsChart {
-    render() {
-      var labels = _.map(this.props.stats, (stat) =>
-        TimeStats.exclusivePartitionByLabel(stat.partition,
-                                            this.props.selectedLabels)
-      );
-      var results = TimeStats.getDisplayResultsBase(labels);
-      results = _.sortBy(results, (x) => -x.totalDuration);
-      var filtered = _.filter(results,
-        (c) => _.contains(this.props.selectedLabels, c.labelNorm));
+    renderChart() {
+      // Filter to include only user-selected labels
+      var filtered = this.filterResults(this.getExclusiveDisplayResults());
+
+      // Resort by duration (because pie)
+      filtered = _.sortBy(filtered, (x) => -x.totalDuration);
+
       var data = _.map(filtered, (c) => {
         return {
           name: c.displayAs,
@@ -30,6 +25,7 @@ module Esper.Components {
           y: TimeStats.toHours(c.totalDuration)
         }
       });
+
       return <div className="percentage-recent-chart">
         <Components.Highchart opts={{
           chart: {
