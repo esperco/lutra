@@ -28,6 +28,13 @@ module Esper.Components {
       var defaults: HighchartsOptions = {
         credits: { enabled: false },
         title: { text: "" },
+
+        plotOptions: {
+          series: {
+            animation: { duration: 500 }
+          }
+        },
+
         tooltip: {
           formatter: function() {
             return `<b>${this.series.name}:</b> ${this.y} ${units}` +
@@ -45,7 +52,7 @@ module Esper.Components {
         }
       };
 
-      return _.extend(defaults, this.props.opts)
+      return _.merge(defaults, this.props.opts)
     }
 
     componentDidMount() {
