@@ -1,5 +1,6 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
+/// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./TestFixtures.ts" />
 
@@ -21,13 +22,13 @@ module Esper.Views {
     it("should not render chart with null default selection", function() {
       spyOn(Calendars, "setDefault").and.returnValue(null);
       spyOn(ApiC, "postForCalendarStats");
-      spyOn(Esper.Charts.Chart.prototype, "renderChart")
+      spyOn(Components.Highchart.prototype, "render")
         .and.returnValue(<span />);
       var component = Test.render(<Views.Charts />);
 
       expect(Calendars.setDefault).toHaveBeenCalled();
       expect(ApiC.postForCalendarStats).not.toHaveBeenCalled();
-      expect(Esper.Charts.Chart.prototype.renderChart).not.toHaveBeenCalled();
+      expect(Components.Highchart.prototype.render).not.toHaveBeenCalled();
     });
 
     describe("with non-null default selection", function() {

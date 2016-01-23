@@ -13,7 +13,7 @@
 module Esper.TimeStats {
 
   // Temporary cap on max intervals to avoid weird dispalys
-  var MAX_INTERVALS = 10;
+  export var MAX_INTERVALS = 10;
 
   // Use API's cache for this -- values here rarely change, so we should be
   // fine
@@ -81,7 +81,9 @@ module Esper.TimeStats {
     Converts our request period into stringified list of windows version for
     API call
   */
-  function requestToJSON(req: RequestPeriod): ApiT.CalendarStatsRequest {
+  export function requestToJSON(req: RequestPeriod)
+    : ApiT.CalendarStatsRequest
+  {
     // Convert to moment
     var mStart = moment(req.windowStart);
     if (! mStart.isBefore(req.windowEnd)) {
