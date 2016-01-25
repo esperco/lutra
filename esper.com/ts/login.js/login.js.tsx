@@ -117,7 +117,7 @@ module Esper {
   }
 
   // Go to post-login redirect
-  function redirect(response: ApiT.LoginResponse) {
+  export function redirect(response: ApiT.LoginResponse) {
     location.href = "/" + getLandingUrl();
   }
 
