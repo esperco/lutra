@@ -38,22 +38,33 @@ module Esper.Colors {
   ];
 
   // Already assigned colors
-  var colorMap: { [index: string]: string } = {};
+  type ColorMap = { [index: string]: string };
+  var labelColorMap: ColorMap = {};
+  var domainColorMap: ColorMap = {};
+
+  export function getColorForLabel(label: string): string {
+    return getColorForMap(label, labelColorMap);
+  }
+
+  export function getColorForDomain(domain: string): string {
+    return getColorForMap(domain, domainColorMap);
+  }
 
   // Get a color for a particular string and remember that color
-  export function getColorForLabel(label: string): string {
-    // Return existing remembered color if applicable
-    if (! colorMap[label]) {
+  export function getColorForMap(key: string, colorMap: ColorMap): string {
+    // Return existing rememgetColorForMapbered color if applicable
+    if (! colorMap[key]) {
       var index = _.keys(colorMap).length;
       var color = presetColors[index % presetColors.length];
-      colorMap[label] = color;
+      colorMap[key] = color;
     }
-    return colorMap[label];
+    return colorMap[key];
   }
 
   // Reset remembered colors
-  export function resetColorMap(): void {
-    colorMap = {};
+  export function resetColorMaps(): void {
+    labelColorMap = {};
+    domainColorMap = {};
   }
 
   // Manipulate colors to lighter or darker

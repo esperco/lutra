@@ -28,9 +28,17 @@ module Esper.Components {
       var defaults: HighchartsOptions = {
         credits: { enabled: false },
         title: { text: "" },
+
+        plotOptions: {
+          series: {
+            animation: { duration: 500 }
+          }
+        },
+
         tooltip: {
           formatter: function() {
-            return `<b>${this.series.name}:</b> ${this.y} ${units}` +
+            var name = this.point.name || this.series.name;
+            return `<b>${name}:</b> ${this.y} ${units}` +
               (this.percentage ? ` (${this.percentage.toFixed(2)}%)` : "");
           },
           backgroundColor: {
@@ -45,7 +53,7 @@ module Esper.Components {
         }
       };
 
-      return _.extend(defaults, this.props.opts)
+      return _.merge(defaults, this.props.opts)
     }
 
     componentDidMount() {

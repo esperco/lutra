@@ -5,7 +5,6 @@
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Components.LabelSelector.tsx" />
-/// <reference path="./AutoStats.ts" />
 
 module Esper.Charts {
 
@@ -26,7 +25,15 @@ module Esper.Charts {
   export abstract class Chart {
     // Static properties about this chart type
     static displayName: string;
-    static usesIntervals: boolean;
+
+    // These are used to configure period selector, with defaults
+    static usesIntervals: boolean = false;
+    static dateLimit: moment.MomentInput = TimeStats.MAX_TIME;
+    static dateLimitForInterval:
+      (interval: TimeStats.Interval) => moment.MomentInput =
+      TimeStats.dateLimitForInterval;
+    static minDate: BootstrapDaterangepicker.DateType = TimeStats.MIN_DATE;
+    static maxDate: BootstrapDaterangepicker.DateType = TimeStats.MAX_DATE;
 
     constructor(public params: ChartParams) { }
 
@@ -52,17 +59,4 @@ module Esper.Charts {
     // data (like label selectors). Must handle lack of store data safely.
     abstract renderSelectors(): React.ReactElement<any>;
   }
-
-  /*
-    Base class for auto-charts (using daily stats API)
-  */
-  // export abstract class AutoChart extends Chart {
-  //   static usesLabels = false;
-  //   static usesIntervals = false;
-
-  //   async() {
-  //     var p = this.params;
-  //     AutoStats.async(p.windowStart, p.windowEnd, p.calendars);
-  //   }
-  // }
 }

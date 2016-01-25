@@ -26,33 +26,32 @@ module Esper.Charts {
         }
       });
 
-      return <div className="percentage-recent-chart">
-        <Components.Highchart opts={{
-          chart: {
-            type: 'pie'
-          },
+      return <Components.Highchart opts={{
+        chart: {
+          type: 'pie'
+        },
 
-          plotOptions: {
-            pie: {
-              allowPointSelect: true,
-              cursor: 'pointer',
-              dataLabels: {
-                enabled: true,
-                formatter: function() {
-                  if (this.percentage) {
-                    return `${this.point.name} ` +
-                      `(${this.percentage.toFixed(2)}%)`;
-                  }
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              formatter: function() {
+                if (this.percentage) {
+                  return `${this.point.name} ` +
+                    `(${this.percentage.toFixed(2)}%)`;
                 }
               }
-            }
-          },
+            },
+            size: '80%'
+          }
+        },
 
-          series: [{
-            data: data
-          }]
-        }} units="Adjusted Hours" />
-      </div>;
+        series: [{
+          data: data
+        }]
+      }} units="Adjusted Hours" />
     }
   }
 }

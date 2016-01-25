@@ -17,6 +17,12 @@ module Esper.Components {
     // Preset ranges
     presets?: { [index: string]: [Date, Date] };
 
+    // Limits on range
+    dateLimit?: moment.MomentInput;
+    dateLimitForInterval?: (interval: TimeStats.Interval) => moment.MomentInput;
+    minDate?: BootstrapDaterangepicker.DateType;
+    maxDate?: BootstrapDaterangepicker.DateType;
+
     // Show interval buttons?
     showIntervals?: boolean;
   }
@@ -64,9 +70,11 @@ module Esper.Components {
       var opts: BootstrapDaterangepicker.Options = {
         autoApply: true,
         opens: "left",
-        minDate: moment().subtract(6, 'months'),
-        maxDate: moment().add(6, 'months')
+        minDate: this.props.minDate,
+        maxDate: this.props.maxDate,
+        dateLimit: this.getDateLimit()
       };
+
       if (this.props.selected) {
         if (this.props.selected.windowEnd) {
           opts.startDate = this.props.selected.windowStart;
@@ -77,7 +85,39 @@ module Esper.Components {
         }
       }
       var presets = this.props.presets || this.getDefaultPresets();
-      if (presets) { opts.ranges = presets; }
+      if (presets) {
+
+        // Filter out presets that don't make sense given limits
+        var maxMs: number;
+        if (opts.dateLimit) {
+          maxMs = moment.duration(opts.dateLimit).as('milliseconds');
+        }
+
+        var minMs: number;
+        if (this.props.showIntervals) {
+          var m: moment.MomentInput;
+          switch (this.props.selected.interval) {
+            case TimeStats.Interval.DAILY:
+              m = {day: 1};
+              break;
+            case TimeStats.Interval.WEEKLY:
+              m = {day: 7};
+              break;
+            default:
+              m = {month: 1};
+          }
+          var minMs = moment.duration(m).as('milliseconds');
+        }
+
+        var f: {[index: string]: [Date, Date]} = {};
+        _.each(presets, (v, k) => {
+          var length = moment(v[1]).diff(moment(v[0]));
+          if (length <= maxMs && length >= minMs) {
+            f[k] = v;
+          }
+        })
+        opts.ranges = f;
+      }
 
       var inputElm = $(this._input);
       if (inputElm.is(":visible")) {
@@ -86,26 +126,20 @@ module Esper.Components {
       }
     }
 
-    componentDidUpdate() {
-      if (this.props.selected &&
-          this.props.selected.windowStart)
-      {
-        var picker = this.getPicker();
-        if (picker) {
-          if (! _.isEqual(picker.startDate,
-                          this.props.selected.windowStart))
-          {
-            picker.setStartDate(this.props.selected.windowStart);
-          }
-          if (! _.isEqual(picker.endDate, this.props.selected.windowEnd)) {
-            picker.setEndDate(this.props.selected.windowEnd);
-          }
-        }
-        else {
-          // Re-attach, old element got clobbered by React
-          this.attachDateRangePicker();
-        }
+    getDateLimit() {
+      if (this.props.dateLimitForInterval &&
+          this.props.showIntervals &&
+          _.isNumber(this.props.selected.interval)) {
+        return this.props.dateLimitForInterval(this.props.selected.interval);
       }
+
+      else if (this.props.dateLimit) {
+        return this.props.dateLimit;
+      }
+    }
+
+    componentDidUpdate() {
+      this.attachDateRangePicker();
     }
 
     getPicker() {
