@@ -12,8 +12,42 @@
 
 module Esper.TimeStats {
 
-  // Temporary cap on max intervals to avoid weird dispalys
-  export var MAX_INTERVALS = 10;
+  // Temporary cap on max intervals to avoid potential weirdness
+  export const MAX_INTERVALS = 10;
+
+  // Cap on maximum lenth of time period analyzed
+  export const MAX_TIME: moment.MomentInput = {months: 6};
+
+  // Earliest possible start time
+  export const MIN_DATE = moment().subtract(6, 'months');
+
+  // Earliest possible end time
+  export const MAX_DATE = moment().add(6, 'months');
+
+  // Helper function for returning a max period based on interval
+  export function dateLimitForInterval(interval: Interval)
+    : moment.MomentInput
+  {
+    var intervalDuration: moment.MomentInput;
+    switch (interval) {
+      case Interval.DAILY:
+        intervalDuration = {days: MAX_INTERVALS};
+        break;
+      case Interval.WEEKLY:
+        intervalDuration = {days: MAX_INTERVALS * 7};
+        break;
+      default:
+        intervalDuration = {months: MAX_INTERVALS};
+    }
+
+    var maxMs = moment.duration(MAX_TIME).as('milliseconds');
+    var intervalMs = moment.duration(intervalDuration).as('milliseconds');
+    if (intervalMs > maxMs) {
+      return MAX_TIME;
+    }
+
+    return intervalDuration;
+  }
 
   // Use API's cache for this -- values here rarely change, so we should be
   // fine

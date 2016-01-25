@@ -11,8 +11,9 @@
 /// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Charts.PercentageRecent.tsx" />
 /// <reference path="./Charts.PercentageOverTime.tsx" />
+/// <reference path="./Charts.TopGuests.tsx" />
 /// <reference path="./TimeStats.ts" />
-/// <reference path="./AutoStats.ts" />
+/// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
@@ -31,7 +32,8 @@ module Esper.Views {
   export var chartTypes: ChartType[] = [
     ChartsM.DurationsOverTime,
     ChartsM.PercentageRecent,
-    ChartsM.PercentageOverTime
+    ChartsM.PercentageOverTime,
+    ChartsM.TopGuests
   ];
 
   // Store for current chart type - store index of class in chartTypes list
@@ -61,7 +63,7 @@ module Esper.Views {
     // Clear label selection and colors if switching teams (default)
     if (current && current.teamId !== teamId) {
       ChartsM.LabelSelectStore.unset();
-      Colors.resetColorMap();
+      Colors.resetColorMaps();
     }
   }
 
@@ -119,7 +121,7 @@ module Esper.Views {
 
   function refresh() {
     TimeStats.StatStore.reset();
-    AutoStats.StatStore.reset();
+    DailyStats.StatStore.reset();
     updateAsync();
   }
 
@@ -138,6 +140,8 @@ module Esper.Views {
   {
     switch (chartType) {
       case ChartsM.PercentageRecent:
+        return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
+      case ChartsM.TopGuests:
         return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
       default:
         return TimeStats.intervalCountRequest(5, TimeStats.Interval.WEEKLY);
@@ -253,6 +257,10 @@ module Esper.Views {
         selected={chart.params}
         updateFn={updateRequestedPeriod}
         showIntervals={chartType.usesIntervals}
+        dateLimit={chartType.dateLimit}
+        dateLimitForInterval={chartType.dateLimitForInterval}
+        minDate={chartType.minDate}
+        maxDate={chartType.maxDate}
       />;
     }
 
