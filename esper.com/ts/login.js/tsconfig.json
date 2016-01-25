@@ -7,5 +7,9 @@
 
   "files": [
     "login.js.tsx"
+  ],
+
+  "devFiles": [
+    "../common/Login.Fake.ts"
   ]
 }

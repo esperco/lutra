@@ -1,13 +1,14 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="../common/Layout.tsx" />
+/// <reference path="../common/Login.Fake.ts" />
 /// <reference path="./Integration.ts" />
 
 module Esper.Integration {
   describe("/time", function() {
     describe("when logged in", function() {
       beforeAll(function(done) {
-        stubLois();
+        Login.stubLois();
         Test.goTo("/time", done);
       });
 
