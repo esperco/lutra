@@ -46,7 +46,7 @@ module Esper.Charts {
         (d) => {
           // For each domain, populate with guests for that domain
           var domainGuests = _.filter(data.top_guests,
-            (g) => _.endsWith(g.id, d.id) && g.split_time > cutOffTime
+            (g) => _.endsWith(g.id, '@' + d.id) && g.split_time > cutOffTime
           );
           domainGuests = _.sortBy(domainGuests, (g) => g.split_time);
 
