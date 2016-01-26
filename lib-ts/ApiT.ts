@@ -647,17 +647,20 @@ type token_response = [
   }
 
   export interface DailyStatsResponse {
-    top_guests: TopGuest[];
-    top_guest_domains: TopGuest[];
+    has_domain_analysis: boolean;
+    guest_stats: GuestStat[];
     daily_stats: DailyStats[];
   }
 
-  export interface TopGuest {
-    id: string; // Email address or domain name for guest(s)
-    name?: string;      // Real-name if applicable
-    split_time: number; // Seconds
+  export interface GuestStat {
+    guests: Identity[];
     count: number;
-    time: number;       // Seconds
+    time: number;   // Seconds
+  }
+
+  export interface Identity {
+    email: string;
+    name?: string;
   }
 
   export interface DailyStats {
