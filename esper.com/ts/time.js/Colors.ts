@@ -37,6 +37,10 @@ module Esper.Colors {
     "#CCA6AC"
   ];
 
+  // If we only need a handful of colors
+  export var first = presetColors[0];
+  export var second = presetColors[1];
+
   // Already assigned colors
   type ColorMap = { [index: string]: string };
   var labelColorMap: ColorMap = {};

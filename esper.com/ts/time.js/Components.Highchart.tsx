@@ -38,7 +38,7 @@ module Esper.Components {
         tooltip: {
           formatter: function() {
             var name = this.point.name || this.series.name;
-            return `<b>${name}:</b> ${this.y} ${units}` +
+            return `<b>${name}:</b> ${this.y} ${units || ''}` +
               (this.percentage ? ` (${this.percentage.toFixed(2)}%)` : "");
           },
           backgroundColor: {

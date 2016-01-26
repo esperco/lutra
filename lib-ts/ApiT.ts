@@ -649,7 +649,7 @@ type token_response = [
   export interface DailyStatsResponse {
     top_guests: TopGuest[];
     top_guest_domains: TopGuest[];
-    daily_stats: string[];
+    daily_stats: DailyStats[];
   }
 
   export interface TopGuest {

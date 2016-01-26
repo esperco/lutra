@@ -12,6 +12,7 @@
 /// <reference path="./Charts.PercentageRecent.tsx" />
 /// <reference path="./Charts.PercentageOverTime.tsx" />
 /// <reference path="./Charts.TopGuests.tsx" />
+/// <reference path="./Charts.DurationHistogram.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
@@ -33,7 +34,8 @@ module Esper.Views {
     ChartsM.DurationsOverTime,
     ChartsM.PercentageRecent,
     ChartsM.PercentageOverTime,
-    ChartsM.TopGuests
+    ChartsM.TopGuests,
+    ChartsM.DurationHistogram
   ];
 
   // Store for current chart type - store index of class in chartTypes list
@@ -138,10 +140,13 @@ module Esper.Views {
   function defaultReqForChartType(chartType: ChartType)
     : TimeStats.RequestPeriod
   {
+    // Autocharts, always one month
+    if (chartType.prototype instanceof ChartsM.AutoChart) {
+      return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
+    }
+
     switch (chartType) {
       case ChartsM.PercentageRecent:
-        return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
-      case ChartsM.TopGuests:
         return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
       default:
         return TimeStats.intervalCountRequest(5, TimeStats.Interval.WEEKLY);
