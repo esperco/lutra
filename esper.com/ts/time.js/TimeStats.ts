@@ -13,7 +13,7 @@
 module Esper.TimeStats {
 
   // Temporary cap on max intervals to avoid potential weirdness
-  export const MAX_INTERVALS = 10;
+  export const MAX_INTERVALS = 31;
 
   // Cap on maximum lenth of time period analyzed
   export const MAX_TIME: moment.MomentInput = {months: 6};
