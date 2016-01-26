@@ -214,20 +214,6 @@ module Esper.AccountTab {
         });
       }
 
-      if (Login.isAdmin() && memberUid !== execUid) {
-'''makeExecView
-<span #makeExecSpan>
-  <a #makeExecLink href="#" class="link">Make Executive</a>
-</span>
-'''
-        actions.append($("<span class='text-divider'>|</span>"));
-        makeExecSpan.appendTo(actions);
-        makeExecLink.click(function() {
-          Api.setExecutive(team.teamid, memberUid)
-            .done(function() { refresh(); });
-        });
-      }
-
       table.append(row);
     });
   }

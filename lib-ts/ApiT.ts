@@ -81,9 +81,11 @@ module Esper.ApiT {
     teamid: string;
     team_name: string;
     team_approved: boolean;
+    team_active_until?: string; // timestamp
     team_executive: string;
     team_assistants: string[];
-    team_primary_assistant?: string;
+    team_owner: string;
+    team_cal_user: string;
     team_labels: string[];
     team_label_urgent: string;
     team_label_new: string;

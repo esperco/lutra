@@ -54,6 +54,8 @@ module Esper.TestFixtures {
           teamid: teamId1,
           team_name: "Peter Griffin",
           team_approved: true,
+          team_owner: uid,
+          team_cal_user: uid,
           team_assistants: [uid],
           team_calendar_accounts: [],
           team_calendars: [{
@@ -80,6 +82,8 @@ module Esper.TestFixtures {
           teamid: teamId2,
           team_name: "Stewie Griffin",
           team_approved: true,
+          team_owner: uid,
+          team_cal_user: uid,
           team_assistants: [uid],
           team_calendar_accounts: [],
           team_calendars: [{
