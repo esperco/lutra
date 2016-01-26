@@ -37,6 +37,13 @@ module Esper.Charts {
       }
     }
 
+    noData() {
+      var data = this.sync()[0];
+      return !_.find(data.daily_stats,
+        (s) => s.scheduled && s.scheduled.length
+      );
+    }
+
     // No selectors for auto-chart
     renderSelectors() {
       return <span />;
