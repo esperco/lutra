@@ -672,6 +672,7 @@ type token_response = [
     chunks: number[];             // Seconds list
     chunks_compl: number[];       // Seconds list
     chunks_with_guests: number[]; // Seconds list
+    chunks_with_guests_compl: number[]; // Seconds list
   }
 
   export interface Task {
