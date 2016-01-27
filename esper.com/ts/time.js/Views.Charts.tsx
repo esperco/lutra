@@ -59,13 +59,16 @@ module Esper.Views {
   }
 
   // Action to update our selection -- also triggers async calls
-  function updateCalSelection(teamId: string, calId: string) {
+  function updateCalSelection(selections: Calendars.CalSelection[]) {
     var current = Calendars.SelectStore.val();
-    Calendars.SelectStore.set({teamId: teamId, calId: calId});
+    Calendars.SelectStore.set(selections[0]);
     updateAsync();
 
+    // Only use first selection for now
+    var selection = selections[0];
+
     // Clear label selection and colors if switching teams (default)
-    if (current && current.teamId !== teamId) {
+    if (selection && current && current.teamId !== selection.teamId) {
       ChartsM.LabelSelectStore.unset();
       Colors.resetColorMaps();
     }
@@ -210,8 +213,7 @@ module Esper.Views {
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
-            selectedTeamId={cal.teamId}
-            selectedCalId={cal.calId}
+            selected={[cal]}
             updateFn={updateCalSelection} />
           { chart ? chart.renderSelectors() : null }
         </div>
