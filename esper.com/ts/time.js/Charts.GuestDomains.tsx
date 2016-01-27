@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Charts.AutoChart.tsx" />
+/// <reference path="./Charts.Guestchart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Colors.ts" />
@@ -24,13 +24,14 @@ module Esper.Charts {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  export class GuestDomains extends AutoChart {
+  export class GuestDomains extends GuestChart {
     static displayName = "Guest Domains";
     static usesIntervals = false;
+    protected allowEmpty = true;
 
     renderChart() {
       var data = this.sync()[0];
-      var domains = DailyStats.topGuestDomains(data);
+      var domains = DailyStats.topGuestDomains(data, this.getSelectedDomains());
 
       // Some math and filtering with totals
       var totalScheduled = DailyStats.sumScheduled(data);
@@ -38,7 +39,9 @@ module Esper.Charts {
       var totalNoGuests = totalScheduled - totalWithGuests;
 
       var totalDomain = _.sum(domains, (d) => d.time);
-      var cutOffTime = TOP_GUESTS_CUT_OFF * totalDomain;
+      var totalDisplayed = this.showEmptyDomain() ?
+        totalNoGuests + totalDomain : totalDomain;
+      var cutOffTime = TOP_GUESTS_CUT_OFF * totalDisplayed;
       domains = _.filter(domains, (d) => d.time >= cutOffTime);
 
       var totalNamedDomain = _.sum(domains, (d) => d.time)
@@ -84,7 +87,7 @@ module Esper.Charts {
         });
 
         // Add "no guests"
-        if (totalNoGuests > 0) {
+        if (this.showEmptyDomain() && totalNoGuests > 0) {
           let color = Colors.lightGray;
           let hours = TimeStats.toHours(totalNoGuests);
           addressData.unshift({
