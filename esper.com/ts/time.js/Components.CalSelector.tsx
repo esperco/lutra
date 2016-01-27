@@ -9,6 +9,7 @@
 /// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.CalAdd.tsx" />
+/// <reference path="./Components.ListSelector.tsx" />
 /// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
@@ -16,26 +17,55 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface CalSelectorProps {
-    selectedTeamId: string;
-    selectedCalId: string;
-    updateFn: (teamId: string, calId: string) => void;
+    selected: Calendars.CalSelection[];
+    updateFn: (selections: Calendars.CalSelection[]) => void;
     minimized?: boolean;
     toggleMinimized?: () => void;
+    allowMulti?: boolean;
   }
 
   export class CalSelector extends Component<CalSelectorProps, {}>
   {
     renderWithData() {
       var teams = Teams.all();
-      var hasCalendars = !!_.find(teams, (t) => {
+      var groups = _.map(teams, (t) => {
         var calList = Calendars.CalendarListStore.val(t.teamid);
-        return calList && calList.length;
+        return {
+          id: t.teamid,
+          displayAs: t.team_name,
+          choices: _.map(calList, (c) => {
+            return {
+              id: c.id,
+              displayAs: c.title
+            };
+          })
+        }
       });
+      groups = _.filter(groups, (g) => g.choices.length > 0);
+      if (groups.length === 1) {
+        groups[0].displayAs = null; // Don't display name for single group
+      }
+
+      var selected = _.map(this.props.selected, (s) => {
+        return {
+          id: s.calId,
+          groupId: s.teamId
+        };
+      });
+
       return <BorderlessSection icon="fa-calendar" title="Select Calendar"
           minimized={this.props.minimized}
           toggleMinimized={this.props.toggleMinimized}>
-        { hasCalendars ?
-          this.renderTeams(teams) :
+        { groups.length ?
+          <ListSelector groups={groups} selectedIds={selected}
+            selectOption={ this.props.allowMulti ?
+              ListSelectOptions.MULTI_SELECT :
+              ListSelectOptions.SINGLE_SELECT }
+            selectedItemClasses="active"
+            selectedIcon="fa-calendar-check-o"
+            unselectedIcon="fa-calendar-o"
+            updateFn={this.updateCal.bind(this)}
+          /> :
           <div className="esper-no-content">No Calendars Available</div>
         }
         <div className="esper-subsection-footer">
@@ -47,50 +77,18 @@ module Esper.Components {
       </BorderlessSection>;
     }
 
+    // Convert ListSelector format to calSeletion
+    updateCal(selectedIds: {id: string, groupId: string}[]) {
+      this.props.updateFn(_.map(selectedIds, (x) => {
+        return {
+          calId: x.id,
+          teamId: x.groupId
+        };
+      }));
+    }
+
     editCalendars() {
       Layout.renderModal(<CalAddModal />);
-    }
-
-    renderTeams(teams: ApiT.Team[]) {
-      return _.map(teams, (team) => {
-        var calList = Calendars.CalendarListStore.val(team.teamid);
-        if (! (calList && calList.length)) {
-          return <span key={team.teamid} />;
-        }
-
-        return <div key={team.teamid}>
-          {
-            teams.length > 1 ?
-            <h5 className="esper-subheader">{team.team_name}</h5> :
-            ""
-          }
-          <div className="list-group">
-            {
-              Teams.dataStatus(team.teamid) === Model.DataStatus.READY ?
-              this.renderCalendars(team.teamid, calList) :
-              <div className="esper-spinner" />
-            }
-          </div>
-        </div>;
-      });
-    }
-
-    renderCalendars(teamId: string, calendars: ApiT.GenericCalendar[]) {
-      return _.map(calendars, (calendar) => {
-        var calId = calendar.id;
-        var classes = ["list-group-item", "one-line"];
-        if (this.props.selectedCalId === calId &&
-            this.props.selectedTeamId === teamId) {
-          classes.push("active");
-        }
-
-        return (
-          <a key={teamId + " " + calId} className={classes.join(" ")}
-             onClick={() => this.props.updateFn(teamId, calId)}>
-            <i className="fa fa-fw fa-calendar-o"></i>
-            {" " + calendar.title}
-          </a>);
-      });
     }
   }
 }

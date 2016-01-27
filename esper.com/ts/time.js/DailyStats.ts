@@ -167,4 +167,12 @@ module Esper.DailyStats {
   export function sumWithGuests(response: ApiT.DailyStatsResponse) {
     return _.sum(response.daily_stats, (s) => _.sum(s.with_guests));
   }
+
+  export function sumScheduledCount(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => s.scheduled.length);
+  }
+
+  export function sumWithGuestsCount(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => s.with_guests.length)
+  }
 }

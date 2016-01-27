@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
@@ -59,15 +58,23 @@ module Esper.Views {
   }
 
   // Action to update our selection -- also triggers async calls
-  function updateCalSelection(teamId: string, calId: string) {
-    var current = Calendars.SelectStore.val();
-    Calendars.SelectStore.set({teamId: teamId, calId: calId});
+  function updateCalSelection(selections: Calendars.CalSelection[]) {
+    // Only use first selection for now
+    var selection = selections[0];
+    Calendars.SelectStore.set(selection);
     updateAsync();
 
-    // Clear label selection and colors if switching teams (default)
-    if (current && current.teamId !== teamId) {
-      ChartsM.LabelSelectStore.unset();
-      Colors.resetColorMaps();
+    var current = Calendars.SelectStore.val();
+    if (selection && current) {
+
+      // Clear label selection and colors if switching teams (default)
+      if (current.teamId !== selection.teamId) {
+        ChartsM.LabelSelectStore.unset();
+        Colors.resetColorMaps();
+      }
+
+      // Always clear domains for now
+      ChartsM.DomainSelectStore.unset();
     }
   }
 
@@ -210,8 +217,7 @@ module Esper.Views {
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
-            selectedTeamId={cal.teamId}
-            selectedCalId={cal.calId}
+            selected={[cal]}
             updateFn={updateCalSelection} />
           { chart ? chart.renderSelectors() : null }
         </div>

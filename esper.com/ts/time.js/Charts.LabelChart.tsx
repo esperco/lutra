@@ -1,5 +1,9 @@
+/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.tsx" />
 /// <reference path="./TimeStats.ts" />
+/// <reference path="./Colors.ts" />
+/// <reference path="./Components.Section.tsx" />
+/// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Charts {
 
@@ -10,12 +14,11 @@ module Esper.Charts {
   export var LabelSelectStore = new Model.StoreOne<LabelSelection>();
 
   // Action to update selected labels
-  function updateLabels(labels: string[]) {
+  function updateLabels(labels: {groupId: string, id: string}[]) {
     LabelSelectStore.set({
-      labels: labels
+      labels: _.map(labels, (l) => l.id)
     });
   }
-
 
   /*
     Base class for chart with labels (using stats2 API)
@@ -125,18 +128,37 @@ module Esper.Charts {
       if (! (this.sync() && this.sync()[0])) return;
 
       var displayResults = this.getRawDisplayResults();
-      var labelData = _.map(displayResults, (d) => {
-        return {
-          labelNorm: d.labelNorm,
-          displayAs: d.displayAs,
-          badge: d.totalCount.toString()
-        };
+
+      // Only one label groups (for now)
+      var groups = [{
+        id: "",
+        choices: _.map(displayResults, (d) => {
+          return {
+            id: d.labelNorm,
+            displayAs: d.displayAs || d.labelNorm,
+            badgeText: d.totalCount.toString(),
+            badgeColor: Colors.getColorForLabel(d.labelNorm)
+          };
+        })
+      }]
+
+      // Conform to ListSelector syntax
+      var selectedIds = _.map(this.getSelectedLabels(displayResults),
+        (label) => {
+          return {
+            id: label,
+            groupId: ""
+          }
       });
 
-      return <Components.LabelSelector
-              allLabels={labelData}
-              selectedLabels={this.getSelectedLabels(displayResults)}
-              updateFn={updateLabels} />
+      return <Components.BorderlessSection
+              icon="fa-tags" title="Select Labels">
+        <Components.ListSelector groups={groups}
+          selectedIds={selectedIds}
+          selectOption={Components.ListSelectOptions.MULTI_SELECT}
+          updateFn={updateLabels}
+        />
+      </Components.BorderlessSection>;
     }
   }
 }
