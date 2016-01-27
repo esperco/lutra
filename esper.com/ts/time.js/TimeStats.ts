@@ -343,30 +343,6 @@ module Esper.TimeStats {
     };
   }
 
-  // Helper to filter out task labels
-  function filterLabels<T>(teamId: string, labels: T[],
-                           transform?: (t: T) => string)
-  {
-    var team = Teams.get(teamId);
-    if (! team) {
-      return labels;
-    }
-
-    transform = transform || _.identity;
-
-    // Filter out task-related labels
-    return _.reject(labels, (label) => {
-      var t = transform(label);
-      return (
-        t === team.team_label_new ||
-        t === team.team_label_done ||
-        t === team.team_label_canceled ||
-        t === team.team_label_pending ||
-        t === team.team_label_urgent ||
-        t === team.team_label_in_progress);
-    });
-  }
-
   /*
     Time stat durations are normally seconds. This normalizes to hours and
     rounds to nearest .01 hour -- rounding may be slightly off because of
