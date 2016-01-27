@@ -4,7 +4,6 @@
 
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
 

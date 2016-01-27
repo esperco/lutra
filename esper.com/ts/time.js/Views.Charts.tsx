@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.LabelSelector.tsx" />
 /// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
