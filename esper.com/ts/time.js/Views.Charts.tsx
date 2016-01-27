@@ -69,6 +69,7 @@ module Esper.Views {
     // Clear label selection and colors if switching teams (default)
     if (selection && current && current.teamId !== selection.teamId) {
       ChartsM.LabelSelectStore.unset();
+      ChartsM.DomainSelectStore.unset();
       Colors.resetColorMaps();
     }
   }

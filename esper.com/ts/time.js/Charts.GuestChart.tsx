@@ -15,7 +15,7 @@ module Esper.Charts {
     domains: string[];
   }
 
-  var domainSelectStore = new Model.StoreOne<DomainSelection>();
+  export var DomainSelectStore = new Model.StoreOne<DomainSelection>();
 
   function updateDomains(selections: {id: string}[]) {
     var newSelections: DomainSelection = {empty: false, domains: []};
@@ -26,7 +26,7 @@ module Esper.Charts {
         newSelections.empty = true;
       }
     });
-    domainSelectStore.set(newSelections);
+    DomainSelectStore.set(newSelections);
   }
 
   interface DomainSelectorProps {
@@ -54,7 +54,7 @@ module Esper.Charts {
     protected getSelectedDomains(
       domains?: DailyStats.GuestDomainDisplayResult[])
     {
-      var domainSelection = domainSelectStore.val();
+      var domainSelection = DomainSelectStore.val();
       if (domainSelection) {
         return domainSelection.domains;
       }
@@ -70,7 +70,7 @@ module Esper.Charts {
     }
 
     protected showEmptyDomain() {
-      var domainSelection = domainSelectStore.val();
+      var domainSelection = DomainSelectStore.val();
       if (domainSelection) {
         return domainSelection.empty;
       }
