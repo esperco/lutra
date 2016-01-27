@@ -12,6 +12,7 @@
 /// <reference path="./Charts.PercentageRecent.tsx" />
 /// <reference path="./Charts.PercentageOverTime.tsx" />
 /// <reference path="./Charts.GuestDomains.tsx" />
+/// <reference path="./Charts.TopGuests.tsx" />
 /// <reference path="./Charts.DurationHistogram.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./DailyStats.ts" />
@@ -34,6 +35,7 @@ module Esper.Views {
     ChartsM.DurationsOverTime,
     ChartsM.PercentageRecent,
     ChartsM.PercentageOverTime,
+    ChartsM.TopGuests,
     ChartsM.GuestDomains,
     ChartsM.DurationHistogram
   ];
