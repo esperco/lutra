@@ -91,7 +91,7 @@ module Esper.DailyStats {
     guests: GuestDisplayResult[];
   }
 
-  // Returns a list of top guests by time. Takes additional params to split
+  // Returns a list of top guests by count. Takes additional params to split
   // time equally among participants and filter by a list of domains
   export function topGuests(response: ApiT.DailyStatsResponse,
     split?: boolean, filterDomains?: string[])
@@ -148,10 +148,16 @@ module Esper.DailyStats {
     var domainMap = _.groupBy(results, (r) => r.email.split('@')[1]);
 
     var ret = _.map(domainMap, (guests, domain) => {
+      // Counts are not split, so can't just sum from topGuests result.
+      var partitionsForDomain = _.filter(response.guest_stats, (s) =>
+        !!_.find(s.guests, (g) => g.email.split('@')[1] === domain)
+      )
+      var count = _.sum(partitionsForDomain, (p) => p.count)
+
       return {
         domain: domain,
         time: _.sum(guests, (g) => g.time),
-        count: _.sum(guests, (g) => g.count),
+        count: count,
         guests: guests
       }
     });
