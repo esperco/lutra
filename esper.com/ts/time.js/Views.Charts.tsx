@@ -59,18 +59,22 @@ module Esper.Views {
 
   // Action to update our selection -- also triggers async calls
   function updateCalSelection(selections: Calendars.CalSelection[]) {
-    var current = Calendars.SelectStore.val();
-    Calendars.SelectStore.set(selections[0]);
-    updateAsync();
-
     // Only use first selection for now
     var selection = selections[0];
+    Calendars.SelectStore.set(selection);
+    updateAsync();
 
-    // Clear label selection and colors if switching teams (default)
-    if (selection && current && current.teamId !== selection.teamId) {
-      ChartsM.LabelSelectStore.unset();
+    var current = Calendars.SelectStore.val();
+    if (selection && current) {
+
+      // Clear label selection and colors if switching teams (default)
+      if (current.teamId !== selection.teamId) {
+        ChartsM.LabelSelectStore.unset();
+        Colors.resetColorMaps();
+      }
+
+      // Always clear domains for now
       ChartsM.DomainSelectStore.unset();
-      Colors.resetColorMaps();
     }
   }
 
