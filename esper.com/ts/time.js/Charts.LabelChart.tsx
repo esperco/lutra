@@ -41,7 +41,7 @@ module Esper.Charts {
     }
 
     // Label Stats currently only supports 1 calendar
-    getCal() {
+    protected getCal() {
       // Label Stats currently only support 1 cal
       var cal = this.params.calendars && this.params.calendars[0];
 
@@ -54,51 +54,50 @@ module Esper.Charts {
 
     /*
       Display results = stored stats with some formatting and normalization.
-      Should only be called once data is available
+      Should only be called once data is available. Automatically filters
+      out unselected labels.
     */
-    getDisplayResults() {
-      var pair = this.sync();
-      if (!pair || !pair[0]) {
-        throw new Error("getDisplayResults called before data ready");
-      }
-
-      var stats = (pair[0].items) || [];
-      var results = TimeStats.getDisplayResults(
-        stats, this.getCal().teamId);
-
-      // Produce consistent sort
-      return _.sortBy(results, (x) => -x.totalCount);
-    }
-
-    getExclusiveDisplayResults() {
-      var pair = this.sync();
-      if (!pair || !pair[0]) {
-        throw new Error("getDisplayResults called before data ready");
-      }
-
-      var stats = (pair[0].items) || [];
-      var results = TimeStats.getExclusiveDisplayResults(
-        stats, this.getCal().teamId);
-
-      // Produce consistent sort (will have to re-sort for pie charts)
-      return _.sortBy(results, (x) => -x.totalCount);
-    }
-
-    // Return label selection, alternatively gets a list of default labels
-    // given (sorted) display results
-    getSelectedLabels(displayResults: TimeStats.DisplayResults): string[] {
-      return this.params.selectedLabels || _.map(
-        displayResults.slice(0, 4), (v) => v.labelNorm
-      );
-    }
-
-    // Fitler display results by selected labels
-    filterResults(displayResults: TimeStats.DisplayResults) {
+    protected getDisplayResults() {
+      var displayResults = this.getRawDisplayResults();
       var selectedLabels = this.getSelectedLabels(displayResults);
 
       // Filter by selected labels (if applicable)
       return _.filter(displayResults,
         (c) => _.contains(selectedLabels, c.labelNorm)
+      );
+    }
+
+    protected getExclusiveDisplayResults() {
+      var displayResults = this.getDisplayResults();
+      var selectedLabels = this.getSelectedLabels(displayResults);
+      var stats = (this.sync()[0].items) || [];
+      var exclusiveResults = TimeStats.getExclusiveDisplayResults(
+        stats, selectedLabels);
+
+      // Produce consistent sort (will have to re-sort for pie charts)
+      return _.sortBy(exclusiveResults, (x) => -x.totalCount);
+    }
+
+    private getRawDisplayResults() {
+      var pair = this.sync();
+      if (!pair || !pair[0]) {
+        throw new Error("getDisplayResults called before data ready");
+      }
+
+      var stats = (pair[0].items) || [];
+      var results = TimeStats.getDisplayResults(stats);
+
+      // Produce consistent sort
+      return _.sortBy(results, (x) => -x.totalCount);
+    }
+
+    // Return label selection, alternatively gets a list of default labels
+    // given (sorted) display results
+    protected getSelectedLabels(displayResults: TimeStats.DisplayResults)
+      : string[]
+    {
+      return this.params.selectedLabels || _.map(
+        displayResults.slice(0, 4), (v) => v.labelNorm
       );
     }
 
@@ -117,8 +116,7 @@ module Esper.Charts {
     }
 
     noData() {
-      var displayResults = this.filterResults(this.getDisplayResults());
-      return !displayResults.length;
+      return !this.getDisplayResults().length;
     }
 
     // Render label selector based on what labels are actually there
@@ -126,7 +124,7 @@ module Esper.Charts {
       // Safety check
       if (! (this.sync() && this.sync()[0])) return;
 
-      var displayResults = this.getDisplayResults()
+      var displayResults = this.getRawDisplayResults();
       var labelData = _.map(displayResults, (d) => {
         return {
           labelNorm: d.labelNorm,

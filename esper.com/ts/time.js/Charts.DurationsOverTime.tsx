@@ -17,8 +17,7 @@ module Esper.Charts {
         this.sync()[0].items,
         this.params.interval);
 
-      var filtered = this.filterResults(this.getDisplayResults());
-      var series = _.map(filtered, (c) => {
+      var series = _.map(this.getDisplayResults(), (c) => {
         return {
           name: c.displayAs,
           color: Colors.getColorForLabel(c.labelNorm),

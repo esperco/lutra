@@ -44,7 +44,7 @@ module Esper.Charts {
       );
     }
 
-    // No selectors for auto-chart
+    // No selectors for auto-chart by default
     renderSelectors() {
       return <span />;
     }

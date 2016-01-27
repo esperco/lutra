@@ -69,4 +69,13 @@ module Esper.DailyStats {
     ]);
   }
 
+
+  /* Utils */
+  export function sumScheduled(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => _.sum(s.scheduled));
+  }
+
+  export function sumWithGuests(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => _.sum(s.with_guests));
+  }
 }
