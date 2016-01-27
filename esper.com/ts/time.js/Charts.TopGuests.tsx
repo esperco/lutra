@@ -43,7 +43,7 @@ module Esper.Charts {
         },
 
         yAxis: [{
-          title: { text: "Aggregate Duration (Hours)" }
+          title: { text: "Aggregate Duration (Hours)" },
         }, {
           title: { text: "Number of Events" },
           allowDecimals: false,
@@ -51,15 +51,15 @@ module Esper.Charts {
         }],
 
         series: [{
-          name: "Aggregate Duration (Hours)",
-          yAxis: 0,
-          color: Colors.first,
-          data: guestTimes
-        } as HighchartsBarChartSeriesOptions, {
           name: "Number of Events",
           yAxis: 1,
           color: Colors.second,
           data: guestCounts
+        } as HighchartsBarChartSeriesOptions, {
+          name: "Aggregate Duration (Hours)",
+          yAxis: 0,
+          color: Colors.first,
+          data: guestTimes
         } as HighchartsBarChartSeriesOptions]
       }} />;
     }
