@@ -13,12 +13,12 @@ module Esper.Charts {
 
     renderChart() {
       // Filter to include only user-selected labels
-      var filtered = this.filterResults(this.getExclusiveDisplayResults());
+      var results = this.getExclusiveDisplayResults();
 
       // Resort by duration (because pie)
-      filtered = _.sortBy(filtered, (x) => -x.totalDuration);
+      results = _.sortBy(results, (x) => -x.totalDuration);
 
-      var data = _.map(filtered, (c) => {
+      var data = _.map(results, (c) => {
         return {
           name: c.displayAs,
           color: Colors.getColorForLabel(c.labelNorm),

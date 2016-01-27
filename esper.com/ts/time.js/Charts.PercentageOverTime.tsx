@@ -18,10 +18,10 @@ module Esper.Charts {
         this.params.interval);
 
       // Filter to include only user-selected labels
-      var filtered = this.filterResults(this.getExclusiveDisplayResults());
+      var results = this.getExclusiveDisplayResults();
 
       // Actual HighCharts data
-      var series = _.map(filtered, (c) => {
+      var series = _.map(results, (c) => {
         return {
           name: c.displayAs,
           color: Colors.getColorForLabel(c.labelNorm),

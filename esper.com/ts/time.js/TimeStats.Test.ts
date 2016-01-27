@@ -4,17 +4,33 @@
 
 module Esper.TimeStats {
 
-  function getStatEntries(): ApiT.CalendarStatEntry[] {
+  function getStats(): ApiT.CalendarStats[] {
     return [{
-      event_labels: ["A", "B"],
-      event_labels_norm: ["a", "b"],
-      event_count: 2,
-      event_duration: 200
+      window_start: "2015-10-05T21:18:08.020-08:00",
+      partition: [{
+        event_labels: ["A", "B"],
+        event_labels_norm: ["a", "b"],
+        event_count: 2,
+        event_duration: 200
+      }, {
+        event_labels: ["A"],
+        event_labels_norm: ["a"],
+        event_count: 1,
+        event_duration: 100
+      }]
     }, {
-      event_labels: ["A", "B", "C"],
-      event_labels_norm: ["a", "b", "c"],
-      event_count: 3,
-      event_duration: 300
+      window_start: "2015-11-05T21:18:08.020-08:00",
+      partition: [{
+        event_labels: ["B", "C"],
+        event_labels_norm: ["b", "c"],
+        event_count: 2,
+        event_duration: 200
+      }, {
+        event_labels: ["B"],
+        event_labels_norm: ["b"],
+        event_count: 1,
+        event_duration: 100
+      }]
     }];
   }
 
@@ -181,141 +197,7 @@ module Esper.TimeStats {
       });
     });
 
-    describe("partitionByLabel", function() {
-      it("should sum up counts and durations for each event", function() {
-        var entries = getStatEntries();
-        var statsByLabel = partitionByLabel(entries);
-        expect(_.keys(statsByLabel)).toEqual(["a", "b", "c"]);
-        expect(statsByLabel["a"]).toEqual({
-          count: 5, duration: 500, displayAs: "A"
-        });
-        expect(statsByLabel["b"]).toEqual({
-          count: 5, duration: 500, displayAs: "B"
-        });
-        expect(statsByLabel["c"]).toEqual({
-          count: 3, duration: 300, displayAs: "C"
-        });
-      });
-    });
-
-    describe("exclusivePartitionByLabel", function() {
-      it("should sum up durations without double-counting or changing counts",
-         function()
-      {
-        var entries = getStatEntries();
-        var statsByLabel = exclusivePartitionByLabel(entries);
-        expect(_.keys(statsByLabel)).toEqual(["a", "b", "c"]);
-        expect(statsByLabel["a"]).toEqual({
-          count: 5, duration: 200, displayAs: "A"
-        });
-        expect(statsByLabel["b"]).toEqual({
-          count: 5, duration: 200, displayAs: "B"
-        });
-        expect(statsByLabel["c"]).toEqual({
-          count: 3, duration: 100, displayAs: "C"
-        });
-      });
-
-      it("should only count the labels given (if passed as param)", function()
-      {
-        var entries = getStatEntries();
-        var statsByLabel = exclusivePartitionByLabel(entries, ["a", "b"]);
-        expect(_.keys(statsByLabel)).toEqual(["a", "b"]);
-        expect(statsByLabel["a"]).toEqual({
-          count: 5, duration: 250, displayAs: "A"
-        });
-        expect(statsByLabel["b"]).toEqual({
-          count: 5, duration: 250, displayAs: "B"
-        });
-      });
-
-      it("does not choke if all labels excluded from a partition", function() {
-        var entries = getStatEntries();
-        var statsByLabel = exclusivePartitionByLabel(entries, ["c"]);
-        expect(_.keys(statsByLabel)).toEqual(["c"]);
-        expect(statsByLabel["c"]).toEqual({
-          count: 3, duration: 300, displayAs: "C"
-        });
-      });
-    });
-
-    describe("valuesByLabel", function() {
-      it("should sum up and fill in values for a sequence of stats",
-        function()
-      {
-        var vals = valuesByLabel(
-          [{
-            a: { count: 1, duration: 100, displayAs: "A" },
-          }, {
-            a: { count: 2, duration: 200, displayAs: "A" },
-            b: { count: 3, duration: 300, displayAs: "B" }
-          }, {
-            b: { count: 4, duration: 400, displayAs: "B" },
-            c: { count: 5, duration: 500, displayAs: "C" }
-          }, {
-            c: { count: 6, duration: 600, displayAs: "C" },
-            a: { count: 7, duration: 700, displayAs: "A" }
-          }]
-        );
-        expect(_.keys(vals)).toEqual(["a", "b", "c"]);
-
-        expect(vals["a"]).toEqual({
-          displayAs: "A",
-          totalCount: 10,
-          counts: [1, 2, 0, 7],
-          totalDuration: 1000,
-          durations: [100, 200, 0, 700]
-        });
-
-        expect(vals["b"]).toEqual({
-          displayAs: "B",
-          totalCount: 7,
-          counts: [0, 3, 4, 0],
-          totalDuration: 700,
-          durations: [0, 300, 400, 0]
-        });
-
-        expect(vals["c"]).toEqual({
-          displayAs: "C",
-          totalCount: 11,
-          counts: [0, 0, 5, 6],
-          totalDuration: 1100,
-          durations: [0, 0, 500, 600]
-        });
-      });
-    });
-
     describe("getDisplayResults", function() {
-      function getStats(): ApiT.CalendarStats[] {
-        return [{
-          window_start: "2015-10-05T21:18:08.020-08:00",
-          partition: [{
-            event_labels: ["A", "B"],
-            event_labels_norm: ["a", "b"],
-            event_count: 2,
-            event_duration: 200
-          }, {
-            event_labels: ["A"],
-            event_labels_norm: ["a"],
-            event_count: 1,
-            event_duration: 100
-          }]
-        }, {
-          window_start: "2015-11-05T21:18:08.020-08:00",
-          partition: [{
-            event_labels: ["B", "C"],
-            event_labels_norm: ["b", "c"],
-            event_count: 2,
-            event_duration: 200
-          }, {
-            event_labels: ["B"],
-            event_labels_norm: ["b"],
-            event_count: 1,
-            event_duration: 100
-          }]
-        }];
-      }
-
       it("should return totals and values for each label, non-exclusively, " +
          "sorted in descending order, with display text", function()
       {
@@ -336,6 +218,73 @@ module Esper.TimeStats {
           totalCount: 3,
           counts: [3, 0]
         }, {
+          labelNorm: "c",
+          displayAs: "C",
+          totalDuration: 200,
+          durations: [0, 200],
+          totalCount: 2,
+          counts: [0, 2]
+        }]);
+      });
+    });
+
+    describe("getExclusiveDisplayResults", function() {
+      it("should return totals and values for each label, exclusively",
+        function()
+      {
+        var val = getExclusiveDisplayResults(getStats());
+        val = _.sortBy(val, (v) => -v.totalCount);
+        expect(val).toEqual([{
+          labelNorm: "b",
+          displayAs: "B",
+          totalDuration: 300,
+          durations: [100, 200],
+          totalCount: 5,
+          counts: [2, 3]
+        }, {
+          labelNorm: "a",
+          displayAs: "A",
+          totalDuration: 200,
+          durations: [200, 0],
+          totalCount: 3,
+          counts: [3, 0]
+        }, {
+          labelNorm: "c",
+          displayAs: "C",
+          totalDuration: 100,
+          durations: [0, 100],
+          totalCount: 2,
+          counts: [0, 2]
+        }]);
+      });
+
+      it("should only count the labels given (if passed as param)", function()
+      {
+        var val = getExclusiveDisplayResults(getStats(), ["a", "b"]);
+        val = _.sortBy(val, (v) => -v.totalCount);
+
+        expect(val).toEqual([{
+          labelNorm: "b",
+          displayAs: "B",
+          totalDuration: 400,
+          durations: [100, 300],
+          totalCount: 5,
+          counts: [2, 3]
+        }, {
+          labelNorm: "a",
+          displayAs: "A",
+          totalDuration: 200,
+          durations: [200, 0],
+          totalCount: 3,
+          counts: [3, 0]
+        }]);
+      });
+
+      it("does not choke if all labels excluded from a partition", function() {
+        var val = getExclusiveDisplayResults(getStats(), ["c"]);
+        val = _.sortBy(val, (v) => -v.totalCount);
+
+        expect(val).toEqual([{
           labelNorm: "c",
           displayAs: "C",
           totalDuration: 200,

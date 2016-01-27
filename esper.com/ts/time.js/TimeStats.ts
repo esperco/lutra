@@ -8,6 +8,7 @@
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Teams.ts" />
 /// <referenec path="./Calendars.ts" />
+/// <reference path="./Partition.ts" />
 /// <reference path="./Esper.ts" />
 
 module Esper.TimeStats {
@@ -164,15 +165,14 @@ module Esper.TimeStats {
   ////
 
   // Stats for a single label
-  export interface StatsForLabel {
-    displayAs: string,   // Display name
-    count: number,
-    duration: number       // seconds
+  export interface StatsForLabel extends Partition.StatSet {
+    count: number;
+    duration: number;       // seconds
   }
 
-  // Collection of stats mapped to labels from normative label
-  export interface StatsByLabel {
-    [index: string]: StatsForLabel
+  export interface ValuesForLabel extends Partition.ValueSet {
+    count: number[];
+    duration: number[];
   }
 
   export interface ValuesByLabel {
@@ -190,23 +190,20 @@ module Esper.TimeStats {
     the entirety of each event's duration will be attributed to each label's
     total.
   */
-  export function partitionByLabel(stats: ApiT.CalendarStatEntry[]) {
-    var ret: StatsByLabel = {};
-    _.each(stats, (s) => {
-      var i = 0;
-      _.each(s.event_labels_norm, (label) => {
-        var x = ret[label] = ret[label] || {
-          displayAs: s.event_labels[i],
-          count: 0,
-          duration: 0
-        };
+  function partitionByLabel(stats: ApiT.CalendarStatEntry[]) {
+    var perms: Partition.Permutation<StatsForLabel>[] = _.map(stats, (s) => {
+      var stats: StatsForLabel = {
+        count: s.event_count,
+        duration: s.event_duration
+      };
 
-        x.count += s.event_count;
-        x.duration += s.event_duration;
-        i += 1;
-      });
+      return {
+        ids: s.event_labels_norm,
+        stats: stats
+      };
     });
-    return ret;
+
+    return Partition.partitionById(perms);
   }
 
   /*
@@ -218,68 +215,28 @@ module Esper.TimeStats {
 
     Counts are unaffected.
   */
-  export function exclusivePartitionByLabel(stats: ApiT.CalendarStatEntry[],
-                                            labels?: string[])
+  function exclusivePartitionByLabel(stats: ApiT.CalendarStatEntry[],
+                                     labels?: string[])
   {
-    var ret: StatsByLabel = {};
-    _.each(stats, (s) => {
+    var perms: Partition.Permutation<StatsForLabel>[] = _.map(stats, (s) => {
       var eventLabels = (labels ?
         _.intersection(labels, s.event_labels_norm) :
         s.event_labels_norm
       );
-      var displayAsMap: {[index: string]: string} = {};
-      _.each(s.event_labels_norm, (normLabel, i) => {
-        displayAsMap[normLabel] = s.event_labels[i]
-      });
 
-      _.each(eventLabels, (label) => {
-        var x = ret[label] = ret[label] || {
-          displayAs: displayAsMap[label] || label,
-          count: 0,
-          duration: 0
-        };
+      var stats: StatsForLabel = {
+        count: s.event_count,
+        duration: eventLabels.length ?
+          (s.event_duration / eventLabels.length) : 0
+      };
 
-        x.count += s.event_count;
-        x.duration += (s.event_duration / eventLabels.length);
-      });
-    });
-    return ret;
-  }
-
-  /*
-    Returns a map from labels to list of values for each label, filling in
-    zeros as appropriate
-  */
-  export function valuesByLabel(statsByLabel: StatsByLabel[]) {
-    var ret: ValuesByLabel = {};
-    var i = 0;
-    var stats: StatsByLabel;
-    for (var i = 0; i < statsByLabel.length; i++) {
-      stats = statsByLabel[i];
-      _.each(stats, (s, labelNorm) => {
-        var labelVal = ret[labelNorm] = ret[labelNorm] || {
-          displayAs: s.displayAs,
-          totalCount: 0,
-          counts: [],
-          totalDuration: 0,
-          durations: []
-        }
-        labelVal.totalCount += s.count;
-        labelVal.counts[i] = s.count;
-        labelVal.totalDuration += s.duration;
-        labelVal.durations[i] = s.duration;
-      });
-    }
-
-    // Normalize undefined to 0
-    _.each(ret, (v, k) => {
-      for (var j = 0; j < statsByLabel.length; j++) {
-        v.counts[j] = v.counts[j] || 0;
-        v.durations[j] = v.durations[j] || 0;
-      }
+      return {
+        ids: eventLabels,
+        stats: stats
+      };
     });
 
-    return ret;
+    return Partition.partitionById(perms);
   }
 
 
@@ -295,47 +252,55 @@ module Esper.TimeStats {
     counts: number[];
   }[];
 
-  export function getDisplayResultsBase(stats: StatsByLabel[], teamId?: string)
-    : DisplayResults
+  function getDisplayResultsBase(
+    statMaps: Partition.StatMap<StatsForLabel>[],
+    labelMap: {[index: string]: string}): DisplayResults
   {
-    var valMap = valuesByLabel(stats);
+    var valMap = Partition.valuesById<StatsForLabel, ValuesForLabel>(statMaps);
     var ret = _.map(valMap, (vals, labelNorm) => {
       return {
         labelNorm: labelNorm,
-        displayAs: vals.displayAs,
-        totalDuration: _.sum(vals.durations),
-        durations: vals.durations,
-        totalCount: _.sum(vals.counts),
-        counts: vals.counts
+        displayAs: labelMap[labelNorm] || labelNorm,
+        totalDuration: _.sum(vals.duration),
+        durations: vals.duration,
+        totalCount: _.sum(vals.count),
+        counts: vals.count
       };
     });
-
-    // If teamId, filter
-    if (teamId) {
-      // Use displayAs since task labels don't have concept of normalization
-      ret = filterLabels(teamId, ret, (r) => r.displayAs);
-    }
 
     return ret;
   }
 
-  export function getDisplayResults(stats: ApiT.CalendarStats[],
-    teamId?: string): DisplayResults
+  // Returns a map of normalized to display names
+  function mapLabels(stats: ApiT.CalendarStats[]) {
+    var ret: {[index: string]: string} = {};
+    _.each(stats, (s) => {
+      _.each(s.partition, (p) => {
+        _.each(p.event_labels_norm, (labelNorm, index) => {
+          ret[labelNorm] = p.event_labels[index] || labelNorm;
+        });
+      });
+    });
+    return ret;
+  }
+
+  export function getDisplayResults(stats: ApiT.CalendarStats[])
+    : DisplayResults
   {
     var labels = _.map(stats, (stat) =>
       partitionByLabel(stat.partition)
     );
-    return getDisplayResultsBase(labels);
+    return getDisplayResultsBase(labels, mapLabels(stats));
   }
 
   // Like getDisplayResults, but using exclusivePartitionByLabel
   export function getExclusiveDisplayResults(stats: ApiT.CalendarStats[],
-    teamId?: string): DisplayResults
+    selectedLabels?: string[]): DisplayResults
   {
     var labels = _.map(stats, (stat) =>
-      exclusivePartitionByLabel(stat.partition)
+      exclusivePartitionByLabel(stat.partition, selectedLabels)
     );
-    return getDisplayResultsBase(labels);
+    return getDisplayResultsBase(labels, mapLabels(stats));
   }
 
 
@@ -376,30 +341,6 @@ module Esper.TimeStats {
       typeLabel: typeLabel,
       groupLabels: groupLabels
     };
-  }
-
-  // Helper to filter out task labels
-  export function filterLabels<T>(teamId: string, labels: T[],
-                                  transform?: (t: T) => string)
-  {
-    var team = Teams.get(teamId);
-    if (! team) {
-      return labels;
-    }
-
-    transform = transform || _.identity;
-
-    // Filter out task-related labels
-    return _.reject(labels, (label) => {
-      var t = transform(label);
-      return (
-        t === team.team_label_new ||
-        t === team.team_label_done ||
-        t === team.team_label_canceled ||
-        t === team.team_label_pending ||
-        t === team.team_label_urgent ||
-        t === team.team_label_in_progress);
-    });
   }
 
   /*

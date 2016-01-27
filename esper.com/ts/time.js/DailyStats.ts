@@ -69,4 +69,102 @@ module Esper.DailyStats {
     ]);
   }
 
+
+  /* Guest Stats*/
+
+  export interface GuestStats extends Partition.StatSet {
+    time: number;   // seconds
+    count: number;
+  }
+
+  export interface GuestDisplayResult {
+    email: string;
+    name?: string;
+    time: number;
+    count: number;
+  }
+
+  export interface GuestDomainDisplayResult {
+    domain: string;
+    time: number;
+    count: number;
+    guests: GuestDisplayResult[];
+  }
+
+  // Returns a list of top guests by time. Takes additional params to split
+  // time equally among participants and filter by a list of domains
+  export function topGuests(response: ApiT.DailyStatsResponse,
+    split?: boolean, filterDomains?: string[])
+  {
+    // Map from email to display name (if any)
+    var nameMap: {[index: string]: string} = {};
+
+    var stats = response.guest_stats;
+    var perms: Partition.Permutation<GuestStats>[] = _.map(stats, (s) => {
+      var guestEmails = _.map(s.guests, (g) => {
+        nameMap[g.email] = g.name;
+        return g.email;
+      });
+
+      // Filter by domain => exclude e-mails
+      if (filterDomains) {
+        guestEmails = _.filter(guestEmails,
+          (e) => _.contains(filterDomains, e.split('@')[1])
+        )
+      }
+
+      var stats: GuestStats = {
+        count: s.count,
+        time: split ?
+          (guestEmails.length ? s.time / guestEmails.length : 0)
+          : s.time
+      };
+
+      return {
+        ids: guestEmails,
+        stats: stats
+      };
+    });
+
+    var guestMap = Partition.partitionById(perms);
+    var ret = _.map(guestMap, (guestStats, email): GuestDisplayResult => {
+      return {
+        email: email,
+        name: nameMap[email],
+        time: guestStats.time,
+        count: guestStats.count
+      };
+    });
+
+    return _.sortBy(ret, (x) => -x.count);
+  }
+
+  // Top domain names
+  export function topGuestDomains(response: ApiT.DailyStatsResponse,
+    filterDomains?: string[]): GuestDomainDisplayResult[]
+  {
+    // This is for a pie chart -- always split and apply filters
+    var results = topGuests(response, true, filterDomains);
+    var domainMap = _.groupBy(results, (r) => r.email.split('@')[1]);
+
+    var ret = _.map(domainMap, (guests, domain) => {
+      return {
+        domain: domain,
+        time: _.sum(guests, (g) => g.time),
+        count: _.sum(guests, (g) => g.count),
+        guests: guests
+      }
+    });
+
+    return _.sortBy(ret, (d) => -d.time);
+  }
+
+  /* Utils */
+  export function sumScheduled(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => _.sum(s.scheduled));
+  }
+
+  export function sumWithGuests(response: ApiT.DailyStatsResponse) {
+    return _.sum(response.daily_stats, (s) => _.sum(s.with_guests));
+  }
 }

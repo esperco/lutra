@@ -40,6 +40,7 @@ module Esper.Colors {
   // If we only need a handful of colors
   export var first = presetColors[0];
   export var second = presetColors[1];
+  export var lightGray = "#CECEDD";
 
   // Already assigned colors
   type ColorMap = { [index: string]: string };
