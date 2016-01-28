@@ -1,6 +1,7 @@
 // For calendar grid charts, not full calendar
 
 @import "../lib/_helpers";
+@import "../lib/_animations";
 
 .calendar-grid-holder {
   .esper-expanded;
@@ -17,6 +18,7 @@
 table.calendar-grid {
   height: 95%;
   width: 100%;
+  table-layout:fixed;
 
   thead {
     height: 1em;
@@ -29,6 +31,8 @@ table.calendar-grid {
   td, th {
     vertical-align: top;
     border: 1px solid @table-border-color;
+    width: calc(100% / 7);
+    overflow: hidden;
   }
 
   .out-month {
@@ -36,11 +40,20 @@ table.calendar-grid {
   }
 
   .in-month .day-header {
-    background: @table-bg-accent;
+    background: @gray-lighter;
   }
 
   .day-header {
     text-align: right;
     padding: @padding-xs-vertical @padding-xs-horizontal;
+  }
+
+  .daily-metric {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    padding: 1px;
+    margin: 1px;
+    animation: fadein 0.5s ease-in-out
   }
 }

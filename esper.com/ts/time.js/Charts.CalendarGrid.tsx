@@ -8,7 +8,7 @@ module Esper.Charts {
   /*
     Base class for calendar grid-style Autochart
   */
-  export class CalendarGridChart extends AutoChart {
+  export abstract class CalendarGridChart extends AutoChart {
     static displayName = "Calendar Grid";
 
     renderChart() {
@@ -19,15 +19,11 @@ module Esper.Charts {
     }
 
     noData() {
-      // Always show grid, even if no data
-      return false;
+      // Always show grid if there's an API response, even if empty
+      return !this.sync()[0];
     }
 
-    dayFn(m: moment.Moment) {
-      return <div>
-        Hello
-      </div>;
-    }
+    protected abstract dayFn(m: moment.Moment): JSX.Element;
 
     // Use a simple month selector rather than allow custom periods
     renderPeriodSelector(updateFn: (req: TimeStats.RequestPeriod) => void) {
