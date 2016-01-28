@@ -26,13 +26,13 @@ module Esper.Charts {
     static displayName: string;
 
     // These are used to configure period selector, with defaults
-    static usesIntervals: boolean = false;
-    static dateLimit: moment.MomentInput = TimeStats.MAX_TIME;
-    static dateLimitForInterval:
+    protected usesIntervals: boolean = false;
+    protected dateLimit: moment.MomentInput = TimeStats.MAX_TIME;
+    protected dateLimitForInterval:
       (interval: TimeStats.Interval) => moment.MomentInput =
       TimeStats.dateLimitForInterval;
-    static minDate: BootstrapDaterangepicker.DateType = TimeStats.MIN_DATE;
-    static maxDate: BootstrapDaterangepicker.DateType = TimeStats.MAX_DATE;
+    protected minDate: BootstrapDaterangepicker.DateType = TimeStats.MIN_DATE;
+    protected maxDate: BootstrapDaterangepicker.DateType = TimeStats.MAX_DATE;
 
     constructor(public params: ChartParams) { }
 
@@ -57,5 +57,18 @@ module Esper.Charts {
     // Render additional selector in left column (if any) to refine chart
     // data (like label selectors). Must handle lack of store data safely.
     abstract renderSelectors(): React.ReactElement<any>;
+
+    // Default period selector
+    renderPeriodSelector(updateFn: (req: TimeStats.RequestPeriod) => void) {
+      return <Components.IntervalRangeSelector
+        selected={this.params}
+        updateFn={updateFn}
+        showIntervals={this.usesIntervals}
+        dateLimit={this.dateLimit}
+        dateLimitForInterval={this.dateLimitForInterval}
+        minDate={this.minDate}
+        maxDate={this.maxDate}
+      />;
+    }
   }
 }

@@ -10,7 +10,7 @@
 module Esper.Charts {
   export class PercentageOverTime extends LabelChart {
     static displayName = "Label Percentage Over Time";
-    static usesIntervals = true;
+    protected usesIntervals = true;
 
     renderChart() {
       var formatted = TimeStats.formatWindowStarts(

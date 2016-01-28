@@ -267,16 +267,7 @@ module Esper.Views {
     }
 
     renderPeriodSelector(chart: Charts.Chart) {
-      var chartType = _.find(chartTypes, (c) => chart instanceof c);
-      return <Components.IntervalRangeSelector
-        selected={chart.params}
-        updateFn={updateRequestedPeriod}
-        showIntervals={chartType.usesIntervals}
-        dateLimit={chartType.dateLimit}
-        dateLimitForInterval={chartType.dateLimitForInterval}
-        minDate={chartType.minDate}
-        maxDate={chartType.maxDate}
-      />;
+      return chart.renderPeriodSelector(updateRequestedPeriod);
     }
 
     /*
