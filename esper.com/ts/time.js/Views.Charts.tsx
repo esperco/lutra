@@ -7,6 +7,7 @@
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./Charts.CalendarGrid.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Charts.PercentageRecent.tsx" />
 /// <reference path="./Charts.PercentageOverTime.tsx" />
@@ -36,7 +37,8 @@ module Esper.Views {
     ChartsM.PercentageOverTime,
     ChartsM.TopGuests,
     ChartsM.GuestDomains,
-    ChartsM.DurationHistogram
+    ChartsM.DurationHistogram,
+    ChartsM.CalendarGridChart
   ];
 
   // Store for current chart type - store index of class in chartTypes list

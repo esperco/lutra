@@ -1,0 +1,46 @@
+// For calendar grid charts, not full calendar
+
+@import "../lib/_helpers";
+
+.calendar-grid-holder {
+  .esper-expanded;
+  .esper-expanded.padded;
+  .esper-expanded.minus-subheader;
+
+  @media (max-width: @screen-xs-max) {
+    .esper-expanded.minus-subheader.collapse-2x;
+  }
+
+  padding-top: @padding-base-vertical;
+}
+
+table.calendar-grid {
+  height: 95%;
+  width: 100%;
+
+  thead {
+    height: 1em;
+  }
+
+  th {
+    text-align: center;
+  }
+
+  td, th {
+    vertical-align: top;
+    border: 1px solid @table-border-color;
+  }
+
+  .out-month {
+    color: @gray-lighter;
+  }
+
+  .in-month .day-header {
+    background: @table-bg-accent;
+  }
+
+  .day-header {
+    text-align: right;
+    padding: @padding-xs-vertical @padding-xs-horizontal;
+  }
+}
