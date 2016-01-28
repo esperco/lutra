@@ -26,7 +26,7 @@ module Esper.Charts {
 
   export class GuestDomains extends GuestChart {
     static displayName = "Guest Domains";
-    static usesIntervals = false;
+    protected usesIntervals = false;
     protected allowEmpty = true;
 
     renderChart() {

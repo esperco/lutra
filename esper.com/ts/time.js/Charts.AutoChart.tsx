@@ -7,7 +7,7 @@ module Esper.Charts {
     Base class for autocharts (using daily-stats API)
   */
   export abstract class AutoChart extends Chart {
-    static dateLimit = {months: 1};
+    protected dateLimit = {months: 1};
 
     async() {
       return DailyStats.async(

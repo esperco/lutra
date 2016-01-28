@@ -7,6 +7,7 @@
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./Charts.ActivityGrid.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Charts.PercentageRecent.tsx" />
 /// <reference path="./Charts.PercentageOverTime.tsx" />
@@ -34,6 +35,7 @@ module Esper.Views {
     ChartsM.DurationsOverTime,
     ChartsM.PercentageRecent,
     ChartsM.PercentageOverTime,
+    ChartsM.ActivityGrid,
     ChartsM.TopGuests,
     ChartsM.GuestDomains,
     ChartsM.DurationHistogram
@@ -265,16 +267,7 @@ module Esper.Views {
     }
 
     renderPeriodSelector(chart: Charts.Chart) {
-      var chartType = _.find(chartTypes, (c) => chart instanceof c);
-      return <Components.IntervalRangeSelector
-        selected={chart.params}
-        updateFn={updateRequestedPeriod}
-        showIntervals={chartType.usesIntervals}
-        dateLimit={chartType.dateLimit}
-        dateLimitForInterval={chartType.dateLimitForInterval}
-        minDate={chartType.minDate}
-        maxDate={chartType.maxDate}
-      />;
+      return chart.renderPeriodSelector(updateRequestedPeriod);
     }
 
     /*
