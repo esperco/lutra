@@ -70,7 +70,7 @@ module Esper.Charts {
         return <div>
           <div className="event-count daily-metric" style={countStyle}>
             <span><i className="fa fa-fw fa-calendar-o" />{" "}
-            {stats.scheduled.length}{" "}Meetings</span>
+            {stats.scheduled.length}{" "}Events</span>
           </div>
           <div className="event-duration daily-metric" style={hoursStyle}>
             <span><i className="fa fa-fw fa-clock-o" />{" "}
