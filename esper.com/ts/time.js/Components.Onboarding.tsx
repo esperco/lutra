@@ -150,9 +150,8 @@ module Esper.Components {
     }
 
     skip() {
-      Onboarding.skip = true;
       Analytics.track(Analytics.Trackable.SkipTimeStatsOnboarding);
-      Route.nav.home();
+      Onboarding.skip();
     }
   }
 
