@@ -1,4 +1,4 @@
-var exec = require('exec-sync');
+var exec = require('sync-exec');
 
 /*
   Returns git hash as version
