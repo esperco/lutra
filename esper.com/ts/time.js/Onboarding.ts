@@ -17,7 +17,7 @@ module Esper.Onboarding {
   ];
 
   // Change this to true to allow skipping
-  export var skip = false;
+  export var canSkip = false;
 
   // Go to previous step in onboarding
   export function prev() {
@@ -41,6 +41,11 @@ module Esper.Onboarding {
     Route.nav.path("calendar-labeling");
   }
 
+  export function skip() {
+    canSkip = true;
+    Route.nav.path("charts");
+  }
+
   // Get current step in onboarding (0-based index)
   export function current() {
     return _.findIndex(paths, Route.nav.isActive);
@@ -48,13 +53,13 @@ module Esper.Onboarding {
 
   // Are we allowed to go to the next step?
   export function canGoToNext() {
-    if (skip) { return true; }
+    if (canSkip) { return true; }
     return completedSoFar() + 1 > current();
   }
 
   // Should we launch onboarding?
   export function required() {
-    if (skip) { return false; }
+    if (canSkip) { return false; }
 
     /*
       Only if no team or labels -- we could check to see if events are labeled
