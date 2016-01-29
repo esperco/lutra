@@ -11,29 +11,39 @@ Merges several previously separate repositories for front-end code:
 Setup
 =====
 
-We current use Node.js at v0.10.37. Newer versions of Node.js will (probably)
-work as well.
+We currently use Node.js's LTS branch (v4.x).
+OS X users can install Node with the installer on https://nodejs.org.
 
-OS X users can install Node with an installer
-
-Ubuntu 14.04 can run the following:
+Linux distros using Debian-based package managers (e.g. Ubuntu) can run the following:
 
 ```
-$ sudo add-apt-repository ppa:chris-lea/node.js
-$ sudo apt-get update
-$ sudo apt-get install python-software-properties python g++ make nodejs
+$ wget -qO- https://deb.nodesource.com/setup_4.x | sudo bash -
+$ sudo apt-get install --yes nodejs
 ```
 
-Linux users should see the following URL for details on how to install
-nodejs and and npm with a package anager:
-https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
+RPM-based distros should run:
+
+```
+$ curl -sL https://rpm.nodesource.com/setup_4.x | bash -
+$ sudo yum install nodejs
+```
 
 To check your Node.js version:
 
 ```
 $ nodejs --version
-v0.10.37
+v4.2.6
 ```
+
+You should also have NPM installed:
+
+```
+$ npm -v
+2.14.12
+```
+
+If you don't have NPM installed, tryin running `sudo apt-get install npm` or
+`sudo yum install npm` as appropriate.
 
 Everyone
 --------
