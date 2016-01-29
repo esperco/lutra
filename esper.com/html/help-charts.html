@@ -1,0 +1,103 @@
+{% extends "_base.html" %}
+
+{% block title %}Charts | Esper{% endblock %}
+
+{% block main %}
+  <!-- Splash -->
+  <div class="splash-content splash-purple short">
+    <div class="splash-text-container">
+      <div class="splash-text">
+        <h1>Help</h1>
+        <h2>Charts and Analysis</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-container left-align">
+    <div class="section-content narrow short">
+      <h4>Activity Grid</h4>
+      <p>This calendar grid shows the total number of events, the aggregate
+      duration of those events, and your scheduling fragmentation for
+      each day of the month.</p>
+      <p>Fragmentation measures whether your events are scheduled together
+      in blocks (i.e. back-to-back meetings) are are scattered (fragmented)
+      throughout the day.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Event Durations</h4>
+      <p>This histogram groups your events by how long they take and shows
+      the aggregate duration and frequency of those events for a given
+      time period.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Frequent Meeting Attendees</h4>
+      <p>This horizontal bar chart lists the people who are most frequently
+      invited to events on your calendar. It shows both the aggregate duration
+      and the number of events for each person.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Guest Domains</h4>
+      <p>This pie chart shows which domain names are the most common
+      among guests invited to events on your calendar and the most
+      common guests for each domain.</p>
+      <p>For the purposes of this pie chart, time is divided evenly among
+      all guests invited to an event. Filtering out certain domain names
+      will re-allocate time in the chart among the domain names still included
+      in the chart.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Label Duration Over Time</h4>
+      <p>This bar chart shows the total number of hours allocated to each
+      category over fixed intervals of time -- e.g. how many hours do
+      you spend on Sales Meetings each week?</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Label Allocation Percentage</h4>
+      <p>This pie chart shows percentages for how you allocate time
+      between different categories -- e.g. what percentage of your time
+      was spent on Sales Meetings between November 1 and December 1?</p>
+      <p>If an event was assigned multiple labels, the time for that
+      event is divided evenly between each <i>visible</i> label for the
+      purpose of calculating percentages. Divided time will be labeled with
+      a unit of "adjusted hours".</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Label Percentage Over Time</h4>
+      <p>This stacked bar chart shows how the percentage of time you
+      allocate between different categories changes over a fixed interval
+      -- e.g. how did the percentage of time you spend on Sales Meetings
+      change between November and December?</p>
+      <p>This chart will use adjusted hours if an event was assigned
+      multiple labels.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Working Hours Availability</h4>
+      <p>This calendar grid shows uninterrupted blocks of free time during
+      your working hours for each calendar day.</p>
+      <p>We consider working hours to be 9AM to 6PM in your local timezone
+      by default but will adjust the period in the chart if your calendar
+      frequently has events scheduled outside that period.</p>
+    </div>
+
+    <div class="section-content narrow short">
+      <h4>Want Something Else?</h4>
+      <p>Esper is in beta, and we've currently limited the time
+      period and types of charts you can get online. If you have a
+      something specific you want charted or analyzed,
+
+      <a href="https://twitter.com/esper_co">tweet us a request!</a></p>
+
+      <a href="https://twitter.com/intent/tweet?screen_name=esper_co&text=Show%20me%20how%20I'm%20spending%20my%20time%20%40esper_co" class="twitter-mention-button" data-size="large">Tweet to @esper_co</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
+  </div>
+
+
+{% endblock %}

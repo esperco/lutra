@@ -17,15 +17,6 @@ module Esper.Integration {
     }
   }
 
-  // Stubs credentials for our "Lois" user
-  export function stubLois() {
-    Login.storeCredentials({
-      uid: "O-w_lois_____________w",
-      api_secret: "lois_secret",
-      email: "lois@esper.com"
-    });
-  }
-
   // Use to clear login credentials
   export function clearLogin() {
     Login.clearCredentials();

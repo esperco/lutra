@@ -194,16 +194,17 @@ module Esper.Api {
       "/" + string(teamid) + "/true", "");
   }
 
-  export function setExecutive(teamid: string, memberUid: string):
-    JQueryPromise<void>
-  {
-    return JsonHttp.put(prefix + "/api/team/" + Login.me() + "/" + teamid
-      + "/executive/" + memberUid, "");
+  export function setTeamOwner(teamid: string, uid: string):
+    JQueryPromise<void> {
+    return JsonHttp.put(prefix + "/api/team-owner/" + string(Login.me())
+      + "/" + string(teamid)
+      + "/" + string(uid),
+      "");
   }
 
-  export function setPrimaryAssistant(teamid: string, uid: string):
-    JQueryPromise<ApiT.Team> {
-    return JsonHttp.put(prefix + "/api/team-primary/" + string(Login.me())
+  export function setTeamCalUser(teamid: string, uid: string):
+    JQueryPromise<void> {
+    return JsonHttp.put(prefix + "/api/team-cal-user/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(uid),
       "");

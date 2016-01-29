@@ -5,13 +5,17 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.LabelSelector.tsx" />
-/// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
-/// <reference path="./Components.DurationsOverTime.tsx" />
-/// <reference path="./Components.PercentageRecent.tsx" />
-/// <reference path="./Components.PercentageOverTime.tsx" />
+/// <reference path="./Charts.ActivityGrid.tsx" />
+/// <reference path="./Charts.DurationsOverTime.tsx" />
+/// <reference path="./Charts.PercentageRecent.tsx" />
+/// <reference path="./Charts.PercentageOverTime.tsx" />
+/// <reference path="./Charts.GuestDomains.tsx" />
+/// <reference path="./Charts.TopGuests.tsx" />
+/// <reference path="./Charts.WorkHoursGrid.tsx" />
+/// <reference path="./Charts.DurationHistogram.tsx" />
 /// <reference path="./TimeStats.ts" />
+/// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
@@ -19,65 +23,119 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
+  // Rename module to fix name conflict
+  var ChartsM = Esper.Charts;
+
   /* State Management */
 
-  // Store for currently selected labels
-  interface LabelSelection {
-    labels: string[];
-  }
-  var LabelSelectStore = new Model.StoreOne<LabelSelection>();
+  // Available chart options (map of integer index to class) -- used in
+  // selector down below
+  type ChartType = typeof ChartsM.Chart;
+  export var chartTypes: ChartType[] = _.sortBy([
+    ChartsM.DurationsOverTime,
+    ChartsM.PercentageRecent,
+    ChartsM.PercentageOverTime,
+    ChartsM.ActivityGrid,
+    ChartsM.TopGuests,
+    ChartsM.GuestDomains,
+    ChartsM.DurationHistogram,
+    ChartsM.WorkHoursGrid
+  ], (ct) => ct.displayName);
 
-  // Export for test helper to access
-  export var chartsLabelSelectStore = LabelSelectStore;
-
-  // Action to update selected labels
-  function updateLabels(labels: string[]) {
-    LabelSelectStore.set({
-      labels: labels
-    });
-  }
-
-  // Store for current chart type
-  export enum ChartType {
-    DurationsOverTime = 1,
-    PercentageRecent,
-    PercentageOverTime
-  }
-  var ChartTypeStore = new Model.StoreOne<ChartType>();
-  export var chartsChartTypeStore = ChartTypeStore;
+  // Store for current chart type - store index of class in chartTypes list
+  export var ChartTypeStore = new Model.StoreOne<number>();
 
   // Action to update our selection -- triggers async calls
-  function updateChartType(chartType: ChartType) {
-    ChartTypeStore.set(chartType);
+  function updateChartType(val: number|ChartType) {
+    var index: number;
+    var chartType: ChartType;
+    if (typeof val === "number") {
+      index = val;
+      chartType = chartTypes[index];
+    } else {
+      index = _.findIndex(chartTypes, (t) => t === val);
+      chartType = val;
+    }
+    ChartTypeStore.set(index);
     updateRequestedPeriod(defaultReqForChartType(chartType));
   }
 
   // Action to update our selection -- also triggers async calls
-  function updateCalSelection(teamId: string, calId: string) {
-    var current = Calendars.SelectStore.val();
-    Calendars.SelectStore.set({teamId: teamId, calId: calId});
+  function updateCalSelection(selections: Calendars.CalSelection[]) {
+    // Only use first selection for now
+    var selection = selections[0];
+    Calendars.SelectStore.set(selection);
     updateAsync();
 
-    // Clear label selection and colors if switching teams (default)
-    if (current && current.teamId !== teamId) {
-      LabelSelectStore.unset();
-      Colors.resetColorMap();
+    var current = Calendars.SelectStore.val();
+    if (selection && current) {
+
+      // Clear label selection and colors if switching teams (default)
+      if (current.teamId !== selection.teamId) {
+        ChartsM.LabelSelectStore.unset();
+        Colors.resetColorMaps();
+      }
+
+      // Always clear domains for now
+      ChartsM.DomainSelectStore.unset();
     }
   }
 
+  // Store for requested time period
+  export var RequestStore = new Model.StoreOne<TimeStats.RequestPeriod>();
+
   // Action to update time period for stats -- triggers async calls
-  function updateRequestedPeriod(req: TimeStats.TypedStatRequest) {
-    TimeStats.RequestStore.set(req);
+  function updateRequestedPeriod(req: TimeStats.RequestPeriod) {
+    RequestStore.set(req);
     updateAsync();
+  }
+
+  /*
+    Gets a chart based on currently stored state -- returns null if
+    insuffucient data
+  */
+  function getChart(): Charts.Chart {
+    var chartType= ChartTypeStore.val();
+    if (_.isUndefined(chartType) || chartType < 0) return;
+
+    var calendar = Calendars.SelectStore.val();
+    if (_.isUndefined(calendar)) return;
+
+    var requestPeriod = RequestStore.val();
+    if (!requestPeriod || !requestPeriod.windowStart ||
+        !requestPeriod.windowEnd) return;
+
+    var labelSelection = ChartsM.LabelSelectStore.val();
+    var params: Charts.ChartParams = {
+      windowStart: requestPeriod.windowStart,
+      windowEnd: requestPeriod.windowEnd,
+      calendars: [calendar],
+      interval: requestPeriod.interval,
+      selectedLabels: labelSelection && labelSelection.labels
+    }
+
+    /*
+      Cast to <any> is necessary because val is subclass of the abstract
+      class Charts.Chart. We want to initiate a new instance of this, but
+      since it's abstract, TypeScript will complain.
+    */
+    var chartCls: any = chartTypes[chartType];
+    if (chartCls) {
+      return new chartCls(params);
+    }
   }
 
   // Call from update actions to trigger async actions
   function updateAsync() {
-    TimeStats.async(); // No values => use default periods
+    var chart = getChart();
+    if (chart) {
+      chart.async(); // No values => use default periods
+    }
   }
 
   function refresh() {
     TimeStats.StatStore.reset();
+    DailyStats.StatStore.reset();
     updateAsync();
   }
 
@@ -85,17 +143,30 @@ module Esper.Views {
   function setDefaults() {
     Calendars.setDefault();
     if (! ChartTypeStore.isSet()) {
-      updateChartType(ChartType.DurationsOverTime);
+      var selection = Calendars.SelectStore.val();
+      if (selection) {
+        var team = Teams.get(selection.teamId);
+      }
+      if (team && team.team_labels && team.team_labels.length) {
+        updateChartType(ChartsM.DurationsOverTime);
+      } else {
+        updateChartType(ChartsM.ActivityGrid);
+      }
     } else {
       updateAsync();
     }
   }
 
   function defaultReqForChartType(chartType: ChartType)
-    : TimeStats.TypedStatRequest
+    : TimeStats.RequestPeriod
   {
+    // Autocharts, always one month
+    if (chartType.prototype instanceof ChartsM.AutoChart) {
+      return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
+    }
+
     switch (chartType) {
-      case ChartType.PercentageRecent:
+      case ChartsM.PercentageRecent:
         return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
       default:
         return TimeStats.intervalCountRequest(5, TimeStats.Interval.WEEKLY);
@@ -103,126 +174,33 @@ module Esper.Views {
   }
 
 
-  // Type for representing values from all stores
-  interface TimeStatsView {
-    teamId: string;
-    calId: string;
-    labels: string[];
-    chartType: ChartType;
-    request: TimeStats.TypedStatRequest;
-  }
-
-  // Logic for getting selection and results data
-  function getSelections() {
-    var calSelect = Calendars.SelectStore.val();
-    var calId = calSelect && calSelect.calId;
-    var teamId = calSelect && calSelect.teamId;
-    var labelSelect = LabelSelectStore.val();
-    var labels = labelSelect && labelSelect.labels;
-    var chartType = ChartTypeStore.val();
-    var request = TimeStats.RequestStore.val();
-
-    return {
-      teamId: teamId,
-      calId: calId,
-      labels: labels, // May be null -- signifies that we should use defaults
-      chartType: chartType,
-      request: request
-    };
-  }
-
-
-  // Type for getResults output below
-  interface TimeStatsResults {
-    busy: boolean;
-    error: boolean;
-    stats: ApiT.CalendarStats[];
-    displayResults: TimeStats.DisplayResults;
-    labelData: {
-      labelNorm: string;
-      displayAs: string;
-      badge?: string;
-    }[];
-  }
-
-  /*
-    Get actual time stats results data based on selections.
-
-    This function mutates state (although not stores) in two ways. First, it
-    updates selected labels if no labels are selected. Second, it triggers an
-    Analytics tracking request.
-  */
-  function getResults(selections: TimeStatsView): TimeStatsResults {
-    // Reset analytics
-    trackView(null);
-
-    // Safety check
-    if (!(selections.teamId && selections.calId && selections.request)) {
-      return;
-    }
-
-    // Get stats from store + data status
-    var pair = TimeStats.get(selections.teamId, selections.calId,
-                              selections.request);
-    var stats = pair && pair[0] && pair[0].items;
-    var dataStatus = pair && pair[1] && pair[1].dataStatus;
-
-    // Always compute durations over time since it's used for label display
-    var displayResults = TimeStats.getDisplayResults(
-      stats, selections.teamId) || [];
-    displayResults = _.sortBy(displayResults, (x) => -x.totalCount);
-
-    var labelData = _.map(displayResults, (d) => {
-      return {
-        labelNorm: d.labelNorm,
-        displayAs: d.displayAs,
-        badge: d.totalCount.toString()
-      };
-    });
-
-    /*
-      If we don't have selected labels, mutate selections to include labels
-      first four labels based on usage
-    */
-    selections.labels = selections.labels ||
-      _.map(displayResults.slice(0, 4), (v) => v.labelNorm);
-
-    return {
-      busy: dataStatus !== Model.DataStatus.READY,
-      error: dataStatus === Model.DataStatus.FETCH_ERROR,
-      stats: stats,
-      displayResults: displayResults,
-      labelData: labelData
-    };
-  }
-
-
   /* Analytics */
 
-  var currentView: TimeStatsView;
+  var currentChart: Charts.Chart;
   var currentTimer: number;
 
-  function trackView(view: TimeStatsView) {
+  function trackView(chart: Charts.Chart) {
     // Cancel existing request
     if (currentTimer) { clearTimeout(currentTimer); }
+    currentChart = chart;
 
-    currentView = view;
-    if (view && view.calId && view.teamId && view.labels &&
-        view.labels.length && view.chartType && view.request)
-    {
+    // Weed out incomplete views
+    if (chart) {
+
       // Calculate start time relative to today
       var now = moment();
-      var relStart = moment(view.request.windowStarts[0]).diff(now, 'days');
-      var relEnd = moment(view.request.windowEnd).diff(now, 'days');
+      var params = chart.params;
+      var relStart = moment(params.windowStart).diff(now, 'days');
+      var relEnd = moment(params.windowEnd).diff(now, 'days');
 
       // Set timeout to post Analytics tracking call after 3 seconds, but only
       // if we're still looking at the same view
       currentTimer = setTimeout(function() {
-        if (_.eq(currentView, view)) {
+        if (_.eq(currentChart.params, chart.params)) {
           Analytics.track(Analytics.Trackable.ViewTimeStats, _.extend({
-            labelCount: view.labels.length,
+            labelCount: (params.selectedLabels || []).length,
             periodLength: relEnd - relStart
-          }, view));
+          }, chart.params));
         }
       }, 3000);
     }
@@ -238,34 +216,31 @@ module Esper.Views {
     }
 
     renderWithData() {
-      var selections = getSelections();
-      var results = getResults(selections);
+      var chart = getChart();
+      trackView(chart);
+
+      var cal = Calendars.SelectStore.val() || {
+        teamId: null, calId: null
+      };
 
       // Render view
       return <div id="charts-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
-            selectedTeamId={selections.teamId}
-            selectedCalId={selections.calId}
+            selected={[cal]}
             updateFn={updateCalSelection} />
-          { results && results.labelData ?
-            <Components.LabelSelector
-              allLabels={results.labelData}
-              selectedLabels={selections.labels}
-              updateFn={updateLabels} /> :
-            null
-          }
+          { chart ? chart.renderSelectors() : null }
         </div>
         <div className="esper-right-content padded">
           <div className="esper-header row clearfix">
             <div className="col-xs-8 col-sm-4">
-              { this.renderChartSelector(selections) }
+              { this.renderChartSelector(chart) }
             </div>
             <div className="col-xs-4 col-sm-2 clearfix">
               <div className="pull-left">
-                <a className="esper-subtle"
-                   onClick={this.openChartTypeModal.bind(this)}>
+                <a className="esper-subtle" href="/help-charts"
+                   target="_blank">
                   <i className="fa fa-fw fa-question-circle" />
                 </a>
               </div>
@@ -277,75 +252,82 @@ module Esper.Views {
               </div>
             </div>
             <div className="col-xs-12 col-sm-6">
-              { this.renderPeriodSelector(selections) }
+              { chart ? this.renderPeriodSelector(chart) : null }
             </div>
           </div>
-          { this.renderChartCheck(selections, results) }
+          { this.renderChartCheck(chart) }
         </div>
       </div>;
     }
 
-    renderChartSelector(selections: TimeStatsView) {
-      return <select value={selections.chartType ?
-                            selections.chartType.toString() : ""}
-                     className="form-control"
-                     onChange={this.changeChartType.bind(this)}>
-        <option value={ChartType.DurationsOverTime.toString()}>
-          Total Duration Over Time
-        </option>
-        <option value={ChartType.PercentageRecent.toString()}>
-          Percentage Allocation
-        </option>
-        <option value={ChartType.PercentageOverTime.toString()}>
-          Percentage Over Time
-        </option>
-      </select>;
+    renderChartSelector(chart: Charts.Chart) {
+      var selected = _.findIndex(chartTypes, (c) => chart instanceof c);
+      return (
+        <select value={selected ? selected.toString() : ""}
+                className="form-control"
+                onChange={(event: React.SyntheticEvent) => {
+                  var target = event.target as HTMLSelectElement;
+                  updateChartType(parseInt(target.value))
+                }}>
+          { _.map(chartTypes, (c, i) =>
+            <option key={i} value={i.toString()}>{c.displayName}</option>
+          )}
+        </select>);
     }
 
-    renderPeriodSelector(selections: TimeStatsView) {
-      switch (selections.chartType) {
-        case ChartType.PercentageRecent:
-          return <Components.IntervalRangeSelector
-            selected={selections.request}
-            updateFn={updateRequestedPeriod}
-          />;
-
-        default:
-          return <Components.IntervalRangeSelector
-            selected={selections.request}
-            updateFn={updateRequestedPeriod}
-            showIntervals={true}
-          />;
-      }
+    renderPeriodSelector(chart: Charts.Chart) {
+      return chart.renderPeriodSelector(updateRequestedPeriod);
     }
 
     /*
       Render any messages as appropriate in lieu of displaying chart, else
       display chart
     */
-    renderChartCheck(selections: TimeStatsView, results: TimeStatsResults) {
-      if (! results) {
+    renderChartCheck(chart: Charts.Chart) {
+      if (! chart) {
+        var calendar = Calendars.SelectStore.val();
+        if (! calendar) {
+          return this.renderMessage(<span>
+            <i className="fa fa-fw fa-calendar"></i>{" "}
+            Please select a calendar
+          </span>);
+        }
+
+        var requestPeriod = RequestStore.val();
+        if (!requestPeriod || !requestPeriod.windowStart ||
+            !requestPeriod.windowEnd) {
+          return this.renderMessage(<span>
+            <i className="fa fa-fw fa-calendar"></i>{" "}
+            Please select a proper time period.
+          </span>);
+        };
+
         return this.renderMessage(<span>
-          <i className="fa fa-fw fa-calendar"></i>{" "}
-          Please select a calendar
+          <i className="fa fa-fw fa-bar-chart"></i>{" "}
+          Please select a chart type
         </span>);
-      } else if (results.error) {
+      }
+
+      else if (chart.getError()) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-warning"></i>{" "}
           Error loading data
         </span>);
-      } else if (results.busy) {
+      }
+
+      else if (chart.isBusy()) {
         return <div className="esper-center">
           <span className="esper-spinner esper-large" />
         </div>;
-      } else if (!_.find(results.stats,
-                 (s) => s.partition && s.partition.length)) {
+      }
+
+      else if (chart.noData()) {
         return this.renderMessage(<span>
-          No Data
+          No data found
         </span>);
       }
 
-      return this.renderChart(selections, results);
+      return chart.renderChart();
     }
 
     renderMessage(elm: JSX.Element|string) {
@@ -356,41 +338,6 @@ module Esper.Views {
           </div>
         </div>
       </div>;
-    }
-
-    renderChart(selections: TimeStatsView, results: TimeStatsResults) {
-      // Pick chart class type and render
-      return React.createElement(this.getChartType(selections.chartType), {
-        selectedLabels: selections.labels,
-        request: selections.request,
-        stats: results.stats,
-        displayResults: results.displayResults
-      });
-    }
-
-    getChartType(chartType: ChartType) {
-      var ret: typeof Components.TimeStatsChart;
-      switch (chartType) {
-        case ChartType.PercentageRecent:
-          ret = Components.PercentageRecent;
-          break;
-        case ChartType.PercentageOverTime:
-          ret = Components.PercentageOverTime;
-          break;
-        default:
-          ret = Components.DurationsOverTime
-      }
-      return ret;
-    }
-
-    changeChartType(event: React.SyntheticEvent) {
-      var target = event.target as HTMLSelectElement;
-      var chartType: ChartType = parseInt(target.value);
-      updateChartType(chartType);
-    }
-
-    openChartTypeModal() {
-      Layout.renderModal(<Components.ChartTypeModal />);
     }
   }
 }

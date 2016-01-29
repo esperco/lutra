@@ -1,6 +1,7 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="../common/Layout.tsx" />
+/// <reference path="../common/Login.Fake.ts" />
 /// <reference path="./Integration.ts" />
 
 module Esper.Integration {
@@ -17,7 +18,7 @@ module Esper.Integration {
 
   describe("/login?logout=1", function() {
     beforeAll(function(done) {
-      stubLois();
+      Login.stubLois();
       Test.goTo("/login?logout=1", done);
     });
 

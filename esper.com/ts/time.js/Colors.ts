@@ -37,23 +37,45 @@ module Esper.Colors {
     "#CCA6AC"
   ];
 
+  // If we only need a handful of colors
+  export var first = presetColors[0];
+  export var second = presetColors[1];
+  export var black = "#000000";
+  export var lightGray = "#CECEDD";
+  export var offWhite = "#FCFCFC";
+  export var green = "#5CB85C";
+  export var yellow = "#FADD00";
+  export var orange = "#F0AD4E";
+  export var red = "#D9534F";
+
   // Already assigned colors
-  var colorMap: { [index: string]: string } = {};
+  type ColorMap = { [index: string]: string };
+  var labelColorMap: ColorMap = {};
+  var domainColorMap: ColorMap = {};
+
+  export function getColorForLabel(label: string): string {
+    return getColorForMap(label, labelColorMap);
+  }
+
+  export function getColorForDomain(domain: string): string {
+    return getColorForMap(domain, domainColorMap);
+  }
 
   // Get a color for a particular string and remember that color
-  export function getColorForLabel(label: string): string {
-    // Return existing remembered color if applicable
-    if (! colorMap[label]) {
+  export function getColorForMap(key: string, colorMap: ColorMap): string {
+    // Return existing rememgetColorForMapbered color if applicable
+    if (! colorMap[key]) {
       var index = _.keys(colorMap).length;
       var color = presetColors[index % presetColors.length];
-      colorMap[label] = color;
+      colorMap[key] = color;
     }
-    return colorMap[label];
+    return colorMap[key];
   }
 
   // Reset remembered colors
-  export function resetColorMap(): void {
-    colorMap = {};
+  export function resetColorMaps(): void {
+    labelColorMap = {};
+    domainColorMap = {};
   }
 
   // Manipulate colors to lighter or darker
@@ -82,5 +104,18 @@ module Esper.Colors {
       (Math.round(((t>>8&0x00FF) - G1) * n) + G1) * 0x100 +
       (Math.round(((t&0x0000FF) - B1) * n) + B1)
     ).toString(16).slice(1);
+  }
+
+  // Get a good text color given a certain background color
+  // See https://24ways.org/2010/calculating-color-contrast/
+  export function colorForText(hexcolor: string) {
+    if (hexcolor[0] === "#") {
+      hexcolor = hexcolor.slice(1);
+    }
+    var r = parseInt(hexcolor.substr(0,2),16);
+    var g = parseInt(hexcolor.substr(2,2),16);
+    var b = parseInt(hexcolor.substr(4,2),16);
+    var yiq = ((r*299)+(g*587)+(b*114))/1000;
+    return (yiq >= 128) ? black : offWhite;
   }
 }

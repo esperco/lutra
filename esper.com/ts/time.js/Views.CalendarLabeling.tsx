@@ -9,12 +9,16 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   // Action to update our selection
-  function updateSelection(teamId: string, calId: string) {
+  function updateSelection(selections: Calendars.CalSelection[]) {
     var current = Calendars.SelectStore.val();
+    var selection = selections[0];
 
     // Update only if calendar doesn't match (to avoid clobbering events)
-    if (!current || current.teamId !== teamId || current.calId !== calId) {
-      Calendars.SelectStore.set({teamId: teamId, calId: calId, events: []});
+    if (selection && !current ||
+        current.teamId !== selection.teamId ||
+        current.calId !== selection.calId) {
+      selection.events = [];
+      Calendars.SelectStore.set(selection);
     }
   }
 
@@ -89,17 +93,11 @@ module Esper.Views {
     }
 
     render() {
-      if (this.state.selectedCal) {
-        var selectedTeamId = this.state.selectedCal.teamId;
-        var selectedCalId = this.state.selectedCal.calId;
-      }
-
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
-            selectedTeamId={selectedTeamId}
-            selectedCalId={selectedCalId}
+            selected={this.state.selectedCal ? [this.state.selectedCal] : []}
             updateFn={updateSelection}
             minimized={this.state.minimizeCalSelector}
             toggleMinimized={toggleMinCalSelect}

@@ -81,9 +81,11 @@ module Esper.ApiT {
     teamid: string;
     team_name: string;
     team_approved: boolean;
+    team_active_until?: string; // timestamp
     team_executive: string;
     team_assistants: string[];
-    team_primary_assistant?: string;
+    team_owner: string;
+    team_cal_user: string;
     team_labels: string[];
     team_label_urgent: string;
     team_label_new: string;
@@ -641,21 +643,24 @@ type token_response = [
   export interface DailyStatsRequest {
     window_start: string; // timestamp
     window_end: string; // timestamp
-    calendars: CalendarTime[];
+    calendars: CalendarAndTeam[];
   }
 
   export interface DailyStatsResponse {
-    top_guests: TopGuest[];
-    top_guest_domains: TopGuest[];
-    daily_stats: string[];
+    has_domain_analysis: boolean;
+    guest_stats: GuestStat[];
+    daily_stats: DailyStats[];
   }
 
-  export interface TopGuest {
-    id: string; // Email address or domain name for guest(s)
-    name?: string;      // Real-name if applicable
-    split_time: number; // Seconds
+  export interface GuestStat {
+    guests: Identity[];
     count: number;
-    time: number;       // Seconds
+    time: number;   // Seconds
+  }
+
+  export interface Identity {
+    email: string;
+    name?: string;
   }
 
   export interface DailyStats {
@@ -664,9 +669,8 @@ type token_response = [
     with_guests: number[];        // Seconds list
     internal?: number[];          // Seconds list
     external?: number[];          // Seconds list
-    chunks: number[];             // Seconds list
-    chunks_compl: number[];       // Seconds list
-    chunks_with_guests: number[]; // Seconds list
+    chunks: number[];             // Seconds list, alternating +/- (+ = busy)
+    chunks_with_guests: number[]; // Seconds list, alternating +/- (+ = busy)
   }
 
   export interface Task {

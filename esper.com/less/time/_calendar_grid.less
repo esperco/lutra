@@ -1,0 +1,98 @@
+// For calendar grid charts, not full calendar
+
+@import "../lib/_helpers";
+@import "../lib/_animations";
+
+.calendar-grid-holder {
+  .esper-expanded;
+  .esper-expanded.padded;
+  .esper-expanded.minus-subheader;
+
+  @media (max-width: @screen-xs-max) {
+    .esper-expanded.minus-subheader.collapse-2x;
+  }
+
+  padding-top: @padding-base-vertical;
+}
+
+table.calendar-grid {
+  height: 95%;
+  width: 100%;
+  margin-bottom: @padding-large-vertical;
+  table-layout:fixed;
+
+  thead {
+    height: 1em;
+  }
+
+  th {
+    text-align: center;
+  }
+
+  td, th {
+    vertical-align: top;
+    border: 1px solid @table-border-color;
+    width: calc(100% / 7);
+    overflow: hidden;
+  }
+
+  .out-month {
+    color: @gray-lighter;
+  }
+
+  .in-month .day-header {
+    background: @gray-lighter;
+  }
+
+  .day-header {
+    text-align: right;
+    padding: @padding-xs-vertical @padding-xs-horizontal;
+  }
+
+  .daily-metric {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    padding: 1px;
+    margin: 1px;
+    animation: fadein 0.5s ease-in-out;
+    cursor: default;
+
+    &:hover {
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+      filter: saturate(1.5);
+    }
+  }
+
+  .time-blocks-container {
+    margin: @padding-small-vertical;
+  }
+
+  .time-block {
+    &:last-child .time-segment:last-child {
+      border-right: 0;
+    }
+
+    &:hover .time-segment > span {
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+      filter: saturate(1.5);
+    }
+  }
+
+  .time-segment {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 1em; // Should get overriden in code -- but a default
+    border-right: 0;
+
+    > span {
+      animation: extendwidth 0.5s ease-in-out;
+      display: block;
+      height: 1em;
+    }
+
+    &:last-child {
+      border-right: 2px solid white;
+    }
+  }
+}

@@ -11,11 +11,17 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface RangeProps {
-    selected: TimeStats.TypedStatRequest;
-    updateFn(value: TimeStats.TypedStatRequest): void;
+    selected: TimeStats.RequestPeriod;
+    updateFn(value: TimeStats.RequestPeriod): void;
 
     // Preset ranges
     presets?: { [index: string]: [Date, Date] };
+
+    // Limits on range
+    dateLimit?: moment.MomentInput;
+    dateLimitForInterval?: (interval: TimeStats.Interval) => moment.MomentInput;
+    minDate?: BootstrapDaterangepicker.DateType;
+    maxDate?: BootstrapDaterangepicker.DateType;
 
     // Show interval buttons?
     showIntervals?: boolean;
@@ -64,13 +70,14 @@ module Esper.Components {
       var opts: BootstrapDaterangepicker.Options = {
         autoApply: true,
         opens: "left",
-        minDate: moment().subtract(6, 'months'),
-        maxDate: moment().add(6, 'months')
+        minDate: this.props.minDate,
+        maxDate: this.props.maxDate,
+        dateLimit: this.getDateLimit()
       };
+
       if (this.props.selected) {
-        var windowStarts = this.props.selected.windowStarts;
-        if (windowStarts && windowStarts[0]) {
-          opts.startDate = windowStarts[0];
+        if (this.props.selected.windowEnd) {
+          opts.startDate = this.props.selected.windowStart;
         }
 
         if (this.props.selected.windowEnd) {
@@ -78,7 +85,44 @@ module Esper.Components {
         }
       }
       var presets = this.props.presets || this.getDefaultPresets();
-      if (presets) { opts.ranges = presets; }
+      if (presets) {
+
+        // Filter out presets that don't make sense given limits
+        var maxMs: number;
+        var dateLimit = this.getDateLimit()
+        if (dateLimit) {
+          maxMs = moment.duration(dateLimit).as('milliseconds');
+        }
+
+        var minMs: number;
+        if (this.props.showIntervals) {
+          var m: moment.MomentInput;
+          switch (this.props.selected.interval) {
+            case TimeStats.Interval.DAILY:
+              m = {day: 1};
+              break;
+            case TimeStats.Interval.WEEKLY:
+              m = {day: 7};
+              break;
+            default:
+              m = {month: 1};
+          }
+          var minMs = moment.duration(m).as('milliseconds');
+        }
+
+        if (!_.isUndefined(minMs) && !_.isUndefined(maxMs)) {
+          var f: {[index: string]: [Date, Date]} = {};
+          _.each(presets, (v, k) => {
+            var length = moment(v[1]).diff(moment(v[0]));
+            if (length <= maxMs && length >= minMs) {
+              f[k] = v;
+            }
+          })
+          presets = f;
+        }
+
+        opts.ranges = presets;
+      }
 
       var inputElm = $(this._input);
       if (inputElm.is(":visible")) {
@@ -87,27 +131,20 @@ module Esper.Components {
       }
     }
 
-    componentDidUpdate() {
-      if (this.props.selected &&
-          this.props.selected.windowStarts &&
-          this.props.selected.windowStarts[0])
-      {
-        var picker = this.getPicker();
-        if (picker) {
-          if (! _.isEqual(picker.startDate,
-                          this.props.selected.windowStarts[0]))
-          {
-            picker.setStartDate(this.props.selected.windowStarts[0]);
-          }
-          if (! _.isEqual(picker.endDate, this.props.selected.windowEnd)) {
-            picker.setEndDate(this.props.selected.windowEnd);
-          }
-        }
-        else {
-          // Re-attach, old element got clobbered by React
-          this.attachDateRangePicker();
-        }
+    getDateLimit() {
+      if (this.props.dateLimitForInterval &&
+          this.props.showIntervals &&
+          _.isNumber(this.props.selected.interval)) {
+        return this.props.dateLimitForInterval(this.props.selected.interval);
       }
+
+      else if (this.props.dateLimit) {
+        return this.props.dateLimit;
+      }
+    }
+
+    componentDidUpdate() {
+      this.attachDateRangePicker();
     }
 
     getPicker() {
@@ -116,18 +153,27 @@ module Esper.Components {
 
     getDefaultPresets() {
       if (_.isUndefined(this.props.presets)) {
-        var m2 = TimeStats.intervalCountRequest(2, TimeStats.Interval.MONTHLY);
-        var w2 = TimeStats.intervalCountRequest(2, TimeStats.Interval.WEEKLY);
-        var d30 = TimeStats.intervalCountRequest(30, TimeStats.Interval.DAILY);
+        var month = 'month';
+        var week = 'week';
+        var day = 'day';
 
-        var ret: {[index: string]: [Date, Date]} = {
-          "This Month": [m2.windowStarts[1], m2.windowEnd],
-          "Last Month": [m2.windowStarts[0], m2.windowStarts[1]],
-          "Last 30 Days": [d30.windowStarts[0], d30.windowEnd],
-          "This Week": [w2.windowStarts[1], w2.windowEnd],
-          "Last Week": [w2.windowStarts[0], w2.windowStarts[1]],
-          "Last 7 Days": [d30.windowStarts[23], d30.windowEnd]
+        var m: {[index: string]: [moment.Moment, moment.Moment]} = {
+          "This Month": [ moment().startOf(month), moment().endOf(month) ],
+          "Last Month": [ moment().startOf(month).subtract(1, month),
+                          moment().endOf(month).subtract(1, month) ],
+          "Last 30 Days": [ moment().startOf(day).subtract(30, day),
+                            moment().endOf(day) ],
+          "This Week": [ moment().startOf(week), moment().endOf(week) ],
+          "Last Week": [ moment().startOf(week).subtract(1, week),
+                         moment().endOf(week).subtract(1, week) ],
+          "Last 7 Days": [ moment().startOf(day).subtract(7, day),
+                           moment().endOf(day) ]
         };
+
+        var ret: {[index: string]: [Date, Date]} = {};
+        _.each(m, (v, k) => {
+          ret[k] = [v[0].toDate(), v[1].toDate()];
+        })
 
         return ret;
       }
@@ -150,9 +196,11 @@ module Esper.Components {
       // Round to beginning / end of days
       var start = picker.startDate.clone().startOf('day');
       var end = picker.endDate.clone().endOf('day');
-      var req = TimeStats.periodRequest(start.toDate(), end.toDate(),
-                                        interval);
-      this.props.updateFn(req);
+      this.props.updateFn({
+        windowStart: start.toDate(),
+        windowEnd: end.toDate(),
+        interval: interval
+      });
     }
   }
 }

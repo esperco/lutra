@@ -1,39 +1,34 @@
 /*
-  Bar chart for show label durations over time
+  Bar chart for showing label percentages over time using split time
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Components.TimeStatsChart.tsx" />
+/// <reference path="./Charts.LabelChart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
-/// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
-module Esper.Components {
-  // Shorten references to React Component class
-  var Component = ReactHelpers.Component;
+module Esper.Charts {
+  export class PercentageOverTime extends LabelChart {
+    static displayName = "Label Percentage Over Time";
+    protected usesIntervals = true;
 
-  export class PercentageOverTime extends TimeStatsChart {
-    render() {
+    renderChart() {
       var formatted = TimeStats.formatWindowStarts(
-        this.props.stats,
-        this.props.request.interval);
+        this.sync()[0].items,
+        this.params.interval);
 
-      var labels = _.map(this.props.stats, (stat) =>
-        TimeStats.exclusivePartitionByLabel(stat.partition,
-                                            this.props.selectedLabels)
-      );
-      var results = TimeStats.getDisplayResultsBase(labels);
-      results = _.sortBy(results, (x) => -x.totalDuration);
-      var filtered = _.filter(results,
-        (c) => _.contains(this.props.selectedLabels, c.labelNorm));
-      var series = _.map(filtered, (c) => {
+      // Filter to include only user-selected labels
+      var results = this.getExclusiveDisplayResults();
+
+      // Actual HighCharts data
+      var series = _.map(results, (c) => {
         return {
           name: c.displayAs,
           color: Colors.getColorForLabel(c.labelNorm),
           data: _.map(c.durations, (value) => TimeStats.toHours(value))
         }
       });
+
       return <div className="percentage-recent-chart">
         <Components.Highchart opts={{
           chart: {
