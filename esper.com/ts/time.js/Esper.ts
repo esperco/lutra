@@ -9,7 +9,6 @@
 /// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
 /// <reference path="../typings/react/react-global.d.ts" />
-/// <reference path="../typings/twitter/twitter.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
@@ -31,6 +30,5 @@ declare module Esper {
   export var pageJs: PageJS.Static;
   export var PRODUCTION: boolean;
   export var TESTING: boolean;
-  export var twttr: Twitter;
 }
 

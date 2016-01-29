@@ -68,9 +68,6 @@
     "ravenjs/ravenjs.d.ts": {
       "commit": "02bc2983507f9ae82fa67300848f070fd88fd11a"
     },
-    "twitter/twitter.d.ts": {
-      "commit": "6054c1a8b163fdc1c30a8f977118a41658025922"
-    },
     "quill/quill.d.ts": {
       "commit": "b5000efa7905758a842aca9f3111d582cf030128"
     },

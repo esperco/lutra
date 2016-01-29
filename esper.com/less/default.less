@@ -526,6 +526,13 @@ input.incorrect{
     &.light { background: @purple; }
   }
 
+  &.short {
+    min-height: 0;
+    .splash-text-container {
+      padding-top: 25px;
+      h1 { margin-top: 10px; }
+    }
+  }
   &.large { min-height: 450px; }
   &.fullscreen { height: 100%; }
   .splash-label {
@@ -610,7 +617,10 @@ input.incorrect{
   }
   &.narrow { max-width: 800px; }
   &.verynarrow { max-width: 650px; }
-  &.short { padding: 18px; }
+  &.short {
+    padding: 10px 20px;
+    &:first-child { padding-top: 30px; }
+  }
   &.index {
     padding-bottom: 10px;
   }
