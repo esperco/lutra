@@ -20,6 +20,11 @@ module Esper.Charts {
   const MAX_FREE = 6 * 60 * 60;
 
   /*
+    Don't render availability blocks smaller than this (in seconds)
+  */
+  const BLOCK_CUT_OFF = 30 * 60;
+
+  /*
     Grid that shows fragmentation, meeting count, and meeting durations
   */
   export class WorkHoursGrid extends CalendarGridChart {
@@ -39,16 +44,27 @@ module Esper.Charts {
       var endFreeTimes: number[] = [];
 
       _.each(stats, (s) => {
-        startFreeTimes.push(9 * 60 * 60);   // TODO: Fix
-        endFreeTimes.push(6 * 60 * 60);     // TODO: Fix
+        if (s.chunks.length > 1) { // Ignore empty days
+          var firstChunk = s.chunks[0];
+          if (firstChunk < 0) {
+            startFreeTimes.push(-firstChunk);
+          }
+          var lastChunk = s.chunks[s.chunks.length - 1]
+          if (lastChunk < 0) {
+            endFreeTimes.push(-lastChunk)
+          }
+        }
       });
 
       startFreeTimes.sort();
       endFreeTimes.sort();
 
-      var medianIndex = Math.floor(stats.length / 2);
-      this.startFree = Math.min(startFreeTimes[medianIndex], START_FREE);
-      this.endFree = Math.min(endFreeTimes[medianIndex], END_FREE);
+      this.startFree = Math.min(
+        startFreeTimes[Math.floor(startFreeTimes.length / 2)],
+        START_FREE);
+      this.endFree = Math.min(
+        endFreeTimes[Math.floor(endFreeTimes.length / 2)],
+        END_FREE);
 
       return super.renderChart();
     }
@@ -57,52 +73,83 @@ module Esper.Charts {
       var data = this.sync()[0];
       var stats = data.daily_stats[m.date() - 1];
       if (stats) {
-        // Aim for three rows
+
+        /*
+          Aim for three rows -- this is approximate and doesn't account for
+          padding at the edges, so we'll probably get a few four row instances
+          if user has a lot of availability.
+        */
         var maxTimePerRow = (24 * 60 * 60 - this.startFree - this.endFree) / 3;
 
-        // TODO: Fix
-        var freeChunks: number[] = stats.scheduled.length ? [
-          8 * 60 * 60,
-          0.5 * 60 * 60,
-          0.5 * 60 * 60,
-          4 * 60 * 60,
-          9 * 60 * 60
-        ] : [24 * 60 * 60];
-        freeChunks[0] -= this.startFree;
-        freeChunks[freeChunks.length - 1] -= this.endFree;
-
-        var spans: JSX.Element[] = [];
-
-        // Track the length of the current row so we can wrap around
-        var currentRow = 0;
-
-        _.each(freeChunks, (c, i) => {
-          if (c <= 15 * 60) { return; } // Ignore tiny or negative chunks
-
-          var color = Colors.lighten(Colors.green,
-            0.9 * (1 - Math.min(c / MAX_FREE, 1)));
-          var j = 0;
-          while (c > 0) {
-            if (currentRow >= maxTimePerRow) { currentRow = 0; }
-            var rowLength = Math.min(maxTimePerRow - currentRow, c);
-            c -= rowLength;
-            currentRow += rowLength;
-            j += 1;
-            spans.push(
-              <span key={i.toString() + " " + j.toString()}
-                className="availability-block"
-                style={{width: (rowLength * 100 / maxTimePerRow) + "%"}}>
-                <span style={{background: color}} />
-              </span>);
+        var freeChunks = _.clone(stats.chunks);
+        if (freeChunks.length > 1) {
+          if (freeChunks[0] < 0) {
+            freeChunks[0] += this.startFree;
           }
-        });
+          if (freeChunks[freeChunks.length - 1] < 0) {
+            freeChunks[freeChunks.length - 1] += this.endFree;
+          }
+          freeChunks = _.map(_.filter(freeChunks, (c) => c < 0), (c) => -c);
+        } else {
+          freeChunks = [24 * 60 * 60 - this.startFree - this.endFree];
+        }
 
-        console.info(spans.length);
-
-        return <div className="availability-blocks-container">
-          { spans }
-        </div>;
+        return <div className="time-blocks-container">{ _.map(freeChunks,
+          (c, i) => <TimeBlock key={i.toString()} seconds={c}
+                               secondsPerRow={maxTimePerRow} />
+        ) }</div>;
       }
+    }
+  }
+
+  class TimeBlock extends ReactHelpers.Component<{
+    key?: string;
+    seconds: number;
+    secondsPerRow: number;
+  }, {}> {
+
+    _block: HTMLSpanElement;
+
+    render() {
+      var shadePct =  Math.min(this.props.seconds / MAX_FREE, 1);
+      var color = Colors.shadeBlend(shadePct, Colors.yellow, Colors.green);
+      color = Colors.lighten(color, 0.9 * (1 - shadePct));
+      var hours = Math.floor(this.props.seconds / (60 * 60));
+      var remainder = this.props.seconds % (60 * 60);
+      var hoursWidth = ((60 * 60) / this.props.secondsPerRow) * 100;
+      var remainderWidth = (remainder / (60 * 60)) * hoursWidth;
+
+      var colorStyle = { background: color };
+      var hoursStyle = {
+        width: Math.floor(hoursWidth) + "%",
+      };
+      var remainderStyle = {
+        width: Math.floor(remainderWidth) + "%",
+      };
+
+      return <span className="time-block" ref={(c) => this._block = c }
+                   data-toggle="tooltip"
+                   title={TimeStats.toHours(this.props.seconds) + " hours"}>
+        {
+          _.times(hours, (i) =>
+            <span key={i.toString()} className="time-segment"
+                  style={hoursStyle}>
+              <span style={colorStyle} />
+            </span>
+          )
+        }
+        {
+          remainder > BLOCK_CUT_OFF ?
+          <span key="remainder" className="time-segment"
+                style={remainderStyle}>
+             <span style={colorStyle} />
+          </span> : null
+        }
+      </span>;
+    }
+
+    componentDidMount() {
+      $(this._block).tooltip();
     }
   }
 }

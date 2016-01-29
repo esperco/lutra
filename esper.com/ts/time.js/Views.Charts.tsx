@@ -32,7 +32,7 @@ module Esper.Views {
   // Available chart options (map of integer index to class) -- used in
   // selector down below
   type ChartType = typeof ChartsM.Chart;
-  export var chartTypes: ChartType[] = [
+  export var chartTypes: ChartType[] = _.sortBy([
     ChartsM.DurationsOverTime,
     ChartsM.PercentageRecent,
     ChartsM.PercentageOverTime,
@@ -41,7 +41,7 @@ module Esper.Views {
     ChartsM.GuestDomains,
     ChartsM.DurationHistogram,
     ChartsM.WorkHoursGrid
-  ];
+  ], (ct) => ct.displayName);
 
   // Store for current chart type - store index of class in chartTypes list
   export var ChartTypeStore = new Model.StoreOne<number>();

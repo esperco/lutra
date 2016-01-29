@@ -345,10 +345,10 @@ module Esper.TimeStats {
 
   /*
     Time stat durations are normally seconds. This normalizes to hours and
-    rounds to nearest .01 hour -- rounding may be slightly off because of
+    rounds to nearest .1 hour -- rounding may be slightly off because of
     floating point arithmetic but that should be OK in most cases
   */
   export function toHours(seconds: number) {
-    return Number((seconds / 3600).toFixed(2))
+    return Number((seconds / 3600).toFixed(1));
   }
 }

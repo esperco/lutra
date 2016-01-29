@@ -18,6 +18,7 @@
 table.calendar-grid {
   height: 95%;
   width: 100%;
+  margin-bottom: @padding-large-vertical;
   table-layout:fixed;
 
   thead {
@@ -55,21 +56,43 @@ table.calendar-grid {
     padding: 1px;
     margin: 1px;
     animation: fadein 0.5s ease-in-out;
+    cursor: default;
+
+    &:hover {
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+      filter: saturate(1.5);
+    }
   }
 
-  .availability-blocks-container {
-    margin: @padding-xs-vertical 0 @padding-xs-vertical @padding-xs-horizontal;
+  .time-blocks-container {
+    margin: @padding-small-vertical;
   }
 
-  .availability-block {
+  .time-block {
+    &:last-child .time-segment:last-child {
+      border-right: 0;
+    }
+
+    &:hover .time-segment > span {
+      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+      filter: saturate(1.5);
+    }
+  }
+
+  .time-segment {
     box-sizing: border-box;
     display: inline-block;
+    width: 1em; // Should get overriden in code -- but a default
+    border-right: 0;
 
     > span {
-      display: block;
-      margin-right: @padding-xs-horizontal;
       animation: extendwidth 0.5s ease-in-out;
+      display: block;
       height: 1em;
+    }
+
+    &:last-child {
+      border-right: 2px solid white;
     }
   }
 }
