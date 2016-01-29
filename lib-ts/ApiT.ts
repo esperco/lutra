@@ -669,10 +669,8 @@ type token_response = [
     with_guests: number[];        // Seconds list
     internal?: number[];          // Seconds list
     external?: number[];          // Seconds list
-    chunks: number[];             // Seconds list
-    chunks_compl: number[];       // Seconds list
-    chunks_with_guests: number[]; // Seconds list
-    chunks_with_guests_compl: number[]; // Seconds list
+    chunks: number[];             // Seconds list, alternating +/- (+ = busy)
+    chunks_with_guests: number[]; // Seconds list, alternating +/- (+ = busy)
   }
 
   export interface Task {

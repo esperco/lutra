@@ -51,10 +51,8 @@ module Esper.DailyStats {
         with_guests: [],
         internal: [],
         external: [],
-        chunks: [],
-        chunks_compl: [hts(24) + hts(9)], // Completement carries to next day
-        chunks_with_guests: [],
-        chunks_with_guests_compl: []
+        chunks: [hts(-24)],
+        chunks_with_guests: []
       } as ApiT.DailyStats,
 
       { /*
@@ -65,14 +63,12 @@ module Esper.DailyStats {
           2PM - 4PM meeting with B+C
         */
         window_start: XDate.toString(new Date(2016, 0, 2)),
-        scheduled: [hts(1), hts(1), hts(1), hts(1), hts(2)],
-        with_guests: [hts(1), hts(1), hts(1), hts(2)],
+        scheduled: _.map([1, 1, 1, 1, 2], hts),
+        with_guests: _.map([1, 1, 1, 2], hts),
         internal: [],
-        external: [hts(1), hts(1), hts(1), hts(2)],
-        chunks: [hts(3), hts(3)],
-        chunks_compl: [hts(1), hts(8) + hts(9)],
-        chunks_with_guests: [hts(2), hts(3)],
-        chunks_with_guests_compl: [hts(2), hts(8) + hts(9)]
+        external: _.map([1, 1, 1, 2], hts),
+        chunks: _.map([-9, 3, -1, 3, -8], hts),
+        chunks_with_guests: _.map([-9, 2, -2, 3, -8], hts)
       } as ApiT.DailyStats,
       { /*
           9AM - 10AM meeting with B+C
@@ -80,14 +76,12 @@ module Esper.DailyStats {
           4PM - 6PM event with no guests
         */
         window_start: XDate.toString(new Date(2016, 0, 3)),
-        scheduled: [hts(1), hts(1), hts(2)],
-        with_guests: [hts(1), hts(1)],
+        scheduled: _.map([1, 1, 2], hts),
+        with_guests: _.map([1, 1], hts),
         internal: [],
-        external: [hts(1), hts(1)],
-        chunks: [hts(1), hts(1), hts(2)],
-        chunks_compl: [hts(3), hts(2), hts(6) + hts(9)],
-        chunks_with_guests: [hts(1), hts(1)],
-        chunks_with_guests_compl: [hts(3), hts(10) + hts(9)]
+        external: _.map([1, 1], hts),
+        chunks: _.map([-9, 1, -3, 1, -2, 2, -6], hts),
+        chunks_with_guests: _.map([-9, 1, -3, 1, -10], hts)
       } as ApiT.DailyStats,
       {
         /*
@@ -95,14 +89,12 @@ module Esper.DailyStats {
           1PM - 8PM meeting with C
         */
         window_start: XDate.toString(new Date(2016, 0, 4)),
-        scheduled: [hts(1), hts(7)],
-        with_guests: [hts(1), hts(7)],
+        scheduled: _.map([1, 7], hts),
+        with_guests: _.map([1, 7], hts),
         internal: [hts(7)],
         external: [hts(1)],
-        chunks: [hts(1), hts(7)],
-        chunks_compl: [hts(3), hts(4)],
-        chunks_with_guests: [hts(1), hts(7)],
-        chunks_with_guests_compl: [hts(3), hts(4)]
+        chunks: _.map([-9, 1, -3, 7, -4], hts),
+        chunks_with_guests: _.map([-9, 1, -3, 7, -4], hts)
       } as ApiT.DailyStats]
     }
   }

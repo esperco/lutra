@@ -59,7 +59,8 @@ module Esper.Charts {
         };
 
         // Fragmentation Calc
-        var frag = (stats.chunks.length - 1) / stats.scheduled.length;
+        var chunks = _.filter(stats.chunks, (c) => c > 0);
+        var frag = (chunks.length - 1) / stats.scheduled.length;
         if (frag < 0) { frag = 0; }
         var fragBg = Colors.lighten(Colors.red, 1-frag);
         var fragStyle = {
