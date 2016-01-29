@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.ChartTypeModal.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Charts.ActivityGrid.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
@@ -144,7 +143,15 @@ module Esper.Views {
   function setDefaults() {
     Calendars.setDefault();
     if (! ChartTypeStore.isSet()) {
-      updateChartType(ChartsM.DurationsOverTime);
+      var selection = Calendars.SelectStore.val();
+      if (selection) {
+        var team = Teams.get(selection.teamId);
+      }
+      if (team && team.team_labels && team.team_labels.length) {
+        updateChartType(ChartsM.DurationsOverTime);
+      } else {
+        updateChartType(ChartsM.ActivityGrid);
+      }
     } else {
       updateAsync();
     }
@@ -232,8 +239,8 @@ module Esper.Views {
             </div>
             <div className="col-xs-4 col-sm-2 clearfix">
               <div className="pull-left">
-                <a className="esper-subtle"
-                   onClick={this.openChartTypeModal.bind(this)}>
+                <a className="esper-subtle" href="/help-charts"
+                   target="_blank">
                   <i className="fa fa-fw fa-question-circle" />
                 </a>
               </div>
@@ -331,10 +338,6 @@ module Esper.Views {
           </div>
         </div>
       </div>;
-    }
-
-    openChartTypeModal() {
-      Layout.renderModal(<Components.ChartTypeModal />);
     }
   }
 }
