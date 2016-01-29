@@ -151,5 +151,9 @@ module Esper.Charts {
     componentDidMount() {
       $(this._block).tooltip();
     }
+
+    componentDidUpdate() {
+      $(this._block).tooltip();
+    }
   }
 }
