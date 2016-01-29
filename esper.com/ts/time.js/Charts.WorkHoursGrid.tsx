@@ -73,15 +73,16 @@ module Esper.Charts {
       var data = this.sync()[0];
       var stats = data.daily_stats[m.date() - 1];
       if (stats) {
+        var maxWorkday = 24 * 60 * 60 - this.startFree - this.endFree;
 
         /*
           Aim for three rows -- this is approximate and doesn't account for
           padding at the edges, so we'll probably get a few four row instances
           if user has a lot of availability.
         */
-        var maxTimePerRow = (24 * 60 * 60 - this.startFree - this.endFree) / 3;
+        var maxTimePerRow = maxWorkday / 3;
 
-        var freeChunks = _.clone(stats.chunks);
+        var freeChunks: number[] = _.clone(stats.chunks);
         if (freeChunks.length > 1) {
           if (freeChunks[0] < 0) {
             freeChunks[0] += this.startFree;
@@ -89,9 +90,12 @@ module Esper.Charts {
           if (freeChunks[freeChunks.length - 1] < 0) {
             freeChunks[freeChunks.length - 1] += this.endFree;
           }
-          freeChunks = _.map(_.filter(freeChunks, (c) => c < 0), (c) => -c);
+          freeChunks = _.map(
+            _.filter(freeChunks, (c) => c < 0),
+            (c) => Math.min(-c, maxWorkday)
+          );
         } else {
-          freeChunks = [24 * 60 * 60 - this.startFree - this.endFree];
+          freeChunks = [maxWorkday];
         }
 
         return <div className="time-blocks-container">{ _.map(freeChunks,
