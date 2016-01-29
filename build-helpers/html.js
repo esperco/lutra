@@ -5,7 +5,7 @@ var data = require("gulp-data"),
     deglob = require("./deglob"),
     gulp = require("gulp"),
     gutil = require("gulp-util"),
-    minify = require("gulp-minify-html"),
+    minify = require("gulp-htmlmin"),
     nunjucksRender = require("gulp-nunjucks-render"),
     production = require("./production"),
     rename = require("gulp-rename"),
@@ -49,7 +49,10 @@ module.exports = function(globs, out, context) {
     }));
 
   if (production.isSet()) {
-    ret = ret.pipe(minify());
+    ret = ret.pipe(minify({
+      collapseWhitespace: true,
+      conservativeCollapse: true
+    }));
   }
 
   /*

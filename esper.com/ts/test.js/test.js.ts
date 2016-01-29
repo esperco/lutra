@@ -19,7 +19,6 @@ declare module Esper {
   export var React: ReactStatic;
   export var ReactDOM: ReactDOMStatic;
   export var page: PageJS.Static;
-  export var twttr: Twitter;
   export var PRODUCTION: boolean;
 }
 
