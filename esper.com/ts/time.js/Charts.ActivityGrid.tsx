@@ -43,23 +43,27 @@ module Esper.Charts {
       if (stats && stats.scheduled.length) {
 
         // Count calc
-        var count = stats.scheduled.length / this.highestCount;
-        var countBg = Colors.lighten(Colors.yellow, 1-count);
+        var count = stats.scheduled.length;
+        var countPct = count / this.highestCount;
+        var countBg = Colors.lighten(Colors.yellow, 1 - countPct);
         var countStyle = {
           background: countBg,
           color: Colors.colorForText(countBg)
         };
 
         // Duration calc
-        var hours = _.sum(stats.scheduled) / this.longestTime;
-        var hoursBg = Colors.lighten(Colors.orange, 1-hours);
-        var hoursStyle = {
-          background: hoursBg,
-          color: Colors.colorForText(hoursBg)
+        var mins = _.sum(stats.scheduled);
+        var minsPct = mins / this.longestTime;
+        var minsBg = Colors.lighten(Colors.orange, 1 - minsPct);
+        var minsStyle = {
+          background: minsBg,
+          color: Colors.colorForText(minsBg)
         };
+        var hours = TimeStats.toHours(mins);
 
         // Fragmentation Calc
-        var frag = (stats.chunks.length - 1) / stats.scheduled.length;
+        var chunks = _.filter(stats.chunks, (c) => c > 0);
+        var frag = (chunks.length - 1) / count;
         if (frag < 0) { frag = 0; }
         var fragBg = Colors.lighten(Colors.red, 1-frag);
         var fragStyle = {
@@ -70,11 +74,11 @@ module Esper.Charts {
         return <div>
           <div className="event-count daily-metric" style={countStyle}>
             <span><i className="fa fa-fw fa-calendar-o" />{" "}
-            {stats.scheduled.length}{" "}Events</span>
+            {count}{" "}Event{count === 1 ? "" : "s"}</span>
           </div>
-          <div className="event-duration daily-metric" style={hoursStyle}>
+          <div className="event-duration daily-metric" style={minsStyle}>
             <span><i className="fa fa-fw fa-clock-o" />{" "}
-            {TimeStats.toHours(_.sum(stats.scheduled))}{" "}Hours</span>
+            {hours}{" "}Hour{hours === 1 ? "" : "s"}</span>
           </div>
           <div className="event-frag daily-metric" style={fragStyle}>
             <span><i className="fa fa-fw fa-qrcode" />{" "}

@@ -89,8 +89,9 @@ module Esper.Components {
 
         // Filter out presets that don't make sense given limits
         var maxMs: number;
-        if (opts.dateLimit) {
-          maxMs = moment.duration(opts.dateLimit).as('milliseconds');
+        var dateLimit = this.getDateLimit()
+        if (dateLimit) {
+          maxMs = moment.duration(dateLimit).as('milliseconds');
         }
 
         var minMs: number;
@@ -109,14 +110,18 @@ module Esper.Components {
           var minMs = moment.duration(m).as('milliseconds');
         }
 
-        var f: {[index: string]: [Date, Date]} = {};
-        _.each(presets, (v, k) => {
-          var length = moment(v[1]).diff(moment(v[0]));
-          if (length <= maxMs && length >= minMs) {
-            f[k] = v;
-          }
-        })
-        opts.ranges = f;
+        if (!_.isUndefined(minMs) && !_.isUndefined(maxMs)) {
+          var f: {[index: string]: [Date, Date]} = {};
+          _.each(presets, (v, k) => {
+            var length = moment(v[1]).diff(moment(v[0]));
+            if (length <= maxMs && length >= minMs) {
+              f[k] = v;
+            }
+          })
+          presets = f;
+        }
+
+        opts.ranges = presets;
       }
 
       var inputElm = $(this._input);
