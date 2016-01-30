@@ -10,8 +10,7 @@ setup: vendor
 
 vendor:
 	npm install
-	rm -f typings/tsd.d.ts
-	tsd reinstall -so
+	typings install
 
 # Remove derived files
 clean:
@@ -21,3 +20,4 @@ clean:
 	rm -rf otter
 	rm -rf zorilla
 	rm -rf marten
+	rm -rf typings
