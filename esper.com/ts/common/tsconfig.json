@@ -1,0 +1,8 @@
+{
+  "description": "Placeholder tsconfig so editor plugins recognize definitions",
+
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react"
+  }
+}

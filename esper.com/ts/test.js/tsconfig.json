@@ -5,8 +5,6 @@
     "outFile": "test.js"
   },
 
-  "files": [],
-
   "devFiles": [
     "test.js.ts",
     "../lib/Test.ts",

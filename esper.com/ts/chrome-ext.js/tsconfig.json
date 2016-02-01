@@ -4,7 +4,7 @@
     "outFile": "chrome-ext.js"
   },
 
-  "files": [
+  "anyFiles": [
     "chrome-ext.js.ts"
   ]
 }

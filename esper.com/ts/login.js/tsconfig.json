@@ -5,7 +5,7 @@
     "outFile": "login.js"
   },
 
-  "files": [
+  "anyFiles": [
     "login.js.tsx"
   ],
 

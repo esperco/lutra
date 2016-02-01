@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="../common/Login.Fake.ts" />

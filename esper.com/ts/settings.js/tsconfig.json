@@ -6,7 +6,7 @@
 
   "oblivion": true,
 
-  "files": [
+  "anyFiles": [
     "Esper.ts",
     "List.ts",
     "Deferred.ts",

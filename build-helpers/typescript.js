@@ -62,7 +62,7 @@ var build = function(globs, tsConfigPath, outDir) {
   }
 
   // Get entry points from config files
-  var files = config.files || [];
+  var files = config.anyFiles || [];
   if (production.isSet()) {
     files = files.concat(config.prodFiles || []);
   } else {

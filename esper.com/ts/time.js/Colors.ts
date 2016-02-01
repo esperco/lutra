@@ -2,8 +2,6 @@
   A module for assigning colors to labels
 */
 
-/// <reference path="../typings/lodash/lodash.d.ts" />
-
 module Esper.Colors {
 
   // Preset list of calendars -- these look pretty close to Google Calendar

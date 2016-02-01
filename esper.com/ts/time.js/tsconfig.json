@@ -5,7 +5,7 @@
     "outFile": "time.js"
   },
 
-  "files": [
+  "anyFiles": [
     "Main.ts"
   ],
 
@@ -14,7 +14,6 @@
     "Calendars.Test.ts",
     "DailyStats.Test.ts",
     "Partition.Test.ts",
-    "Route.Test.ts",
     "Teams.Test.ts",
     "TimeStats.Test.ts",
     "Views.Charts.Test.tsx",

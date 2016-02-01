@@ -1,6 +1,6 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="Route.tsx" />
+/// <reference path="./TestFixtures.ts" />
 
 module Esper.Route {
   // Helper for testing Layout.render's arguments vs. React components
