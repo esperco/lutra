@@ -23,7 +23,8 @@ var projects = {};
 var OBLIVION_BIN = "setup/bin/oblivion";
 
 /*
-  Gulp stream for compiling TypeScript. Supports using Oblivion.
+  Returns functions for building and compiling TypeScript projects.
+  Supports using Oblivion.
 
   tsConfigPaths: string[] - Paths to a config file (relative to CWD of
     gulpfile). Config file should be in the form of a tsconfig.json file with
@@ -41,16 +42,25 @@ var OBLIVION_BIN = "setup/bin/oblivion";
 module.exports = function(tsConfigPaths, commonGlobs, outDir) {
   'use strict';
 
-  return merge.apply(null,
-    _.map(tsConfigPaths, function(p) {
-      return build(p, commonGlobs, outDir);
-    })
-  );
+  var buildFns = _.map(tsConfigPaths, function(p) {
+    return function() { return buildOne(p, commonGlobs, outDir) };
+  });
+
+  var watchFns = _.map(tsConfigPaths, function(p) {
+    return watchOne(p, commonGlobs, outDir);
+  });
+
+  return {
+    build: gulp.parallel.apply(gulp, buildFns),
+    watch: gulp.parallel.apply(gulp, watchFns)
+  }
 }
 
 // Helper function for a single tsconfig.json file
-var build = function(tsConfigPath, commonGlobs, outDir) {
+var buildOne = function(tsConfigPath, commonGlobs, outDir) {
   'use strict';
+
+  console.log("Building " + tsConfigPath);
 
   var relPath = path.relative(__dirname, process.cwd());
   var config = require(path.join(relPath, tsConfigPath));
@@ -72,7 +82,6 @@ var build = function(tsConfigPath, commonGlobs, outDir) {
   var baseGlob = path.join(base, "**", "*.{ts,tsx}");
   var files = glob.sync(baseGlob);
 
-
   // Files are relative to tsconfig.json file. Adjust paths so they're
   // relative to cwd before processing
   function adjustPaths(f) {
@@ -80,20 +89,29 @@ var build = function(tsConfigPath, commonGlobs, outDir) {
     return path.relative(process.cwd(), f);
   }
 
-  // Remove + add dev / prod files as appropriate
-  var exclusions = production.isSet() ? config.devOnly : config.prodOnly;
-  exclusions = _.map(exclusions, adjustPaths);
+  /*
+    Prod => Exclude dev files and explicitly add prod files
+    Dev => Exclude prod files and explicitly add dev files
+    Explicit add necessary because we may want to add files outside
+      the tsconfig base dir on a one-off basis.
+  */
+  var devFiles = _.map(config.devOnly, adjustPaths);
+  var prodFiles = _.map(config.prodOnly, adjustPaths);
+  var exclusions = [];
+  if (production.isSet()) {
+    exclusions = devFiles;
+    files = prodFiles.concat(files);
+  } else {
+    exclusions = prodFiles;
+    files = devFiles.concat(files);
+  }
   _.remove(files, function(f) {
     return !!_.find(exclusions, function(e) {
       return minimatch(f, e);
     });
   });
 
-  // Concatenate entry points to globs to ensure more consistent ordering
-  var tsGlobs = files.concat(commonGlobs);
-  tsGlobs.push(baseGlob);
-
-  var ret = gulp.src(tsGlobs, { base: "." });
+  var ret = gulp.src(commonGlobs.concat(files), { base: "." });
 
   /*
     Oblivion is a custom JS/TS pre-processor that converts HTML-like code to
@@ -168,5 +186,19 @@ var build = function(tsConfigPath, commonGlobs, outDir) {
     ret = ret.pipe(sourcemaps.write());
   }
 
-  return ret.pipe(gulp.dest(outDir));
+  return ret.pipe(gulp.dest(outDir))
+    .on('end', function() { console.log(tsConfigPath, 'done'); });
+}
+
+// Watch a single tsConfigFile
+var watchOne = function(tsConfigPath, commonGlobs, outDir) {
+  'use strict';
+
+  var base = path.dirname(tsConfigPath);
+  var baseGlob = path.join(base, "**", "*.{ts,tsx}");
+  var tsGlobs = [baseGlob].concat(commonGlobs);
+
+  return watch(gulp)(tsGlobs, function() {
+    return buildOne(tsConfigPath, commonGlobs, outDir);
+  });
 }

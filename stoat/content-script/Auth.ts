@@ -143,6 +143,7 @@ module Esper.Auth {
           );
           break;
 
+
         /* Listen for request from the injected script at mail.google.com */
         case "CredentialsRequest":
           obtainCredentials(request.value, false);

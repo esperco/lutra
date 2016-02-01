@@ -19,6 +19,7 @@
     "../lib/JQStore.Test.ts",
     "../lib/Queue.Test.ts",
     "../lib/ReactHelpers.Test.ts",
+    "Integration.ts",
     "Integration.Login.ts",
     "Integration.Time.ts"
   ],

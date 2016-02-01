@@ -1,4 +1,5 @@
 "use strict";
+var _ = require("lodash");
 
 /*
   Short-hand for returning a function that creates a watcher based on an
@@ -11,14 +12,18 @@ function makeWatch(gulp) {
 
   /*
     globs: string[] - Globs to watch
-    task: string - Name of Gulp task
+    task: string|function - Name of Gulp task, or task itself
   */
   return function(globs, task) {
     return function() {
       // Set a var on this function so other code knows we're in watch mode
       makeWatch.watchMode = true;
 
-      return gulp.watch(globs, gulp.series(task));
+      if (! _.isFunction(task)) {
+        task = gulp.series(task);
+      }
+
+      return gulp.watch(globs, task);
     };
   };
 };

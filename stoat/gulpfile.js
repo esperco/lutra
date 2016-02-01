@@ -21,17 +21,6 @@ var config = {
   jsBundles: ["vendor.js"],
   jsOut: "pub/js",
 
-  // Used for watcher only -- typescript helper uses mix of tsConfig base dir
-  // plus tsCommonGlobs
-  tsGlobs: [
-    "common/**/*.{ts,tsx}",
-    "lib/**/*.{ts,tsx}",
-    "content-script/**/*.{ts,tsx}",
-    "event-page/**/*.{ts,tsx}",
-    "gcal-is/**/*.{ts,tsx}",
-    "gmail-is/**/*.{ts,tsx}",
-    "options-page/**/*.{ts,tsx}"
-  ],
   tsCommonGlobs: [
     "common/**/*.{ts,tsx}",
     "lib/**/*.{ts,tsx}"
@@ -60,13 +49,11 @@ gulp.task("build-less", function() {
 
 gulp.task("watch-less", watch(config.lessGlobs, "build-less"));
 
-gulp.task("build-ts", function() {
-  return helpers.typescript(config.tsProjects,
+var ts = helpers.typescript(config.tsProjects,
                             config.tsCommonGlobs,
                             config.jsOut);
-});
-
-gulp.task("watch-ts", watch(config.tsGlobs, "build-ts"));
+gulp.task("build-ts", ts.build);
+gulp.task("watch-ts", ts.watch);
 
 gulp.task("build-assets", function() {
   return helpers.assets(config.assetMap);
