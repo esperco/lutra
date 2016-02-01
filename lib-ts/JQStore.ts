@@ -4,8 +4,6 @@
   memory leaks.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-
 module Esper {
 
   // http://stackoverflow.com/a/10172676

@@ -3,7 +3,6 @@
   order to avoid race conditions).
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Log.ts" />
 
 module Esper.Queue {

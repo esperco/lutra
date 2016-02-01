@@ -2,7 +2,6 @@
   Generic Bootstrap modal wrapper
 */
 
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {

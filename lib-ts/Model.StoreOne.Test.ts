@@ -1,6 +1,5 @@
 /* Test StoreOne module */
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Model.StoreOne.ts"/>
 
 module Esper.Model {

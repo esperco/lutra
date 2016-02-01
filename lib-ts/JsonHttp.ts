@@ -5,8 +5,6 @@
   Assumes CryptoJS
 */
 
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Log.ts" />
 /// <reference path="./Util.ts" />
 

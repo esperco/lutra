@@ -2,7 +2,6 @@
   Module for rendering things (mostly React components) into our HTML page
 */
 
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Layout {

@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/ApiT.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="./DailyStats.ts" />

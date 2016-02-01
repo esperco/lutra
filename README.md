@@ -74,13 +74,13 @@ in `node_modules` (or via the symlink `vendor`).
 
 Typings
 -------
-TypeScript typings are installed via
-[TSD](https://github.com/DefinitelyTyped/tsd). To use, install TSD globally
-with `npm install tsd -g` or use the binary in the `node_modules/.bin`
-directory created after `make setup`.
+TypeScript typings are installed via the Typings definition manager.
+[Typings](https://github.com/typings/typings). To use, install Typings
+globally with `npm install typings -g` or use the binary in the
+`node_modules/.bin` directory created after `make setup`.
 
-Do not modify d.ts files in `typings` directory directly. Modify
-typings in https://github.com/esperco/DefinitelyTyped (`tsd.json` is set
-to pull definitions from there instead of the official DefinitelyTyped repo).
-This makes it easier for us to merge upstream later if we want to open-source
-our definitions.
+Do not modify d.ts files in the `typings` directory directly. Either modify
+typings in https://github.com/esperco/DefinitelyTyped (`typings.json` uses
+definitions from there instead of the official DefinitelyTyped repo), or
+fork or use definitions in a separate repo. This makes it easier for us to
+merge upstream later if we want to open-source our definitions.

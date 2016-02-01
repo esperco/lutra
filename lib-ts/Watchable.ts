@@ -139,7 +139,7 @@ module Esper.Watchable {
 
     unwatch(watcherId: string) {
       this.changeWatchers =
-        List.filter(this.changeWatchers, function(watcher) {
+        _.filter(this.changeWatchers, function(watcher) {
           return watcher.id !== watcherId;
         });
     }

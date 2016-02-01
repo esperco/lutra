@@ -3,8 +3,6 @@
   via a hidden iFrame.
 */
 
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Analytics.ts" />
 /// <reference path="./JQStore.ts" />
 

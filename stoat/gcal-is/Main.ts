@@ -4,11 +4,6 @@
   as required by gmail.js.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-
 /// <reference path="../lib/Log.ts" />
 /// <reference path="../lib/JsonHttp.ts" />
 /// <reference path="../lib/Api.ts" />
@@ -16,6 +11,7 @@
 /// <reference path="../lib/XDate.ts" />
 
 /// <reference path="../common/Esper.ts" />
+/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/List.ts" />

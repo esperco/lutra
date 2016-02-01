@@ -2,9 +2,5 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "outFile": "chrome-ext.js"
-  },
-
-  "files": [
-    "chrome-ext.js.ts"
-  ]
+  }
 }

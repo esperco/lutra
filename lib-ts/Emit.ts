@@ -3,8 +3,6 @@
   changes.
 */
 
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
 declare module Esper {
   export var EventEmitter: typeof EventEmitter3.EventEmitter;
 }

@@ -5,11 +5,7 @@
     "outFile": "login.js"
   },
 
-  "files": [
-    "login.js.tsx"
-  ],
-
-  "devFiles": [
+  "devOnly": [
     "../common/Login.Fake.ts"
   ]
 }

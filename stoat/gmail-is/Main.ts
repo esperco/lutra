@@ -11,6 +11,7 @@
 /// <reference path="../lib/XDate.ts" />
 
 /// <reference path="../common/Esper.ts" />
+/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/Analytics.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />

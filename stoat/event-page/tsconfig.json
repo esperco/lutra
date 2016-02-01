@@ -5,19 +5,6 @@
     "jsx": "react"
   },
 
-  "oblivion": true,
-
-  "files": [
-  ],
-
-  "devFiles": [
-    "../common/DevConf.ts",
-    "Main.ts"
-  ],
-
-  "prodFiles": [
-    "../common/ProdConf.ts",
-    "Main.ts"
-  ]
+  "oblivion": true
 }
 

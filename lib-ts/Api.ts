@@ -3,8 +3,6 @@
   in one module but less of a headache than keeping everything separate
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="./JsonHttp.ts" />
 /// <reference path="./ApiT.ts" />
 /// <reference path="./Login.ts" />

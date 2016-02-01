@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Emit.ts" />
 
 module Esper.Emit {

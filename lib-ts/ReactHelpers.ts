@@ -3,7 +3,6 @@
   being present.
 */
 
-/// <reference path="../typings/react/react-global.d.ts" />
 /// <reference path="./Emit.ts" />
 /// <reference path="./JQStore.ts" />
 /// <reference path="./Model.ts" />

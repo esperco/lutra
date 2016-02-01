@@ -1,6 +1,5 @@
 // Helpers for client-side router
 
-/// <reference path="../typings/page/page.d.ts" />
 /// <reference path="./Login.ts" />
 
 module Esper.Route {

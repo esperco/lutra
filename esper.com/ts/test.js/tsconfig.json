@@ -5,9 +5,7 @@
     "outFile": "test.js"
   },
 
-  "files": [],
-
-  "devFiles": [
+  "devOnly": [
     "test.js.ts",
     "../lib/Test.ts",
     "../lib/ApiC.Test.ts",
@@ -21,9 +19,10 @@
     "../lib/JQStore.Test.ts",
     "../lib/Queue.Test.ts",
     "../lib/ReactHelpers.Test.ts",
+    "Integration.ts",
     "Integration.Login.ts",
     "Integration.Time.ts"
   ],
 
-  "prodFiles": []
+  "prodOnly": []
 }

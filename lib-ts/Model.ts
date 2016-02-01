@@ -8,7 +8,6 @@
   the dispatcher so they're updated when Actions are dispatched.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Util.ts" />
 /// <reference path="./Emit.ts" />
 

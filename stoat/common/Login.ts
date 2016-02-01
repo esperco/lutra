@@ -1,4 +1,3 @@
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/ApiT.ts" />
 /// <reference path="../lib/Watchable.ts" />

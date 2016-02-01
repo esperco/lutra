@@ -1,3 +1,4 @@
+/// <reference path="../../../typings/browser.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Login.Oauth.ts" />
