@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./ApiC.ts" />
 module Esper.ApiC {
   var ApiTest = {

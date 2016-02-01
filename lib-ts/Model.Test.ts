@@ -1,6 +1,5 @@
 /* Test Model.Store */
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Model.ts"/>
 module Esper.Model {
 

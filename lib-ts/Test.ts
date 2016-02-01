@@ -3,10 +3,6 @@
   and React.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/react/react-global.d.ts" />
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="./Api.ts" />
 
 module Esper.Test {

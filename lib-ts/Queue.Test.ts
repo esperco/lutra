@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Queue.ts"/>
 module Esper.Queue {
   describe("Queue.enqueue", function() {

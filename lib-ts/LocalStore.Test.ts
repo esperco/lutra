@@ -1,6 +1,5 @@
 /* Test LocalStore */
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./LocalStore.ts"/>
 
 module Esper.LocalStore {

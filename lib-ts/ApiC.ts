@@ -2,7 +2,6 @@
   Caching for API calls
 */
 
-/// <reference path="../typings/lodash/lodash.d.ts" />
 /// <reference path="./Api.ts" />
 /// <reference path="./Model.Capped.ts" />
 /// <reference path="./Util.ts" />
