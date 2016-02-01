@@ -21,15 +21,20 @@ var config = {
   jsBundles: ["vendor.js"],
   jsOut: "pub/js",
 
+  // Used for watcher only -- typescript helper uses mix of tsConfig base dir
+  // plus tsCommonGlobs
   tsGlobs: [
     "common/**/*.{ts,tsx}",
     "lib/**/*.{ts,tsx}",
-    "typings/**/*.d.ts",
     "content-script/**/*.{ts,tsx}",
     "event-page/**/*.{ts,tsx}",
     "gcal-is/**/*.{ts,tsx}",
     "gmail-is/**/*.{ts,tsx}",
     "options-page/**/*.{ts,tsx}"
+  ],
+  tsCommonGlobs: [
+    "common/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}"
   ],
   tsProjects: [
     "content-script/tsconfig.json",
@@ -56,8 +61,8 @@ gulp.task("build-less", function() {
 gulp.task("watch-less", watch(config.lessGlobs, "build-less"));
 
 gulp.task("build-ts", function() {
-  return helpers.typescript(config.tsGlobs,
-                            config.tsProjects,
+  return helpers.typescript(config.tsProjects,
+                            config.tsCommonGlobs,
                             config.jsOut);
 });
 

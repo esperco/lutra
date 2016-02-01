@@ -4,7 +4,6 @@
   TODO: Refactor against ThreadState.Storage.ts.
 */
 
-/// <reference path="../typings/chrome/chrome.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/Message.ts" />

@@ -2,12 +2,8 @@
   Entry point for the options.js script
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
-
 /// <reference path="../common/Esper.ts" />
+/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/ExtensionOptions.ts" />
 /// <reference path="../common/ExtensionOptions.Storage.ts" />
 
