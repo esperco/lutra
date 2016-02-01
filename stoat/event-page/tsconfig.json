@@ -7,17 +7,12 @@
 
   "oblivion": true,
 
-  "files": [
+  "devOnly": [
+    "../common/DevConf.ts"
   ],
 
-  "devFiles": [
-    "../common/DevConf.ts",
-    "Main.ts"
-  ],
-
-  "prodFiles": [
-    "../common/ProdConf.ts",
-    "Main.ts"
+  "prodOnly": [
+    "../common/ProdConf.ts"
   ]
 }
 

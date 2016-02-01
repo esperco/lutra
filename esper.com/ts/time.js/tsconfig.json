@@ -5,11 +5,7 @@
     "outFile": "time.js"
   },
 
-  "anyFiles": [
-    "Main.ts"
-  ],
-
-  "devFiles": [
+  "devOnly": [
     "../common/JasmineStub.ts",
     "Calendars.Test.ts",
     "DailyStats.Test.ts",
@@ -20,7 +16,7 @@
     "Views.CalendarLabeling.Test.tsx"
   ],
 
-  "prodFiles": [
+  "prodOnly": [
 
   ]
 }

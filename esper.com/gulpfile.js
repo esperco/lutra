@@ -30,8 +30,14 @@ var config = {
 
   jasmineDir: "pub/jasmine",
 
+  // Used for watcher only -- typescript helper uses mix of tsConfig base dir
+  // plus tsCommonGlobs
   tsGlobs: [
     "ts/**/*.{ts,tsx}"
+  ],
+  tsCommonGlobs: [
+    "ts/common/**/*.{ts,tsx}",
+    "ts/lib/**/*.{ts,tsx}"
   ],
   tsProjects: [
     "ts/chrome-ext.js/tsconfig.json",
@@ -72,8 +78,8 @@ gulp.task("build-js", function() {
 gulp.task("watch-js", watch(config.jsGlobs, "build-js"));
 
 gulp.task("build-ts", function() {
-  return helpers.typescript(config.tsGlobs,
-                            config.tsProjects,
+  return helpers.typescript(config.tsProjects,
+                            config.tsCommonGlobs,
                             config.jsOut);
 });
 

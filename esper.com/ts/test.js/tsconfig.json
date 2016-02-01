@@ -5,7 +5,7 @@
     "outFile": "test.js"
   },
 
-  "devFiles": [
+  "devOnly": [
     "test.js.ts",
     "../lib/Test.ts",
     "../lib/ApiC.Test.ts",
@@ -23,5 +23,5 @@
     "Integration.Time.ts"
   ],
 
-  "prodFiles": []
+  "prodOnly": []
 }

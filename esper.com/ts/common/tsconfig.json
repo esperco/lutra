@@ -1,5 +1,5 @@
 {
-  "description": "Placeholder tsconfig so editor plugins recognize definitions",
+  "description": "Placeholder tsconfig so editor plugins recognize type defs",
 
   "compilerOptions": {
     "noImplicitAny": true,
