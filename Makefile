@@ -1,7 +1,7 @@
 .PHONY: default setup clean vendor
 default: setup
 
-# Put bower and tsd in path
+# Put tsc and typings in path
 export PATH := node_modules/.bin:$(PATH)
 
 # Fetch libraries
