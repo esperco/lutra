@@ -1,6 +1,7 @@
 google.maps.event.addDomListener(window, 'load', init);
-var map;
 function init() {
+  "use strict";
+
   var mapOptions = {
     center: new google.maps.LatLng(37.4870029,-122.2309239),
     zoom: 11,
@@ -79,10 +80,18 @@ function init() {
   }
   var mapElement = document.getElementById("esper-map");
   var map = new google.maps.Map(mapElement, mapOptions);
-  marker = new google.maps.Marker({
+
+  var markerOptions = {
     icon: '../img/marker.svg',
     position: new google.maps.LatLng(37.4870029,-122.2309239),
     clickable: false,
     map: map
-  });
+  }
+
+  // IE doesn't like SVG
+  if (navigator.userAgent.indexOf("Trident") >= 0) {
+    delete markerOptions.icon;
+  }
+
+  var marker = new google.maps.Marker(markerOptions);
 }
