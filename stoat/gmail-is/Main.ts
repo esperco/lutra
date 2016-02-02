@@ -7,6 +7,7 @@
 /// <reference path="../lib/Log.ts" />
 /// <reference path="../lib/JsonHttp.ts" />
 /// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Watchable.ts" />
 /// <reference path="../lib/XDate.ts" />
 
@@ -17,7 +18,6 @@
 /// <reference path="../common/Types.ts" />
 /// <reference path="../common/List.ts" />
 /// <reference path="../common/Lazy.ts" />
-/// <reference path="../common/Option.ts" />
 /// <reference path="../common/Team.ts" />
 /// <reference path="../common/EsperCache.ts" />
 /// <reference path="../common/Modal.ts" />
