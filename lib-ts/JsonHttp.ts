@@ -52,6 +52,16 @@ module Esper.JsonHttp {
       return s;
   }
 
+  /*
+    Used to determine whether an JSON error should be ignored
+  */
+  function ignoreError(xhr: JQueryXHR): boolean {
+    if (xhr.responseText.indexOf("Please log in with Google") >= 0) {
+      return true;
+    }
+    return false;
+  }
+
   /** Executes an http request using our standard authentication,
    *  logging and error handling. Can have a custom (ie non-JSON)
    *  content type.
@@ -118,7 +128,7 @@ module Esper.JsonHttp {
           connectivity or DNS issue. We should use a service like Pingdom
           to ensure our server is up rather than report to Sentry.
         */
-        if (details.code !== 0) {
+        if (details.code !== 0 && ! ignoreError(xhr)) {
           Raven.captureException(err, {
             extra: details
           });
