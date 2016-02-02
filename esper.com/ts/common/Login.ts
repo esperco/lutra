@@ -102,6 +102,7 @@ module Esper.Login {
 
     if (needApproval(loginInfo)) {
       goToLogin({error: "For security reasons, please log in again."});
+      return;
     } else {
       setLoginInfo(loginInfo);
       loginDeferred.resolve(loginInfo);
@@ -230,6 +231,7 @@ module Esper.Login {
       path += "?" + paramsStr.join("&");
     }
     location.href = path;
+    return;
   }
 
 

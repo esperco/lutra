@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "outFile": "settings.js"
   },
 

@@ -119,6 +119,7 @@ module Esper.JsonHttp {
         break;
       default: /* Fallback */
         Log.e("Unknown error " + xhr.status, details);
+        break;
       }
 
       // Sanity check since Raven isn't deployed on all front-end stuff yet

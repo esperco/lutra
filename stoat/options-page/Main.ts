@@ -33,6 +33,7 @@ module Esper.Main {
         break;
       default:
         elm.text("");
+        break;
     }
 
     var btn = $('#save-btn');
@@ -42,6 +43,7 @@ module Esper.Main {
         break;
       default:
         btn.prop("disabled", false);
+        break;
     }
   };
 

@@ -70,7 +70,7 @@ module Esper.Test {
   // Mock all APIs
   export function mockAPIs() {
     for (var name in Api) {
-      if (Api.hasOwnProperty(name) && name instanceof Function) {
+      if (Api.hasOwnProperty(name) && (<any> Api)[name] instanceof Function) {
         spyOn(Api, name).and.returnValue($.Deferred<any>().promise());
       }
     }

@@ -130,7 +130,7 @@ module Esper.Model {
     {
       return (arg instanceof Array &&
         arg.length === 2 &&
-        isMetadata(arg[1]));
+        !!isMetadata(arg[1]));
     }
   }
 

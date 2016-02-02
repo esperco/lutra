@@ -83,6 +83,7 @@ module Esper.TeamSettings {
         break;
       default:
         Analytics.page(Analytics.Page.TeamSettings);
+        break;
     }
   }
 

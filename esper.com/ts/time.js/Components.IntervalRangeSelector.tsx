@@ -105,6 +105,7 @@ module Esper.Components {
               break;
             default:
               m = {month: 1};
+              break;
           }
           var minMs = moment.duration(m).as('milliseconds');
         }
