@@ -7,6 +7,7 @@
 
 @esper-sign-in-icon-width: 50px;
 @esper-button-container-shift: 110%;
+@esper-sign-in-max-width: 300px;
 
 #esper-login-container {
   width: 350px;
@@ -70,8 +71,8 @@ button.sign-in-btn {
   width: 100%;
   padding-left: 0;
   padding-right: 0;
-  max-width: 300px;
-  margin: @padding-small-vertical;
+  max-width: @esper-sign-in-max-width;
+  margin: @padding-small-vertical @padding-xs-horizontal;
 
   #esper-login & {
     margin: @padding-large-vertical auto;
@@ -122,5 +123,12 @@ button.sign-in-btn {
   &.btn-primary {
     padding-top: @padding-large-vertical;
     padding-bottom: @padding-large-vertical;
+  }
+
+  // For "Other Provider" button on landing page
+  &.btn-tertiary {
+    @media (min-width: @screen-sm-min) {
+      max-width: @esper-sign-in-max-width * 2 + @padding-xs-horizontal * 3
+    }
   }
 }
