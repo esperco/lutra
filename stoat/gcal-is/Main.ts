@@ -7,6 +7,7 @@
 /// <reference path="../lib/Log.ts" />
 /// <reference path="../lib/JsonHttp.ts" />
 /// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Watchable.ts" />
 /// <reference path="../lib/XDate.ts" />
 
@@ -26,8 +27,6 @@
 /// <reference path="../common/ReminderView.ts" />
 /// <reference path="../common/Teams.ts" />
 /// <reference path="../common/Analytics.ts" />
-
-/// <reference path="../common/Option.ts" />
 /// <reference path="../common/Team.ts" />
 /// <reference path="../common/TaskList.ts" />
 /// <reference path="../common/Agenda.ts" />
