@@ -41,65 +41,11 @@ module Esper {
     }
 
     else if (uid) {
-      Login.loginOnce(uid)
-        .then(function(response) {
-          Login.setCredentials(response.uid, response.api_secret);
-          Login.setLoginInfo(response);
-          return response;
-        })
-
-        // Check if we need approval
-        .then(function(response) {
-          var dfd = $.Deferred<ApiT.LoginResponse>();
-          if (Login.needApproval(response)) {
-            Layout.renderModal(<Components.ApproveTeamsModal info={response}
-              callback={(info, rejected) => {
-                var teamIds = _.map(rejected, (t) => t.teamid);
-                Login.ignoreTeamIds(teamIds);
-                dfd.resolve(info);
-              }} />);
-            return dfd.promise();
-          }
-          return response;
-        })
-
-        .then(function(response) {
-          Login.storeCredentials(response);
-          return response;
-        })
-
-        // Store info, then make second call to Google if necessary
-        .then(function(response) {
-          if (Login.usesGoogle(response)) {
-            return Login.checkGooglePermissions(getLandingUrl())
-              .then(function(ok) {
-                return response;
-              });
-          }
-          return response;
-        })
-
-        .then(function(response) {
-          redirect(response);
-        }, function(err) {
-          var errMsg = "There was an error logging you in."
-          if (err === Login.MISSING_NONCE) {
-            errMsg += (" If you are using Safari, please try using a " +
-              "different browser. If you are in Incognito or Private Mode, " +
-              "please try disabling it.");
-          }
-          renderLogin("", errMsg);
-        });
+      handleLoginInfo(Login.loginOnce(uid));
     }
 
     else if (token) {
-      Token.handle(token)
-        .done(function(msg: string) {
-          renderLogin(msg)
-        })
-        .fail(function(err: string) {
-          renderLogin("", err);
-        });
+      Token.handle(token, handleLoginInfo, renderLogin);
     }
 
     else {
@@ -170,6 +116,58 @@ module Esper {
          }</div>
       </Components.LoginPrompt>
     </div>);
+  }
+
+  function handleLoginInfo(response: JQueryPromise<ApiT.LoginResponse>) {
+    response
+    .then(function(response) {
+      Login.setCredentials(response.uid, response.api_secret);
+      Login.setLoginInfo(response);
+      return response;
+    })
+
+    // Check if we need approval
+    .then(function(response) {
+      var dfd = $.Deferred<ApiT.LoginResponse>();
+      if (Login.needApproval(response)) {
+        Layout.renderModal(<Components.ApproveTeamsModal info={response}
+          callback={(info, rejected) => {
+            var teamIds = _.map(rejected, (t) => t.teamid);
+            Login.ignoreTeamIds(teamIds);
+            dfd.resolve(info);
+          }} />);
+        return dfd.promise();
+      }
+      return response;
+    })
+
+    .then(function(response) {
+      Login.storeCredentials(response);
+      return response;
+    })
+
+    // Store info, then make second call to Google if necessary
+    .then(function(response) {
+      if (Login.usesGoogle(response)) {
+        return Login.checkGooglePermissions(getLandingUrl())
+          .then(function(ok) {
+            return response;
+          });
+      }
+      return response;
+    })
+
+    .then(function(response) {
+      redirect(response);
+    }, function(err) {
+      var errMsg = "There was an error logging you in."
+      if (err === Login.MISSING_NONCE) {
+        errMsg += (" If you are using Safari, please try using a " +
+          "different browser. If you are in Incognito or Private Mode, " +
+          "please try disabling it.");
+      }
+      renderLogin("", errMsg);
+    });
   }
 }
 

@@ -10,7 +10,9 @@
 module Esper.Token {
 
   // Processes a token, returns a promise that resolves with a message
-  export function handle(token: string) {
+  export function handle(token: string,
+      handleLoginInfo: (response: JQueryPromise<ApiT.LoginResponse>) => void,
+      renderLogin: (message?: string, error?: string) => void) {
     return Api.postToken(token)
       .then(function(info: ApiT.TokenInfo) {
         if (! info.token_is_valid) {
@@ -21,11 +23,18 @@ module Esper.Token {
           var x = info.token_value;
           switch (Variant.tag(x)) {
           case "Unsub_daily_agenda":
-            return "You've been unsubscribed from these emails.";
+            renderLogin("You've been unsubscribed from these emails.");
+            break;
           case "Unsub_tasks_update":
-            return "You've been unsubscribed from these emails.";
+            renderLogin("You've been unsubscribed from these emails.");
+            break;
           case "Unsub_label_reminder":
-            return "You've been unsubscribed from these emails.";
+            renderLogin("You've been unsubscribed from these emails.");
+            break;
+          case "Login":
+            var loginInfo: ApiT.LoginResponse = Variant.value(x);
+            handleLoginInfo($.Deferred().resolve(loginInfo));
+            break;
 
           /* Other cases are either obsolete or not supported yet */
           default:
@@ -36,7 +45,7 @@ module Esper.Token {
       }, function() {
         /* Possibly a 404 because the token was already consumed */
         Log.e("HTTP error with token " + token);
-        return "That link is no longer valid.";
+        renderLogin("", "That link is no longer valid.");
       });
   }
 }
