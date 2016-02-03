@@ -379,8 +379,7 @@ module Esper.EventControls {
         cancel.click(close);
 
         CurrentThread.taskPrefs
-          .then(Option.unwrap<ApiT.TaskPreferences>
-            ("taskPrefs (in displayLinkedEventsList)"))
+          .then(Option.unwrap<ApiT.TaskPreferences>)
           .done(function(tpref) {
             var calTimezone = calendar.calendar_timezone;
             var prefs = Teams.getTeamPreferences(team);

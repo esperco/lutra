@@ -21,6 +21,7 @@
     "../lib/Model.StoreOne.Test.ts",
     "../lib/Model.Batch.Test.ts",
     "../lib/JQStore.Test.ts",
+    "../lib/Option.Test.ts",
     "../lib/Queue.Test.ts",
     "../lib/ReactHelpers.Test.ts",
     "Integration.ts",

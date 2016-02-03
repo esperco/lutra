@@ -62,8 +62,7 @@ module Esper.TaskTab {
       taskTab.linkedEventsList.append(noEvents);
     } else {
       CurrentThread.taskPrefs
-        .then(Option.unwrap<ApiT.TaskPreferences>
-              ("taskPrefs (in displayLinkedEventsList)"))
+        .then(Option.unwrap<ApiT.TaskPreferences>)
         .done(function(tpref) {
           var i = 0;
           var last = false;

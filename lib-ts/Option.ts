@@ -25,7 +25,7 @@ module Esper.Option {
     }
 
     /* Extract the value or fail by raising an exception indicating a bug. */
-    unwrap(name: string): E {
+    unwrap(): E {
       if (this.some) {
         return this.value;
       } else {
@@ -58,7 +58,10 @@ module Esper.Option {
   }
 
   /** Wraps a potentially null value into an Option. It's Option.none
-   *  if the value is null or undefined.
+   *  if the value is null or undefined. If value is already an Option,
+   *  returns value as is (this is useful if you want to wrap a return value
+   *  from a function as an Option and that function is later updated to
+   *  return an Option directly.)
    */
   export function wrap<E>(x : E) : T<E> {
     if (x === null || x === undefined) {
@@ -68,13 +71,18 @@ module Esper.Option {
     }
   }
 
-  /** For function composition and general interface consistency, curried */
-  export function unwrap<E>(name: string): { (opt: T<E>) : E } {
-    return function(opt) { return opt.unwrap(name); }
+  /** Like Option.wrap, but if value is already an Option, returns value as is
+   *  (this is useful if you want to wrap a return value from a function as an
+   *  Option and that function is later updated to return an Option directly).
+   */
+  export function cast<E>(x : E|T<E>) : T<E> {
+    if (x instanceof T) {
+      return x;
+    }
+    return wrap(<E> x);
   }
 
-  /** Uncurried version */
-  export function unwrap2<E>(name: string, opt: T<E>) : E {
-    return opt.unwrap(name);
+  export function unwrap<E>(opt: T<E>) : E {
+    return opt.unwrap();
   }
 }

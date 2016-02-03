@@ -1083,8 +1083,7 @@ module Esper.CalPicker {
       .then(function(task) {
         showSpinner = false;  // See below
         CurrentThread.taskPrefs
-          .then(Option.unwrap<ApiT.TaskPreferences>(
-            "taskPrefs (in createInline)"))
+          .then(Option.unwrap<ApiT.TaskPreferences>)
           .done(function(tpref) {
             createInlineSync(task, threadId, tpref);
           });
