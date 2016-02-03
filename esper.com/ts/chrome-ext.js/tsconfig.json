@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "outFile": "chrome-ext.js"
   }
 }

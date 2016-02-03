@@ -2,6 +2,11 @@
   "name": "lutra",
   "version": "0.1.0",
   "description": "Front-end repo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esperco/lutra.git"
+  },
+  "license": "All Rights Reserved",
   "devDependencies": {
     "browserify": "^11.0.1",
     "del": "^1.2.0",
@@ -28,7 +33,7 @@
     "merge-stream": "^1.0.0",
     "minimatch": "^3.0.0",
     "sync-exec": "^0.6.2",
-    "typescript": "~1.7.5",
+    "typescript": "^1.8.0",
     "typings": "^0.6.3",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",

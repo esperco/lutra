@@ -22,17 +22,15 @@ module Esper.Token {
           switch (Variant.tag(x)) {
           case "Unsub_daily_agenda":
             return "You've been unsubscribed from these emails.";
-            break;
           case "Unsub_tasks_update":
             return "You've been unsubscribed from these emails.";
-            break;
           case "Unsub_label_reminder":
             return "You've been unsubscribed from these emails.";
-            break;
 
           /* Other cases are either obsolete or not supported yet */
           default:
             Log.e("Case not supported: " + Variant.tag(x));
+            break;
           }
         }
       }, function() {

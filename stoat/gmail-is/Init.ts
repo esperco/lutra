@@ -121,6 +121,7 @@ module Esper.Init {
           if (! isIgnored) {
             Log.e("Unknown request type: " + request.type);
           }
+          break;
         }
       }
     });

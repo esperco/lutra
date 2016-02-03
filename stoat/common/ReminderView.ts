@@ -204,7 +204,6 @@ This is a friendly reminder that you are scheduled for |event|. The details are 
         } else {
           return false;
         }
-        if (onFinish !== undefined) onFinish();
       },
       "Set reminder");
     $("body").append(dialog.view);
