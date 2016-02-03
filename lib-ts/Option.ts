@@ -82,7 +82,13 @@ module Esper.Option {
     return wrap(<E> x);
   }
 
-  export function unwrap<E>(opt: T<E>) : E {
+  /** For function composition and general interface consistency, curried */
+  export function unwrap<E>(): { (opt: T<E>) : E } {
+    return function(opt) { return opt.unwrap(); }
+  }
+
+  /** Uncurried version */
+  export function unwrap2<E>(opt: T<E>) : E {
     return opt.unwrap();
   }
 }

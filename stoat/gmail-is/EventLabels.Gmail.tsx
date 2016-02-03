@@ -57,7 +57,7 @@ module Esper.EventLabels {
 
     getState() {
       return {
-        team: CurrentThread.currentTeam.get().unwrap(""),
+        team: CurrentThread.currentTeam.get().unwrap(),
         events: _.map(CurrentThread.linkedEvents.get(),
           (ev) => ev.task_event
         )

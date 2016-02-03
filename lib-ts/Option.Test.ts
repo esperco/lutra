@@ -24,7 +24,7 @@ module Esper.Option {
       });
 
       it("can be unwrapped", function() {
-        expect(Option.unwrap(this.option)).toEqual({x: 5, y: 6});
+        expect(this.option.unwrap()).toEqual({x: 5, y: 6});
       });
 
       it("should allow monadic bind via flatMap", function() {
@@ -52,7 +52,7 @@ module Esper.Option {
 
       it("should throw an error when unwrapped", function() {
         expect(function() {
-          Option.unwrap(this.option)
+          this.option.unwrap();
         }).toThrowError();
       });
 
