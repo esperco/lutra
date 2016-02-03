@@ -19,6 +19,7 @@ module Esper {
     var error = Util.getParamByName(Login.errorParam);
     var extLogin = Util.getParamByName(Login.extParam);
     var token = Util.getParamByName(Login.tokenParam);
+    var platform = Util.getParamByName(Login.platformParam).toLowerCase();
     var email = getEmail();
 
     if (Util.getParamByName(Login.logoutParam)) {
@@ -36,6 +37,26 @@ module Esper {
         });
       } else {
         Log.e("Extension login requires e-mail address");
+        renderLogin(message, error);
+      }
+    }
+
+    else if (platform === "google") {
+      Login.loginWithGoogle({
+        landingUrl: getLandingUrl(),
+        email: email,
+        inviteCode: getInviteCode()
+      });
+    }
+
+    else if (platform) {
+      if (email) {
+        Login.loginWithNylas({
+          landingUrl: getLandingUrl(),
+          email: email,
+          inviteCode: getInviteCode()
+        });
+      } else {
         renderLogin(message, error);
       }
     }
@@ -93,11 +114,13 @@ module Esper {
 
   function renderLogin(message?: string, error?: string) {
     var ext = Util.getParamByName(Login.extParam);
+    var platform = Util.getParamByName(Login.platformParam);
     Layout.render(<div id="esper-login-container">
       <Components.LoginPrompt
         landingUrl={getLandingUrl()}
         inviteCode={getInviteCode()}
         email={getEmail()}
+        platform={platform}
         showGoogle={true}
         showExchange={!ext}
         showNylas={!ext}>

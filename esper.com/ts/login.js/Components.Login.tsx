@@ -24,6 +24,9 @@ module Esper.Components {
     // Redirect after login
     landingUrl?: string;
 
+    // Platform
+    platform?: string; // Google / Exchange / Nylas
+
     // Variables passed along to handle token issues or login prompt
     inviteCode?: string;
     email?: string;
@@ -42,8 +45,17 @@ module Esper.Components {
     constructor(props: LoginProps) {
       super(props);
       this.state = {
+        showNylasInput: (
+          this.props.platform === "exchange" ||
+          this.props.platform === "nylas"),
         busy: false
       };
+
+      if (this.state.showNylasInput) {
+        window.requestAnimationFrame(() => {
+          $(this._nylasInput).focus();
+        });
+      }
     }
 
     render() {
