@@ -1,4 +1,3 @@
-/// <reference path="../typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="./Util.ts" />
 
 declare module Esper {

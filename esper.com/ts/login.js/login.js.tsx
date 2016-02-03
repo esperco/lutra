@@ -1,3 +1,4 @@
+/// <reference path="../../../typings/browser.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Login.Oauth.ts" />
@@ -86,7 +87,6 @@ module Esper {
             errMsg += (" If you are using Safari, please try using a " +
               "different browser. If you are in Incognito or Private Mode, " +
               "please try disabling it.");
-            Log.e("Missing nonce");
           }
           renderLogin("", errMsg);
         });

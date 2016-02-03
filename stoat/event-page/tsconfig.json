@@ -1,23 +1,14 @@
 {
   "compilerOptions": {
     "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "outFile": "event-page.js",
     "jsx": "react"
   },
 
-  "oblivion": true,
-
-  "files": [
-  ],
-
-  "devFiles": [
-    "../common/DevConf.ts",
-    "Main.ts"
-  ],
-
-  "prodFiles": [
-    "../common/ProdConf.ts",
-    "Main.ts"
-  ]
+  "oblivion": true
 }
 

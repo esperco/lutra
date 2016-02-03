@@ -2,7 +2,6 @@
   Displays login info or link to login via Otter
 */
 
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Invite.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />

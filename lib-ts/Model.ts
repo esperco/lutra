@@ -8,7 +8,6 @@
   the dispatcher so they're updated when Actions are dispatched.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Util.ts" />
 /// <reference path="./Emit.ts" />
 
@@ -131,7 +130,7 @@ module Esper.Model {
     {
       return (arg instanceof Array &&
         arg.length === 2 &&
-        isMetadata(arg[1]));
+        !!isMetadata(arg[1]));
     }
   }
 

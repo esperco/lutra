@@ -83,14 +83,12 @@ module Esper.CurrentThread {
       threadId.set(newThreadId);
       setTask(null);
       setTeam(Option.none<ApiT.Team>());
-      GroupScheduling.clear();
     } else {
       findTeam(newThreadId).done(function (newTeam) {
         if (newThreadId === readThreadId()) {
           setTeam(newTeam);
           refreshTaskForThread(false, newThreadId).always(function () {
             if (newThreadId === readThreadId()) {
-              GroupScheduling.reset();
               threadId.set(newThreadId);
             }
           });

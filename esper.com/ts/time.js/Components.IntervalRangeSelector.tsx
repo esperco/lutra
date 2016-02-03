@@ -2,7 +2,6 @@
   Interface for selecting date and time ranges
 */
 
-/// <reference path="../typings/bootstrap-daterangepicker/bootstrap-daterangepicker.d.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./TimeStats.ts" />
@@ -106,6 +105,7 @@ module Esper.Components {
               break;
             default:
               m = {month: 1};
+              break;
           }
           var minMs = moment.duration(m).as('milliseconds');
         }

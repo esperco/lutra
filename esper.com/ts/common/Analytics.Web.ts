@@ -4,8 +4,6 @@
   or global scope.
 */
 
-/// <reference path="../typings/moment/moment.d.ts" />
-/// <reference path="../typings/segment-analytics/segment-analytics.d.ts" />
 /// <reference path="../lib/Analytics.ts" />
 /// <reference path="../lib/Login.ts" />
 /// <reference path="../lib/ApiT.ts" />

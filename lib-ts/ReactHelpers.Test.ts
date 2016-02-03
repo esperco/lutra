@@ -3,7 +3,6 @@
   being present.
 */
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Model.StoreOne.ts" />
 /// <reference path="./Test.ts" />

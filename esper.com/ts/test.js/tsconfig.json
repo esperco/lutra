@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "jsx": "react",
     "outFile": "test.js"
   },
 
-  "files": [],
-
-  "devFiles": [
+  "devOnly": [
     "test.js.ts",
     "../lib/Test.ts",
     "../lib/ApiC.Test.ts",
@@ -19,11 +21,13 @@
     "../lib/Model.StoreOne.Test.ts",
     "../lib/Model.Batch.Test.ts",
     "../lib/JQStore.Test.ts",
+    "../lib/Option.Test.ts",
     "../lib/Queue.Test.ts",
     "../lib/ReactHelpers.Test.ts",
+    "Integration.ts",
     "Integration.Login.ts",
     "Integration.Time.ts"
   ],
 
-  "prodFiles": []
+  "prodOnly": []
 }

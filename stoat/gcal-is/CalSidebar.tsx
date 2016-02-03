@@ -2,7 +2,6 @@
   Calendar sidebar (differs a bit from Gmail sidebar)
 */
 
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/JQStore.ts" />

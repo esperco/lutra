@@ -5,17 +5,12 @@
     https://developer.chrome.com/extensions/content_scripts
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/jqueryui/jqueryui.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../typings/quill/quill.d.ts" />
-
 /// <reference path="../lib/Log.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 
 /// <reference path="../common/Analytics.ts" />
+/// <reference path="../common/Conf.ts" />
 /// <reference path="../common/Esper.ts" />
 /// <reference path="../common/HostUrl.ts" />
 /// <reference path="../common/Types.ts" />

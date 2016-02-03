@@ -5,8 +5,6 @@
   Assumes CryptoJS
 */
 
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../typings/jquery/jquery.d.ts" />
 /// <reference path="./Log.ts" />
 /// <reference path="./Util.ts" />
 
@@ -52,6 +50,16 @@ module Esper.JsonHttp {
       return s.slice(0, maxLength) + " ...";
     else
       return s;
+  }
+
+  /*
+    Used to determine whether an JSON error should be ignored
+  */
+  function ignoreError(xhr: JQueryXHR): boolean {
+    if (xhr.responseText.indexOf("Please log in with Google") >= 0) {
+      return true;
+    }
+    return false;
   }
 
   /** Executes an http request using our standard authentication,
@@ -111,6 +119,7 @@ module Esper.JsonHttp {
         break;
       default: /* Fallback */
         Log.e("Unknown error " + xhr.status, details);
+        break;
       }
 
       // Sanity check since Raven isn't deployed on all front-end stuff yet
@@ -120,7 +129,7 @@ module Esper.JsonHttp {
           connectivity or DNS issue. We should use a service like Pingdom
           to ensure our server is up rather than report to Sentry.
         */
-        if (details.code !== 0) {
+        if (details.code !== 0 && ! ignoreError(xhr)) {
           Raven.captureException(err, {
             extra: details
           });

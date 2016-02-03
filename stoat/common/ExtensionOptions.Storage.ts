@@ -5,8 +5,6 @@
 
 /// <reference path="./ExtensionOptions.ts" />
 /// <reference path="./Message.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/chrome/chrome.d.ts" />
 
 module Esper.ExtensionOptions {
 

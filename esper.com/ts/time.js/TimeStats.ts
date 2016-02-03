@@ -39,6 +39,7 @@ module Esper.TimeStats {
         break;
       default:
         intervalDuration = {months: MAX_INTERVALS};
+        break;
     }
 
     var maxMs = moment.duration(MAX_TIME).as('milliseconds');
@@ -331,6 +332,7 @@ module Esper.TimeStats {
       default:
         typeLabel = "Week Starting";
         startFormat = "MMM D";
+        break;
     }
     var groupLabels = _.map(stats,
       // MMM d => Oct 4

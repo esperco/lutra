@@ -1,4 +1,3 @@
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="./Calendars.ts" />
 module Esper.Calendars {
   describe("defaultSelection", function() {

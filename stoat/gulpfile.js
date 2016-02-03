@@ -21,15 +21,9 @@ var config = {
   jsBundles: ["vendor.js"],
   jsOut: "pub/js",
 
-  tsGlobs: [
+  tsCommonGlobs: [
     "common/**/*.{ts,tsx}",
-    "lib/**/*.{ts,tsx}",
-    "typings/**/*.d.ts",
-    "content-script/**/*.{ts,tsx}",
-    "event-page/**/*.{ts,tsx}",
-    "gcal-is/**/*.{ts,tsx}",
-    "gmail-is/**/*.{ts,tsx}",
-    "options-page/**/*.{ts,tsx}"
+    "lib/**/*.{ts,tsx}"
   ],
   tsProjects: [
     "content-script/tsconfig.json",
@@ -55,13 +49,11 @@ gulp.task("build-less", function() {
 
 gulp.task("watch-less", watch(config.lessGlobs, "build-less"));
 
-gulp.task("build-ts", function() {
-  return helpers.typescript(config.tsGlobs,
-                            config.tsProjects,
+var ts = helpers.typescript(config.tsProjects,
+                            config.tsCommonGlobs,
                             config.jsOut);
-});
-
-gulp.task("watch-ts", watch(config.tsGlobs, "build-ts"));
+gulp.task("build-ts", ts.build);
+gulp.task("watch-ts", ts.watch);
 
 gulp.task("build-assets", function() {
   return helpers.assets(config.assetMap);

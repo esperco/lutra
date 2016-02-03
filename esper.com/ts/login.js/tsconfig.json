@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "jsx": "react",
     "outFile": "login.js"
   },
 
-  "files": [
-    "login.js.tsx"
-  ],
-
-  "devFiles": [
+  "devOnly": [
     "../common/Login.Fake.ts"
   ]
 }

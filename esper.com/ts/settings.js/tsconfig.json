@@ -1,50 +1,21 @@
 {
   "compilerOptions": {
     "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "outFile": "settings.js"
   },
 
   "oblivion": true,
 
-  "files": [
-    "Esper.ts",
-    "List.ts",
-    "Deferred.ts",
-    "Promise.ts",
-    "Util.ts",
-    "GmailCompose.ts",
-    "Pay.ts",
-    "Status.ts",
-    "Cache.ts",
-    "Svg.ts",
-    "Show.ts",
-    "ParseUrl.ts",
-    "CalPicker.ts",
-    "Settings.ts",
-    "Footer.ts",
-    "TeamSettings.ts",
-    "Plan.ts",
-    "AccountTab.ts",
-    "Preferences.ts",
-    "PreferencesTab.ts",
-    "WorkflowsTab.ts",
-    "CalendarsTab.ts",
-    "LabelsTab.ts",
-    "AboutTab.ts",
-    "TemplateTab.ts",
-    "Page.ts",
-    "Route.ts",
-    "Main.ts"
+  "devOnly": [
+    "DevConf.ts"
   ],
 
-  "devFiles": [
-    "DevConf.ts",
-    "Test.ts"
-  ],
-
-  "prodFiles": [
-    "ProdConf.ts",
-    "Test.ts"
+  "prodOnly": [
+    "ProdConf.ts"
   ]
 }
 

@@ -1,6 +1,6 @@
 /* Define external libs used by test.js */
 
-/// <reference path="../typings/tsd.d.ts"/>
+/// <reference path="../../../typings/browser.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;
@@ -19,7 +19,6 @@ declare module Esper {
   export var React: ReactStatic;
   export var ReactDOM: ReactDOMStatic;
   export var page: PageJS.Static;
-  export var twttr: Twitter;
   export var PRODUCTION: boolean;
 }
 

@@ -2,7 +2,6 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
-/// <reference path="../typings/ravenjs/ravenjs.d.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Login.ts" />
@@ -103,6 +102,7 @@ module Esper.Login {
 
     if (needApproval(loginInfo)) {
       goToLogin({error: "For security reasons, please log in again."});
+      return;
     } else {
       setLoginInfo(loginInfo);
       loginDeferred.resolve(loginInfo);
@@ -231,6 +231,7 @@ module Esper.Login {
       path += "?" + paramsStr.join("&");
     }
     location.href = path;
+    return;
   }
 
 

@@ -1,6 +1,5 @@
 // Integration test helpers
 
-/// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Login.ts" />
 

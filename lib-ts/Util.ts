@@ -1,5 +1,3 @@
-/// <reference path="../typings/lodash/lodash.d.ts" />
-
 module Esper.Util {
   // Return a random alphanumeric string
   export function randomString() {

@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
     "jsx": "react",
     "outFile": "time.js"
   },
 
-  "files": [
-    "Main.ts"
-  ],
-
-  "devFiles": [
+  "devOnly": [
     "../common/JasmineStub.ts",
     "Calendars.Test.ts",
     "DailyStats.Test.ts",
@@ -21,7 +21,7 @@
     "Views.CalendarLabeling.Test.tsx"
   ],
 
-  "prodFiles": [
+  "prodOnly": [
 
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "description": "Placeholder tsconfig so editor plugins recognize defs",
+
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react"
+  }
+}

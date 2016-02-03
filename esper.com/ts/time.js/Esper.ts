@@ -1,14 +1,4 @@
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../typings/fullCalendar/fullCalendar.d.ts" />
-/// <reference path="../typings/highcharts/highcharts.d.ts" />
-/// <reference path="../typings/moment/moment.d.ts" />
-/// <reference path="../typings/moment-timezone/moment-timezone.d.ts" />
-/// <reference path="../typings/page/page.d.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/eventemitter3/eventemitter3.d.ts" />
-/// <reference path="../typings/react/react-global.d.ts" />
+/// <reference path="../../../typings/browser.d.ts" />
 
 // React is a namespace, so we need a way to refer to its type
 type ReactStatic = typeof React;

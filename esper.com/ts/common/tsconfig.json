@@ -1,14 +1,12 @@
 {
+  "description": "Placeholder tsconfig so editor plugins recognize type defs",
+
   "compilerOptions": {
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noImplicitReturns": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,
-    "outFile": "gcal-is.js",
     "jsx": "react"
-  },
-
-  "oblivion": true
+  }
 }
-

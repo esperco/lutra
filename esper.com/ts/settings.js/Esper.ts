@@ -4,15 +4,7 @@
   Esper module.
 */
 
-/// <reference path="../typings/jquery/jquery.d.ts" />
-/// <reference path="../typings/bootstrap/bootstrap.d.ts" />
-/// <reference path="../typings/cryptojs/cryptojs.d.ts" />
-/// <reference path="../typings/moment/moment.d.ts" />
-/// <reference path="../typings/moment-timezone/moment-timezone.d.ts" />
-/// <reference path="../typings/fullCalendar/fullCalendar.d.ts" />
-/// <reference path="../typings/page/page.d.ts" />
-/// <reference path="../typings/lodash/lodash.d.ts" />
-/// <reference path="../typings/quill/quill.d.ts" />
+/// <reference path="../../../typings/browser.d.ts" />
 
 declare module Esper {
   export var _: _.LoDashStatic;
