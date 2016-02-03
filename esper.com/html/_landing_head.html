@@ -1,8 +1,6 @@
 {# Default head data for landing page #}
 <meta name="viewport" content="width=device-width, initial-scale=1">
-{% if PRODUCTION %}
-<script src="//cdn.optimizely.com/js/4655540192.js"></script>
-{% endif %}
+{% include "_optimizely.html" %}
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
 <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css">
