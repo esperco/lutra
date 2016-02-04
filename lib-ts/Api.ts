@@ -334,7 +334,7 @@ module Esper.Api {
   /***** Team label syncing *****/
 
   export function getSyncedLabels(teamid: string):
-    JQueryPromise<ApiT.EmailLabels> {
+    JQueryPromise<ApiT.Labels> {
     var url = prefix + "/api/labels/synced/" + string(teamid);
     return JsonHttp.get(url);
   }
@@ -657,6 +657,32 @@ module Esper.Api {
   {
     var url = prefix + "/api/calendar/daily-stats/" + string(Login.myUid());
     return JsonHttp.post(url, JSON.stringify(q));
+  }
+
+  export function postEventFeedback(teamid: string, eventid: string,
+    action: string): JQueryPromise<ApiT.Labels>
+  {
+    var url = prefix + "/api/event/feedback/" + string(Login.myUid())
+            + "/" + string(teamid)
+            + "/" + string(eventid)
+            + "/" + encodeURIComponent(action);
+    return JsonHttp.post(url, "");
+  }
+
+  export function postStartEventFeedbacks(teamid: string, calid: string):
+  JQueryPromise<void> {
+    var url = prefix + "/api/calendar/ask-feedbacks/" + string(Login.myUid())
+            + "/" + string(teamid)
+            + "/" + string(calid);
+    return JsonHttp.post(url, "");
+  }
+
+  export function postStopEventFeedbacks(teamid: string, calid: string):
+  JQueryPromise<void> {
+    var url = prefix + "/api/calendar/stop-feedbacks/" + string(Login.myUid())
+            + "/" + string(teamid)
+            + "/" + string(calid);
+    return JsonHttp.post(url, "");
   }
 
   export function postCalendarShow(teamid: string,

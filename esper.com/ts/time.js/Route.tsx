@@ -76,6 +76,16 @@ module Esper.Route {
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
+  // TODO: Select event and perform labeling action
+  // Use ApiT.postEventFeedback() to record the action.
+  route("/calendar-labeling/:eventid/:action", function(ctx) {
+    render(<Views.CalendarLabeling />,
+      undefined,
+      <Components.Footer hoverable={true} />
+    );
+    Analytics.page(Analytics.Page.CalendarLabeling);
+  });
+
   // Onboarding steps
   route("/onboarding/start", function() {
     render(
