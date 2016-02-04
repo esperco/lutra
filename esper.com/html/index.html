@@ -6,16 +6,41 @@
   <div class="splash-text-container" align="center">
     <div class="splash-text" style="padding-bottom: 30px">
       <h1 style="padding-bottom: 30px"><b>Make time great again.</b></h1>
-      <h2 class="splash-text-subheader" style="font-size:24px">
-      View your calendar breakdown. Get actionable insights.</h2>
+      <h2 class="splash-text-subheader">
+        Sign up with your calendar provider to get actionable insights.
+      </h2>
     </div>
-     <a href="/time">
-      <button class="button-primary index green">
-       Try it free
-      </button>
-    </a>
-    <br/>
-    <br/>
+    <div class="text-center">
+      <div class="visible-xs-block visible-sm-inline visible-md-inline
+                  visible-lg-inline">
+        <a href="/login?platform=google">
+          <button class="btn btn-primary sign-in-btn google-btn">
+            <div class="sign-in-icon">
+              <i class="fa fa-fw fa-google"></i>
+            </div>
+            <div class="sign-in-text">Google Account</div>
+          </button>
+        </a>
+      </div>
+      <div class="visible-xs-block visible-sm-inline visible-md-inline
+                  visible-lg-inline">
+        <a href="/login?platform=exchange">
+          <button class="btn btn-primary sign-in-btn exchange-btn">
+            <div class="sign-in-icon">
+              <img src="img/exchange.svg" />
+            </div>
+            <div class="sign-in-text">Microsoft Exchange</div>
+          </button>
+        </a>
+      </div>
+      <div>
+        <a href="/login?platform=exchange">
+          <button class="btn btn-tertiary sign-in-btn">
+            Other Provider
+          </button>
+        </a>
+      </div>
+    </div>
   </div>
 </div>
 

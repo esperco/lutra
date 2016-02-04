@@ -167,6 +167,7 @@ module Esper.Login {
   export var inviteParam = "invite";
   export var tokenParam = "token";
   export var extParam = "ext";
+  export var platformParam = "platform"; // Google / Exchange / Nylas
 
   // Redirects
   export var loginPath = "/login";
