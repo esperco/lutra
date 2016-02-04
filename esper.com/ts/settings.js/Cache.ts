@@ -5,6 +5,8 @@
   in all its views.
 */
 
+/// <reference path="./Util.ts" />
+
 module Esper.Cache {
 
   /*

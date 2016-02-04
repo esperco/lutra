@@ -7,6 +7,7 @@
 
 @esper-sign-in-icon-width: 50px;
 @esper-button-container-shift: 110%;
+@esper-sign-in-max-width: 300px;
 
 #esper-login-container {
   width: 350px;
@@ -54,55 +55,6 @@
     }
   }
 
-  .sign-in-btn {
-    width: 100%;
-    padding-left: 0;
-    padding-right: 0;
-    max-width: 300px;
-
-    display: block;
-    margin: @padding-large-vertical auto;
-
-    .sign-in-icon {
-      width: @esper-sign-in-icon-width;
-      border-right: 1px solid rgba(255,255,255,0.3);
-      float: left;
-      text-align: center;
-      line-height: 1.5em;
-
-      img {
-        height: @line-height-computed;
-        width: auto;
-      }
-    }
-
-    .sign-in-text {
-      margin-left: @esper-sign-in-icon-width;
-      text-align: center;
-      min-width: 200px;
-    }
-
-    &.google-btn {
-      border-color: #DC3921;
-      background-image: linear-gradient(to bottom, #DF4A32 0%, #DD3A22 100%);
-      box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
-
-      &:hover, &:active {
-        box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
-      }
-    }
-
-    &.exchange-btn {
-      border-color: #0173BC;
-      background-image: linear-gradient(to bottom, #0072BB 0%, #0066AA 100%);
-      box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
-
-      &:hover, &:active {
-        box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
-      }
-    }
-  }
-
   .sign-in-footer {
     max-width: 400px;
     margin-right: auto;
@@ -115,3 +67,68 @@
   }
 }
 
+button.sign-in-btn {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  max-width: @esper-sign-in-max-width;
+  margin: @padding-small-vertical @padding-xs-horizontal;
+
+  #esper-login & {
+    margin: @padding-large-vertical auto;
+    display: block;
+  }
+
+  .sign-in-icon {
+    width: @esper-sign-in-icon-width;
+    border-right: 1px solid rgba(255,255,255,0.3);
+    float: left;
+    text-align: center;
+    line-height: 1.5em;
+
+    img {
+      height: @line-height-computed;
+      width: auto;
+    }
+  }
+
+  .sign-in-text {
+    margin-left: @esper-sign-in-icon-width;
+    text-align: center;
+    min-width: 200px;
+  }
+
+  &.google-btn {
+    border-color: #DC3921;
+    background-image: linear-gradient(to bottom, #DF4A32 0%, #DD3A22 100%);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+
+    &:hover, &:active {
+      box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
+      background-image: linear-gradient(to bottom, #DF4A32 0%, #DD3A22 100%);
+    }
+  }
+
+  &.exchange-btn {
+    border-color: #0173BC;
+    background-image: linear-gradient(to bottom, #0072BB 0%, #0066AA 100%);
+    box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+
+    &:hover, &:active {
+      box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
+      background-image: linear-gradient(to bottom, #0072BB 0%, #0066AA 100%);
+    }
+  }
+
+  &.btn-primary {
+    padding-top: @padding-large-vertical;
+    padding-bottom: @padding-large-vertical;
+  }
+
+  // For "Other Provider" button on landing page
+  &.btn-tertiary {
+    @media (min-width: @screen-sm-min) {
+      max-width: @esper-sign-in-max-width * 2 + @padding-xs-horizontal * 3
+    }
+  }
+}
