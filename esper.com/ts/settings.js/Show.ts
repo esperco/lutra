@@ -1,3 +1,5 @@
+/// <reference path="./Util.ts" />
+
 /*
   Select and show one element while hiding others.
 

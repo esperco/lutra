@@ -1,3 +1,5 @@
+/// <reference path="./Show.ts" />
+
 module Esper.Page {
 
   /*
