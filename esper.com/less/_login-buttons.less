@@ -1,9 +1,15 @@
+@import "./lib/_bootstrap-variables";
+
+@esper-sign-in-max-width: 300px;
+@esper-sign-in-icon-width: 50px;
+
 button.sign-in-btn {
   width: 100%;
   padding-left: 0;
   padding-right: 0;
   max-width: @esper-sign-in-max-width;
   margin: @padding-small-vertical @padding-xs-horizontal;
+  box-sizing: border-box;
 
   #esper-login & {
     margin: @padding-large-vertical auto;

@@ -2,7 +2,9 @@
 
 /*** Imports **/
 
-@import "./login";
+@import "./lib/_bootstrap-variables";
+@import "./_login-buttons";
+@import "./_landing-charts";
 
 /*** Colors ***/
 @blue: #0080ce;
@@ -24,17 +26,6 @@
 @orange: #f7941e;
 @orange_bg: #f4e3d3;
 @orange_hover: #e87400;
-@purple: #a25cc6;
-@purple_active: #7d3ca0;
-@purple_bg: #FEFBFF;
-@purple_bg_hover: #fefdff;
-@purple_bg_active: #faf7fc;
-@purple_disabled: #ceb3e5;
-@purple_focus: #c08add;
-@purple_gradient: #a464c6;
-@purple_splash: #785988;
-@purple_hover: #8c42ad;
-@purple_text: #5F5665;
 @red: #d9534f;
 @red_disabled: #eba8a7;
 @red_hover: #d2322d;
@@ -526,7 +517,7 @@ input.incorrect{
   background-position: center;
 
   &.splash-purple {
-    background: @purple_splash;
+    background: @purple_bg;
     &.light { background: @purple; }
   }
 
@@ -1008,7 +999,7 @@ input.incorrect{
   color:#000000;
 }
 .pricing-table tr:first-child th {
-  background-color: @purple_splash;
+  background-color: @purple_bg;
   font-weight: bold;
   border:0px solid #ffffff;
   text-align:center;

@@ -1,0 +1,104 @@
+@import "./lib/_bootstrap-variables";
+@import "./_login-buttons";
+
+@splash-height: 500px;
+@chart-height-md: 600px;
+@chart-height-sm: 500px;
+@chart-height-xs: 350px;
+@cta-margin: 20px;
+
+#chart-splash {
+  padding: 0;
+  max-height: 85%;
+  overflow-y: hidden;
+  background: linear-gradient(to bottom, @purple_bg 50%,
+    @purple_gradient 100%);
+}
+
+#chart-splash {
+  box-shadow: inset 0 -2px 2px rgba(0, 0, 0, 0.16);
+}
+
+.cta-signup {
+  text-align: center;
+  padding-top: @cta-margin;
+  margin-left: auto;
+  margin-right: auto;
+
+  h1.splash-text-header {
+    font-size: 3rem;
+    font-weight: normal;
+  }
+
+  h2.splash-text-subheader {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: normal;
+  }
+
+  .splash-text-header, .splash-text-subheader {
+    color: white;
+    margin: 0 0 @cta-margin;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
+  }
+
+  .login-buttons {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: @cta-margin;
+  }
+}
+
+#chart-container {
+  max-height: @splash-height;
+  overflow-y: hidden;
+}
+
+#chart-target {
+  height: @chart-height-xs;
+  margin-top: -@cta-margin / 2;
+
+  @media (min-width: @screen-sm-min) {
+    height: @chart-height-sm;
+  }
+}
+
+@media (min-width: @screen-md-min) {
+  .cta-signup-container {
+    position: relative;
+    height: @splash-height;
+
+    .cta-signup {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      padding-top: 0;
+    }
+
+    .login-buttons {
+      max-width: @esper-sign-in-max-width;
+    }
+  }
+
+  #chart-splash {
+    max-height: @splash-height * 2;
+  }
+
+  #chart-container {
+    position: relative;
+    height: @splash-height;
+  }
+
+  #chart-target {
+    height: @chart-height-md;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
