@@ -12,20 +12,102 @@ module Esper {
     $(chartSplash).show();
   }
 
-  export function drawGuestDomains() {
+  var defaults: HighchartsOptions = {
+    credits: { enabled: false },
+    title: { text: "" },
+    chart: {
+      backgroundColor: 'rgba(255, 255, 255, 0)'
+    },
+
+    plotOptions: {
+      series: {
+        animation: { duration: 500 }
+      }
+    },
+
+    tooltip: {
+      formatter: function() {
+        var name = this.point.name || this.series.name;
+        return `<b>${name}:</b> ${this.y}` +
+          (this.percentage ? ` (${this.percentage.toFixed(1)}%)` : "");
+      },
+      backgroundColor: {
+        linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
+        stops: [
+            [0, '#FFFFFF'],
+            [1, '#FCFCFC']
+        ]
+      },
+      borderWidth: 0,
+      borderRadius: 1
+    }
+  };
+
+  export function drawTopGuests() {
     showCharts();
-    $(chartTarget).highcharts({
-      credits: { enabled: false },
-      title: { text: "" },
+    $(chartTarget).highcharts(_.merge({
       chart: {
-        type: 'pie',
-        backgroundColor: 'rgba(255, 255, 255, 0)'
+        type: 'bar',
+        height: 21 * 50 + 120,
+        spacingLeft: 0,
+        spacingRight: 50
       },
 
       plotOptions: {
-        series: {
-          animation: { duration: 500 }
+        bar: {
+          borderWidth: 0
         }
+      },
+
+      xAxis: {
+        categories: [
+          'Pepper Potts',
+          'Obadiah Stane',
+          'Norman Osborne',
+          'Gwen Stacy',
+          'Tony Stark',
+          'Darren Cross',
+          'Hope Van Dyne',
+          'Happy Hogan',
+          'Stark Human Resources',
+          'Stark Legal',
+          'Stark Public Relations',
+          'Natasha Romanov',
+          'Clint Barton',
+          'Justin Hammer',
+          'Elon',
+          'Max Dillon',
+          'Hank Pym',
+          'Aldrich Killian',
+          'Andrew Forson',
+          'Franklin Hall',
+          'Ivan Vanko'
+        ],
+        labels: {
+          style: {
+            color: '#ffffff'
+          }
+        }
+      },
+
+      series: [{
+        name: "Number of Events",
+        color: Colors.second,
+        data: [15, 12, 10, 9, 8, 7, 7, 5, 3, 3, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1]
+      } as HighchartsBarChartSeriesOptions, {
+        name: "Aggregate Duration (Hours)",
+        color: Colors.first,
+        data: [20, 12, 10, 12, 10, 5, 5, 2.5, 1.5, 1.5, 1, 6, 6, 1, 1, 0.5, 1, 1, 1, 1, 1]
+      } as HighchartsBarChartSeriesOptions]
+
+    }, defaults));
+  }
+
+  export function drawGuestDomains() {
+    showCharts();
+    $(chartTarget).highcharts(_.merge({
+      chart: {
+        type: 'pie'
       },
 
       tooltip: {
@@ -33,16 +115,7 @@ module Esper {
           var name = this.point.name || this.series.name;
           return `<b>${name}:</b> ${this.y} Hours` +
             (this.percentage ? ` (${this.percentage.toFixed(1)}%)` : "");
-        },
-        backgroundColor: {
-          linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
-          stops: [
-              [0, '#FFFFFF'],
-              [1, '#FCFCFC']
-          ]
-        },
-        borderWidth: 0,
-        borderRadius: 1
+        }
       },
 
       series: [
@@ -166,7 +239,7 @@ module Esper {
           }
         } as HighchartsPieChartSeriesOptions
       ]
-    });
+    }, defaults));
   }
 }
 

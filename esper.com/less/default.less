@@ -94,15 +94,19 @@ hr {
   background: @gray_20;
 }
 
+.no-break {
+  display: inline-block;
+  white-space: nowrap;
+}
+
 
 /* Text */
 body {
-  font-family: "Open Sans";
+  font-family: @font-family-sans-serif;
   font-size: 16px;
   color: @purple_text;
   text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-          font-smoothing: antialiased;
+  font-smoothing: antialiased;
 }
 
 h1 {
@@ -111,10 +115,6 @@ h1 {
 
 h2 {
   font-weight: 600;
-}
-
-h3, h4 {
-  font-family: "Montserrat";
 }
 
 @media (min-width:768px) {
@@ -170,7 +170,6 @@ button {
   margin: 0;
   padding: 8px 16px;
   border-radius: 3px;
-  font-family: "Open Sans";
   font-size: 13px;
   font-weight: 600;
   border: none;
@@ -272,7 +271,6 @@ button.toggle-right {
 input {
   height: 40px;
   padding: 0 12px;
-  font-family: "Open Sans";
   @media (min-width:768px) { font-size: 16px; }
   @media (max-width:767px) { font-size: 16px; }
   border: 1px solid @gray_20;
@@ -1121,11 +1119,6 @@ select.incorrect{
 .users-container {
   margin-top: 25px;
   text-align: center;
-
-  .no-break {
-    display: inline-block;
-    white-space: nowrap;
-  }
 
   .users-logo {
     img {

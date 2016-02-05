@@ -56,7 +56,6 @@
 
 #chart-target {
   height: @chart-height-xs;
-  margin-top: -@cta-margin / 2;
 
   @media (min-width: @screen-sm-min) {
     height: @chart-height-sm;
@@ -87,17 +86,11 @@
   }
 
   #chart-container {
-    position: relative;
     height: @splash-height;
   }
 
   #chart-target {
     height: @chart-height-md;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    transform: translateY(-50%);
     margin-top: 0;
     padding-top: 0;
   }
