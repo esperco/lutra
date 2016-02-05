@@ -1,5 +1,6 @@
 /// <reference path="../../../typings/browser.d.ts" />
 /// <reference path="../common/Colors.ts" />
+/// <reference path="../common/AB.ts" />
 
 module Esper {
   // Highcharts target elm
@@ -241,6 +242,14 @@ module Esper {
       ]
     }, defaults));
   }
+
+  export function initHeader() {
+    if (AB.get(AB.TOP_GUESTS_SPLASH)) {
+      drawTopGuests();
+    } else if (AB.get(AB.GUEST_DOMAINS_SPLASH)) {
+      drawGuestDomains();
+    }
+  }
 }
 
-// window.requestAnimationFrame(Esper.drawGuestDomains);
+window.requestAnimationFrame(Esper.initHeader);

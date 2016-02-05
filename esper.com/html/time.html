@@ -6,7 +6,11 @@
 {% endblock %}
 
 {% block postscripts %}
-  {{ super() }}
   <script type="text/javascript" src="/js/timestats-vendor.js"></script>
+
+  {# Optimizely should go after vendor ensure jQuery loaded #}
+  {% include "_optimizely.html" %}
+
+  {{ super() }}
   <script type="text/javascript" src="/js/time.js"></script>
 {% endblock %}
