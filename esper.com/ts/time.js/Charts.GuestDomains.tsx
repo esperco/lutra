@@ -21,6 +21,9 @@ module Esper.Charts {
   */
   const MAX_COLOR_CHANGE = 0.7;
 
+  // This is the maximum to lighten any slice relative to the previous one
+  const MAX_COLOR_DELTA = 0.2;
+
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
@@ -56,25 +59,31 @@ module Esper.Charts {
           var domainGuests = _.filter(d.guests,
             (g) => g.time >= cutOffTime
           );
+          var remainder = d.time - _.sum(domainGuests, (g) => g.time);
 
           // Each guest is colored a shade of base color for domain
           var baseColor = Colors.getColorForDomain(d.domain);
           var totalGuests = domainGuests.length;
+          if (remainder && remainder > 0) {
+            totalGuests += 1;
+          }
+          var colorStep = Math.min(
+            MAX_COLOR_CHANGE / (totalGuests - 1),
+            MAX_COLOR_DELTA);
+
           _.each(domainGuests, (g, i) => {
             addressData.push({
               name: g.name ? `${g.name} (${g.email})` : g.email,
-              color: Colors.lighten(baseColor,
-                ((totalGuests - i) / totalGuests) * MAX_COLOR_CHANGE),
+              color: Colors.lighten(baseColor, i * colorStep),
               y: TimeStats.toHours(g.time)
             });
           });
 
           // Guests less than cutoff get labeled as "Other"
-          var remainder = d.time - _.sum(domainGuests, (g) => g.time);
           if (remainder && remainder > 0) {
             addressData.push({
               name: "Other " + d.domain,
-              color: baseColor,
+              color: Colors.lighten(baseColor, totalGuests * colorStep),
               y: TimeStats.toHours(remainder)
             });
           }
@@ -134,9 +143,9 @@ module Esper.Charts {
               formatter: function () {
                 return this.percentage > 10 ? this.point.name : null;
               },
-              color: '#ffffff',
+              color: Colors.black,
               style: { textShadow: "" },
-              backgroundColor: "#000000",
+              backgroundColor: Colors.offWhite,
               distance: -30
             }
           } as HighchartsPieChartSeriesOptions,
