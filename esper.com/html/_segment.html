@@ -8,6 +8,6 @@
       analytics.load("QwsMs5clHuU0IhYhq664x8VyV32HFph6");
     {% endif %}
 
-    analytics.page()
+    analytics.page({% if PAGE_NAME %}"{{ PAGE_NAME }}"{% endif %})
   }}();
 </script>

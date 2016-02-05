@@ -121,21 +121,21 @@ module Esper.Analytics {
 
   // Named pages to track
   export enum Page {
-    AppLogin = 1,      // app.esper.com login
-    Settings,          // app.esper.com/#!/settings
-    TeamSettings,      // app.esper.com/#!/team-settings/...
-    TeamCalendars,     // app.esper.com/#!/team-settings/.../calendars
-    TeamPreferences,   // app.esper.com/#!/team-settings/.../preferences
-    TeamWorkflows,     // app.esper.com/#!/team-settings/.../workflows
-    TeamLabels,        // app.esper.com/#!/team-settings/.../teamLabels
-    TeamTemplates,     // app.esper.com/#!/team-settings/.../templates
-    TimeStatsCharts,   // time.esper.com/#!/charts
-    CalendarLabeling,  // time.esper.com/#!/calendar-labeling
-    TimeStatsOnboardingStart,       // time.esper.com/#!/onboarding/start
-    TimeStatsOnboardingAddCals,     // time.esper.com/#!/onboarding/add-cals
-    TimeStatsOnboardingAddLabels,   // time.esper.com/#!/onboarding/add-labels
-    TimeStatsOnboardingLabelEvents, // time.esper.com/#!/onboarding/label-events
-    TimeStatsOnboardingCharts,      // time.esper.com/#!/onboarding/charts
+    Settings = 1,      // esper.com/settings
+    TeamSettings,      // esper.com/settings/#!/team-settings/...
+    TeamCalendars,     // esper.com/settings/#!/team-settings/.../calendars
+    TeamPreferences,   // esper.com/settings/#!/team-settings/.../preferences
+    TeamWorkflows,     // esper.com/settings/#!/team-settings/.../workflows
+    TeamLabels,        // esper.com/settings/#!/team-settings/.../teamLabels
+    TeamTemplates,     // esper.com/settings/#!/team-settings/.../templates
+    TimeStats,         // esper.com/time
+    TimeStatsCharts,   // esper.com/time/#!/charts
+    CalendarLabeling,  // esper.com/time/#!/calendar-labeling
+    TimeStatsOnboardingStart,       // esper.com/time/#!/onboarding/start
+    TimeStatsOnboardingAddCals,     // esper.com/time/#!/onboarding/add-cals
+    TimeStatsOnboardingAddLabels,   // esper.com/time/#!/onboarding/add-labels
+    TimeStatsOnboardingLabelEvents, // esper.com/time/#!/onboarding/label-events
+    TimeStatsOnboardingCharts,      // esper.com/time/#!/onboarding/charts
     DirectoryHome      // dir.esper.com
   }
 
