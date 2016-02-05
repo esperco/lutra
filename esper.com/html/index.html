@@ -2,7 +2,8 @@
 
 {% block main %}
 <!-- Splash -->
-<div class="splash-content large" style="background-image:url(img/splash_home.jpg)">
+<div id="default-splash" class="splash-content large"
+     style="background-image:url(img/splash_home.jpg)">
   <div class="splash-text-container" align="center">
     <div class="splash-text" style="padding-bottom: 30px">
       <h1 style="padding-bottom: 30px"><b>Make time great again.</b></h1>
@@ -34,7 +35,7 @@
         </a>
       </div>
       <div>
-        <a href="/login?platform=exchange">
+        <a href="/login?platform=nylas">
           <button class="btn btn-tertiary sign-in-btn">
             Other Provider
           </button>
@@ -42,6 +43,60 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- A/B Variant for Splash -->
+<div id="chart-splash" style="display: none">
+  <div class="container-fluid"><div class="row">
+
+    <!-- Login + CTA -->
+    <div class="col-md-5 cta-signup-container"><div class="cta-signup">
+      <h1 class="splash-text-header">
+        See where your <span class="no-break">time's going</span>
+      </h1>
+      <h2 class="splash-text-subheader">
+        Sign up with your calendar provider to
+        <span class="no-break">get started</span>
+      </h2>
+      <div class="login-buttons">
+        <div class="visible-xs-block visible-sm-inline visible-md-block
+                    visible-lg-block">
+          <a href="/login?platform=google">
+            <button class="btn btn-primary sign-in-btn google-btn">
+              <div class="sign-in-icon">
+                <i class="fa fa-fw fa-google"></i>
+              </div>
+              <div class="sign-in-text">Google Account</div>
+            </button>
+          </a>
+        </div>
+        <div class="visible-xs-block visible-sm-inline visible-md-block
+                    visible-lg-block">
+          <a href="/login?platform=exchange">
+            <button class="btn btn-primary sign-in-btn exchange-btn">
+              <div class="sign-in-icon">
+                <img src="img/exchange.svg" />
+              </div>
+              <div class="sign-in-text">Microsoft Exchange</div>
+            </button>
+          </a>
+        </div>
+        <div>
+          <a href="/login?platform=nylas">
+            <button class="btn btn-tertiary sign-in-btn">
+              Other Provider
+            </button>
+          </a>
+        </div>
+      </div>
+    </div></div>
+
+    <!-- Chart goes here -->
+    <div id="chart-container" class="col-md-7">
+      <div id="chart-target"></div>
+    </div>
+
+  </div></div>
 </div>
 
 <!--Prominent Users-->
@@ -70,14 +125,16 @@
 <div class="section-container gray">
   <div class="feature-container">
     <div class="feature-image right-col">
-      <img src="img/TimeStats_gif.gif">
+      <img src="img/stacked-bar.png">
     </div>
     <div class="feature-text left-col">
       <h3 class="section-title" style="margin-top: 0px;">
-        Categorize calendar events.</h3>
-      <p>Take the hassle out of time tracking. Esper lets you quickly label
-      your calendar events and assign the semantic meaning missing from your
-      calendar.</p><br>
+        Give Meaning to Your Calendar
+      </h3>
+      <p>With Esper, you can quickly tag your calendar events with objectives,
+      milestones, and whatever else matters to you. Then use that data to
+      create sleek charts showing how you spent your time.
+      </p><br>
       <a href="/time">
         <center><button class="button-primary green index">
           Try it free
@@ -99,14 +156,16 @@
 <div class="section-container">
   <div class="feature-container">
     <div class="feature-image left-col">
-      <img src="img/stacked_bar_chart.png">
+      <img src="img/domain-pie.png">
     </div>
     <div class="feature-text right-col">
-      <h3 class="section-title" style="margin-top: 0px;">View your calendar
-      breakdown.</h3>
-      <p>Get a visual representation of how you spend your time. Transform your
-      calendar into sleek charts using your own categories. Stop using
-      spreadsheets to chart your data. We'll do it for you.</p><br>
+      <h3 class="section-title" style="margin-top: 0px;">
+        It's Auto-Magical
+      </h3>
+      <p>Don't feel like tagging your events? Esper can use calendar metadata
+      such as event duration, invited guests, and more to automatically
+      generate data on how you're spending your time. Just hook up your
+      calendar. We'll do the rest.</p><br>
       <a href="/time">
         <center><button class="button-primary green index">
           Try it free
@@ -120,14 +179,16 @@
 <div class="section-container gray">
   <div class="feature-container">
     <div class="right-col feature-image">
-      <img src="img/pie_chart.png">
+      <img src="img/availability-grid.png">
     </div>
     <div class="left-col feature-text">
        <h3 class="section-title" style="margin-top: 0px;">
-        Gain actionable insights.</h3>
-      <p>Request custom reports to identify time sinks, see trends, and make
-      smart scheduling decisions. We'll help you understand where the hours
-      went and how to get them back.</p><br>
+        Gain Actionable Insights</h3>
+      <p>Esper gives you a heads up display for your time that goes
+      beyond what your calendar offers. Both assistants and executives
+      use Esper to find time sinks, improve scheduling, and get ahead of
+      their work week. Or month.
+      </p><br>
       <a href="/time">
         <center><button class="button-primary green index">
           Try it free
@@ -276,4 +337,9 @@
     </a>
   </div>
 </div>
+{% endblock %}
+
+{% block postscripts %}
+  {{ super() }}
+  <script type="text/javascript" src="js/landing-charts.js"></script>
 {% endblock %}

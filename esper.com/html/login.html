@@ -1,11 +1,14 @@
 {% extends "_app.html" %}
 
+{% set PAGE_NAME = "Login" %}
+
 {% block head %}
   {{ super() }}
   <link rel="stylesheet" href="css/login.css" media="screen" />
 {% endblock %}
 
 {% block postscripts %}
+
   {{ super() }}
   <script type="text/javascript" src="/js/react-simple-vendor.js"></script>
   <script type="text/javascript" src="/js/login.js"></script>
