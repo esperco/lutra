@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../common/AB.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
@@ -147,11 +148,16 @@ module Esper.Views {
       if (selection) {
         var team = Teams.get(selection.teamId);
       }
-      if (team && team.team_labels && team.team_labels.length) {
-        updateChartType(ChartsM.DurationsOverTime);
-      } else {
-        updateChartType(ChartsM.ActivityGrid);
-      }
+      var chartType = ((): typeof ChartsM.Chart => {
+        if (AB.get(AB.TOP_GUESTS_SPLASH)) {
+          return ChartsM.TopGuests;
+        } else if (AB.get(AB.GUEST_DOMAINS_SPLASH)) {
+          return ChartsM.GuestDomains;
+        } else {
+          return ChartsM.DurationsOverTime;
+        }
+      })();
+      updateChartType(chartType);
     } else {
       updateAsync();
     }
