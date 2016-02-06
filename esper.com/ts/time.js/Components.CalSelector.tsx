@@ -3,10 +3,12 @@
 */
 
 /// <reference path="../lib/ApiT.ts" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.CalAdd.tsx" />
 /// <reference path="./Components.ListSelector.tsx" />
@@ -66,7 +68,11 @@ module Esper.Components {
             unselectedIcon="fa-calendar-o"
             updateFn={this.updateCal.bind(this)}
           /> :
-          <div className="esper-no-content">No Calendars Available</div>
+          <div className="esper-no-content">
+            <a onClick={this.editCalendars.bind(this)}>
+              No calendars available. Click here to add.
+            </a>
+          </div>
         }
         <div className="esper-subsection-footer">
           <a onClick={this.editCalendars.bind(this)}>
@@ -75,6 +81,13 @@ module Esper.Components {
           </a>
         </div>
       </BorderlessSection>;
+    }
+
+    // Open modal if no calendars
+    componentDidMount() {
+      if (Onboarding.needsCalendars()) {
+        this.editCalendars();
+      }
     }
 
     // Convert ListSelector format to calSeletion
@@ -87,8 +100,16 @@ module Esper.Components {
       }));
     }
 
+    // Pop up calendar modal. Auto-select when modal closed.
     editCalendars() {
-      Layout.renderModal(<CalAddModal />);
+      Layout.renderModal(<CalAddModal onHidden={() => {
+        if (!this.props.selected.length || !this.props.selected[0].calId) {
+          Option.cast(Calendars.defaultSelection()).match({
+            none: () => null,
+            some: (d) => this.props.updateFn([d])
+          });
+        }
+      }} />);
     }
   }
 }

@@ -83,6 +83,17 @@ module Esper.Onboarding {
     return Math.max(LABELS_REQUIRED - labeledEventsCount, 0);
   }
 
+  export function needsCalendars() {
+    var teamWithCal = _.find(Teams.all(), (t) => {
+      var cals = Option.cast(Calendars.CalendarListStore.val(t.teamid));
+      return cals.match({
+        none: () => false,
+        some: (s) => s.length > 0
+      });
+    });
+    return !teamWithCal;
+  }
+
   // How many onboarding steps have been completed so far?
   function completedSoFar() {
     var teams = Teams.all();

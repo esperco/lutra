@@ -230,10 +230,18 @@ module Esper.Components {
     }
   }
 
-  export class CalAddModal extends Component<{}, {}> {
+  export class CalAddModal extends Component<{
+    onHidden?: () => void;
+  }, {}> {
     render() {
       return <Modal title="Connect Calendars to Esper"
-                    icon="fa-calendar-check-o">
+                    icon="fa-calendar-check-o"
+                    onHidden={this.props.onHidden}>
+        { Onboarding.needsCalendars() ?
+          <div className="alert alert-info">
+            Which calendars do you use to track your time?
+          </div> : null
+        }
         <CalAdd onDone={this.hideModal.bind(this)}/>
       </Modal>;
     }

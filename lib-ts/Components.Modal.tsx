@@ -19,6 +19,7 @@ module Esper.Components {
     okText?: string;
     showFooter?: boolean;
     okOnClick?: () => void;
+    onHidden?: () => void;
     children?: JSX.Element[];
   }
 
@@ -78,6 +79,9 @@ module Esper.Components {
 
     componentDidMount() {
       this.jQuery().on('hidden.bs.modal', () => {
+        if (this.props.onHidden) {
+          this.props.onHidden();
+        }
         this.jQuery().parent().remove();
       });
       this.jQuery().on('shown.bs.modal', () => {
