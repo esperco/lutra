@@ -83,6 +83,7 @@ module Esper.Onboarding {
     return Math.max(LABELS_REQUIRED - labeledEventsCount, 0);
   }
 
+  // Does user need to hook up calendars?
   export function needsCalendars() {
     var teamWithCal = _.find(Teams.all(), (t) => {
       var cals = Option.cast(Calendars.CalendarListStore.val(t.teamid));
