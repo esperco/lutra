@@ -95,6 +95,13 @@ module Esper.Onboarding {
     return !teamWithCal;
   }
 
+  export function needsLabels() {
+    var teamWithLabels = _.find(Teams.all(),
+      (t) => t.team_labels && t.team_labels.length > 1
+    );
+    return !teamWithLabels;
+  }
+
   // How many onboarding steps have been completed so far?
   function completedSoFar() {
     var teams = Teams.all();

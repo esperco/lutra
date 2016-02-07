@@ -2,6 +2,7 @@
   Component for adding and sharing new calendars
 */
 
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/ApiC.ts" />

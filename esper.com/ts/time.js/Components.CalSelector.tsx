@@ -83,13 +83,6 @@ module Esper.Components {
       </BorderlessSection>;
     }
 
-    // Open modal if no calendars
-    componentDidMount() {
-      if (Onboarding.needsCalendars()) {
-        this.editCalendars();
-      }
-    }
-
     // Convert ListSelector format to calSeletion
     updateCal(selectedIds: {id: string, groupId: string}[]) {
       this.props.updateFn(_.map(selectedIds, (x) => {

@@ -15,6 +15,7 @@
 /// <reference path="./Charts.TopGuests.tsx" />
 /// <reference path="./Charts.WorkHoursGrid.tsx" />
 /// <reference path="./Charts.DurationHistogram.tsx" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
@@ -216,6 +217,8 @@ module Esper.Views {
   /* React Views */
 
   export class Charts extends Component<{}, {}> {
+    _calSelector: Components.CalSelector;
+
     constructor(props: {}) {
       setDefaults();
       super(props);
@@ -234,6 +237,7 @@ module Esper.Views {
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
+            ref={(c) => this._calSelector = c}
             selected={[cal]}
             updateFn={updateCalSelection} />
           { chart ? chart.renderSelectors() : null }
@@ -344,6 +348,13 @@ module Esper.Views {
           </div>
         </div>
       </div>;
+    }
+
+    // Open modal if no calendars
+    componentDidMount() {
+      if (Onboarding.needsCalendars()) {
+        this._calSelector.editCalendars();
+      }
     }
   }
 }

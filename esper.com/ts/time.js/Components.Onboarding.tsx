@@ -9,9 +9,12 @@
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
-  export class GifModal extends Component<{}, {}> {
+  export class GifModal extends Component<{
+    onHidden?: () => void;
+  }, {}> {
     render() {
       return (<Modal title="Getting Started" icon="fa-question-circle"
+                     onHidden={this.props.onHidden}
                      showFooter={true}>
         <div className="well">
           Click on events in the calendar and then add labels via the sidebar.
