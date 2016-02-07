@@ -101,7 +101,7 @@ module Esper.Views {
     if (_.isUndefined(chartType) || chartType < 0) return;
 
     var calendar = Calendars.SelectStore.val();
-    if (_.isUndefined(calendar)) return;
+    if (_.isUndefined(calendar) || _.isUndefined(calendar.calId)) return;
 
     var requestPeriod = RequestStore.val();
     if (!requestPeriod || !requestPeriod.windowStart ||
@@ -129,10 +129,19 @@ module Esper.Views {
 
   // Call from update actions to trigger async actions
   function updateAsync() {
-    var chart = getChart();
-    if (chart) {
-      chart.async(); // No values => use default periods
-    }
+    Option.cast(getChart()).match({
+      none: () => null,
+      some: (chart) => {
+        Option.cast(Calendars.SelectStore.val()).match({
+          none: () => null,
+          some: (s) => {
+            if (s.calId) {
+              chart.async();
+            }
+          }
+        })
+      }
+    })
   }
 
   function refresh() {
@@ -296,7 +305,7 @@ module Esper.Views {
     renderChartCheck(chart: Charts.Chart) {
       if (! chart) {
         var calendar = Calendars.SelectStore.val();
-        if (! calendar) {
+        if (!calendar || !calendar.calId) {
           return this.renderMessage(<span>
             <i className="fa fa-fw fa-calendar"></i>{" "}
             Please select a calendar

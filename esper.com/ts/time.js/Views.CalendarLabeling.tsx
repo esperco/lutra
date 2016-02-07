@@ -161,9 +161,11 @@ module Esper.Views {
 
       if (Onboarding.needsLabels()) {
         Layout.renderModal(<Components.GifModal onHidden={() => {
-          if (Onboarding.needsCalendars()) {
-            this._calSelector.editCalendars();
-          }
+          window.requestAnimationFrame(() => {
+            if (Onboarding.needsCalendars()) {
+              this._calSelector.editCalendars();
+            }
+          });
         }} />)
       }
     }
