@@ -341,9 +341,7 @@ module Esper.Views {
       }
 
       else if (chart.noData()) {
-        return this.renderMessage(<span>
-          No data found
-        </span>);
+        return this.renderMessage(chart.noDataMsg());
       }
 
       return chart.renderChart();

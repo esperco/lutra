@@ -1,5 +1,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.tsx" />
+/// <reference path="./Route.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 /// <reference path="./Components.Section.tsx" />
@@ -120,6 +121,15 @@ module Esper.Charts {
 
     noData() {
       return !this.getDisplayResults().length;
+    }
+
+    noDataMsg() {
+      return <span>
+        No data found.{" "}
+        <a onClick={() => Route.nav.path("/calendar-labeling")}>
+          Click here to go to your calendar and label events.
+        </a>
+      </span>;
     }
 
     // Render label selector based on what labels are actually there
