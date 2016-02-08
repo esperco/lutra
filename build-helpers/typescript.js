@@ -169,7 +169,7 @@ var buildOne = function(tsConfigPath, commonGlobs, outDir) {
     .pipe(sourcemaps.init())
     .pipe(ts(project, tsRefFilter, reporter));
 
-  if (config.production) {
+  if (production.isSet()) {
     // loadMaps = true so we can load tsify/browserify sourcemaps
     ret = ret
       .pipe(uglify({
