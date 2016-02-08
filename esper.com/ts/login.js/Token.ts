@@ -17,7 +17,7 @@ module Esper.Token {
       .then(function(info: ApiT.TokenInfo) {
         if (! info.token_is_valid) {
           Log.e("Invalid token " + token);
-          return "That link is no longer valid.";
+          renderLogin("", "That link is no longer valid.");
         }
         else {
           var x = info.token_value;

@@ -1,6 +1,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.Login.tsx" />
-/// <reference path="./Components.Onboarding.tsx" />
+/// <reference path="./Components.GifModal.tsx" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Components {

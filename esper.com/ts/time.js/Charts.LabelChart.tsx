@@ -122,6 +122,15 @@ module Esper.Charts {
       return !this.getDisplayResults().length;
     }
 
+    noDataMsg() {
+      return <span>
+        No data found.{" "}
+        <a onClick={() => Route.nav.path("/calendar-labeling")}>
+          Click here to go to your calendar and label events.
+        </a>
+      </span>;
+    }
+
     // Render label selector based on what labels are actually there
     renderSelectors() {
       // Safety check

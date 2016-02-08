@@ -71,7 +71,15 @@ module Esper.EventLabels {
         }
         <div className={this.props.listClasses}>
           { labelElms && labelElms.length ? labelElms :
-            <div className="esper-no-content">No Labels Found</div> }
+            <div className="esper-no-content">
+              { this.props.editLabelsFn ?
+                <a className="esper-link" target="_blank"
+                   onClick={this.props.editLabelsFn}>
+                  No labels found. Click here to add.
+                </a> :
+                "No labels found"
+              }
+            </div> }
         </div>
         <div className="esper-subsection-footer">
           {

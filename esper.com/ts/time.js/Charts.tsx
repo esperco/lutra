@@ -4,6 +4,8 @@
 
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./TimeStats.ts" />
 
 module Esper.Charts {
 
@@ -69,6 +71,11 @@ module Esper.Charts {
         minDate={this.minDate}
         maxDate={this.maxDate}
       />;
+    }
+
+    // Message to show when busy
+    noDataMsg(): JSX.Element {
+      return <span>No data found</span>;
     }
   }
 }

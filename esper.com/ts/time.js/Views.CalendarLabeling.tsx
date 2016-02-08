@@ -87,6 +87,8 @@ module Esper.Views {
   }
 
   export class CalendarLabeling extends Component<{}, CalendarLabelingState> {
+    _calSelector: Components.CalSelector;
+
     constructor(props: {}) {
       setDefaults();
       super(props);
@@ -97,6 +99,7 @@ module Esper.Views {
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
+            ref={(c) => this._calSelector = c}
             selected={this.state.selectedCal ? [this.state.selectedCal] : []}
             updateFn={updateSelection}
             minimized={this.state.minimizeCalSelector}
@@ -155,6 +158,16 @@ module Esper.Views {
         Calendars.SelectStore,
         calSelectMinStore
       ]);
+
+      if (Onboarding.needsLabels()) {
+        Layout.renderModal(<Components.GifModal onHidden={() => {
+          window.requestAnimationFrame(() => {
+            if (Onboarding.needsCalendars()) {
+              this._calSelector.editCalendars();
+            }
+          });
+        }} />)
+      }
     }
 
     getState() {

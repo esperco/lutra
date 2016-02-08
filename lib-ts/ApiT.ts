@@ -732,7 +732,7 @@ type token_response = [
     url: string;
   }
 
-  export interface EmailLabels {
+  export interface Labels {
     labels: string[];
   }
 

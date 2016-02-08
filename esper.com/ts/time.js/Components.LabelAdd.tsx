@@ -5,6 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
@@ -24,22 +25,21 @@ module Esper.Components {
     selectedTeamId?: string;
   }
 
+  function getTeamId() {
+    var selection = Option.cast(Calendars.SelectStore.val());
+    return selection.match({
+      none: Teams.firstId,
+      some: (s) => s.teamId || Teams.firstId()
+    });
+  }
+
   export class LabelAdd extends Component<LabelAddProps, LabelAddState> {
     _input: HTMLInputElement;
 
     constructor(props: LabelAddProps) {
       super(props);
-
-      // Init state = team of selected calendar, else first team (if any)
-      var selectedTeamId: string;
-      var selection = Calendars.SelectStore.val();
-      if (selection && selection.teamId) {
-        selectedTeamId = selection.teamId;
-      } else {
-        selectedTeamId = Teams.firstId();
-      }
       this.state = {
-        selectedTeamId: selectedTeamId
+        selectedTeamId: getTeamId()
       };
     }
 
@@ -239,8 +239,24 @@ module Esper.Components {
 
   export class LabelAddModal extends Component<{}, {}> {
     render() {
+      var suggestedLabels = [
+        "Product", "Business Development", "Sales",
+        "Email", "Internal Team", "Networking",
+        "Health & Wellness", "Personal", "Travel"
+      ];
+      var hasLabels = Option.cast(Teams.get(getTeamId())).match({
+        none: () => false,
+        some: (t) => !!(t.team_labels && t.team_labels.length)
+      });
+
       return <Modal title="Edit Event Labels" icon="fa-tags">
-        <LabelAdd onDone={this.hideModal.bind(this)}/>
+        { hasLabels ? null :
+          <div className="alert alert-info">
+            Create some labels to categorize your events.
+            You can add more at any time.
+          </div> }
+        <LabelAdd onDone={this.hideModal.bind(this)}
+          suggestedLabels={hasLabels ? null : suggestedLabels} />
       </Modal>;
     }
 

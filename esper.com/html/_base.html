@@ -9,7 +9,18 @@
   <meta charset="UTF-8">
   <title>{% block title %}Esper{% endblock %}</title>
   {% block head %}
-    {% include "_landing_head.html" %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="js/landing-vendor.js"></script>
+
+    {# Optimizely should go after vendor ensure jQuery loaded #}
+    {% include "_optimizely.html" %}
+
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" />
+    <link rel="stylesheet" href="css/vendor.css" media="screen">
+    <link rel="stylesheet" href="css/default.css" media="screen">
+    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon.ico" type="image/x-icon">
   {% endblock %}
 </head>
 

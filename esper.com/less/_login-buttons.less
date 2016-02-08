@@ -1,69 +1,7 @@
-/*
-  Style login component
-*/
 @import "./lib/_bootstrap-variables";
-@import "./_loading";
-@import "./_login-buttons";
 
-@esper-button-container-shift: 110%;
-
-#esper-login-container {
-  width: 350px;
-  margin: 100px auto;
-  padding: @padding-large-vertical;
-  text-align: center;
-  border: 1px solid @gray-lighter;
-  border-radius: @border-radius-large;
-}
-
-#esper-login {
-  overflow-x: hidden;
-
-  #sign-in-hero-mark {
-    -webkit-animation-duration: 1.5s;
-       -moz-animation-duration: 1.5s;
-           -animation-duration: 1.5s;
-  }
-
-  .hero-mark {
-    width: 40px;
-    height: 50px;
-    margin-right: auto;
-    margin-left: auto;
-  }
-
-  .buttons-container {
-    position: relative;
-    left: 0;
-    transition: left 0.6s;
-
-    &.shifted {
-      left: -@esper-button-container-shift;
-    }
-
-    .nylas-form {
-      position: absolute;
-      top: 0;
-      left: @esper-button-container-shift;
-      right: -@esper-button-container-shift;
-
-      .btn-primary {
-        width: 100%;
-      }
-    }
-  }
-
-  .sign-in-footer {
-    max-width: 400px;
-    margin-right: auto;
-    margin-left: auto;
-    margin-bottom: 20px;
-    padding-top: @padding-base-vertical;
-    text-align: center;
-    color: @gray-light;
-    border-top: 1px solid @gray-lighter;
-  }
-}
+@esper-sign-in-max-width: 300px;
+@esper-sign-in-icon-width: 50px;
 
 button.sign-in-btn {
   width: 100%;
@@ -71,6 +9,7 @@ button.sign-in-btn {
   padding-right: 0;
   max-width: @esper-sign-in-max-width;
   margin: @padding-small-vertical @padding-xs-horizontal;
+  box-sizing: border-box;
 
   #esper-login & {
     margin: @padding-large-vertical auto;

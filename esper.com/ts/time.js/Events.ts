@@ -17,7 +17,7 @@ module Esper.Events {
     return _.extend({teamId: teamId}, e) as TeamEvent;
   }
 
-  export var EventStore = new Model.CappedStore<TeamEvent>(200)
+  export var EventStore = new Model.CappedStore<TeamEvent>(9000)
   export var EventListStore = new Model.BatchStore(EventStore, 20);
 
   // Link stored events to teams to avoid mixing label data
