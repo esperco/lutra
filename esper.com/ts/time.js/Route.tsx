@@ -9,7 +9,6 @@
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
-/// <reference path="./Views.Onboarding.tsx" />
 /// <reference path="./Components.Header.tsx" />
 /// <reference path="./Components.Footer.tsx" />
 
@@ -27,16 +26,6 @@ module Esper.Route {
     }
     Layout.render(main, header, footer);
   }
-
-  // Check if we need to launch onboarding
-  var onboardingRequired: PageJS.Callback = function(ctx, next) {
-    if (Onboarding.required()) {
-      Route.nav.path(Onboarding.paths[0]);
-    } else {
-      next();
-    }
-  }
-
 
   ////////
 
@@ -59,7 +48,7 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts", onboardingRequired, function() {
+  route("/charts", function() {
     render(<Views.Charts />,
       undefined,
       <Components.Footer hoverable={true} />
@@ -68,7 +57,7 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", onboardingRequired, function() {
+  route("/calendar-labeling", function() {
     render(<Views.CalendarLabeling />,
       undefined,
       <Components.Footer hoverable={true} />
@@ -84,49 +73,6 @@ module Esper.Route {
       <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
-  });
-
-  // Onboarding steps
-  route("/onboarding/start", function() {
-    render(
-      <Views.OnboardingStart />,
-      Components.onboardingStartHeader()
-    );
-    Analytics.page(Analytics.Page.TimeStatsOnboardingStart);
-  });
-
-  route("/onboarding/add-cals", function() {
-    render(
-      <Views.OnboardingAddCals />,
-      Components.onboardingAddCalsHeader()
-    );
-    Analytics.page(Analytics.Page.TimeStatsOnboardingAddCals);
-  });
-
-  route("/onboarding/add-labels", function() {
-    render(
-      <Views.OnboardingAddLabels />,
-      Components.onboardingAddLabelsHeader()
-    );
-    Analytics.page(Analytics.Page.TimeStatsOnboardingAddLabels);
-  });
-
-  route("/onboarding/label-events", function() {
-    render(
-      <Views.CalendarLabeling />,
-      Components.onboardingLabelEventsHeader(),
-      <Components.Footer hoverable={true} />
-    );
-    Analytics.page(Analytics.Page.TimeStatsOnboardingLabelEvents);
-  });
-
-  route("/onboarding/charts", function() {
-    render(
-      <Views.Charts />,
-      Components.onboardingChartsHeader(),
-      <Components.Footer hoverable={true} />
-    );
-    Analytics.page(Analytics.Page.TimeStatsOnboardingCharts);
   });
 
   // 404 page

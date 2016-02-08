@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../common/AB.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
@@ -14,6 +15,7 @@
 /// <reference path="./Charts.TopGuests.tsx" />
 /// <reference path="./Charts.WorkHoursGrid.tsx" />
 /// <reference path="./Charts.DurationHistogram.tsx" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
@@ -99,7 +101,7 @@ module Esper.Views {
     if (_.isUndefined(chartType) || chartType < 0) return;
 
     var calendar = Calendars.SelectStore.val();
-    if (_.isUndefined(calendar)) return;
+    if (_.isUndefined(calendar) || _.isUndefined(calendar.calId)) return;
 
     var requestPeriod = RequestStore.val();
     if (!requestPeriod || !requestPeriod.windowStart ||
@@ -127,10 +129,19 @@ module Esper.Views {
 
   // Call from update actions to trigger async actions
   function updateAsync() {
-    var chart = getChart();
-    if (chart) {
-      chart.async(); // No values => use default periods
-    }
+    Option.cast(getChart()).match({
+      none: () => null,
+      some: (chart) => {
+        Option.cast(Calendars.SelectStore.val()).match({
+          none: () => null,
+          some: (s) => {
+            if (s.calId) {
+              chart.async();
+            }
+          }
+        })
+      }
+    })
   }
 
   function refresh() {
@@ -147,11 +158,16 @@ module Esper.Views {
       if (selection) {
         var team = Teams.get(selection.teamId);
       }
-      if (team && team.team_labels && team.team_labels.length) {
-        updateChartType(ChartsM.DurationsOverTime);
-      } else {
-        updateChartType(ChartsM.ActivityGrid);
-      }
+      var chartType = ((): typeof ChartsM.Chart => {
+        if (AB.get(AB.TOP_GUESTS_SPLASH)) {
+          return ChartsM.TopGuests;
+        } else if (AB.get(AB.GUEST_DOMAINS_SPLASH)) {
+          return ChartsM.GuestDomains;
+        } else {
+          return ChartsM.DurationsOverTime;
+        }
+      })();
+      updateChartType(chartType);
     } else {
       updateAsync();
     }
@@ -210,6 +226,8 @@ module Esper.Views {
   /* React Views */
 
   export class Charts extends Component<{}, {}> {
+    _calSelector: Components.CalSelector;
+
     constructor(props: {}) {
       setDefaults();
       super(props);
@@ -228,6 +246,7 @@ module Esper.Views {
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
           <Components.CalSelector
+            ref={(c) => this._calSelector = c}
             selected={[cal]}
             updateFn={updateCalSelection} />
           { chart ? chart.renderSelectors() : null }
@@ -286,7 +305,7 @@ module Esper.Views {
     renderChartCheck(chart: Charts.Chart) {
       if (! chart) {
         var calendar = Calendars.SelectStore.val();
-        if (! calendar) {
+        if (!calendar || !calendar.calId) {
           return this.renderMessage(<span>
             <i className="fa fa-fw fa-calendar"></i>{" "}
             Please select a calendar
@@ -322,9 +341,7 @@ module Esper.Views {
       }
 
       else if (chart.noData()) {
-        return this.renderMessage(<span>
-          No data found
-        </span>);
+        return this.renderMessage(chart.noDataMsg());
       }
 
       return chart.renderChart();
@@ -338,6 +355,13 @@ module Esper.Views {
           </div>
         </div>
       </div>;
+    }
+
+    // Open modal if no calendars
+    componentDidMount() {
+      if (Onboarding.needsCalendars()) {
+        this._calSelector.editCalendars();
+      }
     }
   }
 }

@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/Analytics.ts" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/EventLabels.tsx" />
 /// <reference path="../common/Layout.tsx" />
@@ -118,6 +119,18 @@ module Esper.Components {
     analyticsCallback(events: ApiT.GenericCalendarEvent[]) {
       Analytics.track(Analytics.Trackable.EditTimeEsperEventLabels, {
         eventsSelected: events.length
+      });
+    }
+
+    componentDidMount() {
+      Option.cast(Teams.get(this.props.teamId)).match({
+        none: () => null,
+        some: (t) => {
+          // No team labels => open modal
+          if (!t.team_labels || !t.team_labels.length) {
+            this.editLabelsCallback();
+          }
+        }
       });
     }
 
