@@ -6,17 +6,34 @@
 /// <reference path="./Api.ts" />
 
 module Esper.Test {
+  var frameCls = "esper-test-frame";
+  var frameContainer = "#esper-test-frame-container";
+
+  // Create a new test frame
+  function newFrame() {
+    $(frameContainer).prepend(`<iframe class="${frameCls}" />`);
+  }
 
   // Returns the test frame object, wrapped in jQuery
   export function getTestFrame() {
-    return $("#esper-test-frame");
+    return $("." + frameCls).first();
   };
 
   // Navigates to a page in the test frame
-  export function goTo(href: string, done?: (event: JQueryEventObject) => void) {
+  export function goTo(href: string,
+      done?: (event: JQueryEventObject) => void,
+      conditional?: (event: JQueryEventObject) => void) {
+    newFrame();
     var frame = this.getTestFrame();
     if (done) {
-      frame.one("load", done);
+      var cb = function(e: JQueryEventObject) {
+        if (conditional && !conditional(e)) {
+          frame.one("load", cb);
+        } else {
+          done(e);
+        }
+      }
+      frame.one("load", cb);
     }
     frame.attr("src", href);
   }

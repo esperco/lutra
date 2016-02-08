@@ -26,7 +26,8 @@
     "../lib/ReactHelpers.Test.ts",
     "Integration.ts",
     "Integration.Login.ts",
-    "Integration.Time.ts"
+    "Integration.Time.ts",
+    "Integration.Settings.ts"
   ],
 
   "prodOnly": []

@@ -42,10 +42,9 @@ module Esper.Integration {
     describe("when not logged in", function() {
       beforeAll(function(done) {
         clearLogin();
-        Test.goTo("/time", function() {
-          // Wait for one redirect -- failure to call results in timeout
-          Test.getTestFrame().one("load", done);
-        });
+        Test.goTo("/time", done,
+          // Wait for redirect before calling done
+          () => Test.getTestWindow().location.pathname !== "/time");
       });
 
       it("should redirect to login page", function() {
