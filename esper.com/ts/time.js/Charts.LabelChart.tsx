@@ -1,6 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Route.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 /// <reference path="./Components.Section.tsx" />
