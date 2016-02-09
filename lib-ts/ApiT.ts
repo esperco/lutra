@@ -736,6 +736,15 @@ type token_response = [
     labels: string[];
   }
 
+  type EventSelection = ["Eventids", string[]] | ["Label", string];
+
+  export interface LabelChangeRequest {
+    selection: EventSelection;
+    remove_all_labels?: boolean;
+    remove_labels: string[];
+    add_labels: string[];
+  }
+
   export interface Random {
     random: string;
   }
