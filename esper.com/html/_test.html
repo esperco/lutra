@@ -14,8 +14,8 @@
   <script type="text/javascript">
     function toggleTestFrame() {
       "use strict"; /* global document */
-      var frame = document.getElementById("esper-test-frame");
-      frame.className = frame.className ? "" : "hide";
+      var elm = document.getElementById("esper-test-frame-container");
+      elm.className = elm.className ? "" : "hide";
     }
   </script>
   <style>
@@ -24,36 +24,31 @@
     }
 
     #esper-test-frame-container {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-    }
-
-    #esper-test-frame-container button {
-      float: right;
       background: #007069;
-      padding: 5px 10px;
-      border: 0;
-      color: white;
-      cursor: pointer;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      min-width: 5px;
+      max-width: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      transition: max-width 0.6s left 0.6s;
+      z-index: 1000;
     }
 
-    /*
-      Force test frame to always technically be visible because some tests
-      depend on jQuery's concept of visibility
-    */
-    #esper-test-frame.hide {
-      position: absolute;
-      right: -100000%;
-      display: block !important;
+    #esper-test-frame-container:hover {
+      max-width: 80%;
     }
 
-    #esper-test-frame {
+    .esper-test-frame {
+      border: 1px solid #007069;
       resize: both;
+      width: 600px;
       overflow: auto;
       display: block;
       clear: both;
-      border: 1px solid #007069;
+      margin: 5px 20px 5px 5px;
     }
 
     .jasmine_html-reporter {
@@ -64,8 +59,6 @@
 
 {% block body %}
   <div id="esper-test-frame-container">
-    <button onclick="toggleTestFrame();">Test Frame</button>
-    <iframe id="esper-test-frame" class="hide"></iframe>
   </div>
 
   {% block testscripts %}{% endblock %}
