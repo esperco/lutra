@@ -73,7 +73,7 @@ module Esper.Components {
               <i className="fa fa-fw fa-archive" />{" "}Archive a label to
               remove it from this list but keep displaying it in charts.<br />
               <i className="fa fa-fw fa-trash" />{" "}Delete a label to
-              permanantely remove it from all charts and events.
+              permanently remove it from all charts and events.
           </div>
         }
         {
