@@ -174,4 +174,32 @@ a {
   padding: @modal-inner-padding 0 0 0;
 }
 
-// Other helpers
+
+/* Mobile-friendly dropdowns */
+
+@media (max-width: @screen-xs-max) {
+  .dropdown.xs-open {
+    .caret { display: none; }
+    .dropdown-menu { display: block; }
+  }
+
+  .dropdown-menu {
+    position: static;
+    width: 100%;
+    box-shadow: none;
+    margin: @padding-base-vertical 0;
+
+    .navbar-collapse & {
+      border-width: 1px 0 0 0;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    > li > a {
+      padding: @padding-base-vertical @padding-base-horizontal;
+    }
+  }
+}
+
+
+

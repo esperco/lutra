@@ -23,7 +23,7 @@ module Esper.Components {
       }
 
       if (this.state.loginInfo) {
-        return <div className="dropdown navbar-text">
+        return <div className="dropdown navbar-text xs-open">
           <a className="dropdown-toggle" data-toggle="dropdown">
             {this.state.loginInfo.email}{" "}
             <span className="caret"></span>
