@@ -6,6 +6,7 @@
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
+/// <reference path="../common/Analytics.Web.ts" />
 
 module Esper.BatchLabelChange {
 
@@ -17,12 +18,21 @@ module Esper.BatchLabelChange {
   export function rename(teamId: string, oldLabel: string,
     newLabel: string)
   {
+    Analytics.track(Analytics.Trackable.RenameTimeStatsLabel, {
+      _id: teamId,
+      oldLabel: oldLabel,
+      newLabel: newLabel
+    });
     return queueBatchLabelUpdate(teamId, oldLabel, {
       addLabels: [newLabel], removeLabels: [oldLabel]
     });
   }
 
   export function remove(teamId: string, label: string) {
+    Analytics.track(Analytics.Trackable.DeleteTimeStatsLabel, {
+      _id: teamId,
+      label: label
+    });
     return queueBatchLabelUpdate(teamId, label, {
       removeLabels: [label]
     });

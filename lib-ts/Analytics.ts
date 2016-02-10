@@ -78,6 +78,7 @@ module Esper.Analytics {
     CopySelectionToTaskNotes,
     CreateTask,
     CreateTaskTabLinkedEvent,
+    DeleteTimeStatsLabel,
     DisablePreferencesTabDailyAgenda,
     DisablePreferencesTabTasksUpdate,
     EditCalendarPickerEventTitle,
@@ -100,9 +101,8 @@ module Esper.Analytics {
     OpenTimeStatsAddCalendarsModal,
     OpenTimeStatsAddLabelsModal,
     OpenTimeStatsGifModal,
-    OpenTimeStatsRequestCustomReportModal,
-    OpenTimeStatsChartTypeModal,
     RenameTaskTabTask,
+    RenameTimeStatsLabel,
     SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,
     SelectCalendarPickerGuestTimezone,
@@ -112,7 +112,6 @@ module Esper.Analytics {
     SelectTaskTabWorkflow,
     SetTimeStatsCalendars,
     SetTimeStatsLabels,
-    SkipTimeStatsOnboarding,
     UnarchiveTaskTabTask,
     UnlinkTaskTabFromExistingTask,
     ViewTimeStats                // Viewed a particular set of time stats
@@ -131,11 +130,6 @@ module Esper.Analytics {
     TimeStats,         // esper.com/time
     TimeStatsCharts,   // esper.com/time/#!/charts
     CalendarLabeling,  // esper.com/time/#!/calendar-labeling
-    TimeStatsOnboardingStart,       // esper.com/time/#!/onboarding/start
-    TimeStatsOnboardingAddCals,     // esper.com/time/#!/onboarding/add-cals
-    TimeStatsOnboardingAddLabels,   // esper.com/time/#!/onboarding/add-labels
-    TimeStatsOnboardingLabelEvents, // esper.com/time/#!/onboarding/label-events
-    TimeStatsOnboardingCharts,      // esper.com/time/#!/onboarding/charts
     DirectoryHome      // dir.esper.com
   }
 
