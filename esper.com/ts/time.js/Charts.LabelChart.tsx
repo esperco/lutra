@@ -1,7 +1,9 @@
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../common/Layout.tsx" />
 /// <reference path="./Charts.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
+/// <reference path="./Components.LabelAdd.tsx" />
 /// <reference path="./Components.Section.tsx" />
 /// <reference path="./Components.ListSelector.tsx" />
 
@@ -167,7 +169,20 @@ module Esper.Charts {
           selectOption={Components.ListSelectOptions.MULTI_SELECT}
           updateFn={updateLabels}
         />
+        <div className="esper-subsection-footer">
+          <a className="esper-link" target="_blank"
+             onClick={this.editLabels.bind(this)}>
+            <i className="fa fa-fw fa-cog"></i>
+            {" "}Configure Labels
+          </a>
+        </div>
       </Components.BorderlessSection>;
+    }
+
+    editLabels() {
+      Layout.renderModal(<Components.LabelAddModal
+        onHidden={this.async.bind(this)}
+      />);
     }
   }
 }
