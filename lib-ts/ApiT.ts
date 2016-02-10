@@ -741,8 +741,8 @@ type token_response = [
   export interface LabelChangeRequest {
     selection: EventSelection;
     remove_all_labels?: boolean;
-    remove_labels: string[];
-    add_labels: string[];
+    remove_labels?: string[];
+    add_labels?: string[];
   }
 
   export interface Random {

@@ -15,6 +15,7 @@ module Esper.Components {
     teamId: string;
     calId: string;
     eventIds?: string[];
+    forceUpdate?: number; // Random number we can set to force update
     updateFn: (eventId: string, eventTitle: string, add: boolean) => void;
   }
 

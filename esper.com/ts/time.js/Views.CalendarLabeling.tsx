@@ -8,6 +8,14 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
+  // Store used to trigger force update
+  var calendarLabelUpdateStore = new Model.StoreOne<number>();
+
+  export function forceCalendarLabelingUpdate() {
+    calendarLabelUpdateStore.set(Math.random());
+  }
+
+
   // Action to update our selection
   function updateSelection(selections: Calendars.CalSelection[]) {
     var current = Calendars.SelectStore.val();
@@ -122,6 +130,7 @@ module Esper.Views {
       }
 
       return <Components.Calendar
+        forceUpdate={calendarLabelUpdateStore.val()}
         teamId={this.state.selectedCal.teamId}
         calId={this.state.selectedCal.calId}
         eventIds={_.map(this.state.selectedCal.events, (e) => e.id)}
@@ -156,7 +165,8 @@ module Esper.Views {
     componentDidMount() {
       this.setSources([
         Calendars.SelectStore,
-        calSelectMinStore
+        calSelectMinStore,
+        calendarLabelUpdateStore
       ]);
 
       if (Onboarding.needsLabels()) {

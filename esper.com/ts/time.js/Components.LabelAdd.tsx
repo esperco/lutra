@@ -8,6 +8,7 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./BatchLabelChange.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
 
@@ -23,6 +24,10 @@ module Esper.Components {
 
   interface LabelAddState {
     selectedTeamId?: string;
+
+    // Show edit interface or remove prompt for a given label
+    editLabel?: string;
+    rmLabelPrompt?: string;
   }
 
   function getTeamId() {
@@ -34,7 +39,8 @@ module Esper.Components {
   }
 
   export class LabelAdd extends Component<LabelAddProps, LabelAddState> {
-    _input: HTMLInputElement;
+    _addInput: HTMLInputElement;
+    _editInput: HTMLInputElement;
 
     constructor(props: LabelAddProps) {
       super(props);
@@ -45,8 +51,11 @@ module Esper.Components {
 
     renderWithData() {
       var teamStatus = Teams.dataStatus(this.state.selectedTeamId);
+      var changeStatus = BatchLabelChange.getStatus(this.state.selectedTeamId);
       if (teamStatus === Model.DataStatus.FETCH_ERROR ||
-          teamStatus === Model.DataStatus.PUSH_ERROR)
+          teamStatus === Model.DataStatus.PUSH_ERROR ||
+          changeStatus === Model.DataStatus.FETCH_ERROR ||
+          changeStatus === Model.DataStatus.PUSH_ERROR)
       {
         return <Components.ErrorMsg />;
       }
@@ -56,6 +65,17 @@ module Esper.Components {
         { this.renderTeamSelector() }
         { this.renderSuggestedLabels() }
         { this.renderLabelInput() }
+        {
+          this.hasSuggested() || !labels.length ? null :
+          <div className="alert alert-info">
+              <i className="fa fa-fw fa-pencil" />{" "}Rename a label across
+              all events.<br />
+              <i className="fa fa-fw fa-archive" />{" "}Archive a label to
+              remove it from this list but keep displaying it in charts.<br />
+              <i className="fa fa-fw fa-trash" />{" "}Delete a label to
+              permanantely remove it from all charts and events.
+          </div>
+        }
         {
           labels.length ?
           <div className="list-group">
@@ -115,13 +135,82 @@ module Esper.Components {
         return; // Only render if not suggested
       }
 
+      var rmLabel = this.state.rmLabelPrompt &&
+                    this.state.rmLabelPrompt.toLowerCase();
+      if (label.toLowerCase() === rmLabel) {
+        return <div className="list-group-item" key={label}>
+          <div className="form-group">
+            Are you sure you want to remove the
+            {" "}<strong>{label}</strong>{" "}
+            label from all events? This cannot be undone.
+          </div>
+          <div className="row">
+            <div className="col-xs-6">
+              <button className="btn btn-default form-control" type="button"
+                      onClick={this.resetState.bind(this)}>
+                Cancel
+              </button>
+            </div>
+            <div className="col-xs-6">
+              <button className="btn btn-danger form-control" type="button"
+                      onClick={() => this.rmLabel(label)}>
+                Remove
+              </button>
+            </div>
+          </div>
+        </div>;
+      }
+
+      var editLabel = this.state.editLabel &&
+                      this.state.editLabel.toLowerCase();
+      if (label.toLowerCase() === editLabel) {
+        return <div className="list-group-item one-line" key={label}>
+          <div className="form-group">
+            <input ref={ (c) => this._editInput = c }
+                   onKeyDown={this.editInputKeydown.bind(this)}
+                   className="form-control" defaultValue={label}/>
+          </div>
+          <div className="row">
+            <div className="col-xs-6">
+              <button className="btn btn-default form-control" type="button"
+                      onClick={this.resetState.bind(this)}>
+                Cancel
+              </button>
+            </div>
+            <div className="col-xs-6">
+              <button className="btn btn-primary form-control" type="button"
+                      onClick={this.submitEditInput.bind(this)}>
+                Save
+              </button>
+            </div>
+          </div>
+        </div>;
+      }
+
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
-        <a className="pull-right text-danger"
-           onClick={(e) => this.onClickRmLabel(e, label)}>
-          <i className="fa fa-fw fa-close list-group-item-text" />
-        </a>
+        {
+          this.hasSuggested() ?
+          <a className="pull-right text-info" title="Archive"
+             onClick={(e) => this.archive(label)}>
+            <i className="fa fa-fw fa-close list-group-item-text" />
+          </a> :
+          <span>
+            <a className="pull-right text-danger" title="Delete"
+               onClick={(e) => this.promptRmFor(label)}>
+              <i className="fa fa-fw fa-trash list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Archive"
+               onClick={(e) => this.archive(label)}>
+              <i className="fa fa-fw fa-archive list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Edit"
+               onClick={(e) => this.showEditFor(label)}>
+              <i className="fa fa-fw fa-pencil list-group-item-text" />
+            </a>
+          </span>
+        }
       </div>;
     }
 
@@ -135,7 +224,7 @@ module Esper.Components {
         </label>
         <div className="input-group">
           <input type="text" className="form-control esper-modal-focus"
-                 id={this.getId("new-labels")} ref={(c) => this._input = c}
+                 id={this.getId("new-labels")} ref={(c) => this._addInput = c}
                  onKeyDown={this.inputKeydown.bind(this)}
                  placeholder={"Q1 Sales Goal, Positive Meeting, Negative Meeting"} />
           <span className="input-group-btn">
@@ -149,7 +238,7 @@ module Esper.Components {
     }
 
     submitInput() {
-      var input = $(this._input);
+      var input = $(this._addInput);
       if (input.val().trim()) {
         Teams.addLabels(this.state.selectedTeamId, input.val());
       }
@@ -165,9 +254,57 @@ module Esper.Components {
       }
     }
 
-    onClickRmLabel(e: React.SyntheticEvent, label: string) {
-      e.preventDefault();
+    resetState() {
+      this.setState({
+        selectedTeamId: this.state.selectedTeamId,
+        editLabel: null,
+        rmLabelPrompt: null
+      });
+    }
+
+    archive(label: string) {
+      this.resetState();
       Teams.rmLabels(this.state.selectedTeamId, label);
+    }
+
+    promptRmFor(label: string) {
+      this.setState({
+        selectedTeamId: this.state.selectedTeamId,
+        editLabel: null,
+        rmLabelPrompt: label
+      });
+    }
+
+    rmLabel(label: string) {
+      this.archive(label);
+      BatchLabelChange.remove(this.state.selectedTeamId, label);
+    }
+
+    showEditFor(label: string) {
+      this.setState({
+        selectedTeamId: this.state.selectedTeamId,
+        editLabel: label,
+        rmLabelPrompt: null
+      });
+    }
+
+    // Catch enter key on input -- use jQuery to actual examine value
+    editInputKeydown(e: KeyboardEvent) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        this.submitEditInput();
+      }
+    }
+
+    submitEditInput() {
+      var input = $(this._editInput);
+      var val = input.val().trim();
+      if (val && val !== this.state.editLabel) {
+        Teams.addRmLabels(this.state.selectedTeamId, val, this.state.editLabel);
+        BatchLabelChange.rename(this.state.selectedTeamId,
+          this.state.editLabel, val);
+      }
+      this.resetState();
     }
 
     renderTeamSelector() {
@@ -198,9 +335,19 @@ module Esper.Components {
       this.setState({selectedTeamId: target.value})
     }
 
+    componentDidUpdate(prevProps: LabelAddProps, prevState: LabelAddState) {
+      if (this.state.editLabel &&
+          this.state.editLabel !== prevState.editLabel &&
+          this._editInput) {
+        $(this._editInput).select();
+      }
+    }
+
     renderFooter() {
       var dataStatus = Teams.dataStatus(this.state.selectedTeamId);
-      var busy = dataStatus === Model.DataStatus.INFLIGHT;
+      var changeStatus = BatchLabelChange.getStatus(this.state.selectedTeamId);
+      var busy = (dataStatus === Model.DataStatus.INFLIGHT ||
+                  changeStatus === Model.DataStatus.INFLIGHT);
 
       // Don't render footer if no done option and we don't need to show
       // busy indicator
@@ -237,7 +384,9 @@ module Esper.Components {
   } = {};
 
 
-  export class LabelAddModal extends Component<{}, {}> {
+  export class LabelAddModal extends Component<{
+    onHidden?: () => void;
+  }, {}> {
     render() {
       var suggestedLabels = [
         "Product", "Business Development", "Sales",
@@ -249,7 +398,8 @@ module Esper.Components {
         some: (t) => !!(t.team_labels && t.team_labels.length)
       });
 
-      return <Modal title="Edit Event Labels" icon="fa-tags">
+      return <Modal title="Edit Event Labels" icon="fa-tags"
+                    onHidden={this.props.onHidden}>
         { hasLabels ? null :
           <div className="alert alert-info">
             Create some labels to categorize your events.
