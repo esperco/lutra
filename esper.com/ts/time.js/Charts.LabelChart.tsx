@@ -68,7 +68,7 @@ module Esper.Charts {
 
       // Filter by selected labels (if applicable)
       return _.filter(displayResults,
-        (c) => _.contains(selectedLabels, c.labelNorm)
+        (c) => _.includes(selectedLabels, c.labelNorm)
       );
     }
 

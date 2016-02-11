@@ -97,7 +97,7 @@ module Esper.Login {
     // Remove ignored teams
     var teamIds = getIgnoredTeams();
     loginInfo.teams = _.filter(loginInfo.teams, (t) => {
-      return !_.contains(teamIds, t.teamid);
+      return !_.includes(teamIds, t.teamid);
     })
 
     if (needApproval(loginInfo)) {

@@ -27,7 +27,7 @@ module Esper.Teams {
         team_label_canceled: "Canceled"
       };
       var p = $.Deferred().resolve(this.fakeTeam).promise();
-      spyOn(Api, "createTeam").and.returnValue(p);
+      Test.spySafe(Api, "createTeam").and.returnValue(p);
     });
 
     it("should be find-able by saveDefaultTeam", function() {
@@ -62,7 +62,7 @@ module Esper.Teams {
       Queue.reset();
 
       this.dfd = $.Deferred();
-      spyOn(Api, "putSyncedLabels").and.returnValue(this.dfd.promise());
+      Test.spySafe(Api, "putSyncedLabels").and.returnValue(this.dfd.promise());
 
       // Sanity check
       this.teamId = TestFixtures.teamId1;

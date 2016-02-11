@@ -105,7 +105,7 @@ module Esper.Components {
             { _.map(this.props.suggestedLabels, (labelName) =>
               <div className="col-sm-4 suggested-label" key={labelName}>
                 <button onClick={() => this.toggleSuggestedLabel(labelName)}
-                  className={"btn " + (_.contains(this.getLabels(), labelName) ?
+                  className={"btn " + (_.includes(this.getLabels(), labelName) ?
                   "btn-success" : "btn-default"
                 )}>
                   {labelName}
@@ -118,7 +118,7 @@ module Esper.Components {
     }
 
     toggleSuggestedLabel(label: string) {
-      if (_.contains(this.getLabels(), label)) {
+      if (_.includes(this.getLabels(), label)) {
         Teams.rmLabels(this.state.selectedTeamId, label);
       } else {
         Teams.addLabels(this.state.selectedTeamId, label);
@@ -130,7 +130,7 @@ module Esper.Components {
     }
 
     renderLabel(label: string) {
-      if (this.hasSuggested() && _.contains(this.props.suggestedLabels, label))
+      if (this.hasSuggested() && _.includes(this.props.suggestedLabels, label))
       {
         return; // Only render if not suggested
       }

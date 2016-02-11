@@ -49,7 +49,7 @@ module Esper.Components {
 
     renderButton(text: string, interval: TimeStats.Interval) {
       var isSelected = this.props.selected &&
-        _.eq(this.props.selected.interval, interval);
+        _.isEqual(this.props.selected.interval, interval);
       return <button type="button" key={text}
           onClick={() => this.updateInterval(interval)}
           className={"btn btn-default " + (isSelected ? "active" : "")}>

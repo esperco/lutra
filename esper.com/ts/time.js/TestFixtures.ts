@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Test.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="./Teams.ts" />
 
@@ -22,7 +23,7 @@ module Esper.TestFixtures {
     });
 
     var promise = $.Deferred().resolve(mockLoginInfo()).promise();
-    spyOn(Api, "getLoginInfo").and.returnValue(promise);
+    Test.spySafe(Api, "getLoginInfo").and.returnValue(promise);
 
     Login.init(true);
   }
