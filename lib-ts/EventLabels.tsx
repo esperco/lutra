@@ -1,4 +1,4 @@
-/*
+  /*
   Component for updating labels for a given set of events
 */
 
@@ -140,9 +140,9 @@ module Esper.EventLabels {
     }
 
     renderLabel(name: string, index: number) {
-      var checkedByAll = _.contains(this.getAllChecked(), name);
+      var checkedByAll = _.includes(this.getAllChecked(), name);
       var checkedBySome = !checkedByAll &&
-        _.contains(this.getSomeChecked(), name);
+        _.includes(this.getSomeChecked(), name);
       var icon: string;
       if (checkedByAll) {
         icon = "fa-check-square";
@@ -162,7 +162,7 @@ module Esper.EventLabels {
     protected toggle(label: string) {
       // Toggling logic - apply label to events unless ALL events already have
       // it applied, in which case remove.
-      var add = !_.contains(this.getAllChecked(), label);
+      var add = !_.includes(this.getAllChecked(), label);
 
       // Update state
       this.setState({
@@ -243,7 +243,7 @@ module Esper.EventLabels {
       var eventIds = _.map(events, (ev) => ev.id) || [];
       eventIds.push(this.props.team.teamid);
 
-      if (this._lastEventIds && !_.eq(eventIds, this._lastEventIds)) {
+      if (this._lastEventIds && !_.isEqual(eventIds, this._lastEventIds)) {
         this.props.callbackAll(this._lastEvents);
       }
 
@@ -251,7 +251,7 @@ module Esper.EventLabels {
       this._lastEvents = events;
 
       setTimeout(() => {
-        if (_.eq(eventIds, this._lastEventIds)) {
+        if (_.isEqual(eventIds, this._lastEventIds)) {
           this.props.callbackAll(this._lastEvents);
           delete this._lastEventIds;
         }

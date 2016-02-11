@@ -109,7 +109,7 @@ module Esper.DailyStats {
       // Filter by domain => exclude e-mails
       if (filterDomains) {
         guestEmails = _.filter(guestEmails,
-          (e) => _.contains(filterDomains, e.split('@')[1])
+          (e) => _.includes(filterDomains, e.split('@')[1])
         )
       }
 
@@ -152,11 +152,11 @@ module Esper.DailyStats {
       var partitionsForDomain = _.filter(response.guest_stats, (s) =>
         !!_.find(s.guests, (g) => g.email.split('@')[1] === domain)
       )
-      var count = _.sum(partitionsForDomain, (p) => p.count)
+      var count = _.sumBy(partitionsForDomain, (p) => p.count)
 
       return {
         domain: domain,
-        time: _.sum(guests, (g) => g.time),
+        time: _.sumBy(guests, (g) => g.time),
         count: count,
         guests: guests
       }
@@ -167,18 +167,18 @@ module Esper.DailyStats {
 
   /* Utils */
   export function sumScheduled(response: ApiT.DailyStatsResponse) {
-    return _.sum(response.daily_stats, (s) => _.sum(s.scheduled));
+    return _.sumBy(response.daily_stats, (s) => _.sum(s.scheduled));
   }
 
   export function sumWithGuests(response: ApiT.DailyStatsResponse) {
-    return _.sum(response.daily_stats, (s) => _.sum(s.with_guests));
+    return _.sumBy(response.daily_stats, (s) => _.sum(s.with_guests));
   }
 
   export function sumScheduledCount(response: ApiT.DailyStatsResponse) {
-    return _.sum(response.daily_stats, (s) => s.scheduled.length);
+    return _.sumBy(response.daily_stats, (s) => s.scheduled.length);
   }
 
   export function sumWithGuestsCount(response: ApiT.DailyStatsResponse) {
-    return _.sum(response.daily_stats, (s) => s.with_guests.length)
+    return _.sumBy(response.daily_stats, (s) => s.with_guests.length)
   }
 }

@@ -29,7 +29,7 @@ inject({jQuery: jQuery, $: jQuery}, function() {
 /* global Esper: true */
 Esper = (function(esperObj) {
   var assignments = {
-    _:            lodash,
+    _:            lodash.noConflict(),
     $:            jQuery,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },

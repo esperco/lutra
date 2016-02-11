@@ -100,7 +100,7 @@ module Esper.Components {
     }
 
     getApprovedTeams(info: ApiT.LoginResponse) {
-      return _.difference(info.teams, this.getUnapprovedTeams(info));
+      return _(info.teams).difference(this.getUnapprovedTeams(info)).value();
     }
 
     getName(uid: string) {

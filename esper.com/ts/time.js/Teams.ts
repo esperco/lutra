@@ -251,7 +251,7 @@ module Esper.Teams {
   // Given a label list, remove duplicates and near-duplicates
   function normalizeLabels(labels: string[]) {
     labels = labels || [];
-    return _.filter(_.uniq(labels, normalizeLabel));
+    return _.filter(_.uniqBy(labels, normalizeLabel));
   }
 
   /*

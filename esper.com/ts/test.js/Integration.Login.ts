@@ -5,7 +5,18 @@
 
 module Esper.Integration {
   describe("/login", function() {
-    beforeAll(function(done) {
+    var originalTimeout: number;
+
+    beforeAll(function() {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    });
+
+    afterAll(function() {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+    });
+
+    beforeEach(function(done) {
       Test.goTo("/login", done);
     });
 

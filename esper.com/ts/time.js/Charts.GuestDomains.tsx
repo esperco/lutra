@@ -41,13 +41,13 @@ module Esper.Charts {
       var totalWithGuests = DailyStats.sumWithGuests(data);
       var totalNoGuests = totalScheduled - totalWithGuests;
 
-      var totalDomain = _.sum(domains, (d) => d.time);
+      var totalDomain = _.sumBy(domains, (d) => d.time);
       var totalDisplayed = this.showEmptyDomain() ?
         totalNoGuests + totalDomain : totalDomain;
       var cutOffTime = TOP_GUESTS_CUT_OFF * totalDisplayed;
       domains = _.filter(domains, (d) => d.time >= cutOffTime);
 
-      var totalNamedDomain = _.sum(domains, (d) => d.time)
+      var totalNamedDomain = _.sumBy(domains, (d) => d.time)
       var totalUnnamedDomain = totalDomain - totalNamedDomain;
 
       /////
@@ -59,7 +59,7 @@ module Esper.Charts {
           var domainGuests = _.filter(d.guests,
             (g) => g.time >= cutOffTime
           );
-          var remainder = d.time - _.sum(domainGuests, (g) => g.time);
+          var remainder = d.time - _.sumBy(domainGuests, (g) => g.time);
 
           // Each guest is colored a shade of base color for domain
           var baseColor = Colors.getColorForDomain(d.domain);

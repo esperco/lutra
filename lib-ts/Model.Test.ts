@@ -108,7 +108,7 @@ module Esper.Model {
         myRabbitStore.insert("brownRabbitId", {
           uid: "brownRabbitId", carrots: 1
         });
-        jasmine.addCustomEqualityTester(_.eq);
+        jasmine.addCustomEqualityTester(_.isEqual);
       });
 
       it("should let us get all inserted data", function() {

@@ -212,7 +212,7 @@ module Esper.Views {
       // Set timeout to post Analytics tracking call after 3 seconds, but only
       // if we're still looking at the same view
       currentTimer = setTimeout(function() {
-        if (_.eq(currentChart.params, chart.params)) {
+        if (_.isEqual(currentChart.params, chart.params)) {
           Analytics.track(Analytics.Trackable.ViewTimeStats, _.extend({
             labelCount: (params.selectedLabels || []).length,
             periodLength: relEnd - relStart
