@@ -679,7 +679,7 @@ module Esper.CalPicker {
                         tpref: ApiT.TaskPreferences) : JQueryPromise<Picker> {
     var calendars = team.team_calendars;
     return Api.getCalendarList().done(function(x) {
-      calendars = _.uniq(_.union(calendars, x.calendars), 'google_cal_id');
+      calendars = _.uniqBy(_.union(calendars, x.calendars), 'google_cal_id');
     }).then<Picker>(function() {
       var pickerView = createView(refreshCal, calendars, userSidebar, team, tpref);
       setupCalendar(team, calendars, pickerView);

@@ -35,7 +35,7 @@ var bloodhound = require("typeahead.js/dist/bloodhound.js");
 /* global window: false */
 Esper = (function(esperObj) {
   var assignments = {
-    _:            lodash,
+    _:            lodash.noConflict(),
     $:            jQuery,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
