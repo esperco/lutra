@@ -5,6 +5,17 @@
 
 module Esper.Integration {
   describe("/time", function() {
+    var originalTimeout: number;
+
+    beforeAll(function() {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    });
+
+    afterAll(function() {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+    });
+
     describe("when logged in", function() {
       beforeAll(function(done) {
         Login.stubLois();
