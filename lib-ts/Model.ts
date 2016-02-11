@@ -210,7 +210,7 @@ module Esper.Model {
 
     // Update emitChange to handle aliases
     protected emitChange(_ids?: string[]): void {
-      _ids = _.chain(_ids)
+      _ids = _.chain<string>(_ids)
         .map((_id) => {
           var metadata = this.metadata(_id);
           if (metadata && metadata.aliases) {
@@ -218,9 +218,10 @@ module Esper.Model {
           }
           return [_id];
         })
-        .flatten()
+        .flatten<string>()
         .uniq()
         .value();
+
       super.emitChange(_ids);
     }
 
