@@ -304,7 +304,6 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-
   /***** Nylas *****/
   export function getNylasLoginUrl(email: string,
                                    nonce: string,
@@ -329,6 +328,12 @@ module Esper.Api {
       encodeURIComponent(execName) + "/" +
       encodeURIComponent(timezone);
     return JsonHttp.post(url);
+  }
+
+  /***** Slack *****/
+  export function getSlackAuthUrl(): JQueryPromise<ApiT.UrlResult> {
+    var url = prefix + "/api/slack/auth-url/" + string(Login.me());
+    return JsonHttp.get(url);
   }
 
   /***** Team label syncing *****/
@@ -671,7 +676,7 @@ module Esper.Api {
 
   export function postStartEventFeedbacks(teamid: string, calid: string):
   JQueryPromise<void> {
-    var url = prefix + "/api/calendar/ask-feedbacks/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/start-feedbacks/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + string(calid);
     return JsonHttp.post(url, "");

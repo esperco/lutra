@@ -448,6 +448,8 @@ type token_response = [
     transportation?: string[];
     meeting_types: MeetingTypes;
     email_types: EmailTypes;
+    email_for_meeting_feedback?: boolean;
+    slack_for_meeting_feedback?: boolean;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
