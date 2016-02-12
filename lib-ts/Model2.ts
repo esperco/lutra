@@ -265,10 +265,10 @@ module Esper.Model2 {
     ////////////
 
     /*
-      Variant of upsert that only updates if metadata is not UNSAVED or
+      Variant of set that only updates if metadata is not UNSAVED or
       INFLIGHT (avoids clobbering user data). Returns true if successful
     */
-    upsertSafe(_id: TKey, data: Option.T<TData>, opts?: StoreOpts<TKey>)
+    setSafe(_id: TKey, data: Option.T<TData>, opts?: StoreOpts<TKey>)
       : boolean
     {
       return this.get(_id).match({
@@ -287,9 +287,9 @@ module Esper.Model2 {
       });
     }
 
-    // Like upsertSafe, but sans data
-    upsertSafeOpt(_id: TKey, opts: StoreOpts<TKey>): boolean {
-      return this.upsertSafe(_id, this.getData(_id), opts);
+    // Like setSafe, but sans data
+    setSafeOpt(_id: TKey, opts: StoreOpts<TKey>): boolean {
+      return this.setSafe(_id, this.getData(_id), opts);
     }
 
     /*
@@ -297,13 +297,13 @@ module Esper.Model2 {
       the promise resolves. Updates dataStatus metadata accordingly.
     */
     fetch(_id: TKey, promise: JQueryPromise<TData>) {
-      this.upsertSafeOpt(_id, {
+      this.setSafeOpt(_id, {
         dataStatus: Model.DataStatus.FETCHING
       });
 
       return promise.then((newData: TData) => {
         // On success, update store
-        this.upsertSafe(_id, Option.wrap(newData), {
+        this.setSafe(_id, Option.wrap(newData), {
           dataStatus: Model.DataStatus.READY
         });
         return newData;
@@ -311,7 +311,7 @@ module Esper.Model2 {
       }).fail((err) => {
         // On failure, update store to note failure (again, don't override
         // user data)
-        this.upsertSafe(_id, Option.none<TData>(), {
+        this.setSafe(_id, Option.none<TData>(), {
           dataStatus: Model.DataStatus.FETCH_ERROR,
           lastError: err
         });

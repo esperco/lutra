@@ -273,7 +273,7 @@ module Esper.Model2 {
       });
     });
 
-    describe("upsertSafe", function() {
+    describe("setSafe", function() {
       var name: [string, string] = ["Brown", "Rabbit"];
       function setWithStatus(status: DataStatus) {
         setRabbit(name, 100, {
@@ -281,8 +281,8 @@ module Esper.Model2 {
         });
       }
 
-      function upsertSafe() {
-        return rabbitStore.upsertSafe(name, Option.wrap({
+      function setSafe() {
+        return rabbitStore.setSafe(name, Option.wrap({
           name: name, carrots: 200
         }), {
           dataStatus: DataStatus.READY
@@ -293,7 +293,7 @@ module Esper.Model2 {
         describe("with dataStatus " + DataStatus[status], function() {
           beforeEach(function() {
             setWithStatus(status);
-            this.val = upsertSafe();
+            this.val = setSafe();
           });
 
           it("should return false", function() {
@@ -315,7 +315,7 @@ module Esper.Model2 {
         describe("with dataStatus " + DataStatus[status], function() {
           beforeEach(function() {
             setWithStatus(status);
-            this.val = upsertSafe();
+            this.val = setSafe();
           });
 
           it("should return true", function() {
