@@ -210,6 +210,9 @@ module Esper.Model2 {
     set(_id: TKey, data: Option.T<TData>, opts?: StoreOpts<TKey>): void {
       opts = opts || {};
 
+      Log.assert(!_.isUndefined(data) && data !== null,
+        "Do not store null data inside store -- use Option.none");
+
       // See if an instance of data under this key or any alias already exists
       var aliases = Util.some(opts.aliases, [])
         .concat([_id])

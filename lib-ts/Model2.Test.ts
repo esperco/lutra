@@ -30,6 +30,13 @@ module Esper.Model2 {
       rabbitStore.removeAllChangeListeners();
     });
 
+    describe("set null", function() {
+      it("should throw an error", function() {
+        expect(() => rabbitStore.set(["Brown", "Rabbit"], null))
+          .toThrowError();
+      });
+    });
+
     describe("set new", function() {
       beforeEach(function() {
         this.listener = jasmine.createSpy("listener");
