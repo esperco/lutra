@@ -36,7 +36,7 @@ module Esper.Model2 {
   }
 
   // Interface for the mutable parts of store metadata
-  interface StoreOpts<K> {
+  export interface StoreOpts<K> {
     dataStatus?: Model.DataStatus,
     aliases?: K[];
     lastError?: Error;
@@ -158,10 +158,10 @@ module Esper.Model2 {
       var key = Util.cmpStringify(_id);
       var ret = Option.wrap(this.data[key]);
       ret.match({
-        none: () => null,
-        some: (d) => _.each(d.aliases,
+        none: () => Tracker.register(this, key),
+        some: (d) => { _.each(d.aliases,
           (a) => Tracker.register(this, Util.cmpStringify(a))
-        )
+        )}
       });
       return ret;
     }
@@ -200,7 +200,7 @@ module Esper.Model2 {
 
     all(): StoreData<TKey, TData>[] {
       Tracker.register(this);
-      return _.values<StoreData<TKey, TData>>(this.data);
+      return _.uniq(_.values<StoreData<TKey, TData>>(this.data));
     }
 
 
