@@ -20,6 +20,7 @@
     "../lib/Model.Capped.Test.ts",
     "../lib/Model.StoreOne.Test.ts",
     "../lib/Model.Batch.Test.ts",
+    "../lib/Model2.Test.ts",
     "../lib/JQStore.Test.ts",
     "../lib/Option.Test.ts",
     "../lib/Queue.Test.ts",
