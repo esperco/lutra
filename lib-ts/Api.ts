@@ -304,7 +304,6 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-
   /***** Nylas *****/
   export function getNylasLoginUrl(email: string,
                                    nonce: string,
@@ -329,6 +328,12 @@ module Esper.Api {
       encodeURIComponent(execName) + "/" +
       encodeURIComponent(timezone);
     return JsonHttp.post(url);
+  }
+
+  /***** Slack *****/
+  export function getSlackAuthUrl(): JQueryPromise<ApiT.UrlResult> {
+    var url = prefix + "/api/slack/auth-url/" + string(Login.me());
+    return JsonHttp.get(url);
   }
 
   /***** Team label syncing *****/
@@ -671,7 +676,7 @@ module Esper.Api {
 
   export function postStartEventFeedbacks(teamid: string, calid: string):
   JQueryPromise<void> {
-    var url = prefix + "/api/calendar/ask-feedbacks/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/start-feedbacks/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + string(calid);
     return JsonHttp.post(url, "");
@@ -1117,6 +1122,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function getEventLabels(team_id: string, event_id: string):
+    JQueryPromise<{labels: string[]}>
+  {
+    var url = prefix + "/api/event/labels/" + string(Login.myUid())
+            + "/" + string(team_id)
+            + "/" + encodeURIComponent(event_id);
+    return JsonHttp.get(url);
+  }
+
   export function updateEventLabels(team_id: string, event_id: string,
                                     labels: string[]):
   JQueryPromise<void> {
@@ -1124,6 +1138,14 @@ module Esper.Api {
             + "/" + string(team_id)
             + "/" + encodeURIComponent(event_id);
     return JsonHttp.post(url, JSON.stringify({labels:labels}));
+  }
+
+  export function changeEventLabels(team_id: string,
+    req: ApiT.LabelChangeRequest): JQueryPromise<void>
+  {
+    var url = prefix + "/api/event/label-change/" + string(Login.myUid())
+            + "/" + string(team_id);
+    return JsonHttp.post(url, JSON.stringify(req));
   }
 
   export function updateGoogleEvent(teamid: string,

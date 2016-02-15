@@ -27,7 +27,7 @@ inject({jQuery: jQuery, $: jQuery}, function() {
 /* global window: false */
 Esper = (function(esperObj) {
   var assignments = {
-    _:            lodash,
+    _:            lodash.noConflict(),
     $:            jQuery,
     jQuery:       jQuery,
     Highcharts:   highcharts,

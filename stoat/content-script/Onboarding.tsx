@@ -1072,7 +1072,7 @@ module Esper.Onboarding {
           function() {
             return this.value;
           }).get();
-        if (!_.contains(calendars, defaultCal)) {
+        if (!_.includes(calendars, defaultCal)) {
           calendars.push(defaultCal);
         }
 

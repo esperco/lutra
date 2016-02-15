@@ -448,6 +448,8 @@ type token_response = [
     transportation?: string[];
     meeting_types: MeetingTypes;
     email_types: EmailTypes;
+    email_for_meeting_feedback?: boolean;
+    slack_for_meeting_feedback?: boolean;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
@@ -734,6 +736,15 @@ type token_response = [
 
   export interface Labels {
     labels: string[];
+  }
+
+  type EventSelection = ["Eventids", string[]] | ["Label", string];
+
+  export interface LabelChangeRequest {
+    selection: EventSelection;
+    remove_all_labels?: boolean;
+    remove_labels?: string[];
+    add_labels?: string[];
   }
 
   export interface Random {

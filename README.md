@@ -39,7 +39,7 @@ You should also have NPM installed:
 
 ```
 $ npm -v
-2.14.12
+3.7.1
 ```
 
 If you don't have NPM installed, tryin running `sudo apt-get install npm` or

@@ -12,7 +12,7 @@
     "jasmine": "github:esperco/DefinitelyTyped/jasmine/jasmine.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "jquery": "github:esperco/DefinitelyTyped/jquery/jquery.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "jqueryui": "github:esperco/DefinitelyTyped/jqueryui/jqueryui.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
-    "lodash": "github:esperco/DefinitelyTyped/lodash/lodash.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
+    "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#c8630523ef2ee3fb42fe65cc17af5b1b56e611bc",
     "moment": "github:esperco/DefinitelyTyped/moment/moment.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "moment-node": "github:esperco/DefinitelyTyped/moment/moment-node.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "moment-timezone": "github:esperco/DefinitelyTyped/moment-timezone/moment-timezone.d.ts#f53108644c2f32b93de423d844650297fc415a8b",

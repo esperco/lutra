@@ -15,6 +15,7 @@ module Esper.Components {
     teamId: string;
     calId: string;
     eventIds?: string[];
+    forceUpdate?: number; // Random number we can set to force update
     updateFn: (eventId: string, eventTitle: string, add: boolean) => void;
   }
 
@@ -129,7 +130,7 @@ module Esper.Components {
 
     componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
       $(this._fcDiv).fullCalendar('refetchEvents');
-      if (! _.eq(prevProps, this.props)) {
+      if (! _.isEqual(prevProps, this.props)) {
         this.updateCurrentView();
       }
     }
@@ -213,10 +214,10 @@ module Esper.Components {
       callback(_.map(events, (event): FullCalendar.EventObject => {
         var eventId = Events.storeId(event);
         var classNames: string[] = ["selectable"];
-        if (_.contains(this.props.eventIds || [], eventId)) {
+        if (_.includes(this.props.eventIds || [], eventId)) {
           classNames.push("active");
         }
-        if (_.contains(recurringEventIds, event.recurring_event_id)) {
+        if (_.includes(recurringEventIds, event.recurring_event_id)) {
           classNames.push("recurring-active");
         }
         if (event.recurring_event_id) {
@@ -248,7 +249,7 @@ module Esper.Components {
 
     // Handle event selection, toggle
     toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
-      var currentlySelected = _.contains(this.props.eventIds || [], event.id);
+      var currentlySelected = _.includes(this.props.eventIds || [], event.id);
       this.props.updateFn(event.id, event.title,
         jsEvent.shiftKey || jsEvent.ctrlKey);
     }

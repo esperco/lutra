@@ -13,7 +13,7 @@ module Esper.Model {
 
   describe("Model.BatchStore", function() {
     beforeEach(function() {
-      jasmine.addCustomEqualityTester(_.eq);
+      jasmine.addCustomEqualityTester(_.isEqual);
       rabbitStore.reset();
       rabbitListStore.reset();
 

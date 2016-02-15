@@ -44,7 +44,7 @@ module Esper.Analytics {
       identifyViaIframe(uid, _.extend({
         extensionVersion: Conf.version,
         email: data.info && data.info.email,
-        teams: _.pluck(teams, 'teamid'),
+        teams: _.map(teams, (t) => t.teamid),
       }, optsFlattened));
     });
   }

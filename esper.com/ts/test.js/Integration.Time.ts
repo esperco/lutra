@@ -5,6 +5,17 @@
 
 module Esper.Integration {
   describe("/time", function() {
+    var originalTimeout: number;
+
+    beforeAll(function() {
+      originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = 20000;
+    });
+
+    afterAll(function() {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+    });
+
     describe("when logged in", function() {
       beforeAll(function(done) {
         Login.stubLois();
@@ -42,10 +53,9 @@ module Esper.Integration {
     describe("when not logged in", function() {
       beforeAll(function(done) {
         clearLogin();
-        Test.goTo("/time", function() {
-          // Wait for one redirect -- failure to call results in timeout
-          Test.getTestFrame().one("load", done);
-        });
+        Test.goTo("/time", done,
+          // Wait for redirect before calling done
+          () => Test.getTestWindow().location.pathname !== "/time");
       });
 
       it("should redirect to login page", function() {

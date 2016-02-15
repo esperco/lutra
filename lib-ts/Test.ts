@@ -6,17 +6,34 @@
 /// <reference path="./Api.ts" />
 
 module Esper.Test {
+  var frameCls = "esper-test-frame";
+  var frameContainer = "#esper-test-frame-container";
+
+  // Create a new test frame
+  function newFrame() {
+    $(frameContainer).prepend(`<iframe class="${frameCls}" />`);
+  }
 
   // Returns the test frame object, wrapped in jQuery
   export function getTestFrame() {
-    return $("#esper-test-frame");
+    return $("." + frameCls).first();
   };
 
   // Navigates to a page in the test frame
-  export function goTo(href: string, done?: (event: JQueryEventObject) => void) {
+  export function goTo(href: string,
+      done?: (event: JQueryEventObject) => void,
+      conditional?: (event: JQueryEventObject) => void) {
+    newFrame();
     var frame = this.getTestFrame();
     if (done) {
-      frame.one("load", done);
+      var cb = function(e: JQueryEventObject) {
+        if (conditional && !conditional(e)) {
+          frame.one("load", cb);
+        } else {
+          done(e);
+        }
+      }
+      frame.one("load", cb);
     }
     frame.attr("src", href);
   }
@@ -61,7 +78,7 @@ module Esper.Test {
       `Expected ${element.type && getName(element.type)} ` +
       `to be ${getName(cls)}`);
     if (props) {
-      expect(_.eq(props, element.props)).toBeTruthy(
+      expect(_.isEqual(props, element.props)).toBeTruthy(
         `Exepected ${JSON.stringify(props)} to be ` +
         `${JSON.stringify(element.props)}`);
     }
@@ -71,8 +88,21 @@ module Esper.Test {
   export function mockAPIs() {
     for (var name in Api) {
       if (Api.hasOwnProperty(name) && (<any> Api)[name] instanceof Function) {
-        spyOn(Api, name).and.returnValue($.Deferred<any>().promise());
+        if (! isSpy((<any> Api)[name])) {
+          spySafe(Api, name).and.returnValue($.Deferred<any>().promise());
+        }
       }
     }
+  }
+
+  // Returns true if something has already been spied upon -- uses undocumented
+  // API in Jasmine
+  export function isSpy(f: Function): boolean {
+    return (<any> jasmine).isSpy(f);
+  }
+
+  // Spy on things and don't break if already spied upon
+  export function spySafe(o: any, name: string): jasmine.Spy {
+    return isSpy(o[name]) ? o[name] : spyOn(o, name);
   }
 }

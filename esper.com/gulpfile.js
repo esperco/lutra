@@ -46,6 +46,7 @@ var config = {
 
   lessGlobs: [
     "less/**/*.{css,less}",
+    "../lib-less/**/*.{css,less}",
     "../node_modules/font-awesome/css/font-awesome.css"
   ],
   lessOut: "pub/css",

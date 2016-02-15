@@ -42,7 +42,7 @@ module Esper.Util {
   export function pushToCapped<T>(list: T[], newVal: T, cap: number,
                                   eq?: (a: T, b: T) => boolean): T|void
   {
-    eq = eq || _.eq;
+    eq = eq || _.isEqual;
     _.remove(list, function(oldVal) {
       return eq(oldVal, newVal);
     });
@@ -112,5 +112,15 @@ module Esper.Util {
   // Normalize falsey values to null
   export function nullify<T>(a: T): T {
     return a ? a : null;
+  }
+
+  // Ensures var is not null, returns default otherwise
+  export function some<T>(v: T, d?: T): T {
+    if (_.isUndefined(v) || v === null) {
+      Log.assert(!_.isUndefined(d) && d !== null, "Value must be defined")
+      return d;
+    } else {
+      return v;
+    }
   }
 }

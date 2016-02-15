@@ -34,17 +34,17 @@ module Esper.Components {
   export class LabelEditor extends Component<LabelEditorProps, {}>
   {
     renderWithData() {
-      if (!this.props.events || !this.props.events.length) {
+      var events = _.filter(_.map(this.props.events,
+        (e) => Events.EventStore.val(e.id)
+      ));
+
+      if (!events.length) {
         return <span />;
       }
 
-      var heading = (this.props.events.length === 1 ?
-        this.props.events[0].title || "1 Event Selected":
-        this.props.events.length + " Events Selected"
-      );
-
-      var events = _.map(this.props.events,
-        (e) => Events.EventStore.val(e.id)
+      var heading = (events.length === 1 ?
+        events[0].title || "1 Event Selected":
+        events.length + " Events Selected"
       );
 
       var hasRecurring = false;
@@ -135,7 +135,9 @@ module Esper.Components {
     }
 
     editLabelsCallback() {
-      Layout.renderModal(<LabelAddModal />)
+      Layout.renderModal(<LabelAddModal
+        onHidden={Views.forceCalendarLabelingUpdate}
+      />);
     }
   }
 }
