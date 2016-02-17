@@ -183,7 +183,7 @@ module Esper.Model {
       it("should call the post function with StoreOne and empty keys",
         function()
       {
-        track(() => {
+        Tracker.track(() => {
           myRabbitStore.isSet();
           yourRabbitStore.get();
         }, this.post);

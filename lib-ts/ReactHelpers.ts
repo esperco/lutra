@@ -5,7 +5,7 @@
 
 /// <reference path="./Emit.ts" />
 /// <reference path="./JQStore.ts" />
-/// <reference path="./Model.ts" />
+/// <reference path="./Tracker.ts" />
 /// <reference path="./Util.ts" />
 
 /*
@@ -81,10 +81,10 @@ module Esper.ReactHelpers {
     }
   });
 
-  function isTrackingKey(a: Emit.EmitBase|Model.TrackingKey)
-    : a is Model.TrackingKey
+  function isTrackingKey(a: Emit.EmitBase|Tracker.TrackingKey)
+    : a is Tracker.TrackingKey
   {
-    var typedA = <Model.TrackingKey> a;
+    var typedA = <Tracker.TrackingKey> a;
     return !!typedA.store;
   }
 
@@ -107,7 +107,7 @@ module Esper.ReactHelpers {
       will be automatically tracked and you don't have to call setSources.
     */
     render() {
-      return Model.track(() => this.renderWithData(), (calls) => {
+      return Tracker.track(() => this.renderWithData(), (calls) => {
         this.setSources(calls);
       });
     }
@@ -160,7 +160,7 @@ module Esper.ReactHelpers {
       If no key list is provided, then emitter will trigger change on each
       change. Otherwise, will filter against keys if emitter passes any.
     */
-    protected setSources(newSources: Array<Emit.EmitBase|Model.TrackingKey>)
+    protected setSources(newSources: Array<Emit.EmitBase|Tracker.TrackingKey>)
       : void
     {
       _.each(this.sources || [], (source) => {

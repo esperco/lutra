@@ -750,13 +750,13 @@ module Esper.Model {
       });
 
       it("should return the value of its callback", function() {
-        expect(track(() => 123, this.post)).toBe(123);
+        expect(Tracker.track(() => 123, this.post)).toBe(123);
       });
 
       it("should call the post function with any store and values tracked",
         function()
       {
-        track(() => {
+        Tracker.track(() => {
           myRabbitStore.has("brown_rabbit");
           myRabbitStore.get("black_rabbit");
         }, this.post);
@@ -771,7 +771,7 @@ module Esper.Model {
       });
 
       it("should track getAll calls", function() {
-        track(() => {
+        Tracker.track(() => {
           myRabbitStore.getAll();
         }, this.post);
 

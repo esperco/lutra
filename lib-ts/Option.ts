@@ -26,11 +26,8 @@ module Esper.Option {
 
     /* Extract the value or fail by raising an exception indicating a bug. */
     unwrap(): E {
-      if (this.some) {
-        return this.value;
-      } else {
-        Log.assert(false);
-      }
+      Log.assert(this.some, "Unwrap failed.")
+      return this.value;
     }
 
     /** Monadic bind for Option.T, but `bind' is already used in the
