@@ -244,32 +244,18 @@ module Esper.ApiT {
     email: string;
     teams: Team[];
     team_members: TeamMember[];
-    waiting_for_sync: boolean;
-    has_ios_app: boolean;
+    landing_url?: string;
   }
 
   export interface TokenInfo {
-    token_is_valid: boolean;
-    token_value: Variant.Variant /* token_response */;
+    is_valid: boolean;
+    needs_auth: boolean;
+    description: Variant.Variant; // token_description
   }
 
-/*
-type token_response = [
-  | Invite_create_team of invite_create_team
-      (* Invitation to create a team, without specifying which
-         email address must be used for the account.
-      *)
-
-  | Invite_join_team of invite_join_team
-      (* Invitation to join an existing team. *)
-
-  | Login of login_response
-      (* One-time login; usable for password reset. *)
-
-  | Unsub_daily_agenda of unsub_email
-  | Unsub_tasks_update of unsub_email
-]
-*/
+  export interface TokenResponse {
+    token_value: Variant.Variant; // token_value
+  }
 
   export interface InviteCreateTeam {
     from_uid: string;

@@ -141,8 +141,7 @@ module Esper.TestFixtures {
           member_uid: uid
         }
       ],
-      waiting_for_sync: false,
-      has_ios_app: false
+      landing_url: "moon/base"
     };
   }
 }

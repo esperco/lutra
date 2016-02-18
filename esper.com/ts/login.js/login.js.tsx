@@ -66,7 +66,7 @@ module Esper {
     }
 
     else if (token) {
-      Token.handle(token, handleLoginInfo, function(message, error) {
+      Token.consume(token, handleLoginInfo, function(message, error) {
         var r = Util.getParamByName(Login.redirectParam);
         if (r && Login.initCredentials()) {
         // If already logged in, ignore the token error and go straight to
@@ -93,7 +93,8 @@ module Esper {
   }
 
   // Go to post-login redirect
-  export function redirect() {
+  export function redirect(landingUrl?: string) {
+    var landingUrl = landingUrl ? landingUrl : getLandingUrl();
     location.href = "/" + getLandingUrl();
   }
 
@@ -190,7 +191,7 @@ module Esper {
     })
 
     .then(function(response) {
-      redirect();
+      redirect(response.landing_url);
     }, function(err) {
       var errMsg = "There was an error logging you in."
       if (err === Login.MISSING_NONCE) {
