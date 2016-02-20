@@ -19,6 +19,8 @@ module Esper.Components {
     // Classes
     listClasses?: string;
     itemClasses?: string;
+    headerClasses?: string;
+    dividerClasses?: string;
     selectedItemClasses?: string;
 
     updateFn: (selectedIds: SelectedIds[]) => void;
@@ -59,17 +61,18 @@ module Esper.Components {
       </div>;
     }
 
-    renderGroup(group: Group) {
+    renderGroup(group: Group, count: number) {
       var selectedIcon = this.props.selectedIcon || "fa-check-square-o";
       var unselectedIcon = this.props.unselectedIcon || "fa-square-o";
 
       return <div key={group.id}>
         {
           group.displayAs ?
-          <h5 className="esper-subheader">{group.displayAs}</h5> :
-          null
+          <div className={ this.props.headerClasses || "esper-subheader"}>
+            {group.displayAs}
+          </div> : null
         }
-        <div className={"list-group " + this.props.listClasses || ""}>{
+        <div className={this.props.listClasses || "list-group"}>{
           _.map(group.choices, (opts) => {
             var selected = this.isSelected(group.id, opts.id);
 
@@ -85,8 +88,8 @@ module Esper.Components {
             var clickHandler = () => {
               this.handleClick(group.id, opts.id, !selected);
             };
-            var itemClasses = "list-group-item one-line " +
-              (this.props.itemClasses || "") + " " +
+            var itemClasses =
+              (this.props.itemClasses || "list-group-item one-line") + " " +
               (selected ? this.props.selectedItemClasses || "" : "");
 
             return <a onClick={clickHandler} key={group.id + " " + opts.id}
@@ -98,6 +101,10 @@ module Esper.Components {
             </a>
           })
         }</div>
+        {
+          count + 1 < this.props.groups.length ?
+          <div className={this.props.dividerClasses || ""} /> : null
+        }
       </div>;
     }
 
