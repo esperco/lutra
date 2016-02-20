@@ -330,3 +330,55 @@
     color: @gray-dark;
   }
 }
+
+
+/* Similar to Bootstrap's UL styling for dropdown menu, but allows more
+flexibility with non-UL elements */
+
+.esper-select-menu {
+  padding: 0;
+  margin: 0; // override default ul
+  list-style: none;
+  font-size: @font-size-base;
+  text-align: left; // Ensures proper alignment if parent has it changed
+
+  .esper-selectable {
+    display: block;
+    cursor: pointer;
+    padding: @padding-xs-vertical @padding-large-horizontal;
+    clear: both;
+    font-weight: normal;
+    line-height: @line-height-base;
+    color: @dropdown-link-color;
+    white-space: nowrap; // prevent links from randomly breaking onto new lines
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      color: @dropdown-link-hover-color;
+      background-color: @dropdown-link-hover-bg;
+    }
+
+    .badge {
+      float: right;
+    }
+  }
+
+  .divider {
+    height: 1px;
+    margin: ((@line-height-computed / 2) - 1) 0;
+    overflow: hidden;
+    background-color: @dropdown-divider-bg;
+  }
+}
+
+.esper-select-header {
+  display: block;
+  padding: @padding-xs-vertical @padding-large-horizontal;
+  font-size: @font-size-small;
+  line-height: @line-height-base;
+  color: @dropdown-header-color;
+  white-space: nowrap; // as with > li > a
+}
+
+

@@ -180,26 +180,66 @@ a {
 @media (max-width: @screen-xs-max) {
   .dropdown.xs-open {
     .caret { display: none; }
-    .dropdown-menu { display: block; }
-  }
+    .dropdown-menu {
+      display: block;
+      position: static;
+      width: 100%;
+      box-shadow: none;
+      margin: @padding-base-vertical 0;
 
-  .dropdown-menu {
-    position: static;
-    width: 100%;
-    box-shadow: none;
-    margin: @padding-base-vertical 0;
+      .navbar-collapse & {
+        border-width: 1px 0 0 0;
+        border-radius: 0;
+        padding: 0;
+      }
 
-    .navbar-collapse & {
-      border-width: 1px 0 0 0;
-      border-radius: 0;
-      padding: 0;
-    }
-
-    > li > a {
-      padding: @padding-base-vertical @padding-base-horizontal;
+      > li > a {
+        padding: @padding-base-vertical @padding-base-horizontal;
+      }
     }
   }
 }
 
 
+//////
 
+.dropdown {
+  .dropdown-menu {
+    width: 100%;
+  }
+}
+
+input.form-control.dropdown-toggle[readonly] {
+  background: white;
+  float: none;
+  cursor: pointer;
+}
+
+
+/* Fix corner rounding with nested inputs */
+
+.input-group {
+  > div:not(:first-child) {
+    .form-control {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  > div:last-child {
+    .form-control:last-child, .form-control.end-of-group {
+      border-top-right-radius: @input-border-radius;
+      border-bottom-right-radius: @input-border-radius;
+
+      &.input-sm {
+        border-top-right-radius: @input-border-radius-small;
+        border-bottom-right-radius: @input-border-radius-small;
+      }
+
+      &.input-lg {
+        border-top-right-radius: @input-border-radius-large;
+        border-bottom-right-radius: @input-border-radius-large;
+      }
+    }
+  }
+}
