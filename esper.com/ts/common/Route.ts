@@ -3,10 +3,6 @@
 /// <reference path="../lib/Util.ts" />
 /// <reference path="./Login.ts" />
 
-declare module Esper {
-  export var qs: typeof QueryString;
-}
-
 module Esper.Route {
   declare var pageJs: PageJS.Static;
   const jsonParam = "q";
