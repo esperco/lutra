@@ -36,10 +36,11 @@ module Esper.Layout {
   }
 
   /*
-    Renders a modal into the a div near the end of the body -- replaces any
-    existing modal in that div
+    Renders a modal into the a div near the end of the body -- closes and
+    replaces any existing modal in that div
   */
   export function renderModal(modal: React.ReactElement<any>) {
+    closeModal();
     $(modalSelector).empty();
 
     /*
@@ -52,6 +53,22 @@ module Esper.Layout {
     window.requestAnimationFrame(function() {
       $(modalSelector + " .modal").modal("show");
     });
+  }
+
+  export function closeModal() {
+    $(modalSelector).find(".modal").modal('hide');
+  }
+
+  // Updates the Modal elements in React without triggering any animation
+  export function updateModal(modal: React.ReactElement<any>) {
+    var modalContainer = $(modalSelector).children("div:last");
+    if (modalContainer.length) {
+      // Container exists, update
+      $(modalContainer).renderReact(modal);
+    } else {
+      // Container doesn't exist, render for first time
+      renderModal(modal);
+    }
   }
 
   // Hide the loading screen
