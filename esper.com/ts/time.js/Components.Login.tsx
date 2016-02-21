@@ -5,6 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Invite.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
+/// <reference path="../common/Components.Dropdown.tsx" />
 /// <reference path="../common/Login.ts" />
 
 module Esper.Components {
@@ -23,8 +24,8 @@ module Esper.Components {
       }
 
       if (this.state.loginInfo) {
-        return <div className="dropdown navbar-text xs-open">
-          <a className="dropdown-toggle" data-toggle="dropdown">
+        return <Dropdown className="dropdown navbar-text xs-open">
+          <a className="dropdown-toggle">
             {this.state.loginInfo.email}{" "}
             <span className="caret"></span>
           </a>
@@ -39,7 +40,7 @@ module Esper.Components {
               Invite your contacts!
             </a></li>
           </ul>
-        </div>;
+        </Dropdown>;
       }
 
       return <button className="btn btn-default navbar-btn"
@@ -52,7 +53,6 @@ module Esper.Components {
       this.setSources([
         Login.InfoStore
       ]);
-      this.find('.dropdown-toggle').dropdown();
     }
 
     getState() {

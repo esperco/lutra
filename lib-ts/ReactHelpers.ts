@@ -249,4 +249,21 @@ module Esper.ReactHelpers {
     // called during the initial constructor
     protected getState(props: P): S { return; }
   }
+
+  // Use when handling children
+  export function isReactElement(p: React.ReactElement<any> | string | number):
+    p is React.ReactElement<any>
+  {
+    var p2 = p as React.ReactElement<any>;
+    return p2.props instanceof Object;
+  }
+
+  // Use when inspecting if React child has class
+  export function hasClass(p: React.ReactElement<any> | string | number,
+                           cls: string)
+  {
+    return isReactElement(p) &&
+      (p.props as React.HTMLAttributes).className &&
+      _.includes((p.props as React.HTMLAttributes).className.split(" "), cls);
+  }
 }
