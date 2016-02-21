@@ -24,6 +24,7 @@
     "../lib/JQStore.Test.ts",
     "../lib/Option.Test.ts",
     "../lib/Queue.Test.ts",
+    "../lib/Queue2.Test.ts",
     "../lib/ReactHelpers.Test.ts",
     "Integration.ts",
     "Integration.Login.ts",
