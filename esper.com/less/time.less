@@ -28,6 +28,7 @@
 @import "./time/_calendar";
 @import "./time/_calendar_grid";
 @import "./time/_labeling";
+@import "./time/_list";
 
 /* Header and footer animations */
 @keyframes dropdown-nav {
@@ -56,6 +57,10 @@ body, .footer {
   background: @body-bg;
   padding: @navbar-height 0;
   min-height: 50%;
+
+  > .container:first-child {
+    margin-top: @navbar-margin-bottom;
+  }
 }
 
 // Other props for left/right set in marten/less/_helpers.less
@@ -100,6 +105,7 @@ body, .footer {
   color: @footer-default-color;
   border-top: 1px solid @footer-border;
   background: @footer-bg;
+  min-height: @navbar-height * 2;
   ul, li{
     list-style-type: none;
   }
@@ -109,6 +115,7 @@ body, .footer {
     bottom: 0;
     left: 0;
     right: 0;
+    min-height: 0;
     max-height: @padding-large-vertical;
     animation: footer-peek 2s 1.2s;
     overflow: hidden;
