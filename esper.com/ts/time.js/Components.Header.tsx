@@ -12,6 +12,8 @@ module Esper.Components {
   }
 
   export class Header extends Component<{}, HeaderState> {
+    _navbarOpen: boolean;
+
     render() {
       var toggleId = "esper-nav-toggle";
       return <nav className="navbar navbar-default navbar-fixed-top">
@@ -28,15 +30,19 @@ module Esper.Components {
             </a>
           </div>
 
-          <div className="collapse navbar-collapse" id={this.getId(toggleId)}>
+          <div className="collapse navbar-collapse" id={this.getId(toggleId)}
+               onClick={() => this._navbarOpen && this.toggleCollapse()}>
             { this.state.loginInfo ? <ul className="nav navbar-nav">
               <NavLink href="/charts">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
               </NavLink>
-              <NavLink href="/calendar-labeling">
-                <i className="fa fa-fw fa-tags"></i>{" "}Label Events
+              <NavLink href="/calendar-labeling" hiddenXs={true}>
+                <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
               </NavLink>
-              <li>
+              <NavLink href="/list">
+                <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+              </NavLink>
+              <li className="hidden-xs">
                 <a onClick={this.openHelpModal.bind(this)}>
                   <i className="fa fa-fw fa-question-circle" />
                   <span className="visible-xs-inline">{" "}How To</span>
@@ -68,6 +74,7 @@ module Esper.Components {
 
     toggleCollapse() {
       this.find('.collapse').collapse('toggle');
+      this._navbarOpen = !this._navbarOpen;
     }
 
     getState() {
@@ -80,12 +87,15 @@ module Esper.Components {
   interface NavLinkProps {
     href: string;
     children?: JSX.Element[];
+    hiddenXs?: boolean;
   }
 
   class NavLink extends Component<NavLinkProps, {}> {
     render() {
       var selected = Route.nav.isActive(this.props.href);
-      return <li className={(selected ? "active" : "")}>
+      return <li className={(selected ? "active" : "") +
+        (this.props.hiddenXs ? " hidden-xs" : "")
+      }>
         <a onClick={() => Route.nav.path(this.props.href)}>
           {this.props.children}
         </a>

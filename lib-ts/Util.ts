@@ -101,10 +101,12 @@ module Esper.Util {
     Get value of query string
     http://stackoverflow.com/a/901144
   */
-  export function getParamByName(name: string): string {
+  export function getParamByName(name: string, queryStr?: string): string {
+    queryStr = queryStr || location.search;
+    if (queryStr[0] !== "?") queryStr = "?" + queryStr;
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
+        results = regex.exec(queryStr);
     return (results === null ? "" :
       decodeURIComponent(results[1].replace(/\+/g, " ")));
   }

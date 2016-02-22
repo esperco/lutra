@@ -4,13 +4,13 @@
 /// <reference path="../common/Route.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Onboarding.ts" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Components.Header.tsx" />
 /// <reference path="./Components.Footer.tsx" />
+/// <reference path="./Actions.FilterList.tsx" />
 
 module Esper.Route {
 
@@ -73,6 +73,10 @@ module Esper.Route {
       <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
+  });
+
+  route("/list", function(ctx) {
+    render(Actions.FilterList(getJSONQuery(ctx)));
   });
 
   // 404 page
