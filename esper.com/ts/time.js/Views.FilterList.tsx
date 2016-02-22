@@ -288,9 +288,12 @@ module Esper.Views {
             </span>{" to "}<span className="end">
               { moment(event.end).format("h:mm a") }
             </span>{" "}
-            <span className="recurring" title="Recurring">
-              <i className="fa fa-fw fa-refresh" />
-            </span>
+            { event.recurring_event_id ?
+              <span className="recurring" title="Recurring">
+                <i className="fa fa-fw fa-refresh" />
+              </span> :
+              null
+            }
           </div>
           <div className="event-labels">
             { _.map(event.labels_norm,
