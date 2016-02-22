@@ -32,6 +32,7 @@ module Esper.EventLabels {
         end: this.props.event.end.local,
         description_messageids: this.props.event.description_messageids,
         labels: this.props.event.labels,
+        labels_norm: _.map(this.props.event.labels, (l) => l.toLowerCase()),
         all_day: this.props.event.all_day,
         guests: this.props.event.guests,
         transparent: this.props.event.transparent
