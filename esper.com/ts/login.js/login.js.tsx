@@ -241,7 +241,7 @@ module Esper {
         </div>
         <div className="form-group">
           <label htmlFor={this.getId("uid")}>API Secret</label>
-          <input id={this.getId("apiSecret")} type="text"
+          <input id={this.getId("apiSecret")} type="password"
             ref={(c) => this._apiSecret = c}
             defaultValue="lois_secret"
             className="form-control" />
