@@ -171,13 +171,6 @@ module Esper.Api {
       "/join-team", JSON.stringify(invite));
   }
 
-  export function refer(): JQueryPromise<ApiT.UrlResult> {
-    var fromUid = Login.me();
-    var refer = { from_uid: fromUid };
-    return JsonHttp.post(prefix + "/api/invite/" + string(fromUid) + "/refer",
-      JSON.stringify(refer));
-  }
-
   export function setTeamName(teamid: string, name: string):
     JQueryPromise<void> {
     var fromUid = Login.me();

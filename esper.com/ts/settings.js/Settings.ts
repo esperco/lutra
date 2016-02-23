@@ -170,24 +170,6 @@ module Esper.Settings {
     return view;
   }
 
-  function renderReferSection() {
-'''
-<div #view style="margin-top:16px">
-  <div class="generate-row clearfix">
-    <input #url type="text" class="generate-input col-xs-9 disabled"
-           onclick="this.select();"/>
-  </div>
-</div>
-'''
-    Api.refer().done(function(x) {
-      url
-        .val(x.url)
-        .removeClass("disabled")
-        .select();
-    });
-    return view;
-  }
-
   function renderAdminSection() {
 '''
 <div #view style="margin-top:16px">
@@ -275,10 +257,6 @@ module Esper.Settings {
         <a #revoke
            href="#"
            class="danger-link">Deauthorize this account</a>
-      </div>
-      <div class="admin">
-        <div class="esper-h1 settings-section-title">Refer Friend</div>
-        <div #referBody/>
       </div>
       <div #adminSection class="admin hide">
         <div class="esper-h1 settings-section-title">Admin Tools</div>
@@ -382,8 +360,6 @@ module Esper.Settings {
           }
         });
     }
-
-    referBody.append(renderReferSection());
 
     if (Login.isAdmin()) {
       adminBody.append(renderAdminSection());
