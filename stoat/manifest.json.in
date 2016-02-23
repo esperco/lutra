@@ -25,12 +25,14 @@
   "content_scripts": [
     {
       "matches": [
-        "http://127.0.0.1/*",
-        "http://localhost/*",
+        "http://127.0.0.1/chrome-ext*",
+        "http://localhost/chrome-ext*",
+        "http://127.0.0.1:5001/chrome-ext*",
+        "http://localhost:5001/chrome-ext*",
         "http://ec2-54-144-194-80.compute-1.amazonaws.com/*",
         "http://ec2-23-20-70-85.compute-1.amazonaws.com/*",
         "http://ec2-54-205-201-215.compute-1.amazonaws.com/*",
-        "https://esper.com/*",
+        "https://esper.com/chrome-ext*",
         "https://app.esper.com/*",
         "https://www.google.com/calendar/*",
         "https://calendar.google.com/*",
