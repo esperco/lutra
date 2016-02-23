@@ -9,11 +9,15 @@
 
 #esper-login-container {
   width: 350px;
-  margin: 100px auto;
+  margin: @padding-large-vertical auto;
   padding: @padding-large-vertical;
   text-align: center;
   border: 1px solid @gray-lighter;
   border-radius: @border-radius-large;
+
+  @media (min-width: @screen-sm-min) {
+    margin: 100px auto;
+  }
 }
 
 #esper-login {

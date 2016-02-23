@@ -99,6 +99,7 @@ module Esper.Components {
 
     componentWillUnmount() {
       this._mounted = false;
+      super.componentWillUnmount();
     }
   }
 }

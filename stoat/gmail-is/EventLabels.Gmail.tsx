@@ -30,6 +30,7 @@ module Esper.EventLabels {
           end: ev.end.local,
           description_messageids: ev.description_messageids,
           labels: ev.labels,
+          labels_norm: _.map(ev.labels, (l) => l.toLowerCase()),
           all_day: ev.all_day,
           guests: ev.guests,
           transparent: ev.transparent

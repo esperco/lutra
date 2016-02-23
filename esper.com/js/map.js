@@ -82,7 +82,7 @@ function init() {
   var map = new google.maps.Map(mapElement, mapOptions);
 
   var markerOptions = {
-    icon: '../img/marker.svg',
+    icon: '/img/marker.svg',
     position: new google.maps.LatLng(37.4870029,-122.2309239),
     clickable: false,
     map: map
@@ -93,5 +93,8 @@ function init() {
     delete markerOptions.icon;
   }
 
-  var marker = new google.maps.Marker(markerOptions);
+  var marker;
+  $(`<img src="/img/marker.svg" />`).load(function() {
+    marker = new google.maps.Marker(markerOptions);
+  });
 }

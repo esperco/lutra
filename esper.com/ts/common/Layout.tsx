@@ -40,19 +40,30 @@ module Esper.Layout {
     replaces any existing modal in that div
   */
   export function renderModal(modal: React.ReactElement<any>) {
-    closeModal();
-    $(modalSelector).empty();
+    // If modal already exists, clsoe and wait for it to finish hiding before
+    // rendering a new modal
+    var modalElm = $(modalSelector).find(".modal");
+    if (modalElm.length) {
+      $(modalElm).on('hidden.bs.modal', () => {
+        window.requestAnimationFrame(() => renderModal(modal));
+      });
+      closeModal();
+    }
 
-    /*
-      Add an extra container layer for modal because modal needs to remove
-      its parent to trigger unmounting functions
-    */
-    var modalContainer = $('<div />').appendTo(modalSelector);
-    $(modalContainer).renderReact(modal);
+    else {
+      $(modalSelector).empty();
 
-    window.requestAnimationFrame(function() {
-      $(modalSelector + " .modal").modal("show");
-    });
+      /*
+        Add an extra container layer for modal because modal needs to remove
+        its parent to trigger unmounting functions
+      */
+      var modalContainer = $('<div />').appendTo(modalSelector);
+      $(modalContainer).renderReact(modal);
+
+      window.requestAnimationFrame(function() {
+        $(modalSelector + " .modal").modal("show");
+      });
+    }
   }
 
   export function closeModal() {
