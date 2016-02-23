@@ -33,12 +33,17 @@ module Esper {
       var target = window.location.protocol + "//" + window.location.host;
       window.postMessage(esperMessage, target);
 
+      // Post again after interval  (in case extension hasn't loaded yet)
+      window.setInterval(function() {
+        window.postMessage(esperMessage, target);
+      }, 1000);
+
       // Delay so there's time for the message to post -- extension should
       // automatically close this window but display a message just in case
       setTimeout(function() {
         $("#esper-main").html(`You are logged in. ` +
           `You may now close this window.`);
-      }, 3000);
+      }, 5000);
     }
 
     else {
