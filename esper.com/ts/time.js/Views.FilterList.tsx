@@ -173,24 +173,26 @@ module Esper.Views {
       return <div ref={(c) => this._actionMenu = c} className={
         "list-action-menu" + (this.state.actionsPinned ? " pinned" : "")
       }>
-        <div className="action" onClick={() => this.toggleAll()}>
-          <span className="event-checkbox">
-            <i className={"fa fa-fw " +
-              (this.isAllSelected() ? "fa-check-square-o" : "fa-square-o")
-            } />
-          </span>
-          {" "}Select All
-        </div>
-        {
-          this.state.selected.length ?
-          <div className="action" onClick={() => this.editSelectedEvents()}>
-            <i className="fa fa-fw fa-tag" />{" "}Label
-          </div> :
-          null
-        }
-        <div className="action pull-right"
-             onClick={() => this.refreshEvents()}>
-          <i className="fa fa-fw fa-refresh" />
+        <div className="list-action-menu-container">
+          <div className="action" onClick={() => this.toggleAll()}>
+            <span className="event-checkbox">
+              <i className={"fa fa-fw " +
+                (this.isAllSelected() ? "fa-check-square-o" : "fa-square-o")
+              } />
+            </span>
+            {" "}Select All
+          </div>
+          {
+            this.state.selected.length ?
+            <div className="action" onClick={() => this.editSelectedEvents()}>
+              <i className="fa fa-fw fa-tag" />{" "}Label
+            </div> :
+            null
+          }
+          <div className="action pull-right"
+               onClick={() => this.refreshEvents()}>
+            <i className="fa fa-fw fa-refresh" />
+          </div>
         </div>
       </div>
     }
