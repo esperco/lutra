@@ -635,7 +635,7 @@ module Esper.Api {
     JQueryPromise<ApiT.GenericCalendarEvents> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
-            + "/" + encodeURIComponent(calid);
+            + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, JSON.stringify(q));
   }
 
@@ -645,7 +645,7 @@ module Esper.Api {
     q: ApiT.CalendarRequest):
     JQueryPromise<string> {
     var url = prefix + "/api/calendar/events/csv/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + string(calid);
+      + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, JSON.stringify(q), "text");
   }
 
@@ -653,7 +653,7 @@ module Esper.Api {
   export function postForCalendarStats(teamid: string, calid: string,
     q: ApiT.CalendarStatsRequest): JQueryPromise<ApiT.CalendarStatsResult> {
     var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + string(calid);
+      + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, JSON.stringify(q));
   }
 
@@ -678,7 +678,7 @@ module Esper.Api {
   JQueryPromise<void> {
     var url = prefix + "/api/calendar/start-feedbacks/" + string(Login.myUid())
             + "/" + string(teamid)
-            + "/" + string(calid);
+            + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, "");
   }
 
@@ -686,7 +686,7 @@ module Esper.Api {
   JQueryPromise<void> {
     var url = prefix + "/api/calendar/stop-feedbacks/" + string(Login.myUid())
             + "/" + string(teamid)
-            + "/" + string(calid);
+            + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, "");
   }
 
@@ -787,7 +787,7 @@ module Esper.Api {
       prefix + "/api/event/set-reminder-time/" + string(Login.myUid())
       + "/" + string(teamid)
       + "/" + string(from_email)
-      + "/" + string(calid)
+      + "/" + encodeURIComponent(string(calid))
       + "/" + string(eventid)
       + "/" + secs.toString();
     return JsonHttp.post(url, "");
@@ -805,7 +805,7 @@ module Esper.Api {
   JQueryPromise<ApiT.EventReminders> {
     var url =
       prefix + "/api/event/reminders/" + string(Login.myUid())
-      + "/" + string(calid)
+      + "/" + encodeURIComponent(string(calid))
       + "/" + string(eventid);
     return JsonHttp.get(url);
   }
@@ -835,7 +835,7 @@ module Esper.Api {
     var url =
       prefix + "/api/event/default-reminder/" + string(Login.myUid())
       + "/" + string(teamid)
-      + "/" + string(calid)
+      + "/" + encodeURIComponent(string(calid))
       + "/" + string(eventid);
     return JsonHttp.get(url);
   }
@@ -846,7 +846,7 @@ module Esper.Api {
     var url =
       prefix + "/api/calendar/events/view/" + string(Login.myUid())
       + "/" + string(teamid)
-      + "/" + string(calid);
+      + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, JSON.stringify(calRequest));
   }
 
@@ -859,7 +859,7 @@ module Esper.Api {
     var url =
       prefix + "/api/event/task/" + string(Login.myUid())
       + "/" + string(teamid)
-      + "/" + string(calid)
+      + "/" + encodeURIComponent(string(calid))
       + "/" + string(eventid)
       + "?events=" + withEvents.toString()
       + "&threads=" + withThreads.toString();
