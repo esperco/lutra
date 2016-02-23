@@ -148,6 +148,9 @@ module Esper {
            </span> : ""
          }</div>
       </Components.LoginPrompt>
+      { showStagingLogin ? <a onClick={renderStagingLogin}>
+        Staging Login
+      </a> : null }
     </div>);
   }
 
@@ -201,6 +204,74 @@ module Esper {
       }
       renderLogin("", errMsg);
     });
+  }
+
+
+  /* Staging Login */
+
+  function showStagingLogin() {
+    return !PRODUCTION || location.hostname === "staging.esper.com";
+  }
+
+  function renderStagingLogin() {
+    Layout.render(<div id="esper-login-container">
+      <StagingLogin />
+    </div>);
+  }
+
+  class StagingLogin extends ReactHelpers.Component<{}, {}> {
+    _email: HTMLInputElement;
+    _uid: HTMLInputElement;
+    _apiSecret: HTMLInputElement;
+
+    render() {
+      return <div style={{textAlign: "left"}}>
+        <div className="form-group">
+          <label htmlFor={this.getId("eMail")}>E-mail</label>
+          <input id={this.getId("eMail")} type="text"
+            ref={(c) => this._email = c}
+            defaultValue="lois@esper.com"
+            className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor={this.getId("uid")}>UID</label>
+          <input id={this.getId("uid")} type="text"
+            ref={(c) => this._uid = c}
+            defaultValue="O-w_lois_____________w"
+            className="form-control" />
+        </div>
+        <div className="form-group">
+          <label htmlFor={this.getId("uid")}>API Secret</label>
+          <input id={this.getId("apiSecret")} type="password"
+            ref={(c) => this._apiSecret = c}
+            defaultValue="lois_secret"
+            className="form-control" />
+        </div>
+        <div className="form-group">
+          <button className="btn btn-primary" style={{width: "100%"}}
+                  onClick={() => this.handleLogin()}>
+            Login
+          </button>
+        </div>
+      </div>;
+    }
+
+    componentDidMount() {
+      $(this._email).focus();
+    }
+
+    handleLogin() {
+      var email: string = $(this._email).val();
+      var uid: string = $(this._uid).val();
+      var apiSecret: string = $(this._apiSecret).val();
+
+      Login.storeCredentials({
+        email: email,
+        uid: uid,
+        api_secret: apiSecret
+      });
+      Esper.redirect();
+    }
   }
 }
 

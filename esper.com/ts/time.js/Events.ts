@@ -22,7 +22,16 @@ module Esper.Events {
 
   // Link stored events to teams to avoid mixing label data
   export function storeId(event: TeamEvent) {
-    return event.teamId + "|" + event.id;
+    return event.teamId + "|" + event.calendar_id + "|" + event.id;
+  }
+
+  // Returns true if two events are part of the same recurring event
+  export function matchRecurring(e1: TeamEvent, e2: TeamEvent) {
+    return e1.calendar_id === e2.calendar_id &&
+      e1.teamId === e2.teamId &&
+      (e1.recurring_event_id ?
+       e1.recurring_event_id === e2.recurring_event_id :
+       e1.id === e2.id);
   }
 
   function keyForRequest(teamId: string, calId: string, start: Date, end: Date)
@@ -66,9 +75,18 @@ module Esper.Events {
     return EventListStore.batchVal(key);
   }
 
+  export function status(teamId: string, calId: string,
+    start: Date, end: Date)
+  {
+    var key = keyForRequest(teamId, calId, start, end);
+    return Option.cast(EventListStore.metadata(key))
+      .flatMap((m) => Option.wrap(m.dataStatus));
+  }
+
   // Naively invalidate all cached events for now
   export function invalidate() {
     EventListStore.reset();
     EventStore.reset();
+    Route.nav.refreshOnce();
   }
 }

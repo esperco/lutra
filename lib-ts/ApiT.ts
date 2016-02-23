@@ -123,6 +123,7 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     labels: string[];
+    labels_norm: string[];
     location?: string;
     all_day: boolean;
     guests: Attendee[];

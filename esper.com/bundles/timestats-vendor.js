@@ -24,7 +24,10 @@ var highcharts;
 
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
-  require("bootstrap");
+  require("bootstrap/js/collapse");
+  require("bootstrap/js/modal");
+  require("bootstrap/js/tooltip");
+  require("bootstrap/js/transition");
   require("bootstrap-daterangepicker");
 
   highcharts = require("highcharts");

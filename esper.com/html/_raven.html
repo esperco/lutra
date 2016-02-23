@@ -1,29 +1,32 @@
 {% if PRODUCTION %}
-<!--[if (gt IE 8)|!(IE)]><!-->
+<!--[if (gt IE 9)|!(IE)]><!-->
 <script src="https://cdn.ravenjs.com/2.1.0/raven.min.js"></script>
 <script type="text/javascript">
-  Raven.config(
+  /* Use requestAnimationFrame as a proxy for relative newness of browser */
+  if (window.hasOwnProperty('requestAnimationFrame')) {
+    Raven.config(
     'https://e5417c86b25a412c9fd6fc1d33c363b6@app.getsentry.com/63404', {
       release: "{{ VERSION }}" || "dev",
-      ignoreErrors: [
-        /* Triggered by browser extensions, not our code */
-        /WrappedNative/,
-        /NPObject/
-      ],
-      ignoreUrls: [
-        /localhost/i,
+        ignoreErrors: [
+          /* Triggered by browser extensions, not our code */
+          /WrappedNative/,
+          /NPObject/
+        ],
+        ignoreUrls: [
+          /localhost/i,
 
-        /* Chrome extensions */
-        /extensions\//i,
-        /^chrome:\/\//i,
+          /* Chrome extensions */
+          /extensions\//i,
+          /^chrome:\/\//i,
 
-        /* Third party sites */
-        /\.facebook\.com/i,
-        /\.google\.com/i,
-        /\.googleapis\.com/i,
-        /\.twitter\.com/i
-      ]
-    }).install();
+          /* Third party sites */
+          /\.facebook\.com/i,
+          /\.google\.com/i,
+          /\.googleapis\.com/i,
+          /\.twitter\.com/i
+        ]
+      }).install();
+  }
 </script>
 <!--<![endif]-->
 {% endif %}

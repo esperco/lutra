@@ -19,7 +19,7 @@ var SHA1          = require("crypto-js/sha1.js");
 
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
-  require("bootstrap");
+  // require("bootstrap");
 });
 
 // Create a global Esper object with our vendor dependencies
