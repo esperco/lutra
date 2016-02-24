@@ -173,15 +173,22 @@ module Esper.Views {
     }
 
     renderActionMenu() {
+      var icon = (() => {
+        if (this.isAllSelected()) {
+          return "fa-check-square-o";
+        } else if (this.isSomeSelected()) {
+          return "fa-minus-square-o";
+        }
+        return "fa-square-o";
+      })();
+
       return <div ref={(c) => this._actionMenu = c} className={
         "list-action-menu" + (this.state.actionsPinned ? " pinned" : "")
       }>
         <div className="list-action-menu-container">
           <div className="action" onClick={() => this.toggleAll()}>
             <span className="event-checkbox">
-              <i className={"fa fa-fw " +
-                (this.isAllSelected() ? "fa-check-square-o" : "fa-square-o")
-              } />
+              <i className={"fa fa-fw " + icon} />
             </span>
             {" "}Select All
           </div>
@@ -407,7 +414,7 @@ module Esper.Views {
     }
 
     toggleAll() {
-      if (this.isAllSelected()) {
+      if (this.isSomeSelected()) {
         this.setState({ selected: [] })
       } else {
         this.setState({ selected: this.getFilteredEvents() })
@@ -417,6 +424,11 @@ module Esper.Views {
     isAllSelected() {
       return this.state.selected.length &&
         _.every(this.getFilteredEvents(), (e) => this.isSelected(e));
+    }
+
+    isSomeSelected() {
+      return this.state.selected.length &&
+        !!_.find(this.getFilteredEvents(), (e) => this.isSelected(e));
     }
   }
 }
