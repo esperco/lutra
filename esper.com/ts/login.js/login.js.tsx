@@ -148,7 +148,7 @@ module Esper {
            </span> : ""
          }</div>
       </Components.LoginPrompt>
-      { showStagingLogin ? <a onClick={renderStagingLogin}>
+      { showStagingLogin() ? <a onClick={renderStagingLogin}>
         Staging Login
       </a> : null }
     </div>);
