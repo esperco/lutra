@@ -107,6 +107,7 @@ module Esper.ApiT {
     title: string;
     access_role?: string;
       // one of: None, FreeBusyReader, Owner, Reader, Writer
+    prefs?: CalendarPrefs;
   }
 
   export interface GenericCalendars {
@@ -449,11 +450,19 @@ type token_response = [
     transportation?: string[];
     meeting_types: MeetingTypes;
     email_types: EmailTypes;
-    email_for_meeting_feedback?: boolean;
-    slack_for_meeting_feedback?: boolean;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
+  }
+
+  export interface CalendarPrefs {
+    email_for_meeting_feedback?: boolean;
+    slack_for_meeting_feedback?: boolean;
+  }
+
+  export interface SlackAuthInfo {
+    slack_auth_url: string;
+    slack_authorized: boolean;
   }
 
   export interface PreferencesList {

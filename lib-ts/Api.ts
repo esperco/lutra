@@ -331,8 +331,8 @@ module Esper.Api {
   }
 
   /***** Slack *****/
-  export function getSlackAuthUrl(): JQueryPromise<ApiT.UrlResult> {
-    var url = prefix + "/api/slack/auth-url/" + string(Login.me());
+  export function getSlackAuthInfo(): JQueryPromise<ApiT.SlackAuthInfo> {
+    var url = prefix + "/api/slack/auth-info/" + string(Login.me());
     return JsonHttp.get(url);
   }
 
@@ -674,20 +674,13 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-  export function postStartEventFeedbacks(teamid: string, calid: string):
+  export function postCalendarPrefs(teamid: string, calid: string,
+                                    prefs: ApiT.CalendarPrefs):
   JQueryPromise<void> {
-    var url = prefix + "/api/calendar/start-feedbacks/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/prefs/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, "");
-  }
-
-  export function postStopEventFeedbacks(teamid: string, calid: string):
-  JQueryPromise<void> {
-    var url = prefix + "/api/calendar/stop-feedbacks/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, "");
+    return JsonHttp.post(url, JSON.stringify(prefs));
   }
 
   export function postCalendarShow(teamid: string,

@@ -7,6 +7,7 @@
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
+/// <reference path="./Views.CalendarSettings.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Components.Header.tsx" />
 /// <reference path="./Components.Footer.tsx" />
@@ -63,6 +64,14 @@ module Esper.Route {
       <Components.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
+  });
+
+  // Calendar settings page
+  route("/calendar-settings", function() {
+    render(<Views.CalendarSettings teamids={Teams.allIds()}/>,
+      undefined,
+      <Components.Footer hoverable={true} />
+    );
   });
 
   // TODO: Select event and perform labeling action
