@@ -280,8 +280,7 @@ module Esper.ApiT {
 
   export interface GoogleAuthInfo {
     has_token: boolean;
-    is_assistant: boolean;
-    is_executive: boolean;
+    google_auth_scope: string;
     need_google_auth: boolean;
     google_auth_url: string;
   }

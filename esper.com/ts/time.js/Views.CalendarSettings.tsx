@@ -25,6 +25,17 @@ module Esper.Views {
         function() {
           Api.postCalendarPrefs(this.props.teamid, this.props.cal.id,
                                 this.state);
+
+          if (this.state.email_for_meeting_feedback) {
+            Api.getGoogleAuthInfo(null).then(function(x:ApiT.GoogleAuthInfo) {
+              if (x.google_auth_scope.search("//mail.google.com") < 0) {
+                Api.getGoogleAuthUrl(location.href, null, null, null, true)
+                .then(function(x:ApiT.UrlResult) {
+                  location.href = x.url;
+                });
+              }
+            });
+          }
         });
     }
 
@@ -52,7 +63,7 @@ module Esper.Views {
           <h4>{this.props.cal.title}</h4>
           <input
             type="checkbox"
-            checked={this.state.email_for_meeting_feedback}
+            defaultChecked={this.state.email_for_meeting_feedback}
             onClick={e => this.toggleUseEmail()}
             id={id1}
           />
@@ -63,7 +74,7 @@ module Esper.Views {
         <div>
           <input
             type="checkbox"
-            checked={this.state.slack_for_meeting_feedback}
+            defaultChecked={this.state.slack_for_meeting_feedback}
             onClick={e => this.toggleUseSlack()}
             id={id2}
           />
@@ -77,6 +88,7 @@ module Esper.Views {
 
   interface Property {
     teamids: string[];
+    message: string;
   }
 
   interface CalsByTeamid {
@@ -102,6 +114,7 @@ module Esper.Views {
 
     renderWithData() {
       return <div>
+        <p>{this.props.message}</p>
         { _.map(this.state.cals,(cals:ApiT.GenericCalendars,teamid:string) => {
             return <div key={teamid}>
               { _.map(cals.calendars, (cal:ApiT.GenericCalendar) => {

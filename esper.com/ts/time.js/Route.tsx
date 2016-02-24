@@ -67,8 +67,10 @@ module Esper.Route {
   });
 
   // Calendar settings page
-  route("/calendar-settings", function() {
-    render(<Views.CalendarSettings teamids={Teams.allIds()}/>,
+  route("/calendar-settings", function(ctx) {
+    render(<Views.CalendarSettings
+             teamids={Teams.allIds()}
+             message={Util.getParamByName("msg", ctx.querystring)}/>,
       undefined,
       <Components.Footer hoverable={true} />
     );
