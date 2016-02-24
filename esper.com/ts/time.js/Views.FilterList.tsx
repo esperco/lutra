@@ -55,6 +55,8 @@ module Esper.Views {
   {
     _actionMenu: HTMLDivElement;
     _actionMenuOffset: number;
+    _editModalId: number;
+    _editModalEvents: Events.TeamEvent[];
 
     // Use state to track selected events -- reset everytime props change
     constructor(props: FilterListProps) {
@@ -96,6 +98,7 @@ module Esper.Views {
     }
 
     renderWithData() {
+      this.updateModal();
       return <div className="container filter-list">
         <div className="list-selectors">
           <div className="row">
@@ -173,24 +176,26 @@ module Esper.Views {
       return <div ref={(c) => this._actionMenu = c} className={
         "list-action-menu" + (this.state.actionsPinned ? " pinned" : "")
       }>
-        <div className="action" onClick={() => this.toggleAll()}>
-          <span className="event-checkbox">
-            <i className={"fa fa-fw " +
-              (this.isAllSelected() ? "fa-check-square-o" : "fa-square-o")
-            } />
-          </span>
-          {" "}Select All
-        </div>
-        {
-          this.state.selected.length ?
-          <div className="action" onClick={() => this.editSelectedEvents()}>
-            <i className="fa fa-fw fa-tag" />{" "}Label
-          </div> :
-          null
-        }
-        <div className="action pull-right"
-             onClick={() => this.refreshEvents()}>
-          <i className="fa fa-fw fa-refresh" />
+        <div className="list-action-menu-container">
+          <div className="action" onClick={() => this.toggleAll()}>
+            <span className="event-checkbox">
+              <i className={"fa fa-fw " +
+                (this.isAllSelected() ? "fa-check-square-o" : "fa-square-o")
+              } />
+            </span>
+            {" "}Select All
+          </div>
+          {
+            this.state.selected.length ?
+            <div className="action" onClick={() => this.editSelectedEvents()}>
+              <i className="fa fa-fw fa-tag" />{" "}Label
+            </div> :
+            null
+          }
+          <div className="action pull-right"
+               onClick={() => this.refreshEvents()}>
+            <i className="fa fa-fw fa-refresh" />
+          </div>
         </div>
       </div>
     }
@@ -347,13 +352,35 @@ module Esper.Views {
     }
 
     editEvent(event: Events.TeamEvent) {
-      Layout.renderModal(<Components.LabelEditorModal events={[event]} />);
+      this.renderModal([event]);
     }
 
     editSelectedEvents() {
-      Layout.renderModal(<Components.LabelEditorModal
-        events={this.state.selected}
-      />);
+      this.renderModal(this.state.selected);
+    }
+
+    renderModal(events: Events.TeamEvent[]) {
+      this._editModalEvents = events;
+      this._editModalId = Layout.renderModal(this.getModal(events));
+    }
+
+    updateModal() {
+      if (this._editModalEvents && this._editModalEvents.length &&
+          this._editModalId)
+      {
+        Layout.updateModal(
+          this.getModal(this._editModalEvents),
+          this._editModalId
+        );
+      }
+    }
+
+    getModal(events: Events.TeamEvent[]) {
+      // Refresh data from store before rendering modal
+      var eventPairs = _.filter(_.map(events, (e) =>
+        Events.EventStore.get(Events.storeId(e))
+      ));
+      return <Components.LabelEditorModal eventPairs={eventPairs} />;
     }
 
     toggleEvent(event: Events.TeamEvent) {

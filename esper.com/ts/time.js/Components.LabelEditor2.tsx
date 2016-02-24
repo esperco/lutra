@@ -17,13 +17,13 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface LabelEditorProps {
-    events: Events.TeamEvent[];
+    eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
   }
 
   export class LabelEditor2 extends Component<LabelEditorProps, {}>
   {
-    renderWithData() {
-      var events = this.props.events;
+    render() {
+      var events = _.map(this.props.eventPairs, (e) => e[0]);
       if (! events.length) {
         return <span />;
       }
@@ -34,7 +34,7 @@ module Esper.Components {
     }
 
     renderLabel(label: Labels.LabelCount) {
-      var checkedByAll = label.count === this.props.events.length;
+      var checkedByAll = label.count === this.props.eventPairs.length;
       var checkedBySome = label.count > 0;
       var icon = (() => {
         if (checkedByAll) {
@@ -46,10 +46,11 @@ module Esper.Components {
       })();
 
       var handler = () => {
+        var events = _.map(this.props.eventPairs, (e) => e[0]);
         if (checkedByAll) {
-          EventLabelChange.remove(this.props.events, label.displayAs);
+          EventLabelChange.remove(events, label.displayAs);
         } else {
-          EventLabelChange.add(this.props.events, label.displayAs);
+          EventLabelChange.add(events, label.displayAs);
         }
       };
 
@@ -64,37 +65,25 @@ module Esper.Components {
       of the events themselves
     */
     getAllLabels() {
-      return Labels.fromEvents(this.getEvents(), true);
-    }
-
-    // Get updated events from store to trigger reactive udpate
-    getEvents() {
-      return _.map(this.props.events,
-        (e) => Events.EventStore.val(Events.storeId(e))
-      );
+      var events = _.map(this.props.eventPairs, (e) => e[0]);
+      return Labels.fromEvents(events, true);
     }
   }
 
   export class LabelEditorModal extends Component<LabelEditorProps, {}> {
-    renderWithData() {
-      var heading = (this.props.events.length === 1 ?
-        this.props.events[0].title || "1 Event Selected":
-        this.props.events.length + " Events Selected"
+    render() {
+      var heading = (this.props.eventPairs.length === 1 ?
+        this.props.eventPairs[0][0].title || "1 Event Selected":
+        this.props.eventPairs.length + " Events Selected"
       );
 
-      var error = !!_.find(this.props.events, (e) =>
-        Option.cast(Events.EventStore.metadata(Events.storeId(e))).match({
-          none: () => false,
-          some: (m) => m.dataStatus === Model.DataStatus.PUSH_ERROR ||
-                       m.dataStatus === Model.DataStatus.FETCH_ERROR
-        })
+      var error = !!_.find(this.props.eventPairs, (e) =>
+        e[1].dataStatus === Model.DataStatus.PUSH_ERROR ||
+        e[1].dataStatus === Model.DataStatus.FETCH_ERROR
       );
 
-      var busy = !!_.find(this.props.events, (e) =>
-        Option.cast(Events.EventStore.metadata(Events.storeId(e))).match({
-          none: () => false,
-          some: (m) => m.dataStatus === Model.DataStatus.INFLIGHT
-        })
+      var busy = !!_.find(this.props.eventPairs, (e) =>
+        e[1].dataStatus === Model.DataStatus.INFLIGHT
       );
 
       return <Modal icon="fa-calendar-o" title={heading}
@@ -102,7 +91,7 @@ module Esper.Components {
         busy={busy}
       >
         { error ? <ErrorMsg /> : null }
-        <LabelEditor2 events={this.props.events} />
+        <LabelEditor2 eventPairs={this.props.eventPairs} />
         <div className="esper-select-menu">
           <div className="divider" />
           <a className="esper-selectable" target="_blank"

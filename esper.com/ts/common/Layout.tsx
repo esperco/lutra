@@ -35,11 +35,14 @@ module Esper.Layout {
     window.requestAnimationFrame(hideLoader);
   }
 
+  // Used to track which modal is currently rendered
+  var currentModalId: number = 0;
+
   /*
     Renders a modal into the a div near the end of the body -- closes and
     replaces any existing modal in that div
   */
-  export function renderModal(modal: React.ReactElement<any>) {
+  export function renderModal(modal: React.ReactElement<any>): number {
     // If modal already exists, clsoe and wait for it to finish hiding before
     // rendering a new modal
     var modalElm = $(modalSelector).find(".modal");
@@ -52,6 +55,7 @@ module Esper.Layout {
 
     else {
       $(modalSelector).empty();
+      currentModalId += 1;
 
       /*
         Add an extra container layer for modal because modal needs to remove
@@ -64,19 +68,32 @@ module Esper.Layout {
         $(modalSelector + " .modal").modal("show");
       });
     }
+
+    return currentModalId;
   }
 
-  export function closeModal() {
-    $(modalSelector).find(".modal").modal('hide');
+  // Close the current modal (optionally close only if modalId matches)
+  export function closeModal(modalId?: number) {
+    if (_.isUndefined(modalId) || modalId === currentModalId) {
+      $(modalSelector).find(".modal").modal('hide');
+    }
   }
 
-  // Updates the Modal elements in React without triggering any animation
-  export function updateModal(modal: React.ReactElement<any>) {
+  /*
+    Updates the Modal elements in React without triggering any animation.
+    Takes an optional modalId (as returned by renderModal) to tell updateModal
+    to update if and only if the modalId matches
+  */
+  export function updateModal(modal: React.ReactElement<any>,
+                              modalId?: number)
+  {
     var modalContainer = $(modalSelector).children("div:last");
     if (modalContainer.length) {
-      // Container exists, update
-      $(modalContainer).renderReact(modal);
-    } else {
+      // Container exists, update if modalId matches
+      if (_.isUndefined(modalId) || modalId === currentModalId) {
+        $(modalContainer).renderReact(modal);
+      }
+    } else if (_.isUndefined(modalId)) {
       // Container doesn't exist, render for first time
       renderModal(modal);
     }

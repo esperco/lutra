@@ -171,13 +171,6 @@ module Esper.Api {
       "/join-team", JSON.stringify(invite));
   }
 
-  export function refer(): JQueryPromise<ApiT.UrlResult> {
-    var fromUid = Login.me();
-    var refer = { from_uid: fromUid };
-    return JsonHttp.post(prefix + "/api/invite/" + string(fromUid) + "/refer",
-      JSON.stringify(refer));
-  }
-
   export function setTeamName(teamid: string, name: string):
     JQueryPromise<void> {
     var fromUid = Login.me();
@@ -227,21 +220,18 @@ module Esper.Api {
 
   /***** Opaque URLs with unique token *****/
 
-  /*
-    Post an opaque token provided in a URL of the form:
+  export function getToken(token: string): JQueryPromise<ApiT.TokenInfo> {
+    return JsonHttp.get(prefix + "/api/token/" +
+      encodeURIComponent(string(token)));
+  }
 
-      https://app.esper.com/#!t/XXXXXX
-
-    The response describes what has be done and what can be done next.
-    This is used for invites and other URLs that are given out to users.
-   */
-  export function postToken(token: string): JQueryPromise<ApiT.TokenInfo> {
+  export function postToken(token: string): JQueryPromise<ApiT.TokenResponse> {
     return JsonHttp.post(prefix + "/api/token/" +
       encodeURIComponent(string(token)), "");
   }
 
   export function postTokenEmail(token: string, email: string, name: string):
-    JQueryPromise<ApiT.TokenInfo> {
+    JQueryPromise<ApiT.TokenResponse> {
     var path = prefix +
       "/api/token-email/" + encodeURIComponent(string(token))
       + "/" + encodeURIComponent(string(email))
@@ -331,8 +321,8 @@ module Esper.Api {
   }
 
   /***** Slack *****/
-  export function getSlackAuthUrl(): JQueryPromise<ApiT.UrlResult> {
-    var url = prefix + "/api/slack/auth-url/" + string(Login.me());
+  export function getSlackAuthInfo(): JQueryPromise<ApiT.SlackAuthInfo> {
+    var url = prefix + "/api/slack/auth-info/" + string(Login.me());
     return JsonHttp.get(url);
   }
 
@@ -674,20 +664,13 @@ module Esper.Api {
     return JsonHttp.post(url, "");
   }
 
-  export function postStartEventFeedbacks(teamid: string, calid: string):
+  export function postCalendarPrefs(teamid: string, calid: string,
+                                    prefs: ApiT.CalendarPrefs):
   JQueryPromise<void> {
-    var url = prefix + "/api/calendar/start-feedbacks/" + string(Login.myUid())
+    var url = prefix + "/api/calendar/prefs/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, "");
-  }
-
-  export function postStopEventFeedbacks(teamid: string, calid: string):
-  JQueryPromise<void> {
-    var url = prefix + "/api/calendar/stop-feedbacks/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, "");
+    return JsonHttp.post(url, JSON.stringify(prefs));
   }
 
   export function postCalendarShow(teamid: string,
@@ -1447,12 +1430,6 @@ module Esper.Api {
     JQueryPromise<ApiT.CalendarEventPalette> {
     var url = prefix + "/api/gcal/colors/event/" + string(Login.me());
     return JsonHttp.get(url);
-  }
-
-  export function signup(email: string, data: ApiT.Signup):
-    JQueryPromise<void> {
-    var url = prefix + "/api/signup/" + string(email);
-    return JsonHttp.put(url, JSON.stringify(data));
   }
 
   export function createWorkflow(teamid: string, title: string):

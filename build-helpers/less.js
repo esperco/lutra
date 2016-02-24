@@ -31,7 +31,7 @@ module.exports = function(globs, out) {
 
   if (production.isSet()) {
     // External source maps + minimize
-    ret = ret.pipe(minifyCss())
+    ret = ret.pipe(minifyCss({ zindex: false }))
              .pipe(sourcemaps.write("./"));
   } else {
     // Inline source maps

@@ -64,8 +64,6 @@ module Esper.EventLabelChange {
       ));
     }
 
-    console.info(events);
-
     // Wrap the whole kaboodle in a transaction
     Events.EventStore.transact(() => {
       Events.EventStore.transactP(p, (tP) => {

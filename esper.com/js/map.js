@@ -94,7 +94,7 @@ function init() {
   }
 
   var marker;
-  $(`<img src="/img/marker.svg" />`).load(function() {
+  $('<img src="/img/marker.svg" />').load(function() {
     marker = new google.maps.Marker(markerOptions);
   });
 }
