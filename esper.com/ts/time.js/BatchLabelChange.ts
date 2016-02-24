@@ -16,15 +16,19 @@ module Esper.BatchLabelChange {
 
   // Queue a batch label change
   export function rename(teamId: string, oldLabel: string,
-    newLabel: string)
+    newLabel: string, split=false)
   {
     Analytics.track(Analytics.Trackable.RenameTimeStatsLabel, {
       _id: teamId,
       oldLabel: oldLabel,
       newLabel: newLabel
     });
+
     return queueBatchLabelUpdate(teamId, oldLabel, {
-      addLabels: [newLabel], removeLabels: [oldLabel]
+      addLabels: split ?
+        Labels.toList(newLabel) :
+        [newLabel.trim()],
+      removeLabels: [oldLabel]
     });
   }
 

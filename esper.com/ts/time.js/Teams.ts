@@ -174,18 +174,14 @@ module Esper.Teams {
       return;
     }
 
-    var addLabels: string[] = addCommaSeparatedLabels.split(",");
-    var rmLabels: string[] = rmCommaSeparatedLabels.split(",");
+    var addLabels = Labels.toList(addCommaSeparatedLabels);
+    var rmLabels = Labels.toList(rmCommaSeparatedLabels);
 
     /*
-      Trim prior to normalize because we want to display labels as entered
-      minus extra spaces. Normalize doesn't mutate list -- it only uses
-      case-insensitive comparison for removing duplicates
+      Find index for first thing we're removing and insert there
+      Use normalize, which doesn't mutate list but uses case-insensitive
+      comparison for removing duplicates.
     */
-    addLabels = _.map(addLabels, (l) => l.trim());
-    rmLabels = _.map(rmLabels, (l) => l.trim());
-
-    // Find index for first thing we're removing and insert there
     var index = -1;
     if (rmLabels.length) {
       index = _.findIndex(team.team_labels,

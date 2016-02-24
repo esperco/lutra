@@ -164,6 +164,7 @@ module Esper.Components {
       var editLabel = this.state.editLabel &&
                       this.state.editLabel.toLowerCase();
       if (label.toLowerCase() === editLabel) {
+        label = this.fmtLabelInput(label);
         return <div className="list-group-item one-line" key={label}>
           <div className="form-group">
             <input ref={ (c) => this._editInput = c }
@@ -264,7 +265,14 @@ module Esper.Components {
 
     archive(label: string) {
       this.resetState();
-      Teams.rmLabels(this.state.selectedTeamId, label);
+      Teams.rmLabels(this.state.selectedTeamId, this.fmtLabelInput(label));
+    }
+
+    // Clean label input before submission
+    fmtLabelInput(label: string) {
+      label = label.trim();
+      if (label.indexOf(",") > -1) label = "\"" + label + "\"";
+      return label;
     }
 
     promptRmFor(label: string) {
@@ -299,10 +307,10 @@ module Esper.Components {
     submitEditInput() {
       var input = $(this._editInput);
       var val = input.val().trim();
-      if (val && val !== this.state.editLabel) {
-        Teams.addRmLabels(this.state.selectedTeamId, val, this.state.editLabel);
-        BatchLabelChange.rename(this.state.selectedTeamId,
-          this.state.editLabel, val);
+      var orig = this.fmtLabelInput(this.state.editLabel);
+      if (val && val !== orig) {
+        Teams.addRmLabels(this.state.selectedTeamId, val, orig);
+        BatchLabelChange.rename(this.state.selectedTeamId, orig, val, true);
       }
       this.resetState();
     }

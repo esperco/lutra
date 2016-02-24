@@ -67,4 +67,45 @@ module Esper.Labels {
   export function normalize(l: string) {
     return l.toLowerCase().trim();
   }
+
+  /*
+    Converts a comma-separated list of labels into an array of labels.
+    Allows escaping with quotes: "a, b", c => ["a, b", "c"]
+  */
+  export function toList(commaSeparated: string): string[] {
+    var ret: string[] = [];
+    var currentQuote: string[] = [];
+    var quoteMode = false;
+
+    _.each(commaSeparated.split(","), (l) => {
+      var trim = l.trim();
+      var startsWithQuote = trim[0] === "\"";
+      var endsWithQuote = trim[trim.length - 1] === "\"";
+
+      if (quoteMode) {
+        currentQuote.push(l);
+        if (endsWithQuote) {
+          quoteMode = false;
+          ret.push(currentQuote.join(","));
+        }
+      } else if (startsWithQuote && !endsWithQuote) {
+        quoteMode = true;
+        currentQuote = [l];
+      } else {
+        ret.push(l);
+      }
+    });
+
+    return _(ret)
+      .map((l) => l.trim())
+      .map((l) => {
+        if (l[0] === "\"" && l[l.length - 1] === "\"" ||
+            l[0] === "'" && l[l.length - 1] === "'") {
+          return l.slice(1, l.length - 1);
+        }
+        return l;
+      })
+      .filter((l) => !!l)
+      .value();
+  }
 }
