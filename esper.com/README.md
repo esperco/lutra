@@ -18,7 +18,7 @@ s3cmd --configure
 ```
 
 Version 1.1.0 or above is required. Version 1.0.0 as prepackaged for
-Ubuntu to this day doesn't support the
+Ubuntu to this day (2016-02-24) doesn't support the
 `--default-mime-type` option. EC2 machines are equipped with a
 suitable version. Check the version with:
 ```
