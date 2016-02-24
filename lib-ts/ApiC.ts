@@ -63,7 +63,7 @@ module Esper.ApiC {
     so until that's resolved, you'll need to explicitly pass A and T as
     type parameters to make type-checking work, e.g.:
 
-      makeC<typeof Api.postTokenEmail, ApiT.TokenInfo>(Api.postTokenEmail)
+      makeC<typeof Api.postTokenEmail, ApiT.TokenResponse>(Api.postTokenEmail)
 
   */
   export function makeC<A,T>(fn: ApiFn<T> & A, opts?: CacheOpts<T>):
