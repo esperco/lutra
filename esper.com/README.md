@@ -17,6 +17,15 @@ Give the S3 access keys to s3cmd:
 s3cmd --configure
 ```
 
+Version 1.1.0 or above is required. Version 1.0.0 as prepackaged for
+Ubuntu to this day (2016-02-24) doesn't support the
+`--default-mime-type` option. EC2 machines are equipped with a
+suitable version. Check the version with:
+```
+$ s3cmd --version
+s3cmd version 1.1.0-beta3
+```
+
 Now you are set up for uploading files to S3 using `s3cmd`.
 
 Development Build
@@ -30,5 +39,5 @@ Call `make watch` to launch a development server at `localhost:5000`.
 Production Release
 ------------------
 
-Merge the commits for release into the `release/esper.com` branch. Once the 
+Merge the commits for release into the `release/esper.com` branch. Once the
 branch is usable and a candidate for a release, call `make install`.
