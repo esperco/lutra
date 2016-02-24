@@ -38,7 +38,7 @@ module Esper.Components {
   }, {}> {
 
     _dropdown: Dropdown;
-    _modal: Modal;
+    _modalId: number;
     _hiddenXs: HTMLElement;
 
     render() {
@@ -56,21 +56,20 @@ module Esper.Components {
       Log.assert(menuIndex >= 0, "No dropdown menu found");
       var originalMenu = children[menuIndex];
 
-      var modalElm = <Modal ref={(c) => this._modal = c}
-          showFooter={this.props.keepOpen}>
+      var modalElm = <Modal showFooter={this.props.keepOpen}>
         <div className="dropdown-modal-menu"
              onClick={() => this.props.keepOpen || this.close()}>
           { originalMenu }
         </div>
       </Modal>;
-      if (this._modal && this._modal._mounted) {
-        Layout.updateModal(modalElm);
+      if (this._modalId) {
+        Layout.updateModal(modalElm, this._modalId);
       }
 
       var xsChildren = _.clone(children);
       xsChildren[toggleIndex] = React.cloneElement(originalToggle, {
         key: "xs-toggle",
-        onClick: () => Layout.renderModal(modalElm)
+        onClick: () => this._modalId = Layout.renderModal(modalElm)
       });
       xsChildren[menuIndex] = null;
 
@@ -89,8 +88,8 @@ module Esper.Components {
     }
 
     close() {
-      if (this._modal && this._modal._mounted) {
-        Layout.closeModal();
+      if (this._modalId) {
+        Layout.closeModal(this._modalId);
       }
       if (this._dropdown) {
         this._dropdown.close();
