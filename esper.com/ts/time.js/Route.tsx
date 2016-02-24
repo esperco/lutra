@@ -72,7 +72,6 @@ module Esper.Route {
       undefined,
       <Components.Footer hoverable={true} />
     );
-    Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
   // TODO: Select event and perform labeling action
