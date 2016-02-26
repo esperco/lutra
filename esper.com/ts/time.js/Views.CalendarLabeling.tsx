@@ -168,16 +168,6 @@ module Esper.Views {
         calSelectMinStore,
         calendarLabelUpdateStore
       ]);
-
-      if (Onboarding.needsLabels()) {
-        Layout.renderModal(<Components.GifModal onHidden={() => {
-          window.requestAnimationFrame(() => {
-            if (Onboarding.needsCalendars()) {
-              this._calSelector.editCalendars();
-            }
-          });
-        }} />)
-      }
     }
 
     getState() {
