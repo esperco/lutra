@@ -4,7 +4,7 @@
 
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="../lib/Model.Capped.ts" />
-/// <reference path="../lib/Queue.ts" />
+/// <reference path="../lib/Queue2.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
 
@@ -21,9 +21,12 @@ module Esper.Calendars {
   // Store currently selected calendar
   export var SelectStore = new Model.StoreOne<CalSelection>();
 
-  // Store list of calendars by teamId
+  // Store list of calendars by teamId (usually, see below)
   export var CalendarListStore =
     new Model.CappedStore<ApiT.GenericCalendar[]>();
+
+
+  ////////
 
   export function get(teamId: string, calId: string) {
     var list = CalendarListStore.val(teamId);
@@ -88,6 +91,9 @@ module Esper.Calendars {
     }
   }
 
+
+  ////////
+
   /*
     Code for converting legacy non-generic Google calendar-specific to
     generic calendar interface
@@ -121,96 +127,135 @@ module Esper.Calendars {
     }
   }
 
+  export function asTeamCalendar(c: Calendar, teamId?: string): ApiT.Calendar {
+    var asCal = <ApiT.Calendar> c;
+    var asGen = <ApiT.GenericCalendar> c;
 
-  /*
-    Code for adding and removing calendars for Google-based teams (currently
-    not an option for Nylas teams)
-  */
-  export function addTeamCalendar(_id: string, cal: ApiT.Calendar) {
-    var team = Teams.get(_id);
-    if (team) {
-      var teamCopy = _.cloneDeep(team); // Store values immutable so clone
-      var cal = _.cloneDeep(cal);
-      teamCopy.team_calendars = teamCopy.team_calendars || [];
-      teamCopy.team_calendars.push(cal);
-      cal.calendar_default_view = true;
-      cal.calendar_default_write = true;
-      cal.calendar_default_agenda = true;
-      queueUpdate(_id, teamCopy);
+    // Is Google, return as is
+    if (asCal.google_cal_id) {
+      return asCal;
     }
-  }
 
-  export function removeTeamCalendar(_id: string, cal: ApiT.Calendar) {
-    var team = Teams.get(_id);
-    if (team) {
-      var teamCopy = _.cloneDeep(team); // Store values immutable so clone
-      _.remove(teamCopy.team_calendars,
-        (c) => asGeneric(c).id === asGeneric(cal).id
-      );
+    // Generic => convert
+    else if (asGen) {
 
-      // Check if we're deselecting current calendar
-      var currentSelection = SelectStore.val();
-      if (currentSelection &&
-          currentSelection.teamId === _id &&
-          currentSelection.calId === asGeneric(cal).id)
-      {
-        SelectStore.unset();
-      }
-
-      queueUpdate(_id, teamCopy);
-    }
-  }
-
-  // Queues update to server to match calendars on a given team object
-  function queueUpdate(_id: string, team: ApiT.Team) {
-    nextUpdates[_id] = team;
-
-    /*
-      Prepend team-cal- because we only want to be blocking on team calendar
-      updates, not any object with this teamid
-    */
-    var p = Queue.enqueue("team-cal-" + _id, (t?: ApiT.Team) => {
-      var calendars = nextUpdates[_id] && nextUpdates[_id].team_calendars;
-      if (calendars) {
-        delete nextUpdates[_id];
-
-        var teamId = (team.teamid || (t && t.teamid));
-        Analytics.track(Analytics.Trackable.SetTimeStatsCalendars, {
-          numCalendars: calendars.length,
-          teamId: teamId,
-          calendarIds: _.map(calendars, (c) => asGeneric(c).id)
-        });
-        if (teamId) {
-          return Api.putTeamCalendars(teamId, calendars);
-        } else {
-          return Teams.saveTeam(_id, team);
+      // TeamId => see if calendar is already in team. If so, just use that.
+      if (teamId) {
+        var team = Teams.get(teamId);
+        if (team) {
+          var cal = _.find(team.team_calendars,
+            (c) => asGeneric(c).id === asGen.id);
+          if (cal) return cal;
         }
       }
 
-      // Return promise that resolves to current team to avoid pushFetch
-      // setting something to null
-      var ret = t || Teams.get(_id);
-      return $.Deferred<ApiT.Team>().resolve(ret).promise();
-    });
+      // Not in team, convert
+      return {
+        google_cal_id: asGen.id,
+        calendar_title: asGen.title
+      };
+    }
 
-    Teams.teamStore.pushFetch(_id, p, team);
-    CalendarListStore.push(_id, p, _.map(team.team_calendars, asGeneric));
+    // Weird edge case => log
+    else {
+      Log.e("asTeamCalendar called with blank calendar")
+    }
   }
 
-  // Track pending calendar updates for team
-  var nextUpdates: {
-    [index: string]: ApiT.Team
-  } = {};
 
+  ////////
+
+  /*
+    Code for adding and removing calendars for Google-based teams (currently
+    not an option for Nylas teams that the user doesn't control)
+  */
+  export function addTeamCalendar(_id: string,
+                                  cal: ApiT.Calendar|ApiT.GenericCalendar)
+  {
+    var calendars = _.cloneDeep(CalendarListStore.val(_id) || []);
+    calendars.push(asGeneric(_.cloneDeep(cal)));
+    queueUpdate(_id, calendars);
+  }
+
+  export function removeTeamCalendar(_id: string,
+                                     cal: ApiT.Calendar|ApiT.GenericCalendar)
+  {
+    var calendars = _.cloneDeep(CalendarListStore.val(_id) || []);
+    _.remove(calendars, (c) => asGeneric(c).id === asGeneric(cal).id);
+
+    // Check if we're deselecting current calendar
+    var currentSelection = SelectStore.val();
+    if (currentSelection &&
+        currentSelection.teamId === _id &&
+        currentSelection.calId === asGeneric(cal).id)
+    {
+      SelectStore.unset();
+    }
+
+    queueUpdate(_id, calendars);
+  }
+
+  // Queues update to server to match calendars on a given team object
+  function queueUpdate(_id: string, calendars: ApiT.GenericCalendar[]) {
+    var teamCalendars = _.map(calendars, (c) => asTeamCalendar(c, _id));
+
+    var p = CalendarUpdateQueue.enqueue(_id, {
+      _id: _id,
+      calendars: teamCalendars
+    });
+    CalendarListStore.push(_id, p, calendars);
+
+    // Shouldn't be reliant on team.team_calendars, but just in case,
+    // update team as well
+    if (_id) {
+      var team = _.cloneDeep(Teams.get(_id));
+      team.team_calendars = teamCalendars;
+      Teams.teamStore.pushFetch(_id, p, team);
+    }
+  }
+
+
+
+  interface CalendarUpdate {
+    _id: string; // CalendarListStore _id, not necessarily teamId
+
+    /*
+      Although we're using ApiT.Calendar rather than ApiT.GenericCalendar,
+      this weirdly works for Nylas too (so long as you're dealing with
+      non-deleged calendar access)
+    */
+    calendars: ApiT.Calendar[]
+  }
+
+  var CalendarUpdateQueue = new Queue2.Processor(
+    function(update: CalendarUpdate) {
+      Analytics.track(Analytics.Trackable.SetTimeStatsCalendars, {
+        numCalendars: update.calendars.length,
+        teamId: update._id,
+        calendarIds: _.map(update.calendars, (c) => asGeneric(c).id)
+      });
+      return Api.putTeamCalendars(update._id, update.calendars);
+    },
+    function(updates) {
+      return [updates[updates.length - 1]];
+    });
+
+
+  //////
+
+  // Promise for when all calendars have finished loading
+  export var calendarLoadPromise: JQueryPromise<void>;
 
   /*
     Initialize calendar list from team data
   */
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    _.each(loginResponse.teams, function(t) {
-      var genCals = _.map(t.team_calendars, asGeneric) || [];
-      CalendarListStore.upsert(t.teamid, genCals);
+    var promises = _.map(loginResponse.teams, (t) => {
+      var p = Api.getGenericCalendarList(t.teamid);
+      p.done((c) => CalendarListStore.upsert(t.teamid, c.calendars));
+      return p;
     });
+    calendarLoadPromise = $.when.apply($, promises);
   }
 
   export function init() {
