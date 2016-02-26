@@ -8,6 +8,7 @@
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.CalendarSettings.tsx" />
+/// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Components.Header.tsx" />
 /// <reference path="./Components.Footer.tsx" />
@@ -74,6 +75,32 @@ module Esper.Route {
       undefined,
       <Components.Footer hoverable={true} />
     );
+  });
+
+  // Event feedback landing page
+  route("/event", function(ctx) {
+    var q = decodeURIComponent(ctx.querystring);
+    /* ctx.querystring does not really contain the query of the URL.
+       It is just the part of the fragment identifier after '?', i.e.,
+         .../time#!/...?{ctx.querystring}
+       so we need an explicit url-decoding here for the '&' separators.
+     */
+
+    var teamid  = Util.getParamByName("team",   q);
+    var calid   = Util.getParamByName("cal",    q);
+    var eventid = Util.getParamByName("event",  q);
+    var action  = Util.getParamByName("action", q);
+
+    Api.postEventFeedback(teamid, eventid, action)
+    .then(function(labels:ApiT.Labels) {
+      Api.getGenericEvent(teamid, calid, eventid)
+      .then(function(event:ApiT.GenericCalendarEvent) {
+        render(<Views.Event event={event} />,
+          undefined,
+          <Components.Footer hoverable={true} />
+        );
+      });
+    });
   });
 
   // TODO: Select event and perform labeling action
