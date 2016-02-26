@@ -21,7 +21,7 @@ module Esper.Calendars {
   // Store currently selected calendar
   export var SelectStore = new Model.StoreOne<CalSelection>();
 
-  // Store list of calendars by teamId (usually, see below)
+  // Store list of calendars by teamId
   export var CalendarListStore =
     new Model.CappedStore<ApiT.GenericCalendar[]>();
 
