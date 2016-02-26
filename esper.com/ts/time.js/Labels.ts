@@ -5,6 +5,12 @@
 /// <reference path="./Events.ts" />
 
 module Esper.Labels {
+  // For new teams
+  export var DEFAULTS = [
+    "Product", "Business Development", "Sales",
+    "Email", "Internal Team", "Networking",
+    "Health & Wellness", "Personal", "Travel"
+  ];
 
   export interface Label {
     id: string;        // Noralized form
