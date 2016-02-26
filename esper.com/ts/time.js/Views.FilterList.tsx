@@ -140,7 +140,7 @@ module Esper.Views {
 
     renderLabelSelector() {
       var events = this.getEvents();
-      var labels = _.sortBy(Labels.fromEvents(events), (l) => -l.count);
+      var labels = Labels.fromEvents(events, Teams.all());
       return <div className="col-sm-6 form-group">
         <Components.LabelSelectorDropdown labels={labels}
           totalCount={events.length}
@@ -387,7 +387,15 @@ module Esper.Views {
       var eventPairs = _.filter(_.map(events, (e) =>
         Events.EventStore.get(Events.storeId(e))
       ));
-      return <Components.LabelEditorModal eventPairs={eventPairs} />;
+      var teamPairs = _.map(Teams.all(),
+        (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
+          .match<[ApiT.Team, Model.StoreMetadata]>({
+            none: () => null,
+            some: (m) => [t, m]
+          }));
+
+      return <Components.LabelEditorModal eventPairs={eventPairs}
+                                          teamPairs={teamPairs} />;
     }
 
     toggleEvent(event: Events.TeamEvent) {

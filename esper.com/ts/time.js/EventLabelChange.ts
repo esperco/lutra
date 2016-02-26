@@ -11,12 +11,14 @@
 
 module Esper.EventLabelChange {
 
-  export function add(events: Events.TeamEvent[], label: string) {
-    apply(events, { addLabels: [label] })
+  export function add(events: Events.TeamEvent[], label: string, split=false) {
+    apply(events, { addLabels: split ? Labels.toList(label) : [label] })
   }
 
-  export function remove(events: Events.TeamEvent[], label: string) {
-    apply(events, { removeLabels: [label] })
+  export function remove(events: Events.TeamEvent[], label: string,
+                         split=false)
+  {
+    apply(events, { removeLabels: split ? Labels.toList(label) : [label] })
   }
 
   export function apply(events: Events.TeamEvent[], opts: {
