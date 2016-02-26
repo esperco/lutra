@@ -11,7 +11,6 @@
 /// <reference path="./Teams.ts" />
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./Calendars.ts" />
-/// <reference path="./Components.CalAdd.tsx" />
 /// <reference path="./Components.ListSelector.tsx" />
 /// <reference path="./Components.Section.tsx" />
 
@@ -106,14 +105,12 @@ module Esper.Components {
 
     // Pop up calendar modal. Auto-select when modal closed.
     editCalendars() {
-      Layout.renderModal(<CalAddModal onHidden={() => {
-        if (!this.props.selected.length || !this.props.selected[0].calId) {
-          Option.cast(Calendars.defaultSelection()).match({
-            none: () => null,
-            some: (d) => this.props.updateFn([d])
-          });
-        }
-      }} />);
+      // Delay to avoid React trying to close dropdown after redirect
+      window.requestAnimationFrame(() =>
+        Route.nav.path("/calendar-setup" + (
+          this.props.selected.length ? "/" + this.props.selected[0].teamId : ""
+        ))
+      );
     }
   }
 
@@ -176,7 +173,9 @@ module Esper.Components {
     }
 
     updateCal(selectedIds: {id: string, groupId: string}[]) {
-      this._dropdownModal.close();
+      if (this._dropdownModal) {
+        this._dropdownModal.close();
+      }
       return super.updateCal(selectedIds);
     }
   }

@@ -4,13 +4,16 @@
 /// <reference path="../common/Route.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./Onboarding.ts" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.CalendarSettings.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
+/// <reference path="./Views.LoadError.tsx" />
 /// <reference path="./Components.Header.tsx" />
 /// <reference path="./Components.Footer.tsx" />
+/// <reference path="./Actions.CalendarSetup.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
 
 module Esper.Route {
@@ -27,6 +30,29 @@ module Esper.Route {
     }
     Layout.render(main, header, footer);
   }
+
+  // Helper to check default team created and calendars loaded
+  var checkTeamAndCalendars: PageJS.Callback = function(ctx, next) {
+    Teams.defaultTeamPromise
+      .then(() => Calendars.calendarLoadPromise)
+      .then(next, (err) => {
+        Log.e(err);
+        render(<Views.LoadError />);
+      });
+  }
+
+  // Helper to require onboarding for certain pages -- also checks team and
+  // calendar promises
+  var checkOnboarding: PageJS.Callback = function(ctx, next) {
+    checkTeamAndCalendars(ctx, () => {
+      if (Onboarding.needsCalendars()) {
+        Route.nav.path("/calendar-setup");
+      } else {
+        next();
+      }
+    });
+  }
+
 
   ////////
 
@@ -49,7 +75,7 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts", function() {
+  route("/charts", checkOnboarding, function() {
     render(<Views.Charts />,
       undefined,
       <Components.Footer hoverable={true} />
@@ -58,7 +84,7 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", function() {
+  route("/calendar-labeling", checkOnboarding, function() {
     render(<Views.CalendarLabeling />,
       undefined,
       <Components.Footer hoverable={true} />
@@ -67,16 +93,21 @@ module Esper.Route {
   });
 
   // Calendar settings page
-  route("/calendar-settings", function() {
+  route("/calendar-settings", checkOnboarding, function() {
     render(<Views.CalendarSettings teamids={Teams.allIds()}/>,
       undefined,
       <Components.Footer hoverable={true} />
     );
   });
 
+  // Page for setting up initial teams and calendars
+  route("/calendar-setup/:teamid?", checkTeamAndCalendars, function(ctx) {
+    render(Actions.CalendarSetup(ctx.params["teamid"]));
+  });
+
   // TODO: Select event and perform labeling action
   // Use ApiT.postEventFeedback() to record the action.
-  route("/calendar-labeling/:eventid/:action", function(ctx) {
+  route("/calendar-labeling/:eventid/:action", checkOnboarding, function(ctx) {
     render(<Views.CalendarLabeling />,
       undefined,
       <Components.Footer hoverable={true} />
@@ -84,7 +115,7 @@ module Esper.Route {
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
-  route("/list", function(ctx) {
+  route("/list", checkOnboarding, function(ctx) {
     render(Actions.FilterList(getJSONQuery(ctx)));
   });
 
