@@ -40,103 +40,21 @@ module Esper.Teams {
     return allTeamsStore.val(batchKey);
   }
 
-  /*
-    Create an unsaved, default team for self-assisted user using loginInfo,
-    stores it, and returns the _id the default team is stored under.
-  */
-  export function createDefaultTeam(loginInfo?: ApiT.LoginResponse): string {
-    loginInfo = loginInfo || Login.InfoStore.val();
-    if (! loginInfo) {
-      Log.e("Unabled to create default team. No login info.");
-      return;
-    }
-
-    // If existing _id, use that
-    var currentId = getDefaultTeamId();
-    if (currentId) {
-      return currentId;
-    }
-
-    var team: ApiT.Team = {
-      teamid: "",
-      team_name: loginInfo.email,
-      team_approved: true,
-      team_executive: loginInfo.uid,
-      team_assistants: [loginInfo.uid],
-      team_owner: loginInfo.uid,
-      team_cal_user: loginInfo.uid,
-      team_labels: [],
-      team_label_urgent: "Urgent",
-      team_label_new: "New",
-      team_label_in_progress: "In Progress",
-      team_label_pending: "Pending",
-      team_label_done: "Done",
-      team_label_canceled: "Canceled",
-      team_calendars: [],
-      team_email_aliases: [],
-      team_calendar_accounts: []
-    }
-
-    return upsertTeam(team);
-  }
-
   export function upsertTeam(team: ApiT.Team): string {
-    var _id: string;
-    if (team.teamid) {
-      _id = team.teamid;
-      teamStore.upsertSafe(_id, team, {
-        dataStatus: Model.DataStatus.UNSAVED
-      });
-    } else {
-      _id = Util.randomString();
-      teamStore.insert(team, {
-        _id: _id,
-        dataStatus: Model.DataStatus.UNSAVED
-      });
-    }
+    teamStore.upsertSafe(team.teamid, team, {
+      dataStatus: Model.DataStatus.UNSAVED
+    });
 
     var currentTeamIds = _.clone(allTeamsStore.val(batchKey)) || [];
-    currentTeamIds.push(_id);
+    currentTeamIds.push(team.teamid);
     currentTeamIds = _.uniq(currentTeamIds);
     allTeamsStore.upsertSafe(batchKey, currentTeamIds);
 
-    return _id;
+    return team.teamid;
   }
 
-  // Save our default team
-  export function saveDefaultTeam() {
-    var _id = getDefaultTeamId();
-    var team = _id && teamStore.val(_id);
-    if (team &&
-        teamStore.metadata(_id).dataStatus === Model.DataStatus.UNSAVED)
-    {
-      return saveTeam(_id, team);
-    }
-  }
-
-  // Create a team given an unsaved team from the store
-  export function saveTeam(_id: string, team: ApiT.Team) {
-    var req: ApiT.TeamCreationRequest = {
-      executive_name: team.team_name,
-      team_calendars: team.team_calendars || []
-    };
-
-    return Api.createTeam(req).then((t) => {
-      if (t && t.teamid) {
-        teamStore.alias(_id, t.teamid);
-        Calendars.CalendarListStore.alias(_id, t.teamid);
-      }
-      return t;
-    });
-  }
-
-  // Saves a Nylas team for a given exec email
-  export function saveNylasExecTeam(email: string) {
-    var req: ApiT.TeamCreationRequest = {
-      executive_name: email,
-      executive_email: email
-    };
-
+  // Create a new team for an executive
+  function create(req: ApiT.TeamCreationRequest) {
     return Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         upsertTeam(t);
@@ -145,12 +63,29 @@ module Esper.Teams {
     });
   }
 
-  export function getDefaultTeamId(): string {
-    var pair = _.find(teamStore.getAll(),
-      (p) => p[0].team_executive === Login.myUid()
+  export var defaultTeamPromise: JQueryPromise<ApiT.Team>;
+
+  function setDefaultTeam() {
+    var info = Login.InfoStore.val();
+    var defaultTeam = _.find(info.teams,
+      (t) => t.team_executive === Login.myUid()
     );
-    return pair && pair[1]._id;
+    if (defaultTeam) {
+      defaultTeamPromise = $.Deferred().resolve(defaultTeam);
+    } else {
+      defaultTeamPromise = createExecTeam(info.email);
+    }
   }
+
+  export function createExecTeam(email: string) {
+    return create({
+      executive_name: email,
+      executive_email: email
+    });
+  }
+
+
+  //////////
 
   // Takes a comma-separated set of labels to add
   export function addLabels(_id: string, commaSeparatedLabels: string) {
@@ -185,12 +120,12 @@ module Esper.Teams {
     var index = -1;
     if (rmLabels.length) {
       index = _.findIndex(team.team_labels,
-        (t) => normalizeLabel(t) === normalizeLabel(rmLabels[0])
+        (t) => Labels.normalize(t) === Labels.normalize(rmLabels[0])
       );
     }
     var newLabels: string[] = _.filter(team.team_labels,
       (l) => !_.find(rmLabels,
-        (rmL) => normalizeLabel(l) === normalizeLabel(rmL)
+        (rmL) => Labels.normalize(l) === Labels.normalize(rmL)
       )
     );
 
@@ -216,10 +151,10 @@ module Esper.Teams {
       Prepend team-label- because we only want to be blocking on team label
       updates, not any object with this teamid
     */
-    var p = Queue.enqueue("team-label-" + _id, (t?: ApiT.Team) => {
+    var p = Queue.enqueue("team-label-" + _id, () => {
       var labels = nextLabelUpdates[_id];
       if (labels) {
-        var teamId = (t && t.teamid) || team.teamid;
+        var teamId = team.teamid || _id;
 
         delete nextLabelUpdates[_id];
         Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
@@ -229,15 +164,7 @@ module Esper.Teams {
           labels: labels
         });
 
-        if (teamId) {
-          return Api.putSyncedLabels(teamId, { labels: labels })
-            .then(() => t || team);
-        } else {
-          return saveTeam(_id, team).then((t2: ApiT.Team) => {
-            return Api.putSyncedLabels(t2.teamid, { labels: labels })
-              .then(() => t2)
-          });
-        }
+        return Api.putSyncedLabels(team.teamid, { labels: labels });
       }
     });
 
@@ -247,17 +174,7 @@ module Esper.Teams {
   // Given a label list, remove duplicates and near-duplicates
   function normalizeLabels(labels: string[]) {
     labels = labels || [];
-    return _.filter(_.uniqBy(labels, normalizeLabel));
-  }
-
-  /*
-    Helper for above -- use only for comparison purposes, not to actually
-    clean up before setting on server -- we want to preserve user edits to
-    some extent
-  */
-  function normalizeLabel(label: string) {
-    var ret = label.trim().toLowerCase();
-    return ret;
+    return _.filter(_.uniqBy(labels, Labels.normalize));
   }
 
   // Track pending label updates for team
@@ -273,13 +190,7 @@ module Esper.Teams {
       (t): [string, ApiT.Team] => [t.teamid, t]
     );
     allTeamsStore.batchUpsert(batchKey, tuples);
-
-    // createDefaultTeam checks for existing team before creating, but we
-    // should trigger for Nylas users and new users with no teams
-    if (loginResponse.platform === "Nylas" ||
-        !(loginResponse.teams && loginResponse.teams.length > 0)) {
-      createDefaultTeam(loginResponse);
-    }
+    setDefaultTeam();
   }
 
   export function init() {
