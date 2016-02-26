@@ -117,7 +117,7 @@ module Esper.Route {
 
     // Navigate to home page
     export function home() {
-      return path("");
+      return path("/");
     }
 
     // Shortcut to handle querystring on current page

@@ -20,7 +20,8 @@ module Esper.Components {
   }
 
   export class RequestExec
-      extends Component<RequestExecProps, RequestExecState> {
+    extends Component<RequestExecProps, RequestExecState>
+  {
      _input: HTMLInputElement;
 
     constructor(props: RequestExecProps) {
@@ -31,17 +32,18 @@ module Esper.Components {
     render() {
       return <div className="form-group">
         <label className="control-label" htmlFor={this.getId("request-exec")}>
-          Request Calendar Access From Someone Else
+          Managing Time for Someone Else?
         </label>
         <p>
-          Don't see the calendar you want? Enter the e-mail address of the
-          calendar owner to have Esper request permission to access it on
-          your behalf.
+          If you're managing someone else's calendars, enter that person's
+          e-mail address. We'll invite that person to Esper and set things up
+          so that person can retain access to his or her Esper data if you
+          decide to hand off calendar duties to someone else.
         </p>
         { this.state.error ?
           <div className="alert alert-danger">
             <i className="fa fa-fw fa-warning"></i>
-            There was an error requesting calendar access for this e-mail
+            There was an error setting up calendar access for this e-mail
             address.{" "}<a href="https://esper.com/contact">Please contact us
             for assistance.</a>
           </div> :
@@ -57,14 +59,7 @@ module Esper.Components {
             <button className="btn btn-default" type="button"
                     disabled={this.state.busy}
                     onClick={this.submitInput.bind(this)}>
-              { this.state.busy ?
-                <span>
-                  Sending &hellip;
-                </span> :
-                <span>
-                  <i className="fa fa-fw fa-send" />{" "}Request
-                </span>
-              }
+              <i className="fa fa-fw fa-send" />{" "}OK
             </button>
           </span>
         </div>
@@ -80,7 +75,7 @@ module Esper.Components {
           error: false
         })
 
-        var p = Teams.saveNylasExecTeam(val);
+        var p = Teams.createExecTeam(val);
         p.done(() => this.setState({
             busy: false,
             error: false

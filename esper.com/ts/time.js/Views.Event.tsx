@@ -6,7 +6,7 @@ module Esper.Views {
     event: ApiT.GenericCalendarEvent;
   }
 
-  export class Event extends Component<Property, {}> {
+  export class EventView extends Component<Property, {}> {
     renderWithData() {
       var event = this.props.event;
       return <div className="event-content">

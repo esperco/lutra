@@ -9,6 +9,12 @@ module Esper.Onboarding {
   // Does user need to hook up calendars?
   export function needsCalendars() {
     var teamWithCal = _.find(Teams.all(), (t) => {
+      var teamReady = Option.cast(Teams.teamStore.metadata(t.teamid)).match({
+        none: () => false,
+        some: (m) => m.dataStatus === Model.DataStatus.READY
+      });
+      if (! teamReady) return false;
+
       var cals = Option.cast(Calendars.CalendarListStore.val(t.teamid));
       return cals.match({
         none: () => false,
