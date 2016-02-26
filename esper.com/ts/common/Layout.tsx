@@ -43,7 +43,7 @@ module Esper.Layout {
     replaces any existing modal in that div
   */
   export function renderModal(modal: React.ReactElement<any>): number {
-    // If modal already exists, clsoe and wait for it to finish hiding before
+    // If modal already exists, close and wait for it to finish hiding before
     // rendering a new modal
     var modalElm = $(modalSelector).find(".modal");
     if (modalElm.length) {
@@ -51,24 +51,23 @@ module Esper.Layout {
         window.requestAnimationFrame(() => renderModal(modal));
       });
       closeModal();
+      return currentModalId + 1;
     }
 
-    else {
-      $(modalSelector).empty();
-      currentModalId += 1;
+    $(modalSelector).empty();
 
-      /*
-        Add an extra container layer for modal because modal needs to remove
-        its parent to trigger unmounting functions
-      */
-      var modalContainer = $('<div />').appendTo(modalSelector);
-      $(modalContainer).renderReact(modal);
+    /*
+      Add an extra container layer for modal because modal needs to remove
+      its parent to trigger unmounting functions
+    */
+    var modalContainer = $('<div />').appendTo(modalSelector);
+    $(modalContainer).renderReact(modal);
 
-      window.requestAnimationFrame(function() {
-        $(modalSelector + " .modal").modal("show");
-      });
-    }
+    window.requestAnimationFrame(function() {
+      $(modalSelector + " .modal").modal("show");
+    });
 
+    currentModalId += 1;
     return currentModalId;
   }
 
