@@ -40,7 +40,7 @@ module Esper.Components {
       choices: _.map(props.labels, (l) => ({
         id: l.id,
         displayAs: l.displayAs,
-        badgeText: Labels.hasCount(l) ? l.count.toString() : "",
+        badgeText: Labels.hasCount(l) ? l.count && l.count.toString() : "",
         badgeColor: Colors.getColorForLabel(l.id)
       }))
     }];
@@ -137,10 +137,14 @@ module Esper.Components {
           <div className="esper-select-menu">
             <a className="esper-selectable"
                onClick={toggleUnlabel}>
-              <span className="badge">{ props.unlabeledCount }</span>
+              {
+                props.unlabeledCount ?
+                <span className="badge">{ props.unlabeledCount }</span> :
+                null
+              }
               <i className={"fa fa-fw " + (unlabeledSelected ?
                 "fa-check-square-o" : "fa-square-o")} />{" "}
-              Unlabled Events
+              Unlabeled Events
             </a>
           </div>
           <div className="divider" />
