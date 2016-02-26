@@ -9,6 +9,7 @@
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.CalendarSettings.tsx" />
+/// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoadError.tsx" />
 /// <reference path="./Components.Header.tsx" />
@@ -93,8 +94,10 @@ module Esper.Route {
   });
 
   // Calendar settings page
-  route("/calendar-settings", checkOnboarding, function() {
-    render(<Views.CalendarSettings teamids={Teams.allIds()}/>,
+  route("/calendar-settings", checkOnboarding, function(ctx) {
+    render(<Views.CalendarSettings
+             teamids={Teams.allIds()}
+             message={Util.getParamByName("msg", ctx.querystring)}/>,
       undefined,
       <Components.Footer hoverable={true} />
     );
@@ -103,6 +106,32 @@ module Esper.Route {
   // Page for setting up initial teams and calendars
   route("/calendar-setup/:teamid?", checkTeamAndCalendars, function(ctx) {
     render(Actions.CalendarSetup(ctx.params["teamid"]));
+  });
+
+  // Event feedback landing page
+  route("/event", checkOnboarding, function(ctx) {
+    var q = decodeURIComponent(ctx.querystring);
+    /* ctx.querystring does not really contain the query of the URL.
+       It is just the part of the fragment identifier after '?', i.e.,
+         .../time#!/...?{ctx.querystring}
+       so we need an explicit url-decoding here for the '&' separators.
+     */
+
+    var teamid  = Util.getParamByName("team",   q);
+    var calid   = Util.getParamByName("cal",    q);
+    var eventid = Util.getParamByName("event",  q);
+    var action  = Util.getParamByName("action", q);
+
+    Api.postEventFeedback(teamid, eventid, action)
+      .then(function(labels:ApiT.Labels) {
+        Api.getGenericEvent(teamid, calid, eventid)
+        .then(function(event:ApiT.GenericCalendarEvent) {
+          render(<Views.EventView event={event} />,
+            undefined,
+            <Components.Footer hoverable={true} />
+          );
+        });
+      });
   });
 
   // TODO: Select event and perform labeling action

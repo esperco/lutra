@@ -629,6 +629,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(q));
   }
 
+  export function getGenericEvent(teamid:string, calid:string, eventid:string):
+  JQueryPromise<ApiT.GenericCalendarEvent> {
+    var url = prefix + "/api/ts/events/" + string(Login.myUid())
+            + "/" + string(teamid)
+            + "/" + encodeURIComponent(string(calid))
+            + "/" + encodeURIComponent(string(eventid));
+    return JsonHttp.get(url);
+  }
+
   // supports generic calendar
   export function postForCalendarEventsCSV(teamid: string,
     calid: string,
@@ -658,9 +667,9 @@ module Esper.Api {
     action: string): JQueryPromise<ApiT.Labels>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + string(eventid)
-            + "/" + encodeURIComponent(action);
+            + "/" + encodeURIComponent(string(teamid))
+            + "/" + encodeURIComponent(string(eventid))
+            + "/" + encodeURIComponent(string(action));
     return JsonHttp.post(url, "");
   }
 
