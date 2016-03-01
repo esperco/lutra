@@ -148,6 +148,7 @@ module Esper.Views {
           selected={this.props.labels}
           allSelected={this.props.allLabels}
           unlabeledSelected={this.props.unlabeled}
+          showUnlabeled={true}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
             allLabels: x.all,
             unlabeled: x.unlabeled,

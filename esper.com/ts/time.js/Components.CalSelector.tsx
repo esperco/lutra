@@ -181,7 +181,7 @@ module Esper.Components {
     renderWithData() {
       return <div className="input-group cal-selector">
         <span className="input-group-addon">
-          <i className="fa fa-fw fa-calendar" />
+          <i className="fa fa-fw fa-calendar-o" />
         </span>
         { super.renderWithData() }
       </div>;

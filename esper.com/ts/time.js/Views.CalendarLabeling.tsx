@@ -87,6 +87,7 @@ module Esper.Views {
         <div className="esper-left-sidebar padded">
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
+              <i className="fa fa-fw fa-calendar-o" />{" "}
               Calendar
             </label>
             <Components.CalSelectorDropdown

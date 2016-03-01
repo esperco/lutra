@@ -51,7 +51,7 @@ module Esper.Components {
         <div className="divider" />
         <a className="esper-selectable" target="_blank"
            onClick={renderManageLabels}>
-        <i className="fa fa-fw fa-tags"></i>
+        <i className="fa fa-fw fa-bars"></i>
         {" "}Manage Labels
         </a>
       </div>
