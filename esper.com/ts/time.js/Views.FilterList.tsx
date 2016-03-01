@@ -116,7 +116,7 @@ module Esper.Views {
 
     renderCalSelector() {
       return <div className="col-sm-6 form-group">
-        <Components.CalSelectorDropdown
+        <Components.CalSelectorDropdownWithIcon
           selected={this.props.calendars}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
             calendars: x

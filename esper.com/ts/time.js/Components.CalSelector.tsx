@@ -135,41 +135,38 @@ module Esper.Components {
         return "No Calendars Selected"
       })();
 
-      return <div className="input-group cal-selector">
-        <span className="input-group-addon">
-          <i className="fa fa-fw fa-calendar" />
-        </span>
-        <DropdownModal ref={(c) => this._dropdownModal = c}>
-          <input type="text" id={this.props.id || this.getId("")}
-                 className="form-control dropdown-toggle end-of-group"
-                 readOnly={true}
-                 value={ selectedText } />
-          <div className="dropdown-menu">
-            { groups.length ?
-              <ListSelector groups={groups} selectedIds={selected}
-                selectOption={ this.props.allowMulti ?
-                  ListSelectOptions.MULTI_SELECT :
-                  ListSelectOptions.SINGLE_SELECT }
-                selectedItemClasses="active"
-                selectedIcon="fa-calendar-check-o"
-                unselectedIcon="fa-calendar-o"
-                listClasses="esper-select-menu"
-                itemClasses="esper-selectable"
-                headerClasses="esper-select-header"
-                updateFn={this.updateCal.bind(this)}
-              /> : null
-            }
-            { groups.length ? <div className="divider" /> : null }
-            <div className="esper-select-menu">
-              <a className="esper-selectable"
-                 onClick={this.editCalendars.bind(this)}>
-                <i className="fa fa-fw fa-calendar-check-o" />{" "}
-                Add / Remove Calendars
-              </a>
-            </div>
+      return <DropdownModal ref={(c) => this._dropdownModal = c}>
+        <input type="text" id={this.props.id || this.getId("")}
+               className="form-control dropdown-toggle end-of-group"
+               readOnly={true}
+               value={ selectedText } />
+        <div className="dropdown-menu">
+          { groups.length ?
+            <ListSelector groups={groups} selectedIds={selected}
+              selectOption={ this.props.allowMulti ?
+                ListSelectOptions.MULTI_SELECT :
+                ListSelectOptions.SINGLE_SELECT }
+              selectedItemClasses="active"
+              selectedIcon="fa-calendar-check-o"
+              unselectedIcon="fa-calendar-o"
+              listClasses="esper-select-menu"
+              itemClasses="esper-selectable"
+              headerClasses="esper-select-header"
+              updateFn={this.updateCal.bind(this)}
+            /> : null
+          }
+          { groups.length ? <div className="divider" /> : null }
+          <div className="esper-select-menu">
+            <a className="esper-selectable"
+               onClick={this.editCalendars.bind(this)}>
+              <i className="fa fa-fw fa-calendar-check-o" />{" "}
+              Add / Remove Calendars
+            </a>
           </div>
-        </DropdownModal>
-      </div>;
+        </div>
+      </DropdownModal>;
+
+
     }
 
     updateCal(selectedIds: {id: string, groupId: string}[]) {
@@ -177,6 +174,17 @@ module Esper.Components {
         this._dropdownModal.close();
       }
       return super.updateCal(selectedIds);
+    }
+  }
+
+  export class CalSelectorDropdownWithIcon extends CalSelectorDropdown {
+    renderWithData() {
+      return <div className="input-group cal-selector">
+        <span className="input-group-addon">
+          <i className="fa fa-fw fa-calendar" />
+        </span>
+        { super.renderWithData() }
+      </div>;
     }
   }
 }
