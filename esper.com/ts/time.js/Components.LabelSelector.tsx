@@ -7,33 +7,23 @@
 /// <reference path="./Labels.ts" />
 
 module Esper.Components {
-  export function LabelSelectorDropdown(props: {
+  interface LabelSelectorProps {
     labels: Array<Labels.Label|Labels.LabelCount>;
     totalCount?: number;
     unlabeledCount?: number;
     selected: string[];
     allSelected?: boolean;
     unlabeledSelected?: boolean;
+    showUnlabeled?: boolean;
     updateFn: (x: {
       all: boolean;
       unlabeled: boolean;
       labels: string[];
     }) => void;
-  }) {
-    // Dropdown input text
-    var selectedText = (() => {
-      if (props.allSelected) {
-        return "All Labels";
-      }
-      var labels = _.map(
-        _.filter(props.labels, (l) => _.includes(props.selected, l.id)),
-        (l) => l.displayAs);
-      if (props.unlabeledSelected) {
-        labels.push("Unlabeled Events");
-      }
-      return labels.join(", ");
-    })();
+    className?: string;
+  }
 
+  export function LabelSelector(props: LabelSelectorProps) {
     // Only one group for now
     var groups = [{
       id: "",
@@ -59,11 +49,11 @@ module Esper.Components {
       groupId: ""
     }));
 
-
-    /////
+     /////
 
     var allSelected = props.allSelected ||
-      (selectedIds.length === props.labels.length && props.unlabeledSelected);
+      (selectedIds.length === props.labels.length &&
+       (props.unlabeledSelected || !props.showUnlabeled));
     var unlabeledSelected = props.allSelected || props.unlabeledSelected;
 
     function toggleAll() {
@@ -102,6 +92,77 @@ module Esper.Components {
       Layout.renderModal(<Components.LabelAddModal />);
     }
 
+
+    /////
+
+    return <div className={props.className || "esper-select-menu"}>
+      <div className="esper-select-menu">
+        <a className="esper-selectable"
+           onClick={toggleAll}>
+          <span className="badge">{ props.totalCount }</span>
+          <i className={"fa fa-fw " + (allSelected ?
+            "fa-check-square-o" : "fa-square-o")} />{" "}
+          Select All
+        </a>
+      </div>
+      <div className="divider" />
+
+      { groups[0].choices.length > 0 ?
+        <ListSelector groups={groups} selectedIds={selectedIdsWithGroups}
+          selectOption={ ListSelectOptions.MULTI_SELECT }
+          selectedItemClasses="active"
+          listClasses="esper-select-menu"
+          itemClasses="esper-selectable"
+          headerClasses="esper-select-header"
+          dividerClasses="divider"
+          updateFn={updateLabels}
+        /> : null }
+      { groups[0].choices.length > 0 ? <div className="divider" /> : null }
+
+      { props.showUnlabeled ?
+        <div className="esper-select-menu">
+        <a className="esper-selectable"
+           onClick={toggleUnlabel}>
+          {
+            props.unlabeledCount ?
+            <span className="badge">{ props.unlabeledCount }</span> :
+            null
+          }
+          <i className={"fa fa-fw " + (unlabeledSelected ?
+            "fa-check-square-o" : "fa-square-o")} />{" "}
+          Unlabeled Events
+        </a>
+      </div> : null }
+      { props.showUnlabeled ? <div className="divider" /> : null }
+
+      <div className="esper-select-menu">
+        <a className="esper-selectable"
+           onClick={editLabels}>
+          <i className="fa fa-fw fa-bars" />{" "}
+          Manage Labels
+        </a>
+      </div>
+    </div>;
+  }
+
+
+  //////
+
+  export function LabelSelectorDropdown(props: LabelSelectorProps) {
+    // Dropdown input text
+    var selectedText = (() => {
+      if (props.allSelected) {
+        return "All Labels";
+      }
+      var labels = _.map(
+        _.filter(props.labels, (l) => _.includes(props.selected, l.id)),
+        (l) => l.displayAs);
+      if (props.unlabeledSelected) {
+        labels.push("Unlabeled Events");
+      }
+      return labels.join(", ");
+    })();
+
     return <div className="input-group cal-selector">
       <span className="input-group-addon">
         <i className="fa fa-fw fa-tag" />
@@ -110,53 +171,11 @@ module Esper.Components {
         <input type="text" className="form-control dropdown-toggle end-of-group"
                data-toggle="dropdown" readOnly={true}
                value={ selectedText } />
-        <div className="dropdown-menu">
-          <div className="esper-select-menu">
-            <a className="esper-selectable"
-               onClick={toggleAll}>
-              <span className="badge">{ props.totalCount }</span>
-              <i className={"fa fa-fw " + (allSelected ?
-                "fa-check-square-o" : "fa-square-o")} />{" "}
-              Select All
-            </a>
-          </div>
-          <div className="divider" />
-
-          { groups[0].choices.length > 0 ?
-            <ListSelector groups={groups} selectedIds={selectedIdsWithGroups}
-              selectOption={ ListSelectOptions.MULTI_SELECT }
-              selectedItemClasses="active"
-              listClasses="esper-select-menu"
-              itemClasses="esper-selectable"
-              headerClasses="esper-select-header"
-              dividerClasses="divider"
-              updateFn={updateLabels}
-            /> : null }
-          { groups[0].choices.length > 0 ? <div className="divider" /> : null }
-
-          <div className="esper-select-menu">
-            <a className="esper-selectable"
-               onClick={toggleUnlabel}>
-              {
-                props.unlabeledCount ?
-                <span className="badge">{ props.unlabeledCount }</span> :
-                null
-              }
-              <i className={"fa fa-fw " + (unlabeledSelected ?
-                "fa-check-square-o" : "fa-square-o")} />{" "}
-              Unlabeled Events
-            </a>
-          </div>
-          <div className="divider" />
-
-          <div className="esper-select-menu">
-            <a className="esper-selectable"
-               onClick={editLabels}>
-              <i className="fa fa-fw fa-cog" />{" "}
-              Configure Labels
-            </a>
-          </div>
-        </div>
+        {
+          LabelSelector(_.extend({
+            className: "dropdown-menu"
+          }, props) as LabelSelectorProps)
+        }
       </DropdownModal>
     </div>;
   }
