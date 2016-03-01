@@ -5,7 +5,7 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,
-    "outFile": "gmail-is.js",
+    "outFile": "options.js",
     "jsx": "react"
   },
 
