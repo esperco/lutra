@@ -94,6 +94,7 @@ module Esper.ApiT {
     team_label_done: string;
     team_label_canceled: string;
     team_calendars: Calendar[];
+    team_timestats_calendars?: string[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
   }
