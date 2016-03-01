@@ -149,7 +149,7 @@
   height: @line-height-computed;
   width: @line-height-computed;
 
-  &.esper-centered, .esper-center &, .esper-left-sidebar & {
+  &.esper-centered, .esper-center & {
     margin-left: auto;
     margin-right: auto;
     margin-top: @padding-large-vertical * 2;
@@ -192,11 +192,13 @@
 .esper-header {
   line-height: @input-height-base;
   vertical-align: middle;
-  margin-top: @padding-small-vertical;
+  margin-top: @padding-large-vertical - @padding-base-vertical;
 
   // Z-index relative to .esper-expanded
-  position: relative;
-  z-index: 2;
+  &.fixed {
+    position: relative;
+    z-index: 2;
+  }
 
   .min-icon {
     cursor: pointer;
@@ -220,6 +222,22 @@
   margin-bottom: 20px; // To match well
 }
 
+.esper-menu-section {
+  margin-top: @padding-large-vertical - @padding-base-vertical;
+  padding: (@line-height-computed / 2) 0;
+  border-top: 1px solid @dropdown-divider-bg;
+
+  &:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .esper-subheader {
+    margin: 0 0 @padding-large-vertical;
+  }
+}
+
+// Deprecated
 .esper-borderless-section {
   .esper-header {
     border-bottom: 1px solid @panel-default-border;

@@ -252,7 +252,7 @@ module Esper.Views {
           { chart ? chart.renderSelectors() : null }
         </div>
         <div className="esper-right-content padded">
-          <div className="esper-header row clearfix">
+          <div className="esper-header fixed row clearfix">
             <div className="col-xs-8 col-sm-4">
               { this.renderChartSelector(chart) }
             </div>
