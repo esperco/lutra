@@ -8,6 +8,7 @@
 module Esper.Components {
   interface FooterProps {
     busy?: boolean;
+    busyText?: string|JSX.Element;
     onCancel?: () => void;
     cancelText?: string|JSX.Element;
     disableCancel?: boolean;
@@ -33,7 +34,7 @@ module Esper.Components {
     return <div className="clearfix modal-footer">
       { props.busy ? <div className="esper-spinner" /> : null }
       {
-        props.onCancel ?
+        props.onCancel && !(props.busyText && props.busy) ?
         <button className="btn btn-default"
                 onClick={props.onCancel}
                 disabled={props.disableCancel}>
@@ -42,7 +43,7 @@ module Esper.Components {
         null
       }
       {
-        props.onOK ?
+        props.onOK && !(props.busyText && props.busy) ?
         <button className="btn btn-primary"
                 onClick={props.onOK}
                 disabled={props.disableOK}>
@@ -50,6 +51,7 @@ module Esper.Components {
         </button> :
         null
       }
+      { props.busy ? props.busyText : null }
     </div>;
   }
 }

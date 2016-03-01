@@ -43,6 +43,7 @@ module Esper.Components {
     // NB: Use cancel button instead of OK button because purpose of button
     // is just to close panel, not do anything
     return <ModalPanel busy={busy} error={error}
+                       busyText={<span>Saving &hellip;</span>}
                        onCancel={props.onDone} cancelText="Close">
       <LabelInput events={events} />
       <LabelList events={events} teams={teams} />
