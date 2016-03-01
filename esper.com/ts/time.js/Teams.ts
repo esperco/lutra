@@ -14,8 +14,20 @@ module Esper.Teams {
   export var allTeamsStore = new Model.BatchStore(teamStore, 1);
   var batchKey = "";
 
-  export function get(teamId: string): ApiT.Team {
+  export function get(teamId: string, ensure=false): ApiT.Team {
     return teamStore.val(teamId);
+  }
+
+  // Like get, but logs error if team doe not exist
+  export function require(teamId: string) {
+    var team = get(teamId);
+    if (! team) {
+      Log.e("Teams.require called with non-existent team - " + teamId);
+      teamStore.upsertSafe(teamId, null, {
+        dataStatus: Model.DataStatus.PUSH_ERROR
+      });
+    }
+    return team;
   }
 
   export function dataStatus(teamId: string): Model.DataStatus {
@@ -58,6 +70,7 @@ module Esper.Teams {
     return Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         upsertTeam(t);
+        setDefaultLabels(t.teamid);
       }
       return t;
     });
@@ -100,17 +113,25 @@ module Esper.Teams {
   export function addRmLabels(_id: string,
     addCommaSeparatedLabels: string, rmCommaSeparatedLabels: string)
   {
-    var team = get(_id);
-    if (! team) {
-      Log.e("addRmLabels called with non-existent team - " + _id);
-      teamStore.upsertSafe(_id, null, {
-        dataStatus: Model.DataStatus.PUSH_ERROR
-      });
-      return;
-    }
-
     var addLabels = Labels.toList(addCommaSeparatedLabels);
     var rmLabels = Labels.toList(rmCommaSeparatedLabels);
+    return applyLabels(_id, addLabels, rmLabels);
+  }
+
+  function setDefaultLabels(_id: string) {
+    var team = require(_id);
+    if (! team) {
+      throw new Error("No team in setDefaultLabels");
+    }
+
+    if (! team.team_labels.length) {
+      applyLabels(_id, Labels.DEFAULTS, []);
+    }
+  }
+
+  function applyLabels(_id: string, addLabels: string[], rmLabels: string[]) {
+    var team = require(_id);
+    if (! team) return;
 
     /*
       Find index for first thing we're removing and insert there
@@ -169,6 +190,7 @@ module Esper.Teams {
     });
 
     teamStore.push(_id, p, teamCopy);
+    return p;
   }
 
   // Given a label list, remove duplicates and near-duplicates
@@ -190,6 +212,7 @@ module Esper.Teams {
       (t): [string, ApiT.Team] => [t.teamid, t]
     );
     allTeamsStore.batchUpsert(batchKey, tuples);
+    _.each(allIds(), setDefaultLabels);
     setDefaultTeam();
   }
 

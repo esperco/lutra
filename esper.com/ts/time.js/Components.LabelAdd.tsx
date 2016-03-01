@@ -19,7 +19,6 @@ module Esper.Components {
     disableDone?: boolean;
     doneText?: string;
     onDone?: () => void;
-    suggestedLabels?: string[]
   }
 
   interface LabelAddState {
@@ -39,7 +38,6 @@ module Esper.Components {
   }
 
   export class LabelAdd extends Component<LabelAddProps, LabelAddState> {
-    _addInput: HTMLInputElement;
     _editInput: HTMLInputElement;
 
     constructor(props: LabelAddProps) {
@@ -63,10 +61,8 @@ module Esper.Components {
       var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }
-        { this.renderSuggestedLabels() }
-        { this.renderLabelInput() }
         {
-          this.hasSuggested() || !labels.length ? null :
+          !labels.length ? null :
           <div className="alert alert-info">
               <i className="fa fa-fw fa-pencil" />{" "}Rename a label across
               all events.<br />
@@ -82,9 +78,8 @@ module Esper.Components {
             { _.map(labels, this.renderLabel.bind(this)) }
           </div> :
           (
-            this.hasSuggested() ? null :
             <div className="esper-no-content">
-              No Labels Added Yet
+              No Labels Found
             </div>
           )
         }
@@ -97,44 +92,7 @@ module Esper.Components {
       return (team && team.team_labels) || [];
     }
 
-    renderSuggestedLabels() {
-      if (this.hasSuggested()) {
-        return <div className="esper-panel-section clearfix">
-          <label>Need Some Ideas?</label>
-          <div>
-            { _.map(this.props.suggestedLabels, (labelName) =>
-              <div className="col-sm-4 suggested-label" key={labelName}>
-                <button onClick={() => this.toggleSuggestedLabel(labelName)}
-                  className={"btn " + (_.includes(this.getLabels(), labelName) ?
-                  "btn-success" : "btn-default"
-                )}>
-                  {labelName}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      }
-    }
-
-    toggleSuggestedLabel(label: string) {
-      if (_.includes(this.getLabels(), label)) {
-        Teams.rmLabels(this.state.selectedTeamId, label);
-      } else {
-        Teams.addLabels(this.state.selectedTeamId, label);
-      }
-    }
-
-    hasSuggested() {
-      return this.props.suggestedLabels && this.props.suggestedLabels.length;
-    }
-
     renderLabel(label: string) {
-      if (this.hasSuggested() && _.includes(this.props.suggestedLabels, label))
-      {
-        return; // Only render if not suggested
-      }
-
       var rmLabel = this.state.rmLabelPrompt &&
                     this.state.rmLabelPrompt.toLowerCase();
       if (label.toLowerCase() === rmLabel) {
@@ -191,68 +149,21 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
-        {
-          this.hasSuggested() ?
+        <span>
+          <a className="pull-right text-danger" title="Delete"
+             onClick={(e) => this.promptRmFor(label)}>
+            <i className="fa fa-fw fa-trash list-group-item-text" />
+          </a>
           <a className="pull-right text-info" title="Archive"
              onClick={(e) => this.archive(label)}>
-            <i className="fa fa-fw fa-close list-group-item-text" />
-          </a> :
-          <span>
-            <a className="pull-right text-danger" title="Delete"
-               onClick={(e) => this.promptRmFor(label)}>
-              <i className="fa fa-fw fa-trash list-group-item-text" />
-            </a>
-            <a className="pull-right text-info" title="Archive"
-               onClick={(e) => this.archive(label)}>
-              <i className="fa fa-fw fa-archive list-group-item-text" />
-            </a>
-            <a className="pull-right text-info" title="Edit"
-               onClick={(e) => this.showEditFor(label)}>
-              <i className="fa fa-fw fa-pencil list-group-item-text" />
-            </a>
-          </span>
-        }
+            <i className="fa fa-fw fa-archive list-group-item-text" />
+          </a>
+          <a className="pull-right text-info" title="Edit"
+             onClick={(e) => this.showEditFor(label)}>
+            <i className="fa fa-fw fa-pencil list-group-item-text" />
+          </a>
+        </span>
       </div>;
-    }
-
-    renderLabelInput() {
-      return <div className="form-group">
-        <label htmlFor={this.getId("new-labels")}>
-          { this.hasSuggested() ?
-            "Or Use Your Own" :
-            "New Labels" }
-          {" "} (Separate by Commas)
-        </label>
-        <div className="input-group">
-          <input type="text" className="form-control esper-modal-focus"
-                 id={this.getId("new-labels")} ref={(c) => this._addInput = c}
-                 onKeyDown={this.inputKeydown.bind(this)}
-                 placeholder={"Q1 Sales Goal, Positive Meeting, Negative Meeting"} />
-          <span className="input-group-btn">
-            <button className="btn btn-default" type="button"
-                    onClick={this.submitInput.bind(this)}>
-              <i className="fa fa-fw fa-plus" />{" "}Add
-            </button>
-          </span>
-        </div>
-      </div>;
-    }
-
-    submitInput() {
-      var input = $(this._addInput);
-      if (input.val().trim()) {
-        Teams.addLabels(this.state.selectedTeamId, input.val());
-      }
-      input.val("");
-      input.focus();
-    }
-
-    // Catch enter key on input -- use jQuery to actual examine value
-    inputKeydown(e: KeyboardEvent) {
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        this.submitInput();
-      }
     }
 
     resetState() {
@@ -373,16 +284,11 @@ module Esper.Components {
           </div> :
           <button className="btn btn-secondary"
                   disabled={this.props.disableDone}
-                  onClick={this.handleDone.bind(this)}>
-            {this.props.doneText || "Done"}
+                  onClick={this.props.onDone}>
+            {this.props.doneText || "Close"}
           </button>
         }
       </div>;
-    }
-
-    handleDone() {
-      this.submitInput();
-      this.props.onDone();
     }
   }
 
@@ -396,25 +302,9 @@ module Esper.Components {
     onHidden?: () => void;
   }, {}> {
     render() {
-      var suggestedLabels = [
-        "Product", "Business Development", "Sales",
-        "Email", "Internal Team", "Networking",
-        "Health & Wellness", "Personal", "Travel"
-      ];
-      var hasLabels = Option.cast(Teams.get(getTeamId())).match({
-        none: () => false,
-        some: (t) => !!(t.team_labels && t.team_labels.length)
-      });
-
       return <Modal title="Edit Event Labels" icon="fa-tags"
                     onHidden={this.props.onHidden}>
-        { hasLabels ? null :
-          <div className="alert alert-info">
-            Create some labels to categorize your events.
-            You can add more at any time.
-          </div> }
-        <LabelAdd onDone={this.hideModal.bind(this)}
-          suggestedLabels={hasLabels ? null : suggestedLabels} />
+        <LabelAdd onDone={this.hideModal.bind(this)} />
       </Modal>;
     }
 
