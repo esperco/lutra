@@ -81,6 +81,14 @@ module Esper.Views {
     renderWithData() {
       calendarLabelUpdateStore.get();
       var selectedCal = Calendars.SelectStore.val();
+      var teams = Teams.all();
+      var calendarsByTeamId = (() => {
+        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
+        _.each(Teams.all(), (t) => {
+          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
+        });
+        return ret;
+      })();
 
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
@@ -94,6 +102,8 @@ module Esper.Views {
               id={this.getId("cal-select")}
               selected={selectedCal ? [selectedCal] : []}
               updateFn={updateSelection}
+              teams={teams}
+              calendarsByTeamId={calendarsByTeamId}
             />
           </div>
           {this.renderLabelEditor()}

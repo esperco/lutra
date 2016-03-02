@@ -115,8 +115,19 @@ module Esper.Views {
     }
 
     renderCalSelector() {
+      var teams = Teams.all();
+      var calendarsByTeamId = (() => {
+        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
+        _.each(Teams.all(), (t) => {
+          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
+        });
+        return ret;
+      })();
+
       return <div className="col-sm-6 form-group">
         <Components.CalSelectorDropdownWithIcon
+          teams={teams}
+          calendarsByTeamId={calendarsByTeamId}
           selected={this.props.calendars}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
             calendars: x
