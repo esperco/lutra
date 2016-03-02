@@ -34,30 +34,47 @@ module Esper.Charts {
 
     renderChart() {
       var data = this.sync()[0];
-      var aggDuration = _.map(DURATION_BUCKETS, () => 0);
-      var frequency = _.clone(aggDuration);
+      var series: {
+        name: string,
+        color: string,
+        data: [number, number][]
+      }[] = [];
 
       _.each(data.daily_stats, function(stat) {
         _.each(stat.scheduled, function(duration) {
           var i = _.findLastIndex(DURATION_BUCKETS, (b) => {
             return duration >= b.gte;
           });
-          aggDuration[i] += duration;
-          frequency[i] += 1;
+          series.push({
+            name: "Event on " + moment(stat.window_start).format("MMM D"),
+            color: Colors.presets[i],
+            data: [[i, TimeStats.toHours(duration)]]
+          })
         });
       });
-
-      // Round to hour
-      aggDuration = _.map(aggDuration, (a) => TimeStats.toHours(a));
 
       return <Components.Highchart opts={{
         chart: {
           type: 'column'
         },
 
+        tooltip: {
+          formatter: function() {
+            if (this.series.name) {
+              return `<b>${this.series.name}:</b> ${this.y} hours`;
+            } else {
+              return `${this.y} hours`;
+            }
+          }
+        },
+
+        legend: {
+          enabled: false
+        },
+
         plotOptions: {
           column: {
-            borderWidth: 0
+            stacking: 'normal'
           }
         },
 
@@ -66,24 +83,10 @@ module Esper.Charts {
         },
 
         yAxis: [{
-          title: { text: "Aggregate Duration (Hours)" }
-        }, {
-          title: { text: "Number of Events" },
-          allowDecimals: false,
-          opposite: true
+          title: { text: "Duration (Hours)" }
         }],
 
-        series: [{
-          name: "Aggregate Duration (Hours)",
-          yAxis: 0,
-          color: Colors.first,
-          data: aggDuration
-        } as HighchartsColumnChartSeriesOptions, {
-          name: "Number of Events",
-          yAxis: 1,
-          color: Colors.second,
-          data: frequency
-        } as HighchartsColumnChartSeriesOptions]
+        series: series
       }} />;
     }
   }
