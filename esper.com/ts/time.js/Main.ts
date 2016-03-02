@@ -6,6 +6,7 @@
 
 /// <reference path="./Route.tsx" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Colors.ts" />
 
 module Esper.Conf {
   export var segmentKey: string; // Set via Dev.ts or Prod.ts
@@ -14,6 +15,7 @@ module Esper.Conf {
 module Esper.Main {
   export function init() {
     Teams.init();
+    Colors.init();
     Calendars.init();
 
     if (Esper.TESTING) {

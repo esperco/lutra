@@ -76,7 +76,8 @@ module Esper.Teams {
     });
   }
 
-  export var defaultTeamPromise: JQueryPromise<ApiT.Team>;
+  var defaultTeamDfd: JQueryDeferred<ApiT.Team> = $.Deferred();
+  export var defaultTeamPromise = defaultTeamDfd.promise();
 
   function setDefaultTeam() {
     var info = Login.InfoStore.val();
@@ -84,9 +85,9 @@ module Esper.Teams {
       (t) => t.team_executive === Login.myUid()
     );
     if (defaultTeam) {
-      defaultTeamPromise = $.Deferred().resolve(defaultTeam);
+      defaultTeamDfd.resolve(defaultTeam);
     } else {
-      defaultTeamPromise = createExecTeam(info.email);
+      createExecTeam(info.email).done((t) => defaultTeamDfd.resolve(t));
     }
   }
 
