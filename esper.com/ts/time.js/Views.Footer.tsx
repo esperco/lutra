@@ -4,26 +4,15 @@
 
 module Esper.Views {
 
-  // Shorten references to React Component class
-  var Component = ReactHelpers.Component;
-
-  // On full-screen-ish views, we can set a class that makes the footer pop
-  // up when we hover near the bottom
-  interface FooterProps {
-    hoverable?: boolean;
-  }
-
-  export class Footer extends Component<FooterProps, {}> {
+  export class Footer extends ReactHelpers.Component<{}, {}> {
     renderWithData() {
-      return <div className={"footer" + (this.props.hoverable ?
-                             " hoverable": "")}>
+      return <div className="footer">
         <div className="container-fluid padded clearfix">
           <ul className="footer-links pull-left nav nav-pills">
-            <li><a href="/">Home</a></li>
-            <li><a href="/contact">Contact</a></li>
-            <li><a href="/privacy-policy">Privacy</a></li>
-            <li><a href="/terms-of-use">Terms</a></li>
-            <li><a onClick={() => Login.goToLogout()}>Log Out</a></li>
+            <li><a href="/" target="_blank">Home</a></li>
+            <li><a href="/contact" target="_blank">Contact</a></li>
+            <li><a href="/privacy-policy" target="_blank">Privacy</a></li>
+            <li><a href="/terms-of-use" target="_blank">Terms</a></li>
           </ul>
           <div className="pull-right navbar-text"
                onDoubleClick={this.testError}>

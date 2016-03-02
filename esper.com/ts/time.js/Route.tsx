@@ -80,19 +80,13 @@ module Esper.Route {
 
   // Charts
   route("/charts", checkOnboarding, function() {
-    render(<Views.Charts />,
-      undefined,
-      <Views.Footer hoverable={true} />
-    );
+    render(<Views.Charts />);
     Analytics.page(Analytics.Page.TimeStatsCharts);
   });
 
   // Calendar labeling page
   route("/calendar-labeling", checkOnboarding, function() {
-    render(<Views.CalendarLabeling />,
-      undefined,
-      <Views.Footer hoverable={true} />
-    );
+    render(<Views.CalendarLabeling />);
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
@@ -134,10 +128,7 @@ module Esper.Route {
   // TODO: Select event and perform labeling action
   // Use ApiT.postEventFeedback() to record the action.
   route("/calendar-labeling/:eventid/:action", checkOnboarding, function(ctx) {
-    render(<Views.CalendarLabeling />,
-      undefined,
-      <Views.Footer hoverable={true} />
-    );
+    render(<Views.CalendarLabeling />);
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
