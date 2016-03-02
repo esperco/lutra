@@ -1,6 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
-/// <reference path="./Components.GifModal.tsx" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Views {
@@ -44,12 +43,6 @@ module Esper.Views {
               <NavLink href="/list">
                 <i className="fa fa-fw fa-th-list"></i>{" "}Event List
               </NavLink>
-              <li className="hidden-xs">
-                <a onClick={this.openHelpModal.bind(this)}>
-                  <i className="fa fa-fw fa-question-circle" />
-                  <span className="visible-xs-inline">{" "}How To</span>
-                </a>
-              </li>
             </ul> : null }
 
             <div className="navbar-right">
@@ -59,10 +52,6 @@ module Esper.Views {
 
         </div>
       </nav>;
-    }
-
-    openHelpModal() {
-      Layout.renderModal(<Components.GifModal />);
     }
 
     componentDidMount() {

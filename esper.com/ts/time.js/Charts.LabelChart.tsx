@@ -135,8 +135,8 @@ module Esper.Charts {
     noDataMsg() {
       return <span>
         No data found.{" "}
-        <a onClick={() => Route.nav.path("/calendar-labeling")}>
-          Click here to go to your calendar and label events.
+        <a onClick={() => Route.nav.path("/list")}>
+          Click here to label events from your calendar.
         </a>
       </span>;
     }

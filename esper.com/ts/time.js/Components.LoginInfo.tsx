@@ -30,14 +30,32 @@ module Esper.Components {
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
-            <li><a onClick={() => Login.goToLogout()}>
-              <i className="fa fa-fw fa-sign-out"></i>{" "}
-              Logout
+            <li><a href="/" target="_blank">
+              <i className="fa fa-fw fa-home"></i>{" "}
+              Home
+            </a></li>
+            <li><a href="/contact" target="_blank">
+              <i className="fa fa-fw fa-envelope"></i>{" "}
+              Contact Us
+            </a></li>
+            <li><a href="/privacy-policy" target="_blank">
+              <i className="fa fa-fw fa-lock"></i>{" "}
+              Privacy
+            </a></li>
+            <li><a href="/terms-of-use" target="_blank">
+              <i className="fa fa-fw fa-legal"></i>{" "}
+              Terms
             </a></li>
             <li><a onClick={
                 () => { Layout.renderModal(<Components.Invite />) }
               }>
-              Invite your contacts!
+              <i className="fa fa-fw fa-users"></i>{" "}
+              Invite Your Contacts
+            </a></li>
+            <li className="divider" />
+            <li><a onClick={() => Login.goToLogout()}>
+              <i className="fa fa-fw fa-sign-out"></i>{" "}
+              Logout
             </a></li>
           </ul>
         </Dropdown>;
