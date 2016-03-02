@@ -12,7 +12,6 @@
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.ListSelector.tsx" />
-/// <reference path="./Components.Section.tsx" />
 
 module Esper.Components {
   // Shorten references to React Component class
@@ -25,17 +24,17 @@ module Esper.Components {
     minimized?: boolean;
     toggleMinimized?: () => void;
     allowMulti?: boolean;
+    className?: string
   }
 
   export class CalSelector extends Component<CalSelectorProps, {}>
   {
+    _className: string;
+
     renderWithData() {
       var groups = this.getGroups();
       var selected = this.getSelected();
-
-      return <BorderlessSection icon="fa-calendar" title="Select Calendar"
-          minimized={this.props.minimized}
-          toggleMinimized={this.props.toggleMinimized}>
+      return <div className={this.props.className || this._className}>
         { groups.length ?
           <ListSelector groups={groups} selectedIds={selected}
             selectOption={ this.props.allowMulti ?
@@ -44,21 +43,21 @@ module Esper.Components {
             selectedItemClasses="active"
             selectedIcon="fa-calendar-check-o"
             unselectedIcon="fa-calendar-o"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+            headerClasses="esper-select-header"
             updateFn={this.updateCal.bind(this)}
-          /> :
-          <div className="esper-no-content">
-            <a onClick={this.editCalendars.bind(this)}>
-              No calendars available. Click here to add.
-            </a>
-          </div>
+          /> : null
         }
-        <div className="esper-subsection-footer">
-          <a onClick={this.editCalendars.bind(this)}>
+        { groups.length ? <div className="divider" /> : null }
+        <div className="esper-select-menu">
+          <a className="esper-selectable"
+             onClick={this.editCalendars.bind(this)}>
             <i className="fa fa-fw fa-calendar-check-o" />{" "}
             Add / Remove Calendars
           </a>
         </div>
-      </BorderlessSection>;
+      </div>;
     }
 
     getGroups() {
@@ -118,6 +117,11 @@ module Esper.Components {
   export class CalSelectorDropdown extends CalSelector {
     _dropdownModal: DropdownModal;
 
+    constructor(props: CalSelectorProps) {
+      super(this.props);
+      this._className = "dropdown-menu";
+    }
+
     renderWithData() {
       var groups = this.getGroups();
       var selected = this.getSelected();
@@ -140,33 +144,8 @@ module Esper.Components {
                className="form-control dropdown-toggle end-of-group"
                readOnly={true}
                value={ selectedText } />
-        <div className="dropdown-menu">
-          { groups.length ?
-            <ListSelector groups={groups} selectedIds={selected}
-              selectOption={ this.props.allowMulti ?
-                ListSelectOptions.MULTI_SELECT :
-                ListSelectOptions.SINGLE_SELECT }
-              selectedItemClasses="active"
-              selectedIcon="fa-calendar-check-o"
-              unselectedIcon="fa-calendar-o"
-              listClasses="esper-select-menu"
-              itemClasses="esper-selectable"
-              headerClasses="esper-select-header"
-              updateFn={this.updateCal.bind(this)}
-            /> : null
-          }
-          { groups.length ? <div className="divider" /> : null }
-          <div className="esper-select-menu">
-            <a className="esper-selectable"
-               onClick={this.editCalendars.bind(this)}>
-              <i className="fa fa-fw fa-calendar-check-o" />{" "}
-              Add / Remove Calendars
-            </a>
-          </div>
-        </div>
+        { super.renderWithData() }
       </DropdownModal>;
-
-
     }
 
     updateCal(selectedIds: {id: string, groupId: string}[]) {

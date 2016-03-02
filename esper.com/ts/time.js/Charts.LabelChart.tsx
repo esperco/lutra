@@ -4,7 +4,6 @@
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 /// <reference path="./Components.LabelSelector.tsx" />
-/// <reference path="./Components.Section.tsx" />
 
 module Esper.Charts {
 
