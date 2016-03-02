@@ -130,6 +130,10 @@ module Esper.Analytics {
     TimeStats,         // esper.com/time
     TimeStatsCharts,   // esper.com/time/#!/charts
     CalendarLabeling,  // esper.com/time/#!/calendar-labeling
+    CalendarSettings,  // esper.com/time/#!/calendar-settings
+    CalendarSetup,     // esper.com/time/#!/calendar-setup
+    EventFeedback,     // esper.com/time/#!/event
+    EventList,         // esper.com/time/#!/list
     DirectoryHome      // dir.esper.com
   }
 

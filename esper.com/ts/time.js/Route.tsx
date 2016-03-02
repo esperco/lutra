@@ -95,11 +95,15 @@ module Esper.Route {
     render(<Views.CalendarSettings
              teamids={Teams.allIds()}
              message={Util.getParamByName("msg", ctx.querystring)}/>);
+    Analytics.page(Analytics.Page.CalendarSettings);
   });
 
   // Page for setting up initial teams and calendars
   route("/calendar-setup/:teamid?", checkTeamAndCalendars, function(ctx) {
     render(Actions.CalendarSetup(ctx.params["teamid"]));
+    Analytics.page(Analytics.Page.CalendarSetup, {
+      teamId: ctx.params["teamid"]
+    });
   });
 
   // Event feedback landing page
@@ -123,6 +127,7 @@ module Esper.Route {
             render(<Views.EventView eventKey={eventKey} />);
           });
       });
+    Analytics.page(Analytics.Page.EventFeedback);
   });
 
   // TODO: Select event and perform labeling action
