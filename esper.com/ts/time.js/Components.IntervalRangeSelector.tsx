@@ -30,16 +30,20 @@ module Esper.Components {
     _input: HTMLInputElement;
 
     render() {
-      return (this.props.showIntervals ?
-        <div className="input-group">
-          { this.renderInput() }
+      return <div className="input-group">
+        <span className="input-group-addon">
+          <i className="fa fa-fw fa-clock-o" />
+        </span>
+        { this.renderInput() }
+        { this.props.showIntervals ?
           <div className="input-group-btn">
             { this.renderButton("Day", TimeStats.Interval.DAILY) }
             { this.renderButton("Week", TimeStats.Interval.WEEKLY) }
             { this.renderButton("Month", TimeStats.Interval.MONTHLY) }
-          </div>
-        </div> :
-        this.renderInput());
+          </div> :
+          null
+        }
+      </div>;
     }
 
     renderInput() {
