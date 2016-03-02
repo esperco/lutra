@@ -81,6 +81,19 @@ module Esper.Actions {
 
     var filterStr = params.filterStr || "";
 
+    var duration = moment.duration(period.end.getTime() -
+                                   period.start.getTime()).humanize();
+    var start = moment(period.start).fromNow();
+    Analytics.page(Analytics.Page.EventList, {
+      calendars: cals.length,
+      allLabels: allLabels,
+      unlabeled: unlabled,
+      numLabels: labels.length,
+      filterStr: filterStr,
+      periodLength: duration,
+      start: start
+    });
+
     return <Views.FilterList
       calendars={cals}
       start={period.start}
