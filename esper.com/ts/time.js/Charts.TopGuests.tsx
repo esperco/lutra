@@ -13,7 +13,7 @@ module Esper.Charts {
   var Component = ReactHelpers.Component;
 
   export class TopGuests extends GuestChart {
-    static displayName = "Frequent Meeting Attendees";
+    static displayName = "Top Guests";
     static usesIntervals = false;
 
     renderChart() {
