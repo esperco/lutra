@@ -146,6 +146,10 @@ module Esper.ApiC {
     <typeof Api.getCalendarList, ApiT.Calendars>
     (Api.getCalendarList);
 
+  export var getGenericCalendarListOfUser = makeC
+    <typeof Api.getGenericCalendarListOfUser, ApiT.GenericCalendars>
+    (Api.getGenericCalendarListOfUser);
+
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>
     (Api.postCalendar, {
