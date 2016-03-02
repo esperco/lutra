@@ -12,21 +12,21 @@ module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface LoginInfoState {
+  interface LoginInfoProps {
     loginInfo: ApiT.LoginResponse;
     busy: boolean;
   };
 
-  export class LoginInfo extends Component<{}, LoginInfoState> {
+  export class LoginInfo extends Component<LoginInfoProps, {}> {
     render() {
-      if (this.state.busy) {
+      if (this.props.busy) {
         return <div className="esper-spinner"></div>;
       }
 
-      if (this.state.loginInfo) {
+      if (this.props.loginInfo) {
         return <Dropdown className="dropdown navbar-text xs-open">
           <a className="dropdown-toggle">
-            {this.state.loginInfo.email}{" "}
+            {this.props.loginInfo.email}{" "}
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
@@ -47,22 +47,6 @@ module Esper.Components {
         onClick={() => Login.goToLogin()}>
         Login / Signup
       </button>;
-    }
-
-    componentDidMount() {
-      this.setSources([
-        Login.InfoStore
-      ]);
-    }
-
-    getState() {
-      var tuple = Login.InfoStore.get();
-      var loginInfo = tuple && tuple[0];
-      var metadata = tuple && tuple[1];
-      return {
-        loginInfo: loginInfo,
-        busy: metadata && metadata.dataStatus !== Model.DataStatus.READY
-      };
     }
   }
 }

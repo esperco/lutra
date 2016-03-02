@@ -3,19 +3,21 @@
 /// <reference path="./Components.GifModal.tsx" />
 /// <reference path="./Route.tsx" />
 
-module Esper.Components {
+module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface HeaderState {
-    loginInfo: ApiT.LoginResponse;
-  }
-
-  export class Header extends Component<{}, HeaderState> {
+  export class Header extends Component<{}, {}> {
     _navbarOpen: boolean;
 
-    render() {
+    renderWithData() {
       var toggleId = "esper-nav-toggle";
+      var loginInfo = Login.InfoStore.val();
+      var busy = Option.cast(Login.InfoStore.metadata()).match({
+        none: () => true,
+        some: (m) => m.dataStatus !== Model.DataStatus.READY
+      });
+
       return <nav className="navbar navbar-default navbar-fixed-top">
         <div className="container-fluid padded">
           <div className="navbar-header">
@@ -32,7 +34,7 @@ module Esper.Components {
 
           <div className="collapse navbar-collapse" id={this.getId(toggleId)}
                onClick={() => this._navbarOpen && this.toggleCollapse()}>
-            { this.state.loginInfo ? <ul className="nav navbar-nav">
+            { loginInfo ? <ul className="nav navbar-nav">
               <NavLink href="/charts">
                 <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
               </NavLink>
@@ -51,7 +53,7 @@ module Esper.Components {
             </ul> : null }
 
             <div className="navbar-right">
-              <Components.LoginInfo />
+              <Components.LoginInfo loginInfo={loginInfo} busy={busy} />
             </div>
           </div>
 
@@ -64,9 +66,6 @@ module Esper.Components {
     }
 
     componentDidMount() {
-      this.setSources([
-        Login.InfoStore
-      ]);
       this.find('.collapse').collapse({
         toggle: false
       });
@@ -75,12 +74,6 @@ module Esper.Components {
     toggleCollapse() {
       this.find('.collapse').collapse('toggle');
       this._navbarOpen = !this._navbarOpen;
-    }
-
-    getState() {
-      return {
-        loginInfo: Login.InfoStore.val()
-      };
     }
   }
 
