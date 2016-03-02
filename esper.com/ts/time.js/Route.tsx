@@ -100,10 +100,7 @@ module Esper.Route {
   route("/calendar-settings", checkOnboarding, function(ctx) {
     render(<Views.CalendarSettings
              teamids={Teams.allIds()}
-             message={Util.getParamByName("msg", ctx.querystring)}/>,
-      undefined,
-      <Views.Footer hoverable={true} />
-    );
+             message={Util.getParamByName("msg", ctx.querystring)}/>);
   });
 
   // Page for setting up initial teams and calendars
@@ -129,10 +126,7 @@ module Esper.Route {
       .then(function(labels:ApiT.Labels) {
         Events.fetch1(teamid, calid, eventid)
           .then((eventKey: string) => {
-            render(<Views.EventView eventKey={eventKey} />,
-              undefined,
-              <Views.Footer hoverable={true} />
-            );
+            render(<Views.EventView eventKey={eventKey} />);
           });
       });
   });
