@@ -89,7 +89,8 @@ module Esper.Components {
 
     getLabels() {
       var team = Teams.get(this.state.selectedTeamId);
-      return (team && team.team_labels) || [];
+      var ret = (team && team.team_labels) || [];
+      return Labels.sortLabelStrs(ret);
     }
 
     renderLabel(label: string) {

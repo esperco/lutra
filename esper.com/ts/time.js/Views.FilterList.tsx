@@ -141,6 +141,7 @@ module Esper.Views {
     renderLabelSelector() {
       var events = this.getEvents();
       var labels = Labels.fromEvents(events, Teams.all());
+      labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
         <Components.LabelSelectorDropdown labels={labels}
           totalCount={events.length}

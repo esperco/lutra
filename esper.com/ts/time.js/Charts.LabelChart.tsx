@@ -154,6 +154,7 @@ module Esper.Charts {
         displayAs: r.displayAs,
         count: r.totalCount
       }));
+      labels = Labels.sortLabels(labels);
 
       var totalCount = _.sumBy(stats,
         (s) => _.sumBy(s.partition,

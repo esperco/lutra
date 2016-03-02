@@ -128,6 +128,7 @@ module Esper.Components {
     }
 
     var labels = Labels.fromEvents(props.events, props.teams);
+    labels = Labels.sortLabels(labels);
     return <div className="esper-select-menu">
       {
         _.map(labels,
