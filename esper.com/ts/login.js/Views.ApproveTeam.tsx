@@ -8,7 +8,7 @@
 /// <reference path="../lib/ApiC.ts" />
 /// <reference path="./Login.Oauth.ts" />
 
-module Esper.Components {
+module Esper.Views {
   var Component = ReactHelpers.Component;
 
   /*
@@ -197,12 +197,13 @@ module Esper.Components {
         this.jQuery().modal('hide');
       };
 
-      return <Modal title="Approve Access" icon="fa-warning" fixed={true}>
+      return <Components.Modal title="Approve Access" icon="fa-warning"
+                               fixed={true}>
         { React.createElement(ApproveTeams, _.extend({}, this.props, {
             callback: callback
           }) as ApproveProps)
         }
-      </Modal>
+      </Components.Modal>
     }
   }
 }

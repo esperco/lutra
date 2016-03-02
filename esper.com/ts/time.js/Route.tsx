@@ -12,8 +12,8 @@
 /// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoadError.tsx" />
-/// <reference path="./Components.Header.tsx" />
-/// <reference path="./Components.Footer.tsx" />
+/// <reference path="./Views.Header.tsx" />
+/// <reference path="./Views.Footer.tsx" />
 /// <reference path="./Actions.CalendarSetup.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
 
@@ -24,10 +24,10 @@ module Esper.Route {
                   header?: React.ReactElement<any>,
                   footer?: React.ReactElement<any>) {
     if (header !== null) { // Null => intentionally blank
-      header = header || <Components.Header />;
+      header = header || <Views.Header />;
     }
     if (footer !== null) {
-      footer = footer || <Components.Footer />;
+      footer = footer || <Views.Footer />;
     }
     Layout.render(main, header, footer);
   }
@@ -82,7 +82,7 @@ module Esper.Route {
   route("/charts", checkOnboarding, function() {
     render(<Views.Charts />,
       undefined,
-      <Components.Footer hoverable={true} />
+      <Views.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.TimeStatsCharts);
   });
@@ -91,7 +91,7 @@ module Esper.Route {
   route("/calendar-labeling", checkOnboarding, function() {
     render(<Views.CalendarLabeling />,
       undefined,
-      <Components.Footer hoverable={true} />
+      <Views.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
@@ -102,7 +102,7 @@ module Esper.Route {
              teamids={Teams.allIds()}
              message={Util.getParamByName("msg", ctx.querystring)}/>,
       undefined,
-      <Components.Footer hoverable={true} />
+      <Views.Footer hoverable={true} />
     );
   });
 
@@ -131,7 +131,7 @@ module Esper.Route {
           .then((eventKey: string) => {
             render(<Views.EventView eventKey={eventKey} />,
               undefined,
-              <Components.Footer hoverable={true} />
+              <Views.Footer hoverable={true} />
             );
           });
       });
@@ -142,7 +142,7 @@ module Esper.Route {
   route("/calendar-labeling/:eventid/:action", checkOnboarding, function(ctx) {
     render(<Views.CalendarLabeling />,
       undefined,
-      <Components.Footer hoverable={true} />
+      <Views.Footer hoverable={true} />
     );
     Analytics.page(Analytics.Page.CalendarLabeling);
   });

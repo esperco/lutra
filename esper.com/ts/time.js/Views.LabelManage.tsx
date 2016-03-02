@@ -12,7 +12,7 @@
 /// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
 
-module Esper.Components {
+module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface LabelManageProps {
@@ -295,20 +295,15 @@ module Esper.Components {
     }
   }
 
-  // Used to track the next pending label update for an id in a queue
-  var nextUpdates: {
-    [index: string]: string[]
-  } = {};
-
 
   export class LabelManageModal extends Component<{
     onHidden?: () => void;
   }, {}> {
     render() {
-      return <Modal title="Edit Event Labels" icon="fa-tags"
+      return <Components.Modal title="Edit Event Labels" icon="fa-tags"
                     onHidden={this.props.onHidden}>
         <LabelManage onDone={this.hideModal.bind(this)} />
-      </Modal>;
+      </Components.Modal>;
     }
 
     hideModal() {

@@ -11,7 +11,7 @@
 /// <reference path="./Events.ts" />
 /// <reference path="./EventLabelChange.ts" />
 /// <reference path="./Teams.ts" />
-/// <reference path="./Components.LabelManage.tsx" />
+/// <reference path="./Views.LabelManage.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -59,7 +59,7 @@ module Esper.Components {
   }
 
   function renderManageLabels() {
-    Layout.renderModal(<LabelManageModal />);
+    Layout.renderModal(<Views.LabelManageModal />);
   }
 
 

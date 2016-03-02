@@ -19,19 +19,21 @@ module Esper.Components {
 
   interface CalSelectorProps {
     id?: string;
+    className?: string;
+    teams: ApiT.Team[];
+    calendarsByTeamId: {[index: string]: ApiT.GenericCalendar[]};
     selected: Calendars.CalSelection[];
     updateFn: (selections: Calendars.CalSelection[]) => void;
     minimized?: boolean;
     toggleMinimized?: () => void;
     allowMulti?: boolean;
-    className?: string
   }
 
   export class CalSelector extends Component<CalSelectorProps, {}>
   {
     _className: string;
 
-    renderWithData() {
+    render() {
       var groups = this.getGroups();
       var selected = this.getSelected();
       return <div className={this.props.className || this._className}>
@@ -61,9 +63,8 @@ module Esper.Components {
     }
 
     getGroups() {
-      var teams = Teams.all();
-      var groups = _.map(teams, (t) => {
-        var calList = Calendars.CalendarListStore.val(t.teamid);
+      var groups = _.map(this.props.teams, (t) => {
+        var calList = this.props.calendarsByTeamId[t.teamid];
         return {
           id: t.teamid,
           displayAs: t.team_name,
@@ -122,7 +123,7 @@ module Esper.Components {
       this._className = "dropdown-menu";
     }
 
-    renderWithData() {
+    render() {
       var groups = this.getGroups();
       var selected = this.getSelected();
       var selectedText = ((): string => {
@@ -149,7 +150,7 @@ module Esper.Components {
                className="form-control dropdown-toggle end-of-group"
                readOnly={true}
                value={ selectedText } />
-        { super.renderWithData() }
+        { super.render() }
       </DropdownModal>;
     }
 
@@ -162,12 +163,12 @@ module Esper.Components {
   }
 
   export class CalSelectorDropdownWithIcon extends CalSelectorDropdown {
-    renderWithData() {
+    render() {
       return <div className="input-group cal-selector">
         <span className="input-group-addon">
           <i className="fa fa-fw fa-calendar-o" />
         </span>
-        { super.renderWithData() }
+        { super.render() }
       </div>;
     }
   }

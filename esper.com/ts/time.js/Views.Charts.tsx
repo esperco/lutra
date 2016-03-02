@@ -241,6 +241,15 @@ module Esper.Views {
         teamId: null, calId: null
       };
 
+      var teams = Teams.all();
+      var calendarsByTeamId = (() => {
+        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
+        _.each(Teams.all(), (t) => {
+          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
+        });
+        return ret;
+      })();
+
       // Render view
       return <div id="charts-page"
                   className="esper-full-screen minus-nav">
@@ -252,6 +261,8 @@ module Esper.Views {
             </label>
             <Components.CalSelectorDropdown
               id={this.getId("cal-select")}
+              teams={teams}
+              calendarsByTeamId={calendarsByTeamId}
               selected={[cal]}
               updateFn={updateCalSelection}
             />

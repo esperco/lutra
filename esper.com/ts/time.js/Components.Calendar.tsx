@@ -1,5 +1,14 @@
 /*
   Component for a FullCalendar rendering
+
+  This is technically more of a "View" in that it depends on the data from
+  Event stores as opposed to being a pure function of props and state. But
+  making FullCalendar fit a React paradigm isn't worth the effort right now.
+
+  Consider removing FullCalendar and just using straight up React at some
+  point (this would also have the nice effect of shrinking our vendor bundle).
+  https://github.com/intljusticemission/react-big-calendar is a good candidate
+  for this.
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
