@@ -55,9 +55,11 @@ module Esper.Components {
       (selectedIds.length === props.labels.length &&
        (props.unlabeledSelected || !props.showUnlabeled));
     var unlabeledSelected = props.allSelected || props.unlabeledSelected;
+    var someSelected = allSelected || selectedIds.length ||
+      (props.unlabeledSelected && props.showUnlabeled);
 
     function toggleAll() {
-      props.updateFn(allSelected ? {
+      props.updateFn(someSelected ? {
         all: false,
         unlabeled: false,
         labels: []
@@ -95,13 +97,22 @@ module Esper.Components {
 
     /////
 
+    var selectAllIcon = (() => {
+      if (allSelected) {
+        return "fa-check-square-o";
+      } else if (someSelected) {
+        return "fa-minus-square-o";
+      } else {
+        return "fa-square-o";
+      }
+    })();
+
     return <div className={props.className || "esper-select-menu"}>
       <div className="esper-select-menu">
         <a className="esper-selectable"
            onClick={toggleAll}>
           <span className="badge">{ props.totalCount }</span>
-          <i className={"fa fa-fw " + (allSelected ?
-            "fa-check-square-o" : "fa-square-o")} />{" "}
+          <i className={"fa fa-fw " + selectAllIcon} />{" "}
           Select All
         </a>
       </div>

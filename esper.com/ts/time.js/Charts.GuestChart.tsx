@@ -117,6 +117,15 @@ module Esper.Charts {
       }
 
       var totalCount = DailyStats.sumScheduledCount(stats);
+      var selectAllIcon = (() => {
+        if (this.isAllSelected()) {
+          return "fa-check-square-o";
+        } else if (this.isSomeSelected()) {
+          return "fa-minus-square-o";
+        } else {
+          return "fa-square-o"
+        }
+      })();
 
       return <div className="esper-menu-section">
         <div className="esper-subheader">
@@ -127,8 +136,7 @@ module Esper.Charts {
           <a className="esper-selectable"
              onClick={this.toggleAll.bind(this)}>
             <span className="badge">{ totalCount }</span>
-            <i className={"fa fa-fw " + (this.isAllSelected() ?
-              "fa-check-square-o" : "fa-square-o")} />{" "}
+            <i className={"fa fa-fw " + selectAllIcon} />{" "}
             Select All
           </a>
           <div className="divider" />
@@ -151,7 +159,7 @@ module Esper.Charts {
       var pair = this.sync();
       var stats = pair && pair[0];
 
-      if (this.isAllSelected()) {
+      if (this.isSomeSelected()) {
         updateDomains([])
       } else {
         var domainIds = _.map(DailyStats.topGuestDomains(stats),
@@ -175,6 +183,18 @@ module Esper.Charts {
 
       return selectedIds.length === maxSelectable &&
         (!this.allowEmpty || this.showEmptyDomain());
+    }
+
+    isSomeSelected() {
+      var pair = this.sync();
+      var stats = pair && pair[0];
+      if (! stats) {
+        return false;
+      }
+      var domains = DailyStats.topGuestDomains(stats);
+      var selectedIds = this.getSelectedDomains(domains);
+
+      return selectedIds.length || (this.allowEmpty && this.showEmptyDomain());
     }
   }
 }
