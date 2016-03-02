@@ -10,7 +10,8 @@
         ignoreErrors: [
           /* Triggered by browser extensions, not our code */
           /WrappedNative/,
-          /NPObject/
+          /NPObject/,
+          /jsclient-bucket4/
         ],
         ignoreUrls: [
           /localhost/i,
@@ -19,11 +20,19 @@
           /extensions\//i,
           /^chrome:\/\//i,
 
-          /* Third party sites */
+          /* Third party sites and libraries */
           /\.facebook\.com/i,
           /\.google\.com/i,
           /\.googleapis\.com/i,
-          /\.twitter\.com/i
+          /\.intercom\.io/i,
+          /\.mixpanel\.com/i,
+          /\.optimizely\.com/i,
+          /\.olark\.com/i,
+          /\.segment\.com/i,
+          /\.twitter\.com/i,
+
+          /* Local file (if someone saves a copy of the page for some reason) */
+          /file:\/\/\//i
         ]
       }).install();
   }
