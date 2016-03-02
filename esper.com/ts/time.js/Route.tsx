@@ -127,13 +127,13 @@ module Esper.Route {
 
     Api.postEventFeedback(teamid, eventid, action)
       .then(function(labels:ApiT.Labels) {
-        Api.getGenericEvent(teamid, calid, eventid)
-        .then(function(event:ApiT.GenericCalendarEvent) {
-          render(<Views.EventView event={event} />,
-            undefined,
-            <Components.Footer hoverable={true} />
-          );
-        });
+        Events.fetch1(teamid, calid, eventid)
+          .then((eventKey: string) => {
+            render(<Views.EventView eventKey={eventKey} />,
+              undefined,
+              <Components.Footer hoverable={true} />
+            );
+          });
       });
   });
 
