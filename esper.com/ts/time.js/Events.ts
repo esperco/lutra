@@ -22,7 +22,11 @@ module Esper.Events {
 
   // Link stored events to teams to avoid mixing label data
   export function storeId(event: TeamEvent) {
-    return event.teamId + "|" + event.calendar_id + "|" + event.id;
+    return keyForEvent(event.teamId, event.calendar_id, event.id);
+  }
+
+  function keyForEvent(teamid:string, calid:string, eventid:string) {
+    return teamid + "|" + calid + "|" + eventid;
   }
 
   // Returns true if two events are part of the same recurring event
@@ -67,6 +71,26 @@ module Esper.Events {
     // Wrap existing results in promise
     else {
       return $.Deferred().resolve(EventListStore.batchVal(key)).promise();
+    }
+  }
+
+  export function fetch1(teamid:string, calid:string, eventid:string,
+                         forceRefresh=false): JQueryPromise<string>
+  {
+    var key = keyForEvent(teamid, calid, eventid);
+    if (forceRefresh || ! EventStore.has(key)) {
+      var p = $.Deferred();
+      EventStore.fetch(key, p);
+
+      Api.getGenericEvent(teamid, calid, eventid)
+      .done((event: ApiT.GenericCalendarEvent) => {
+        p.resolve(asTeamEvent(teamid, event));
+      });
+      return p.then(() => {
+        return key;
+      });
+    } else {
+      return $.Deferred().resolve(key);
     }
   }
 

@@ -2,13 +2,10 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface Property {
-    event: ApiT.GenericCalendarEvent;
-  }
-
-  export class EventView extends Component<Property, {}> {
+  export class EventView extends Component<{eventKey:string}, {}> {
     renderWithData() {
-      var event = this.props.event;
+      var eventPair = Events.EventStore.get(this.props.eventKey);
+      var event = eventPair[0];
       return <div className="event-content">
         <div className="title">{event.title}</div>
         <div className="time">
@@ -24,24 +21,11 @@ module Esper.Views {
             null
           }
         </div>
-        <div className="event-labels">
-          { _.map(event.labels_norm,
-            (l, i) => this.renderLabel(l, event.labels[i])
-          ) }
-        </div>
+        <Components.LabelEditor2
+          eventPairs={[eventPair]}
+          teamPairs={Teams.allPairs()}
+        />
       </div>;
-    }
-
-    renderLabel(id: string, displayAs: string) {
-      var labelColor = Colors.getColorForLabel(id)
-      var style = {
-        background: labelColor,
-        color: Colors.colorForText(labelColor)
-      };
-      return <span style={style} key={id} className="event-label">
-        <i className="fa fa-fw fa-tag" />{" "}
-        {displayAs}
-      </span>;
     }
   }
 }

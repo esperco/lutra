@@ -52,6 +52,10 @@ module Esper.Teams {
     return allTeamsStore.val(batchKey);
   }
 
+  export function allPairs(): [ApiT.Team, Model.StoreMetadata][] {
+    return allTeamsStore.batchGet(batchKey) || [];
+  }
+
   export function upsertTeam(team: ApiT.Team): string {
     teamStore.upsertSafe(team.teamid, team, {
       dataStatus: Model.DataStatus.UNSAVED

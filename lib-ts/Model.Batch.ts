@@ -53,6 +53,13 @@ module Esper.Model {
       }
     }
 
+    batchGet(_id: string): [TData, StoreMetadata][] {
+      if (this.batchHas(_id)) {
+        var idList = this.val(_id);
+        return _.map(idList, (itemId) => this.itemStore.get(itemId));
+      }
+    }
+
     /* Batch upserts based on a promise, updates dataStatus accordingly */
     batchFetch(_id: string, promise: JQueryPromise<[string, TData][]>) {
       var batchPromise = promise.then(function(pairList) {
