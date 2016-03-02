@@ -35,7 +35,10 @@ module Esper.Route {
   // Helper to check default team created and calendars loaded
   var checkTeamAndCalendars: PageJS.Callback = function(ctx, next) {
     Teams.defaultTeamPromise
-      .then(() => Calendars.calendarLoadPromise)
+
+      // Uncomment if we want to wait for calendar names to finish loading
+      // .then(() => Calendars.calendarLoadPromise)
+
       .then(next, (err) => {
         Log.e(err);
         render(<Views.LoadError />);

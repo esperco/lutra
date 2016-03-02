@@ -35,14 +35,14 @@ module Esper.Components {
   // Group of choies
   interface Group {
     id: string;
-    displayAs?: string;
+    displayAs?: string|JSX.Element;
     choices: ListChoice[];
   }
 
   // Single item in list
   interface ListChoice {
     id: string;
-    displayAs: string;
+    displayAs: string|JSX.Element;
     badgeText?: string;
     badgeColor?: string;
   }

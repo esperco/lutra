@@ -70,7 +70,7 @@ module Esper.Components {
           choices: _.map(calList, (c) => {
             return {
               id: c.id,
-              displayAs: c.title
+              displayAs: c.title || <span className="esper-placeholder" />
             };
           })
         }
@@ -125,7 +125,7 @@ module Esper.Components {
     renderWithData() {
       var groups = this.getGroups();
       var selected = this.getSelected();
-      var selectedText = (() => {
+      var selectedText = ((): string => {
         if (selected.length > 1) {
           return selected.length + " Calendars Selected";
         }
@@ -133,7 +133,12 @@ module Esper.Components {
           var g = _.find(groups, (g) => g.id === selected[0].groupId);
           if (g) {
             var c = _.find(g.choices, (c) => c.id === selected[0].id);
-            if (c) { return c.displayAs; }
+            if (c) {
+              if (typeof c.displayAs === "string") {
+                return c.displayAs.toString();
+              }
+              return "Loading ...";
+            }
           }
         }
         return "No Calendars Selected"

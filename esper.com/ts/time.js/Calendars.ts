@@ -173,6 +173,15 @@ module Esper.Calendars {
   */
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
     var promises = _.map(loginResponse.teams, (t) => {
+
+      // Pre-populate calendar list store with _ids while we're fetching
+      var calendars = _.map(t.team_timestats_calendars,
+        (calId) => ({ id: calId, title: "" })
+      );
+      CalendarListStore.upsert(t.teamid, calendars, {
+        dataStatus: Model.DataStatus.FETCHING
+      });
+
       var p = Api.getGenericCalendarList(t.teamid);
       p.done((c) => CalendarListStore.upsert(t.teamid, c.calendars));
       return p;
