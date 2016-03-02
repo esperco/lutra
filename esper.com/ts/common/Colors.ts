@@ -4,35 +4,113 @@
 
 module Esper.Colors {
 
-  // Preset list of calendars -- these look pretty close to Google Calendar
-  // colors
+  /*
+    Preset list of colors -- picked from
+    https://www.google.com/design/spec/style/color.html#color-color-palette
+  */
   export var presets: string[] = [
-    "#9FE1E7",
-    "#FFAD46",
-    "#42D692",
-    "#9A9CFF",
-    "#FF7537",
-    "#92E1C0",
-    "#AC725E",
-    "#16A765",
-    "#D06B64",
-    "#B99AFF",
-    "#F83A22",
-    "#C2C2C2",
-    "#9FC6E7",
-    "#FBE983",
-    "#7BD148",
-    "#CD74E6", // NB: This looks really close to the Esper brand "purple", so
-               // may need to disable if it conflicts with selection colors,
-               // etc.
-    "#F691B2",
-    "#CABDBF",
-    "#4986E7",
-    "#FAD165",
-    "#B3DC6C",
-    "#A47AE2",
-    "#FA573C",
-    "#CCA6AC"
+    // 500
+    // "#9C27B0",
+    // "#2196F3",
+    // "#009688",
+    // "#FF9800",
+    // "#F44336",
+    // "#673AB7",
+    // "#03A9F4",
+    // "#4CAF50",
+    // "#FFEB3B",
+    // "#FF5722",
+    // "#E91E63",
+    // "#3F51B5",
+    // "#00BCD4",
+    // "#8BC34A",
+    // "#FFC107",
+
+    // 400
+    "#AB47BC",
+    "#42A5F5",
+    "#26A69A",
+    "#FFA726",
+    "#EF5350",
+    "#7E57C2",
+    "#29B6F6",
+    "#66BB6A",
+    "#FFEE58",
+    "#FF7043",
+    "#EC407A",
+    "#5C6BC0",
+    "#26C6DA",
+    "#9CCC65",
+    "#FFCA28",
+
+    // 300
+    // "#BA68C8",
+    // "#64B5F6",
+    // "#4DB6AC",
+    // "#FFB74D",
+    // "#E57373",
+    // "#9575CD",
+    // "#4FC3F7",
+    // "#81C784",
+    // "#FF8A65",
+    // "#7986CB",
+    // "#4DD0E1",
+    // "#AED581",
+    // "#FFD54F",
+
+    // 200
+    "#CE93D8",
+    "#90CAF9",
+    "#80CBC4",
+    "#E6EE9C",
+    "#FFCC80",
+    "#EF9A9A",
+    "#B39DDB",
+    "#81D4FA",
+    "#A5D6A7",
+    "#FFF59D",
+    "#FFAB91",
+    "#F48FB1",
+    "#9FA8DA",
+    "#80DEEA",
+    "#C5E1A5",
+    "#FFE082",
+
+    // 100
+    // "#E1BEE7",
+    // "#BBDEFB",
+    // "#B2DFDB",
+    // "#F0F4C3",
+    // "#FFE0B2",
+    // "#FFCDD2",
+    // "#D1C4E9",
+    // "#B3E5FC",
+    // "#C8E6C9",
+    // "#FFF9C4",
+    // "#FFCCBC",
+    // "#F8BBD0",
+    // "#C5CAE9",
+    // "#B2EBF2",
+    // "#DCEDC8",
+    // "#FFECB3",
+
+    // 50
+    "#F3E5F5",
+    "#E3F2FD",
+    "#E0F2F1",
+    "#F9FBE7",
+    "#FFF3E0",
+    "#EDE7F6",
+    "#FFEBEE",
+    "#E1F5FE",
+    "#E8F5E9",
+    "#FFFDE7",
+    "#FBE9E7",
+    "#FCE4EC",
+    "#E8EAF6",
+    "#E0F7FA",
+    "#F1F8E9",
+    "#FFF8E1"
   ];
 
   // If we only need a handful of colors
