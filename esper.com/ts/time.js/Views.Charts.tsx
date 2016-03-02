@@ -113,7 +113,9 @@ module Esper.Views {
       windowEnd: requestPeriod.windowEnd,
       calendars: [calendar],
       interval: requestPeriod.interval,
-      selectedLabels: labelSelection && labelSelection.labels
+      selectedLabels: labelSelection && labelSelection.labels,
+      allLabels: labelSelection && labelSelection.all,
+      unlabeled: labelSelection && labelSelection.unlabeled
     }
 
     /*
@@ -226,8 +228,6 @@ module Esper.Views {
   /* React Views */
 
   export class Charts extends Component<{}, {}> {
-    _calSelector: Components.CalSelector;
-
     constructor(props: {}) {
       setDefaults();
       super(props);
@@ -245,14 +245,21 @@ module Esper.Views {
       return <div id="charts-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
-          <Components.CalSelector
-            ref={(c) => this._calSelector = c}
-            selected={[cal]}
-            updateFn={updateCalSelection} />
+          <div className="esper-menu-section">
+            <label htmlFor={this.getId("cal-select")}>
+              <i className="fa fa-fw fa-calendar-o" />{" "}
+              Calendar
+            </label>
+            <Components.CalSelectorDropdown
+              id={this.getId("cal-select")}
+              selected={[cal]}
+              updateFn={updateCalSelection}
+            />
+          </div>
           { chart ? chart.renderSelectors() : null }
         </div>
         <div className="esper-right-content padded">
-          <div className="esper-header row clearfix">
+          <div className="esper-header fixed row clearfix">
             <div className="col-xs-8 col-sm-4">
               { this.renderChartSelector(chart) }
             </div>
@@ -355,13 +362,6 @@ module Esper.Views {
           </div>
         </div>
       </div>;
-    }
-
-    // Open modal if no calendars
-    componentDidMount() {
-      if (Onboarding.needsCalendars()) {
-        this._calSelector.editCalendars();
-      }
     }
   }
 }

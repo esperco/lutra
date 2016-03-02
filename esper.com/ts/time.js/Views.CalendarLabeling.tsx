@@ -1,6 +1,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.LabelEditor.tsx" />
+/// <reference path="./Components.LabelEditor2.tsx" />
 /// <reference path="./Components.Calendar.tsx" />
 /// <refernece path="./Calendars.ts" />
 
@@ -58,12 +58,6 @@ module Esper.Views {
         }];
       }
 
-      // Switch to minimized state for calendar selector as soon as we pick
-      // an event so we can start labeling right away
-      if (!selected && !calSelectMinStore.isSet()) {
-        calSelectMinStore.set(true);
-      }
-
       return newData;
     });
   }
@@ -76,43 +70,32 @@ module Esper.Views {
     }
   }
 
-  // Store to track minimized state of cal selector
-  var calSelectMinStore = new Model.StoreOne<boolean>();
-
-  function toggleMinCalSelect() {
-    var current = calSelectMinStore.val();
-    calSelectMinStore.set(!current);
-  }
-
-  // Export with prefix for testing
-  export var clCalSelectMinStore = calSelectMinStore;
-
   ////
 
-  interface CalendarLabelingState {
-    selectedCal: Calendars.CalSelection;
-    minimizeCalSelector: boolean;
-  }
-
-  export class CalendarLabeling extends Component<{}, CalendarLabelingState> {
-    _calSelector: Components.CalSelector;
-
+  export class CalendarLabeling extends Component<{}, {}> {
     constructor(props: {}) {
       setDefaults();
       super(props);
     }
 
-    render() {
+    renderWithData() {
+      calendarLabelUpdateStore.get();
+      var selectedCal = Calendars.SelectStore.val();
+
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
-          <Components.CalSelector
-            ref={(c) => this._calSelector = c}
-            selected={this.state.selectedCal ? [this.state.selectedCal] : []}
-            updateFn={updateSelection}
-            minimized={this.state.minimizeCalSelector}
-            toggleMinimized={toggleMinCalSelect}
-          />
+          <div className="esper-menu-section">
+            <label htmlFor={this.getId("cal-select")}>
+              <i className="fa fa-fw fa-calendar-o" />{" "}
+              Calendar
+            </label>
+            <Components.CalSelectorDropdown
+              id={this.getId("cal-select")}
+              selected={selectedCal ? [selectedCal] : []}
+              updateFn={updateSelection}
+            />
+          </div>
           {this.renderLabelEditor()}
         </div>
         <div className="esper-right-content padded">
@@ -122,7 +105,8 @@ module Esper.Views {
     }
 
     renderCalendar() {
-      if (!this.state.selectedCal || !this.state.selectedCal.calId) {
+      var selectedCal = Calendars.SelectStore.val();
+      if (!selectedCal || !selectedCal.calId) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-calendar"></i>{" "}
           Please select a calendar
@@ -131,9 +115,9 @@ module Esper.Views {
 
       return <Components.Calendar
         forceUpdate={calendarLabelUpdateStore.val()}
-        teamId={this.state.selectedCal.teamId}
-        calId={this.state.selectedCal.calId}
-        eventIds={_.map(this.state.selectedCal.events, (e) => e.id)}
+        teamId={selectedCal.teamId}
+        calId={selectedCal.calId}
+        eventIds={_.map(selectedCal.events, (e) => e.id)}
         updateFn={updateEvent}
       />;
     }
@@ -149,31 +133,54 @@ module Esper.Views {
     }
 
     renderLabelEditor() {
-      if (this.state.selectedCal &&
-          this.state.selectedCal.events &&
-          this.state.selectedCal.events.length > 0) {
-        return <Components.LabelEditor
-          teamId={this.state.selectedCal.teamId}
-          calId={this.state.selectedCal.calId}
-          events={this.state.selectedCal.events}
-        />;
+      var selectedCal = Calendars.SelectStore.val();
+      if (selectedCal &&
+          selectedCal.events &&
+          selectedCal.events.length > 0) {
+        var eventPairs = _.filter(_.map(selectedCal.events,
+          (e) => Events.EventStore.get(e.id)
+        ));
+        var teamPairs = _.map(Teams.all(),
+        (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
+          .match<[ApiT.Team, Model.StoreMetadata]>({
+            none: () => null,
+            some: (m) => [t, m]
+          }));
+
+        var heading = (eventPairs.length === 1 ?
+          eventPairs[0][0].title || "1 Event Selected":
+          eventPairs.length + " Events Selected"
+        );
+        var hasRecurring = false;
+        if (_.find(eventPairs, (e) => !!e[0].recurring_event_id)) {
+          hasRecurring = true;
+        }
+
+        return <div className="esper-menu-section">
+          <div className="esper-subheader select-labels-heading">
+            {heading}
+            { hasRecurring ?
+              <span className="recurring-note">
+                {" "}+ Recurring
+              </span>: ""
+            }
+            { eventPairs.length === 1 ?
+              <span className="shift-note">
+                {" "}(Hold Shift to Select Multiple Events)
+              </span>: ""
+            }
+         </div>
+          <Components.LabelEditor2
+            eventPairs={eventPairs}
+            teamPairs={teamPairs}
+          />
+        </div>;
       } else {
-        return <span />;
-      }
-    }
-
-    componentDidMount() {
-      this.setSources([
-        Calendars.SelectStore,
-        calSelectMinStore,
-        calendarLabelUpdateStore
-      ]);
-    }
-
-    getState() {
-      return {
-        selectedCal: Calendars.SelectStore.val(),
-        minimizeCalSelector: calSelectMinStore.val()
+        return <div className="esper-menu-section">
+          <div className="esper-no-content">
+            Select a Calendar Event
+          </div>
+        </div>;
       }
     }
   }

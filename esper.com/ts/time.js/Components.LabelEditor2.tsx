@@ -39,10 +39,11 @@ module Esper.Components {
     var busy = !!_.find(metadata, (m) =>
       m.dataStatus === Model.DataStatus.INFLIGHT
     );
+    var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
 
     // NB: Use cancel button instead of OK button because purpose of button
     // is just to close panel, not do anything
-    return <ModalPanel busy={busy} error={error}
+    return <ModalPanel busy={busy} error={error} busyText={busyText}
                        onCancel={props.onDone} cancelText="Close">
       <LabelInput events={events} />
       <LabelList events={events} teams={teams} />
@@ -50,7 +51,7 @@ module Esper.Components {
         <div className="divider" />
         <a className="esper-selectable" target="_blank"
            onClick={renderManageLabels}>
-        <i className="fa fa-fw fa-tags"></i>
+        <i className="fa fa-fw fa-bars"></i>
         {" "}Manage Labels
         </a>
       </div>

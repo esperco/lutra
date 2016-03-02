@@ -7,7 +7,6 @@
 /// <reference path="./Charts.AutoChart.tsx" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Components.ListSelector.tsx" />
-/// <reference path="./Components.Section.tsx" />
 
 module Esper.Charts {
   interface DomainSelection {
@@ -117,15 +116,85 @@ module Esper.Charts {
         }
       }
 
-      return <Components.BorderlessSection
-              icon="fa-users" title="Select Domains">
+      var totalCount = DailyStats.sumScheduledCount(stats);
+      var selectAllIcon = (() => {
+        if (this.isAllSelected()) {
+          return "fa-check-square-o";
+        } else if (this.isSomeSelected()) {
+          return "fa-minus-square-o";
+        } else {
+          return "fa-square-o"
+        }
+      })();
+
+      return <div className="esper-menu-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-users" />{" "}
+          Domains
+        </div>
+        <div className="esper-select-menu">
+          <a className="esper-selectable"
+             onClick={this.toggleAll.bind(this)}>
+            <span className="badge">{ totalCount }</span>
+            <i className={"fa fa-fw " + selectAllIcon} />{" "}
+            Select All
+          </a>
+          <div className="divider" />
+        </div>
         <Components.ListSelector groups={groups}
           selectOption={Components.ListSelectOptions.MULTI_SELECT}
           selectedIds={ _.map(selectedIds, (s) => {
             return { id: s, groupId: "" }
           }) }
+          selectedItemClasses="active"
+          listClasses="esper-select-menu"
+          itemClasses="esper-selectable"
+          headerClasses="esper-select-header"
+          dividerClasses="divider"
           updateFn={updateDomains} />
-      </Components.BorderlessSection>;
+      </div>;
+    }
+
+    toggleAll() {
+      var pair = this.sync();
+      var stats = pair && pair[0];
+
+      if (this.isSomeSelected()) {
+        updateDomains([])
+      } else {
+        var domainIds = _.map(DailyStats.topGuestDomains(stats),
+          (d) => ({id: d.domain}));
+        if (this.allowEmpty) {
+          domainIds = [{id: ""}].concat(domainIds);
+        }
+        updateDomains(domainIds);
+      }
+    }
+
+    isAllSelected() {
+      var pair = this.sync();
+      var stats = pair && pair[0];
+      if (! stats) {
+        return false;
+      }
+      var domains = DailyStats.topGuestDomains(stats);
+      var maxSelectable = domains.length;
+      var selectedIds = this.getSelectedDomains(domains);
+
+      return selectedIds.length === maxSelectable &&
+        (!this.allowEmpty || this.showEmptyDomain());
+    }
+
+    isSomeSelected() {
+      var pair = this.sync();
+      var stats = pair && pair[0];
+      if (! stats) {
+        return false;
+      }
+      var domains = DailyStats.topGuestDomains(stats);
+      var selectedIds = this.getSelectedDomains(domains);
+
+      return selectedIds.length || (this.allowEmpty && this.showEmptyDomain());
     }
   }
 }

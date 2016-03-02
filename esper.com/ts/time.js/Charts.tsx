@@ -21,6 +21,8 @@ module Esper.Charts {
 
     // Applicable to labeled charts only
     selectedLabels?: string[];
+    unlabeled?: boolean;
+    allLabels?: boolean;
   }
 
   export abstract class Chart {

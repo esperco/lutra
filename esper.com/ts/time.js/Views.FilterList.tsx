@@ -116,7 +116,7 @@ module Esper.Views {
 
     renderCalSelector() {
       return <div className="col-sm-6 form-group">
-        <Components.CalSelectorDropdown
+        <Components.CalSelectorDropdownWithIcon
           selected={this.props.calendars}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
             calendars: x
@@ -148,6 +148,7 @@ module Esper.Views {
           selected={this.props.labels}
           allSelected={this.props.allLabels}
           unlabeledSelected={this.props.unlabeled}
+          showUnlabeled={true}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
             allLabels: x.all,
             unlabeled: x.unlabeled,

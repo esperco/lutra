@@ -3,23 +3,25 @@
 /// <reference path="./Charts.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
-/// <reference path="./Components.LabelAdd.tsx" />
-/// <reference path="./Components.Section.tsx" />
-/// <reference path="./Components.ListSelector.tsx" />
+/// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
 
   // Store for currently selected labels (used by LabelChart below)
   interface LabelSelection {
     labels: string[];
+    unlabeled: boolean;
+    all: boolean;
   }
   export var LabelSelectStore = new Model.StoreOne<LabelSelection>();
 
   // Action to update selected labels
-  function updateLabels(labels: {groupId: string, id: string}[]) {
-    LabelSelectStore.set({
-      labels: _.map(labels, (l) => l.id)
-    });
+  function updateLabels(x: {
+      all: boolean;
+      unlabeled: boolean;
+      labels: string[];
+  }) {
+    LabelSelectStore.set(x);
   }
 
   /*
@@ -101,9 +103,11 @@ module Esper.Charts {
     protected getSelectedLabels(displayResults: TimeStats.DisplayResults)
       : string[]
     {
-      return this.params.selectedLabels || _.map(
-        displayResults.slice(0, 4), (v) => v.labelNorm
-      );
+      var labelNorms = _.map(displayResults, (r) => r.labelNorm);
+      if (this.params.allLabels) {
+        return labelNorms;
+      }
+      return this.params.selectedLabels || labelNorms.slice(0, 4);
     }
 
     isBusy() {
@@ -136,53 +140,49 @@ module Esper.Charts {
     // Render label selector based on what labels are actually there
     renderSelectors() {
       // Safety check
-      if (! (this.sync() && this.sync()[0])) return;
+      var stats: ApiT.CalendarStats[] = Option.cast(this.sync()).match({
+        none: () => null,
+        some: (d) => d[0] && d[0].items
+      });
+      if (! stats) return;
 
       var displayResults = this.getRawDisplayResults();
 
-      // Only one label groups (for now)
-      var groups = [{
-        id: "",
-        choices: _.map(displayResults, (d) => {
-          return {
-            id: d.labelNorm,
-            displayAs: d.displayAs || d.labelNorm,
-            badgeText: d.totalCount.toString(),
-            badgeColor: Colors.getColorForLabel(d.labelNorm)
-          };
-        })
-      }]
+      // Conform to LabelSelector syntax
+      var labels = _.map(displayResults, (r) => ({
+        id: r.labelNorm,
+        displayAs: r.displayAs,
+        count: r.totalCount
+      }));
 
-      // Conform to ListSelector syntax
-      var selectedIds = _.map(this.getSelectedLabels(displayResults),
-        (label) => {
-          return {
-            id: label,
-            groupId: ""
-          }
+      var totalCount = _.sumBy(stats,
+        (s) => _.sumBy(s.partition,
+          (p) => p.event_count));
+      var unlabeledCount = _.sumBy(stats, (s) => {
+        var partitions = _.filter(s.partition,
+          (p) => p.event_labels.length === 0);
+        if (partitions.length) {
+          return partitions[0].event_count;
+        }
+        return 0;
       });
 
-      return <Components.BorderlessSection
-              icon="fa-tags" title="Select Labels">
-        <Components.ListSelector groups={groups}
-          selectedIds={selectedIds}
-          selectOption={Components.ListSelectOptions.MULTI_SELECT}
+      var selectedLabels = this.getSelectedLabels(displayResults);
+
+      return <div className="esper-menu-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-tags" />{" "}
+          Labels
+        </div>
+        <Components.LabelSelector labels={labels}
+          totalCount={totalCount}
+          unlabeledCount={unlabeledCount}
+          selected={selectedLabels || []}
+          allSelected={this.params.allLabels || false}
+          unlabeledSelected={this.params.unlabeled || false}
           updateFn={updateLabels}
         />
-        <div className="esper-subsection-footer">
-          <a className="esper-link" target="_blank"
-             onClick={this.editLabels.bind(this)}>
-            <i className="fa fa-fw fa-cog"></i>
-            {" "}Configure Labels
-          </a>
-        </div>
-      </Components.BorderlessSection>;
-    }
-
-    editLabels() {
-      Layout.renderModal(<Components.LabelAddModal
-        onHidden={this.async.bind(this)}
-      />);
+      </div>;
     }
   }
 }
