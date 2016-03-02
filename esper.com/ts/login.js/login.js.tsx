@@ -3,7 +3,7 @@
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Login.Oauth.ts" />
 /// <reference path="./Components.Login.tsx" />
-/// <reference path="./Components.ApproveTeam.tsx" />
+/// <reference path="./Views.ApproveTeam.tsx" />
 /// <reference path="./Token.ts" />
 
 module Esper {
@@ -166,7 +166,7 @@ module Esper {
     .then(function(response) {
       var dfd = $.Deferred<ApiT.LoginResponse>();
       if (Login.needApproval(response)) {
-        Layout.renderModal(<Components.ApproveTeamsModal info={response}
+        Layout.renderModal(<Views.ApproveTeamsModal info={response}
           callback={(info, rejected) => {
             var teamIds = _.map(rejected, (t) => t.teamid);
             Login.ignoreTeamIds(teamIds);
