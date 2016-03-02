@@ -15,13 +15,13 @@
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
-  interface LabelAddProps {
+  interface LabelManageProps {
     disableDone?: boolean;
     doneText?: string;
     onDone?: () => void;
   }
 
-  interface LabelAddState {
+  interface LabelManageState {
     selectedTeamId?: string;
 
     // Show edit interface or remove prompt for a given label
@@ -37,10 +37,12 @@ module Esper.Components {
     });
   }
 
-  export class LabelAdd extends Component<LabelAddProps, LabelAddState> {
+  export class LabelManage
+    extends Component<LabelManageProps, LabelManageState>
+  {
     _editInput: HTMLInputElement;
 
-    constructor(props: LabelAddProps) {
+    constructor(props: LabelManageProps) {
       super(props);
       this.state = {
         selectedTeamId: getTeamId()
@@ -255,7 +257,7 @@ module Esper.Components {
       this.setState({selectedTeamId: target.value})
     }
 
-    componentDidUpdate(prevProps: LabelAddProps, prevState: LabelAddState) {
+    componentDidUpdate(prevProps: LabelManageProps, prevState: LabelManageState) {
       if (this.state.editLabel &&
           this.state.editLabel !== prevState.editLabel &&
           this._editInput) {
@@ -299,13 +301,13 @@ module Esper.Components {
   } = {};
 
 
-  export class LabelAddModal extends Component<{
+  export class LabelManageModal extends Component<{
     onHidden?: () => void;
   }, {}> {
     render() {
       return <Modal title="Edit Event Labels" icon="fa-tags"
                     onHidden={this.props.onHidden}>
-        <LabelAdd onDone={this.hideModal.bind(this)} />
+        <LabelManage onDone={this.hideModal.bind(this)} />
       </Modal>;
     }
 
