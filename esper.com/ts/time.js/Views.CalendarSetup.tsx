@@ -72,7 +72,9 @@ module Esper.Views {
       none: () => allCals(),
       some: (t) => {
         if (Login.usesNylas() && Login.myUid() !== t.team_executive) {
-          return _.map(t.team_calendars, Calendars.asGeneric);
+          return _.map(t.team_timestats_calendars,
+            (calId) => Calendars.get(t.teamid, calId)
+          );
         } else {
           return allCals();
         }
@@ -80,14 +82,14 @@ module Esper.Views {
     })
   }
 
-  var allCalsKey = ApiC.getCalendarList.strFunc([]);
-  var allCalsStore = ApiC.getCalendarList.store;
+  var allCalsKey = ApiC.getGenericCalendarListOfUser.strFunc([]);
+  var allCalsStore = ApiC.getGenericCalendarListOfUser.store;
 
   function allCals() {
     return Option.cast(allCalsStore.val(allCalsKey))
       .match<ApiT.GenericCalendar[]>({
         none: () => [],
-        some: (c) => _.map(c.calendars, Calendars.asGeneric)
+        some: (c) => c.calendars
       });
   }
 

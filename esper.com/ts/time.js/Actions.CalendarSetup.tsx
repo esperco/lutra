@@ -4,7 +4,7 @@ module Esper.Actions {
 
   export function CalendarSetup(teamId?: string) {
     // Trigger async -> does nothing if already loaded
-    ApiC.getCalendarList();
+    ApiC.getGenericCalendarListOfUser();
 
     // Select default team if none provided
     if (! teamId) {
