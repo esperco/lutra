@@ -95,7 +95,7 @@ module Esper.Charts {
       var results = TimeStats.getDisplayResults(stats);
 
       // Produce consistent sort
-      return _.sortBy(results, (x) => -x.totalCount);
+      return _.sortBy(results, (x) => Labels.normalizeForSort(x.displayAs));
     }
 
     // Return label selection, alternatively gets a list of default labels
@@ -103,11 +103,15 @@ module Esper.Charts {
     protected getSelectedLabels(displayResults: TimeStats.DisplayResults)
       : string[]
     {
-      var labelNorms = _.map(displayResults, (r) => r.labelNorm);
       if (this.params.allLabels) {
-        return labelNorms;
+        return _.map(displayResults, (r) => r.labelNorm);
       }
-      return this.params.selectedLabels || labelNorms.slice(0, 4);
+
+      // Get top 4 labels
+      return this.params.selectedLabels || _.map(
+        _.sortBy(displayResults, (r) => r.totalCount).slice(0, 4),
+        (l) => l.labelNorm
+      );
     }
 
     isBusy() {
@@ -154,6 +158,7 @@ module Esper.Charts {
         displayAs: r.displayAs,
         count: r.totalCount
       }));
+      labels = Labels.sortLabels(labels);
 
       var totalCount = _.sumBy(stats,
         (s) => _.sumBy(s.partition,

@@ -91,7 +91,7 @@ module Esper.Components {
     }
 
     function editLabels() {
-      Layout.renderModal(<Components.LabelAddModal />);
+      Layout.renderModal(<Components.LabelManageModal />);
     }
 
 

@@ -25,7 +25,7 @@ module Esper.Components {
               data-target={this.getId(toggleId)}>
               <i className="fa fa-bars"></i>
             </button>
-            <a className="navbar-brand lg" href="/#!/">
+            <a className="navbar-brand lg" href="#!/">
               <img alt="Esper" src="/img/esper-logo-purple.svg" />
             </a>
           </div>

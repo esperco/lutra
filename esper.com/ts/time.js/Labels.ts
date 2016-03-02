@@ -68,9 +68,42 @@ module Esper.Labels {
     return l.hasOwnProperty('count');
   }
 
-  // Temp helper to normalize labels on teams
+  /*
+    Helper to normalize labels on teams
+
+    TODO: Use normalized forms return by server when team contains
+    normalized forms.
+  */
   export function normalize(l: string) {
     return l.toLowerCase().trim();
+  }
+
+  /*
+    Helper to normalize display versions of labels for sorting. Note that
+    this is distinct from the normalization above, which intended to
+    mimic server normalization and used for equality comparison as opposed
+    to normalizing for sorting purposes.
+
+    Currently the two are identical, but this is not guaranteed.
+  */
+  export function normalizeForSort(l: string) {
+    return l.toLowerCase().trim();
+  }
+
+  /*
+    Sort a list of labels by normalized version of display text -- note
+    that this is distinct from
+  */
+  export function sortLabels<T extends Label>(labels: T[]): T[] {
+    return _.sortBy(labels, (l) => normalizeForSort(l.displayAs));
+  }
+
+  /*
+    Sort of list of strings (note that we don't use the normalize function
+    because the normalization here)
+  */
+  export function sortLabelStrs(labels: string[]) {
+    return _.sortBy(labels, normalizeForSort);
   }
 
   /*

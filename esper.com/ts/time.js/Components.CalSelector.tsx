@@ -118,7 +118,7 @@ module Esper.Components {
     _dropdownModal: DropdownModal;
 
     constructor(props: CalSelectorProps) {
-      super(this.props);
+      super(props);
       this._className = "dropdown-menu";
     }
 

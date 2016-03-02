@@ -76,9 +76,9 @@ module Esper.Components {
         header: {
           left: 'today prev,next',
           center: 'title',
-          right: 'agendaDay,agendaWeek,month'
+          right: 'agendaWeek,month'
         },
-        defaultView: 'agendaWeek',
+        defaultView: 'month',
         snapDuration: "00:15:00",
         events: this.getSync.bind(this),
         viewRender:this.fetchAsync.bind(this),

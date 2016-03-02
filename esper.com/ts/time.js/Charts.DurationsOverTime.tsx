@@ -10,7 +10,7 @@
 module Esper.Charts {
   export class DurationsOverTime extends LabelChart {
     static displayName = "Label Duration Over Time";
-    static usesIntervals = true;
+    protected usesIntervals = true;
 
     renderChart() {
       var formatted = TimeStats.formatWindowStarts(
