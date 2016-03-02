@@ -37,18 +37,22 @@ module Esper.Charts {
       var series: {
         name: string,
         color: string,
-        data: [number, number][]
-      }[] = [];
+        data: {name?: string, x: number, y: number}[]
+      }[] = _.map(DURATION_BUCKETS, (b, i) => ({
+        name: b.label,
+        color: Colors.presets[i],
+        data: []
+      }))
 
       _.each(data.daily_stats, function(stat) {
         _.each(stat.scheduled, function(duration) {
           var i = _.findLastIndex(DURATION_BUCKETS, (b) => {
             return duration >= b.gte;
           });
-          series.push({
+          series[i].data.push({
             name: "Event on " + moment(stat.window_start).format("MMM D"),
-            color: Colors.presets[i],
-            data: [[i, TimeStats.toHours(duration)]]
+            x: i,
+            y: TimeStats.toHours(duration)
           })
         });
       });
@@ -60,8 +64,9 @@ module Esper.Charts {
 
         tooltip: {
           formatter: function() {
-            if (this.series.name) {
-              return `<b>${this.series.name}:</b> ${this.y} hours`;
+            if (this.point.name) {
+              return `<b>${this.point.name}:</b>` +
+                     `${this.y} hour${this.y != 1 ? 's' : ''}`;
             } else {
               return `${this.y} hours`;
             }
