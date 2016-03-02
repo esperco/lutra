@@ -1,5 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Components.Login.tsx" />
+/// <reference path="./Components.LoginInfo.tsx" />
 /// <reference path="./Components.GifModal.tsx" />
 /// <reference path="./Route.tsx" />
 
