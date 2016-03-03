@@ -408,7 +408,8 @@ module Esper.Views {
           }));
 
       return <Components.LabelEditorModal eventPairs={eventPairs}
-                                          teamPairs={teamPairs} />;
+                                          teamPairs={teamPairs}
+                                          showDescription={true} />;
     }
 
     toggleEvent(event: Events.TeamEvent) {

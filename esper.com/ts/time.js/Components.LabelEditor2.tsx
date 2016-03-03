@@ -23,6 +23,7 @@ module Esper.Components {
     eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
     onDone?: () => void;
+    showDescription?: boolean;
   }
 
   export function LabelEditor2(props: LabelEditorProps) {
@@ -45,7 +46,8 @@ module Esper.Components {
     // is just to close panel, not do anything
     return <ModalPanel busy={busy} error={error} busyText={busyText}
                        onCancel={props.onDone} cancelText="Close">
-      { events.length === 1 ? <EventDetails event={events[0]} /> : null }
+      { props.showDescription && events.length === 1 ?
+        <EventDetails event={events[0]} /> : null }
       <LabelInput events={events} />
       <LabelList events={events} teams={teams} />
       <div className="esper-select-menu">
@@ -217,6 +219,7 @@ module Esper.Components {
       return <Modal icon="fa-calendar-o" title={heading}>
         <LabelEditor2 eventPairs={this.props.eventPairs}
                       teamPairs={this.props.teamPairs}
+                      showDescription={this.props.showDescription}
                       onDone={() => Layout.closeModal()} />
       </Modal>;
     }
