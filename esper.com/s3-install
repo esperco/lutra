@@ -8,7 +8,7 @@ s3_bucket="$2"
 
 # Do CSS files first with forced mime (mime-magic guesses this incorrectly)
 (cd $target && \
-    s3cmd put \
+    s3cmd sync \
       --mime-type=text/css \
       --exclude="*" \
       --include="*.css" \
@@ -17,7 +17,7 @@ s3_bucket="$2"
 
 # Do SVG files next with forced mime (mime-magic guesses this incorrectly)
 (cd $target && \
-    s3cmd put \
+    s3cmd sync \
       --mime-type=image/svg+xml \
       --exclude="*" \
       --include="*.svg" \
@@ -25,7 +25,7 @@ s3_bucket="$2"
 
 # Do remainder with guessed mime, defaulting to HTML (because of blanks)
 (cd $target && \
-    s3cmd put \
+    s3cmd sync \
       --guess-mime-type \
       --exclude="*.css" \
       --exclude="*.svg" \
