@@ -62,9 +62,6 @@ module Esper.Components {
     }
 
     renderGroup(group: Group, count: number) {
-      var selectedIcon = this.props.selectedIcon || "fa-check-square-o";
-      var unselectedIcon = this.props.unselectedIcon || "fa-square-o";
-
       return <div key={group.id}>
         {
           group.displayAs ?
@@ -74,6 +71,18 @@ module Esper.Components {
         }
         <div className={this.props.listClasses || "list-group"}>{
           _.map(group.choices, (opts) => {
+            var selectedIcon = this.props.selectedIcon ||
+              (opts.badgeColor ? "fa-check-square" : "fa-check-square-o");
+            var unselectedIcon = this.props.unselectedIcon ||
+              (opts.badgeColor ? "fa-square" : "fa-square-o");
+            var iconStyle = ((): {color?: string} => {
+              if (opts.badgeColor) {
+                return { color: opts.badgeColor };
+              }
+              return {};
+            })();
+
+
             var selected = this.isSelected(group.id, opts.id);
 
             var badge: JSX.Element;
@@ -95,7 +104,7 @@ module Esper.Components {
             return <a onClick={clickHandler} key={group.id + " " + opts.id}
               className={itemClasses}>
               {badge}
-              <i className={"fa fa-fw " +
+              <i style={iconStyle} className={"fa fa-fw " +
                 (selected ? selectedIcon : unselectedIcon)} />
               {" "}{opts.displayAs}
             </a>

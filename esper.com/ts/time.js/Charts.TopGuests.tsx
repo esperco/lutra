@@ -13,7 +13,8 @@ module Esper.Charts {
   var Component = ReactHelpers.Component;
 
   export class TopGuests extends GuestChart {
-    static displayName = "Frequent Meeting Attendees";
+    static displayName = "Top Guests";
+    static icon = "fa-align-left";
     static usesIntervals = false;
 
     renderChart() {
@@ -23,8 +24,16 @@ module Esper.Charts {
       var guestNames = _.map(guests,
         (g) => g.name ? `${g.name} (${g.email})` : g.email
       );
-      var guestTimes = _.map(guests, (g) => TimeStats.toHours(g.time));
-      var guestCounts = _.map(guests, (g) => g.count);
+      var guestTimes = _.map(guests, (g) => ({
+        color: Colors.getColorForDomain(g.email.split('@')[1]),
+        y: TimeStats.toHours(g.time)
+      }));
+      var guestCounts = _.flatten(
+        _.map(guests, (g, i) => _.times(g.count, () => ({
+          x: i, y: 1,
+          color: Colors.lighten(
+            Colors.getColorForDomain(g.email.split('@')[1]), 0.5)
+        }))));
 
       return <Components.Highchart opts={{
         chart: {
@@ -32,9 +41,24 @@ module Esper.Charts {
           height: guestTimes.length * 50 + 120
         },
 
+        legend: {
+          enabled: false
+        },
+
         plotOptions: {
           bar: {
-            borderWidth: 0
+            borderWidth: 1,
+            stacking: 'normal'
+          }
+        },
+
+        tooltip: {
+          shared: true,
+          formatter: function() {
+            var events = this.points[0].total;
+            var hours = this.points[1].y;
+            return `${hours} hour${hours != 1 ? 's' : ''} / ` +
+                  `${events} event${events != 1 ? 's' : ''}`;
           }
         },
 
@@ -43,21 +67,23 @@ module Esper.Charts {
         },
 
         yAxis: [{
-          title: { text: "Aggregate Duration (Hours)" },
-        }, {
           title: { text: "Number of Events" },
           allowDecimals: false,
-          opposite: true
+          visible: false
+        }, {
+          title: { text: "Duration (Hours)" },
         }],
 
         series: [{
           name: "Number of Events",
-          yAxis: 1,
+          yAxis: 0,
+          stack: 0,
           color: Colors.second,
           data: guestCounts
         } as HighchartsBarChartSeriesOptions, {
-          name: "Aggregate Duration (Hours)",
-          yAxis: 0,
+          name: "Duration (Hours)",
+          yAxis: 1,
+          stack: 1,
           color: Colors.first,
           data: guestTimes
         } as HighchartsBarChartSeriesOptions]

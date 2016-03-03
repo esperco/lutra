@@ -1,6 +1,11 @@
 @import "./_bootstrap-variables";
 @import "./_animations";
 
+
+// Custom Esper variables
+@min-fullscreen-height: 350px;
+
+
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
   out into Marten for reuse with Chrome extension
@@ -30,10 +35,16 @@
 }
 
 .esper-expanded.padded {
-  top: @padding-large-vertical;
-  bottom: @padding-large-vertical;
-  left: @padding-base-horizontal;
-  right: @padding-base-horizontal;
+  @media screen and (max-width: @screen-xs-max) {
+    padding: @padding-base-vertical 0;
+  }
+
+  @media screen and (min-width: @screen-sm-min) {
+    top: @padding-large-vertical;
+    bottom: @padding-large-vertical;
+    left: @padding-base-horizontal;
+    right: @padding-base-horizontal;
+  }
 }
 
 // Use for absolutely positioning a center div on screen
@@ -56,7 +67,18 @@
   }
 
   .esper-full-screen &, .esper-expanded  & {
-    top: 42%; // Intentionally nudge a little higher because of header margins
+    top: 45%; // Intentionally nudge a little higher because of header margins
+  }
+}
+
+.esper-full-screen {
+  @media screen and (max-width: @screen-xs-max) {
+    position: relative;
+    min-height: @min-fullscreen-height;
+
+    &.minus-nav, {
+      top: 0;
+    }
   }
 }
 
@@ -66,25 +88,21 @@
   z-index: 1;
   background: @body-bg;
 
-  &.minus-nav {
-    top: @navbar-height;
+  @media screen and (max-width: @screen-xs-max) {
+    position: relative;
+    min-height: @min-fullscreen-height;
+  }
 
-    &.collapse-2x {
-      @media (max-width: @screen-xs-max) {
-        top: @navbar-height * 2;
-      }
+  &.minus-nav {
+    @media screen and (min-width: @screen-sm-min) {
+      top: @navbar-height;
     }
   }
 
   &.minus-subheader, &.padded.minus-subheader {
-    top: @font-size-h4 + @line-height-computed +
-         @panel-body-padding + @padding-base-vertical;
-
-    &.collapse-2x {
-      @media (max-width: @screen-xs-max) {
-        top: (@font-size-h4 + @line-height-computed) * 2 +
-             @panel-body-padding + @padding-base-vertical;
-      }
+    @media screen and (min-width: @screen-sm-min) {
+      top: @font-size-h4 + @line-height-computed +
+           @panel-body-padding + @padding-base-vertical;
     }
   }
 
@@ -94,6 +112,7 @@
     background: @body-bg;
     top: 0;
     bottom: 0;
+
     &.padded {
       .esper-padded;
     }
@@ -101,10 +120,36 @@
 
   .esper-left-sidebar {
     left: 0;
+    width: 30%;
+
+    @media screen and (max-width: @screen-xs-max) {
+      position: fixed;
+      top: auto;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: @zindex-navbar - 1;
+      transition: max-height 1s;
+      max-height: @input-height-base;
+      overflow: hidden;
+
+      &.open {
+        max-height: 70%;
+        overflow: auto;
+        box-shadow: 0px -6px 12px rgba(0, 0, 0, 0.16);
+      }
+    }
   }
 
   .esper-right-content {
     right: 0;
+    width: 70%;
+
+    @media screen and (max-width: @screen-xs-max) {
+      position: relative;
+      width: 100%;
+      min-height: @min-fullscreen-height;
+    }
   }
 
   // e.g. if panel is only element
@@ -113,6 +158,10 @@
     font-size: 250%;
     margin: 0;
     color: @gray-light;
+
+    @media screen and (max-width: @screen-xs-max) {
+      min-height: @min-fullscreen-height * .95;
+    }
 
     @media screen and (min-width: @screen-sm-min) {
       font-size: 200%;
@@ -342,6 +391,14 @@ flexibility with non-UL elements */
     line-height: @line-height-base;
     color: @dropdown-link-color;
     white-space: nowrap; // prevent links from randomly breaking onto new lines
+
+    &.active {
+      font-weight: bold;
+    }
+
+    &.partial-active {
+      font-style: italic;
+    }
 
     &:hover,
     &:focus {

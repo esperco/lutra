@@ -165,13 +165,13 @@ module Esper.Components {
           "This Month": [ moment().startOf(month), moment().endOf(month) ],
           "Last Month": [ moment().startOf(month).subtract(1, month),
                           moment().endOf(month).subtract(1, month) ],
-          "Last 30 Days": [ moment().startOf(day).subtract(30, day),
-                            moment().endOf(day) ],
+          "Next Month": [ moment().startOf(month).add(1, month),
+                          moment().endOf(month).add(1, month) ],
           "This Week": [ moment().startOf(week), moment().endOf(week) ],
           "Last Week": [ moment().startOf(week).subtract(1, week),
                          moment().endOf(week).subtract(1, week) ],
-          "Last 7 Days": [ moment().startOf(day).subtract(7, day),
-                           moment().endOf(day) ]
+          "Next Week": [ moment().startOf(week).add(1, week),
+                         moment().endOf(week).add(1, week) ]
         };
 
         var ret: {[index: string]: [Date, Date]} = {};

@@ -10,6 +10,7 @@
 module Esper.Charts {
   export class DurationsOverTime extends LabelChart {
     static displayName = "Label Duration Over Time";
+    static icon = "fa-bar-chart";
     protected usesIntervals = true;
 
     renderChart() {

@@ -11,53 +11,76 @@ module Esper.Charts {
   // Durations for each bar in our histogram
   const DURATION_BUCKETS = [{
     label: "< 30m",
-    gt: 0   // Greater than, seconds
+    gte: 0   // Greater than, seconds
   }, {
     label: "30m +",
-    gt: 30 * 60
+    gte: 30 * 60
   }, {
     label: "1h +",
-    gt: 60 * 60
+    gte: 60 * 60
   }, {
     label: "2h +",
-    gt: 2 * 60 * 60
+    gte: 2 * 60 * 60
   }, {
     label: "4h +",
-    gt: 4 * 60 * 60
+    gte: 4 * 60 * 60
   }, {
     label: "8h +",
-    gt: 8 * 60 * 60
+    gte: 8 * 60 * 60
   }];
 
   export class DurationHistogram extends AutoChart {
     static displayName = "Event Durations";
+    static icon = "fa-bar-chart";
 
     renderChart() {
       var data = this.sync()[0];
-      var aggDuration = _.map(DURATION_BUCKETS, () => 0);
-      var frequency = _.clone(aggDuration);
+      var series: {
+        name: string,
+        color: string,
+        data: {name?: string, x: number, y: number}[]
+      }[] = _.map(DURATION_BUCKETS, (b, i) => ({
+        name: b.label,
+        color: Colors.presets[i],
+        data: []
+      }))
 
       _.each(data.daily_stats, function(stat) {
         _.each(stat.scheduled, function(duration) {
           var i = _.findLastIndex(DURATION_BUCKETS, (b) => {
-            return duration > b.gt;
+            return duration >= b.gte;
           });
-          aggDuration[i] += duration;
-          frequency[i] += 1;
+          series[i].data.push({
+            name: "Event on " + moment(stat.window_start).format("MMM D"),
+            x: i,
+            y: TimeStats.toHours(duration)
+          })
         });
       });
-
-      // Round to hour
-      aggDuration = _.map(aggDuration, (a) => TimeStats.toHours(a));
 
       return <Components.Highchart opts={{
         chart: {
           type: 'column'
         },
 
+        tooltip: {
+          formatter: function() {
+            if (this.point.name) {
+              return `<b>${this.point.name}:</b>` +
+                     `${this.y} hour${this.y != 1 ? 's' : ''}`;
+            } else {
+              return `${this.y} hours`;
+            }
+          }
+        },
+
+        legend: {
+          enabled: false
+        },
+
         plotOptions: {
           column: {
-            borderWidth: 0
+            stacking: 'normal'
           }
         },
 
@@ -66,24 +89,10 @@ module Esper.Charts {
         },
 
         yAxis: [{
-          title: { text: "Aggregate Duration (Hours)" }
-        }, {
-          title: { text: "Number of Events" },
-          allowDecimals: false,
-          opposite: true
+          title: { text: "Duration (Hours)" }
         }],
 
-        series: [{
-          name: "Aggregate Duration (Hours)",
-          yAxis: 0,
-          color: Colors.first,
-          data: aggDuration
-        } as HighchartsColumnChartSeriesOptions, {
-          name: "Number of Events",
-          yAxis: 1,
-          color: Colors.second,
-          data: frequency
-        } as HighchartsColumnChartSeriesOptions]
+        series: series
       }} />;
     }
   }

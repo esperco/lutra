@@ -11,6 +11,7 @@ module Esper.Charts {
   */
   export abstract class CalendarGridChart extends AutoChart {
     static displayName = "Calendar Grid";
+    static icon = "fa-calendar";
 
     renderChart() {
       return <Components.CalendarGrid

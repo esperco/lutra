@@ -29,6 +29,7 @@ module Esper.Charts {
 
   export class GuestDomains extends GuestChart {
     static displayName = "Guest Domains";
+    static icon = "fa-pie-chart";
     protected usesIntervals = false;
     protected allowEmpty = true;
 

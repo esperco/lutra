@@ -10,6 +10,7 @@
 module Esper.Charts {
   export class PercentageRecent extends LabelChart {
     static displayName = "Label Allocation Percentage";
+    static icon = "fa-pie-chart";
 
     renderChart() {
       // Filter to include only user-selected labels

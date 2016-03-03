@@ -116,7 +116,10 @@ module Esper.Charts {
         }
       }
 
-      var totalCount = DailyStats.sumScheduledCount(stats);
+      var totalCount = this.allowEmpty ?
+        DailyStats.sumScheduledCount(stats) :
+        DailyStats.sumWithGuestsCount(stats);
+
       var selectAllIcon = (() => {
         if (this.isAllSelected()) {
           return "fa-check-square-o";
