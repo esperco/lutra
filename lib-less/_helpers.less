@@ -343,6 +343,14 @@ flexibility with non-UL elements */
     color: @dropdown-link-color;
     white-space: nowrap; // prevent links from randomly breaking onto new lines
 
+    &.active {
+      font-weight: bold;
+    }
+
+    &.partial-active {
+      font-style: italic;
+    }
+
     &:hover,
     &:focus {
       text-decoration: none;

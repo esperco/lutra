@@ -144,14 +144,25 @@ module Esper.Components {
   }) {
     var checkedByAll = props.label.count === props.events.length;
     var checkedBySome = props.label.count > 0;
+
+    var labelClass = (() => {
+      var ret = "esper-selectable";
+      if (checkedByAll) {
+        return ret + " active";
+      } else if (checkedBySome) {
+        return ret + " partial-active";
+      }
+      return ret;
+    })();
     var icon = (() => {
       if (checkedByAll) {
         return "fa-check-square";
       } else if (checkedBySome) {
-        return "fa-minus-square-o"
+        return "fa-minus-square";
       }
-      return "fa-square-o";
+      return "fa-square";
     })();
+    var iconStyle = { color: Colors.getColorForLabel(props.label.id) };
 
     var handler = () => {
       if (checkedByAll) {
@@ -161,9 +172,8 @@ module Esper.Components {
       }
     };
 
-    return <a className="esper-selectable"
-              key={props.label.id} onClick={handler}>
-      <i className={"fa fa-fw " + icon} />{" "}
+    return <a key={props.label.id} className={labelClass} onClick={handler}>
+      <i style={iconStyle} className={"fa fa-fw " + icon} />{" "}
       {props.label.displayAs}
     </a>;
   }
