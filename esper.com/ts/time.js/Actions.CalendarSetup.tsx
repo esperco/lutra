@@ -3,8 +3,6 @@
 module Esper.Actions {
 
   export function CalendarSetup(teamId?: string) {
-    // Trigger async -> does nothing if already loaded
-    ApiC.getGenericCalendarListOfUser();
 
     // Select default team if none provided
     if (! teamId) {
@@ -15,6 +13,9 @@ module Esper.Actions {
         some: (t) => t.teamid
       });
     }
+
+    // Trigger async -> does nothing if already loaded
+    ApiC.getGenericCalendarList(teamId);
 
     return <Views.CalendarSetup teamId={teamId} />;
   }

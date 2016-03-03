@@ -48,7 +48,7 @@ module Esper.Views {
                 <CalendarList
                   calendarListId={_id}
                   selectedTeam={Option.wrap(Teams.get(this.props.teamId))}
-                  calendarStatus={allCalsStatus()}
+                  calendarStatus={availableCalendarsStatus(_id)}
                   selectedCalendars={selectedCalendars(_id)}
                   availableCalendars={availableCalendars(_id)}
                 />
@@ -68,37 +68,23 @@ module Esper.Views {
   }
 
   function availableCalendars(teamId: string) {
-    return Option.cast(Teams.get(teamId)).match({
-      none: () => allCals(),
-      some: (t) => {
-        if (Login.usesNylas() && Login.myUid() !== t.team_executive) {
-          return _.map(t.team_timestats_calendars,
-            (calId) => Calendars.get(t.teamid, calId)
-          );
-        } else {
-          return allCals();
-        }
-      }
-    })
+    return Option.cast(calStore.val(calKey(teamId))).match({
+      none: (): ApiT.GenericCalendar[] => [],
+      some: (c) => c.calendars
+    });
   }
 
-  var allCalsKey = ApiC.getGenericCalendarListOfUser.strFunc([]);
-  var allCalsStore = ApiC.getGenericCalendarListOfUser.store;
-
-  function allCals() {
-    return Option.cast(allCalsStore.val(allCalsKey))
-      .match<ApiT.GenericCalendar[]>({
-        none: () => [],
-        some: (c) => c.calendars
-      });
-  }
-
-  function allCalsStatus() {
-    return Option.cast(allCalsStore.metadata(allCalsKey)).match({
-      none: () => Model.DataStatus.READY,
+  function availableCalendarsStatus(teamId: string) {
+    return Option.cast(calStore.metadata(calKey(teamId))).match({
+      none: () => Model.DataStatus.FETCHING,
       some: (m) => m.dataStatus
     });
   }
+
+  function calKey(teamId: string) {
+    return ApiC.getGenericCalendarList.strFunc([teamId]);
+  }
+  var calStore = ApiC.getGenericCalendarList.store;
 
 
   /////
@@ -144,14 +130,6 @@ module Esper.Views {
 
           // Approved (or not Nylas)
           <div>
-            { Login.usesNylas() && !isExec ?
-              <div className="alert alert-warning">
-                You do not have permission to add calendars for this
-                account. You may remove calendars, but you will need the
-                calendar owner to log in to re-grant access to access any
-                calendars you have removed.
-              </div> : null
-            }
             { calendars && calendars.length ?
               // Calendars
               <div>
