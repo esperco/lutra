@@ -133,13 +133,6 @@
           text-decoration: underline;
         }
       }
-
-      .time {
-        color: @gray-light;
-        font-size: @font-size-small;
-        white-space: nowrap;
-        display: inline-block;
-      }
     }
 
     .event-label {
@@ -151,4 +144,27 @@
       cursor: pointer;
     }
   }
+}
+
+.filter-list .event, .event-details {
+  .time {
+    color: @gray-light;
+    font-size: @font-size-small;
+    white-space: nowrap;
+    display: inline-block;
+  }
+
+  .location {
+    font-size: @font-size-small;
+  }
+
+  .description {
+    padding-top: @padding-small-vertical;
+  }
+}
+
+.event-details {
+  border-bottom: 1px solid @dropdown-divider-bg;
+  padding-bottom: (@line-height-computed / 2);
+  margin-bottom: (@line-height-computed / 2);
 }

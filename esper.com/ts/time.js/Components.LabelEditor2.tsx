@@ -45,6 +45,7 @@ module Esper.Components {
     // is just to close panel, not do anything
     return <ModalPanel busy={busy} error={error} busyText={busyText}
                        onCancel={props.onDone} cancelText="Close">
+      { events.length === 1 ? <EventDetails event={events[0]} /> : null }
       <LabelInput events={events} />
       <LabelList events={events} teams={teams} />
       <div className="esper-select-menu">
@@ -60,6 +61,41 @@ module Esper.Components {
 
   function renderManageLabels() {
     Layout.renderModal(<Views.LabelManageModal />);
+  }
+
+
+  ///////
+
+  function EventDetails({event}: {event: Events.TeamEvent}) {
+    return <div className="event-details">
+      <div className="time">
+        <i className="fa fa-fw fa-clock-o" />{" "}
+        <span className="start">
+          { moment(event.start).format("ddd, MMM D, h:mm a") }
+        </span>{" to "}<span className="end">
+          { moment(event.end).format("h:mm a") }
+        </span>{" "}
+        { event.recurring_event_id ?
+          <span className="recurring" title="Recurring">
+            <i className="fa fa-fw fa-refresh" />
+          </span> :
+          null
+        }
+      </div>
+      { event.location ?
+        <div className="location">
+          <i className="fa fa-fw fa-map-marker" />{" "}
+          {event.location}
+        </div>
+        : null
+      }
+      { event.description ?
+        <div className="description">
+          {event.description}
+        </div>
+        : null
+      }
+    </div>;
   }
 
 
