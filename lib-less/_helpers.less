@@ -35,10 +35,16 @@
 }
 
 .esper-expanded.padded {
-  top: @padding-large-vertical;
-  bottom: @padding-large-vertical;
-  left: @padding-base-horizontal;
-  right: @padding-base-horizontal;
+  @media screen and (max-width: @screen-xs-max) {
+    padding: @padding-base-vertical 0;
+  }
+
+  @media screen and (min-width: @screen-sm-min) {
+    top: @padding-large-vertical;
+    bottom: @padding-large-vertical;
+    left: @padding-base-horizontal;
+    right: @padding-base-horizontal;
+  }
 }
 
 // Use for absolutely positioning a center div on screen
@@ -61,7 +67,7 @@
   }
 
   .esper-full-screen &, .esper-expanded  & {
-    top: 42%; // Intentionally nudge a little higher because of header margins
+    top: 45%; // Intentionally nudge a little higher because of header margins
   }
 }
 
@@ -84,6 +90,7 @@
 
   @media screen and (max-width: @screen-xs-max) {
     position: relative;
+    min-height: @min-fullscreen-height;
   }
 
   &.minus-nav {
@@ -151,6 +158,10 @@
     font-size: 250%;
     margin: 0;
     color: @gray-light;
+
+    @media screen and (max-width: @screen-xs-max) {
+      min-height: @min-fullscreen-height * .95;
+    }
 
     @media screen and (min-width: @screen-sm-min) {
       font-size: 200%;
