@@ -182,7 +182,7 @@ module Esper.Calendars {
         dataStatus: Model.DataStatus.FETCHING
       });
 
-      var p = Api.getGenericCalendarList(t.teamid);
+      var p = Api.getTimestatsCalendarList(t.teamid);
       p.done((c) => CalendarListStore.upsert(t.teamid, c.calendars));
       return p;
     });
