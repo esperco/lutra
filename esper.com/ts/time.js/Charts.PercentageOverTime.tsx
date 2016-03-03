@@ -10,6 +10,7 @@
 module Esper.Charts {
   export class PercentageOverTime extends LabelChart {
     static displayName = "Label Percentage Over Time";
+    static icon = "fa-tasks fa-rotate-270";
     protected usesIntervals = true;
 
     renderChart() {

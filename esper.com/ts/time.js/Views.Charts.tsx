@@ -5,6 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/AB.ts" />
 /// <reference path="../common/Layout.tsx" />
+/// <reference path="../common/Components.DropdownModal.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
 /// <reference path="./Charts.ActivityGrid.tsx" />
@@ -298,18 +299,33 @@ module Esper.Views {
     }
 
     renderChartSelector(chart: Charts.Chart) {
-      var selected = _.findIndex(chartTypes, (c) => chart instanceof c);
+      var selected = Option.wrap(
+        _.find(chartTypes, (c) => chart instanceof c)
+      ).match({
+        none: () => chartTypes[0],
+        some: (s) => s
+      });
       return (
-        <select value={selected ? selected.toString() : ""}
-                className="form-control"
-                onChange={(event: React.SyntheticEvent) => {
-                  var target = event.target as HTMLSelectElement;
-                  updateChartType(parseInt(target.value))
-                }}>
-          { _.map(chartTypes, (c, i) =>
-            <option key={i} value={i.toString()}>{c.displayName}</option>
-          )}
-        </select>);
+        <Components.DropdownModal>
+          <input type="text" className="form-control dropdown-toggle"
+                 readOnly={true}
+                 value={ selected.displayName } />
+          <ul className="dropdown-menu">
+            {
+              _.map(chartTypes, (c, i) =>
+                <li key={i} onClick={() => updateChartType(i)}>
+                  <a>
+                    { c.icon ? <span>
+                        <span className={"fa fa-fw " + c.icon} />{" "}
+                      </span> : null
+                    }
+                    { c.displayName }
+                  </a>
+                </li>
+              )
+            }
+          </ul>
+        </Components.DropdownModal>);
     }
 
     renderPeriodSelector(chart: Charts.Chart) {

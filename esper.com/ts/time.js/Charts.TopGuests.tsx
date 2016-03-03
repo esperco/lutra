@@ -14,6 +14,7 @@ module Esper.Charts {
 
   export class TopGuests extends GuestChart {
     static displayName = "Top Guests";
+    static icon = "fa-align-left";
     static usesIntervals = false;
 
     renderChart() {

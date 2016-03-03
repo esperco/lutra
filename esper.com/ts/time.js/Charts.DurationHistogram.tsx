@@ -31,6 +31,7 @@ module Esper.Charts {
 
   export class DurationHistogram extends AutoChart {
     static displayName = "Event Durations";
+    static icon = "fa-bar-chart";
 
     renderChart() {
       var data = this.sync()[0];

@@ -28,6 +28,7 @@ module Esper.Charts {
   export abstract class Chart {
     // Static properties about this chart type
     static displayName: string;
+    static icon: string;
 
     // These are used to configure period selector, with defaults
     protected usesIntervals: boolean = false;
