@@ -625,7 +625,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  // supports generic calendar
+  export function getTimestatsCalendarList(teamid: string):
+    JQueryPromise<ApiT.GenericCalendars> {
+    var url = prefix + "/api/ts/ts-calendars/" + string(Login.myUid())
+            + "/" + string(teamid);
+    return JsonHttp.get(url);
+  }
+
+// supports generic calendar
   export function postForGenericCalendarEvents(teamid: string, calid: string,
     q: ApiT.CalendarRequest):
     JQueryPromise<ApiT.GenericCalendarEvents> {
