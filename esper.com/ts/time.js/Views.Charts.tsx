@@ -8,6 +8,7 @@
 /// <reference path="../common/Components.DropdownModal.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./Components.SidebarToggle.tsx" />
 /// <reference path="./Charts.ActivityGrid.tsx" />
 /// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Charts.PercentageRecent.tsx" />
@@ -255,20 +256,23 @@ module Esper.Views {
       return <div id="charts-page"
                   className="esper-full-screen minus-nav">
         <div className="esper-left-sidebar padded">
-          <div className="esper-menu-section">
-            <label htmlFor={this.getId("cal-select")}>
-              <i className="fa fa-fw fa-calendar-o" />{" "}
-              Calendar
-            </label>
-            <Components.CalSelectorDropdown
-              id={this.getId("cal-select")}
-              teams={teams}
-              calendarsByTeamId={calendarsByTeamId}
-              selected={[cal]}
-              updateFn={updateCalSelection}
-            />
+          <Components.SidebarToggle />
+          <div className="xs-open">
+            <div className="esper-menu-section">
+              <label htmlFor={this.getId("cal-select")}>
+                <i className="fa fa-fw fa-calendar-o" />{" "}
+                Calendar
+              </label>
+              <Components.CalSelectorDropdown
+                id={this.getId("cal-select")}
+                teams={teams}
+                calendarsByTeamId={calendarsByTeamId}
+                selected={[cal]}
+                updateFn={updateCalSelection}
+              />
+            </div>
+            { chart ? chart.renderSelectors() : null }
           </div>
-          { chart ? chart.renderSelectors() : null }
         </div>
         <div className="esper-right-content padded">
           <div className="esper-header fixed row clearfix">

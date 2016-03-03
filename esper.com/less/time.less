@@ -9,11 +9,6 @@
 @footer-default-color: @text-color;
 @footer-default-link-color: @brand-bg;
 
-/*
-  Not ideal to have < 100% for mobile but functional until we figure out
-  a better mobile UI
-*/
-@sidebar-xs-width: 42%;
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 28%;
 @sidebar-lg-width: 20%;
@@ -64,12 +59,14 @@ body, .footer {
 }
 
 // Other props for left/right set in marten/less/_helpers.less
-.esper-left-sidebar {
-  border-right: 1px solid @table-border-color;
-  width: @sidebar-xs-width;
+.esper-full-screen .esper-left-sidebar {
+  @media (max-width: @screen-xs-max) {
+    border-top: 1px solid @navbar-inverse-border;
+  }
 
   @media (min-width: @screen-sm-min) {
     width: @sidebar-sm-width;
+    border-right: 1px solid @table-border-color;
   }
 
   @media (min-width: @screen-md-min) {
@@ -80,11 +77,7 @@ body, .footer {
     width: @sidebar-lg-width;
   }
 }
-.esper-right-content {
-  /* xs-width -- not ideal but function until we
-     figure out a better mobile UI */
-  width: 100% - @sidebar-xs-width;
-
+.esper-full-screen .esper-right-content {
   @media (min-width: @screen-sm-min) {
     width: 100% - @sidebar-sm-width;
   }
