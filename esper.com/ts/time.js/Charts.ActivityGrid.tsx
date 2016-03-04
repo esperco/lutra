@@ -84,7 +84,7 @@ module Esper.Charts {
           </div>
           <div className="event-frag daily-metric" style={fragStyle}>
             <span><i className="fa fa-fw fa-qrcode" />{" "}
-            {(frag * 100).toFixed(0)}% Fragmentation</span>
+            { Util.roundStr(frag * 100) }% Fragmentation</span>
           </div>
         </div>;
       }

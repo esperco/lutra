@@ -1,4 +1,5 @@
 /// <reference path="../../../typings/browser.d.ts" />
+/// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Colors.ts" />
 /// <reference path="../common/AB.ts" />
 
@@ -30,7 +31,7 @@ module Esper {
       formatter: function() {
         var name = this.point.name || this.series.name;
         return `<b>${name}:</b> ${this.y}` +
-          (this.percentage ? ` (${this.percentage.toFixed(1)}%)` : "");
+          (this.percentage ? ` (${Util.roundStr(this.percentage, 1)}%)` : "");
       },
       backgroundColor: {
         linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
@@ -115,7 +116,7 @@ module Esper {
         formatter: function() {
           var name = this.point.name || this.series.name;
           return `<b>${name}:</b> ${this.y} Hours` +
-            (this.percentage ? ` (${this.percentage.toFixed(1)}%)` : "");
+            (this.percentage ? ` (${Util.roundStr(this.percentage, 1)}%)` : "");
         }
       },
 
@@ -231,7 +232,7 @@ module Esper {
             formatter: function() {
               if (this.percentage) {
                 return `${this.point.name} ` +
-                  `(${this.percentage.toFixed(1)}%)`;
+                  `(${Util.roundStr(this.percentage, 1)}%)`;
               }
               return null;
             },

@@ -39,7 +39,9 @@ module Esper.Components {
           formatter: function() {
             var name = this.point.name || this.series.name;
             return `<b>${name}:</b> ${this.y} ${units || ''}` +
-              (this.percentage ? ` (${this.percentage.toFixed(2)}%)` : "");
+              (this.percentage ?
+                ` (${Util.roundStr(this.percentage, 1)}%)`
+                : "");
           },
           backgroundColor: {
             linearGradient: {x1: 0, y1: 0.5, x2: 0, y2: 1},
