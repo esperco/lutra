@@ -1127,6 +1127,14 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  export function postEventNotes(team_id: string, event_id: string,
+                                 notes: string): JQueryPromise<void> {
+    var url = prefix + "/api/event/notes/" + string(Login.myUid())
+            + "/" + string(team_id)
+            + "/" + encodeURIComponent(event_id);
+    return JsonHttp.post(url, notes);
+  }
+
   export function getEventLabels(team_id: string, event_id: string):
     JQueryPromise<{labels: string[]}>
   {

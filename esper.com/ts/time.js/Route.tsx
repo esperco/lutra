@@ -124,7 +124,8 @@ module Esper.Route {
       .then(function(labels:ApiT.Labels) {
         Events.fetch1(teamid, calid, eventid)
           .then((eventKey: string) => {
-            render(<Views.EventView eventKey={eventKey} />);
+            render(<Views.EventView teamid={teamid} eventid={eventid}
+                                    eventKey={eventKey} />);
           });
       });
     Analytics.page(Analytics.Page.EventFeedback);
