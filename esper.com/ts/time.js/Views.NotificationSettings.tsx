@@ -64,7 +64,7 @@ module Esper.Views {
             prefs.email_for_meeting_feedback ?
             "fa-check-square-o" : "fa-square-o"
           )} />{" "}
-          Receive e-mail for meeting feedback
+          Receive email for meeting feedback
         </div>
         <div className="esper-selectable" onClick={() => this.toggleUseSlack()}>
           <i className={"fa fa-fw " + (
@@ -107,7 +107,7 @@ module Esper.Views {
             {isBusy ? <span className="esper-spinner" /> : null}
           </div>
           <div className="panel-body">
-            { hasError ? <Components.ErrorMsg /> : null}
+            { hasError ? <Components.ErrorMsg /> : null }
             { _.map(calendars, (c) =>
               <OneCalendarPrefs key={team.teamid + " " + c.id}
                 team={team} cal={c}
@@ -119,6 +119,89 @@ module Esper.Views {
     });
   }
 
+  class GeneralPrefs extends Component<{
+    prefsList: Option.T<ApiT.PreferencesList>;
+    status: Model.DataStatus;
+  }, {}> {
+    render() {
+      var status = this.props.status;
+      var isBusy = (
+        status === Model.DataStatus.FETCHING ||
+        status === Model.DataStatus.INFLIGHT);
+      var hasError = (
+        status === Model.DataStatus.PUSH_ERROR ||
+        status === Model.DataStatus.FETCH_ERROR);
+
+      return this.props.prefsList.match({
+        none: () => {
+          if (! isBusy) {
+            return <span />;
+          }
+          return <div className="esper-spinner esper-centered esper-large" />;
+        },
+        some: (p) => {
+          var sendLabelReminders = !!_.find(p.preferences_list,
+            (l) => l.general.send_label_reminders);
+          return <div className="panel panel-default">
+            <div className="panel-heading">
+              <i className="fa fa-fw fa-envelope" />{" "}
+              E-mail Subscriptions
+              {isBusy ? <span className="esper-spinner" /> : null}
+            </div>
+            <div className="panel-body">
+              { hasError ? <Components.ErrorMsg /> : null }
+              <div className="esper-select-menu">
+                <div className="esper-selectable"
+                     onClick={() => this.toggleLabelReminders()}>
+                  <i className={"fa fa-fw " + (
+                    sendLabelReminders ?
+                    "fa-check-square-o" : "fa-square-o"
+                  )} />{" "}
+                  Send reminder emails to label calendar events
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      });
+    }
+
+    toggleLabelReminders() {
+      this.props.prefsList.match({
+        none: () => null,
+        some: (p) => {
+          var prefsList = _.cloneDeep(p);
+          var prefsWithLabelReminders = _.filter(prefsList.preferences_list,
+            (l) => l.general.send_label_reminders)
+
+          var store = ApiC.getAllPreferences.store;
+          var storeKey = ApiC.getAllPreferences.strFunc([]);
+
+          // If enabling label-reminders, only enable for first team
+          if (prefsWithLabelReminders.length === 0) {
+            let prefs = prefsList.preferences_list[0];
+            let teamId = prefs.teamid;
+            prefs.general.send_label_reminders = true;
+            let promise = Api.setGeneralPrefs(teamId, prefs.general);
+            store.push(storeKey, promise, prefsList);
+          }
+
+          // If disabling label-reminders, disable for all teams
+          else {
+            var promises: JQueryPromise<any>[] = [];
+            _.each(prefsWithLabelReminders, (prefs) => {
+              let teamId = prefs.teamid;
+              prefs.general.send_label_reminders = false;
+              promises.push(Api.setGeneralPrefs(teamId, prefs.general))
+            });
+            let promise = $.when.apply($, promises);
+            store.push(storeKey, promise, prefsList);
+          }
+        }
+      });
+    }
+  }
+
   export class NotificationSettings extends Component<{message?: string}, {}> {
     renderWithData() {
       return <div className="container">
@@ -126,6 +209,7 @@ module Esper.Views {
           <div className="alert alert-info">{this.props.message}</div> :
           null }
         { _.map(Teams.all(), (t) => this.renderTeam(t)) }
+        { this.renderGeneralPrefs() }
       </div>;
     }
 
@@ -136,7 +220,7 @@ module Esper.Views {
       var status = Option.cast(
         Calendars.CalendarListStore.metadata(team.teamid)
       ).match({
-        none: () => Model.DataStatus.FETCHING,
+        none: () => Model.DataStatus.FETCH_ERROR,
         some: (m) => m.dataStatus
       });
 
@@ -145,6 +229,17 @@ module Esper.Views {
         calendars={calendars}
         status={status}
       />;
+    }
+
+    renderGeneralPrefs() {
+      var store = ApiC.getAllPreferences.store;
+      var key = ApiC.getAllPreferences.strFunc([]);
+      var prefsList = Option.cast(store.val(key));
+      var status = Option.cast(store.metadata(key)).match({
+        none: () => Model.DataStatus.FETCH_ERROR,
+        some: (m) => m.dataStatus
+      });
+      return <GeneralPrefs prefsList={prefsList} status={status} />;
     }
   }
 }

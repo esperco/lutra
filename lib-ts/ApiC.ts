@@ -138,6 +138,10 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
+  export var getAllPreferences = makeC
+    <typeof Api.getAllPreferences, ApiT.PreferencesList>
+    (Api.getAllPreferences);
+
   export var getAllProfiles = makeC
     <typeof Api.getAllProfiles, ApiT.ProfileList>
     (Api.getAllProfiles);
