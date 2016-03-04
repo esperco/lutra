@@ -41,7 +41,7 @@ module Esper.Charts {
               formatter: function() {
                 if (this.percentage) {
                   return `${this.point.name} ` +
-                    `(${this.percentage.toFixed(2)}%)`;
+                    `(${Util.roundStr(this.percentage, 1)}%)`;
                 }
               }
             },

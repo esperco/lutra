@@ -1,8 +1,17 @@
+/// <reference path="./Log.ts" />
+
 module Esper.Util {
   // Return a random alphanumeric string
   export function randomString() {
     return Math.random().toString(36).slice(2);
   };
+
+  // Returns a rounded string version of a number
+  export function roundStr(num: number, digits=0) {
+    var adjust = Math.pow(10, digits);
+    var str = (Math.round(num * adjust) / adjust).toFixed(digits);
+    return Number(str).toString();
+  }
 
   // Recursively freeze object on IE9 and up.
   export function deepFreeze<T>(o: T): T {

@@ -2,6 +2,20 @@
 module Esper.Util {
 
   describe("Util", function() {
+    describe("roundStr", function() {
+      it("should return a rounded string", function() {
+        expect(roundStr(125.521)).toEqual("126");
+      });
+
+      it("should allow rounding to a specific decimal place", function() {
+        expect(roundStr(125.521, 1)).toEqual("125.5");
+      });
+
+      it("should get rid of trailing zeros", function() {
+        expect(roundStr(123.001, 1)).toEqual("123");
+      });
+    });
+
     describe("deepFreeze", function() {
       it("should prevent shallow updates", function() {
         var o: any = deepFreeze({ x: 5 });
