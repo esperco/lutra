@@ -124,6 +124,7 @@ module Esper.ApiT {
     title?: string;
     description?: string;
     description_messageids: string[];
+    notes?: string;
     labels: string[];
     labels_norm: string[];
     location?: string;
