@@ -8,7 +8,6 @@
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
-/// <reference path="./Views.NotificationSettings.tsx" />
 /// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoadError.tsx" />
@@ -16,6 +15,7 @@
 /// <reference path="./Views.Footer.tsx" />
 /// <reference path="./Actions.CalendarSetup.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
+/// <reference path="./Actions.NotificationSettings.tsx" />
 
 module Esper.Route {
 
@@ -92,9 +92,8 @@ module Esper.Route {
 
   // Notification settings page
   route("/notification-settings", checkOnboarding, function(ctx) {
-    render(<Views.NotificationSettings
-             teamids={Teams.allIds()}
-             message={Util.getParamByName("msg", ctx.querystring)}/>);
+    var msg = Util.getParamByName("msg", ctx.querystring);
+    render(Actions.NotificationSettings(msg));
     Analytics.page(Analytics.Page.NotificationSettings);
   });
 

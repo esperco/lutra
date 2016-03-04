@@ -166,30 +166,42 @@ module Esper.Calendars {
   //////
 
   // Promise for when all calendars have finished loading
-  export var calendarLoadPromise: JQueryPromise<void>;
+  var calendarLoadDfd: JQueryDeferred<any> = $.Deferred();
+  export var calendarLoadPromise = calendarLoadDfd.promise();
+
+  export function loadAllCalendars({teams, force=false}: {
+    teams?: ApiT.Team[];
+    force?: boolean;
+  }) {
+    teams = teams || Teams.all();
+    var promises = _.map(teams, (t) => {
+
+      var calendars = CalendarListStore.val(t.teamid);
+      if (calendars && !force) {
+        return $.Deferred().resolve().promise();
+      }
+
+      // Pre-populate calendar list store with _ids while we're fetching
+      calendars = calendars ||
+        _.map(t.team_timestats_calendars,
+          (calId) => ({ id: calId, title: "" })
+        );
+
+      var p = Api.getTimestatsCalendarList(t.teamid);
+      CalendarListStore.pushFetch(t.teamid,
+        p.then((c) => c.calendars),
+        calendars);
+      return p;
+    });
+
+    calendarLoadPromise = $.when.apply($, promises)
+      .done(() => calendarLoadDfd.resolve());
+  }
 
   /*
     Initialize calendar list from team data
   */
-  export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    var promises = _.map(loginResponse.teams, (t) => {
-
-      // Pre-populate calendar list store with _ids while we're fetching
-      var calendars = _.map(t.team_timestats_calendars,
-        (calId) => ({ id: calId, title: "" })
-      );
-      CalendarListStore.upsert(t.teamid, calendars, {
-        dataStatus: Model.DataStatus.FETCHING
-      });
-
-      var p = Api.getTimestatsCalendarList(t.teamid);
-      p.done((c) => CalendarListStore.upsert(t.teamid, c.calendars));
-      return p;
-    });
-    calendarLoadPromise = $.when.apply($, promises);
-  }
-
   export function init() {
-    Login.promise.done(loadFromLoginInfo);
+    Login.promise.done((info) => loadAllCalendars({teams: info.teams}));
   }
 }

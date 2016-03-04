@@ -1,133 +1,150 @@
+/// <reference path="../lib/ApiC.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Components.ErrorMsg.tsx" />
+
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface CalProperty {
-    teamid: string;
+  class OneCalendarPrefs extends Component<{
+    team: ApiT.Team;
     cal: ApiT.GenericCalendar;
-  }
+  }, {}> {
 
-  class OneCalendarPrefs extends Component<CalProperty, ApiT.CalendarPrefs> {
-    constructor(props: CalProperty) {
-      super(props);
+    updateCalendarPrefs(prefs: ApiT.CalendarPrefs) {
+      // Post to server
+      var teamId = this.props.team.teamid;
+      var calId = this.props.cal.id
+      var p = Api.postCalendarPrefs(teamId, calId, prefs);
 
-      this.state = {
-        email_for_meeting_feedback: props.cal.prefs.email_for_meeting_feedback
-                                    || false,
-        slack_for_meeting_feedback: props.cal.prefs.slack_for_meeting_feedback
-                                    || false
-      };
+      // Update local state
+      var newCal = _.cloneDeep(this.props.cal);
+      newCal.prefs = _.extend(newCal.prefs, prefs);
+
+      var calendarList = _.clone(Calendars.CalendarListStore.val(teamId));
+      var index = _.findIndex(calendarList, (c) => c.id === calId);
+      calendarList[index] = newCal;
+
+      Calendars.CalendarListStore.push(teamId, p, calendarList);
     }
 
     toggleUseEmail() {
-      this.setState(
-        {email_for_meeting_feedback: ! this.state.email_for_meeting_feedback},
-        function() {
-          Api.postCalendarPrefs(this.props.teamid, this.props.cal.id,
-                                this.state);
-
-          if (this.state.email_for_meeting_feedback) {
-            Api.getGoogleAuthInfo(null).then(function(x:ApiT.GoogleAuthInfo) {
-              if (x.google_auth_scope.search("//mail.google.com") < 0) {
-                Api.getGoogleAuthUrl(location.href, null, null, null, true)
-                .then(function(x:ApiT.UrlResult) {
-                  location.href = x.url;
-                });
-              }
-            });
-          }
-        });
-    }
-
-    toggleUseSlack() {
-      this.setState(
-        {slack_for_meeting_feedback: ! this.state.slack_for_meeting_feedback},
-        function() {
-          Api.postCalendarPrefs(this.props.teamid, this.props.cal.id,
-                                this.state);
-
-          if (this.state.slack_for_meeting_feedback) {
-            Api.getSlackAuthInfo().then(function(x:ApiT.SlackAuthInfo) {
-              if (! x.slack_authorized) {
-                location.href = x.slack_auth_url;
-              }
-            });
-          }
-        });
-    }
-
-    renderWithData() {
-      var id1 = Util.randomString(), id2 = Util.randomString();
-      return <div>
-        <div>
-          <h4>{this.props.cal.title}</h4>
-          <input
-            type="checkbox"
-            defaultChecked={this.state.email_for_meeting_feedback}
-            onClick={e => this.toggleUseEmail()}
-            id={id1}
-          />
-          <label htmlFor={id1}>
-            Receive email for meeting feedback
-          </label>
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            defaultChecked={this.state.slack_for_meeting_feedback}
-            onClick={e => this.toggleUseSlack()}
-            id={id2}
-          />
-          <label htmlFor={id2}>
-            Receive slack message for meeting feedback
-          </label>
-        </div>
-      </div>;
-    }
-  }
-
-  interface Property {
-    teamids: string[];
-    message: string;
-  }
-
-  interface CalsByTeamid {
-    [index: string]: ApiT.GenericCalendars;
-  }
-  interface State {
-    cals: CalsByTeamid;
-  }
-
-  export class NotificationSettings extends Component<Property, State> {
-    constructor(props: Property) {
-      super(props);
-
-      this.state = {cals:{}};
-      _.each(props.teamids, (teamid:string) => {
-        Api.getGenericCalendarList(teamid)
-        .then((cals:ApiT.GenericCalendars) => {
-          this.state.cals[teamid] = cals;
-          this.forceUpdate();
-        });
+      var current = this.props.cal.prefs.email_for_meeting_feedback;
+      this.updateCalendarPrefs({
+        email_for_meeting_feedback: !current
       });
     }
 
-    renderWithData() {
-      return <div>
-        <p>{this.props.message}</p>
-        { _.map(this.state.cals,(cals:ApiT.GenericCalendars,teamid:string) => {
-            return <div key={teamid}>
-              { _.map(cals.calendars, (cal:ApiT.GenericCalendar) => {
-                  return <div key={cal.id}>
-                    <OneCalendarPrefs teamid={teamid} cal={cal}/>
-                  </div>;
-                })
-              }
-              <hr/>
-            </div>;
-          })
-        }
+    toggleUseSlack() {
+      var current = this.props.cal.prefs.slack_for_meeting_feedback;
+      this.updateCalendarPrefs({
+        slack_for_meeting_feedback: !current
+      });
+
+      // Check if we need Slack authorization
+      if (! current) {
+        ApiC.getSlackAuthInfo().then(function(x:ApiT.SlackAuthInfo) {
+          if (! x.slack_authorized) {
+            // Uncache non-authorized status b/c this is likely to change
+            ApiC.getSlackAuthInfo.store.reset();
+            location.href = x.slack_auth_url;
+          }
+        });
+      }
+    }
+
+    render() {
+      var prefs = this.props.cal.prefs || {};
+      return <div className="esper-select-menu">
+        <div className="esper-select-header">
+          { this.props.cal.title }
+        </div>
+        <div className="esper-selectable" onClick={() => this.toggleUseEmail()}>
+          <i className={"fa fa-fw " + (
+            prefs.email_for_meeting_feedback ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}
+          Receive e-mail for meeting feedback
+        </div>
+        <div className="esper-selectable" onClick={() => this.toggleUseSlack()}>
+          <i className={"fa fa-fw " + (
+            prefs.slack_for_meeting_feedback ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}
+          Receive Slack message for meeting feedback
+        </div>
       </div>;
+    }
+  }
+
+  function TeamCalendarSettings({team, calendars, status}: {
+    team: ApiT.Team;
+    calendars: Option.T<ApiT.GenericCalendar[]>;
+    status: Model.DataStatus;
+  }) {
+    return calendars.match({
+      none: () => {
+        if (status === Model.DataStatus.READY) {
+          return <span />;
+        }
+        return <div className="esper-spinner esper-centered esper-large" />;
+      },
+      some: (calendars) => {
+        if (calendars.length === 0) {
+          return <span />;
+        }
+
+        var isBusy = (
+          status === Model.DataStatus.FETCHING ||
+          status === Model.DataStatus.INFLIGHT);
+        var hasError = (
+          status === Model.DataStatus.PUSH_ERROR ||
+          status === Model.DataStatus.FETCH_ERROR);
+        return <div className="panel panel-default">
+          <div className="panel-heading">
+            <i className="fa fa-fw fa-user" />{" "}
+            {team.team_name}
+            {isBusy ? <span className="esper-spinner" /> : null}
+          </div>
+          <div className="panel-body">
+            { hasError ? <Components.ErrorMsg /> : null}
+            { _.map(calendars, (c) =>
+              <OneCalendarPrefs key={team.teamid + " " + c.id}
+                team={team} cal={c}
+              />
+            )}
+          </div>
+        </div>;
+      }
+    });
+  }
+
+  export class NotificationSettings extends Component<{message?: string}, {}> {
+    renderWithData() {
+      return <div className="container">
+        { this.props.message ?
+          <div className="alert alert-info">{this.props.message}</div> :
+          null }
+        { _.map(Teams.all(), (t) => this.renderTeam(t)) }
+      </div>;
+    }
+
+    renderTeam(team: ApiT.Team) {
+      var calendars = Option.cast(
+        Calendars.CalendarListStore.val(team.teamid)
+      );
+      var status = Option.cast(
+        Calendars.CalendarListStore.metadata(team.teamid)
+      ).match({
+        none: () => Model.DataStatus.FETCHING,
+        some: (m) => m.dataStatus
+      });
+
+      return <TeamCalendarSettings key={team.teamid}
+        team={team}
+        calendars={calendars}
+        status={status}
+      />;
     }
   }
 }
