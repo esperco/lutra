@@ -205,11 +205,16 @@
     margin-bottom: @padding-large-vertical * 2;
   }
 
-  .modal-footer & {
+  .modal-footer &, .panel-footer & {
     float: left;
     display: block;
     height: 32px;
     width: 32px;
+  }
+
+  .modal-header &, .panel-heading & {
+    float: right;
+    display: block;
   }
 
   .navbar & {

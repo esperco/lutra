@@ -138,6 +138,10 @@ module Esper.ApiC {
 
   // Actual API Calls /////////////////
 
+  export var getAllPreferences = makeC
+    <typeof Api.getAllPreferences, ApiT.PreferencesList>
+    (Api.getAllPreferences);
+
   export var getAllProfiles = makeC
     <typeof Api.getAllProfiles, ApiT.ProfileList>
     (Api.getAllProfiles);
@@ -153,6 +157,10 @@ module Esper.ApiC {
   export var getGenericCalendarList = makeC
     <typeof Api.getGenericCalendarList, ApiT.GenericCalendars>
     (Api.getGenericCalendarList);
+
+  export var getSlackAuthInfo = makeC
+    <typeof Api.getSlackAuthInfo, ApiT.SlackAuthInfo>
+    (Api.getSlackAuthInfo);
 
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>

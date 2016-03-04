@@ -30,6 +30,11 @@ module Esper.Components {
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
+            <li><a href="#!/notification-settings">
+              <i className="fa fa-fw fa-exchange"></i>{" "}
+              Notification Settings
+            </a></li>
+            <li className="divider" />
             <li><a href="/" target="_blank">
               <i className="fa fa-fw fa-home"></i>{" "}
               Home
