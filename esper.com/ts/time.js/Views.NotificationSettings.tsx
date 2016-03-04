@@ -81,7 +81,7 @@ module Esper.Views {
           <label htmlFor={id2}>
             Receive slack message for meeting feedback
           </label>
-        </div>        
+        </div>
       </div>;
     }
   }
@@ -98,7 +98,7 @@ module Esper.Views {
     cals: CalsByTeamid;
   }
 
-  export class CalendarSettings extends Component<Property, State> {
+  export class NotificationSettings extends Component<Property, State> {
     constructor(props: Property) {
       super(props);
 
