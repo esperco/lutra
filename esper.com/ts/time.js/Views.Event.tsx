@@ -7,26 +7,52 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface Property {
-    eventKey: string;
-    eventid: string;
-    teamid: string;
+    calId: string;
+    eventId: string;
+    teamId: string;
   }
 
   export class EventView extends Component<Property, {}> {
     renderWithData() {
-      var eventPair = Events.EventStore.get(this.props.eventKey);
-      var event = eventPair[0];
       return <div className="container event-content">
-        <div className="panel panel-default">
-          <div className="panel-heading title">{event.title}</div>
-          <div className="panel-body">
-            <Components.EventDetails event={event} />
-            <EventNotes eventPair={eventPair} />
-            <Components.LabelEditor2
-              eventPairs={[eventPair]}
-              teamPairs={Teams.allPairs()}
-            />
-          </div>
+        <div className="row"><div className="col-md-6 col-md-offset-3">
+          { this.renderContent() };
+        </div></div>
+      </div>;
+    }
+
+    renderContent() {
+      var eventKey = Events.keyForEvent(
+        this.props.teamId, this.props.calId, this.props.eventId);
+      var eventPair = Events.EventStore.get(eventKey);
+      var event = eventPair[0];
+      var metadata = eventPair[1];
+
+      var busy = Option.cast(metadata).match({
+        none: () => false,
+        some: (m) => m.dataStatus === Model.DataStatus.FETCHING
+      });
+      if (busy) {
+        return <div className="esper-spinner esper-centered esper-medium" />;
+      }
+
+      var error = Option.cast(metadata).match({
+        none: () => true,
+        some: (m) => m.dataStatus === Model.DataStatus.FETCH_ERROR
+      });
+      if (error) {
+        return <Components.ErrorMsg />;
+      }
+
+      return <div className="panel panel-default">
+        <div className="panel-heading title">{event.title}</div>
+        <div className="panel-body">
+          <Components.EventDetails event={event} />
+          <EventNotes eventPair={eventPair} />
+          <Components.LabelEditor2
+            eventPairs={[eventPair]}
+            teamPairs={Teams.allPairs()}
+          />
         </div>
       </div>;
     }
@@ -86,6 +112,7 @@ module Esper.Views {
       var event = this.props.eventPair[0];
       var val = this.inputNotes.value.trim();
       if (event.notes !== val) {
+        console.info(event.teamId);
         var p = Api.postEventNotes(event.teamId, event.id, val);
         var storeId = Events.storeId(event);
         var newEvent = _.cloneDeep(event);

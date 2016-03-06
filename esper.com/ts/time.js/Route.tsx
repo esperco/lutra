@@ -120,21 +120,18 @@ module Esper.Route {
          .../time#!/...?{ctx.querystring}
        so we need an explicit url-decoding here for the '&' separators.
      */
-
-    var teamid  = Util.getParamByName("team",   q);
-    var calid   = Util.getParamByName("cal",    q);
-    var eventid = Util.getParamByName("event",  q);
+    var teamId  = Util.getParamByName("team",   q);
+    var calId   = Util.getParamByName("cal",    q);
+    var eventId = Util.getParamByName("event",  q);
     var action  = Util.getParamByName("action", q);
 
-    Api.postEventFeedback(teamid, eventid, action)
-      .then(function(labels:ApiT.Labels) {
-        Events.fetch1(teamid, calid, eventid)
-          .then((eventKey: string) => {
-            render(<Views.EventView teamid={teamid} eventid={eventid}
-                                    eventKey={eventKey} />);
-          });
-      });
-    Analytics.page(Analytics.Page.EventFeedback);
+    Events.fetch1(teamId, calId, eventId);
+    render(<Views.EventView teamId={teamId} calId={calId} eventId={eventId} />);
+    Analytics.page(Analytics.Page.EventFeedback, {
+      teamId: teamId,
+      calId: calId,
+      eventId: eventId
+    });
   });
 
   // TODO: Select event and perform labeling action
