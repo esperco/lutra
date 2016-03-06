@@ -1,3 +1,7 @@
+/// <reference path="../common/Components.ModalPanel.tsx" />
+/// <reference path="./Components.EventDetails.tsx" />
+/// <reference path="./Components.LabelEditor2.tsx" />
+
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
@@ -9,38 +13,91 @@ module Esper.Views {
   }
 
   export class EventView extends Component<Property, {}> {
-    inputNotes: HTMLInputElement;
-
     renderWithData() {
       var eventPair = Events.EventStore.get(this.props.eventKey);
       var event = eventPair[0];
-      return <div className="event-content">
-        <div className="title">{event.title}</div>
-        <div>
-          <input type="text" placeholder="Notes" className="form-control"
-            defaultValue={event.notes} ref={(ref) => this.inputNotes = ref}
-            onKeyDown={this.notesKeydown.bind(this)}
-          />
+      return <div className="container event-content">
+        <div className="panel panel-default">
+          <div className="panel-heading title">{event.title}</div>
+          <div className="panel-body">
+            <Components.EventDetails event={event} />
+            <EventNotes eventPair={eventPair} />
+            <Components.LabelEditor2
+              eventPairs={[eventPair]}
+              teamPairs={Teams.allPairs()}
+            />
+          </div>
         </div>
-        <Components.LabelEditor2
-          showDescription={true}
-          eventPairs={[eventPair]}
-          teamPairs={Teams.allPairs()}
-        />
       </div>;
+    }
+  }
+
+  class EventNotes extends Component<{
+    eventPair: [Events.TeamEvent, Model.StoreMetadata]
+  }, {
+    saved: boolean;
+    saveEnabled: boolean;
+  }> {
+    inputNotes: HTMLTextAreaElement;
+    saveTimeout: number;
+
+    constructor(props: { eventPair: [Events.TeamEvent, Model.StoreMetadata] }) {
+      super(props);
+      this.state = {
+        saved: false,
+        saveEnabled: false
+      };
+    }
+
+    render() {
+      var event = this.props.eventPair[0];
+      var status = this.props.eventPair[1].dataStatus;
+      var busy = status === Model.DataStatus.INFLIGHT;
+      var error = status === Model.DataStatus.FETCH_ERROR ||
+        status === Model.DataStatus.PUSH_ERROR;
+
+      var okText = (() => {
+        if (busy) return "Saving";
+        if (this.state.saved) return "Saved";
+        return "Save";
+      })();
+      var disableOk = busy || !this.state.saveEnabled;
+
+      return <Components.ModalPanel busy={busy} error={error}
+              okText={okText} onOK={() => this.submitNotes()}
+              disableOK={disableOk}
+              className="event-notes esper-panel-section">
+        <label htmlFor={this.getId("notes")}>Post-Meeting Notes</label>
+        <textarea id={this.getId("notes")} placeholder="Notes"
+          ref={(ref) => this.inputNotes = ref}
+          className="form-control" defaultValue={event.notes}
+          onKeyDown={this.notesKeydown.bind(this)}
+        />
+      </Components.ModalPanel>;
     }
 
     notesKeydown(e: KeyboardEvent) {
-      if (e.keyCode === 13) {
-        e.preventDefault();
+      this.setState({saved: false, saveEnabled: true})
+      clearTimeout(this.saveTimeout);
+      this.saveTimeout = setTimeout(() => this.submitNotes(), 2000);
+    }
 
-        Api.postEventNotes(this.props.teamid, this.props.eventid,
-                           this.inputNotes.value);
-
-        var event = Events.EventStore.val(this.props.eventKey);
-        event.notes = this.inputNotes.value;
-        Events.EventStore.set(this.props.eventKey, event);
+    submitNotes() {
+      var event = this.props.eventPair[0];
+      var val = this.inputNotes.value.trim();
+      if (event.notes !== val) {
+        var p = Api.postEventNotes(event.teamId, event.id, val);
+        var storeId = Events.storeId(event);
+        var newEvent = _.cloneDeep(event);
+        newEvent.notes = val;
+        Events.EventStore.push(storeId, p, newEvent);
+        this.setState({saved: true, saveEnabled: false});
       }
+    }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      clearTimeout(this.saveTimeout);
     }
   }
 }
