@@ -25,8 +25,8 @@ module Esper.Events {
     return keyForEvent(event.teamId, event.calendar_id, event.id);
   }
 
-  function keyForEvent(teamid:string, calid:string, eventid:string) {
-    return teamid + "|" + calid + "|" + eventid;
+  export function keyForEvent(teamId: string, calId: string, eventId: string) {
+    return teamId + "|" + calId + "|" + eventId;
   }
 
   // Returns true if two events are part of the same recurring event
@@ -74,23 +74,17 @@ module Esper.Events {
     }
   }
 
-  export function fetch1(teamid:string, calid:string, eventid:string,
-                         forceRefresh=false): JQueryPromise<string>
+  export function fetch1(teamId:string, calId:string, eventId:string,
+                         forceRefresh=false)
   {
-    var key = keyForEvent(teamid, calid, eventid);
-    if (forceRefresh || ! EventStore.has(key)) {
-      var p = $.Deferred();
+    var key = keyForEvent(teamId, calId, eventId);
+    if (forceRefresh || !EventStore.has(key)) {
+      var p = Api.getGenericEvent(teamId, calId, eventId)
+        .then((e: ApiT.GenericCalendarEvent) => asTeamEvent(teamId, e));
       EventStore.fetch(key, p);
-
-      Api.getGenericEvent(teamid, calid, eventid)
-      .done((event: ApiT.GenericCalendarEvent) => {
-        p.resolve(asTeamEvent(teamid, event));
-      });
-      return p.then(() => {
-        return key;
-      });
+      return p;
     } else {
-      return $.Deferred().resolve(key);
+      return $.Deferred().resolve(EventStore.val(key));
     }
   }
 

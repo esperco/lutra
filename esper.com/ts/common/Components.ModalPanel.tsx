@@ -19,11 +19,12 @@ module Esper.Components {
 
   interface ModalPanelProps extends FooterProps {
     error?: boolean;
+    className?: string;
     children?: JSX.Element[];
   }
 
   export function ModalPanel(props: ModalPanelProps) {
-    return <div>
+    return <div className={props.className}>
       { props.error ? <Components.ErrorMsg /> : null }
       { props.children }
       { ModalPanelFooter(props) }

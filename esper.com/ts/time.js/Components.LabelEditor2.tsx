@@ -11,6 +11,7 @@
 /// <reference path="./Events.ts" />
 /// <reference path="./EventLabelChange.ts" />
 /// <reference path="./Teams.ts" />
+/// <reference path="./Components.EventDetails.tsx" />
 /// <reference path="./Views.LabelManage.tsx" />
 
 module Esper.Components {
@@ -45,59 +46,27 @@ module Esper.Components {
     // NB: Use cancel button instead of OK button because purpose of button
     // is just to close panel, not do anything
     return <ModalPanel busy={busy} error={error} busyText={busyText}
-                       onCancel={props.onDone} cancelText="Close">
+                       onCancel={props.onDone} cancelText="Close"
+                       className="esper-panel-section">
       { props.showDescription && events.length === 1 ?
         <EventDetails event={events[0]} /> : null }
-      <LabelInput events={events} />
-      <LabelList events={events} teams={teams} />
-      <div className="esper-select-menu">
-        <div className="divider" />
-        <a className="esper-selectable" target="_blank"
-           onClick={renderManageLabels}>
-        <i className="fa fa-fw fa-bars"></i>
-        {" "}Manage Labels
-        </a>
+      <div className="esper-panel-section">
+        <LabelInput events={events} />
+        <LabelList events={events} teams={teams} />
+        <div className="esper-select-menu">
+          <div className="divider" />
+          <a className="esper-selectable" target="_blank"
+             onClick={renderManageLabels}>
+          <i className="fa fa-fw fa-bars"></i>
+          {" "}Manage Labels
+          </a>
+        </div>
       </div>
     </ModalPanel>
   }
 
   function renderManageLabels() {
     Layout.renderModal(<Views.LabelManageModal />);
-  }
-
-
-  ///////
-
-  function EventDetails({event}: {event: Events.TeamEvent}) {
-    return <div className="event-details">
-      <div className="time">
-        <i className="fa fa-fw fa-clock-o" />{" "}
-        <span className="start">
-          { moment(event.start).format("ddd, MMM D, h:mm a") }
-        </span>{" to "}<span className="end">
-          { moment(event.end).format("h:mm a") }
-        </span>{" "}
-        { event.recurring_event_id ?
-          <span className="recurring" title="Recurring">
-            <i className="fa fa-fw fa-refresh" />
-          </span> :
-          null
-        }
-      </div>
-      { event.location ?
-        <div className="location">
-          <i className="fa fa-fw fa-map-marker" />{" "}
-          {event.location}
-        </div>
-        : null
-      }
-      { event.description ?
-        <div className="description">
-          {event.description}
-        </div>
-        : null
-      }
-    </div>;
   }
 
 
