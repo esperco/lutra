@@ -114,7 +114,7 @@ module Esper.ApiC {
 
       // Call original function and attach promise handlers that update our
       // stores
-      promise = promises[key] = (<any> fn).apply(Api, arguments);
+      promise = promises[key] = (<any> ret.orig).apply(Api, arguments);
 
       // Tie store updates to promise resolution / rejection
       store.fetch(key, promise);
@@ -129,6 +129,7 @@ module Esper.ApiC {
       return promise;
     };
 
+    ret.orig = fn;
     ret.store = store;
     ret.strFunc = strFunc;
     ret._promises = promises; // Expose for debugging only (not in type)

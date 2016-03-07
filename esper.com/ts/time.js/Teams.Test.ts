@@ -5,7 +5,7 @@
 module Esper.Teams {
   describe("Labels", function() {
     beforeEach(function() {
-      TestFixtures.mockLoginInfo();
+      TestFixtures.mockLogin();
       Test.mockAPIs();
       Queue.reset();
 

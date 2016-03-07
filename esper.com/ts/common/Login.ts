@@ -68,8 +68,8 @@ module Esper.Login {
     This function should be called when the app is initially loaded and we
     want to check if user has stored credentials.
   */
-  export function init(force=false) {
-    if (alreadyInit && !force) { return; }
+  export function init() {
+    if (alreadyInit) { return; }
     alreadyInit = true;
 
     if (initCredentials()) {
@@ -77,6 +77,16 @@ module Esper.Login {
     } else {
       goToLogin();
     }
+  }
+
+  // Used for testing
+  export function reset() {
+    alreadyInit = false;
+    loginDeferred = $.Deferred();
+    promise = loginDeferred.promise();
+    InfoStore.reset();
+    InfoStore.removeAllChangeListeners();
+    unsetCredentials();
   }
 
   // Set scope for use in other
