@@ -144,4 +144,24 @@ module Esper.TestFixtures {
       landing_url: "moon/base"
     };
   }
+
+  export function makeGenericCalendarEvent(props: {
+    start?: string,
+    end?: string
+  } = {}): ApiT.GenericCalendarEvent {
+    var defaultEvent: ApiT.GenericCalendarEvent = {
+      id: "id1",
+      calendar_id: "calId",
+      start: "2016-03-02T12:14:17.000-08:00",
+      end: "2016-03-02T2:14:17.000-08:00",
+      title: "Event",
+      all_day: false,
+      labels: [],
+      labels_norm: [],
+      guests: [],
+      transparent: false,
+      description_messageids: []
+    };
+    return _.extend(defaultEvent, props) as ApiT.GenericCalendarEvent;
+  }
 }
