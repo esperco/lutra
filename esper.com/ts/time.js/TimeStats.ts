@@ -353,4 +353,28 @@ module Esper.TimeStats {
   export function toHours(seconds: number) {
     return Number((Math.round((seconds / 3600) / 0.05) * 0.05).toFixed(2));
   }
+
+
+  ///////
+
+  // Count aggregate duration of events, avoids double-counting overlaps
+  export function aggregateDuration(events: ApiT.GenericCalendarEvent[]) {
+    var agg = 0;
+    var lastEnd: number;
+
+    events = _.sortBy(events, (e) => moment(e.start).unix());
+    _.each(events, (e) => {
+      var start = moment(e.start).unix();
+      var end = moment(e.end).unix();
+
+      start = (lastEnd && lastEnd > start) ? lastEnd : start;
+      var duration = end - start;
+      if (duration > 0) {
+        agg += duration;
+        lastEnd = end;
+      }
+    });
+
+    return agg;
+  }
 }

@@ -79,7 +79,7 @@ module Esper.Test {
       `to be ${getName(cls)}`);
     if (props) {
       expect(_.isEqual(props, element.props)).toBeTruthy(
-        `Exepected ${JSON.stringify(props)} to be ` +
+        `Expected ${JSON.stringify(props)} to be ` +
         `${JSON.stringify(element.props)}`);
     }
   }
@@ -90,6 +90,16 @@ module Esper.Test {
       if (Api.hasOwnProperty(name) && (<any> Api)[name] instanceof Function) {
         if (! isSpy((<any> Api)[name])) {
           spySafe(Api, name).and.returnValue($.Deferred<any>().promise());
+        }
+      }
+    }
+
+    for (var name in ApiC) {
+      if (ApiC.hasOwnProperty(name) &&
+          (<any> ApiC)[name].orig instanceof Function) {
+        if (! isSpy((<any> ApiC)[name].orig)) {
+          spySafe((<any> ApiC)[name], "orig").and
+            .returnValue($.Deferred<any>().promise());
         }
       }
     }

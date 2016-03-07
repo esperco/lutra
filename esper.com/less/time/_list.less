@@ -34,17 +34,30 @@
     @media (min-width: @screen-lg-min) {
       max-width: @container-lg - @grid-gutter-width;
     }
+
+    > .action {
+      float: left;
+      padding-right: @padding-large-horizontal;
+
+      &:last-child {
+        padding-right: 0;
+      }
+    }
+
+    > .pull-right {
+      > * {
+        display: inline-block;
+        padding-right: @padding-large-horizontal;
+
+        &:last-child {
+          padding-right: 0;
+        }
+      }
+    }
   }
 
   .action {
     cursor: pointer;
-    float: left;
-    padding-right: @padding-large-horizontal;
-  }
-
-  .action.pull-right {
-    float: right;
-    padding-right: 0;
   }
 
   background: @navbar-inverse-bg;

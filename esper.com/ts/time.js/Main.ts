@@ -14,17 +14,20 @@ module Esper.Conf {
 
 module Esper.Main {
   export function init() {
-    Teams.init();
-    Colors.init();
-    Calendars.init();
-
     if (Esper.TESTING) {
       Route.setBase("/test-time");
     } else {
       Route.setBase("/time");
+      initAll();
       Route.init();
-      Login.init();
     }
+  }
+
+  export function initAll() {
+    Teams.init();
+    Colors.init();
+    Calendars.init();
+    Login.init();
   }
 }
 

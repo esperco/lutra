@@ -203,21 +203,42 @@ module Esper.Views {
             <span className="event-checkbox">
               <i className={"fa fa-fw " + icon} />
             </span>
-            {" "}Select All
+            <span className="hidden-xs">
+              {" "}Select All
+            </span>
           </div>
           {
             this.state.selected.length ?
             <div className="action" onClick={() => this.editSelectedEvents()}>
-              <i className="fa fa-fw fa-tag" />{" "}Label
+              <i className="fa fa-fw fa-tag" />
+              <span className="hidden-xs">
+                {" "}Label
+              </span>
             </div> :
             null
           }
-          <div className="action pull-right"
+          <div className="pull-right">
+            { this.getStats() }
+            <div className="action"
                onClick={() => this.refreshEvents()}>
-            <i className="fa fa-fw fa-refresh" />
+              <i className="fa fa-fw fa-refresh" />
+            </div>
           </div>
         </div>
       </div>
+    }
+
+    getStats() {
+      var events = this.state.selected;
+      if (! events.length) {
+        events = this.getFilteredEvents();
+      }
+      var duration = TimeStats.aggregateDuration(events);
+
+      return <div className="event-stats">
+        { events.length }{" "}Events,{" "}
+        { Util.roundStr(TimeStats.toHours(duration), 2) }{" "}Hours
+      </div>;
     }
 
     getEvents() {

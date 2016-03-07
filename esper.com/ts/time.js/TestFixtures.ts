@@ -9,35 +9,46 @@
 
 module Esper.TestFixtures {
   export var uid = "my-uid";
-  export var email = "me@esper.com"
+  export var email = "me@esper.com";
+  export var teamId0 = "team-id-0";
+  export var team0Labels = ["Label"];
   export var teamId1 = "team-id-1";
   export var team1Labels = ["Label 1", "Label 2", "Label 3"];
   export var teamId2 = "team-id-2";
   export var team2Labels = ["Label A", "Label B", "Label C"];
 
+  // Start complete init process with mock login data
   export function mockLogin() {
+    reset();
+    Test.mockAPIs();
+    mockLoginInfo();
+    Main.initAll();
+  }
+
+  // Mock response to getLoginInfo call
+  export function mockLoginInfo() {
     spyOn(LocalStore, "get").and.returnValue({
       uid: uid,
       api_secret: "secret",
       email: email
     });
 
-    var promise = $.Deferred().resolve(mockLoginInfo()).promise();
+    var promise = $.Deferred().resolve(getLoginInfo()).promise();
     Test.spySafe(Api, "getLoginInfo").and.returnValue(promise);
-
-    Login.init(true);
   }
 
-  export function mockLoginInfo() {
+  export function reset() {
+    Login.reset();
     Teams.teamStore.reset();
     Teams.teamStore.removeAllChangeListeners();
     Teams.allTeamsStore.reset();
     Teams.allTeamsStore.removeAllChangeListeners();
-
-    var info = getLoginInfo();
-    Login.InfoStore.set(info);
-    Teams.loadFromLoginInfo(info);
-    return info;
+    Calendars.CalendarListStore.reset();
+    Calendars.CalendarListStore.removeAllChangeListeners();
+    Events.EventListStore.reset();
+    Events.EventListStore.removeAllChangeListeners();
+    Events.EventStore.reset();
+    Events.EventStore.removeAllChangeListeners();
   }
 
   export function getLoginInfo(): ApiT.LoginResponse {
@@ -51,6 +62,35 @@ module Esper.TestFixtures {
       email: email,
       teams: [
         {
+          teamid: teamId0,
+          team_name: email,
+          team_approved: true,
+          team_owner: uid,
+          team_cal_user: uid,
+          team_assistants: [uid],
+          team_calendar_accounts: [],
+          team_calendars: [{
+            calendar_default_agenda: true,
+            calendar_default_dupe: false,
+            calendar_default_view: true,
+            calendar_default_write: true,
+            calendar_timezone: "America/New_York",
+            calendar_title: "Lois's Calendar",
+            google_access_role: "Owner",
+            google_cal_id: "lois@esper.com",
+            is_primary: true
+          }],
+          team_email_aliases: [],
+          team_executive: uid,
+          team_labels: team0Labels,
+          team_label_urgent: "Urgent",
+          team_label_new: "New",
+          team_label_in_progress: "In Progress",
+          team_label_pending: "Pending",
+          team_label_done: "Done",
+          team_label_canceled: "Canceled",
+          team_timestats_calendars: ["lois@esper.com"]
+        }, {
           teamid: teamId1,
           team_name: "Peter Griffin",
           team_approved: true,
@@ -77,7 +117,8 @@ module Esper.TestFixtures {
           team_label_in_progress: "In Progress",
           team_label_pending: "Pending",
           team_label_done: "Done",
-          team_label_canceled: "Canceled"
+          team_label_canceled: "Canceled",
+          team_timestats_calendars: ["peter@esper.com"]
         }, {
           teamid: teamId2,
           team_name: "Stewie Griffin",
@@ -115,7 +156,8 @@ module Esper.TestFixtures {
           team_label_in_progress: "In Progress",
           team_label_pending: "Pending",
           team_label_done: "Done",
-          team_label_canceled: "Canceled"
+          team_label_canceled: "Canceled",
+          team_timestats_calendars: ["stewie@esper.com", "rupert@esper.com"]
         }
       ],
       team_members: [
@@ -143,5 +185,25 @@ module Esper.TestFixtures {
       ],
       landing_url: "moon/base"
     };
+  }
+
+  export function makeGenericCalendarEvent(props: {
+    start?: string,
+    end?: string
+  } = {}): ApiT.GenericCalendarEvent {
+    var defaultEvent: ApiT.GenericCalendarEvent = {
+      id: "id1",
+      calendar_id: "calId",
+      start: "2016-03-02T12:14:17.000-08:00",
+      end: "2016-03-02T2:14:17.000-08:00",
+      title: "Event",
+      all_day: false,
+      labels: [],
+      labels_norm: [],
+      guests: [],
+      transparent: false,
+      description_messageids: []
+    };
+    return _.extend(defaultEvent, props) as ApiT.GenericCalendarEvent;
   }
 }
