@@ -255,25 +255,22 @@ module Esper.Views {
       // Render view
       return <div id="charts-page"
                   className="esper-full-screen minus-nav">
-        <div className="esper-left-sidebar padded">
-          <Components.SidebarToggle />
-          <div className="xs-open">
-            <div className="esper-menu-section">
-              <label htmlFor={this.getId("cal-select")}>
-                <i className="fa fa-fw fa-calendar-o" />{" "}
-                Calendar
-              </label>
-              <Components.CalSelectorDropdown
-                id={this.getId("cal-select")}
-                teams={teams}
-                calendarsByTeamId={calendarsByTeamId}
-                selected={[cal]}
-                updateFn={updateCalSelection}
-              />
-            </div>
-            { chart ? chart.renderSelectors() : null }
+        <Components.SidebarWithToggle>
+          <div className="esper-menu-section">
+            <label htmlFor={this.getId("cal-select")}>
+              <i className="fa fa-fw fa-calendar-o" />{" "}
+              Calendar
+            </label>
+            <Components.CalSelectorDropdown
+              id={this.getId("cal-select")}
+              teams={teams}
+              calendarsByTeamId={calendarsByTeamId}
+              selected={[cal]}
+              updateFn={updateCalSelection}
+            />
           </div>
-        </div>
+          { chart ? chart.renderSelectors() : null }
+        </Components.SidebarWithToggle>
         <div className="esper-right-content padded">
           <div className="esper-header fixed row clearfix">
             <div className="col-xs-8 col-sm-4">

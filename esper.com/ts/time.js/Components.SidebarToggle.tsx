@@ -5,7 +5,9 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Components {
-  export class SidebarToggle extends ReactHelpers.Component<{}, {
+  export class SidebarWithToggle extends ReactHelpers.Component<{
+    children?: JSX.Element|JSX.Element[];
+  }, {
     open: boolean;
   }> {
     constructor(props: {}) {
@@ -14,24 +16,41 @@ module Esper.Components {
     }
 
     render() {
-      return <div className="visible-xs-block sidebar-toggle"
-                  onClick={() => this.toggle()}>
-        { this.state.open ?
-          <i className="fa fa-fw fa-angle-double-down" /> :
-          <i className="fa fa-fw fa-angle-double-up" />
-        }
+      return <div className={"esper-left-sidebar padded" +
+                             ( this.state.open ? " open" : "")}>
+        <div className="visible-xs-block sidebar-toggle"
+                onClick={() => this.toggle()}>
+          { this.state.open ?
+            <i className="fa fa-fw fa-angle-double-down" /> :
+            <i className="fa fa-fw fa-angle-double-up" />
+          }
+        </div>
+        <div className="xs-open">
+          { this.props.children }
+        </div>
       </div>;
     }
 
     toggle() {
-      var elm = this.jQuery().closest(".esper-left-sidebar");
-      elm.toggleClass("open");
+      this.setState({open: !this.state.open});
+    }
 
-      if (elm.hasClass("open")) {
-        this.setState({open: true});
-      } else {
+    componentDidMount() {
+      Route.onBack(this.onBack);
+    }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      Route.offBack(this.onBack);
+    }
+
+    onBack = () => {
+      if (this.state.open) {
         this.setState({open: false});
+        this.jQuery().closest(".esper-left-sidebar").removeClass("open");
+        return false;
       }
+      return true;
     }
   }
 }

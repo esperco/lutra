@@ -87,12 +87,20 @@ module Esper.Route {
 
   // Back button handlers -- takes PageJS context. Return false to stay on the
   // existing page
-  var backBtnHandlers: { (ctx: PageJS.Context): boolean; }[] = [];
+  interface BackBtnHandler {
+    (ctx: PageJS.Context): boolean;
+  };
 
-  export function onBack(cb: { (ctx: PageJS.Context): boolean; }) {
+  export var backBtnHandlers: BackBtnHandler[] = [];
+
+  export function onBack(cb: BackBtnHandler) {
     if (! _.includes(backBtnHandlers, cb)) {
       backBtnHandlers.push(cb);
     }
+  }
+
+  export function offBack(cb: BackBtnHandler) {
+    backBtnHandlers = _.without(backBtnHandlers, cb);
   }
 
   export function getJSONQuery(ctx: PageJS.Context): any {
