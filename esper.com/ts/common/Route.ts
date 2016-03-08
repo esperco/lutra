@@ -5,41 +5,75 @@
 
 module Esper.Route {
   declare var pageJs: PageJS.Static;
-  const jsonParam = "q";
-
-  // Random pre-route hooks other modules can modify
-  export var preRouteHooks: PageJS.Callback[] = [];
 
   // Helper to wrap default pageJs route definition function
   export function route(pattern: string, ...callbacks: PageJS.Callback[]) {
     var callbacks = preRouteHooks.concat(callbacks);
-    pageJs(pattern,
-
-      // Add function to record current path
-      (ctx, next) => {
-        current = ctx && ctx.path;
-        next();
-      },
-
-      // Modify query string to include lastQuery. Also, contains workaround
-      // for https://github.com/visionmedia/page.js/issues/216
-      (ctx, next) => {
-        if (lastQuery) {
-          ctx.querystring = lastQuery;
-          lastQuery = undefined;
-        } else {
-          ctx.querystring = ctx.canonicalPath.split("?")[1] || "";
-        }
-        next();
-      },
-
-      // Check login status before proceeding
-      (ctx, next) => {
-        Login.promise.done(next);
-      },
-
-      ...callbacks)
+    pageJs(pattern, ...callbacks);
   }
+
+
+  //////////
+
+  const jsonParam = "q";
+
+  // Random pre-route hooks other modules can modify
+  export var preRouteHooks: PageJS.Callback[] = [
+    // Add function to record current path
+    (ctx, next) => {
+      current = ctx && ctx.path;
+      next();
+    },
+
+    // Modify query string to include lastQuery. Also, contains workaround
+    // for https://github.com/visionmedia/page.js/issues/216
+    (ctx, next) => {
+      if (lastQuery) {
+        ctx.querystring = lastQuery;
+        lastQuery = undefined;
+      } else {
+        ctx.querystring = ctx.canonicalPath.split("?")[1] || "";
+      }
+      next();
+    },
+
+    // Check login status before proceeding
+    (ctx, next) => {
+      Login.promise.done(next);
+    },
+
+    /*
+      On mobile, users expect back button to close modals and whatnot. To
+      do that, we hook into routing system to detect when back button is pressed.
+      If a modal is visible, we close the modal and then go forward again (so
+      a user must hit back twice to close a modal and go back a page).
+
+      Note that this may trigger a re-render when we go forward again.
+    */
+    (ctx, next) => {
+      // Seen means the back button was pressed
+      if (ctx.state.seen) {
+        for (var i in backBtnHandlers) {
+          var fn = backBtnHandlers[i];
+          if (fn(ctx) === false) {
+            history.forward();
+            return;
+          }
+        }
+      } else {
+        ctx.state.seen = true;
+        if (firstPage) {
+          ctx.save(); // Explicit save seems required for first page
+
+          // Add an extra state object to handle first page
+          history.pushState(ctx.state, document.title);
+
+          firstPage = false;
+        }
+      }
+      next();
+    }
+  ];
 
   // Track current path
   export var current: string;
@@ -47,6 +81,19 @@ module Esper.Route {
   // Track last query (void of "?") in order to handle situations where
   // querystring may get too long
   export var lastQuery: string;
+
+  // Track if this is the first page in the stack (used above)
+  var firstPage = true;
+
+  // Back button handlers -- takes PageJS context. Return false to stay on the
+  // existing page
+  var backBtnHandlers: { (ctx: PageJS.Context): boolean; }[] = [];
+
+  export function onBack(cb: { (ctx: PageJS.Context): boolean; }) {
+    if (! _.includes(backBtnHandlers, cb)) {
+      backBtnHandlers.push(cb);
+    }
+  }
 
   export function getJSONQuery(ctx: PageJS.Context): any {
     var str = Util.getParamByName(jsonParam, ctx.querystring);
@@ -56,6 +103,9 @@ module Esper.Route {
       return null;
     }
   }
+
+
+  //////
 
   // Use to set base path
   export function setBase(base: string) {
@@ -69,6 +119,9 @@ module Esper.Route {
       hashbang: true
     });
   }
+
+
+  //////
 
   // Helper functions to navigate
   export module nav {

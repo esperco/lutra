@@ -39,47 +39,14 @@ module Esper.Layout {
 
   //////
 
-  interface PreRouteHookCtx extends PageJS.Context {
-    state: ShowModalState;
-  }
-
-  interface ShowModalState {
-    path: string;
-    seen?: boolean;
-  }
-
-  /*
-    On mobile, users expect back button to close modals and whatnot. To
-    do that, we hook into routing system to detect when back button is pressed.
-    If a modal is visible, we close the modal and then go forward again (so
-    a user must hit back twice to close a modal and go back a page).
-
-    Note that this will trigger a re-render when we go forward again.
-  */
-  Route.preRouteHooks.push(function(ctx: PreRouteHookCtx, next: () => any) {
-    // Seen means the back button was pressed
-    if (ctx.state.seen) {
-      if (modalIsVisible()) {
-        closeModal();
-        history.forward();
-        return;
-      }
-    } else {
-      ctx.state.seen = true;
-      if (firstPage) {
-        ctx.save(); // Explicit save seems required for first page
-
-        // Add an extra state object to handle first page
-        history.pushState(ctx.state, document.title);
-
-        firstPage = false;
-      }
+  // Close modal when user hits back button
+  Route.onBack(function() {
+    if (modalIsVisible()) {
+      closeModal();
+      return false;
     }
-    next();
+    return true;
   });
-
-  // Track if this is the first page in the stack (used above)
-  var firstPage = true;
 
   // Used to track which modal is currently rendered
   var currentModalId: number = 0;
