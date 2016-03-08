@@ -7,8 +7,12 @@ module Esper.Route {
   declare var pageJs: PageJS.Static;
   const jsonParam = "q";
 
+  // Random pre-route hooks other modules can modify
+  export var preRouteHooks: PageJS.Callback[] = [];
+
   // Helper to wrap default pageJs route definition function
   export function route(pattern: string, ...callbacks: PageJS.Callback[]) {
+    var callbacks = preRouteHooks.concat(callbacks);
     pageJs(pattern,
 
       // Add function to record current path
@@ -76,6 +80,9 @@ module Esper.Route {
       // queryStr (which just passes query as is)
       queryStr?: string;
       jsonQuery?: any;
+
+      // State variables to pass to history
+      state?: any;
     };
 
     // Normalize slashes and hashes
