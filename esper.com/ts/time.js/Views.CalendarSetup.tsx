@@ -146,6 +146,10 @@ module Esper.Views {
             }
           </div>
         }
+        <div className="alert">
+          Can't find the calendar you're looking for? Please
+          {" "}<a href="/contact">contact us</a> for help.
+        </div>
         <Components.RequestExec onSave={changeTeamPromise} />
       </div>;
     }
