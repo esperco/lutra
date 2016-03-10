@@ -57,7 +57,6 @@ module Esper.Token {
         }
       }, function() {
         /* Possibly a 404 because the token was already consumed */
-        Log.e("HTTP error with token " + token);
         renderLogin("", "That link is no longer valid.");
       });
   }
