@@ -226,8 +226,10 @@ module Esper.Api {
   }
 
   export function postToken(token: string): JQueryPromise<ApiT.TokenResponse> {
-    return JsonHttp.post(prefix + "/api/token/" +
-      encodeURIComponent(string(token)), "");
+    return JsonHttp.noWarn(function() {
+      return JsonHttp.post(prefix + "/api/token/"
+                           + encodeURIComponent(string(token)), "");
+    });
   }
 
   export function postTokenEmail(token: string, email: string, name: string):
