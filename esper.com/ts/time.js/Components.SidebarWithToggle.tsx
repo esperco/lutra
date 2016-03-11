@@ -18,14 +18,15 @@ module Esper.Components {
     render() {
       return <div className={"esper-left-sidebar padded" +
                              ( this.state.open ? " open" : "")}>
-        <div className="visible-xs-block sidebar-toggle"
-                onClick={() => this.toggle()}>
-          { this.state.open ?
-            <i className="fa fa-fw fa-angle-double-down" /> :
-            <i className="fa fa-fw fa-angle-double-up" />
-          }
-        </div>
-        <div className="xs-open">
+        <div className="sidebar-backdrop" onClick={() => this.toggle()}/>
+        <div className="sidebar-collapse">
+          <div className="visible-xs-block sidebar-toggle"
+                  onClick={() => this.toggle()}>
+            { this.state.open ?
+              <i className="fa fa-fw fa-angle-double-down" /> :
+              <i className="fa fa-fw fa-angle-double-up" />
+            }
+          </div>
           { this.props.children }
         </div>
       </div>;
