@@ -27,7 +27,9 @@ module Esper.Components {
               <i className="fa fa-fw fa-angle-double-up" />
             }
           </div>
-          { this.props.children }
+          <div className="sidebar-collapse-content">
+            { this.props.children }
+          </div>
         </div>
       </div>;
     }

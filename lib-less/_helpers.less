@@ -166,22 +166,47 @@
         overflow: hidden;
         background: @body-bg;
         transition: height 1s;
+
+        .sidebar-toggle {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          line-height: @input-height-base;
+          vertical-align: middle;
+        }
+
+        .sidebar-collapse-content {
+          position: absolute;
+          top: @input-height-base;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          overflow: auto;
+        }
       }
 
       &.open {
+        .sidebar-toggle {
+          line-height: @line-height-computed;
+        }
+
         .sidebar-backdrop {
           top: 0;
         }
 
         .sidebar-collapse {
           height: 70%;
-          overflow: auto;
           box-shadow: 0px -6px 12px rgba(0, 0, 0, 0.16);
-        }
 
-        &.padded .sidebar-collapse {
-          .esper-padded;
+          .sidebar-collapse-content {
+            top: @line-height-computed;
+          }
         }
+      }
+
+      &.padded .sidebar-collapse-content {
+        .esper-padded;
       }
     }
   }
