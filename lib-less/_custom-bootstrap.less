@@ -47,11 +47,18 @@
 .container-fluid.padded {
   padding-left: @padding-base-horizontal;
   padding-right: @padding-base-horizontal;
-}
 
-.container-fluid {
-  .navbar-right {
-    margin-right: 0;
+  @media (max-width: @screen-xs-max) {
+    .navbar & {
+      padding-left: @grid-gutter-width / 2;
+      padding-right: @grid-gutter-width / 2;
+    }
+  }
+
+  @media (min-width: @screen-sm-min) {
+    .navbar-right {
+      margin-right: 0;
+    }
   }
 }
 
@@ -183,32 +190,6 @@ a {
 }
 
 
-/* Mobile-friendly dropdowns */
-
-@media (max-width: @screen-xs-max) {
-  .dropdown.xs-open {
-    .caret { display: none; }
-    .dropdown-menu {
-      display: block;
-      position: static;
-      min-width: 100%;
-      box-shadow: none;
-      margin: @padding-base-vertical 0;
-
-      .navbar-collapse & {
-        border-width: 1px 0 0 0;
-        border-radius: 0;
-        padding: 0;
-      }
-
-      > li > a {
-        padding: @padding-base-vertical @padding-base-horizontal;
-      }
-    }
-  }
-}
-
-
 //////
 
 .dropdown {
@@ -247,6 +228,44 @@ input.form-control.dropdown-toggle[readonly] {
       &.input-lg {
         border-top-right-radius: @input-border-radius-large;
         border-bottom-right-radius: @input-border-radius-large;
+      }
+    }
+  }
+}
+
+
+/* Navbar should be (this lets us add transparent elements to navbar) */
+
+.navbar-default, .navbar-inverse {
+  background-color: transparent;
+}
+
+.navbar-default {
+  .container, .container-fluid {
+    background-color: @navbar-default-bg;
+  }
+}
+
+.navbar-inverse {
+  .container, .container-fluid {
+    background-color: @navbar-default-bg;
+  }
+}
+
+
+/* Navbar styling for mobile */
+
+@media (max-width: @screen-xs-max) {
+  .navbar-collapse, .esper-collapse {
+    .navbar-nav + .navbar-nav {
+      padding-top: (@navbar-padding-vertical / 2);
+      border-top: 1px solid @dropdown-divider-bg;
+    }
+
+    .padded & {
+      .navbar-nav {
+        padding-left: @padding-base-horizontal;
+        padding-right: @padding-base-horizontal;
       }
     }
   }

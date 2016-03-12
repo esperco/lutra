@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./Route.ts" />
 
 module Esper.Layout {
   // References to our jQuery selectors
@@ -35,6 +36,18 @@ module Esper.Layout {
     window.requestAnimationFrame(hideLoader);
   }
 
+
+  //////
+
+  // Close modal when user hits back button
+  Route.onBack(function() {
+    if (modalIsVisible()) {
+      closeModal();
+      return false;
+    }
+    return true;
+  });
+
   // Used to track which modal is currently rendered
   var currentModalId: number = 0;
 
@@ -46,7 +59,7 @@ module Esper.Layout {
     // If modal already exists, close and wait for it to finish hiding before
     // rendering a new modal
     var modalElm = $(modalSelector).find(".modal");
-    if (modalElm.length) {
+    if (modalElm.is(":visible")) {
       $(modalElm).on('hidden.bs.modal', () => {
         window.requestAnimationFrame(() => renderModal(modal));
       });
@@ -87,14 +100,19 @@ module Esper.Layout {
                               modalId?: number)
   {
     var modalContainer = $(modalSelector).children("div:last");
-    if (modalContainer.length) {
+    if (modalIsVisible(modalId)) {
       // Container exists, update if modalId matches
-      if (_.isUndefined(modalId) || modalId === currentModalId) {
-        $(modalContainer).renderReact(modal);
-      }
+      $(modalContainer).renderReact(modal);
     } else if (_.isUndefined(modalId)) {
       // Container doesn't exist, render for first time
       renderModal(modal);
+    }
+  }
+
+  // Is the modal (with an optional modalId) visible?
+  export function modalIsVisible(modalId?: number) {
+    if ($(modalSelector).find(".modal").is(":visible")) {
+      return _.isUndefined(modalId) || modalId === currentModalId;
     }
   }
 

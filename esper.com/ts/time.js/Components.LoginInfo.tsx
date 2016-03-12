@@ -15,6 +15,7 @@ module Esper.Components {
   interface LoginInfoProps {
     loginInfo: ApiT.LoginResponse;
     busy: boolean;
+    children?: JSX.Element[];
   };
 
   export class LoginInfo extends Component<LoginInfoProps, {}> {
@@ -24,44 +25,13 @@ module Esper.Components {
       }
 
       if (this.props.loginInfo) {
-        return <Dropdown className="dropdown navbar-text xs-open">
+        return <Dropdown className="dropdown">
           <a className="dropdown-toggle">
             {this.props.loginInfo.email}{" "}
             <span className="caret"></span>
           </a>
           <ul className="dropdown-menu">
-            <li><a href="#!/notification-settings">
-              <i className="fa fa-fw fa-exchange"></i>{" "}
-              Notification Settings
-            </a></li>
-            <li className="divider" />
-            <li><a href="/" target="_blank">
-              <i className="fa fa-fw fa-home"></i>{" "}
-              Home
-            </a></li>
-            <li><a href="/contact" target="_blank">
-              <i className="fa fa-fw fa-envelope"></i>{" "}
-              Contact Us
-            </a></li>
-            <li><a href="/privacy-policy" target="_blank">
-              <i className="fa fa-fw fa-lock"></i>{" "}
-              Privacy
-            </a></li>
-            <li><a href="/terms-of-use" target="_blank">
-              <i className="fa fa-fw fa-legal"></i>{" "}
-              Terms
-            </a></li>
-            <li><a onClick={
-                () => { Layout.renderModal(<Components.Invite />) }
-              }>
-              <i className="fa fa-fw fa-users"></i>{" "}
-              Invite Your Contacts
-            </a></li>
-            <li className="divider" />
-            <li><a onClick={() => Login.goToLogout()}>
-              <i className="fa fa-fw fa-sign-out"></i>{" "}
-              Logout
-            </a></li>
+            { this.props.children }
           </ul>
         </Dropdown>;
       }

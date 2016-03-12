@@ -92,7 +92,7 @@ module Esper.Views {
 
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
-        <div className="esper-left-sidebar padded">
+        <Components.SidebarWithToggle>    
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
@@ -107,7 +107,7 @@ module Esper.Views {
             />
           </div>
           {this.renderLabelEditor()}
-        </div>
+        </Components.SidebarWithToggle>
         <div className="esper-right-content padded">
           {this.renderCalendar()}
         </div>
