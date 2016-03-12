@@ -115,6 +115,12 @@ module Esper.ApiT {
     calendars: GenericCalendar[];
   }
 
+  export interface EventFeedback {
+    notes?: string;
+    attended?: boolean;
+    rating?: number;
+  }
+
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
@@ -124,9 +130,9 @@ module Esper.ApiT {
     title?: string;
     description?: string;
     description_messageids: string[];
-    notes?: string;
     labels: string[];
     labels_norm: string[];
+    feedback: EventFeedback;
     location?: string;
     all_day: boolean;
     guests: Attendee[];

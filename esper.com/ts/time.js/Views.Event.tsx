@@ -12,7 +12,14 @@ module Esper.Views {
     teamId: string;
   }
 
+  function submitFeedback(event: Events.TeamEvent) {
+    var p = Api.postEventFeedback(event.teamId, event.id, event.feedback);
+    Events.EventStore.push(Events.storeId(event), p, event);
+  }
+
   export class EventView extends Component<Property, {}> {
+    inputRating: HTMLSelectElement;
+
     renderWithData() {
       return <div className="container event-content">
         <div className="row"><div className="col-md-6 col-md-offset-3">
@@ -22,9 +29,7 @@ module Esper.Views {
     }
 
     renderContent() {
-      var eventKey = Events.keyForEvent(
-        this.props.teamId, this.props.calId, this.props.eventId);
-      var eventPair = Events.EventStore.get(eventKey);
+      var eventPair = Events.EventStore.get(this.eventKey());
       var event = eventPair[0];
       var metadata = eventPair[1];
 
@@ -44,17 +49,55 @@ module Esper.Views {
         return <Components.ErrorMsg />;
       }
 
+      var rating = event.feedback.rating === undefined ? ""
+                 : event.feedback.rating.toString();
+
       return <div className="panel panel-default">
         <div className="panel-heading title">{event.title}</div>
         <div className="panel-body">
           <Components.EventDetails event={event} />
           <EventNotes eventPair={eventPair} />
+          <div className="esper-selectable"
+               onClick={() => this.toggleAttended()}>
+            <i className={"fa fa-fw " + (
+              event.feedback.attended === false ?
+              "fa-square-o" : "fa-check-square-o"
+            )} />{" "}
+            Attended
+          </div>
+          <select value={rating}
+                  ref={(ref) => this.inputRating = ref}
+                  onChange={() => this.updateRating()}>
+            <option value=""></option>
+            <option value="1">Hated It</option>
+            <option value="2">Disliked It</option>
+            <option value="3">Okay</option>
+            <option value="4">Liked It</option>
+            <option value="5">Loved It</option>
+          </select>
           <Components.LabelEditor2
             eventPairs={[eventPair]}
             teamPairs={Teams.allPairs()}
           />
         </div>
       </div>;
+    }
+
+    toggleAttended() {
+      var event = _.cloneDeep(Events.EventStore.val(this.eventKey()));
+      event.feedback.attended = ! event.feedback.attended;
+      submitFeedback(event);
+    }
+
+    updateRating() {
+      var event = _.cloneDeep(Events.EventStore.val(this.eventKey()));
+      event.feedback.rating = parseInt(this.inputRating.value);
+      submitFeedback(event);
+    }
+
+    eventKey() {
+      return Events.keyForEvent(
+        this.props.teamId, this.props.calId, this.props.eventId);
     }
   }
 
@@ -96,7 +139,7 @@ module Esper.Views {
         <label htmlFor={this.getId("notes")}>Post-Meeting Notes</label>
         <textarea id={this.getId("notes")} placeholder="Notes"
           ref={(ref) => this.inputNotes = ref}
-          className="form-control" defaultValue={event.notes}
+          className="form-control" defaultValue={event.feedback.notes}
           onKeyDown={this.notesKeydown.bind(this)}
         />
       </Components.ModalPanel>;
@@ -111,13 +154,11 @@ module Esper.Views {
     submitNotes() {
       var event = this.props.eventPair[0];
       var val = this.inputNotes.value.trim();
-      if (event.notes !== val) {
+      if (event.feedback.notes !== val) {
         console.info(event.teamId);
-        var p = Api.postEventNotes(event.teamId, event.id, val);
-        var storeId = Events.storeId(event);
         var newEvent = _.cloneDeep(event);
-        newEvent.notes = val;
-        Events.EventStore.push(storeId, p, newEvent);
+        newEvent.feedback.notes = val;
+        submitFeedback(newEvent);
         this.setState({saved: true, saveEnabled: false});
       }
     }

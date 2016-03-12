@@ -200,6 +200,7 @@ module Esper.TestFixtures {
       all_day: false,
       labels: [],
       labels_norm: [],
+      feedback: {},
       guests: [],
       transparent: false,
       description_messageids: []
