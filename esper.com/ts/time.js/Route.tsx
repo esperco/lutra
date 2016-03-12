@@ -125,20 +125,20 @@ module Esper.Route {
     var eventId = Util.getParamByName("event",  q);
     var action  = Util.getParamByName("action", q);
 
-    Events.fetch1(teamId, calId, eventId);
+    Events.fetch1(teamId, calId, eventId).then((event: Events.TeamEvent) => {
+      Api.postEventFeedbackAction(teamId, eventId, action)
+      .then((feedback: ApiT.EventFeedback) => {
+        var newEvent = _.cloneDeep(event);
+        newEvent.feedback = feedback;
+        Events.EventStore.set(Events.storeId(event), newEvent);
+      });
+    });
     render(<Views.EventView teamId={teamId} calId={calId} eventId={eventId} />);
     Analytics.page(Analytics.Page.EventFeedback, {
       teamId: teamId,
       calId: calId,
       eventId: eventId
     });
-  });
-
-  // TODO: Select event and perform labeling action
-  // Use ApiT.postEventFeedback() to record the action.
-  route("/calendar-labeling/:eventid/:action", checkOnboarding, function(ctx) {
-    render(<Views.CalendarLabeling />);
-    Analytics.page(Analytics.Page.CalendarLabeling);
   });
 
   route("/list", checkOnboarding, function(ctx) {

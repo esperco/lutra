@@ -679,7 +679,16 @@ module Esper.Api {
   }
 
   export function postEventFeedback(teamid: string, eventid: string,
-    action: string): JQueryPromise<ApiT.Labels>
+    feedback: ApiT.EventFeedback): JQueryPromise<ApiT.EventFeedback>
+  {
+    var url = prefix + "/api/event/feedback/" + string(Login.myUid())
+            + "/" + encodeURIComponent(string(teamid))
+            + "/" + encodeURIComponent(string(eventid));
+    return JsonHttp.post(url, JSON.stringify(feedback));
+  }
+
+  export function postEventFeedbackAction(teamid: string, eventid: string,
+    action: string): JQueryPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))
@@ -1127,14 +1136,6 @@ module Esper.Api {
     var body = { description: description,
                  description_messageids: messageids };
     return JsonHttp.post(url, JSON.stringify(body));
-  }
-
-  export function postEventNotes(team_id: string, event_id: string,
-                                 notes: string): JQueryPromise<void> {
-    var url = prefix + "/api/event/notes/" + string(Login.myUid())
-            + "/" + string(team_id)
-            + "/" + encodeURIComponent(event_id);
-    return JsonHttp.post(url, notes);
   }
 
   export function getEventLabels(team_id: string, event_id: string):
