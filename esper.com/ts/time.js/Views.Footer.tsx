@@ -18,10 +18,10 @@ module Esper.Views {
             <li><a href="/privacy-policy" target="_blank">Privacy</a></li>
             <li><a href="/terms-of-use" target="_blank">Terms</a></li>
           </ul>
-          <div className="visible-xs-block navbar-text pull-left">
+          <div className="visible-xs-block navbar-text text-muted pull-left">
             { email ? "Logged in as " + email : "" }
           </div>
-          <div className="pull-right navbar-text"
+          <div className="pull-right navbar-text text-muted"
                onDoubleClick={this.testError}>
             &copy; {new Date().getFullYear()} Esper
           </div>
