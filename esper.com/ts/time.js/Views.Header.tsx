@@ -113,6 +113,23 @@ module Esper.Views {
         </a></li>
       ];
     }
+
+    componentDidMount() {
+      Route.onBack(this.onBack);
+    }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      Route.offBack(this.onBack);
+    }
+
+    onBack = () => {
+      if (this.state.open) {
+        this.setState({open: false});
+        return false;
+      }
+      return true;
+    }
   }
 
   interface NavLinkProps {

@@ -52,7 +52,6 @@ module Esper.Components {
     onBack = () => {
       if (this.state.open) {
         this.setState({open: false});
-        this.jQuery().closest(".esper-left-sidebar").removeClass("open");
         return false;
       }
       return true;
