@@ -4,6 +4,7 @@
 
 // Custom Esper variables
 @min-fullscreen-height: 350px;
+@esper-collapse-max-height: 450px;
 
 
 /*
@@ -127,8 +128,14 @@
     }
 
     @media screen and (max-width: @screen-xs-max) {
-      position: static;
+      position: fixed;
       background: transparent;
+      z-index: @zindex-navbar - 1;
+      width: 100%;
+      top: auto;
+      bottom: 0;
+      left: 0;
+      right: 0;
       padding: 0;
       margin: 0;
 
@@ -141,72 +148,24 @@
         text-align: center;
         color: @link-color;
         cursor: pointer;
+        line-height: @input-height-base;
+        vertical-align: middle;
       }
 
-      .sidebar-backdrop {
-        display: block;
-        position: fixed;
-        z-index: @zindex-navbar - 2;
-        top: 100%;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.25);
-      }
-
-      .sidebar-collapse {
-        display: block;
-        position: fixed;
-        z-index: @zindex-navbar - 1;
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: @input-height-base;
+      .sidebar-content {
+        display: block;       
         overflow: hidden;
         background: @body-bg;
-        transition: height 1s;
-
-        .sidebar-toggle {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          line-height: @input-height-base;
-          vertical-align: middle;
-        }
-
-        .sidebar-collapse-content {
-          position: absolute;
-          top: @input-height-base;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          overflow: auto;
-        }
       }
 
       &.open {
-        .sidebar-toggle {
-          line-height: @line-height-computed;
-        }
-
-        .sidebar-backdrop {
-          top: 0;
-        }
-
-        .sidebar-collapse {
-          height: 70%;
+        .sidebar-content {
           box-shadow: 0px -6px 12px rgba(0, 0, 0, 0.16);
-
-          .sidebar-collapse-content {
-            top: @line-height-computed;
-          }
         }
       }
 
-      &.padded .sidebar-collapse-content {
-        .esper-padded;
+      &.padded .esper-collapse {
+        padding: 0 @padding-base-horizontal;
       }
     }
   }
@@ -453,7 +412,7 @@ flexibility with non-UL elements */
   font-size: @font-size-base;
   text-align: left; // Ensures proper alignment if parent has it changed
 
-  .esper-selectable {
+  .esper-selectable, li > a {
     display: block;
     cursor: pointer;
     padding: @padding-xs-vertical @padding-large-horizontal;
@@ -478,6 +437,11 @@ flexibility with non-UL elements */
       text-decoration: none;
       color: @dropdown-link-hover-color;
       background-color: @dropdown-link-hover-bg;
+    }
+
+    .nav & {
+      color: @navbar-default-link-color;
+      padding: @nav-link-padding;
     }
 
     .badge {
@@ -507,3 +471,40 @@ flexibility with non-UL elements */
 }
 
 
+/* Use esper-collapse for drawers or collapsible objects on mobile */
+
+@media screen and (max-width: @screen-xs-max) {
+  .esper-collapse {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.6s;
+
+    .navbar & {
+      margin-right: -@navbar-padding-horizontal;
+      margin-left:  -@navbar-padding-horizontal;
+      padding-left:  @navbar-padding-horizontal;
+      padding-right: @navbar-padding-horizontal;
+    }
+
+    &.open {
+      max-height: @esper-collapse-max-height;
+      overflow: auto;
+
+      .navbar-default & {
+        border-top: 1px solid @navbar-default-border;
+        border-bottom: 1px solid @navbar-default-border;
+      }
+
+      .navbar-inverse & {
+        border-top: 1px solid @navbar-inverse-border;
+        border-bottom: 1px solid @navbar-inverse-border;
+      }
+    }
+  }
+
+  .esper-collapse-backdrop {
+    background: rgba(0, 0, 0, 0.25);
+    width: 100%;
+    height: 3000px;
+  }
+}
