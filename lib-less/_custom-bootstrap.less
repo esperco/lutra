@@ -45,10 +45,17 @@
 */
 
 .container-fluid.padded {
-  @media (min-width: @screen-sm-min) {
-    padding-left: @padding-base-horizontal;
-    padding-right: @padding-base-horizontal;
+  padding-left: @padding-base-horizontal;
+  padding-right: @padding-base-horizontal;
 
+  @media (max-width: @screen-xs-max) {
+    .navbar & {
+      padding-left: @grid-gutter-width / 2;
+      padding-right: @grid-gutter-width / 2;
+    }
+  }
+
+  @media (min-width: @screen-sm-min) {
     .navbar-right {
       margin-right: 0;
     }
