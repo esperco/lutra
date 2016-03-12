@@ -85,7 +85,7 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", checkOnboarding, function(ctx) {
+  route("/calendar-labeling", checkOnboarding, function() {
     render(<Views.CalendarLabeling />);
     Analytics.page(Analytics.Page.CalendarLabeling);
   });
