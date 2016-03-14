@@ -11,6 +11,8 @@
 /// <reference path="./Actions.FilterList.tsx" />
 
 module Esper.Views {
+  var Component = ReactHelpers.Component;
+
   interface FilterListProps {
     calendars: Calendars.CalSelection[];
     start: Date;
@@ -50,9 +52,7 @@ module Esper.Views {
     Route.nav.query(flQS, opts);
   }
 
-  export class FilterList
-      extends ReactHelpers.Component<FilterListProps, FilterListState>
-  {
+  export class FilterList extends Component<FilterListProps, FilterListState> {
     _actionMenu: HTMLDivElement;
     _actionMenuOffset: number;
     _editModalId: number;
@@ -154,34 +154,43 @@ module Esper.Views {
       var labels = Labels.fromEvents(events, Teams.all());
       labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
-        <Components.LabelSelectorDropdown labels={labels}
-          totalCount={events.length}
-          unlabeledCount={Labels.countUnlabeled(events)}
-          selected={this.props.labels}
-          allSelected={this.props.allLabels}
-          unlabeledSelected={this.props.unlabeled}
-          showUnlabeled={true}
-          updateFn={(x) => updateRoute(_.extend({}, this.props, {
-            allLabels: x.all,
-            unlabeled: x.unlabeled,
-            labels: x.all ? [] : x.labels
-          }) as FilterListProps)} />
+        <div className="esper-clearable">
+          <Components.LabelSelectorDropdown labels={labels}
+            totalCount={events.length}
+            unlabeledCount={Labels.countUnlabeled(events)}
+            selected={this.props.labels}
+            allSelected={this.props.allLabels}
+            unlabeledSelected={this.props.unlabeled}
+            showUnlabeled={true}
+            updateFn={(x) => updateRoute(_.extend({}, this.props, {
+              allLabels: x.all,
+              unlabeled: x.unlabeled,
+              labels: x.all ? [] : x.labels
+            }) as FilterListProps)} />
+          {
+            !this.props.allLabels ?
+            <span className="esper-clear-action" onClick={
+              () => updateRoute(_.extend({}, this.props, {
+                allLabels: true,
+                unlabeled: true,
+                labels: []
+              }) as FilterListProps)
+            }>
+              <i className="fa fa-fw fa-times" />
+            </span> :
+            null
+          }
+        </div>
       </div>;
     }
 
     renderFilterStr() {
       return <div className="col-sm-6 form-group">
-        <div className="input-group">
-          <span className="input-group-addon">
-            <i className="fa fa-fw fa-search" />
-          </span>
-          <input type="text" className="form-control"
-            placeholder="Search Title"
-            defaultValue={this.props.filterStr || null}
-            onKeyUp={(e) => updateRoute(_.extend({}, this.props, {
-              filterStr: (e.target as HTMLInputElement).value
-            }) as FilterListProps, { delay: 500, replace: true })} />
-        </div>
+        <FilterStr value={this.props.filterStr} onUpdate={(val) => {
+          updateRoute(_.extend({}, this.props, {
+            filterStr: val
+          }) as FilterListProps, { replace: true })
+        }}/>
       </div>;
     }
 
@@ -472,6 +481,69 @@ module Esper.Views {
     isSomeSelected() {
       return this.state.selected.length &&
         !!_.find(this.getFilteredEvents(), (e) => this.isSelected(e));
+    }
+  }
+
+
+  /////////
+
+  interface FilterStrProps {
+    // The "default" or original value
+    value: string;
+    onUpdate: (newValue: string) => void;
+  }
+
+  interface FilterStrState {
+    // The current value in the input
+    value: string;
+  }
+
+  class FilterStr extends Component<FilterStrProps, FilterStrState> {
+    _timeout: number;
+
+    constructor(props: FilterStrProps) {
+      super(props);
+      this.state = { value: this.props.value };
+    }
+
+    render() {
+      return <div className="esper-clearable">
+        <div className="input-group">
+          <span className="input-group-addon">
+            <i className="fa fa-fw fa-search" />
+          </span>
+          <input type="text" className="form-control"
+            placeholder="Search Title"
+            value={this.state.value || null}
+            onChange={
+              (e) => this.onChange((e.target as HTMLInputElement).value)
+            } />
+        </div>
+        {
+          this.state.value ?
+          <span className="esper-clear-action" onClick={() => this.reset()}>
+            <i className="fa fa-fw fa-times" />
+          </span> :
+          null
+        }
+      </div>;
+    }
+
+    onChange(val: string) {
+      this.setState({ value: val });
+      this.setTimeout();
+    }
+
+    setTimeout() {
+      clearTimeout(this._timeout);
+      this._timeout = setTimeout(
+        () => this.props.onUpdate(this.state.value), 500
+      );
+    }
+
+    reset() {
+      this.setState({ value: "" });
+      this.props.onUpdate("");
     }
   }
 }

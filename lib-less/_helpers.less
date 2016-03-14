@@ -6,7 +6,6 @@
 @min-fullscreen-height: 350px;
 @esper-collapse-max-height: 450px;
 
-
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
   out into Marten for reuse with Chrome extension
@@ -153,7 +152,7 @@
       }
 
       .sidebar-content {
-        display: block;       
+        display: block;
         overflow: hidden;
         background: @body-bg;
       }
@@ -506,5 +505,40 @@ flexibility with non-UL elements */
     background: rgba(0, 0, 0, 0.25);
     width: 100%;
     height: 3000px;
+  }
+}
+
+
+/* For positioning an X in the right corner of text boxes to clear input */
+
+.esper-clearable {
+  position: relative;
+
+  div {
+    z-index: 1;
+  }
+
+  .esper-clear-action {
+    display: block;
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    width: @input-height-base;
+    height: @input-height-base;
+    line-height: @input-height-base;
+    margin-right: @grid-gutter-width / 2;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    color: @text-muted;
+
+    &:hover, &:focus {
+      color: @brand-danger;
+    }
+  }
+
+  input[type=text] {
+    padding-right: @input-height-base;
   }
 }
