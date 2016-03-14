@@ -11,47 +11,46 @@
   }
 }
 
-.list-action-menu {
-  .list-action-menu-container {
-    &:after {
-      visibility: hidden;
-      display: block;
-      font-size: 0;
-      content: " ";
-      clear: both;
-      height: 0;
-    }
+.list-filter-msg, .list-action-menu-container {
+  margin: 0 auto;
 
-    margin: 0 auto;
-    @media (min-width: @screen-sm-min) {
-      max-width: @container-sm - @grid-gutter-width;
-    }
+  &:after {
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
+  }
 
-    @media (min-width: @screen-md-min) {
-      max-width: @container-md - @grid-gutter-width;
-    }
+  @media (min-width: @screen-sm-min) {
+    max-width: @container-sm - @grid-gutter-width;
+  }
 
-    @media (min-width: @screen-lg-min) {
-      max-width: @container-lg - @grid-gutter-width;
-    }
+  @media (min-width: @screen-md-min) {
+    max-width: @container-md - @grid-gutter-width;
+  }
 
-    > .action {
-      float: left;
+  @media (min-width: @screen-lg-min) {
+    max-width: @container-lg - @grid-gutter-width;
+  }
+
+  > .action {
+    float: left;
+    padding-right: @padding-large-horizontal;
+
+    &:last-child {
+      padding-right: 0;
+    }
+  }
+
+  > .pull-right {
+    > * {
+      display: inline-block;
       padding-right: @padding-large-horizontal;
 
       &:last-child {
         padding-right: 0;
-      }
-    }
-
-    > .pull-right {
-      > * {
-        display: inline-block;
-        padding-right: @padding-large-horizontal;
-
-        &:last-child {
-          padding-right: 0;
-        }
       }
     }
   }
@@ -59,19 +58,28 @@
   .action {
     cursor: pointer;
   }
+}
 
-  background: @navbar-inverse-bg;
-  color: @navbar-inverse-color;
-  border-color: @navbar-inverse-border;
+.list-filter-msg, .list-action-menu {
   margin: @padding-base-vertical 0;
   padding: @padding-base-vertical @padding-large-horizontal;
   border-radius: @border-radius-base;
 
   @media (max-width: @screen-xs-max) {
-    border-left: 0;
-    border-right: 0;
     border-radius: 0;
   }
+}
+
+.list-filter-msg {
+  border-width: 1px;
+  border-style: solid;
+  border-color: @panel-default-border;
+}
+
+.list-action-menu {
+  background: @navbar-inverse-bg;
+  color: @navbar-inverse-color;
+  border-color: @navbar-inverse-border;
 
   &.pinned {
     position: fixed;

@@ -530,15 +530,18 @@ flexibility with non-UL elements */
     margin-right: @grid-gutter-width / 2;
     vertical-align: middle;
     text-align: center;
-    cursor: pointer;
-    color: @text-muted;
-
-    &:hover, &:focus {
-      color: @brand-danger;
-    }
   }
 
   input[type=text] {
     padding-right: @input-height-base;
+  }
+}
+
+.esper-clear-action {
+  cursor: pointer;
+  color: @text-muted;
+
+  &:hover, &:focus {
+    color: @brand-danger;
   }
 }

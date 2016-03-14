@@ -110,6 +110,8 @@ module Esper.Views {
             { this.renderFilterStr() }
           </div>
         </div>
+        { this.renderActionMenu() }
+        { this.renderFilterMsg() }
         { this.renderMain() }
       </div>;
     }
@@ -191,6 +193,25 @@ module Esper.Views {
             filterStr: val
           }) as FilterListProps, { replace: true })
         }}/>
+      </div>;
+    }
+
+    renderFilterMsg() {
+      var numFilteredEvents = this.getFilteredEvents().length;
+      var numTotalEvents = this.getEvents().length;
+      if (numTotalEvents === numFilteredEvents) {
+        return;
+      }
+
+      return <div className="list-filter-msg">
+        <span className="muted">
+          {numTotalEvents - numFilteredEvents} Events Not Shown
+        </span>
+        <span className="pull-right action esper-clear-action" onClick={
+          () => this.resetFilters()
+        }>
+          <i className="fa fa-times" />
+        </span>
       </div>;
     }
 
@@ -276,6 +297,15 @@ module Esper.Views {
       return events;
     }
 
+    resetFilters() {
+      updateRoute(_.extend({}, this.props, {
+        allLabels: true,
+        unlabeled: true,
+        filterStr: null,
+        labels: []
+      }) as FilterListProps);
+    }
+
     refreshEvents() {
       _.each(this.props.calendars, (c) =>
         Events.fetch(c.teamId, c.calId, this.props.start, this.props.end, true)
@@ -304,7 +334,6 @@ module Esper.Views {
       var sortedKeys = _.sortBy(_.keys(groupByDays), (k) => parseInt(k));
 
       return <div>
-        { this.renderActionMenu() }
         {
           _.map(sortedKeys, (k) =>
             this.renderDay(parseInt(k), groupByDays[k])
@@ -542,8 +571,14 @@ module Esper.Views {
     }
 
     reset() {
-      this.setState({ value: "" });
-      this.props.onUpdate("");
+      clearTimeout(this._timeout);
+      this.setState({ value: null });
+      this.props.onUpdate(null);
+    }
+
+    componentWillReceiveProps(nextProps: FilterStrProps) {
+      clearTimeout(this._timeout);
+      this.setState({value: nextProps.value});
     }
   }
 }
