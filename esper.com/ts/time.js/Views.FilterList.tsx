@@ -261,7 +261,7 @@ module Esper.Views {
     getStats() {
       var events = this.state.selected;
       if (! events.length) {
-        events = this.getFilteredEvents();
+        return;
       }
       var duration = TimeStats.aggregateDuration(events);
 
