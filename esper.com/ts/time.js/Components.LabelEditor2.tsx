@@ -11,12 +11,11 @@
 /// <reference path="./Events.ts" />
 /// <reference path="./EventLabelChange.ts" />
 /// <reference path="./Teams.ts" />
-/// <reference path="./Components.EventDetails.tsx" />
+/// <reference path="./Components.EventEditor.tsx" />
 /// <reference path="./Views.LabelManage.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
-
 
   //////
 
@@ -24,45 +23,81 @@ module Esper.Components {
     eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
     onDone?: () => void;
-    showDescription?: boolean;
+    doneText?: string;
   }
 
-  export function LabelEditor2(props: LabelEditorProps) {
-    var events = _.map(props.eventPairs, (e) => e[0]);
-    var teams = _.map(props.teamPairs, (t) => t[0]);
-    var metadata = _.map(props.eventPairs, (e) => e[1])
-      .concat(_.map(props.teamPairs, (t) => t[1]));
+  export class LabelEditor2 extends Component<LabelEditorProps, {
+    // Did labels change in between props? Set in componentWillReceiveProps
+    labelsChanged?: boolean;
+  }> {
+    constructor(props: LabelEditorProps) {
+      super(props);
+      this.state = {};
+    }
 
-    var error = !!_.find(metadata, (m) =>
-      m.dataStatus === Model.DataStatus.PUSH_ERROR ||
-      m.dataStatus === Model.DataStatus.FETCH_ERROR
-    );
+    componentWillReceiveProps(newProps: LabelEditorProps) {
+      // Events changed => not a label change
+      var oldIds = _.map(this.props.eventPairs, (p) =>
+        [p[0].calendar_id, p[0].teamId, p[0].id]
+      );
+      var newIds = _.map(newProps.eventPairs, (p) =>
+        [p[0].calendar_id, p[0].teamId, p[0].id]
+      );
+      if (! _.isEqual(oldIds, newIds)) {
+        this.setState({ labelsChanged: false });
+        return;
+      }
 
-    var busy = !!_.find(metadata, (m) =>
-      m.dataStatus === Model.DataStatus.INFLIGHT
-    );
-    var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
+      // Check if labels changed
+      var oldLabels = _.map(this.props.eventPairs, (p) =>
+        p[0].labels_norm
+      );
+      var newLabels = _.map(newProps.eventPairs, (p) =>
+        p[0].labels_norm
+      );
+      if (!_.isEqual(oldLabels, newLabels)) {
+        this.setState({ labelsChanged: true });
+      }
+    }
 
-    // NB: Use cancel button instead of OK button because purpose of button
-    // is just to close panel, not do anything
-    return <ModalPanel busy={busy} error={error} busyText={busyText}
-                       onCancel={props.onDone} cancelText="Close"
-                       className="esper-panel-section">
-      { props.showDescription && events.length === 1 ?
-        <EventDetails event={events[0]} /> : null }
-      <div className="esper-panel-section">
-        <LabelInput events={events} />
-        <LabelList events={events} teams={teams} />
-        <div className="esper-select-menu">
-          <div className="divider" />
-          <a className="esper-selectable" target="_blank"
-             onClick={renderManageLabels}>
-          <i className="fa fa-fw fa-bars"></i>
-          {" "}Manage Labels
-          </a>
+    render() {
+      var props = this.props;
+      var events = _.map(props.eventPairs, (e) => e[0]);
+      var teams = _.map(props.teamPairs, (t) => t[0]);
+      var metadata = _.map(props.eventPairs, (e) => e[1])
+        .concat(_.map(props.teamPairs, (t) => t[1]));
+
+      var error = !!_.find(metadata, (m) =>
+        m.dataStatus === Model.DataStatus.PUSH_ERROR ||
+        m.dataStatus === Model.DataStatus.FETCH_ERROR
+      );
+
+      var busy = !!_.find(metadata, (m) =>
+        m.dataStatus === Model.DataStatus.INFLIGHT
+      );
+      var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
+
+      var success = !busy && this.state.labelsChanged;
+
+      // NB: Use cancel button instead of OK button because purpose of button
+      // is just to close panel, not do anything
+      return <ModalPanel busy={busy} error={error} busyText={busyText}
+              onCancel={props.onDone} cancelText={props.doneText || "Close"}
+              success={success} className="esper-panel-section">
+        <div className="esper-panel-section">
+          <LabelInput events={events} />
+          <LabelList events={events} teams={teams} />
+          <div className="esper-select-menu">
+            <div className="divider" />
+            <a className="esper-selectable" target="_blank"
+               onClick={renderManageLabels}>
+            <i className="fa fa-fw fa-bars"></i>
+            {" "}Manage Labels
+            </a>
+          </div>
         </div>
-      </div>
-    </ModalPanel>
+      </ModalPanel>
+    }
   }
 
   function renderManageLabels() {
@@ -83,7 +118,7 @@ module Esper.Components {
           New Labels (Separate by Commas)
         </label>
         <div className="input-group">
-          <input type="text" className="form-control esper-modal-focus"
+          <input type="text" className="form-control"
                  id={this.getId("new-labels")} ref={(c) => this._input = c}
                  onKeyDown={this.inputKeydown.bind(this)}
                  placeholder={
@@ -183,24 +218,5 @@ module Esper.Components {
       <i style={iconStyle} className={"fa fa-fw " + icon} />{" "}
       {props.label.displayAs}
     </a>;
-  }
-
-
-  /////
-
-  export class LabelEditorModal extends Component<LabelEditorProps, {}> {
-    render() {
-      var heading = (this.props.eventPairs.length === 1 ?
-        this.props.eventPairs[0][0].title || "1 Event Selected":
-        this.props.eventPairs.length + " Events Selected"
-      );
-
-      return <Modal icon="fa-calendar-o" title={heading}>
-        <LabelEditor2 eventPairs={this.props.eventPairs}
-                      teamPairs={this.props.teamPairs}
-                      showDescription={this.props.showDescription}
-                      onDone={() => Layout.closeModal()} />
-      </Modal>;
-    }
   }
 }

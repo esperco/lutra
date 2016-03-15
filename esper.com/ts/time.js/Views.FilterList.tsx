@@ -6,7 +6,7 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.LabelSelector.tsx" />
-/// <refernece path="./Components.LabelEditor2.tsx" />
+/// <refernece path="./Components.EventEditor.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Actions.FilterList.tsx" />
 
@@ -362,7 +362,8 @@ module Esper.Views {
           }
         </div>
         <div className="event-content">
-          <div className="title esper-link"
+          <div className={"title esper-link" +
+                 (event.feedback.attended === false ? " no-attend" : "")}
                onClick={() => this.editEvent(event)}>
             {event.title}
           </div>
@@ -378,6 +379,12 @@ module Esper.Views {
               </span> :
               null
             }
+          </div>
+          <div className="event-rating">
+            { _.times((event.feedback.attended !== false &&
+                       event.feedback.rating) || 0, (i) =>
+              <i key={i.toString()} className="fa fa-fw fa-star" />
+            )}
           </div>
           <div className="event-labels">
             { _.map(event.labels_norm,
@@ -466,9 +473,8 @@ module Esper.Views {
             some: (m) => [t, m]
           }));
 
-      return <Components.LabelEditorModal eventPairs={eventPairs}
-                                          teamPairs={teamPairs}
-                                          showDescription={true} />;
+      return <Components.EventEditorModal eventPairs={eventPairs}
+                                          teamPairs={teamPairs} />;
     }
 
     toggleEvent(event: Events.TeamEvent) {
@@ -579,6 +585,11 @@ module Esper.Views {
     componentWillReceiveProps(nextProps: FilterStrProps) {
       clearTimeout(this._timeout);
       this.setState({value: nextProps.value});
+    }
+
+    componentWillUnmount(){
+      super.componentWillUnmount();
+      clearTimeout(this._timeout);
     }
   }
 }
