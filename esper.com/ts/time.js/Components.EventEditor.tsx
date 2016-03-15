@@ -140,7 +140,7 @@ module Esper.Components {
 
     renderRating(event: Events.TeamEvent) {
       return <div className="row">
-        <div className="col-sm-8 form-group">
+        <div className="col-sm-8 form-group event-star-ratings">
           <StarRating
             value={(event.feedback.attended && event.feedback.rating) || 0}
             onChange={(i) => this.submitStarRating(i)} />
