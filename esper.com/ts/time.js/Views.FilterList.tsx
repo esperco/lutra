@@ -6,7 +6,7 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.LabelSelector.tsx" />
-/// <refernece path="./Components.LabelEditor2.tsx" />
+/// <refernece path="./Components.EventEditor.tsx" />
 /// <reference path="./Events.ts" />
 /// <reference path="./Actions.FilterList.tsx" />
 
@@ -466,9 +466,8 @@ module Esper.Views {
             some: (m) => [t, m]
           }));
 
-      return <Components.LabelEditorModal eventPairs={eventPairs}
-                                          teamPairs={teamPairs}
-                                          showDescription={true} />;
+      return <Components.EventEditorModal eventPairs={eventPairs}
+                                          teamPairs={teamPairs} />;
     }
 
     toggleEvent(event: Events.TeamEvent) {
@@ -579,6 +578,11 @@ module Esper.Views {
     componentWillReceiveProps(nextProps: FilterStrProps) {
       clearTimeout(this._timeout);
       this.setState({value: nextProps.value});
+    }
+
+    componentWillUnmount(){
+      super.componentWillUnmount();
+      clearTimeout(this._timeout);
     }
   }
 }
