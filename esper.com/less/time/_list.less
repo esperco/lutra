@@ -139,6 +139,12 @@
         border-right: 0;
       }
 
+      .event-rating {
+        display: inline-block;
+        color: @text-muted;
+        float: right;
+      }
+
       .title {
         @media (min-width: @screen-sm-min) {
           display: inline-block;
@@ -148,6 +154,10 @@
         &:hover, &:focus {
           color: @link-hover-color;
           text-decoration: underline;
+        }
+
+        &.no-attend {
+          text-decoration: line-through;
         }
       }
     }
@@ -169,6 +179,7 @@
     font-size: @font-size-small;
     white-space: nowrap;
     display: inline-block;
+    margin-right: @padding-small-horizontal;
   }
 
   .location {

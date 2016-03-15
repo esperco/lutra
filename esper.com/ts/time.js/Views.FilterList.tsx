@@ -362,7 +362,8 @@ module Esper.Views {
           }
         </div>
         <div className="event-content">
-          <div className="title esper-link"
+          <div className={"title esper-link" +
+                 (event.feedback.attended === false ? " no-attend" : "")}
                onClick={() => this.editEvent(event)}>
             {event.title}
           </div>
@@ -378,6 +379,12 @@ module Esper.Views {
               </span> :
               null
             }
+          </div>
+          <div className="event-rating">
+            { _.times((event.feedback.attended !== false &&
+                       event.feedback.rating) || 0, (i) =>
+              <i key={i.toString()} className="fa fa-fw fa-star" />
+            )}
           </div>
           <div className="event-labels">
             { _.map(event.labels_norm,
