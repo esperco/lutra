@@ -5,10 +5,12 @@
 
 module Esper.Actions {
 
-  export function NotificationSettings(msg?: string) {
+  export function renderNotificationSettings(msg?: string) {
     Calendars.loadAllCalendars({});
     ApiC.getAllPreferences();
-    return <Views.NotificationSettings message={msg} />;
+
+    render(<Views.NotificationSettings message={msg} />);
+    Analytics.page(Analytics.Page.NotificationSettings);
   }
 
 }

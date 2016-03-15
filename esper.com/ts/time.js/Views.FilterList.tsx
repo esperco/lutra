@@ -37,7 +37,7 @@ module Esper.Views {
   }
 
   function updateRoute(props: FilterListProps, opts?: Route.nav.Opts) {
-    var flQS: Actions.FilterListQS = {
+    var flQS: Actions.EventFilterJSON = {
       cals: _.map(props.calendars, (c) => ({
         teamId: c.teamId,
         calId: c.calId

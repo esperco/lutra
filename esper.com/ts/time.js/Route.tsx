@@ -1,36 +1,24 @@
 /// <reference path="../common/Analytics.Web.ts" />
-/// <reference path="../common/Layout.tsx" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Route.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Onboarding.ts" />
+/// <reference path="./Actions.tsx" />
 /// <reference path="./Views.Index.tsx" />
 /// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoadError.tsx" />
-/// <reference path="./Views.Header.tsx" />
-/// <reference path="./Views.Footer.tsx" />
 /// <reference path="./Actions.CalendarSetup.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
 /// <reference path="./Actions.NotificationSettings.tsx" />
 
 module Esper.Route {
 
-  // Set defaults for header and footer render
-  function render(main: React.ReactElement<any>,
-                  header?: React.ReactElement<any>,
-                  footer?: React.ReactElement<any>) {
-    if (header !== null) { // Null => intentionally blank
-      header = header || <Views.Header />;
-    }
-    if (footer !== null) {
-      footer = footer || <Views.Footer />;
-    }
-    Layout.render(main, header, footer);
-  }
+  // Shortcut for simple routes
+  var render = Actions.render;
 
   // Helper to check default team created and calendars loaded
   var checkTeamAndCalendars: PageJS.Callback = function(ctx, next) {
@@ -93,8 +81,7 @@ module Esper.Route {
   // Notification settings page
   route("/notification-settings", checkOnboarding, function(ctx) {
     var msg = Util.getParamByName("msg", ctx.querystring);
-    render(Actions.NotificationSettings(msg));
-    Analytics.page(Analytics.Page.NotificationSettings);
+    Actions.renderNotificationSettings(msg);
   });
 
   // Alias for old references to calendar-settings
@@ -106,10 +93,7 @@ module Esper.Route {
 
   // Page for setting up initial teams and calendars
   route("/calendar-setup/:teamid?", checkTeamAndCalendars, function(ctx) {
-    render(Actions.CalendarSetup(ctx.params["teamid"]));
-    Analytics.page(Analytics.Page.CalendarSetup, {
-      teamId: ctx.params["teamid"]
-    });
+    Actions.renderCalendarSetup(ctx.params["teamid"]);
   });
 
   // Event feedback landing page
@@ -120,29 +104,16 @@ module Esper.Route {
          .../time#!/...?{ctx.querystring}
        so we need an explicit url-decoding here for the '&' separators.
      */
-    var teamId  = Util.getParamByName("team",   q);
-    var calId   = Util.getParamByName("cal",    q);
-    var eventId = Util.getParamByName("event",  q);
-    var action  = Util.getParamByName("action", q);
-
-    Events.fetch1(teamId, calId, eventId).then((event: Events.TeamEvent) => {
-      Api.postEventFeedbackAction(teamId, eventId, action)
-      .then((feedback: ApiT.EventFeedback) => {
-        var newEvent = _.cloneDeep(event);
-        newEvent.feedback = feedback;
-        Events.EventStore.set(Events.storeId(event), newEvent);
-      });
-    });
-    render(<Views.EventView teamId={teamId} calId={calId} eventId={eventId} />);
-    Analytics.page(Analytics.Page.EventFeedback, {
-      teamId: teamId,
-      calId: calId,
-      eventId: eventId
+    Actions.renderEvent({
+      teamId  : Util.getParamByName("team",   q),
+      calId   : Util.getParamByName("cal",    q),
+      eventId : Util.getParamByName("event",  q),
+      action  : Util.getParamByName("action", q)
     });
   });
 
   route("/list", checkOnboarding, function(ctx) {
-    render(Actions.FilterList(getJSONQuery(ctx)));
+    Actions.renderFilterList(getJSONQuery(ctx));
   });
 
   // 404 page

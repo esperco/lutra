@@ -10,60 +10,14 @@
 module Esper.Actions {
 
   /* List action => render a list of events */
-
-  /*
-    Interface for query params expected by filter route after being parsed
-    as JSON. No guarantee that user input respects typing, so handling code
-    should be robust.
-  */
-  export interface FilterListQS {
-    cals?: {
-      teamId: string;
-      calId: string
-    }[];
-    start?: number; // UTC time
-    end?: number;   // UTC time
-    labels?: string[];
-    unlabeled?: boolean;
-    allLabels?: boolean;
-    filterStr?: string;
-  }
-
-  export function FilterList(params?: FilterListQS) {
-    params = params || {};
-
-    var cals: Calendars.CalSelection[] = [];
-    _.each(params.cals, (c) => {
-      if (_.isString(c.teamId) && _.isString(c.calId)) {
-        cals.push(c);
-      }
-    });
-    if (! cals.length) {
-      Option.cast(Calendars.defaultSelection()).match({
-        none: () => null,
-        some: (d) => cals.push(d)
-      });
-    }
-
-    var period = (() => {
-      var duration = params.end - params.start;
-      if (isNaN(duration) || duration <= 0 ||
-          duration > 1000 * 60 * 60 * 24 * 32) {
-        return {
-          start: moment().startOf('month').toDate(),
-          end: moment().endOf('month').toDate()
-        };
-      } else {
-        return {
-          start: new Date(params.start),
-          end: new Date(params.end)
-        }
-      }
-    })();
+  export function renderFilterList(params?: EventFilterJSON) {
+    params = cleanEventFilterQuery(params);
+    var start = new Date(params.start);
+    var end = new Date(params.end);
 
     // Trigger async load
-    _.each(cals, (c) =>
-      Events.fetch(c.teamId, c.calId, period.start, period.end)
+    _.each(params.cals, (c) =>
+      Events.fetch(c.teamId, c.calId, start, end)
     );
 
     var labels = _.filter(params.labels, (l) => _.isString(l));
@@ -80,29 +34,29 @@ module Esper.Actions {
     }
 
     var filterStr = params.filterStr || "";
+    render(<Views.FilterList
+      calendars={params.cals}
+      start={start}
+      end={end}
+      filterStr={filterStr}
+      labels={labels}
+      unlabeled={unlabled}
+      allLabels={allLabels}
+    />);
 
-    var duration = moment.duration(period.end.getTime() -
-                                   period.start.getTime()).humanize();
-    var start = moment(period.start).fromNow();
+    /////
+
+    var duration = moment.duration(end.getTime() - start.getTime()).humanize();
+    var startStr = moment(start).fromNow();
     Analytics.page(Analytics.Page.EventList, {
-      calendars: cals.length,
+      calendars: params.cals.length,
       allLabels: allLabels,
       unlabeled: unlabled,
       numLabels: labels.length,
       filterStr: filterStr,
       periodLength: duration,
-      start: start
+      start: startStr
     });
-
-    return <Views.FilterList
-      calendars={cals}
-      start={period.start}
-      end={period.end}
-      filterStr={filterStr}
-      labels={labels}
-      unlabeled={unlabled}
-      allLabels={allLabels}
-    />;
   }
 
 }

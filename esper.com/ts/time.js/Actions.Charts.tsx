@@ -5,6 +5,7 @@
 
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Layout.tsx" />
+/// <refernece path="./Actions" />
 /// <reference path="./Views.Charts.tsx" />
 
 module Esper.Actions {
