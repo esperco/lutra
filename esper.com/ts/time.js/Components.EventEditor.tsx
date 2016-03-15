@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../common/Components.StarRating.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 
 module Esper.Components {
@@ -127,13 +128,32 @@ module Esper.Components {
       return <Components.ModalPanel busy={busy} error={error} success={success}
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
           className="event-notes esper-panel-section">
-        <label htmlFor={this.getId("notes")}>Post-Meeting Notes</label>
+        <label htmlFor={this.getId("notes")}>Post-Meeting Feedback</label>
+        { this.renderRating(event) }
         <textarea id={this.getId("notes")} placeholder="Notes"
           ref={(ref) => this.inputNotes = ref}
           className="form-control" value={this.state.notes}
           onChange={(e) => this.notesChange(e)}
         />
       </Components.ModalPanel>;
+    }
+
+    renderRating(event: Events.TeamEvent) {
+      return <div className="row">
+        <div className="col-sm-8 form-group">
+          <StarRating
+            value={(event.feedback.attended && event.feedback.rating) || 0}
+            onChange={(i) => this.submitStarRating(i)} />
+        </div>
+        <div className="col-sm-4 form-group">
+          <button className={"form-control btn btn-default" +
+                    (event.feedback.attended ? "" : " active")}
+                  onClick={() => this.toggleAttended()}>
+            <i className="fa fa-fw fa-ban" />{" "}
+            Didn't Attend
+          </button>
+        </div>
+      </div>;
     }
 
     notesChange(e: React.FormEvent) {
@@ -152,6 +172,21 @@ module Esper.Components {
         }) as ApiT.EventFeedback;
         this.submitFeedback(feedback);
       }
+    }
+
+    toggleAttended() {
+      var event = this.props.eventPair[0];
+      this.submitFeedback(_.extend({}, event.feedback, {
+        attended: !event.feedback.attended
+      }) as ApiT.EventFeedback);
+    }
+
+    submitStarRating(rating: number) {
+      var event = this.props.eventPair[0];
+      this.submitFeedback(_.extend({}, event.feedback, {
+        rating: rating,
+        attended: true
+      }) as ApiT.EventFeedback);
     }
 
     submitFeedback(feedback: ApiT.EventFeedback) {
