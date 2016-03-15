@@ -93,7 +93,7 @@ module Esper.Components {
         }
       });
       this.jQuery().on('shown.bs.modal', () => {
-        this.find('.esper-modal-focus').focus();
+        this.find('.esper-modal-focus:first').focus();
       });
     }
 

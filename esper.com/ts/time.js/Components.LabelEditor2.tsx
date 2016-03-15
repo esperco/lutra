@@ -118,7 +118,7 @@ module Esper.Components {
           New Labels (Separate by Commas)
         </label>
         <div className="input-group">
-          <input type="text" className="form-control esper-modal-focus"
+          <input type="text" className="form-control"
                  id={this.getId("new-labels")} ref={(c) => this._input = c}
                  onKeyDown={this.inputKeydown.bind(this)}
                  placeholder={
