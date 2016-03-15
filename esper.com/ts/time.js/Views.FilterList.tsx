@@ -388,14 +388,14 @@ module Esper.Views {
           </div>
           <div className="event-labels">
             { _.map(event.labels_norm,
-              (l, i) => this.renderLabel(l, event.labels[i])
+              (l, i) => this.renderLabel(event, l, event.labels[i])
             ) }
           </div>
         </div>
       </div>;
     }
 
-    renderLabel(id: string, displayAs: string) {
+    renderLabel(event: Events.TeamEvent, id: string, displayAs: string) {
       var labelColor = Colors.getColorForLabel(id)
       var style = {
         background: labelColor,
@@ -407,12 +407,20 @@ module Esper.Views {
         unlabeled: false,
         allLabels: false
       }) as FilterListProps);
+      var clearLabel = ((e: __React.MouseEvent) => {
+        e.stopPropagation();
+        EventLabelChange.remove([event], displayAs);
+      });
 
       return <span style={style} key={id} className="event-label"
         onClick={onClick}
       >
         <i className="fa fa-fw fa-tag" />{" "}
         {displayAs}
+        <span className="hidden-xs esper-clear-action"
+              onClick={(e) => clearLabel(e)}>{" "}
+          <i className="fa fa-fw fa-times" />
+        </span>
       </span>;
     }
 
