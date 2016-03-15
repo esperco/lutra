@@ -129,6 +129,10 @@ module Esper.Components {
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
           className="event-notes esper-panel-section">
         <label htmlFor={this.getId("notes")}>Post-Meeting Feedback</label>
+        <p className="text-muted">
+          Don't worry! Ratings and notes are NOT shared with other
+          meeting guests.
+        </p>
         { this.renderRating(event) }
         <textarea id={this.getId("notes")} placeholder="Notes"
           ref={(ref) => this.inputNotes = ref}
@@ -147,7 +151,7 @@ module Esper.Components {
         </div>
         <div className="col-sm-4 form-group">
           <button className={"form-control btn btn-default" +
-                    (event.feedback.attended ? "" : " active")}
+                    (event.feedback.attended === false ? " active" : "")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
             Didn't Attend
@@ -177,7 +181,7 @@ module Esper.Components {
     toggleAttended() {
       var event = this.props.eventPair[0];
       this.submitFeedback(_.extend({}, event.feedback, {
-        attended: !event.feedback.attended
+        attended: (event.feedback.attended === false ? true : false)
       }) as ApiT.EventFeedback);
     }
 
