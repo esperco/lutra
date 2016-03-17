@@ -11,7 +11,7 @@ module Esper.Actions {
 
   /* List action => render a list of events */
   export function renderFilterList(params?: EventFilterJSON) {
-    params = cleanEventFilterQuery(params);
+    params = cleanEventFilterJSON(params);
     var start = new Date(params.start);
     var end = new Date(params.end);
 

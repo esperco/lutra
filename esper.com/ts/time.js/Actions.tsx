@@ -47,7 +47,7 @@ module Esper.Actions {
 
     Also sets defaults for missing variables.
   */
-  export function cleanEventFilterQuery(params?: EventFilterJSON) {
+  export function cleanEventFilterJSON(params?: EventFilterJSON) {
     params = params || {};
 
     var cals: Calendars.CalSelection[] = [];

@@ -27,222 +27,30 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Rename module to fix name conflict
-  var ChartsM = Esper.Charts;
+  type ChartType = typeof Esper.Charts.Chart;
+  interface ChartTypeInfo {
+    // Used in URL to identify which chart we're looking at
+    id: string;
 
-  /* State Management */
+    // Display Name
+    displayAs: string;
+    icon: string;
 
-  // Available chart options (map of integer index to class) -- used in
-  // selector down below
-  type ChartType = typeof ChartsM.Chart;
-  export var chartTypes: ChartType[] = _.sortBy([
-    ChartsM.DurationsOverTime,
-    ChartsM.PercentageRecent,
-    ChartsM.PercentageOverTime,
-    ChartsM.ActivityGrid,
-    ChartsM.TopGuests,
-    ChartsM.GuestDomains,
-    ChartsM.DurationHistogram,
-    ChartsM.WorkHoursGrid
-  ], (ct) => ct.displayName);
-
-  // Store for current chart type - store index of class in chartTypes list
-  export var ChartTypeStore = new Model.StoreOne<number>();
-
-  // Action to update our selection -- triggers async calls
-  function updateChartType(val: number|ChartType) {
-    var index: number;
-    var chartType: ChartType;
-    if (typeof val === "number") {
-      index = val;
-      chartType = chartTypes[index];
-    } else {
-      index = _.findIndex(chartTypes, (t) => t === val);
-      chartType = val;
-    }
-    ChartTypeStore.set(index);
-    updateRequestedPeriod(defaultReqForChartType(chartType));
+    // Actual chart Object
+    chartType: ChartType;
   }
 
-  // Action to update our selection -- also triggers async calls
-  function updateCalSelection(selections: Calendars.CalSelection[]) {
-    // Only use first selection for now
-    var selection = selections[0];
-    Calendars.SelectStore.set(selection);
-    updateAsync();
-
-    var current = Calendars.SelectStore.val();
-    if (selection && current) {
-
-      // Clear label selection and colors if switching teams (default)
-      if (current.teamId !== selection.teamId) {
-        ChartsM.LabelSelectStore.unset();
-        Colors.resetColorMaps();
-      }
-
-      // Always clear domains for now
-      ChartsM.DomainSelectStore.unset();
-    }
+  interface Props {
+    currentChart: Esper.Charts.Chart<Esper.Charts.ChartJSON>;
+    chartId: Actions.ChartId;
+    chartTypes: Actions.ChartTypeInfo[];
   }
-
-  // Store for requested time period
-  export var RequestStore = new Model.StoreOne<TimeStats.RequestPeriod>();
-
-  // Action to update time period for stats -- triggers async calls
-  function updateRequestedPeriod(req: TimeStats.RequestPeriod) {
-    RequestStore.set(req);
-    updateAsync();
-  }
-
-  /*
-    Gets a chart based on currently stored state -- returns null if
-    insuffucient data
-  */
-  function getChart(): Charts.Chart {
-    var chartType= ChartTypeStore.val();
-    if (_.isUndefined(chartType) || chartType < 0) return;
-
-    var calendar = Calendars.SelectStore.val();
-    if (_.isUndefined(calendar) || _.isUndefined(calendar.calId)) return;
-
-    var requestPeriod = RequestStore.val();
-    if (!requestPeriod || !requestPeriod.windowStart ||
-        !requestPeriod.windowEnd) return;
-
-    var labelSelection = ChartsM.LabelSelectStore.val();
-    var params: Charts.ChartParams = {
-      windowStart: requestPeriod.windowStart,
-      windowEnd: requestPeriod.windowEnd,
-      calendars: [calendar],
-      interval: requestPeriod.interval,
-      selectedLabels: labelSelection && labelSelection.labels,
-      allLabels: labelSelection && labelSelection.all,
-      unlabeled: labelSelection && labelSelection.unlabeled
-    }
-
-    /*
-      Cast to <any> is necessary because val is subclass of the abstract
-      class Charts.Chart. We want to initiate a new instance of this, but
-      since it's abstract, TypeScript will complain.
-    */
-    var chartCls: any = chartTypes[chartType];
-    if (chartCls) {
-      return new chartCls(params);
-    }
-  }
-
-  // Call from update actions to trigger async actions
-  function updateAsync() {
-    Option.cast(getChart()).match({
-      none: () => null,
-      some: (chart) => {
-        Option.cast(Calendars.SelectStore.val()).match({
-          none: () => null,
-          some: (s) => {
-            if (s.calId) {
-              chart.async();
-            }
-          }
-        })
-      }
-    })
-  }
-
-  function refresh() {
-    TimeStats.StatStore.reset();
-    DailyStats.StatStore.reset();
-    updateAsync();
-  }
-
-  // Called when view is loaded for the first time
-  function setDefaults() {
-    Calendars.setDefault();
-    if (! ChartTypeStore.isSet()) {
-      var selection = Calendars.SelectStore.val();
-      if (selection) {
-        var team = Teams.get(selection.teamId);
-      }
-      var chartType = ((): typeof ChartsM.Chart => {
-        if (AB.get(AB.TOP_GUESTS_SPLASH)) {
-          return ChartsM.TopGuests;
-        } else if (AB.get(AB.GUEST_DOMAINS_SPLASH)) {
-          return ChartsM.GuestDomains;
-        } else {
-          return ChartsM.DurationsOverTime;
-        }
-      })();
-      updateChartType(chartType);
-    } else {
-      updateAsync();
-    }
-  }
-
-  function defaultReqForChartType(chartType: ChartType)
-    : TimeStats.RequestPeriod
-  {
-    // Autocharts, always one month
-    if (chartType.prototype instanceof ChartsM.AutoChart) {
-      return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
-    }
-
-    switch (chartType) {
-      case ChartsM.PercentageRecent:
-        return TimeStats.intervalCountRequest(1, TimeStats.Interval.MONTHLY);
-      default:
-        return TimeStats.intervalCountRequest(5, TimeStats.Interval.WEEKLY);
-    }
-  }
-
-
-  /* Analytics */
-
-  var currentChart: Charts.Chart;
-  var currentTimer: number;
-
-  function trackView(chart: Charts.Chart) {
-    // Cancel existing request
-    if (currentTimer) { clearTimeout(currentTimer); }
-    currentChart = chart;
-
-    // Weed out incomplete views
-    if (chart) {
-
-      // Calculate start time relative to today
-      var now = moment();
-      var params = chart.params;
-      var relStart = moment(params.windowStart).diff(now, 'days');
-      var relEnd = moment(params.windowEnd).diff(now, 'days');
-
-      // Set timeout to post Analytics tracking call after 3 seconds, but only
-      // if we're still looking at the same view
-      currentTimer = setTimeout(function() {
-        if (_.isEqual(currentChart.params, chart.params)) {
-          Analytics.track(Analytics.Trackable.ViewTimeStats, _.extend({
-            labelCount: (params.selectedLabels || []).length,
-            periodLength: relEnd - relStart
-          }, chart.params));
-        }
-      }, 3000);
-    }
-  }
-
 
   /* React Views */
 
-  export class Charts extends Component<{}, {}> {
-    constructor(props: {}) {
-      setDefaults();
-      super(props);
-    }
-
+  export class Charts extends Component<Props, {}> {
     renderWithData() {
-      var chart = getChart();
-      trackView(chart);
-
-      var cal = Calendars.SelectStore.val() || {
-        teamId: null, calId: null
-      };
-
+      var chart = this.props.currentChart;
       var teams = Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
@@ -265,8 +73,8 @@ module Esper.Views {
               id={this.getId("cal-select")}
               teams={teams}
               calendarsByTeamId={calendarsByTeamId}
-              selected={[cal]}
-              updateFn={updateCalSelection}
+              selected={chart.params.cals}
+              updateFn={(c) => this.updateCalSelection(c)}
             />
           </div>
           { chart ? chart.renderSelectors() : null }
@@ -274,7 +82,7 @@ module Esper.Views {
         <div className="esper-right-content padded">
           <div className="esper-header fixed row clearfix">
             <div className="col-xs-8 col-sm-4">
-              { this.renderChartSelector(chart) }
+              { this.renderChartSelector() }
             </div>
             <div className="col-xs-4 col-sm-2 clearfix">
               <div className="pull-left">
@@ -285,42 +93,37 @@ module Esper.Views {
               </div>
               <div className="pull-right">
                 <button className="btn btn-default"
-                        onClick={refresh}>
+                        onClick={() => this.refresh()}>
                   <i className="fa fa-fw fa-refresh" title="refresh" />
                 </button>
               </div>
             </div>
             <div className="col-xs-12 col-sm-6">
-              { chart ? this.renderPeriodSelector(chart) : null }
+              { chart ? this.renderPeriodSelector() : null }
             </div>
           </div>
-          { this.renderChartCheck(chart) }
+          { this.renderChartCheck() }
         </div>
       </div>;
     }
 
-    renderChartSelector(chart: Charts.Chart) {
-      var selected = Option.wrap(
-        _.find(chartTypes, (c) => chart instanceof c)
-      ).match({
-        none: () => chartTypes[0],
-        some: (s) => s
-      });
+    renderChartSelector() {
+      var selected = this.getCurrentChartInfo();
       return (
         <Components.DropdownModal>
           <input type="text" className="form-control dropdown-toggle"
                  readOnly={true}
-                 value={ selected.displayName } />
+                 value={ selected.displayAs } />
           <ul className="dropdown-menu">
             {
-              _.map(chartTypes, (c, i) =>
-                <li key={i} onClick={() => updateChartType(i)}>
+              _.map(this.props.chartTypes, (c, i) =>
+                <li key={i} onClick={() => this.updateChartType(c.id)}>
                   <a>
                     { c.icon ? <span>
                         <span className={"fa fa-fw " + c.icon} />{" "}
                       </span> : null
                     }
-                    { c.displayName }
+                    { c.displayAs }
                   </a>
                 </li>
               )
@@ -329,36 +132,20 @@ module Esper.Views {
         </Components.DropdownModal>);
     }
 
-    renderPeriodSelector(chart: Charts.Chart) {
-      return chart.renderPeriodSelector(updateRequestedPeriod);
+    renderPeriodSelector() {
+      return this.props.currentChart.renderPeriodSelector();
     }
 
     /*
       Render any messages as appropriate in lieu of displaying chart, else
       display chart
     */
-    renderChartCheck(chart: Charts.Chart) {
+    renderChartCheck() {
+      var chart = this.props.currentChart;
       if (! chart) {
-        var calendar = Calendars.SelectStore.val();
-        if (!calendar || !calendar.calId) {
-          return this.renderMessage(<span>
-            <i className="fa fa-fw fa-calendar"></i>{" "}
-            Please select a calendar
-          </span>);
-        }
-
-        var requestPeriod = RequestStore.val();
-        if (!requestPeriod || !requestPeriod.windowStart ||
-            !requestPeriod.windowEnd) {
-          return this.renderMessage(<span>
-            <i className="fa fa-fw fa-calendar"></i>{" "}
-            Please select a proper time period.
-          </span>);
-        };
-
         return this.renderMessage(<span>
-          <i className="fa fa-fw fa-bar-chart"></i>{" "}
-          Please select a chart type
+          <i className="fa fa-fw fa-calendar"></i>{" "}
+          Please select a calendar.
         </span>);
       }
 
@@ -390,6 +177,62 @@ module Esper.Views {
           </div>
         </div>
       </div>;
+    }
+
+
+    /* Helpers */
+
+    getCurrentChartInfo() {
+      return Option.wrap(
+        _.find(this.props.chartTypes,
+          (ct) => this.props.chartId === ct.id
+        )
+      ).match({
+        none: () => this.props.chartTypes[0],
+        some: (info) => info
+      });
+    }
+
+
+    /* Actions */
+
+    refresh() {
+      TimeStats.StatStore.reset();
+      DailyStats.StatStore.reset();
+      Route.nav.refresh();
+    }
+
+    updateRoute<T extends Esper.Charts.ChartJSON>(
+      {chartTypeId, props, opts}: {
+        chartTypeId?: string;
+        props?: T;
+        opts?: Route.nav.Opts;
+      })
+    {
+      chartTypeId = chartTypeId || this.getCurrentChartInfo().id;
+      var frag = "/charts/" + chartTypeId;
+
+      opts = opts || {};
+      opts.jsonQuery = props;
+      Route.nav.path(frag, opts);
+    }
+
+    updateChartType(val: string) {
+      this.updateRoute({ chartTypeId: val });
+    }
+
+    updateCalSelection(selections: Calendars.CalSelection[]) {
+      this.updateRoute({
+        props: this.extendCurrentProps({
+          cals: selections
+        })
+      });
+    }
+
+    extendCurrentProps(newParams: Esper.Charts.ChartJSON)
+      : Esper.Charts.ChartJSON
+    {
+      return _.extend({}, this.props.currentChart.params, newParams);
     }
   }
 }

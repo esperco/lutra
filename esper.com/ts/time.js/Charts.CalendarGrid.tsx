@@ -9,13 +9,10 @@ module Esper.Charts {
   /*
     Base class for calendar grid-style Autochart
   */
-  export abstract class CalendarGridChart extends AutoChart {
-    static displayName = "Calendar Grid";
-    static icon = "fa-calendar";
-
+  export abstract class CalendarGridChart extends AutoChart<Charts.ChartJSON> {
     renderChart() {
       return <Components.CalendarGrid
-        date={this.params.windowStart}
+        date={new Date(this.params.start)}
         dayFn={this.dayFn.bind(this)}
       />;
     }
@@ -28,12 +25,11 @@ module Esper.Charts {
     protected abstract dayFn(m: moment.Moment): JSX.Element;
 
     // Use a simple month selector rather than allow custom periods
-    renderPeriodSelector(updateFn: (req: TimeStats.RequestPeriod) => void) {
-      this.params.windowStart
+    renderPeriodSelector() {
       return <Components.MonthSelector
-        windowStart={this.params.windowStart}
-        windowEnd={this.params.windowEnd}
-        updateFn={updateFn}
+        windowStart={new Date(this.params.start)}
+        windowEnd={new Date(this.params.end)}
+        updateFn={(x) => this.updatePeriod(x)}
       />;
     }
   }

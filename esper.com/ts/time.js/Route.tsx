@@ -6,12 +6,12 @@
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./Actions.tsx" />
 /// <reference path="./Views.Index.tsx" />
-/// <reference path="./Views.Charts.tsx" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 /// <reference path="./Views.Event.tsx" />
 /// <reference path="./Views.NotFound.tsx" />
 /// <reference path="./Views.LoadError.tsx" />
 /// <reference path="./Actions.CalendarSetup.tsx" />
+/// <reference path="./Actions.Charts.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
 /// <reference path="./Actions.NotificationSettings.tsx" />
 
@@ -67,9 +67,8 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts", checkOnboarding, function() {
-    render(<Views.Charts />);
-    Analytics.page(Analytics.Page.TimeStatsCharts);
+  route("/charts/:chartType?", checkOnboarding, function(ctx) {
+    Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
   });
 
   // Calendar labeling page

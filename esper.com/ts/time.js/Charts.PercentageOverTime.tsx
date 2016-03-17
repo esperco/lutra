@@ -2,21 +2,17 @@
   Bar chart for showing label percentages over time using split time
 */
 
-/// <reference path="./Charts.LabelChart.tsx" />
+/// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
-  export class PercentageOverTime extends LabelChart {
-    static displayName = "Label Percentage Over Time";
-    static icon = "fa-tasks fa-rotate-270";
-    protected usesIntervals = true;
-
+  export class PercentageOverTime extends DurationsOverTime {
     renderChart() {
       var formatted = TimeStats.formatWindowStarts(
         this.sync()[0].items,
-        this.params.interval);
+        this.params.chartParams.interval);
 
       // Filter to include only user-selected labels
       var results = this.getExclusiveDisplayResults();
