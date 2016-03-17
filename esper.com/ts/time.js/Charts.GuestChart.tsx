@@ -32,6 +32,9 @@ module Esper.Charts {
       if (! _.isBoolean(cleaned.chartParams.allDomains)) {
         cleaned.chartParams.allDomains = true;
       }
+      if (! cleaned.chartParams.domains) {
+        cleaned.chartParams.domains = [];
+      }
       if (! _.every(cleaned.chartParams.domains, (d) => _.isString(d))) {
         cleaned.chartParams.domains = [];
       }
@@ -179,6 +182,7 @@ module Esper.Charts {
         });
       } else {
         this.updateSelections({
+          allDomains: false,
           domains: _.map(selections, (s) => s.id)
         });
       }
@@ -201,9 +205,27 @@ module Esper.Charts {
     }
 
     toggleEmpty() {
-      this.updateSelections({
-        emptyDomain: !this.showEmptyDomain()
-      });
+      var pair = this.sync();
+      var stats = pair && pair[0];
+      if (! stats) { return; }
+      var allDomains = _.map(DailyStats.topGuestDomains(stats),
+        (d) => d.domain
+      );
+      var currentDomains = this.params.chartParams.domains || [];
+
+      if (this.showEmptyDomain()) {
+        this.updateSelections({
+          allDomains: false,
+          emptyDomain: false,
+          domains: (currentDomains.length ? currentDomains : allDomains)
+        });
+      } else {
+        this.updateSelections({
+          allDomains: currentDomains.length === allDomains.length,
+          emptyDomain: true,
+          domains: currentDomains
+        });
+      }
     }
 
     updateSelections(newParams: DomainChartParams) {
@@ -211,7 +233,9 @@ module Esper.Charts {
         this.params.chartParams,
         newParams) as DomainChartParams;
       this.updateRoute({
-        props: this.extendCurrentProps(newParams)
+        props: this.extendCurrentProps({
+          chartParams: newParams
+        })
       });
     }
   }
