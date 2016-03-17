@@ -82,9 +82,21 @@ module Esper.Actions {
 
   /* Analytics */
 
-  // Analytics.page(Analytics.Page.TimeStatsCharts);
+  var analyticsId = "chart-analytics-id";
 
+  function trackChart(variant: ChartVariant) {
+    var params = variant[1].params;
+    var periodLength = (params.end - params.start) / (24 * 60 * 60 * 1000);
 
+    // Delay tracking by 2 seconds to ensure user is actually looking at chart
+    Util.delayOne(analyticsId, function() {
+      Analytics.page(Analytics.Page.TimeStatsCharts, {
+        chartType: variant[0],
+        params: variant[1].params,
+        periodLength: Math.round(periodLength)
+      });
+    }, 2000);
+  }
 
   ///////
 
@@ -103,7 +115,7 @@ module Esper.Actions {
       chartTypes={chartInfo}
     />);
 
-    // TODO: Analytics
+    trackChart(chartVariant);
   }
 
   function getDefaultChartType(): ChartId {
@@ -152,43 +164,4 @@ module Esper.Actions {
         return getChart(chartInfo[0].id, chartJSON);
     }
   }
-
-
-  // /* Analytics */
-
-  // var currentChart: Charts.Chart;
-  // var currentTimer: number;
-
-  // function trackView(chart: Charts.Chart) {
-  //   // Cancel existing request
-  //   if (currentTimer) { clearTimeout(currentTimer); }
-  //   currentChart = chart;
-
-  //   // Weed out incomplete views
-  //   if (chart) {
-
-  //     // Calculate start time relative to today
-  //     var now = moment();
-  //     var params = chart.params;
-  //     var relStart = moment(params.windowStart).diff(now, 'days');
-  //     var relEnd = moment(params.windowEnd).diff(now, 'days');
-
-  //     // Set timeout to post Analytics tracking call after 3 seconds, but only
-  //     // if we're still looking at the same view
-  //     currentTimer = setTimeout(function() {
-  //       if (_.isEqual(currentChart.params, chart.params)) {
-  //         Analytics.track(Analytics.Trackable.ViewTimeStats, _.extend({
-  //           labelCount: (params.selectedLabels || []).length,
-  //           periodLength: relEnd - relStart
-  //         }, chart.params));
-  //       }
-  //     }, 3000);
-  //   }
-  // }
-
-
-
-
-
-
 }
