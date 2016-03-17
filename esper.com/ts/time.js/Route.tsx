@@ -45,6 +45,30 @@ module Esper.Route {
     });
   }
 
+  // Helper to default to the last selected team / calendar selection
+  var rememberCal: PageJS.Callback = function(ctx, next) {
+    var filterJSON: Actions.EventFilterJSON = getJSONQuery(ctx) || {};
+
+    // Request has calendars, remember them, then next
+    if (filterJSON.cals && filterJSON.cals.length) {
+      lastCals = filterJSON.cals;
+      next();
+    }
+
+    // Has previously selected calendars, stub into request
+    else if (lastCals.length) {
+      filterJSON.cals = lastCals;
+      console.info("hi");
+      Route.nav.query(filterJSON, {replace: true});
+    }
+
+    // No previously selected calendars, proceed normally
+    else {
+      next();
+    }
+  }
+  var lastCals: Calendars.CalSelection[] = [];
+
 
   ////////
 
@@ -67,12 +91,12 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts/:chartType?", checkOnboarding, function(ctx) {
+  route("/charts/:chartType?", checkOnboarding, rememberCal, function(ctx) {
     Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", checkOnboarding, function(ctx) {
+  route("/calendar-labeling", checkOnboarding, rememberCal, function(ctx) {
     Actions.renderCalendarLabeling(getJSONQuery(ctx));
   });
 
@@ -110,7 +134,7 @@ module Esper.Route {
     });
   });
 
-  route("/list", checkOnboarding, function(ctx) {
+  route("/list", checkOnboarding, rememberCal, function(ctx) {
     Actions.renderFilterList(getJSONQuery(ctx));
   });
 
