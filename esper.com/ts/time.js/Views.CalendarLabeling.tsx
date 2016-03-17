@@ -5,82 +5,32 @@
 /// <refernece path="./Calendars.ts" />
 
 module Esper.Views {
-  // Shorten references to React Component class
-  var Component = ReactHelpers.Component;
-
-  // Store used to trigger force update
-  var calendarLabelUpdateStore = new Model.StoreOne<number>();
-
-  export function forceCalendarLabelingUpdate() {
-    calendarLabelUpdateStore.set(Math.random());
+  interface Props {
+    cals: {
+      teamId: string;
+      calId: string;
+    }[];
   }
 
-
-  // Action to update our selection
-  function updateSelection(selections: Calendars.CalSelection[]) {
-    var current = Calendars.SelectStore.val();
-    var selection = selections[0];
-
-    // Update only if calendar doesn't match (to avoid clobbering events)
-    if (selection && !current ||
-        current.teamId !== selection.teamId ||
-        current.calId !== selection.calId) {
-      selection.events = [];
-      Calendars.SelectStore.set(selection);
-    }
-  }
-
-  function updateEvent(eventId: string, eventTitle: string, add: boolean) {
-    Calendars.SelectStore.set(function(oldData) {
-      var newData = _.cloneDeep(oldData);
-      newData.events = newData.events || [];
-      var selected = _.find(newData.events, (e) => e.id === eventId);
-
-      // Add => cumulative, shift key is down
-      if (add) {
-        if (selected) {
-          newData.events = _.filter(newData.events, (e) => e.id !== eventId);
-        } else {
-          newData.events.push({
-            id: eventId,
-            title: eventTitle
-          });
-        }
-      }
-
-      // Exclusive, select one event only
-      else if (selected) {
-        newData.events = [];
-      } else {
-        newData.events = [{
-          id: eventId,
-          title: eventTitle
-        }];
-      }
-
-      return newData;
-    });
-  }
-
-  function setDefaults() {
-    if (! Calendars.SelectStore.isSet()) {
-      Calendars.SelectStore.set(_.extend({
-        events: []
-      }, Calendars.defaultSelection()) as Calendars.CalSelection);
-    }
-  }
-
-  ////
-
-  export class CalendarLabeling extends Component<{}, {}> {
-    constructor(props: {}) {
-      setDefaults();
+  export class CalendarLabeling extends ReactHelpers.Component<Props, {
+    selected: {
+      teamId: string;
+      calId: string;
+      eventIds: string[];
+    }[]
+  }> {
+    constructor(props: Props) {
       super(props);
+      this.state = {selected: []};
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+      if (! _.isEqual(newProps.cals, this.props.cals)) {
+        this.setState({selected: []});
+      }
     }
 
     renderWithData() {
-      calendarLabelUpdateStore.get();
-      var selectedCal = Calendars.SelectStore.val();
       var teams = Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
@@ -92,7 +42,7 @@ module Esper.Views {
 
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
-        <Components.SidebarWithToggle>    
+        <Components.SidebarWithToggle>
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
@@ -100,8 +50,8 @@ module Esper.Views {
             </label>
             <Components.CalSelectorDropdown
               id={this.getId("cal-select")}
-              selected={selectedCal ? [selectedCal] : []}
-              updateFn={updateSelection}
+              selected={this.props.cals}
+              updateFn={(x) => this.updateCalSelection(x)}
               teams={teams}
               calendarsByTeamId={calendarsByTeamId}
             />
@@ -115,20 +65,27 @@ module Esper.Views {
     }
 
     renderCalendar() {
-      var selectedCal = Calendars.SelectStore.val();
-      if (!selectedCal || !selectedCal.calId) {
+      if (! this.props.cals.length) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-calendar"></i>{" "}
           Please select a calendar
         </span>);
       }
 
+      // Just one cal for now
+      var selectedCal = this.props.cals[0];
+
+      // Get events for selectedCal
+      var selectedEventsForCal = _.find(this.state.selected,
+        (s) => s.calId === selectedCal.calId &&
+               s.teamId === selectedCal.teamId);
+      var eventIds = selectedEventsForCal ? selectedEventsForCal.eventIds : [];
+
       return <Components.Calendar
-        forceUpdate={calendarLabelUpdateStore.val()}
         teamId={selectedCal.teamId}
         calId={selectedCal.calId}
-        eventIds={_.map(selectedCal.events, (e) => e.id)}
-        updateFn={updateEvent}
+        eventIds={eventIds}
+        updateFn={(eventId, add) => this.updateEventSelection(eventId, add)}
       />;
     }
 
@@ -143,20 +100,14 @@ module Esper.Views {
     }
 
     renderLabelEditor() {
-      var selectedCal = Calendars.SelectStore.val();
-      if (selectedCal &&
-          selectedCal.events &&
-          selectedCal.events.length > 0) {
-        var eventPairs = _.filter(_.map(selectedCal.events,
-          (e) => Events.EventStore.get(e.id)
-        ));
-        var teamPairs = _.map(Teams.all(),
-        (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
-          .match<[ApiT.Team, Model.StoreMetadata]>({
-            none: () => null,
-            some: (m) => [t, m]
-          }));
+      var eventPairs = _.filter(_.flatten(
+        _.map(this.state.selected, (s) => _.map(s.eventIds,
+          (eventStoreId) => Events.EventStore.get(eventStoreId)
+        ))
+      ));
 
+      if (eventPairs.length) {
+        var teamPairs = Teams.allPairs();
         var heading = (eventPairs.length === 1 ?
           eventPairs[0][0].title || "1 Event Selected":
           eventPairs.length + " Events Selected"
@@ -192,6 +143,59 @@ module Esper.Views {
           </div>
         </div>;
       }
+    }
+
+
+    /////////
+
+    updateCalSelection(selections: Calendars.CalSelection[]) {
+      Route.nav.query({
+        cals: selections
+      } as Actions.EventFilterJSON);
+    }
+
+    updateEventSelection(eventId: string, add: boolean) {
+      // Only one cal for now -- update if we display multiple
+      var cal = this.props.cals[0];
+
+      var selected = _.cloneDeep(this.state.selected);
+      var selectedCal = _.find(selected, (s) => s.calId === cal.calId &&
+                                                s.teamId === cal.teamId);
+      if (! selectedCal) {
+        selectedCal = {
+          teamId: cal.teamId,
+          calId: cal.calId,
+          eventIds: []
+        };
+        if (add) {
+          selected.push(selectedCal)
+        } else {
+          selected = [selectedCal];
+        }
+      }
+
+      var eventSelected = _.includes(selectedCal.eventIds, eventId);
+
+      // Add => cumulative, shift key is down
+      if (add) {
+        if (eventSelected) {
+          selectedCal.eventIds = _.without(selectedCal.eventIds, eventId);
+        } else {
+          selectedCal.eventIds.push(eventId);
+        }
+      }
+
+      // Exclusive, select one event only
+      else if (eventSelected) {
+        selected = [];
+      } else {
+        selectedCal.eventIds = [eventId];
+      }
+
+      // Set state to trigger display changes
+      this.setState({
+        selected: selected
+      });
     }
   }
 }

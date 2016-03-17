@@ -24,8 +24,7 @@ module Esper.Components {
     teamId: string;
     calId: string;
     eventIds?: string[];
-    forceUpdate?: number; // Random number we can set to force update
-    updateFn: (eventId: string, eventTitle: string, add: boolean) => void;
+    updateFn: (eventStoreId: string, add: boolean) => void;
   }
 
   interface CalendarState {
@@ -259,8 +258,7 @@ module Esper.Components {
     // Handle event selection, toggle
     toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
       var currentlySelected = _.includes(this.props.eventIds || [], event.id);
-      this.props.updateFn(event.id, event.title,
-        jsEvent.shiftKey || jsEvent.ctrlKey);
+      this.props.updateFn(event.id, jsEvent.shiftKey || jsEvent.ctrlKey);
     }
   }
 }

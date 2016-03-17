@@ -30,11 +30,7 @@ module Esper.Views {
   }
 
   function getTeamId() {
-    var selection = Option.cast(Calendars.SelectStore.val());
-    return selection.match({
-      none: Teams.firstId,
-      some: (s) => s.teamId || Teams.firstId()
-    });
+    return Teams.firstId();
   }
 
   export class LabelManage
