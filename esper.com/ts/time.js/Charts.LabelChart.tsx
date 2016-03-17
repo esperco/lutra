@@ -128,8 +128,6 @@ module Esper.Charts {
       if (this.params.chartParams.allLabels) {
         return _.map(displayResults, (r) => r.labelNorm);
       }
-
-      // Get top 4 labels
       return this.params.chartParams.labels || [];
     }
 

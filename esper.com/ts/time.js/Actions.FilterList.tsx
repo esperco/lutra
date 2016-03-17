@@ -12,6 +12,13 @@ module Esper.Actions {
   /* List action => render a list of events */
   export function renderFilterList(params?: EventFilterJSON) {
     params = cleanEventFilterJSON(params);
+
+    // Max duration for filter list request
+    var duration = params.end - params.start;
+    if (duration > 1000 * 60 * 60 * 24 * 32) {
+      params.end = moment(params.start).endOf('month').valueOf()
+    }
+
     var start = new Date(params.start);
     var end = new Date(params.end);
 
@@ -46,7 +53,8 @@ module Esper.Actions {
 
     /////
 
-    var duration = moment.duration(end.getTime() - start.getTime()).humanize();
+    var durationStr =
+      moment.duration(end.getTime() - start.getTime()).humanize();
     var startStr = moment(start).fromNow();
     Analytics.page(Analytics.Page.EventList, {
       calendars: params.cals.length,
@@ -54,7 +62,7 @@ module Esper.Actions {
       unlabeled: unlabled,
       numLabels: labels.length,
       filterStr: filterStr,
-      periodLength: duration,
+      periodLength: durationStr,
       start: startStr
     });
   }

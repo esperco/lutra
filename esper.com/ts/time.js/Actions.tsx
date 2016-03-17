@@ -65,8 +65,7 @@ module Esper.Actions {
     params.cals = cals;
 
     var duration = params.end - params.start;
-    if (isNaN(duration) || duration <= 0 ||
-        duration > 1000 * 60 * 60 * 24 * 32) {
+    if (isNaN(duration) || duration <= 0) {
       params.start = moment().startOf('month').valueOf();
       params.end = moment().endOf('month').valueOf();
     }
