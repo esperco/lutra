@@ -6,21 +6,19 @@ module Esper.Charts {
   /*
     Base class for autocharts (using daily-stats API)
   */
-  export abstract class AutoChart extends Chart {
-    protected dateLimit = {months: 1};
-
+  export abstract class AutoChart<T extends Charts.ChartJSON> extends Chart<T> {
     async() {
       return DailyStats.async(
-        this.params.windowStart,
-        this.params.windowEnd,
-        this.params.calendars);
+        new Date(this.params.start),
+        new Date(this.params.end),
+        this.params.cals);
     }
 
     sync() {
       return DailyStats.get(
-        this.params.windowStart,
-        this.params.windowEnd,
-        this.params.calendars);
+        new Date(this.params.start),
+        new Date(this.params.end),
+        this.params.cals);
     }
 
     isBusy() {

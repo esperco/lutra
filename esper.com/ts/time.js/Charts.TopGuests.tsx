@@ -13,10 +13,6 @@ module Esper.Charts {
   var Component = ReactHelpers.Component;
 
   export class TopGuests extends GuestChart {
-    static displayName = "Top Guests";
-    static icon = "fa-align-left";
-    static usesIntervals = false;
-
     renderChart() {
       var data = this.sync()[0];
       var domains = this.getSelectedDomains();

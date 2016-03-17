@@ -5,41 +5,30 @@
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./Actions.tsx" />
 /// <reference path="./TimeStats.ts" />
 
 module Esper.Charts {
 
-  export interface ChartParams {
-    windowStart: Date;
-    windowEnd: Date;
-
-    // Selected team-calendar combos
-    calendars: Calendars.CalSelection[];
-
-    // Additional field to make static interval explicit (if applicable)
-    interval?: TimeStats.Interval;
-
-    // Applicable to labeled charts only
-    selectedLabels?: string[];
-    unlabeled?: boolean;
-    allLabels?: boolean;
+  export interface ChartJSON extends Actions.EventFilterJSON {
+    chartParams?: {};
   }
 
-  export abstract class Chart {
-    // Static properties about this chart type
-    static displayName: string;
-    static icon: string;
+  export abstract class Chart<T extends ChartJSON> {
+    public params: T;
 
-    // These are used to configure period selector, with defaults
-    protected usesIntervals: boolean = false;
-    protected dateLimit: moment.MomentInput = TimeStats.MAX_TIME;
-    protected dateLimitForInterval:
-      (interval: TimeStats.Interval) => moment.MomentInput =
-      TimeStats.dateLimitForInterval;
-    protected minDate: BootstrapDaterangepicker.DateType = TimeStats.MIN_DATE;
-    protected maxDate: BootstrapDaterangepicker.DateType = TimeStats.MAX_DATE;
+    // Constructor must accept either subtype or generic ChartJSON object
+    constructor(params?: T|ChartJSON) {
+      this.params = this.cleanParams(params || {});
+    }
 
-    constructor(public params: ChartParams) { }
+    // Params is derived from user query -- don't trust, verify. Also convert
+    // ChartJSON to T if applicable
+    cleanParams(params: T|ChartJSON): T {
+      var cleaned = Actions.cleanEventFilterJSON(params) as T;
+      cleaned.chartParams = cleaned.chartParams || {};
+      return cleaned;
+    }
 
     // Triggers async call to update chart data
     abstract async(): void;
@@ -64,21 +53,44 @@ module Esper.Charts {
     abstract renderSelectors(): React.ReactElement<any>;
 
     // Default period selector
-    renderPeriodSelector(updateFn: (req: TimeStats.RequestPeriod) => void) {
+    renderPeriodSelector() {
+      var selected: TimeStats.RequestPeriod = {
+        windowStart: new Date(this.params.start),
+        windowEnd: new Date(this.params.end)
+      };
+
       return <Components.IntervalRangeSelector
-        selected={this.params}
-        updateFn={updateFn}
-        showIntervals={this.usesIntervals}
-        dateLimit={this.dateLimit}
-        dateLimitForInterval={this.dateLimitForInterval}
-        minDate={this.minDate}
-        maxDate={this.maxDate}
+        selected={selected}
+        updateFn={(req) => this.updatePeriod(req)}
+        dateLimit={TimeStats.MAX_TIME}
+        minDate={TimeStats.MIN_DATE}
+        maxDate={TimeStats.MAX_DATE}
       />;
+    }
+
+    updatePeriod(req: TimeStats.RequestPeriod) {
+      this.updateRoute({
+        props: this.extendCurrentProps({
+          start: req.windowStart.getTime(),
+          end: req.windowEnd.getTime()
+        })
+      });
     }
 
     // Message to show when busy
     noDataMsg(): JSX.Element {
       return <span>No data found</span>;
+    }
+
+
+    /* Helpers for Chart Actions */
+
+    updateRoute({props, opts}: {props?: T; opts?: Route.nav.Opts;}) {
+      Route.nav.query(props, opts || {})
+    }
+
+    extendCurrentProps(newParams: T|ChartJSON): T {
+      return _.extend({}, this.params, newParams) as T;
     }
   }
 }

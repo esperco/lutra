@@ -12,14 +12,7 @@ module Esper.Calendars {
   export interface CalSelection {
     teamId: string;
     calId: string;
-    events?: {
-      id: string,
-      title: string
-    }[];
   }
-
-  // Store currently selected calendar
-  export var SelectStore = new Model.StoreOne<CalSelection>();
 
   // Store list of calendars by teamId
   export var CalendarListStore =
@@ -85,12 +78,6 @@ module Esper.Calendars {
     }
   }
 
-  export function setDefault() {
-    if (! SelectStore.isSet()) {
-      SelectStore.set(defaultSelection());
-    }
-  }
-
 
   ////////
 
@@ -107,16 +94,6 @@ module Esper.Calendars {
   export function removeTeamCalendar(_id: string, cal: ApiT.GenericCalendar) {
     var calendars = _.cloneDeep(CalendarListStore.val(_id) || []);
     _.remove(calendars, (c) => c.id === cal.id);
-
-    // Check if we're deselecting current calendar
-    var currentSelection = SelectStore.val();
-    if (currentSelection &&
-        currentSelection.teamId === _id &&
-        currentSelection.calId === cal.id)
-    {
-      SelectStore.unset();
-    }
-
     queueUpdate(_id, calendars);
   }
 

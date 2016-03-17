@@ -15,8 +15,6 @@ module Esper.Charts {
     Grid that shows fragmentation, meeting count, and meeting durations
   */
   export class ActivityGrid extends CalendarGridChart {
-    static displayName = "Activity Grid";
-
     // These vars get set by renderChart
     private longestTime: number;
     private highestCount: number;

@@ -17,9 +17,7 @@
     "Partition.Test.ts",
     "Route.Test.ts",
     "Teams.Test.ts",
-    "TimeStats.Test.ts",
-    "Views.Charts.Test.tsx",
-    "Views.CalendarLabeling.Test.tsx"
+    "TimeStats.Test.ts"
   ],
 
   "prodOnly": [

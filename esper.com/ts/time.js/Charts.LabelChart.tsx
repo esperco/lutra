@@ -7,33 +7,56 @@
 
 module Esper.Charts {
 
-  // Store for currently selected labels (used by LabelChart below)
-  interface LabelSelection {
-    labels: string[];
-    unlabeled: boolean;
-    all: boolean;
-  }
-  export var LabelSelectStore = new Model.StoreOne<LabelSelection>();
-
-  // Action to update selected labels
-  function updateLabels(x: {
-      all: boolean;
-      unlabeled: boolean;
-      labels: string[];
-  }) {
-    LabelSelectStore.set(x);
+  /*
+    Don't use EventFilterJSON's label options because these are distinct
+    from the one used for charting. The former controls which events to
+    include (not implemented as of 2016-03-16) and the latter controls
+    which labels to actually show in the chart.
+  */
+  export interface LabelChartJSON extends Actions.EventFilterJSON {
+    chartParams?: {
+      labels?: string[];
+      unlabeled?: boolean;
+      allLabels?: boolean;
+    };
   }
 
   /*
     Base class for chart with labels (using stats2 API)
   */
-  export abstract class LabelChart extends Chart {
+  export abstract class LabelChart<T extends LabelChartJSON>
+    extends Chart<T>
+  {
+    cleanParams(params: T|ChartJSON): T {
+      var cleanedParams = super.cleanParams(params);
+      var chartParams = (cleanedParams.chartParams =
+        cleanedParams.chartParams || {});
+
+      // No labels => select all labels
+      if (!chartParams.labels &&
+          !_.isBoolean(chartParams.unlabeled) &&
+          !_.isBoolean(chartParams.allLabels)) {
+        cleanedParams.chartParams = chartParams = {
+          labels: [],
+          unlabeled: false,
+          allLabels: true
+        };
+      }
+
+      // Invalid label entry => no labels
+      else if (!chartParams.labels ||
+               !_.every(chartParams.labels, (l) => _.isString(l))) {
+        chartParams.labels = [];
+      }
+
+      return cleanedParams;
+    }
+
     async() {
       var cal = this.getCal();
       return TimeStats.async(cal.teamId, cal.calId, {
-        windowStart: this.params.windowStart,
-        windowEnd: this.params.windowEnd,
-        interval: this.params.interval
+        windowStart: new Date(this.params.start),
+        windowEnd: new Date(this.params.end)
       });
     }
 
@@ -41,16 +64,15 @@ module Esper.Charts {
       // Get stats from store + data status
       var cal = this.getCal();
       return TimeStats.get(cal.teamId, cal.calId, {
-        windowStart: this.params.windowStart,
-        windowEnd: this.params.windowEnd,
-        interval: this.params.interval
+        windowStart: new Date(this.params.start),
+        windowEnd: new Date(this.params.end)
       });
     }
 
     // Label Stats currently only supports 1 calendar
     protected getCal() {
       // Label Stats currently only support 1 cal
-      var cal = this.params.calendars && this.params.calendars[0];
+      var cal = this.params.cals && this.params.cals[0];
 
       // Must check calendar length > 0 before calling
       if (! cal) {
@@ -103,15 +125,10 @@ module Esper.Charts {
     protected getSelectedLabels(displayResults: TimeStats.DisplayResults)
       : string[]
     {
-      if (this.params.allLabels) {
+      if (this.params.chartParams.allLabels) {
         return _.map(displayResults, (r) => r.labelNorm);
       }
-
-      // Get top 4 labels
-      return this.params.selectedLabels || _.map(
-        _.sortBy(displayResults, (r) => r.totalCount).slice(0, 4),
-        (l) => l.labelNorm
-      );
+      return this.params.chartParams.labels || [];
     }
 
     isBusy() {
@@ -183,11 +200,30 @@ module Esper.Charts {
           totalCount={totalCount}
           unlabeledCount={unlabeledCount}
           selected={selectedLabels || []}
-          allSelected={this.params.allLabels || false}
-          unlabeledSelected={this.params.unlabeled || false}
-          updateFn={updateLabels}
+          allSelected={this.params.chartParams.allLabels || false}
+          unlabeledSelected={this.params.chartParams.unlabeled || false}
+          updateFn={(x) => this.updateLabels(x)}
         />
       </div>;
+    }
+
+    /* Actions */
+
+    updateLabels(x: {
+      all: boolean;
+      unlabeled: boolean;
+      labels: string[];
+    }) {
+      var props: LabelChartJSON = {
+        chartParams: {
+          allLabels: x.all,
+          unlabeled: x.unlabeled,
+          labels: x.labels
+        }
+      };
+      this.updateRoute({
+        props: props as T
+      });
     }
   }
 }

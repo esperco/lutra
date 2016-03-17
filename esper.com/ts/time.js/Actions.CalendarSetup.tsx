@@ -1,8 +1,9 @@
 /// <reference path="./Views.CalendarSetup.tsx" />
+/// <refernece path="./Actions" />
 
 module Esper.Actions {
 
-  export function CalendarSetup(teamId?: string) {
+  export function renderCalendarSetup(teamId?: string) {
 
     // Select default team if none provided
     if (! teamId) {
@@ -17,7 +18,10 @@ module Esper.Actions {
     // Trigger async -> does nothing if already loaded
     ApiC.getGenericCalendarList(teamId);
 
-    return <Views.CalendarSetup teamId={teamId} />;
+    render(<Views.CalendarSetup teamId={teamId} />);
+    Analytics.page(Analytics.Page.CalendarSetup, {
+      teamId: teamId
+    });
   }
 
 }

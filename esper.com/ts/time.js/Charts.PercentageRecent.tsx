@@ -8,10 +8,7 @@
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
-  export class PercentageRecent extends LabelChart {
-    static displayName = "Label Allocation Percentage";
-    static icon = "fa-pie-chart";
-
+  export class PercentageRecent extends LabelChart<Charts.LabelChartJSON> {
     renderChart() {
       // Filter to include only user-selected labels
       var results = this.getExclusiveDisplayResults();

@@ -2,43 +2,44 @@
   Component for selecting guest domain names
 */
 
-/// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Colors.ts" />
 /// <reference path="./Charts.AutoChart.tsx" />
 /// <reference path="./DailyStats.ts" />
 /// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Charts {
-  interface DomainSelection {
-    empty: boolean;     // Is the "no guests" domain selected?
-    domains: string[];
+  interface DomainChartParams {
+    emptyDomain?: boolean;  // Is the "no guests" domain selected?
+    allDomains?: boolean;   // Show all domains -- alternate to listing
+    domains?: string[];
   }
 
-  export var DomainSelectStore = new Model.StoreOne<DomainSelection>();
-
-  function updateDomains(selections: {id: string}[]) {
-    var newSelections: DomainSelection = {empty: false, domains: []};
-    _.each(selections, (s) => {
-      if (s.id) {
-        newSelections.domains.push(s.id);
-      } else if (s.id === "") {
-        newSelections.empty = true;
-      }
-    });
-    DomainSelectStore.set(newSelections);
+  export interface GuestChartJSON extends Charts.ChartJSON {
+    chartParams?: DomainChartParams
   }
-
-  interface DomainSelectorProps {
-    stats: ApiT.DailyStatsResponse,
-    allowEmpty?: boolean; // Allow selection of empty or "no guests" domain
-  }
-
 
   /*
     Base class for auto-chart with guest domain selector
   */
-  export abstract class GuestChart extends AutoChart {
+  export abstract class GuestChart extends AutoChart<GuestChartJSON> {
     protected allowEmpty = false;
+
+    cleanParams(params: GuestChartJSON|ChartJSON): GuestChartJSON {
+      var cleaned = super.cleanParams(params);
+      if (! _.isBoolean(cleaned.chartParams.emptyDomain)) {
+        cleaned.chartParams.emptyDomain = this.allowEmpty;
+      }
+      if (! _.isBoolean(cleaned.chartParams.allDomains)) {
+        cleaned.chartParams.allDomains = true;
+      }
+      if (! cleaned.chartParams.domains) {
+        cleaned.chartParams.domains = [];
+      }
+      if (! _.every(cleaned.chartParams.domains, (d) => _.isString(d))) {
+        cleaned.chartParams.domains = [];
+      }
+      return cleaned;
+    }
 
     noData() {
       if (this.allowEmpty) {
@@ -53,12 +54,12 @@ module Esper.Charts {
     protected getSelectedDomains(
       domains?: DailyStats.GuestDomainDisplayResult[])
     {
-      var domainSelection = DomainSelectStore.val();
-      if (domainSelection) {
-        return domainSelection.domains;
+      if (! this.params.chartParams.allDomains) {
+        return this.params.chartParams.domains;
       }
 
       if (! domains) {
+        // All domains
         var pair = this.sync();
         var stats = pair && pair[0];
         domains = stats ? DailyStats.topGuestDomains(stats) : [];
@@ -69,11 +70,10 @@ module Esper.Charts {
     }
 
     protected showEmptyDomain() {
-      var domainSelection = DomainSelectStore.val();
-      if (domainSelection) {
-        return domainSelection.empty;
-      }
-      return this.allowEmpty;
+      return this.allowEmpty && (
+        this.params.chartParams.allDomains ||
+        this.params.chartParams.emptyDomain
+      );
     }
 
     renderSelectors() {
@@ -104,16 +104,21 @@ module Esper.Charts {
         var noGuestsCount =
           DailyStats.sumScheduledCount(stats) -
           DailyStats.sumWithGuestsCount(stats)
-        groups[0].choices.unshift({
-          id: "",
-          displayAs: "No Guests",
-          badgeText: noGuestsCount.toString(),
-          badgeColor: Colors.lightGray
-        });
 
-        if (this.showEmptyDomain()) {
-          selectedIds = [""].concat(selectedIds);
-        }
+        var emptySelector = <div className="esper-select-menu">
+          <a className="esper-selectable"
+             onClick={this.toggleEmpty.bind(this)}>
+            {
+              noGuestsCount ?
+              <span className="badge">{ noGuestsCount }</span> :
+              null
+            }
+            <i className={"fa fa-fw " + (this.showEmptyDomain() ?
+              "fa-check-square-o" : "fa-square-o")} />{" "}
+            No Guests
+          </a>
+          <div className="divider" />
+        </div>;
       }
 
       var totalCount = this.allowEmpty ?
@@ -121,9 +126,9 @@ module Esper.Charts {
         DailyStats.sumWithGuestsCount(stats);
 
       var selectAllIcon = (() => {
-        if (this.isAllSelected()) {
+        if (this.params.chartParams.allDomains) {
           return "fa-check-square-o";
-        } else if (this.isSomeSelected()) {
+        } else if (selectedIds.length) {
           return "fa-minus-square-o";
         } else {
           return "fa-square-o"
@@ -144,6 +149,7 @@ module Esper.Charts {
           </a>
           <div className="divider" />
         </div>
+        { this.allowEmpty ? emptySelector : null }
         <Components.ListSelector groups={groups}
           selectOption={Components.ListSelectOptions.MULTI_SELECT}
           selectedIds={ _.map(selectedIds, (s) => {
@@ -153,51 +159,84 @@ module Esper.Charts {
           listClasses="esper-select-menu"
           itemClasses="esper-selectable"
           headerClasses="esper-select-header"
-          dividerClasses="divider"
-          updateFn={updateDomains} />
+          updateFn={this.updateDomains.bind(this)} />
       </div>;
     }
 
-    toggleAll() {
+    //////
+
+    updateDomains(selections: {id: string}[]) {
       var pair = this.sync();
       var stats = pair && pair[0];
+      if (! stats) { return; }
+      var domains = DailyStats.topGuestDomains(stats);
+      var maxDomains = domains.length;
 
-      if (this.isSomeSelected()) {
-        updateDomains([])
+      if (selections.length === maxDomains &&
+          (this.showEmptyDomain() || !this.allowEmpty))
+      {
+        this.updateSelections({
+          allDomains: true,
+          emptyDomain: this.allowEmpty,
+          domains: []
+        });
       } else {
-        var domainIds = _.map(DailyStats.topGuestDomains(stats),
-          (d) => ({id: d.domain}));
-        if (this.allowEmpty) {
-          domainIds = [{id: ""}].concat(domainIds);
-        }
-        updateDomains(domainIds);
+        this.updateSelections({
+          allDomains: false,
+          domains: _.map(selections, (s) => s.id)
+        });
       }
     }
 
-    isAllSelected() {
-      var pair = this.sync();
-      var stats = pair && pair[0];
-      if (! stats) {
-        return false;
+    toggleAll() {
+      if (this.getSelectedDomains().length) {
+        this.updateSelections({
+          allDomains: false,
+          emptyDomain: false,
+          domains: []
+        });
+      } else {
+        this.updateSelections({
+          allDomains: true,
+          emptyDomain: this.allowEmpty,
+          domains: []
+        });
       }
-      var domains = DailyStats.topGuestDomains(stats);
-      var maxSelectable = domains.length;
-      var selectedIds = this.getSelectedDomains(domains);
-
-      return selectedIds.length === maxSelectable &&
-        (!this.allowEmpty || this.showEmptyDomain());
     }
 
-    isSomeSelected() {
+    toggleEmpty() {
       var pair = this.sync();
       var stats = pair && pair[0];
-      if (! stats) {
-        return false;
-      }
-      var domains = DailyStats.topGuestDomains(stats);
-      var selectedIds = this.getSelectedDomains(domains);
+      if (! stats) { return; }
+      var allDomains = _.map(DailyStats.topGuestDomains(stats),
+        (d) => d.domain
+      );
+      var currentDomains = this.params.chartParams.domains || [];
 
-      return selectedIds.length || (this.allowEmpty && this.showEmptyDomain());
+      if (this.showEmptyDomain()) {
+        this.updateSelections({
+          allDomains: false,
+          emptyDomain: false,
+          domains: (currentDomains.length ? currentDomains : allDomains)
+        });
+      } else {
+        this.updateSelections({
+          allDomains: currentDomains.length === allDomains.length,
+          emptyDomain: true,
+          domains: currentDomains
+        });
+      }
+    }
+
+    updateSelections(newParams: DomainChartParams) {
+      newParams = _.extend({},
+        this.params.chartParams,
+        newParams) as DomainChartParams;
+      this.updateRoute({
+        props: this.extendCurrentProps({
+          chartParams: newParams
+        })
+      });
     }
   }
 }

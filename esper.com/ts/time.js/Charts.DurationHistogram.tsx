@@ -29,10 +29,7 @@ module Esper.Charts {
     gte: 8 * 60 * 60
   }];
 
-  export class DurationHistogram extends AutoChart {
-    static displayName = "Event Durations";
-    static icon = "fa-bar-chart";
-
+  export class DurationHistogram extends AutoChart<Charts.ChartJSON> {
     renderChart() {
       var data = this.sync()[0];
       var series: {

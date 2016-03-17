@@ -134,4 +134,14 @@ module Esper.Util {
       return v;
     }
   }
+
+  /*
+    Do something after a short delay. Ensures that only one function is
+    pending for any given id.
+  */
+  var delayTimeouts: {[index: string]: number} = {};
+  export function delayOne(id: string, fn: () => void, delay: number) {
+    clearTimeout(delayTimeouts[id]);
+    delayTimeouts[id] = setTimeout(fn, delay);
+  }
 }

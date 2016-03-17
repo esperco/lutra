@@ -28,8 +28,6 @@ module Esper.Charts {
     Grid that shows fragmentation, meeting count, and meeting durations
   */
   export class WorkHoursGrid extends CalendarGridChart {
-    static displayName = "Working Hours Availability";
-
     // These vars get set by renderChart
     private startFree: number;
     private endFree: number;
