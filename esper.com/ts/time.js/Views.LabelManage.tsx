@@ -112,6 +112,8 @@ module Esper.Views {
       return <Components.LabelInput
         onSubmit={(val) => {
           Teams.addLabels(this.props.teamId, val);
+          this.setState({ labelFilter: null })
+          return "";
         }}
         onChange={(val) => {
           this.setState({ labelFilter: val });

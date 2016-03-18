@@ -31,6 +31,9 @@ module Esper.Components {
 
     // Filter for labels shown
     labelFilter?: string;
+
+    // Which label is selected?
+    labelSelected?: string;
   }> {
     constructor(props: LabelEditorProps) {
       super(props);
@@ -89,9 +92,7 @@ module Esper.Components {
               success={success} className="esper-panel-section">
         <div className="esper-panel-section">
           { this.renderLabelInput(events) }
-          <LabelList events={events} teams={teams}
-            filter={this.state.labelFilter}
-          />
+          { this.renderLabelList(events) }
           <div className="esper-select-menu">
             <div className="divider" />
             <a className="esper-selectable" target="_blank"
@@ -107,26 +108,108 @@ module Esper.Components {
     renderLabelInput(events: Events.TeamEvent[]) {
       return <LabelInput
         onSubmit={(val) => {
-          var teamIds = _.map(events, (e) => e.teamId);
-          teamIds = _.uniq(teamIds);
-          _.each(teamIds, (teamId) => {
-            Teams.addLabels(teamId, val);
-          });
-          EventLabelChange.add(events, val, true);
+          if (this.state.labelSelected) {
+            if (_.every(events,
+              (e) => _.includes(e.labels_norm, this.state.labelSelected)
+            )) {
+              EventLabelChange.remove(events, val);
+            } else {
+              EventLabelChange.add(events, val);
+            }
+            return val;
+          }
+
+          else {
+            var teamIds = _.map(events, (e) => e.teamId);
+            teamIds = _.uniq(teamIds);
+            _.each(teamIds, (teamId) => {
+              Teams.addLabels(teamId, val);
+            });
+            EventLabelChange.add(events, val, true);
+            this.setState({ labelFilter: null })
+            return "";
+          }
         }}
-        onChange={(val) => this.setState({ labelFilter: val })}
+        onChange={(val) => this.setState({
+          labelFilter: val,
+          labelSelected: null
+        })}
+        onDown={(val) => this.handleUpDown(val, 1)}
+        onUp={(val) => this.handleUpDown(val, -1)}
       />;
+    }
+
+    renderLabelList(events: Events.TeamEvent[]) {
+      var labels = this.getLabels();
+      return <div className="esper-select-menu">
+        {
+          _.map(labels,
+            (l) => <Label key={l.id} label={l} events={events}
+              highlight={l.id === this.state.labelSelected}
+            />
+          )
+        }
+      </div>;
+    }
+
+    getLabels() {
+      var events = _.map(this.props.eventPairs, (e) => e[0]);
+      var teams = _.map(this.props.teamPairs, (t) => t[0]);
+      var labels = Labels.fromEvents(events, teams);
+      labels = Labels.sortLabels(labels);
+
+      if (this.state.labelFilter) {
+        var normFilter = this.state.labelFilter.toLowerCase();
+        labels = _.filter(labels,
+          (l) => _.includes(l.displayAs.toLowerCase(), normFilter)
+        );
+      }
+
+      return labels;
+    }
+
+    handleUpDown(val: string, incr: number) {
+      var labels = this.getLabels();
+      if (! labels.length) return val;
+
+      var currentIndex = _.findIndex(labels,
+        (l) => this.state.labelSelected === l.id
+      );
+      currentIndex += incr;
+
+      if (currentIndex < 0) {
+        currentIndex = 0;
+      } else if (currentIndex > labels.length - 1) {
+        currentIndex = labels.length - 1;
+      }
+
+      var selected = labels[currentIndex];
+      this.setState( { labelSelected: selected.id });
+      return labels[currentIndex].displayAs;
     }
   }
 
 
   ///////
 
-  export class LabelInput extends Component<{
-    onSubmit: (val: string) => void;
+  interface LabelInputProps {
+    onSubmit: (val: string) => string;
+
+    // Triggered by user typing (not changes by onSubmit, onUp, onDown)
     onChange?: (val: string) => void;
-  }, {}> {
-    _input: HTMLInputElement;
+
+    // Keyboard events
+    onDown?: (val: string) => string;
+    onUp?: (val: string) => string;
+  }
+
+  export class LabelInput extends Component<LabelInputProps, {
+    value: string;
+  }> {
+    constructor(props: LabelInputProps) {
+      super(props);
+      this.state = { value: "" }
+    }
 
     render() {
       return <div className="form-group">
@@ -135,17 +218,28 @@ module Esper.Components {
           <span className="comma-note esper-note">Separate by Commas</span>
         </label>
         <div className="input-group">
-          <input type="text" className="form-control"
-                 id={this.getId("new-labels")} ref={(c) => this._input = c}
-                 onKeyDown={this.inputKeydown.bind(this)}
-                 onChange={(e) => this.onChange(e)}
-                 placeholder={
-                  "Q1 Sales Goal, Positive Meeting, Negative Meeting"
-                 } />
+          <div className={ this.state.value ? "esper-clearable" : "" }>
+            <input type="text" className="form-control"
+                   id={this.getId("new-labels")}
+                   onKeyDown={this.inputKeydown.bind(this)}
+                   onChange={(e) => this.onChange(e)}
+                   value={this.state.value}
+                   placeholder={
+                    "Q1 Sales Goal, Positive Meeting, Negative Meeting"
+                   } />
+            {
+              this.state.value ?
+              <span className="esper-clear-action"
+                    onClick={() => this.reset()}>
+                <i className="fa fa-fw fa-times" />
+              </span> :
+              <span />
+            }
+          </div>
           <span className="input-group-btn">
             <button className="btn btn-default" type="button"
                     onClick={this.submitInput.bind(this)}>
-              <i className="fa fa-fw fa-plus" />{" "}Add
+              <i className="fa fa-fw fa-plus" />
             </button>
           </span>
         </div>
@@ -153,27 +247,40 @@ module Esper.Components {
     }
 
     submitInput() {
-      var input = $(this._input);
-      var val = input.val().trim();
+      var val = this.state.value;
       if (val) {
-        this.props.onSubmit(val);
-        input.val("");
-        this.props.onChange("");
-        input.focus();
+        var newVal = this.props.onSubmit(val);
+        this.setState({ value: newVal });
       }
     }
 
-    // Catch enter key on input -- use jQuery to actual examine value
+    reset() {
+      this.setState({ value: "" });
+      this.props.onChange("");
+    }
+
+    // Catch enter / up / down keys
     inputKeydown(e: KeyboardEvent) {
-      if (e.keyCode === 13) {
+      var val = (e.target as HTMLInputElement).value;
+      if (e.keyCode === 13) {         // Enter
         e.preventDefault();
         this.submitInput();
+      } else if (e.keyCode === 27) {  // ESC
+        e.preventDefault();
+        this.reset();
+      } else if (e.keyCode === 38 && this.props.onUp) {
+        e.preventDefault();
+        this.setState({ value: this.props.onUp(val) });
+      } else if (e.keyCode === 40 && this.props.onDown) {
+        e.preventDefault();
+        this.setState({ value: this.props.onDown(val) });
       }
     }
 
     onChange(e: React.FormEvent) {
+      var val = (e.target as HTMLInputElement).value;
+      this.setState({ value: val })
       if (this.props.onChange) {
-        var val = (e.target as HTMLInputElement).value;
         this.props.onChange(val);
       }
     }
@@ -182,36 +289,10 @@ module Esper.Components {
 
   ///////
 
-  function LabelList(props: {
-    events: Events.TeamEvent[];
-    teams: ApiT.Team[];
-    filter?: string;
-  }) {
-    if (! props.events.length) {
-      return <span />;
-    }
-
-    var labels = Labels.fromEvents(props.events, props.teams);
-    labels = Labels.sortLabels(labels);
-    if (props.filter) {
-      var normFilter = props.filter.toLowerCase();
-      labels = _.filter(labels,
-        (l) => _.includes(l.displayAs.toLowerCase(), normFilter)
-      );
-    }
-
-    return <div className="esper-select-menu">
-      {
-        _.map(labels,
-          (l) => <Label key={l.id} label={l} events={props.events} />
-        )
-      }
-    </div>;
-  }
-
   function Label(props: {
     label: Labels.LabelCount;
-    events: Events.TeamEvent[]
+    events: Events.TeamEvent[];
+    highlight?: boolean;
   }) {
     var checkedByAll = props.label.count === props.events.length;
     var checkedBySome = props.label.count > 0;
@@ -233,6 +314,9 @@ module Esper.Components {
       }
       return "fa-square";
     })();
+    if (props.highlight) {
+      labelClass += " highlight";
+    }
     var iconStyle = { color: Colors.getColorForLabel(props.label.id) };
 
     var handler = () => {
