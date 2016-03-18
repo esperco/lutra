@@ -20,11 +20,17 @@ module Esper.Actions {
       Events.EventStore.pushFetch(storeId, p);
     });
 
-    render(<Views.EventView teamId={teamId} calId={calId} eventId={eventId} />);
+    render(<Views.EventView
+      teamId={teamId}
+      calId={calId}
+      eventId={eventId}
+      initAction={!!action}
+    />);
     Analytics.page(Analytics.Page.EventFeedback, {
       teamId: teamId,
       calId: calId,
-      eventId: eventId
+      eventId: eventId,
+      action: action
     });
   }
 }

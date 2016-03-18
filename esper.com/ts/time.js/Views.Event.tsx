@@ -10,6 +10,7 @@ module Esper.Views {
     calId: string;
     eventId: string;
     teamId: string;
+    initAction?: boolean;
   }
 
   export class EventView extends Component<Property, {}> {
@@ -51,6 +52,7 @@ module Esper.Views {
             className="panel-body"
             eventPairs={[eventPair]}
             teamPairs={Teams.allPairs()}
+            initAction={this.props.initAction}
             onDone={() => Route.nav.path("/list")}
           />
       </div>;
