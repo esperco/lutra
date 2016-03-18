@@ -50,6 +50,9 @@ module Esper.Views {
               <NavLink href="/list">
                 <i className="fa fa-fw fa-th-list"></i>{" "}Event List
               </NavLink>
+              <NavLink href="/labels">
+                <i className="fa fa-fw fa-tags"></i>{" "}Labels
+              </NavLink>
             </ul> : null }
 
             <div className="nav navbar-nav navbar-right">

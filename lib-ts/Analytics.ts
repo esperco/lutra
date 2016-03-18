@@ -133,6 +133,7 @@ module Esper.Analytics {
     CalendarSetup,     // esper.com/time/#!/calendar-setup
     EventFeedback,     // esper.com/time/#!/event
     EventList,         // esper.com/time/#!/list
+    LabelManagement,   // esper.com/time/#!/labels
     NotificationSettings,  // esper.com/time/#!/notification-settings
     DirectoryHome      // dir.esper.com
   }

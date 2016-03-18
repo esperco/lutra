@@ -13,7 +13,6 @@
     "../common/JasmineStub.ts",
     "Calendars.Test.ts",
     "DailyStats.Test.ts",
-    "Labels.Test.ts",
     "Partition.Test.ts",
     "Route.Test.ts",
     "Teams.Test.ts",

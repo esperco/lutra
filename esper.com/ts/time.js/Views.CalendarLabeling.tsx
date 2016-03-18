@@ -121,19 +121,20 @@ module Esper.Views {
           <div className="esper-subheader select-labels-heading">
             {heading}
             { hasRecurring ?
-              <span className="recurring-note">
+              <span className="recurring-note esper-note">
                 {" "}+ Recurring
               </span>: ""
             }
             { eventPairs.length === 1 ?
-              <span className="shift-note">
+              <div className="shift-note esper-note">
                 {" "}(Hold Shift to Select Multiple Events)
-              </span>: ""
+              </div>: ""
             }
          </div>
           <Components.LabelEditor2
             eventPairs={eventPairs}
             teamPairs={teamPairs}
+            autoFocus={true}
           />
         </div>;
       } else {

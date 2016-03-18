@@ -442,6 +442,7 @@ flexibility with non-UL elements */
       font-style: italic;
     }
 
+    &.highlight,
     &:hover,
     &:focus {
       text-decoration: none;
@@ -525,7 +526,7 @@ flexibility with non-UL elements */
 .esper-clearable {
   position: relative;
 
-  div {
+  div, input[type=text], input[type=text]:focus {
     z-index: 1;
   }
 
@@ -543,8 +544,10 @@ flexibility with non-UL elements */
     text-align: center;
   }
 
-  input[type=text] {
-    padding-right: @input-height-base;
+  &.has-clear-action {
+    input[type=text] {
+      padding-right: @input-height-base;
+    }
   }
 }
 
@@ -555,6 +558,15 @@ flexibility with non-UL elements */
   &:hover, &:focus {
     color: @brand-danger;
   }
+}
+
+
+/* Text formatting */
+
+.esper-note {
+  font-size: 80%;
+  font-weight: normal;
+  color: @text-muted;
 }
 
 
