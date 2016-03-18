@@ -218,7 +218,10 @@ module Esper.Views {
     }
 
     updateChartType(val: string) {
-      this.updateRoute({ chartTypeId: val });
+      this.updateRoute({
+        chartTypeId: val,
+        props: this.props.currentChart.params
+      });
     }
 
     updateCalSelection(selections: Calendars.CalSelection[]) {
