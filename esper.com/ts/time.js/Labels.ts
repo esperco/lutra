@@ -36,8 +36,8 @@ module Esper.Labels {
     var labels: string[] = [];
 
     _.each(teams, (t) => {
-      _.each(t.team_labels, (teamLabel) => {
-        var id = normalize(teamLabel);
+      _.each(t.team_labels_norm, (id, i) => {
+        var teamLabel = t.team_labels[i];
         map[id] = map[id] || teamLabel;
         labels.push(id);
       })
@@ -69,20 +69,9 @@ module Esper.Labels {
   }
 
   /*
-    Helper to normalize labels on teams
-
-    TODO: Use normalized forms return by server when team contains
-    normalized forms.
-  */
-  export function normalize(l: string) {
-    return l.toLowerCase().trim();
-  }
-
-  /*
     Helper to normalize display versions of labels for sorting. Note that
-    this is distinct from the normalization above, which intended to
-    mimic server normalization and used for equality comparison as opposed
-    to normalizing for sorting purposes.
+    this is distinct from server normalization, which is used for equality
+    comparison as opposed to normalizing for sorting purposes.
 
     Currently the two are identical, but this is not guaranteed.
   */

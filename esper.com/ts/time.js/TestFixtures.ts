@@ -17,6 +17,11 @@ module Esper.TestFixtures {
   export var teamId2 = "team-id-2";
   export var team2Labels = ["Label A", "Label B", "Label C"];
 
+  // Stub normalization function for tests
+  function normalizeLabel(label: string) {
+    return label.trim().toLowerCase();
+  }
+
   // Start complete init process with mock login data
   export function mockLogin() {
     reset();
@@ -83,6 +88,7 @@ module Esper.TestFixtures {
           team_email_aliases: [],
           team_executive: uid,
           team_labels: team0Labels,
+          team_labels_norm: _.map(team0Labels, normalizeLabel),
           team_label_urgent: "Urgent",
           team_label_new: "New",
           team_label_in_progress: "In Progress",
@@ -112,6 +118,7 @@ module Esper.TestFixtures {
           team_email_aliases: [],
           team_executive: "O-w_peter____________w",
           team_labels: team1Labels,
+          team_labels_norm: _.map(team1Labels, normalizeLabel),
           team_label_urgent: "Urgent",
           team_label_new: "New",
           team_label_in_progress: "In Progress",
@@ -151,6 +158,7 @@ module Esper.TestFixtures {
           team_email_aliases: [],
           team_executive: "O-w_stewie____________w",
           team_labels: team2Labels,
+          team_labels_norm: _.map(team2Labels, normalizeLabel),
           team_label_urgent: "Urgent",
           team_label_new: "New",
           team_label_in_progress: "In Progress",

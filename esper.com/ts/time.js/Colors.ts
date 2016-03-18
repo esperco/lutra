@@ -6,8 +6,8 @@ module Esper.Colors {
   var labelColorMap: ColorMap = {};
   var domainColorMap: ColorMap = {};
 
-  export function getColorForLabel(label: string): string {
-    return getColorForMap(Labels.normalize(label), labelColorMap);
+  export function getColorForLabel(labelNorm: string): string {
+    return getColorForMap(labelNorm, labelColorMap);
   }
 
   export function getColorForDomain(domain: string): string {
@@ -24,7 +24,7 @@ module Esper.Colors {
     // Set initial colors based on team labels to ensure reasonable consistency
     Teams.defaultTeamPromise.done(() => {
       var labels = _(Teams.all())
-        .map((t) => t.team_labels)
+        .map((t) => t.team_labels_norm)
         .flatten<string>()
         .uniq()
         .value();

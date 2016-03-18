@@ -105,17 +105,35 @@ module Esper.Teams {
 
   //////////
 
-  // Takes a comma-separated set of labels to add
+  // Add and remove exact, display versions of labels
+
   export function addLabel(_id: string, label: string) {
-    return applyLabels(_id, [label], []);
+    return applyLabels(_id, [], [label]);
   }
 
   export function rmLabel(_id: string, label: string) {
-    return applyLabels(_id, [], [label]);
+    return applyLabels(_id, [label], []);
   }
 
   export function renameLabel(_id: string, oldLabel: string, newLabel: string) {
     return applyLabels(_id, [oldLabel], [newLabel]);
+  }
+
+  // Find the normalized form of a team label
+  export function getNormLabel(label: string) {
+    var teams = Teams.all();
+    for (let i in teams) {
+      var team = teams[i];
+
+      for (let j in team.team_labels) {
+        if (team.team_labels[j] === label) {
+          return team.team_labels_norm[j];
+        }
+      }
+    }
+
+    // No match, default to lowercase and trimming
+    return label.toLowerCase().trim();
   }
 
   function setDefaultLabels(_id: string) {
@@ -129,36 +147,16 @@ module Esper.Teams {
     }
   }
 
-  function applyLabels(_id: string, addLabels: string[], rmLabels: string[]) {
+  function applyLabels(_id: string, rmLabels: string[], addLabels: string[]) {
     var team = require(_id);
     if (! team) return;
 
-    /*
-      Find index for first thing we're removing and insert there
-      Use normalize, which doesn't mutate list but uses case-insensitive
-      comparison for removing duplicates.
-    */
-    var index = -1;
-    if (rmLabels.length) {
-      index = _.findIndex(team.team_labels,
-        (t) => Labels.normalize(t) === Labels.normalize(rmLabels[0])
-      );
-    }
-    var newLabels: string[] = _.filter(team.team_labels,
-      (l) => !_.find(rmLabels,
-        (rmL) => Labels.normalize(l) === Labels.normalize(rmL)
-      )
-    );
+    var newLabels = _.filter(team.team_labels, (l) => !_.includes(rmLabels, l));
+    newLabels = newLabels.concat(addLabels);
 
-    if (index > -1) {
-      newLabels = newLabels.slice(0, index)
-                    .concat(addLabels)
-                    .concat(newLabels.slice(index));
-    } else {
-      newLabels = newLabels.concat(addLabels);
-    }
+    // Remove duplicates based on normalization
+    newLabels = _.uniqBy(newLabels, getNormLabel);
 
-    newLabels = normalizeLabels(newLabels);
     return setTeamLabels(_id, team, newLabels);
   }
 
@@ -166,6 +164,7 @@ module Esper.Teams {
     // Store values immutable so clone
     var teamCopy = _.cloneDeep(team);
     teamCopy.team_labels = labels;
+    teamCopy.team_labels_norm = _.map(labels, getNormLabel);
     nextLabelUpdates[_id] = labels;
 
     /*
@@ -191,12 +190,6 @@ module Esper.Teams {
 
     teamStore.push(_id, p, teamCopy);
     return p;
-  }
-
-  // Given a label list, remove duplicates and near-duplicates
-  function normalizeLabels(labels: string[]) {
-    labels = labels || [];
-    return _.filter(_.uniqBy(labels, Labels.normalize));
   }
 
   // Track pending label updates for team

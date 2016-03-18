@@ -150,7 +150,6 @@ module Esper.Views {
       var editLabel = this.state.editLabel &&
                       this.state.editLabel.toLowerCase();
       if (label.toLowerCase() === editLabel) {
-        label = this.fmtLabelInput(label);
         return <div className="list-group-item one-line" key={label}>
           <div className="form-group">
             <input ref={ (c) => this._editInput = c }
@@ -209,12 +208,7 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Teams.rmLabel(this.props.teamId, this.fmtLabelInput(label));
-    }
-
-    // Clean label input before submission
-    fmtLabelInput(label: string) {
-      return label.trim();
+      Teams.rmLabel(this.props.teamId, label);
     }
 
     promptRmFor(label: string) {
@@ -247,7 +241,7 @@ module Esper.Views {
     submitEditInput() {
       var input = $(this._editInput);
       var val = input.val().trim();
-      var orig = this.fmtLabelInput(this.state.editLabel);
+      var orig = this.state.editLabel.trim();
       if (val && val !== orig) {
         Teams.renameLabel(this.props.teamId, orig, val);
         BatchLabelChange.rename(this.props.teamId, orig, val);

@@ -72,7 +72,7 @@ module Esper.EventLabelChange {
           var newEvent = _.cloneDeep(Events.EventStore.val(storeId));
 
           _.each(opt.addLabels, (l) => {
-            var normalized = Labels.normalize(l);
+            var normalized = Teams.getNormLabel(l);
             if (! _.includes(newEvent.labels_norm, normalized)) {
               newEvent.labels_norm.push(normalized);
               newEvent.labels.push(l);
@@ -80,7 +80,7 @@ module Esper.EventLabelChange {
           });
 
           _.each(opt.removeLabels, (l) => {
-            var normalized = Labels.normalize(l);
+            var normalized = Teams.getNormLabel(l);
             var index = _.indexOf(newEvent.labels_norm, normalized);
             if (index >= 0) {
               newEvent.labels.splice(index, 1);
