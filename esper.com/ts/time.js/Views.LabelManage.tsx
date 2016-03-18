@@ -15,39 +15,53 @@
 module Esper.Views {
   var Component = ReactHelpers.Component;
 
+  export class LabelManage extends Component<{
+    teamId: string;
+  }, {}> {
+    renderWithData() {
+      return <div className="container"><div className="row">
+        <div className="col-sm-offset-2 col-sm-8">
+          <div className="panel panel-default">
+            <div className="panel-body">
+              <LabelManageBase
+                teamId={this.props.teamId}
+                onDone={() => Route.nav.path("/list")}
+              />
+            </div>
+          </div>
+        </div>
+      </div></div>;
+    }
+  }
+
+
+  /////
+
   interface LabelManageProps {
+    teamId: string;
     disableDone?: boolean;
     doneText?: string;
     onDone?: () => void;
   }
 
   interface LabelManageState {
-    selectedTeamId?: string;
-
     // Show edit interface or remove prompt for a given label
     editLabel?: string;
     rmLabelPrompt?: string;
   }
 
-  function getTeamId() {
-    return Teams.firstId();
-  }
-
-  export class LabelManage
-    extends Component<LabelManageProps, LabelManageState>
+  class LabelManageBase extends Component<LabelManageProps, LabelManageState>
   {
     _editInput: HTMLInputElement;
 
     constructor(props: LabelManageProps) {
       super(props);
-      this.state = {
-        selectedTeamId: getTeamId()
-      };
+      this.state = {};
     }
 
     renderWithData() {
-      var teamStatus = Teams.dataStatus(this.state.selectedTeamId);
-      var changeStatus = BatchLabelChange.getStatus(this.state.selectedTeamId);
+      var teamStatus = Teams.dataStatus(this.props.teamId);
+      var changeStatus = BatchLabelChange.getStatus(this.props.teamId);
       if (teamStatus === Model.DataStatus.FETCH_ERROR ||
           teamStatus === Model.DataStatus.PUSH_ERROR ||
           changeStatus === Model.DataStatus.FETCH_ERROR ||
@@ -86,7 +100,7 @@ module Esper.Views {
     }
 
     getLabels() {
-      var team = Teams.get(this.state.selectedTeamId);
+      var team = Teams.get(this.props.teamId);
       var ret = (team && team.team_labels) || [];
       return Labels.sortLabelStrs(ret);
     }
@@ -167,7 +181,6 @@ module Esper.Views {
 
     resetState() {
       this.setState({
-        selectedTeamId: this.state.selectedTeamId,
         editLabel: null,
         rmLabelPrompt: null
       });
@@ -175,7 +188,7 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Teams.rmLabels(this.state.selectedTeamId, this.fmtLabelInput(label));
+      Teams.rmLabels(this.props.teamId, this.fmtLabelInput(label));
     }
 
     // Clean label input before submission
@@ -187,7 +200,6 @@ module Esper.Views {
 
     promptRmFor(label: string) {
       this.setState({
-        selectedTeamId: this.state.selectedTeamId,
         editLabel: null,
         rmLabelPrompt: label
       });
@@ -195,12 +207,11 @@ module Esper.Views {
 
     rmLabel(label: string) {
       this.archive(label);
-      BatchLabelChange.remove(this.state.selectedTeamId, label);
+      BatchLabelChange.remove(this.props.teamId, label);
     }
 
     showEditFor(label: string) {
       this.setState({
-        selectedTeamId: this.state.selectedTeamId,
         editLabel: label,
         rmLabelPrompt: null
       });
@@ -219,8 +230,8 @@ module Esper.Views {
       var val = input.val().trim();
       var orig = this.fmtLabelInput(this.state.editLabel);
       if (val && val !== orig) {
-        Teams.addRmLabels(this.state.selectedTeamId, val, orig);
-        BatchLabelChange.rename(this.state.selectedTeamId, orig, val, true);
+        Teams.addRmLabels(this.props.teamId, val, orig);
+        BatchLabelChange.rename(this.props.teamId, orig, val, true);
       }
       this.resetState();
     }
@@ -235,7 +246,7 @@ module Esper.Views {
             { isNylas ? "Calendar Owner" : "Executive Team" }
           </label>
           <select className="form-control"
-                  value={this.state.selectedTeamId}
+                  value={this.props.teamId}
                   onChange={this.changeTeam.bind(this)}>
             {_.map(allTeamIds, (_id) => {
               var t = Teams.get(_id);
@@ -250,7 +261,7 @@ module Esper.Views {
 
     changeTeam(event: Event) {
       var target = event.target as HTMLOptionElement;
-      this.setState({selectedTeamId: target.value})
+      Route.nav.path("/labels/" + target.value);
     }
 
     componentDidUpdate(prevProps: LabelManageProps, prevState: LabelManageState) {
@@ -262,8 +273,8 @@ module Esper.Views {
     }
 
     renderFooter() {
-      var dataStatus = Teams.dataStatus(this.state.selectedTeamId);
-      var changeStatus = BatchLabelChange.getStatus(this.state.selectedTeamId);
+      var dataStatus = Teams.dataStatus(this.props.teamId);
+      var changeStatus = BatchLabelChange.getStatus(this.props.teamId);
       var busy = (dataStatus === Model.DataStatus.INFLIGHT ||
                   changeStatus === Model.DataStatus.INFLIGHT);
 
@@ -288,26 +299,6 @@ module Esper.Views {
           </button>
         }
       </div>;
-    }
-  }
-
-
-  export class LabelManageModal extends Component<{
-    onHidden?: () => void;
-  }, {}> {
-    render() {
-      return <Components.Modal title="Edit Event Labels" icon="fa-tags"
-                    onHidden={this.props.onHidden}>
-        <LabelManage onDone={this.hideModal.bind(this)} />
-      </Components.Modal>;
-    }
-
-    hideModal() {
-      this.jQuery().modal('hide');
-    }
-
-    componentDidMount() {
-      Analytics.track(Analytics.Trackable.OpenTimeStatsAddLabelsModal);
     }
   }
 }

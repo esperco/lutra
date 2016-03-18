@@ -78,6 +78,7 @@ module Esper.Components {
       var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
 
       var success = !busy && this.state.labelsChanged;
+      var selectedTeamId = events[0] ? events[0].teamId : "";
 
       // NB: Use cancel button instead of OK button because purpose of button
       // is just to close panel, not do anything
@@ -90,7 +91,7 @@ module Esper.Components {
           <div className="esper-select-menu">
             <div className="divider" />
             <a className="esper-selectable" target="_blank"
-               onClick={renderManageLabels}>
+               href={"#!/labels/" + selectedTeamId}>
             <i className="fa fa-fw fa-bars"></i>
             {" "}Manage Labels
             </a>
@@ -98,10 +99,6 @@ module Esper.Components {
         </div>
       </ModalPanel>
     }
-  }
-
-  function renderManageLabels() {
-    Layout.renderModal(<Views.LabelManageModal />);
   }
 
 

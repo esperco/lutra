@@ -92,10 +92,6 @@ module Esper.Components {
       });
     }
 
-    function editLabels() {
-      Layout.renderModal(<Views.LabelManageModal />);
-    }
-
 
     /////
 
@@ -149,8 +145,7 @@ module Esper.Components {
       { props.showUnlabeled ? <div className="divider" /> : null }
 
       <div className="esper-select-menu">
-        <a className="esper-selectable"
-           onClick={editLabels}>
+        <a className="esper-selectable" href="#!/labels">
           <i className="fa fa-fw fa-bars" />{" "}
           Manage Labels
         </a>

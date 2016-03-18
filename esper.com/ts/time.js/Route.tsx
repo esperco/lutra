@@ -13,6 +13,7 @@
 /// <reference path="./Actions.Charts.tsx" />
 /// <reference path="./Actions.Event.tsx" />
 /// <reference path="./Actions.FilterList.tsx" />
+/// <reference path="./Actions.LabelManage.tsx" />
 /// <reference path="./Actions.NotificationSettings.tsx" />
 
 module Esper.Route {
@@ -132,6 +133,10 @@ module Esper.Route {
       eventId : Util.getParamByName("event",  q),
       action  : Util.getParamByName("action", q)
     });
+  });
+
+  route("/labels/:teamid?", checkOnboarding, function(ctx) {
+    Actions.renderLabelManage(ctx.params["teamid"]);
   });
 
   route("/list", checkOnboarding, rememberCal, function(ctx) {
