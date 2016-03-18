@@ -28,6 +28,9 @@ module Esper.Components {
   export class LabelEditor2 extends Component<LabelEditorProps, {
     // Did labels change in between props? Set in componentWillReceiveProps
     labelsChanged?: boolean;
+
+    // Filter for labels shown
+    labelFilter?: string;
   }> {
     constructor(props: LabelEditorProps) {
       super(props);
@@ -85,8 +88,10 @@ module Esper.Components {
               onCancel={props.onDone} cancelText={props.doneText || "Close"}
               success={success} className="esper-panel-section">
         <div className="esper-panel-section">
-          <LabelInputForEvents events={events} />
-          <LabelList events={events} teams={teams} />
+          { this.renderLabelInput(events) }
+          <LabelList events={events} teams={teams}
+            filter={this.state.labelFilter}
+          />
           <div className="esper-select-menu">
             <div className="divider" />
             <a className="esper-selectable" target="_blank"
@@ -98,23 +103,24 @@ module Esper.Components {
         </div>
       </ModalPanel>
     }
+
+    renderLabelInput(events: Events.TeamEvent[]) {
+      return <LabelInput
+        onSubmit={(val) => {
+          var teamIds = _.map(events, (e) => e.teamId);
+          teamIds = _.uniq(teamIds);
+          _.each(teamIds, (teamId) => {
+            Teams.addLabels(teamId, val);
+          });
+          EventLabelChange.add(events, val, true);
+        }}
+        onChange={(val) => this.setState({ labelFilter: val })}
+      />;
+    }
   }
 
 
   ///////
-
-  function LabelInputForEvents({events}: {
-    events: Events.TeamEvent[];
-  }) {
-    return <LabelInput onSubmit={(val) => {
-      var teamIds = _.map(events, (e) => e.teamId);
-      teamIds = _.uniq(teamIds);
-      _.each(teamIds, (teamId) => {
-        Teams.addLabels(teamId, val);
-      });
-      EventLabelChange.add(this.props.events, val, true);
-    }} />;
-  }
 
   export class LabelInput extends Component<{
     onSubmit: (val: string) => void;
@@ -151,9 +157,10 @@ module Esper.Components {
       var val = input.val().trim();
       if (val) {
         this.props.onSubmit(val);
+        input.val("");
+        this.props.onChange("");
+        input.focus();
       }
-      input.val("");
-      input.focus();
     }
 
     // Catch enter key on input -- use jQuery to actual examine value
@@ -177,7 +184,8 @@ module Esper.Components {
 
   function LabelList(props: {
     events: Events.TeamEvent[];
-    teams: ApiT.Team[]
+    teams: ApiT.Team[];
+    filter?: string;
   }) {
     if (! props.events.length) {
       return <span />;
@@ -185,6 +193,13 @@ module Esper.Components {
 
     var labels = Labels.fromEvents(props.events, props.teams);
     labels = Labels.sortLabels(labels);
+    if (props.filter) {
+      var normFilter = props.filter.toLowerCase();
+      labels = _.filter(labels,
+        (l) => _.includes(l.displayAs.toLowerCase(), normFilter)
+      );
+    }
+
     return <div className="esper-select-menu">
       {
         _.map(labels,
