@@ -25,8 +25,9 @@ module Esper.Components {
 
       var selected = _.findIndex(months, (m) =>
         this.props.windowStart >= m[0].toDate() &&
-        this.props.windowEnd <= m[1].toDate()
-      ) || 0;
+        this.props.windowStart <= m[1].toDate()
+      );
+      if (selected < 0) { selected = 0; }
 
       var disableLeft = selected <= 0;
       var disableRight = selected >= months.length - 1;
