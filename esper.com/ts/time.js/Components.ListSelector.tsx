@@ -4,6 +4,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./Components.Badge.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -44,6 +45,7 @@ module Esper.Components {
     id: string;
     displayAs: string|JSX.Element;
     badgeText?: string;
+    badgeHoverText?: string;
     badgeColor?: string;
   }
 
@@ -85,15 +87,12 @@ module Esper.Components {
 
             var selected = this.isSelected(group.id, opts.id);
 
-            var badge: JSX.Element;
-            if (opts.badgeText) {
-              var badgeStyle = (selected && opts.badgeColor) ? {
-                background: opts.badgeColor
-              } : {};
-              badge = <span className="badge" style={badgeStyle}>
-                {opts.badgeText}
-              </span>;
-            }
+            var badge = opts.badgeText ? <Components.Badge
+              text={opts.badgeText}
+              hoverText={opts.badgeHoverText}
+              color={selected && opts.badgeColor}
+            /> : null;
+
             var clickHandler = () => {
               this.handleClick(group.id, opts.id, !selected);
             };
