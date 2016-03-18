@@ -12,6 +12,7 @@ module Esper.Components {
   interface EventEditorProps {
     eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
+    initAction?: boolean;
     onDone?: () => void;
     className?: string;
   }
@@ -30,7 +31,7 @@ module Esper.Components {
         null
       }
       { props.eventPairs.length === 1 ?
-        <EventFeedback eventPair={eventPair} /> :
+        <EventFeedback eventPair={eventPair} initAction={props.initAction} /> :
         null
       }
       <Components.LabelEditor2
@@ -97,6 +98,7 @@ module Esper.Components {
 
   interface EventPairProps {
     eventPair: [Events.TeamEvent, Model.StoreMetadata];
+    initAction?: boolean;
   }
 
   export class EventFeedback extends Component<EventPairProps, {
@@ -122,8 +124,10 @@ module Esper.Components {
                   status === Model.DataStatus.PUSH_ERROR;
       var hasChanges = this.state.notes !== event.feedback.notes;
       var disableOk = busy || !hasChanges;
-      var success = !busy && !hasChanges &&
-        _.isEqual(this.state.lastSavedEvent, event);
+      var success = !busy && !hasChanges && (
+        (this.props.initAction && !this.state.lastSavedEvent) ||
+        _.isEqual(this.state.lastSavedEvent, event)
+      );
 
       return <Components.ModalPanel busy={busy} error={error} success={success}
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
