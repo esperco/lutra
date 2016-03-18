@@ -140,9 +140,9 @@ module Esper.Components {
             var teamIds = _.map(events, (e) => e.teamId);
             teamIds = _.uniq(teamIds);
             _.each(teamIds, (teamId) => {
-              Teams.addLabels(teamId, val);
+              Teams.addLabel(teamId, val);
             });
-            EventLabelChange.add(events, val, true);
+            EventLabelChange.add(events, val);
             this.setState({ labelFilter: null })
             return "";
           }
@@ -231,8 +231,7 @@ module Esper.Components {
     render() {
       return <div className="form-group">
         <label htmlFor={this.getId("new-labels")}>
-          Find / Add Labels{" "}
-          <span className="comma-note esper-note">Separate by Commas</span>
+          Find / Add Labels
         </label>
         <div className="input-group">
           <div className={ this.state.value ? "esper-clearable" : "" }>
@@ -241,9 +240,8 @@ module Esper.Components {
                    onKeyDown={this.inputKeydown.bind(this)}
                    onChange={(e) => this.onChange(e)}
                    value={this.state.value}
-                   placeholder={
-                    "Q1 Sales Goal, Positive Meeting, Negative Meeting"
-                   } />
+                   placeholder="Ex: Q1 Sales Goal"
+            />
             {
               this.state.value ?
               <span className="esper-clear-action"

@@ -106,21 +106,16 @@ module Esper.Teams {
   //////////
 
   // Takes a comma-separated set of labels to add
-  export function addLabels(_id: string, commaSeparatedLabels: string) {
-    return addRmLabels(_id, commaSeparatedLabels, "");
+  export function addLabel(_id: string, label: string) {
+    return applyLabels(_id, [label], []);
   }
 
-  export function rmLabels(_id: string, commaSeparatedLabels: string) {
-    return addRmLabels(_id, "", commaSeparatedLabels);
+  export function rmLabel(_id: string, label: string) {
+    return applyLabels(_id, [], [label]);
   }
 
-  // Takes comma separated list of labels to add and remove
-  export function addRmLabels(_id: string,
-    addCommaSeparatedLabels: string, rmCommaSeparatedLabels: string)
-  {
-    var addLabels = Labels.toList(addCommaSeparatedLabels);
-    var rmLabels = Labels.toList(rmCommaSeparatedLabels);
-    return applyLabels(_id, addLabels, rmLabels);
+  export function renameLabel(_id: string, oldLabel: string, newLabel: string) {
+    return applyLabels(_id, [oldLabel], [newLabel]);
   }
 
   function setDefaultLabels(_id: string) {

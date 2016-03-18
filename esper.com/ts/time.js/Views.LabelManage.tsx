@@ -111,7 +111,7 @@ module Esper.Views {
     renderLabelInput() {
       return <Components.LabelInput
         onSubmit={(val) => {
-          Teams.addLabels(this.props.teamId, val);
+          Teams.addLabel(this.props.teamId, val);
           this.setState({ labelFilter: null })
           return "";
         }}
@@ -209,14 +209,12 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Teams.rmLabels(this.props.teamId, this.fmtLabelInput(label));
+      Teams.rmLabel(this.props.teamId, this.fmtLabelInput(label));
     }
 
     // Clean label input before submission
     fmtLabelInput(label: string) {
-      label = label.trim();
-      if (label.indexOf(",") > -1) label = "\"" + label + "\"";
-      return label;
+      return label.trim();
     }
 
     promptRmFor(label: string) {
@@ -251,8 +249,8 @@ module Esper.Views {
       var val = input.val().trim();
       var orig = this.fmtLabelInput(this.state.editLabel);
       if (val && val !== orig) {
-        Teams.addRmLabels(this.props.teamId, val, orig);
-        BatchLabelChange.rename(this.props.teamId, orig, val, true);
+        Teams.renameLabel(this.props.teamId, orig, val);
+        BatchLabelChange.rename(this.props.teamId, orig, val);
       }
       this.resetState();
     }

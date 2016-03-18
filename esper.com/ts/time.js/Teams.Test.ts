@@ -19,17 +19,17 @@ module Esper.Teams {
       );
     });
 
-    it("should add labels in CSV form", function() {
-      Teams.addLabels(this.teamId, "Label 4, Label 5");
+    it("should add labels", function() {
+      Teams.addLabel(this.teamId, "Label 4");
       expect(Api.putSyncedLabels).toHaveBeenCalledWith(this.teamId, {
-        labels: ["Label 1", "Label 2", "Label 3", "Label 4", "Label 5"]
+        labels: ["Label 1", "Label 2", "Label 3", "Label 4"]
       })
     });
 
     it("should de-duplicate similar labels when adding", function() {
-      Teams.addLabels(this.teamId, "label 3, Label 4");
+      Teams.addLabel(this.teamId, "label 3");
       expect(Api.putSyncedLabels).toHaveBeenCalledWith(this.teamId, {
-        labels: ["Label 1", "Label 2", "Label 3", "Label 4"]
+        labels: ["Label 1", "Label 2", "Label 3"]
       });
     });
   });
