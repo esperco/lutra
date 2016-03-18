@@ -70,7 +70,7 @@ module Esper.Test {
   // Helper for comparing a ReactElement vs. expected class and props in
   // Jasmine. Does a shallow comparison on props.
   export function cmpReact(element: React.ReactElement<any>,
-      cls: typeof React.Component, props: any = {}) {
+      cls: typeof React.Component, props?: any) {
     var getName = function(constructor: any) {
       return constructor.name || constructor.toString().match(/^.*$/m)[0];
     }

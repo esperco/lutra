@@ -11,7 +11,7 @@ module Esper.Route {
     expect(spy).toHaveBeenCalled();
 
     var args = spy.calls.argsFor(0);
-    Test.cmpReact(args[0], main, mainProps || {});
+    Test.cmpReact(args[0], main, mainProps);
 
     if (arguments.length > 3) {
       if (header) {
