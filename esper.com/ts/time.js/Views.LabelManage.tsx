@@ -49,6 +49,7 @@ module Esper.Views {
     // Show edit interface or remove prompt for a given label
     editLabel?: string;
     rmLabelPrompt?: string;
+    labelFilter?: string;
   }
 
   class LabelManageBase extends Component<LabelManageProps, LabelManageState>
@@ -74,7 +75,7 @@ module Esper.Views {
       var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }
-        <LabelInputForManage teamId={this.props.teamId} />
+        { this.renderLabelInput() }
         {
           !labels.length ? null :
           <div className="alert alert-info">
@@ -105,6 +106,16 @@ module Esper.Views {
       var team = Teams.get(this.props.teamId);
       var ret = (team && team.team_labels) || [];
       return Labels.sortLabelStrs(ret);
+    }
+
+    renderLabelInput() {
+      return <Components.LabelInput
+        onSubmit={(val) => {
+          Teams.addLabels(this.props.teamId, val);
+        }}
+        onChange={(val) => {
+          this.setState({ labelFilter: val });
+        }} />;
     }
 
     renderLabel(label: string) {
@@ -159,6 +170,12 @@ module Esper.Views {
             </div>
           </div>
         </div>;
+      }
+
+      if (this.state.labelFilter &&
+          ! _.includes(label.toLowerCase(),
+                       this.state.labelFilter.toLowerCase())) {
+        return null;
       }
 
       return <div className="list-group-item one-line" key={label}>
@@ -302,14 +319,5 @@ module Esper.Views {
         }
       </div>;
     }
-  }
-
-
-  ///////
-
-  function LabelInputForManage({teamId}: {teamId: string}) {
-    return <Components.LabelInput onSubmit={(val) => {
-      Teams.addLabels(teamId, val);
-    }} />;
   }
 }

@@ -118,6 +118,7 @@ module Esper.Components {
 
   export class LabelInput extends Component<{
     onSubmit: (val: string) => void;
+    onChange?: (val: string) => void;
   }, {}> {
     _input: HTMLInputElement;
 
@@ -131,6 +132,7 @@ module Esper.Components {
           <input type="text" className="form-control"
                  id={this.getId("new-labels")} ref={(c) => this._input = c}
                  onKeyDown={this.inputKeydown.bind(this)}
+                 onChange={(e) => this.onChange(e)}
                  placeholder={
                   "Q1 Sales Goal, Positive Meeting, Negative Meeting"
                  } />
@@ -159,6 +161,13 @@ module Esper.Components {
       if (e.keyCode === 13) {
         e.preventDefault();
         this.submitInput();
+      }
+    }
+
+    onChange(e: React.FormEvent) {
+      if (this.props.onChange) {
+        var val = (e.target as HTMLInputElement).value;
+        this.props.onChange(val);
       }
     }
   }
