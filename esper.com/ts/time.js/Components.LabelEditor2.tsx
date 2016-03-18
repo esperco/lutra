@@ -23,6 +23,7 @@ module Esper.Components {
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
     onDone?: () => void;
     doneText?: string;
+    autoFocus?: boolean;
   }
 
   export class LabelEditor2 extends Component<LabelEditorProps, {
@@ -62,6 +63,22 @@ module Esper.Components {
       );
       if (!_.isEqual(oldLabels, newLabels)) {
         this.setState({ labelsChanged: true });
+      }
+    }
+
+    componentDidMount() {
+      this.focus();
+    }
+
+    componentDidUpdate(prevProps: LabelEditorProps) {
+      if (! _.isEqual(this.props, prevProps)) {
+        this.focus();
+      }
+    }
+
+    focus() {
+      if (this.props.autoFocus) {
+        this.find("input[type=text]:first").focus();
       }
     }
 

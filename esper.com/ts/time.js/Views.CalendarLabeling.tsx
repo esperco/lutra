@@ -134,6 +134,7 @@ module Esper.Views {
           <Components.LabelEditor2
             eventPairs={eventPairs}
             teamPairs={teamPairs}
+            autoFocus={true}
           />
         </div>;
       } else {
