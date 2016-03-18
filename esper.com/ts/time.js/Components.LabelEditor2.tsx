@@ -12,7 +12,6 @@
 /// <reference path="./EventLabelChange.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Components.EventEditor.tsx" />
-/// <reference path="./Views.LabelManage.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -86,7 +85,7 @@ module Esper.Components {
               onCancel={props.onDone} cancelText={props.doneText || "Close"}
               success={success} className="esper-panel-section">
         <div className="esper-panel-section">
-          <LabelInput events={events} />
+          <LabelInputForEvents events={events} />
           <LabelList events={events} teams={teams} />
           <div className="esper-select-menu">
             <div className="divider" />
@@ -104,15 +103,29 @@ module Esper.Components {
 
   ///////
 
-  class LabelInput extends Component<{
+  function LabelInputForEvents({events}: {
     events: Events.TeamEvent[];
+  }) {
+    return <LabelInput onSubmit={(val) => {
+      var teamIds = _.map(events, (e) => e.teamId);
+      teamIds = _.uniq(teamIds);
+      _.each(teamIds, (teamId) => {
+        Teams.addLabels(teamId, val);
+      });
+      EventLabelChange.add(this.props.events, val, true);
+    }} />;
+  }
+
+  export class LabelInput extends Component<{
+    onSubmit: (val: string) => void;
   }, {}> {
     _input: HTMLInputElement;
 
     render() {
       return <div className="form-group">
         <label htmlFor={this.getId("new-labels")}>
-          New Labels (Separate by Commas)
+          Find / Add Labels{" "}
+          <span className="comma-note esper-note">Separate by Commas</span>
         </label>
         <div className="input-group">
           <input type="text" className="form-control"
@@ -135,12 +148,7 @@ module Esper.Components {
       var input = $(this._input);
       var val = input.val().trim();
       if (val) {
-        var teamIds = _.map(this.props.events, (e) => e.teamId);
-        teamIds = _.uniq(teamIds);
-        _.each(teamIds, (teamId) => {
-          Teams.addLabels(teamId, val);
-        });
-        EventLabelChange.add(this.props.events, val, true);
+        this.props.onSubmit(val);
       }
       input.val("");
       input.focus();

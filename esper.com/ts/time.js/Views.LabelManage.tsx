@@ -9,6 +9,7 @@
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./BatchLabelChange.ts" />
+/// <reference path="./Components.LabelEditor2.tsx" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
 
@@ -73,6 +74,7 @@ module Esper.Views {
       var labels = this.getLabels();
       return <div>
         { this.renderTeamSelector() }
+        <LabelInputForManage teamId={this.props.teamId} />
         {
           !labels.length ? null :
           <div className="alert alert-info">
@@ -300,5 +302,14 @@ module Esper.Views {
         }
       </div>;
     }
+  }
+
+
+  ///////
+
+  function LabelInputForManage({teamId}: {teamId: string}) {
+    return <Components.LabelInput onSubmit={(val) => {
+      Teams.addLabels(teamId, val);
+    }} />;
   }
 }
