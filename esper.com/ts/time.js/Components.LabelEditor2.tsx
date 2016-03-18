@@ -112,7 +112,7 @@ module Esper.Components {
           { this.renderLabelList(events) }
           <div className="esper-select-menu">
             <div className="divider" />
-            <a className="esper-selectable" target="_blank"
+            <a className="esper-selectable"
                href={"#!/labels/" + selectedTeamId}>
             <i className="fa fa-fw fa-bars"></i>
             {" "}Manage Labels

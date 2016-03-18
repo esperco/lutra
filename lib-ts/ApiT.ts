@@ -87,6 +87,7 @@ module Esper.ApiT {
     team_owner: string;
     team_cal_user: string;
     team_labels: string[];
+    team_labels_norm: string[];
     team_label_urgent: string;
     team_label_new: string;
     team_label_in_progress: string;
