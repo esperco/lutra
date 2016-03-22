@@ -320,17 +320,17 @@ module Esper.Model2 {
       Helper to fetch data via a promise and store it at a particular key when
       the promise resolves. Updates dataStatus metadata accordingly.
     */
-    fetch(_id: TKey, promise: JQueryPromise<TData>) {
+    fetch(_id: TKey, promise: JQueryPromise<Option.T<TData>>) {
       this.setSafeOpt(_id, {
         dataStatus: Model.DataStatus.FETCHING
       });
 
-      return promise.then((newData: TData) => {
+      return promise.then((optData: Option.T<TData>) => {
         // On success, update store
-        this.setSafe(_id, Option.wrap(newData), {
+        this.setSafe(_id, optData, {
           dataStatus: Model.DataStatus.READY
         });
-        return newData;
+        return optData;
 
       }).fail((err) => {
         // On failure, update store to note failure (again, don't override
@@ -348,10 +348,7 @@ module Esper.Model2 {
       on promise resolution. Optionally takes new data to populate store.
     */
     push(_id: TKey, promise: JQueryPromise<any>, newData: Option.T<TData>) {
-      this.pushFetch(_id, promise.then(() => this.getData(_id).match({
-        none: () => null,
-        some: (d): TData => d
-      })), newData);
+      this.pushFetch(_id, promise.then(() => this.getData(_id)), newData);
     }
 
     /*
@@ -359,7 +356,7 @@ module Esper.Model2 {
       promise returns. Updates dataStatus accordingly. Can also set initial
       data in store pending promise resolution.
     */
-    pushFetch(_id: TKey, promise: JQueryPromise<TData>,
+    pushFetch(_id: TKey, promise: JQueryPromise<Option.T<TData>>,
               initData?: Option.T<TData>)
     {
       // Set to INFLIGHT and populate with initData (if any)
@@ -377,12 +374,12 @@ module Esper.Model2 {
         some: (d) => d.dataStatus !== Model.DataStatus.UNSAVED
       });
 
-      promise.then((newData: TData) => {
+      promise.then((optData: Option.T<TData>) => {
         // On success, update store
-        canSave() && this.set(_id, Option.wrap(newData), {
+        canSave() && this.set(_id, optData, {
           dataStatus: Model.DataStatus.READY
         });
-        return newData;
+        return optData;
 
       }).fail((err) => {
         // On failure, update store to note failure (again, don't override
