@@ -57,6 +57,8 @@ module Esper.Model2 {
     idForData: (data: TData) => TKey
     cap: number;
 
+    // FIFO queue of alias lists
+    capList: TKey[][];
 
     //////
 
@@ -73,12 +75,14 @@ module Esper.Model2 {
 
       opts = opts || {};
       this.cap = opts.cap;
+      this.capList = [];
       this.idForData = opts.idForData;
     }
 
     // Clears all data in store
     reset(): void {
       this.data = {};
+      this.capList = [];
     }
 
 
@@ -256,6 +260,23 @@ module Esper.Model2 {
       _.each(aliases, (a) => {
         this.data[Util.cmpStringify(a)] = storeData;
       });
+
+      // Update cap list
+      var aliasesToRm = Util.pushToCapped(this.capList, aliases, this.cap,
+        (a, b) => _.intersectionBy(a, b, Util.cmpStringify).length > 0
+      );
+      if (aliasesToRm instanceof Array) {
+
+        /*
+          Don't call this.remove because we don't necessarily want to emit
+          a change event if the element is already rendered in the DOM. Just
+          remove from internal data reference.
+        */
+        _.each(aliasesToRm, (a) => {
+          delete this.data[Util.cmpStringify(a)];
+        });
+      }
+
       this.emitChange(aliases);
     }
 
@@ -382,6 +403,9 @@ module Esper.Model2 {
           _.each(d.aliases, (a) => {
             delete this.data[Util.cmpStringify(a)]
           });
+          this.capList = _.filter(this.capList,
+            (l) => _.intersection(l, d.aliases).length === 0
+          );
           this.emitChange(d.aliases);
           return true;
         }

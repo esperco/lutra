@@ -700,12 +700,131 @@ module Esper.Model2 {
       });
     });
 
-    // TODO
+    describe("with cap", function() {
+      beforeEach(function() {
+        rabbitStore = new Store<[string, string], Rabbit>({
+          cap: 3
+        });
+      });
 
-    // describe("with cap", function() {
+      it("should have a cap", function() {
+        expect(rabbitStore.cap).toEqual(3);
+      });
 
-    // });
+      describe("with just enough objects", function() {
+        beforeEach(function() {
+          setRabbit(["Rabbit", "1"], 1);
+          setRabbit(["Rabbit", "2"], 2);
+          setRabbit(["Rabbit", "3"], 3);
+        });
 
+        it("should preserve all objects", function() {
+          expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+          expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+          expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+        });
+
+        describe("with one extra object", function() {
+          beforeEach(function() {
+            setRabbit(["Rabbit", "4"], 4);
+          });
+
+          it("should keep the total number of objects at the cap", function() {
+            expect(rabbitStore.all().length).toEqual(3);
+          });
+
+          it("should remove objects from the cap in FIFO order", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+
+        describe("with removal before addition", function() {
+          beforeEach(function() {
+            rabbitStore.remove(["Rabbit", "3"]);
+            setRabbit(["Rabbit", "4"], 4)
+          });
+
+          it("should not trigger cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+
+        describe("followed by update", function() {
+          beforeEach(function() {
+            setRabbit(["Rabbit", "1"], 100);
+          });
+
+          it("should not trigger cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+          });
+
+          describe("followed by insertion", function() {
+            beforeEach(function() {
+              setRabbit(["Rabbit", "4"], 4);
+            });
+
+            it("should remove last updated, not last inserted", function() {
+              expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+              expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(false);
+              expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+              expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+            });
+          });
+        });
+
+        describe("with aliases", function() {
+          beforeEach(function() {
+            rabbitStore.set(["Rabbit","1"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "1"], carrots: 100
+            }), {
+              aliases: [["Rabbit", "One"]]
+            });
+            rabbitStore.set(["Rabbit","2"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "2"], carrots: 200
+            }), {
+              aliases: [["Rabbit", "Two"]]
+            });
+            rabbitStore.set(["Rabbit","3"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "3"], carrots: 300
+            }), {
+              aliases: [["Rabbit", "Three"]]
+            });
+          });
+
+          it("should not count aliases towards cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "One"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Two"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Three"]).isSome()).toBe(true);
+          });
+
+          it("should count non-aliased towards cap", function() {
+            setRabbit(["Rabbit", "4"], 4);
+
+            // Note that aliase is removed too
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "One"]).isSome()).toBe(false);
+
+            // Remainder untouched
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Two"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Three"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+      });
+    });
   });
 
 }
