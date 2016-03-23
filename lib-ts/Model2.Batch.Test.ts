@@ -23,7 +23,7 @@ module Esper.Model2 {
 
     describe("batchSet", function() {
       beforeEach(function() {
-        rabbitListStore.batchSet(1, [{
+        rabbitListStore.batchSet(1, Option.some([{
           itemKey: rabbitA,
           data: Option.wrap({ name: rabbitA, carrots: 1 })
         },{
@@ -32,7 +32,7 @@ module Esper.Model2 {
           opts: {
             aliases: [rabbitC]
           }
-        }]);
+        }]));
       });
 
       it("should add data to itemStore",
@@ -72,7 +72,7 @@ module Esper.Model2 {
 
     describe("with alias", function() {
       beforeEach(function() {
-        rabbitListStore.batchSet(1, [{
+        rabbitListStore.batchSet(1, Option.some([{
           itemKey: rabbitA,
           data: Option.wrap({ name: rabbitA, carrots: 1 })
         },{
@@ -81,7 +81,7 @@ module Esper.Model2 {
           opts: {
             aliases: [rabbitC]
           }
-        }], {
+        }]), {
           aliases: [2]
         });
       });

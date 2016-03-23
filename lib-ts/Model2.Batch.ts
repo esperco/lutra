@@ -23,28 +23,31 @@ module Esper.Model2 {
     }
 
     batchSet(batchKey: BatchKey,
-             batchVals: BatchVal<ItemKey, ItemData>[],
+             batchValOpt: Option.T<BatchVal<ItemKey, ItemData>[]>,
              opts?: Model2.StoreOpts<BatchKey>) {
       var keys: ItemKey[] = [];
 
       this.transact(() => {
-        this.itemStore.transact(() => {
-          _.each(batchVals, (batchVal) => {
-            if (batchVal.opts) {
-              this.itemStore.set(batchVal.itemKey, batchVal.data,
-                                 batchVal.opts);
-            } else {
-              this.itemStore.set(batchVal.itemKey, batchVal.data);
-            }
-            keys.push(batchVal.itemKey);
+        var keyOpt = batchValOpt.flatMap((batchVals) => {
+          this.itemStore.transact(() => {
+            _.each(batchVals, (batchVal) => {
+              if (batchVal.opts) {
+                this.itemStore.set(batchVal.itemKey, batchVal.data,
+                                   batchVal.opts);
+              } else {
+                this.itemStore.set(batchVal.itemKey, batchVal.data);
+              }
+              keys.push(batchVal.itemKey);
+            });
           });
-
-          if (opts) {
-            this.set(batchKey, Option.wrap(keys), opts);
-          } else {
-            this.set(batchKey, Option.wrap(keys));
-          }
+          return Option.wrap(keys);
         });
+
+        if (opts) {
+          this.set(batchKey, keyOpt, opts);
+        } else {
+          this.set(batchKey, keyOpt);
+        }
       });
     }
 
