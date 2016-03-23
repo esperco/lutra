@@ -55,10 +55,10 @@ module Esper.Model2 {
       });
 
       it("should allow retrieval of item list via batchGet", function() {
-        var vals = rabbitListStore.batchGet(1).unwrap();
+        var vals = rabbitListStore.batchGet(1).unwrap().data.unwrap();
         expect(vals.length).toEqual(2);
-        expect(vals[0].unwrap().data.unwrap().name).toEqual(rabbitA);
-        expect(vals[1].unwrap().data.unwrap().name).toEqual(rabbitB);
+        expect(vals[0].data.unwrap().name).toEqual(rabbitA);
+        expect(vals[1].data.unwrap().name).toEqual(rabbitB);
       });
 
       describe("if one items in itemStore is missing", function() {
@@ -74,7 +74,7 @@ module Esper.Model2 {
       it("should normalize to Option.None", function() {
         rabbitListStore.batchSet(1, Option.some([]));
         expect(rabbitListStore.get(1).unwrap().data.isSome()).toBeFalsy();
-        expect(rabbitListStore.batchGet(1).isSome()).toBeFalsy();
+        expect(rabbitListStore.batchGet(1).unwrap().data.isSome()).toBeFalsy();
       });
     })
 

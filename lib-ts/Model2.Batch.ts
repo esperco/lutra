@@ -9,6 +9,14 @@ module Esper.Model2 {
     opts?: Model2.StoreOpts<ItemKey>
   }
 
+  export interface BatchResults<ItemKey, ItemData> {
+    data: Option.T<StoreData<ItemKey, ItemData>[]>;
+    dataStatus?: Model.DataStatus;
+  }
+
+  export interface BatchStoreData<BatchKey, ItemKey, ItemData> extends
+    StoreData<BatchKey, StoreData<ItemKey, ItemData>[]> {};
+
   export class BatchStore<BatchKey, ItemKey, ItemData>
     extends Store<BatchKey, ItemKey[]>
   {
@@ -54,16 +62,49 @@ module Esper.Model2 {
       });
     }
 
-    batchGet(batchKey: BatchKey) {
-      return this.get(batchKey)
-        .flatMap((x) => x.data)
-        .flatMap((d) => Option.wrap(_.map(d,
-          (k) => this.itemStore.get(k)
-        )))
-        .flatMap((l) => _.find(l, (i) => i.isNone()) ?
-          Option.none<typeof l>() :
-          Option.wrap(l)
-        );
+    /*
+      Like `get` but replaces the data option with list of item options. There
+      are a couple layers of Options to work through (each of which mean
+      something different):
+
+        batchGet(key).match({
+          none: () => { ... }, // No data under batch key
+          some: (s) => {       // Batch key exists
+
+            return s.data.match({
+              none: () => { ... },  // No items under this batch key
+              some: (items) => {    // Some items under this batch key
+
+                return _.map(items, item.data.match({
+                  none: () => { ... },      // Empty item
+                  some: (item) => { ... }   // Specific item for this batch
+                }))
+              }
+            });
+          }
+        })
+    */
+    batchGet(batchKey: BatchKey)
+      : Option.T<BatchStoreData<BatchKey, ItemKey, ItemData>>
+    {
+      return this.get(batchKey).flatMap((x) => {
+        var items = x.data.match({
+          none: (): Option.T<StoreData<ItemKey, ItemData>>[] => [],
+          some: (d) => _.map(d, (k) => this.itemStore.get(k))
+        });
+
+        // If store references missing item, this fetch is invalid. Mark
+        // key as None.
+        if (_.find(items, (i) => i.isNone())) {
+          return Option.none<BatchStoreData<BatchKey, ItemKey, ItemData>>();
+        }
+
+        return Option.some(_.extend({}, x, {
+          data: x.data.flatMap(
+            () => Option.some(_.map(items, (i) => i.unwrap()))
+          )
+        }) as BatchStoreData<BatchKey, ItemKey, ItemData>);
+      });
     }
 
     batchFetch(batchKey: BatchKey,
