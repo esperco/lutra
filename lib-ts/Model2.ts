@@ -55,6 +55,7 @@ module Esper.Model2 {
 
     // Vars set by constructor
     idForData: (data: TData) => TKey
+    validate: (data: TData) => boolean;
     cap: number;
 
     // FIFO queue of alias lists
@@ -68,7 +69,10 @@ module Esper.Model2 {
 
       // Function to extract a key from data object -- will add to a data
       // object's aliases if not already included
-      idForData?: (data: TData) => TKey
+      idForData?: (data: TData) => TKey,
+
+      // Validate data stored, normalize to Option.None if invalid
+      validate?: (data: TData) => boolean
     }) {
       super();
       this.reset();
@@ -77,6 +81,7 @@ module Esper.Model2 {
       this.cap = opts.cap;
       this.capList = [];
       this.idForData = opts.idForData;
+      this.validate = opts.validate;
     }
 
     // Clears all data in store
@@ -216,6 +221,12 @@ module Esper.Model2 {
 
       Log.assert(!_.isUndefined(data) && data !== null,
         "Do not store null data inside store -- use Option.none");
+
+      // Validate data before setting
+      if (this.validate) {
+        data = data.flatMap((x) => this.validate(x) ?
+          Option.some(x) : Option.none<TData>());
+      }
 
       // See if an instance of data under this key or any alias already exists
       var aliases = Util.some(opts.aliases, [])

@@ -834,6 +834,26 @@ module Esper.Model2 {
         });
       });
     });
+
+    describe("validate", function() {
+      beforeEach(function() {
+        rabbitStore = new Store<[string, string], Rabbit>({
+          validate: (r) => !!r.carrots
+        });
+        setRabbit(["Rabbit", "0"], 0);
+        setRabbit(["Rabbit", "1"], 1);
+      });
+
+      it("should normalize invalid items to Option.None", function() {
+        expect(rabbitStore.get(["Rabbit", "0"]).unwrap().data.isNone())
+          .toBeTruthy();
+      });
+
+      it("should preserve valid items as Option.Some", function() {
+        expect(rabbitStore.get(["Rabbit", "1"]).unwrap().data.isSome())
+          .toBeTruthy();
+      });
+    });
   });
 
 }
