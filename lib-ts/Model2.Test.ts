@@ -342,37 +342,40 @@ module Esper.Model2 {
     });
 
     describe("push", function() {
+      var dfd: JQueryDeferred<any>;
+      var name: [string, string];
+
       beforeEach(function() {
-        this.name = ["Brown", "Rabbit"];
-        this.dfd = $.Deferred<Rabbit>();
-        setRabbit(this.name, 100, { dataStatus: DataStatus.UNSAVED });
-        rabbitStore.push(this.name, this.dfd, Option.some({
-          name: this.name, carrots: 200
+        name = ["Brown", "Rabbit"];
+        dfd = $.Deferred();
+        setRabbit(name, 100, { dataStatus: DataStatus.UNSAVED });
+        rabbitStore.push(name, dfd, Option.some({
+          name: name, carrots: 200
         }));
       });
 
       it("should set an initial value", function() {
-        expect(rabbitStore.get(this.name).unwrap().data.unwrap().carrots)
+        expect(rabbitStore.get(name).unwrap().data.unwrap().carrots)
           .toEqual(200);
       });
 
       it("should normally update dataStatus to INFLIGHT", function() {
-        expect(rabbitStore.get(this.name).unwrap().dataStatus)
+        expect(rabbitStore.get(name).unwrap().dataStatus)
           .toBe(DataStatus.INFLIGHT);
       });
 
       describe("after promise resolves", function() {
         beforeEach(function() {
-          this.dfd.resolve({ name: this.name, carrots: 789 });
+          dfd.resolve(Option.some({ name: name, carrots: 789 }));
         });
 
         it("should update the data status to READY", function() {
-          expect(rabbitStore.get(this.name).unwrap().dataStatus)
+          expect(rabbitStore.get(name).unwrap().dataStatus)
             .toBe(DataStatus.READY);
         });
 
         it("should not update store value", function() {
-          expect(rabbitStore.get(this.name).unwrap().data.unwrap().carrots)
+          expect(rabbitStore.get(name).unwrap().data.unwrap().carrots)
             .toEqual(200);
         });
       });
@@ -380,12 +383,12 @@ module Esper.Model2 {
       describe("after promise fails", function() {
         beforeEach(function() {
           this.err = new Error("Whoops!");
-          this.dfd.reject(this.err);
+          dfd.reject(this.err);
         });
 
         it("should update dataStatus to PUSH_ERROR and populate lastError",
         function() {
-          var data = rabbitStore.get(this.name).unwrap();
+          var data = rabbitStore.get(name).unwrap();
           expect(data.dataStatus).toBe(DataStatus.PUSH_ERROR);
           expect(data.lastError).toBe(this.err);
         });
@@ -393,40 +396,43 @@ module Esper.Model2 {
 
       describe("if data at key is UNSAVED after push initiated", function() {
         beforeEach(function() {
-          setRabbit(this.name, 200, { dataStatus: DataStatus.UNSAVED });
-          this.dfd.resolve();
+          setRabbit(name, 200, { dataStatus: DataStatus.UNSAVED });
+          dfd.resolve();
         });
 
         it("should not update dataStatus to READY after resolution",
         function()
         {
-          expect(rabbitStore.get(this.name).unwrap().dataStatus)
+          expect(rabbitStore.get(name).unwrap().dataStatus)
             .toBe(DataStatus.UNSAVED);
         });
       });
     });
 
     describe("fetch", function() {
+      var dfd: JQueryDeferred<Option.T<Rabbit>>;
+      var name: [string, string];
+
       beforeEach(function() {
-        this.name = ["Brown", "Rabbit"];
-        this.dfd = $.Deferred<Rabbit>();
+        name = ["Brown", "Rabbit"];
+        dfd = $.Deferred();
       });
 
       describe("default", function() {
         beforeEach(function() {
-          rabbitStore.fetch(this.name, this.dfd);
+          rabbitStore.fetch(name, dfd);
         });
 
         it("should normally update dataStatus to FETCHING", function() {
-          expect(rabbitStore.get(this.name).unwrap().dataStatus)
+          expect(rabbitStore.get(name).unwrap().dataStatus)
             .toBe(DataStatus.FETCHING);
         });
 
         it("should update value and dataStatus to READY after promise resolves",
           function()
         {
-          this.dfd.resolve({ name: this.name, carrots: 1000 });
-          var data = rabbitStore.get(this.name).unwrap();
+          dfd.resolve(Option.some({ name: name, carrots: 1000 }));
+          var data = rabbitStore.get(name).unwrap();
           expect(data.dataStatus).toBe(DataStatus.READY);
 
           var rabbit = data.data.unwrap();
@@ -437,8 +443,8 @@ module Esper.Model2 {
           function()
         {
           var err = new Error("Whoops");
-          this.dfd.reject(err);
-          var data = rabbitStore.get(this.name).unwrap();
+          dfd.reject(err);
+          var data = rabbitStore.get(name).unwrap();
           expect(data.dataStatus).toBe(DataStatus.FETCH_ERROR);
           expect(data.lastError).toBe(err);
         });
@@ -448,30 +454,30 @@ module Esper.Model2 {
         describe("if data at key is currently " + DataStatus[status],
         function() {
           beforeEach(function() {
-            setRabbit(this.name, 100, {
+            setRabbit(name, 100, {
               dataStatus: status
             });
-            rabbitStore.fetch(this.name, this.dfd);
+            rabbitStore.fetch(name, dfd);
           });
 
           it("should not update dataStatus initially", function() {
-            expect(rabbitStore.get(this.name).unwrap().dataStatus)
+            expect(rabbitStore.get(name).unwrap().dataStatus)
               .toBe(status);
           });
 
           it("should not update dataStatus after promise resolves",
             function()
           {
-            this.dfd.resolve({ name: this.name, carrots: 1000 });
-            expect(rabbitStore.get(this.name).unwrap().dataStatus)
+            dfd.resolve(Option.wrap({ name: name, carrots: 1000 }));
+            expect(rabbitStore.get(name).unwrap().dataStatus)
               .toBe(status);
           });
 
           it("should not update dataStatus after promise rejects",
             function()
           {
-            this.dfd.reject(new Error());
-            expect(rabbitStore.get(this.name).unwrap().dataStatus)
+            dfd.reject(new Error());
+            expect(rabbitStore.get(name).unwrap().dataStatus)
               .toBe(status);
           });
         });
@@ -482,43 +488,46 @@ module Esper.Model2 {
     });
 
     describe("pushFetch", function() {
+      var dfd: JQueryDeferred<Option.T<Rabbit>>;
+      var name: [string, string];
+
       beforeEach(function() {
-        this.name = ["Brown", "Rabbit"];
-        this.dfd = $.Deferred<Rabbit>();
-        setRabbit(this.name, 100);
-        rabbitStore.pushFetch(this.name, this.dfd);
+        name = ["Brown", "Rabbit"];
+        dfd = $.Deferred();
+        setRabbit(name, 100);
+        rabbitStore.pushFetch(name, dfd);
       });
 
       it("should update with initial value if one passed", function() {
-        rabbitStore.pushFetch(this.name, this.dfd, Option.some({
-          name: this.name, carrots: 200
+        rabbitStore.pushFetch(name, dfd, Option.some({
+          name: name, carrots: 200
         }));
-        expect(rabbitStore.get(this.name).unwrap().data.unwrap().carrots)
+        expect(rabbitStore.get(name).unwrap().data.unwrap().carrots)
           .toEqual(200);
       });
 
       it("should not override existing data if no value passed", function() {
-        expect(rabbitStore.get(this.name).unwrap().data.unwrap().carrots)
+        expect(rabbitStore.get(name).unwrap().data.unwrap().carrots)
           .toEqual(100);
       });
 
       it("should set status to INFLIGHT", function() {
-        expect(rabbitStore.get(this.name).unwrap().dataStatus)
+        expect(rabbitStore.get(name).unwrap().dataStatus)
           .toBe(DataStatus.INFLIGHT);
       });
 
       describe("after promise resolves", function() {
         beforeEach(function() {
-          this.dfd.resolve({name: this.name, carrots: 1234})
+          dfd.resolve(Option.some({name: name, carrots: 1234}));
         });
 
         it("should update the store metadata to READY", function() {
-          expect(rabbitStore.get(this.name).unwrap().dataStatus)
+          expect(rabbitStore.get(name).unwrap().dataStatus)
             .toBe(DataStatus.READY);
         });
 
         it("should update store value", function() {
-          expect(rabbitStore.get(this.name).unwrap().data.unwrap().carrots)
+          expect(rabbitStore.get(name).unwrap().data.unwrap().carrots)
             .toBe(1234);
         });
       });
@@ -526,12 +535,12 @@ module Esper.Model2 {
       describe("after promise fails", function() {
         beforeEach(function() {
           this.err = new Error("Whoops");
-          this.dfd.reject(this.err);
+          dfd.reject(this.err);
         });
 
         it("should update dataStatus to PUSH_ERROR and populate lastError",
         function() {
-          var data = rabbitStore.get(this.name).unwrap();
+          var data = rabbitStore.get(name).unwrap();
           var rabbit = data.data.unwrap();
           expect(data.dataStatus).toBe(DataStatus.PUSH_ERROR);
           expect(data.lastError).toBe(this.err);
@@ -700,12 +709,131 @@ module Esper.Model2 {
       });
     });
 
-    // TODO
+    describe("with cap", function() {
+      beforeEach(function() {
+        rabbitStore = new Store<[string, string], Rabbit>({
+          cap: 3
+        });
+      });
 
-    // describe("with cap", function() {
+      it("should have a cap", function() {
+        expect(rabbitStore.cap).toEqual(3);
+      });
 
-    // });
+      describe("with just enough objects", function() {
+        beforeEach(function() {
+          setRabbit(["Rabbit", "1"], 1);
+          setRabbit(["Rabbit", "2"], 2);
+          setRabbit(["Rabbit", "3"], 3);
+        });
 
+        it("should preserve all objects", function() {
+          expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+          expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+          expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+        });
+
+        describe("with one extra object", function() {
+          beforeEach(function() {
+            setRabbit(["Rabbit", "4"], 4);
+          });
+
+          it("should keep the total number of objects at the cap", function() {
+            expect(rabbitStore.all().length).toEqual(3);
+          });
+
+          it("should remove objects from the cap in FIFO order", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+
+        describe("with removal before addition", function() {
+          beforeEach(function() {
+            rabbitStore.remove(["Rabbit", "3"]);
+            setRabbit(["Rabbit", "4"], 4)
+          });
+
+          it("should not trigger cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+
+        describe("followed by update", function() {
+          beforeEach(function() {
+            setRabbit(["Rabbit", "1"], 100);
+          });
+
+          it("should not trigger cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+          });
+
+          describe("followed by insertion", function() {
+            beforeEach(function() {
+              setRabbit(["Rabbit", "4"], 4);
+            });
+
+            it("should remove last updated, not last inserted", function() {
+              expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+              expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(false);
+              expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+              expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+            });
+          });
+        });
+
+        describe("with aliases", function() {
+          beforeEach(function() {
+            rabbitStore.set(["Rabbit","1"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "1"], carrots: 100
+            }), {
+              aliases: [["Rabbit", "One"]]
+            });
+            rabbitStore.set(["Rabbit","2"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "2"], carrots: 200
+            }), {
+              aliases: [["Rabbit", "Two"]]
+            });
+            rabbitStore.set(["Rabbit","3"], Option.wrap({
+              name: <[string, string]> ["Rabbit", "3"], carrots: 300
+            }), {
+              aliases: [["Rabbit", "Three"]]
+            });
+          });
+
+          it("should not count aliases towards cap", function() {
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "One"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Two"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Three"]).isSome()).toBe(true);
+          });
+
+          it("should count non-aliased towards cap", function() {
+            setRabbit(["Rabbit", "4"], 4);
+
+            // Note that aliase is removed too
+            expect(rabbitStore.get(["Rabbit", "1"]).isSome()).toBe(false);
+            expect(rabbitStore.get(["Rabbit", "One"]).isSome()).toBe(false);
+
+            // Remainder untouched
+            expect(rabbitStore.get(["Rabbit", "2"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Two"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "3"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "Three"]).isSome()).toBe(true);
+            expect(rabbitStore.get(["Rabbit", "4"]).isSome()).toBe(true);
+          });
+        });
+      });
+    });
   });
 
 }
