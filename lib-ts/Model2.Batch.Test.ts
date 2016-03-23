@@ -70,6 +70,14 @@ module Esper.Model2 {
       });
     });
 
+    describe("empty lists", function() {
+      it("should normalize to Option.None", function() {
+        rabbitListStore.batchSet(1, Option.some([]));
+        expect(rabbitListStore.get(1).unwrap().data.isSome()).toBeFalsy();
+        expect(rabbitListStore.batchGet(1).isSome()).toBeFalsy();
+      });
+    })
+
     describe("with alias", function() {
       beforeEach(function() {
         rabbitListStore.batchSet(1, Option.some([{

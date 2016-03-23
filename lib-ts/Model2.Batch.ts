@@ -18,7 +18,10 @@ module Esper.Model2 {
       // Max number of keys to store
       cap?: number
     }) {
-      super(opts);
+      super(_.extend({
+        // Normalize empty data to None
+        validate: (keys: ItemKey[]) => keys.length > 0
+      }, opts));
       this.itemStore = itemStore;
     }
 
