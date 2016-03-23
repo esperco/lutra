@@ -310,18 +310,6 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function setupNylasCalendar(teamid: string,
-    execName: string,
-    timezone: string):
-    JQueryPromise<void> {
-    var url = prefix + "/api/nylas/setup-calendar/" +
-      string(Login.me()) + "/" +
-      encodeURIComponent(teamid) + "/" +
-      encodeURIComponent(execName) + "/" +
-      encodeURIComponent(timezone);
-    return JsonHttp.post(url);
-  }
-
   /***** Slack *****/
   export function getSlackAuthInfo(): JQueryPromise<ApiT.SlackAuthInfo> {
     var url = prefix + "/api/slack/auth-info/" + string(Login.me());
