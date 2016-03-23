@@ -98,6 +98,10 @@ module Esper.Util {
       return o;
     }
 
+    if (o instanceof Date) {
+      return o;
+    }
+
     var keys = _.keys(o);
     keys.sort();
 
