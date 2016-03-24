@@ -197,7 +197,9 @@ module Esper.TestFixtures {
 
   export function makeGenericCalendarEvent(props: {
     start?: string,
-    end?: string
+    end?: string,
+    id?: string,
+    calendar_id?: string
   } = {}): ApiT.GenericCalendarEvent {
     var defaultEvent: ApiT.GenericCalendarEvent = {
       id: "id1",
