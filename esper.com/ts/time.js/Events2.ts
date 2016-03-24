@@ -169,6 +169,24 @@ module Esper.Events2 {
       })());
   }
 
+  export function fetch1(fullEventId: FullEventId, forceRefresh=false) {
+    if (forceRefresh || EventStore.get(fullEventId).isNone()) {
+      var p = Api.getGenericEvent(
+        fullEventId.teamId,
+        fullEventId.calId,
+        fullEventId.eventId
+      ).then((e: ApiT.GenericCalendarEvent) =>
+        Option.wrap(asTeamEvent(fullEventId.teamId, e))
+      );
+      EventStore.fetch(fullEventId, p);
+      return p;
+    } else {
+      return $.Deferred().resolve(EventStore.get(fullEventId).unwrap().data)
+    }
+  }
+
+  export var fetchOne = fetch1;
+
 
   /* Helpers */
 
