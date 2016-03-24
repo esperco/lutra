@@ -22,7 +22,8 @@ module Esper.EventStats {
     truncateEnd?: Date;
   }
 
-  export function annotate(events: Events2.TeamEvent[]): AnnotatedEvent[]
+  export function annotate(events: Events2.TeamEvent[],
+    opts: AnnotateOpts = {}): AnnotatedEvent[]
   {
     // Make sure events are sorted by start date
     events = _.sortBy(events, (e) => moment(e.start).valueOf());
@@ -37,7 +38,7 @@ module Esper.EventStats {
     });
 
 
-    /* Overlap calculation */
+    /* Overlap, truncate calculation */
 
     // Use strings for maps because numbers convert to Array
     var startMap: {[index: string]: AnnotatedEvent[]} = {};
@@ -47,8 +48,25 @@ module Esper.EventStats {
     var criticalPoints: number[] = [];
 
     _.each(ret, (e) => {
-      var start = moment(e.start).valueOf();
-      var end = moment(e.end).valueOf();
+
+      // Truncate start
+      var startM = moment(e.start);
+      if (opts.truncateStart && moment(opts.truncateStart).diff(startM) > 0) {
+        startM = moment(opts.truncateStart);
+      }
+      var start = startM.valueOf();
+
+      // Truncate end
+      var endM = moment(e.end);
+      if (opts.truncateEnd && moment(opts.truncateEnd).diff(endM) < 0) {
+        endM = moment(opts.truncateEnd);
+      }
+      var end = endM.valueOf();
+
+      // Ignore invalid start/end dates (possible after truncation)
+      if (end <= start) { return; }
+
+      // Map critical points to check for overlaps
       var startStr = start.toString();
       var endStr = end.toString();
       startMap[startStr] = startMap[startStr] || [];

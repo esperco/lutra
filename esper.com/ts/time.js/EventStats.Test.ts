@@ -90,6 +90,22 @@ module Esper.EventStats {
           );
         });
       });
+
+      describe("with truncate", function() {
+        function getVal() {
+          return annotate([e1, e2, e6], {
+            truncateStart: new Date(2016, 0, 2),
+            truncateEnd: new Date(2016, 0, 2, 5)
+          });
+        }
+
+        it("should truncate durations before and after opts",
+        function() {
+          expect(_.map(getVal(), (e) => e.adjustedDuration)).toEqual(
+            _.map([0, 2, 2], (s) => Math.round(s * 60 * 60))
+          );
+        });
+      });
     });
 
   });
