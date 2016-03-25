@@ -167,9 +167,9 @@ module Esper.Model2 {
       var key = Util.cmpStringify(_id);
       var ret = Option.wrap(this.data[key]);
       ret.match({
-        none: () => Tracker.register(this, key),
+        none: () => Tracker.register(this, _id),
         some: (d) => { _.each(d.aliases,
-          (a) => Tracker.register(this, Util.cmpStringify(a))
+          (a) => Tracker.register(this, a)
         )}
       });
       return ret;
