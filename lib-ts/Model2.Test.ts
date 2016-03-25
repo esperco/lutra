@@ -565,10 +565,9 @@ module Esper.Model2 {
           rabbitStore.get(name);
         }, this.post);
 
-        var nameStr = Util.cmpStringify(name);
         expect(this.post).toHaveBeenCalledWith([{
           store: rabbitStore,
-          key: nameStr
+          key: name
         }]);
       });
 

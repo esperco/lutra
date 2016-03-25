@@ -90,10 +90,10 @@ module Esper.ReactHelpers {
 
   interface Source {
     emitter: Emit.EmitBase;
-    keys?: string[]
+    keys?: any[]
 
     // Create a new onChange function for each source
-    onChange: (_ids: string[]) => void;
+    onChange: (_ids: any[]) => void;
   }
 
   // Subclass of Component with some helper functions
@@ -170,7 +170,7 @@ module Esper.ReactHelpers {
       this.sources = [];
       _.each(newSources, (source) => {
         var emitter: Emit.EmitBase;
-        var key: string;
+        var key: any;
         if (isTrackingKey(source)) {
           emitter = source.store;
           key = source.key;
@@ -198,19 +198,20 @@ module Esper.ReactHelpers {
 
     // Like createSimpleSource, but ensure that only call updateState if
     // keys match
-    protected createSource(emitter: Emit.EmitBase, keys?: string[])
+    protected createSource(emitter: Emit.EmitBase, keys?: any[])
       : Source
     {
       var src = {
         emitter: emitter,
         keys: keys,
-        onChange: (_ids?: string[]) => {
+        onChange: (_ids?: any[]) => {
 
           // No _ids => force update
           if (_.isUndefined(_ids) || _.isNull(_ids) || !src.keys) {
             this.updateState();
           }
-          else if (_.intersection(_ids, src.keys).length > 0) {
+
+          else if (_.intersectionWith(_ids, src.keys, _.isEqual).length > 0) {
             this.updateState();
           }
         }

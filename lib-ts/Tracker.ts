@@ -16,7 +16,7 @@
 module Esper.Tracker {
   export interface TrackingKey {
     store: Emit.EmitBase;
-    key?: string;
+    key?: any;
   }
 
   export function track<T>(main: () => T,
@@ -30,11 +30,11 @@ module Esper.Tracker {
     return ret;
   }
 
-  export function register(store: Emit.EmitBase, key?: string) {
+  export function register(store: Emit.EmitBase, key?: any) {
     // Avoid duplicate registries
-    if (isTrackingActive &&
-        !_.find(trackingKeys, (k) => k.store === store && k.key === key))
-    {
+    if (isTrackingActive && !_.find(trackingKeys,
+      (k) => k.store === store && _.isEqual(k.key, key)
+    )) {
       if (key) {
         trackingKeys.push({
           store: store,
