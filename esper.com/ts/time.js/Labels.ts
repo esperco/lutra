@@ -2,7 +2,7 @@
   Module for managing event labels
 */
 
-/// <reference path="./Events.ts" />
+/// <reference path="./Events2.ts" />
 
 module Esper.Labels {
   // For new teams
@@ -23,7 +23,7 @@ module Esper.Labels {
 
   // Takes a list of events and returns a list of unique normalized / display
   // label combos. Optionally includes team labels too.
-  export function fromEvents(events: Events.TeamEvent[],
+  export function fromEvents(events: Events2.TeamEvent[],
                              teams: ApiT.Team[] = [])
   {
     // Map of normalized to displayAs

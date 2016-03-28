@@ -19,9 +19,9 @@ module Esper.Components {
 
   interface CalendarProps {
     period: Period.Single;
-    events: Events.TeamEvent[];
-    selectedEvents: Events.TeamEvent[];
-    onEventClick: (event: Events.TeamEvent, add: boolean) => void;
+    events: Events2.TeamEvent[];
+    selectedEvents: Events2.TeamEvent[];
+    onEventClick: (event: Events2.TeamEvent, add: boolean) => void;
     onViewChange: (period: Period.Single) => void;
     busy?: boolean;
     error?: boolean;

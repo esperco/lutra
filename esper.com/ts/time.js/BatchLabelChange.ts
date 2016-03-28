@@ -62,7 +62,7 @@ module Esper.BatchLabelChange {
     );
     p.done(() => {
       TimeStats.StatStore.reset();
-      Events.invalidate();
+      Events2.invalidate();
     });
     Store.push(teamId, p, {});
   }
