@@ -9,12 +9,21 @@
 
 module Esper.Actions {
 
-  export function renderCalendarLabeling(params?: EventFilterJSON) {
-    params = cleanEventFilterJSON(params);
+  export function renderCalendarLabeling(cals: {
+    teamId: string, calId: string
+  }[], period: Period.Single) {
 
-    // At the moment, only calendar selection supported
+    // Fetch
+    _.each(cals, (cal) => Events2.fetchForPeriod({
+      teamId: cal.teamId,
+      calId: cal.calId,
+      period: period
+    }));
+
+    // Render
     render(<Views.CalendarLabeling
-      cals={params.cals}
+      cals={cals}
+      period={period}
     />);
     Analytics.page(Analytics.Page.CalendarLabeling);
   }

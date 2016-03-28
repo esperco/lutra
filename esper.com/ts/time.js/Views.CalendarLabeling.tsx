@@ -10,13 +10,14 @@ module Esper.Views {
       teamId: string;
       calId: string;
     }[];
+    period: Period.Single;
   }
 
   export class CalendarLabeling extends ReactHelpers.Component<Props, {
     selected: {
       teamId: string;
       calId: string;
-      eventIds: string[];
+      eventId: string;
     }[]
   }> {
     constructor(props: Props) {
@@ -54,6 +55,7 @@ module Esper.Views {
               updateFn={(x) => this.updateCalSelection(x)}
               teams={teams}
               calendarsByTeamId={calendarsByTeamId}
+              allowMulti={true}
             />
           </div>
           {this.renderLabelEditor()}
@@ -72,20 +74,34 @@ module Esper.Views {
         </span>);
       }
 
-      // Just one cal for now
-      var selectedCal = this.props.cals[0];
+      var eventsData = Option.flatten(
+        _.map(this.props.cals,
+          (cal) => Events2.getForPeriod({
+            teamId: cal.teamId,
+            calId: cal.calId,
+            period: this.props.period
+          }))
+      );
+      var isBusy = !!_.find(eventsData, (e) => e.isBusy);
+      var hasError = !!_.find(eventsData, (e) => e.hasError);
 
-      // Get events for selectedCal
-      var selectedEventsForCal = _.find(this.state.selected,
-        (s) => s.calId === selectedCal.calId &&
-               s.teamId === selectedCal.teamId);
-      var eventIds = selectedEventsForCal ? selectedEventsForCal.eventIds : [];
+      var events = _.flatten(_.map(eventsData, (e) => e.events));
+      var selectedEvents = _.filter(events, (e) =>
+        !!_.find(this.state.selected, (s) =>
+          s.teamId === e.teamId &&
+          s.calId === e.calendar_id &&
+          s.eventId === e.id
+        )
+      );
 
       return <Components.Calendar
-        teamId={selectedCal.teamId}
-        calId={selectedCal.calId}
-        eventIds={eventIds}
-        updateFn={(eventId, add) => this.updateEventSelection(eventId, add)}
+        period={this.props.period}
+        events={events}
+        selectedEvents={selectedEvents}
+        busy={isBusy}
+        error={hasError}
+        onViewChange={(period) => this.updatePeriod(period)}
+        onEventClick={(event, add) => this.updateEventSelection(event, add)}
       />;
     }
 
@@ -100,20 +116,28 @@ module Esper.Views {
     }
 
     renderLabelEditor() {
-      var eventPairs = _.filter(_.flatten(
-        _.map(this.state.selected, (s) => _.map(s.eventIds,
-          (eventStoreId) => Events.EventStore.get(eventStoreId)
-        ))
-      ));
+      var eventData = Option.flatten(
+        _.map(this.state.selected, (s) => Events2.EventStore.get({
+          teamId: s.teamId,
+          calId: s.calId,
+          eventId: s.eventId
+        }))
+      );
 
-      if (eventPairs.length) {
+      if (eventData.length) {
         var teamPairs = Teams.allPairs();
-        var heading = (eventPairs.length === 1 ?
-          eventPairs[0][0].title || "1 Event Selected":
-          eventPairs.length + " Events Selected"
+        var heading = (eventData.length === 1 ?
+          eventData[0].data.match({
+            none: () => "",
+            some: (e) => e.title
+          }) || "1 Event Selected" :
+          eventData.length + " Events Selected"
         );
         var hasRecurring = false;
-        if (_.find(eventPairs, (e) => !!e[0].recurring_event_id)) {
+        if (_.find(eventData, (e) => e.data.match({
+          none: () => false,
+          some: (e) => !!e.recurring_event_id
+        }))) {
           hasRecurring = true;
         }
 
@@ -125,14 +149,14 @@ module Esper.Views {
                 {" "}+ Recurring
               </span>: ""
             }
-            { eventPairs.length === 1 ?
+            { eventData.length === 1 ?
               <div className="shift-note esper-note">
                 {" "}(Hold Shift to Select Multiple Events)
               </div>: ""
             }
          </div>
           <Components.LabelEditor2
-            eventPairs={eventPairs}
+            eventData={eventData}
             teamPairs={teamPairs}
             autoFocus={true}
           />
@@ -150,52 +174,57 @@ module Esper.Views {
     /////////
 
     updateCalSelection(selections: Calendars.CalSelection[]) {
-      Route.nav.query({
-        cals: selections
-      } as Actions.EventFilterJSON);
+      // Only one calendar supported for now
+      if (selections.length) {
+        this.updateRoute({
+          cals: selections,
+          period: this.props.period
+        });
+      }
     }
 
-    updateEventSelection(eventId: string, add: boolean) {
-      // Only one cal for now -- update if we display multiple
-      var cal = this.props.cals[0];
+    updatePeriod(period: Period.Single) {
+      this.updateRoute({
+        cals: this.props.cals,
+        period: period
+      });
+    }
 
-      var selected = _.cloneDeep(this.state.selected);
-      var selectedCal = _.find(selected, (s) => s.calId === cal.calId &&
-                                                s.teamId === cal.teamId);
-      if (! selectedCal) {
-        selectedCal = {
-          teamId: cal.teamId,
-          calId: cal.calId,
-          eventIds: []
-        };
-        if (add) {
-          selected.push(selectedCal)
-        } else {
-          selected = [selectedCal];
-        }
-      }
+    updateRoute(props: Props) {
+      Route.nav.path([
+        "calendar-labeling",
+        props.cals[0].teamId,  // Only one team supported per view right now
+        _.map(props.cals, (c) => c.calId).join(Actions.CAL_ID_SEPARATOR),
+        props.period.interval,
+        props.period.index.toString()
+      ]);
+    }
 
-      var eventSelected = _.includes(selectedCal.eventIds, eventId);
+    updateEventSelection(event: Events2.TeamEvent, add: boolean) {
+      var selectedList = _.cloneDeep(this.state.selected);
+      var selectedIndex = _.findIndex(selectedList,
+        (s) => Events2.matchId(event, s)
+      );
 
       // Add => cumulative, shift key is down
       if (add) {
-        if (eventSelected) {
-          selectedCal.eventIds = _.without(selectedCal.eventIds, eventId);
+        if (selectedIndex >= 0) {
+          selectedList.splice(selectedIndex, 1);
         } else {
-          selectedCal.eventIds.push(eventId);
+          selectedList.push(Events2.storeId(event));
         }
       }
 
       // Exclusive, select one event only
-      else if (eventSelected) {
-        selected = [];
+      else if (selectedIndex >= 0) {
+        selectedList = [];
       } else {
-        selectedCal.eventIds = [eventId];
+        selectedList = [Events2.storeId(event)];
       }
 
       // Set state to trigger display changes
       this.setState({
-        selected: selected
+        selected: selectedList
       });
     }
   }

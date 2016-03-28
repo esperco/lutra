@@ -59,7 +59,6 @@ module Esper.Route {
     // Has previously selected calendars, stub into request
     else if (lastCals.length) {
       filterJSON.cals = lastCals;
-      console.info("hi");
       Route.nav.query(filterJSON, {replace: true});
     }
 
@@ -97,8 +96,17 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", checkOnboarding, rememberCal, function(ctx) {
-    Actions.renderCalendarLabeling(getJSONQuery(ctx));
+  route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding, rememberCal,
+  function(ctx) {
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderCalendarLabeling(_.map(calIds, (calId) => ({
+      teamId: teamId,
+      calId: calId
+    })), period);
   });
 
   // Notification settings page

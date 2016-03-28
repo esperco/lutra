@@ -147,7 +147,8 @@ module Esper.Route {
     };
 
     // Normalize slashes and hashes
-    export function normalize(frag: string) {
+    export function normalize(fragArg: string|string[]) {
+      var frag = fragArg instanceof Array ? mkPath(fragArg) : fragArg;
       if (! frag) {
         return "";
       }
@@ -167,7 +168,7 @@ module Esper.Route {
     var pathTimeout: number;
 
     // Navigate to a particular page
-    export function path(frag: string, opts?: Opts) {
+    export function path(frag: string|string[], opts?: Opts) {
       opts = opts || {};
       var fn = opts.replace ? pageJs.redirect : pageJs;
       var query = opts.queryStr || (opts.jsonQuery ?
@@ -181,6 +182,10 @@ module Esper.Route {
       } else {
         fn(arg);
       }
+    }
+
+    export function mkPath(args: string[]) {
+      return _.map(args, encodeURIComponent).join("/");
     }
 
     // Navigate to home page
