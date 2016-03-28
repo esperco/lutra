@@ -88,4 +88,16 @@ module Esper.Option {
   export function unwrap2<E>(opt: T<E>) : E {
     return opt.unwrap();
   }
+
+  /*
+    Given a list of options, unwrap them if some -- i.e. what flatMap
+    in Scala does (which is would we'd call this function if it wasn't
+    already taken above ...)
+  */
+  export function flatten<E>(opts: T<E>[]): E[] {
+    return _(opts)
+      .filter((o) => o.isSome())
+      .map((s) => s.unwrap())
+      .value();
+  }
 }
