@@ -91,7 +91,7 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts/:chartType?", checkOnboarding, rememberCal, function(ctx) {
+  route("/charts/:chartType?", checkOnboarding, function(ctx) {
     Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
   });
 
@@ -147,8 +147,22 @@ module Esper.Route {
     Actions.renderLabelManage(ctx.params["teamid"]);
   });
 
-  route("/list", checkOnboarding, rememberCal, function(ctx) {
-    Actions.renderFilterList(getJSONQuery(ctx));
+  route("/list/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding, rememberCal,
+  function(ctx) {
+    var q = Actions.cleanFilterStrJSON(
+      getJSONQuery(ctx)
+    ) as Actions.FilterListJSON;
+    q.labels = Actions.cleanListSelectJSON(q.labels);
+
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderFilterList({
+      teamId: teamId,
+      calIds: Actions.cleanCalIds(teamId, ctx.params["calIds"]),
+      period: period
+    }, q)
   });
 
   // 404 page

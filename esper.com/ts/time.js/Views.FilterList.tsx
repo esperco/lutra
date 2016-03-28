@@ -7,56 +7,43 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Components.LabelSelector.tsx" />
 /// <refernece path="./Components.EventEditor.tsx" />
-/// <reference path="./Events.ts" />
+/// <reference path="./Components.PeriodSelector.tsx" />
+/// <reference path="./Events2.ts" />
 /// <reference path="./Actions.FilterList.tsx" />
 
 module Esper.Views {
   var Component = ReactHelpers.Component;
 
-  interface FilterListProps {
-    calendars: Calendars.CalSelection[];
-    start: Date;
-    end: Date;
-
-    /*
-      Which labels to show -- does a union of all events that have a label
-      in the list + special options for showing all labels and showing
-      unlabled events
-    */
-    labels: string[];
-    unlabeled: boolean;
-    allLabels: boolean;
-
-    // Substring to filter events by (using titles)
-    filterStr: string;
+  interface FilterListProps extends Actions.FilterListJSON {
+    teamId: string;
+    calIds: string[];
+    period: Period.Single;
   }
 
   interface FilterListState {
-    selected?: Events.TeamEvent[];
+    selected?: Events2.TeamEvent[];
     actionsPinned?: boolean;
   }
 
-  function updateRoute(props: FilterListProps, opts?: Route.nav.Opts) {
-    var flQS: Actions.EventFilterJSON = {
-      cals: _.map(props.calendars, (c) => ({
-        teamId: c.teamId,
-        calId: c.calId
-      })),
-      start: props.start.getTime(),
-      end: props.end.getTime(),
-      labels: props.labels,
-      allLabels: props.allLabels,
-      unlabeled: props.unlabeled,
-      filterStr: props.filterStr
-    };
-    Route.nav.query(flQS, opts);
+  function updateRoute(props: FilterListProps, opts: Route.nav.Opts = {}) {
+    var path = "/list/" + (_.map([
+      props.teamId,
+      props.calIds.join(","),
+      props.period.interval[0],
+      props.period.index.toString()
+    ], encodeURIComponent)).join("/");
+    opts.jsonQuery = {
+      filterStr: props.filterStr,
+      labels: props.labels
+    } as Actions.FilterListJSON;
+    Route.nav.path(path, opts);
   }
 
   export class FilterList extends Component<FilterListProps, FilterListState> {
     _actionMenu: HTMLDivElement;
     _actionMenuOffset: number;
     _editModalId: number;
-    _editModalEvents: Events.TeamEvent[];
+    _editModalEvents: Events2.TeamEvent[];
 
     // Use state to track selected events -- reset everytime props change
     constructor(props: FilterListProps) {
@@ -97,8 +84,51 @@ module Esper.Views {
       }
     }
 
+    getEventData() {
+      // Merge event lists for multiple calendars
+      var eventData = Option.flatten(
+        _.map(this.props.calIds, (calId) =>
+          Events2.getForPeriod({
+            teamId: this.props.teamId,
+            calId: calId,
+            period: this.props.period
+          })
+        )
+      );
+
+      var events = _.flatten(_.map(eventData, (e) => e.events));
+      return {
+        events: _.sortBy(events, (e) => moment(e.start)),
+        isBusy: !!_.find(eventData, (e) => e.isBusy),
+        hasError: !!_.find(eventData, (e) => e.hasError)
+      };
+    }
+
+    filterEvents(events: Events2.TeamEvent[]) {
+      if (! this.props.labels.all) {
+        events = _.filter(events, (e) =>
+          (this.props.labels.none && e.labels_norm.length === 0) ||
+          (_.intersection(this.props.labels.some, e.labels_norm).length > 0)
+        );
+      }
+
+      if (this.props.filterStr) {
+        events = _.filter(events,
+          (e) => _.includes(e.title.toLowerCase(),
+                            this.props.filterStr.toLowerCase())
+        );
+      }
+
+      return events;
+    }
+
     renderWithData() {
       this.updateModal();
+      var eventData = this.getEventData();
+      var events = eventData.events;
+      var filteredEvents = this.filterEvents(events);
+      var hiddenEvents = events.length - filteredEvents.length;
+
       return <div className="container filter-list">
         <div className="list-selectors">
           <div className="row">
@@ -106,13 +136,21 @@ module Esper.Views {
             { this.renderMonthSelector() }
           </div>
           <div className="row">
-            { this.renderLabelSelector() }
+            { this.renderLabelSelector(events) }
             { this.renderFilterStr() }
           </div>
         </div>
-        { this.renderActionMenu() }
-        { this.renderFilterMsg() }
-        { this.renderMain() }
+        { this.renderActionMenu(filteredEvents) }
+        { hiddenEvents ? this.renderFilterMsg(hiddenEvents) : null }
+        { (() => {
+          if (eventData.hasError) {
+            return <Components.ErrorMsg />;
+          }
+          if (eventData.isBusy) {
+            return <div className="esper-spinner esper-centered esper-large" />;
+          }
+          return this.renderMain(filteredEvents);
+        })() }
       </div>;
     }
 
@@ -129,30 +167,35 @@ module Esper.Views {
       return <div className="col-sm-6 form-group">
         <Components.CalSelectorDropdownWithIcon
           teams={teams}
+          allowMulti={true}
           calendarsByTeamId={calendarsByTeamId}
-          selected={this.props.calendars}
-          updateFn={(x) => updateRoute(_.extend({}, this.props, {
-            calendars: x
-          }) as FilterListProps)}
+          selected={_.map(this.props.calIds, (calId) => ({
+            teamId: this.props.teamId, calId: calId
+          }))}
+          updateFn={(x) => updateRoute(_.extend({}, this.props, x.length > 0 ?
+            {
+              teamId: x[0].teamId,
+              calIds: _.map(x, (s) => s.calId)
+            } : {
+              teamId: null,
+              calIds: null
+            }) as FilterListProps)}
         />
       </div>;
     }
 
     renderMonthSelector() {
       return <div className="col-sm-6 form-group">
-        <Components.MonthSelector
-          windowStart={this.props.start}
-          windowEnd={this.props.end}
+        <Components.PeriodSelector
+          period={this.props.period}
           updateFn={(x) => updateRoute(_.extend({}, this.props, {
-            start: x.windowStart,
-            end: x.windowEnd
+            period: x
           }) as FilterListProps)}
         />
       </div>;
     }
 
-    renderLabelSelector() {
-      var events = this.getEvents();
+    renderLabelSelector(events: Events2.TeamEvent[]) {
       var labels = Labels.fromEvents(events, Teams.all());
       labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
@@ -160,22 +203,28 @@ module Esper.Views {
           <Components.LabelSelectorDropdown labels={labels}
             totalCount={events.length}
             unlabeledCount={Labels.countUnlabeled(events)}
-            selected={this.props.labels}
-            allSelected={this.props.allLabels}
-            unlabeledSelected={this.props.unlabeled}
+            selected={this.props.labels.some}
+            allSelected={this.props.labels.all}
+            unlabeledSelected={this.props.labels.none}
             showUnlabeled={true}
             updateFn={(x) => updateRoute(_.extend({}, this.props, {
-              allLabels: x.all,
-              unlabeled: x.unlabeled,
-              labels: x.all ? [] : x.labels
+              labels: {
+                all: x.all,
+                none: x.unlabeled,
+                some: x.all ? [] : x.labels,
+                unmatched: false
+              }
             }) as FilterListProps)} />
           {
-            !this.props.allLabels ?
+            !this.props.labels.all ?
             <span className="esper-clear-action" onClick={
               () => updateRoute(_.extend({}, this.props, {
-                allLabels: true,
-                unlabeled: true,
-                labels: []
+                labels: {
+                  all: true,
+                  none: true,
+                  some: [],
+                  unmatched: false
+                }
               }) as FilterListProps)
             }>
               <i className="fa fa-fw fa-times" />
@@ -196,16 +245,10 @@ module Esper.Views {
       </div>;
     }
 
-    renderFilterMsg() {
-      var numFilteredEvents = this.getFilteredEvents().length;
-      var numTotalEvents = this.getEvents().length;
-      if (numTotalEvents === numFilteredEvents) {
-        return;
-      }
-
+    renderFilterMsg(hiddenEvents: number) {
       return <div className="list-filter-msg">
         <span className="muted">
-          {numTotalEvents - numFilteredEvents} Events Not Shown
+          {hiddenEvents} Events Not Shown
         </span>
         <span className="pull-right action esper-clear-action" onClick={
           () => this.resetFilters()
@@ -215,11 +258,11 @@ module Esper.Views {
       </div>;
     }
 
-    renderActionMenu() {
+    renderActionMenu(events: Events2.TeamEvent[]) {
       var icon = (() => {
-        if (this.isAllSelected()) {
+        if (this.isAllSelected(events)) {
           return "fa-check-square-o";
-        } else if (this.isSomeSelected()) {
+        } else if (this.isSomeSelected(events)) {
           return "fa-minus-square-o";
         }
         return "fa-square-o";
@@ -229,7 +272,7 @@ module Esper.Views {
         "list-action-menu" + (this.state.actionsPinned ? " pinned" : "")
       }>
         <div className="list-action-menu-container">
-          <div className="action" onClick={() => this.toggleAll()}>
+          <div className="action" onClick={() => this.toggleAll(events)}>
             <span className="event-checkbox">
               <i className={"fa fa-fw " + icon} />
             </span>
@@ -271,32 +314,6 @@ module Esper.Views {
       </div>;
     }
 
-    getEvents() {
-      return _.filter(_.flatten(
-        _.map(this.props.calendars, (c) =>
-          Events.get(c.teamId, c.calId, this.props.start, this.props.end)
-        )));
-    }
-
-    getFilteredEvents() {
-      var events = this.getEvents();
-      if (! this.props.allLabels) {
-        events = _.filter(events, (e) =>
-          (this.props.unlabeled && e.labels_norm.length === 0) ||
-          (_.intersection(this.props.labels, e.labels_norm).length > 0)
-        );
-      }
-
-      if (this.props.filterStr) {
-        events = _.filter(events,
-          (e) => _.includes(e.title.toLowerCase(),
-                            this.props.filterStr.toLowerCase())
-        );
-      }
-
-      return events;
-    }
-
     resetFilters() {
       updateRoute(_.extend({}, this.props, {
         allLabels: true,
@@ -307,21 +324,17 @@ module Esper.Views {
     }
 
     refreshEvents() {
-      _.each(this.props.calendars, (c) =>
-        Events.fetch(c.teamId, c.calId, this.props.start, this.props.end, true)
+      _.each(this.props.calIds, (c) =>
+        Events2.fetchForPeriod({
+          teamId: this.props.teamId,
+          calId: c,
+          period: this.props.period,
+          force: true
+        })
       );
     }
 
-    renderMain() {
-      if (this.hasError()) {
-        return <Components.ErrorMsg />;
-      }
-
-      if (! this.isReady()) {
-        return <div className="esper-spinner esper-centered esper-large" />;
-      }
-
-      var events = this.getFilteredEvents();
+    renderMain(events: Events2.TeamEvent[]) {
       if (events.length === 0) {
         return <div className="esper-no-content">
           No events found
@@ -342,7 +355,7 @@ module Esper.Views {
       </div>;
     }
 
-    renderDay(timestamp: number, events: Events.TeamEvent[]) {
+    renderDay(timestamp: number, events: Events2.TeamEvent[]) {
       var m = moment(timestamp);
       return <div className="day" key={timestamp}>
         <div className="day-title">{ m.format("MMM D - dddd") }</div>
@@ -352,8 +365,9 @@ module Esper.Views {
       </div>
     }
 
-    renderEvent(event: Events.TeamEvent) {
-      return <div key={Events.storeId(event)} className="list-group-item event">
+    renderEvent(event: Events2.TeamEvent) {
+      return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
+                  className="list-group-item event">
         <div className="event-checkbox"
              onClick={() => this.toggleEvent(event)}>
           { this.isSelected(event) ?
@@ -395,7 +409,7 @@ module Esper.Views {
       </div>;
     }
 
-    renderLabel(event: Events.TeamEvent, id: string, displayAs: string) {
+    renderLabel(event: Events2.TeamEvent, id: string, displayAs: string) {
       var labelColor = Colors.getColorForLabel(id)
       var style = {
         background: labelColor,
@@ -424,28 +438,7 @@ module Esper.Views {
       </span>;
     }
 
-    hasError() {
-      return !!_.find(this.props.calendars, (c) =>
-        Events.status(c.teamId, c.calId, this.props.start, this.props.end)
-          .match({
-            none: () => false,
-            some: (s) => s === Model.DataStatus.FETCH_ERROR ||
-                         s === Model.DataStatus.PUSH_ERROR
-          })
-      );
-    }
-
-    isReady() {
-      return  !!_.find(this.props.calendars, (c) =>
-        Events.status(c.teamId, c.calId, this.props.start, this.props.end)
-          .match({
-            none: () => false,
-            some: (s) => s === Model.DataStatus.READY
-          })
-      );
-    }
-
-    editEvent(event: Events.TeamEvent) {
+    editEvent(event: Events2.TeamEvent) {
       this.renderModal([event]);
     }
 
@@ -453,7 +446,7 @@ module Esper.Views {
       this.renderModal(this.state.selected);
     }
 
-    renderModal(events: Events.TeamEvent[]) {
+    renderModal(events: Events2.TeamEvent[]) {
       this._editModalEvents = events;
       this._editModalId = Layout.renderModal(this.getModal(events));
     }
@@ -469,11 +462,17 @@ module Esper.Views {
       }
     }
 
-    getModal(events: Events.TeamEvent[]) {
+    getModal(events: Events2.TeamEvent[]) {
       // Refresh data from store before rendering modal
-      var eventPairs = _.filter(_.map(events, (e) =>
-        Events.EventStore.get(Events.storeId(e))
-      ));
+      var eventData = _(events)
+        .map((e) => Events2.EventStore.get({
+          teamId: e.teamId,
+          calId: e.calendar_id,
+          eventId: e.id
+        }))
+        .filter((e) => e.isSome())
+        .map((e) => e.unwrap())
+        .value();
       var teamPairs = _.map(Teams.all(),
         (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
           .match<[ApiT.Team, Model.StoreMetadata]>({
@@ -481,15 +480,15 @@ module Esper.Views {
             some: (m) => [t, m]
           }));
 
-      return <Components.EventEditorModal eventPairs={eventPairs}
+      return <Components.EventEditorModal eventData={eventData}
                                           teamPairs={teamPairs} />;
     }
 
-    toggleEvent(event: Events.TeamEvent) {
+    toggleEvent(event: Events2.TeamEvent) {
       var selected = this.state.selected;
       var index = this.findIndex(event);
       if (index >= 0) {
-        selected = _.filter(selected, (s) => !Events.matchRecurring(event, s));
+        selected = _.filter(selected, (s) => !Events2.matchRecurring(event, s));
       } else {
         selected = selected.concat([event]);
       }
@@ -498,32 +497,32 @@ module Esper.Views {
       });
     }
 
-    isSelected(event: Events.TeamEvent) {
+    isSelected(event: Events2.TeamEvent) {
       return this.findIndex(event) >= 0;
     }
 
-    findIndex(event: Events.TeamEvent) {
+    findIndex(event: Events2.TeamEvent) {
       return _.findIndex(this.state.selected, (e) =>
-        Events.matchRecurring(e, event)
+        Events2.matchRecurring(e, event)
       );
     }
 
-    toggleAll() {
-      if (this.isSomeSelected()) {
+    toggleAll(events: Events2.TeamEvent[]) {
+      if (this.isSomeSelected(events)) {
         this.setState({ selected: [] })
       } else {
-        this.setState({ selected: this.getFilteredEvents() })
+        this.setState({ selected: events })
       }
     }
 
-    isAllSelected() {
+    isAllSelected(events: Events2.TeamEvent[]) {
       return this.state.selected.length &&
-        _.every(this.getFilteredEvents(), (e) => this.isSelected(e));
+        _.every(events, (e) => this.isSelected(e));
     }
 
-    isSomeSelected() {
+    isSomeSelected(events: Events2.TeamEvent[]) {
       return this.state.selected.length &&
-        !!_.find(this.getFilteredEvents(), (e) => this.isSelected(e));
+        !!_.find(events, (e) => this.isSelected(e));
     }
   }
 
