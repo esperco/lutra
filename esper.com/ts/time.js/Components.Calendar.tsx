@@ -1,19 +1,16 @@
 /*
   Component for a FullCalendar rendering
 
-  This is technically more of a "View" in that it depends on the data from
-  Event stores as opposed to being a pure function of props and state. But
-  making FullCalendar fit a React paradigm isn't worth the effort right now.
-
   Consider removing FullCalendar and just using straight up React at some
   point (this would also have the nice effect of shrinking our vendor bundle).
   https://github.com/intljusticemission/react-big-calendar is a good candidate
-  for this.
+  for this. Or just using the existing CalendarGrid component and something
+  else for week / agenda view.
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Events.ts" />
+/// <reference path="./Events2.ts" />
 /// <reference path="./Calendars.ts" />
 
 module Esper.Components {
@@ -21,26 +18,21 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface CalendarProps {
-    teamId: string;
-    calId: string;
-    eventIds?: string[];
-    updateFn: (eventStoreId: string, add: boolean) => void;
+    period: Period.Single;
+    events: Events2.TeamEvent[];
+    selectedEvents: Events2.TeamEvent[];
+    onEventClick: (event: Events2.TeamEvent, add: boolean) => void;
+    onViewChange: (period: Period.Single) => void;
+    busy?: boolean;
+    error?: boolean;
   }
 
-  interface CalendarState {
-    showBusy?: boolean;
-    showError?: boolean;
-  }
-
-  export abstract class Calendar extends Component<CalendarProps, CalendarState>
+  export abstract class Calendar extends Component<CalendarProps, {}>
   {
     _fcDiv: HTMLElement;
-    _currentStart: number;  // Unix time
-    _currentEnd: number;    // Unix time
 
     constructor(props: CalendarProps) {
       super(props);
-      this.state = {};
     }
 
     render() {
@@ -52,14 +44,14 @@ module Esper.Components {
 
     renderMessage() {
       var msg: JSX.Element;
-      if (this.state.showBusy) {
+      if (this.props.busy) {
         msg = <span>
           <span className="esper-spinner esper-inline" />{" "}
           Loading &hellip;
         </span>;
       }
 
-      else if (this.state.showError) {
+      else if (this.props.error) {
         msg = <span>
           <i className="fa fa-fw fa-warning" />{" "}
           There was an error loading calendar data.
@@ -75,6 +67,15 @@ module Esper.Components {
       return <div className="esper-center esper-msg">{msg}</div>;
     }
 
+    // Performance fix => only check events for change is not busy or error
+    shouldComponentUpdate(nextProps: CalendarProps) {
+      if (nextProps.busy || nextProps.error) {
+        return this.props.busy !== nextProps.busy ||
+               this.props.error !== nextProps.error;
+      }
+      return true;
+    }
+
     /*
       Where fullCalendar gets initially invoked
     */
@@ -86,10 +87,17 @@ module Esper.Components {
           center: 'title',
           right: 'agendaWeek,month'
         },
-        defaultView: 'month',
-        snapDuration: "00:15:00",
-        events: this.getSync.bind(this),
-        viewRender:this.fetchAsync.bind(this),
+        defaultView: (() => {
+          switch (this.props.period.interval) {
+            case "week":
+              return 'agendaWeek';
+            default:
+              return 'month';
+          }
+        })(),
+        defaultDate: Period.boundsFromPeriod(this.props.period)[0],
+        events: this.getEvents.bind(this),
+        viewRender: this.onViewChange.bind(this),
         eventClick: this.toggleEvent.bind(this),
         height: fcDiv.parent().height() - 10,
         windowResize: () => {
@@ -97,8 +105,6 @@ module Esper.Components {
         }
       });
       this.insertRefreshButton();
-
-      this.setSources([Events.EventStore]);
     }
 
     /*
@@ -112,7 +118,7 @@ module Esper.Components {
 
       // Sanity check
       if (!container || !container.length) {
-        Log.e("Unable to locate FC container for reresh button");
+        Log.e("Unable to locate FC container for refresh button");
         return;
       }
 
@@ -124,105 +130,58 @@ module Esper.Components {
         btn.addClass("fc-corner-left fc-corner-right");
         btn.attr("id", btnId);
         btn.click(() => {
-          Events.invalidate();
-          this.updateCurrentView();
+          Events2.invalidate();
+          Route.nav.refreshOnce();
         });
         container.prepend(btn);
       }
     }
 
-    // Return something so setSources works
-    getState(props: CalendarProps) {
-      return this.state || {};
-    }
-
-    componentDidUpdate(prevProps: CalendarProps, prevState: CalendarState) {
-      $(this._fcDiv).fullCalendar('refetchEvents');
-      if (! _.isEqual(prevProps, this.props)) {
-        this.updateCurrentView();
+    componentDidUpdate() {
+      if (!this.props.busy && !this.props.error) {
+        $(this._fcDiv).fullCalendar('gotoDate',
+          Period.boundsFromPeriod(this.props.period)[0]
+        );
+        $(this._fcDiv).fullCalendar('refetchEvents');
       }
     }
 
-    // Offset range to handle timezone weirdness -- doesn't mutate
-    getRange(start: moment.Moment, end: moment.Moment) {
-      return [
-        start.clone().subtract(1, 'day'),
-        end.clone().add(1, 'day')
-      ];
-    }
-
-    // Makes async calls to update current calendar view
-    updateCurrentView() {
-      var view = $(this._fcDiv).fullCalendar('getView');
-      this.fetchAsync(view);
-    }
-
-    // Asynchronusly make calls to update stores
-    fetchAsync(view: FullCalendar.View) {
-      var range = this.getRange(moment(view.start), moment(view.end));
-      var momentStart = range[0];
-      var momentEnd = range[1];
-
-      /*
-        Remember currrent interval start/stop for callback purposes -- used
-        to avoid situation where navigating between multiple views quickly
-        causes state to be improperly updated. Use unix time to avoid
-        mutation issues.
-      */
-      var currentStart = this._currentStart = momentStart.unix();
-      var currentEnd = this._currentEnd = momentEnd.unix();
-
-      var apiDone = false;
-      Events.fetch(this.props.teamId, this.props.calId,
-        momentStart.toDate(), momentEnd.toDate()
-      ).done(() => {
-        // Only update state if we're still looking at the same interval
-        if (this._currentStart === currentStart &&
-            this._currentEnd === currentEnd) {
-          this.setState({showBusy: false, showError: false});
+    // Update URL to reflect current FC view
+    onViewChange(view: FullCalendar.ViewObject) {
+      var interval = ((name: string): Period.Interval => {
+        switch(name) {
+          case "agendaWeek":
+            return "week";
+          default:
+            return "month";
         }
-      }).fail(() => {
-        this.setState({showBusy: false, showError: true});
-      }).always(() => {
-        apiDone = true;
-      });
+      })(view.name);
 
-      // Promise will return synchronously if already complete and update
-      // state accordingly -- so only update to busy and avoid React re-render
-      // if API call hasn't compelted yet
-      if (! apiDone) {
-        this.setState({showBusy: true, showError: false});
+      // Advance by one day to correct for timezone issues
+      var startDate = moment(view.intervalStart)
+        .clone().add(1, 'day').toDate();
+      var p = Period.singleFromDate(interval, startDate);
+      if (! _.isEqual(p, this.props.period)) {
+        this.props.onViewChange(p);
       }
     }
 
-    // Synchronously fetch from stores
-    getSync(momentStart: moment.Moment, momentEnd: moment.Moment,
-            tz: string|boolean,
-            callback: (events: FullCalendar.EventObject[]) => void): void
+    // Format events for FullCalendar
+    getEvents(mStart: moment.Moment, mEnd: moment.Moment, tz: string|boolean,
+              callback: (events: FullCalendar.EventObject[]) => void): void
     {
-      var range = this.getRange(momentStart, momentEnd);
-      momentStart = range[0];
-      momentEnd = range[1];
-
-      var events = Events.get(this.props.teamId, this.props.calId,
-        momentStart.toDate(), momentEnd.toDate()
-      );
-      events = _.filter(events);
+      var selectedEventIds = _.map(this.props.selectedEvents, (e) => e.id);
 
       // For inferring which events are "selected" by virtue of being a
       // recurring event
-      var selectedEvents = _.map(this.props.eventIds,
-        (_id) => Events.EventStore.val(_id)
-      ) || [];
-      var recurringEventIds = _.map(selectedEvents,
+      var recurringEventIds = _.map(this.props.selectedEvents,
         (e) => e && e.recurring_event_id
       );
       recurringEventIds = _.uniq(_.filter(recurringEventIds));
 
-      callback(_.map(events, (event): FullCalendar.EventObject => {
-        var eventId = Events.storeId(event);
+      callback(_.map(this.props.events, (event, i) => {
         var classNames: string[] = ["selectable"];
-        if (_.includes(this.props.eventIds || [], eventId)) {
+        if (_.includes(selectedEventIds, event.id)) {
           classNames.push("active");
         }
         if (_.includes(recurringEventIds, event.recurring_event_id)) {
@@ -234,8 +193,9 @@ module Esper.Components {
         if (event.labels && event.labels.length) {
           classNames.push("labeled");
         }
-        return {
-          id: eventId,
+
+        var ret: FullCalendar.EventObject = {
+          id: i,
           title: event.title || "",
           allDay: event.all_day,
           start: this.adjustTz(event.start, event.timezone),
@@ -243,22 +203,28 @@ module Esper.Components {
           editable: false,
           className: classNames.join(" ")
         };
+        return ret;
       }));
     }
 
-    // Adjust a timetamp based on the currently selected event'ss timezone
+    // Adjust a timetamp based on the currently selected event's timezone
     adjustTz(timestamp: string, timezone?: string) {
       if (timezone) {
-        return moment.tz(timestamp, timezone).toDate()
+        return moment.tz(timestamp, timezone);
       } else {
-        return moment(timestamp).toDate();
+        return moment(timestamp);
       }
     }
 
     // Handle event selection, toggle
-    toggleEvent(event: FullCalendar.EventObject, jsEvent: MouseEvent) {
-      var currentlySelected = _.includes(this.props.eventIds || [], event.id);
-      this.props.updateFn(event.id, jsEvent.shiftKey || jsEvent.ctrlKey);
+    toggleEvent(fcEvent: FullCalendar.EventObject, jsEvent: MouseEvent) {
+      var index: number = fcEvent.id;
+      var event = this.props.events[index];
+      if (event) {
+        this.props.onEventClick(event, jsEvent.shiftKey || jsEvent.ctrlKey);
+      } else {
+        Log.e("Unable to find event with index " + index + " in props");
+      }
     }
   }
 }

@@ -7,19 +7,19 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue2.ts" />
 /// <reference path="../common/Analytics.Web.ts" />
-/// <reference path="./Events.ts" />
+/// <reference path="./Events2.ts" />
 
 module Esper.EventLabelChange {
 
-  export function add(events: Events.TeamEvent[], label: string) {
+  export function add(events: Events2.TeamEvent[], label: string) {
     apply(events, { addLabels: [label] })
   }
 
-  export function remove(events: Events.TeamEvent[], label: string) {
+  export function remove(events: Events2.TeamEvent[], label: string) {
     apply(events, { removeLabels: [label] })
   }
 
-  export function apply(events: Events.TeamEvent[], opts: {
+  export function apply(events: Events2.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
   }) {
@@ -29,7 +29,7 @@ module Esper.EventLabelChange {
     });
   }
 
-  function applyForTeam(teamId: string, events: Events.TeamEvent[], opt: {
+  function applyForTeam(teamId: string, events: Events2.TeamEvent[], opt: {
     addLabels?: string[];
     removeLabels?: string[];
   }) {
@@ -51,44 +51,56 @@ module Esper.EventLabelChange {
     });
 
     // Include recurring events
+    const recurring = "r";
+    const notRecurring = "n";
     var eventGroups = _.groupBy(events,
-      (e) => e.recurring_event_id ? "r" : "n"
+      (e) => e.recurring_event_id ? recurring : notRecurring
     );
-    var events = eventGroups["n"] || [];
-    if ((eventGroups["r"] || []).length) {
-      var recurringEventIds = _.map(eventGroups["r"],
+    var events = eventGroups[notRecurring] || [];
+    if ((eventGroups[recurring] || []).length) {
+      var recurringEventIds = _.map(eventGroups[recurring],
         (e) => e.recurring_event_id
       );
-      events = events.concat(_.filter(Events.EventStore.valAll(), (e) =>
-        _.includes(recurringEventIds, e.recurring_event_id)
-      ));
+      events = events.concat(
+        _(Events2.EventStore.all())
+          .filter((d) => d.data.match({
+            none: () => false,
+            some: (e) => _.includes(recurringEventIds, e.recurring_event_id)
+          }))
+          .map((d) => d.data.unwrap())
+          .value()
+      );
     }
 
     // Wrap the whole kaboodle in a transaction
-    Events.EventStore.transact(() => {
-      Events.EventStore.transactP(p, (tP) => {
+    Events2.EventStore.transact(() => {
+      Events2.EventStore.transactP(p, (tP) => {
         _.each(events, (e) => {
-          var storeId = Events.storeId(e);
-          var newEvent = _.cloneDeep(Events.EventStore.val(storeId));
+          var storeId = Events2.storeId(e);
 
-          _.each(opt.addLabels, (l) => {
-            var normalized = Teams.getNormLabel(l);
-            if (! _.includes(newEvent.labels_norm, normalized)) {
-              newEvent.labels_norm.push(normalized);
-              newEvent.labels.push(l);
-            }
-          });
+          var eventOpt = Events2.EventStore.cloneData(storeId).flatMap(
+            (newEvent) => {
+              _.each(opt.addLabels, (l) => {
+                var normalized = Teams.getNormLabel(l);
+                if (! _.includes(newEvent.labels_norm, normalized)) {
+                  newEvent.labels_norm.push(normalized);
+                  newEvent.labels.push(l);
+                }
+              });
 
-          _.each(opt.removeLabels, (l) => {
-            var normalized = Teams.getNormLabel(l);
-            var index = _.indexOf(newEvent.labels_norm, normalized);
-            if (index >= 0) {
-              newEvent.labels.splice(index, 1);
-              newEvent.labels_norm.splice(index, 1);
-            }
-          });
+              _.each(opt.removeLabels, (l) => {
+                var normalized = Teams.getNormLabel(l);
+                var index = _.indexOf(newEvent.labels_norm, normalized);
+                if (index >= 0) {
+                  newEvent.labels.splice(index, 1);
+                  newEvent.labels_norm.splice(index, 1);
+                }
+              });
 
-          Events.EventStore.push(storeId, tP, newEvent);
+              return Option.wrap(newEvent);
+            });
+
+          Events2.EventStore.push(storeId, tP, eventOpt);
         });
       });
     });

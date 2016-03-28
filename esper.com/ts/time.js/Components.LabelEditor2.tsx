@@ -8,7 +8,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="../common/Components.ModalPanel.tsx" />
-/// <reference path="./Events.ts" />
+/// <reference path="./Events2.ts" />
 /// <reference path="./EventLabelChange.ts" />
 /// <reference path="./Teams.ts" />
 /// <reference path="./Components.EventEditor.tsx" />
@@ -19,7 +19,7 @@ module Esper.Components {
   //////
 
   interface LabelEditorProps {
-    eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
+    eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
     onDone?: () => void;
     doneText?: string;
@@ -43,24 +43,22 @@ module Esper.Components {
 
     componentWillReceiveProps(newProps: LabelEditorProps) {
       // Events changed => not a label change
-      var oldIds = _.map(this.props.eventPairs, (p) =>
-        [p[0].calendar_id, p[0].teamId, p[0].id]
-      );
-      var newIds = _.map(newProps.eventPairs, (p) =>
-        [p[0].calendar_id, p[0].teamId, p[0].id]
-      );
+      var oldIds = _.map(this.props.eventData, (d) => d.aliases[0]);
+      var newIds = _.map(newProps.eventData, (d) => d.aliases[0]);
       if (! _.isEqual(oldIds, newIds)) {
         this.setState({ labelsChanged: false });
         return;
       }
 
       // Check if labels changed
-      var oldLabels = _.map(this.props.eventPairs, (p) =>
-        p[0].labels_norm
-      );
-      var newLabels = _.map(newProps.eventPairs, (p) =>
-        p[0].labels_norm
-      );
+      var oldLabels = _.map(this.props.eventData, (d) => d.data.match({
+        none: (): string[] => [],
+        some: (e) => e.labels_norm
+      }));
+      var newLabels = _.map(newProps.eventData, (d) => d.data.match({
+        none: (): string[] => [],
+        some: (e) => e.labels_norm
+      }));
       if (!_.isEqual(oldLabels, newLabels)) {
         this.setState({ labelsChanged: true });
       }
@@ -84,18 +82,16 @@ module Esper.Components {
 
     render() {
       var props = this.props;
-      var events = _.map(props.eventPairs, (e) => e[0]);
+      var events = this.getEvents();
       var teams = _.map(props.teamPairs, (t) => t[0]);
-      var metadata = _.map(props.eventPairs, (e) => e[1])
-        .concat(_.map(props.teamPairs, (t) => t[1]));
 
-      var error = !!_.find(metadata, (m) =>
-        m.dataStatus === Model.DataStatus.PUSH_ERROR ||
-        m.dataStatus === Model.DataStatus.FETCH_ERROR
+      var error = !!_.find(props.eventData, (data) =>
+        data.dataStatus === Model.DataStatus.PUSH_ERROR ||
+        data.dataStatus === Model.DataStatus.FETCH_ERROR
       );
 
-      var busy = !!_.find(metadata, (m) =>
-        m.dataStatus === Model.DataStatus.INFLIGHT
+      var busy = !!_.find(props.eventData, (data) =>
+        data.dataStatus === Model.DataStatus.INFLIGHT
       );
       var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
 
@@ -122,7 +118,7 @@ module Esper.Components {
       </ModalPanel>
     }
 
-    renderLabelInput(events: Events.TeamEvent[]) {
+    renderLabelInput(events: Events2.TeamEvent[]) {
       return <LabelInput
         onSubmit={(val) => {
           if (this.state.labelSelected) {
@@ -156,7 +152,7 @@ module Esper.Components {
       />;
     }
 
-    renderLabelList(events: Events.TeamEvent[]) {
+    renderLabelList(events: Events2.TeamEvent[]) {
       var labels = this.getLabels();
       return <div className="esper-select-menu">
         {
@@ -169,8 +165,17 @@ module Esper.Components {
       </div>;
     }
 
+    getEvents() {
+      var events: Events2.TeamEvent[] = [];
+      _.each(this.props.eventData, (e) => e.data.match({
+        none: () => null,
+        some: (e) => events.push(e)
+      }));
+      return events;
+    }
+
     getLabels() {
-      var events = _.map(this.props.eventPairs, (e) => e[0]);
+      var events = this.getEvents();
       var teams = _.map(this.props.teamPairs, (t) => t[0]);
       var labels = Labels.fromEvents(events, teams);
       labels = Labels.sortLabels(labels);
@@ -306,7 +311,7 @@ module Esper.Components {
 
   function Label(props: {
     label: Labels.LabelCount;
-    events: Events.TeamEvent[];
+    events: Events2.TeamEvent[];
     highlight?: boolean;
   }) {
     var checkedByAll = props.label.count === props.events.length;

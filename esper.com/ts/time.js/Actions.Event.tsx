@@ -9,15 +9,24 @@ module Esper.Actions {
     eventId: string;
     action: string;
   }) {
-    Events.fetch1(teamId, calId, eventId).then((event: Events.TeamEvent) => {
-      var storeId = Events.keyForEvent(teamId, calId, eventId);
-      var p = Api.postEventFeedbackAction(teamId, eventId, action)
-        .then((feedback: ApiT.EventFeedback) => {
-          var newEvent = _.cloneDeep(event);
-          newEvent.feedback = feedback;
-          return newEvent;
-        });
-      Events.EventStore.pushFetch(storeId, p);
+    var storeId = {
+      teamId: teamId,
+      calId: calId,
+      eventId: eventId
+    };
+    Events2.fetchOne(storeId).then((optEvent: Option.T<Events2.TeamEvent>) => {
+      optEvent.match({
+        none: () => Route.nav.home(),
+        some: (event) => {
+          var p = Api.postEventFeedbackAction(teamId, eventId, action)
+            .then((feedback: ApiT.EventFeedback) => {
+              var newEvent = _.cloneDeep(event);
+              newEvent.feedback = feedback;
+              return Option.some(newEvent);
+            });
+          Events2.EventStore.pushFetch(storeId, p);
+        }
+      })
     });
 
     render(<Views.EventView

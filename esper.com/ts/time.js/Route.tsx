@@ -59,7 +59,6 @@ module Esper.Route {
     // Has previously selected calendars, stub into request
     else if (lastCals.length) {
       filterJSON.cals = lastCals;
-      console.info("hi");
       Route.nav.query(filterJSON, {replace: true});
     }
 
@@ -92,13 +91,22 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts/:chartType?", checkOnboarding, rememberCal, function(ctx) {
+  route("/charts/:chartType?", checkOnboarding, function(ctx) {
     Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
   });
 
   // Calendar labeling page
-  route("/calendar-labeling", checkOnboarding, rememberCal, function(ctx) {
-    Actions.renderCalendarLabeling(getJSONQuery(ctx));
+  route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding, rememberCal,
+  function(ctx) {
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderCalendarLabeling(_.map(calIds, (calId) => ({
+      teamId: teamId,
+      calId: calId
+    })), period);
   });
 
   // Notification settings page
@@ -139,8 +147,22 @@ module Esper.Route {
     Actions.renderLabelManage(ctx.params["teamid"]);
   });
 
-  route("/list", checkOnboarding, rememberCal, function(ctx) {
-    Actions.renderFilterList(getJSONQuery(ctx));
+  route("/list/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding, rememberCal,
+  function(ctx) {
+    var q = Actions.cleanFilterStrJSON(
+      getJSONQuery(ctx)
+    ) as Actions.FilterListJSON;
+    q.labels = Actions.cleanListSelectJSON(q.labels);
+
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderFilterList({
+      teamId: teamId,
+      calIds: Actions.cleanCalIds(teamId, ctx.params["calIds"]),
+      period: period
+    }, q)
   });
 
   // 404 page

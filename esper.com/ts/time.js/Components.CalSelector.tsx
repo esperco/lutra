@@ -40,7 +40,7 @@ module Esper.Components {
         { groups.length ?
           <ListSelector groups={groups} selectedIds={selected}
             selectOption={ this.props.allowMulti ?
-              ListSelectOptions.MULTI_SELECT :
+              ListSelectOptions.MULTI_SELECT_ONE_GROUP :
               ListSelectOptions.SINGLE_SELECT }
             selectedItemClasses="active"
             selectedIcon="fa-calendar-check-o"
@@ -145,7 +145,9 @@ module Esper.Components {
         return "No Calendars Selected"
       })();
 
-      return <DropdownModal ref={(c) => this._dropdownModal = c}>
+      return <DropdownModal
+              ref={ (c) => this._dropdownModal = c }
+              keepOpen={ this.props.allowMulti }>
         <input type="text" id={this.props.id || this.getId("")}
                className="form-control dropdown-toggle end-of-group"
                readOnly={true}
@@ -155,7 +157,7 @@ module Esper.Components {
     }
 
     updateCal(selectedIds: {id: string, groupId: string}[]) {
-      if (this._dropdownModal) {
+      if (this._dropdownModal && !this.props.allowMulti) {
         this._dropdownModal.close();
       }
       return super.updateCal(selectedIds);

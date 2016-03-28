@@ -10,59 +10,65 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface EventEditorProps {
-    eventPairs: [Events.TeamEvent, Model.StoreMetadata][];
+    eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
+
     initAction?: boolean;
     onDone?: () => void;
     className?: string;
   }
 
   export function EventEditor(props: EventEditorProps) {
-    if (! props.eventPairs.length) {
+    if (! props.eventData.length) {
       return <div />;
     }
 
-    var eventPair = props.eventPairs[0];
-    var event = eventPair[0];
-
-    return <div className={props.className}>
-      { props.eventPairs.length === 1 ?
-        <EventDetails event={event} /> :
-        null
-      }
-      { props.eventPairs.length === 1 ?
-        <EventFeedback eventPair={eventPair} initAction={props.initAction} /> :
-        null
-      }
-      <Components.LabelEditor2
-        eventPairs={props.eventPairs}
-        teamPairs={props.teamPairs}
-        onDone={props.onDone}
-        doneText="Done"
-      />
-    </div>;
+    return props.eventData[0].data.match({
+      none: () => <div />,
+      some: (firstEvent) => <div className={props.className}>
+        { props.eventData.length === 1 ?
+          <EventDetails event={firstEvent} /> :
+          null
+        }
+        { props.eventData.length === 1 ?
+          <EventFeedback event={firstEvent}
+                         status={props.eventData[0].dataStatus}
+                         initAction={props.initAction} /> :
+          null
+        }
+        <Components.LabelEditor2
+          eventData={props.eventData}
+          teamPairs={props.teamPairs}
+          onDone={props.onDone}
+          doneText="Done"
+        />
+      </div>
+    });
   }
 
   ////
 
   export class EventEditorModal extends Component<EventEditorProps, {}> {
     render() {
-      var heading = (this.props.eventPairs.length === 1 ?
-        this.props.eventPairs[0][0].title || "1 Event Selected":
-        this.props.eventPairs.length + " Events Selected"
+      var heading = (this.props.eventData.length === 1 ?
+        this.props.eventData[0].data.match({
+          none: () => "",
+          some: (e) => e.title
+        }) || "1 Event Selected" :
+        this.props.eventData.length + " Events Selected"
       );
 
       return <Modal icon="fa-calendar-o" title={heading}>
-        <EventEditor eventPairs={this.props.eventPairs}
-                      teamPairs={this.props.teamPairs}
-                      onDone={() => Layout.closeModal()} />
+        <EventEditor eventData={this.props.eventData}
+                     teamPairs={this.props.teamPairs}
+                     onDone={() => Layout.closeModal()} />
       </Modal>;
     }
   }
 
   ////
 
-  export function EventDetails({event}: {event: Events.TeamEvent}) {
+  export function EventDetails({event}: {event: Events2.TeamEvent}) {
     return <div className="event-details esper-panel-section">
       <div className="time">
         <i className="fa fa-fw fa-clock-o" />{" "}
@@ -96,14 +102,15 @@ module Esper.Components {
 
   ////
 
-  interface EventPairProps {
-    eventPair: [Events.TeamEvent, Model.StoreMetadata];
+  interface OneEventProps {
+    event: Events2.TeamEvent;
+    status: Model2.DataStatus;
     initAction?: boolean;
   }
 
-  export class EventFeedback extends Component<EventPairProps, {
+  export class EventFeedback extends Component<OneEventProps, {
     // Track last saved event so we only show success on save
-    lastSavedEvent?: Events.TeamEvent;
+    lastSavedEvent?: Events2.TeamEvent;
 
     // Current state of event notes (not yet committed, saved yet)
     notes?: string;
@@ -111,14 +118,14 @@ module Esper.Components {
     inputNotes: HTMLTextAreaElement;
     inputSaveTimeout: number;
 
-    constructor(props: EventPairProps) {
+    constructor(props: OneEventProps) {
       super(props);
-      this.state = { notes: this.props.eventPair[0].feedback.notes };
+      this.state = { notes: this.props.event.feedback.notes };
     }
 
     render() {
-      var event = this.props.eventPair[0];
-      var status = this.props.eventPair[1].dataStatus;
+      var event = this.props.event;
+      var status = this.props.status;
       var busy = status === Model.DataStatus.INFLIGHT;
       var error = status === Model.DataStatus.FETCH_ERROR ||
                   status === Model.DataStatus.PUSH_ERROR;
@@ -146,7 +153,7 @@ module Esper.Components {
       </Components.ModalPanel>;
     }
 
-    renderRating(event: Events.TeamEvent) {
+    renderRating(event: Events2.TeamEvent) {
       return <div className="row">
         <div className="col-sm-8 form-group event-star-ratings">
           <StarRating
@@ -173,7 +180,7 @@ module Esper.Components {
     }
 
     submitNotes() {
-      var event = this.props.eventPair[0];
+      var event = this.props.event;
       if (event.feedback.notes !== this.state.notes) {
         var feedback = _.extend({}, event.feedback, {
           notes: this.state.notes
@@ -183,14 +190,14 @@ module Esper.Components {
     }
 
     toggleAttended() {
-      var event = this.props.eventPair[0];
+      var event = this.props.event;
       this.submitFeedback(_.extend({}, event.feedback, {
         attended: (event.feedback.attended === false ? true : false)
       }) as ApiT.EventFeedback);
     }
 
     submitStarRating(rating: number) {
-      var event = this.props.eventPair[0];
+      var event = this.props.event;
       this.submitFeedback(_.extend({}, event.feedback, {
         rating: rating,
         attended: true
@@ -198,10 +205,10 @@ module Esper.Components {
     }
 
     submitFeedback(feedback: ApiT.EventFeedback) {
-      var event = _.cloneDeep(this.props.eventPair[0]);
+      var event = _.cloneDeep(this.props.event);
       event.feedback = feedback;
       var p = Api.postEventFeedback(event.teamId, event.id, event.feedback);
-      Events.EventStore.push(Events.storeId(event), p, event);
+      Events2.EventStore.push(Events2.storeId(event), p, Option.some(event));
       this.setState({lastSavedEvent: event});
     }
 

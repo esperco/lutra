@@ -30,7 +30,8 @@ module Esper.Components {
   export enum ListSelectOptions {
     SINGLE_SELECT,  // Select exactly one item
     MULTI_SELECT,   // Select 0 - many items
-    SINGLE_SELECT_PER_GROUP  // Select exactly one item per group
+    SINGLE_SELECT_PER_GROUP,  // Select exactly one item per group
+    MULTI_SELECT_ONE_GROUP    // Select multiple but only in one group
   }
 
   // Group of choies
@@ -129,6 +130,12 @@ module Esper.Components {
         var selected = _.clone(this.props.selectedIds);
         if (opt === ListSelectOptions.SINGLE_SELECT_PER_GROUP) {
           _.remove(selected, (s) => s.groupId === groupId);
+        }
+
+        else if (opt === ListSelectOptions.MULTI_SELECT_ONE_GROUP) {
+          _.remove(selected,
+            (s) => s.groupId !== groupId || s.id === id
+          );
         }
 
         else { // Multi-select

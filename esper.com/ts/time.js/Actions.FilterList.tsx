@@ -9,61 +9,42 @@
 
 module Esper.Actions {
 
+  export interface FilterListJSON extends FilterStrJSON {
+    labels: ListSelectJSON;
+  }
+
   /* List action => render a list of events */
-  export function renderFilterList(params?: EventFilterJSON) {
-    params = cleanEventFilterJSON(params);
+  export function renderFilterList(params: {
+    teamId: string;
+    calIds: string[];
+    period: Period.Single;
+  }, queryJSON: FilterListJSON) {
 
-    // Max duration for filter list request
-    var duration = params.end - params.start;
-    if (duration > 1000 * 60 * 60 * 24 * 32) {
-      params.end = moment(params.start).endOf('month').valueOf()
-    }
+    // Async load of events
+    _.each(params.calIds, (calId) => Events2.fetchForPeriod({
+      teamId: params.teamId,
+      calId: calId,
+      period: params.period
+    }));
 
-    var start = new Date(params.start);
-    var end = new Date(params.end);
-
-    // Trigger async load
-    _.each(params.cals, (c) =>
-      Events.fetch(c.teamId, c.calId, start, end)
-    );
-
-    var labels = _.filter(params.labels, (l) => _.isString(l));
-    var unlabled = !!params.unlabeled;
-    var allLabels = !!params.allLabels;
-
-    // Default => select all
-    if (_.isUndefined(params.labels) &&
-        _.isUndefined(params.unlabeled) &&
-        _.isUndefined(params.allLabels))
-    {
-      allLabels = true;
-      unlabled = true;
-    }
-
-    var filterStr = params.filterStr || "";
+    // Render view
     render(<Views.FilterList
-      calendars={params.cals}
-      start={start}
-      end={end}
-      filterStr={filterStr}
-      labels={labels}
-      unlabeled={unlabled}
-      allLabels={allLabels}
+      teamId={params.teamId}
+      calIds={params.calIds}
+      period={params.period}
+      labels={queryJSON.labels}
+      filterStr={queryJSON.filterStr}
     />);
 
     /////
 
-    var durationStr =
-      moment.duration(end.getTime() - start.getTime()).humanize();
-    var startStr = moment(start).fromNow();
     Analytics.page(Analytics.Page.EventList, {
-      calendars: params.cals.length,
-      allLabels: allLabels,
-      unlabeled: unlabled,
-      numLabels: labels.length,
-      filterStr: filterStr,
-      periodLength: durationStr,
-      start: startStr
+      calendars: params.calIds.length,
+      teamId: params.teamId,
+      interval: params.period.interval,
+      relativePeriod: Period.relativeIndex(params.period),
+      hasFilterStr: !!queryJSON.filterStr,
+      hasLabelFilter: !queryJSON.labels.all
     });
   }
 
