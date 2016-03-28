@@ -107,4 +107,16 @@ module Esper.Option {
       });
     });
   });
+
+  describe("Option.flatten", function() {
+    it("should return a list with unwrapped options that are are not None",
+    function() {
+      expect(Option.flatten([
+        Option.none<number>(),
+        Option.some(1),
+        Option.none<number>(),
+        Option.some(2)
+      ])).toEqual([1, 2]);
+    });
+  });
 }
