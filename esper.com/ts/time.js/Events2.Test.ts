@@ -5,48 +5,17 @@
 module Esper.Events2 {
   describe("Events2", function() {
     beforeEach(function() {
-      jasmine.clock().install();
       EventsForDateStore.reset();
       EventStore.reset();
     });
 
-    afterEach(function() {
-      jasmine.clock().uninstall();
-    });
-
-    describe("datesForRelativePeriod", function() {
-      beforeEach(function() {
-        var baseTime = new Date(2016, 1, 22); // Feb 22, month is 0-indexed
-        jasmine.clock().mockDate(baseTime);
-      });
-
-      it("can return all dates in current month", function() {
-        var dates = datesForRelativePeriod({ interval: 'month' });
-        expect(dates.length).toEqual(29); // Feb, leap month
-        expect(dates[0]).toEqual(new Date(2016, 1, 1));
-        expect(dates[dates.length - 1]).toEqual(new Date(2016, 1, 29));
-      });
-
-      it("can return all dates in next quarter", function() {
-        var dates = datesForRelativePeriod({
-          interval: 'quarter', incr: 1
-        });
-
-        // Q2 2016 - Apr, May, June
-        expect(dates.length).toEqual(91);
-        expect(dates[0]).toEqual(new Date(2016, 3, 1));
-        expect(dates[dates.length - 1]).toEqual(new Date(2016, 5, 30));
-      });
-
-      it("can return all dates from last week", function() {
-        var dates = datesForRelativePeriod({
-          interval: 'week', incr: -1
-        });
-        expect(dates.length).toEqual(7);
-
-        // Assume week starts on Sunday ...
-        expect(dates[0]).toEqual(new Date(2016, 1, 14));
-        expect(dates[dates.length - 1]).toEqual(new Date(2016, 1, 20));
+    describe("datesFromBounds", function() {
+      it("can return all dates between two dates inclusive", function() {
+        var dates = datesFromBounds(new Date(2016, 0, 1),
+                                    new Date(2016, 0, 31)); // Jan 2016
+        expect(dates.length).toEqual(31);
+        expect(dates[0]).toEqual(new Date(2016, 0, 1));
+        expect(dates[dates.length - 1]).toEqual(new Date(2016, 0, 31));
       });
     });
 
@@ -144,24 +113,21 @@ module Esper.Events2 {
       id: eventId4
     }));
 
-    describe("fetchForRelativePeriod", function() {
+    describe("fetchForPeriod", function() {
       var apiSpy: jasmine.Spy;
       var dfd: JQueryDeferred<ApiT.GenericCalendarEvents>;
 
       beforeEach(function() {
-        var baseTime = new Date(2016, 0, 1);
-        jasmine.clock().mockDate(baseTime);
-
         apiSpy = spyOn(Api, "postForGenericCalendarEvents");
         dfd = $.Deferred();
         apiSpy.and.returnValue(dfd.promise());
-
         testFetch();
       });
 
       function testFetch() {
-        fetchForRelativePeriod({ teamId: teamId, calId: calId, period: {
-          interval: "month"
+        fetchForPeriod({ teamId: teamId, calId: calId, period: {
+          interval: "month",
+          index: 552 // Jan 2016
         }});
       }
 
@@ -239,12 +205,10 @@ module Esper.Events2 {
       });
     });
 
-    describe("getForRelativePeriod", function() {
+    describe("getForPeriod", function() {
       beforeEach(function() {
-        var baseTime = new Date(2016, 0, 1);
-        jasmine.clock().mockDate(baseTime);
-
-        var dates = datesForRelativePeriod({ interval: 'month' });
+        var dates = datesFromBounds(new Date(2016, 0, 1),
+                                    new Date(2016, 1, 1));
         _.each(dates, (d) => EventsForDateStore.batchSet({
           teamId: teamId,
           calId: calId,
@@ -306,10 +270,11 @@ module Esper.Events2 {
       });
 
       function getVal() {
-        return getForRelativePeriod({
+        return getForPeriod({
           teamId: teamId, calId: calId,
           period: {
-            interval: "month"
+            interval: "month",
+            index: 552 // Jan 2016
           }
         }).unwrap();
       }

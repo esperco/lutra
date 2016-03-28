@@ -5,6 +5,7 @@
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Model2.Batch.ts" />
 /// <reference path="../lib/Model2.ts" />
+/// <reference path="./Period.ts" />
 
 module Esper.Events2 {
   export interface TeamEvent extends ApiT.GenericCalendarEvent {
@@ -29,23 +30,15 @@ module Esper.Events2 {
     date: Date;
   }
 
-  /*
-    Used to represent a chunk of time relative to now:
-
-    { incr: 0, interval: 'month' }    // Current month
-    { incr: 1, interval: 'week' }     // Next week
-    { incr: -2, interval: 'quarter' } // Two quarters ago
-  */
-  export interface RelativePeriod {
-    incr?: number,
-    interval: 'week'|'month'|'quarter'
-  }
+  export type EventData =
+    Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>;
 
   /*
     Convenience interface for grouping together merged event list with
   */
-  interface EventListData {
-    period: RelativePeriod;
+  export interface EventListData {
+    start: Date;
+    end: Date;
     events: TeamEvent[];
     isBusy: boolean;
     hasError: boolean;
@@ -54,84 +47,114 @@ module Esper.Events2 {
     eventsByDate: Model2.BatchStoreData<DateId, FullEventId, TeamEvent>[];
   }
 
+
   /* Stores */
 
   // Store individual events
   export var EventStore = new Model2.Store<FullEventId, TeamEvent>({
-    cap: 9000,
+    cap: 20000,
 
     // Function used to work backwards from event to FullEventId
-    idForData: (event) => ({
-      teamId: event.teamId,
-      calId: event.calendar_id,
-      eventId: event.id
-    })
+    idForData: storeId
   });
 
   // Store a list of events for each day
   export var EventsForDateStore = new Model2.BatchStore
     <DateId, FullEventId, TeamEvent>(EventStore, {
-      cap: 366
+      cap: 2000
     });
+
+  // Naively resets store (for refresh)
+  export function invalidate() {
+    EventsForDateStore.reset();
+    EventStore.reset();
+  }
 
 
   /* API */
 
-  export function fetchForRelativePeriod({teamId, calId, period, force=false}: {
+  export function fetchForPeriod({teamId, calId, period, force=false}: {
     teamId: string,
     calId: string,
-    period: RelativePeriod,
+    period: Period.Single,
     force?: boolean;
   }) {
 
     // Check if data is cached before loading
-    var dates = datesForRelativePeriod({
-      incr: period.incr,
-      interval: period.interval
+    var bounds = Period.boundsFromPeriod(period);
+    return fetch({
+      teamId: teamId,
+      calId: calId,
+      start: bounds[0],
+      end: bounds[1],
+      force: force
     });
+  }
+
+  export function fetch({teamId, calId, start, end, force=false}: {
+    teamId: string,
+    calId: string,
+    start: Date,
+    end: Date,
+    force?: boolean;
+  }) {
+    var dates = datesFromBounds(start, end);
     var eventsForDates = _.map(dates, (d) => EventsForDateStore.get({
       calId: calId, teamId: teamId, date: d
     }));
     if (force || _.find(eventsForDates, (e) => e.isNone())) {
-
-      var bounds = boundsForRelativePeriod({
-        incr: period.incr,
-        interval: period.interval
-      });
       var apiP = Api.postForGenericCalendarEvents(teamId, calId, {
-        window_start: XDate.toString(bounds[0].toDate()),
-        window_end: XDate.toString(bounds[1].toDate())
+        window_start: XDate.toString(start),
+        window_end: XDate.toString(end)
       });
 
-      _.each(dates, (d) => {
-        var dateP = apiP.then((eventList) => {
-          var events = _.filter(eventList.events, (e) => overlapsDate(e, d));
-          return Option.wrap(_.map(events,
-            (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
-              itemKey: {
-                teamId: teamId,
-                calId: calId,
-                eventId: e.id
-              },
-              data: Option.some(asTeamEvent(teamId, e))
-            })));
-        });
-        EventsForDateStore.batchFetch({
-          teamId: teamId, calId: calId, date: d
-        }, dateP);
-      });
+      EventsForDateStore.transactP(apiP, (apiP2) =>
+        EventStore.transactP(apiP2, (apiP3) => {
+          _.each(dates, (d) => {
+            var dateP = apiP3.then((eventList) => {
+              var events = _.filter(eventList.events,
+                (e) => overlapsDate(e, d)
+              );
+              return Option.wrap(_.map(events,
+                (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
+                  itemKey: {
+                    teamId: teamId,
+                    calId: calId,
+                    eventId: e.id
+                  },
+                  data: Option.some(asTeamEvent(teamId, e))
+                })));
+            });
+            EventsForDateStore.batchFetch({
+              teamId: teamId, calId: calId, date: d
+            }, dateP);
+          });
+        })
+      );
     }
   }
 
-  export function getForRelativePeriod({teamId, calId, period}: {
+  export function getForPeriod({teamId, calId, period}: {
     teamId: string,
     calId: string,
-    period: RelativePeriod,
+    period: Period.Single,
   }): Option.T<EventListData> {
-    var dates = datesForRelativePeriod({
-      incr: period.incr,
-      interval: period.interval
+    var bounds = Period.boundsFromPeriod(period);
+    return get({
+      teamId: teamId,
+      calId: calId,
+      start: bounds[0],
+      end: bounds[1]
     });
+  }
+
+  export function get({teamId, calId, start, end}: {
+    teamId: string,
+    calId: string,
+    start: Date,
+    end: Date,
+  }): Option.T<EventListData> {
+    var dates = datesFromBounds(start, end);
     var eventsByDate = _.map(dates, (d) =>
       EventsForDateStore.batchGet({
         teamId: teamId,
@@ -160,7 +183,8 @@ module Esper.Events2 {
           (e) => e.dataStatus === Model2.DataStatus.FETCH_ERROR);
 
         return {
-          period: period,
+          start: start,
+          end: end,
           events: events,
           isBusy: isBusy,
           hasError: hasError,
@@ -189,27 +213,15 @@ module Esper.Events2 {
 
 
   /* Helpers */
-
-  // List start of all days within RelativePeriod
-  export function datesForRelativePeriod({incr=0, interval}: RelativePeriod) {
-    var bounds = boundsForRelativePeriod({incr: incr, interval: interval});
-    var startM = bounds[0];
-    var endM = bounds[1];
-
+  export function datesFromBounds(start: Date, end: Date) {
+    var startM = moment(start).startOf('day');
+    var endM = moment(end).endOf('day');
     var ret: Date[] = [];
-    while (startM < endM) {
+    while (endM.diff(startM) > 0) {
       ret.push(startM.clone().toDate());
       startM = startM.add(1, 'day');
     }
     return ret;
-  }
-
-  function boundsForRelativePeriod({incr=0, interval}: RelativePeriod)
-    : [moment.Moment, moment.Moment]
-  {
-    var startM = moment().startOf(interval).add(incr, interval);
-    var endM = moment().endOf(interval).add(incr, interval);
-    return [startM, endM];
   }
 
   export function overlapsDate(event: ApiT.GenericCalendarEvent, date: Date) {
@@ -233,4 +245,18 @@ module Esper.Events2 {
        e1.id === e2.id);
   }
 
+  export function storeId(event: TeamEvent): FullEventId {
+    return {
+      teamId: event.teamId,
+      calId: event.calendar_id,
+      eventId: event.id
+    }
+  }
+
+  export function matchId(event: TeamEvent, storeId: FullEventId) {
+    return event && storeId &&
+      event.id === storeId.eventId &&
+      event.calendar_id === storeId.calId &&
+      event.teamId === storeId.teamId;
+  }
 }
