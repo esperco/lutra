@@ -64,19 +64,23 @@ module Esper.EventStats {
       id: eventId5
     }));
 
-    describe("annotate", function() {
-      describe("by default", function() {
-        function getVal() {
-          return annotate([e1, e2, e3, e4, e5, e6]);
-        }
+    describe("getDurations", function() {
+      function getVal() {
+        var wrappers = _.map([e1, e2, e3, e4, e5, e6], (e, i) => ({
+          event: e,
+          index: i
+        }))
+        return getDurations(wrappers);
+      }
 
-        it("should annotate duration in seconds for each event", function() {
+      describe("by default", function() {
+        it("should calculate duration in seconds for each event", function() {
           expect(_.map(getVal(), (e) => e.duration)).toEqual(
             _.map([1, 2, 5, 1, 3, 3], (s) => s * 60 * 60)
           );
         });
 
-        it("should annotate overlap-adjusted duration for each event",
+        it("should calculate overlap-adjusted duration for each event",
         function() {
           expect(_.map(getVal(), (e) => e.adjustedDuration)).toEqual(
             _.map([
@@ -89,15 +93,23 @@ module Esper.EventStats {
             ], (s) => Math.round(s * 60 * 60))
           );
         });
+
+        it("should preserve wrapper data", function() {
+          expect(_.map(getVal(), (e) => e.index)).toEqual([0, 1, 2, 3, 4, 5]);
+        });
       });
 
       describe("with truncate", function() {
         function getVal() {
-          return annotate([e1, e2, e6], {
+          var wrappers = _.map([e1, e2, e6], (e, i) => ({
+            event: e,
+            index: i
+          }))
+          return getDurations(wrappers, {
             truncateStart: new Date(2016, 0, 2),
             truncateEnd: new Date(2016, 0, 2, 5)
           });
-        }
+        };
 
         it("should truncate durations before and after opts",
         function() {

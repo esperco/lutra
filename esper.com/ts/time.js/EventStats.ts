@@ -5,8 +5,8 @@
 /// <reference path="./Events2.ts" />
 
 module Esper.EventStats {
-  export interface AnnotatedEvent extends Events2.TeamEvent {
-    // End - start
+  export interface EventDurations {
+     // End - start (seconds)
     duration: number;
 
     // Duration may need to be adjusted for overlapping events and other
@@ -14,7 +14,11 @@ module Esper.EventStats {
     adjustedDuration: number;
   }
 
-  export interface AnnotateOpts {
+  export interface HasEvent {
+    event: Events2.TeamEvent;
+  }
+
+  export interface DurationOpts {
     // Truncate duration if start is before this date/time
     truncateStart?: Date;
 
@@ -22,27 +26,34 @@ module Esper.EventStats {
     truncateEnd?: Date;
   }
 
-  export function annotate(events: Events2.TeamEvent[],
-    opts: AnnotateOpts = {}): AnnotatedEvent[]
+
+  ////
+
+  export function getDurations<T extends HasEvent>(eventWrappers: T[],
+    opts: DurationOpts = {}): Array<T & EventDurations>
   {
     // Make sure events are sorted by start date
-    events = _.sortBy(events, (e) => moment(e.start).valueOf());
+    eventWrappers = _.sortBy(eventWrappers,
+      (e) => moment(e.event.start).valueOf()
+    );
 
-    // Created annoted event ojbects
-    var ret = _.map(events, (e) => {
-      var duration = Math.floor(moment(e.end).diff(moment(e.start)) / 1000);
+    // Convert wrapper to duration object
+    var ret = _.map(eventWrappers, (e) => {
+      var event = e.event;
+      var duration = Math.floor(
+        moment(event.end).diff(moment(event.start)) / 1000
+      );
       return _.extend({}, e, {
         duration: duration,
         adjustedDuration: 0
-      }) as AnnotatedEvent
+      }) as T & EventDurations
     });
-
 
     /* Overlap, truncate calculation */
 
     // Use strings for maps because numbers convert to Array
-    var startMap: {[index: string]: AnnotatedEvent[]} = {};
-    var endMap: {[index: string]: AnnotatedEvent[]} = {};
+    var startMap: {[index: string]: Array<T & EventDurations>} = {};
+    var endMap: {[index: string]: Array<T & EventDurations>} = {};
 
     // Critical points = start / end points
     var criticalPoints: number[] = [];
@@ -50,14 +61,15 @@ module Esper.EventStats {
     _.each(ret, (e) => {
 
       // Truncate start
-      var startM = moment(e.start);
+      var event = e.event;
+      var startM = moment(event.start);
       if (opts.truncateStart && moment(opts.truncateStart).diff(startM) > 0) {
         startM = moment(opts.truncateStart);
       }
       var start = startM.valueOf();
 
       // Truncate end
-      var endM = moment(e.end);
+      var endM = moment(event.end);
       if (opts.truncateEnd && moment(opts.truncateEnd).diff(endM) < 0) {
         endM = moment(opts.truncateEnd);
       }
@@ -81,7 +93,7 @@ module Esper.EventStats {
     var criticalPoints = _.sortedUniq(criticalPoints);
 
     // Stack of active events as we move through time
-    var eventStack: AnnotatedEvent[] = [];
+    var eventStack:  Array<T & EventDurations> = [];
 
     _.each(criticalPoints, (p, i) => {
       // Add and remove from current stack
@@ -101,5 +113,4 @@ module Esper.EventStats {
 
     return ret;
   }
-
 }
