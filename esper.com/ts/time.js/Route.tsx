@@ -46,30 +46,6 @@ module Esper.Route {
     });
   }
 
-  // Helper to default to the last selected team / calendar selection
-  var rememberCal: PageJS.Callback = function(ctx, next) {
-    var filterJSON: Actions.EventFilterJSON = getJSONQuery(ctx) || {};
-
-    // Request has calendars, remember them, then next
-    if (filterJSON.cals && filterJSON.cals.length) {
-      lastCals = filterJSON.cals;
-      next();
-    }
-
-    // Has previously selected calendars, stub into request
-    else if (lastCals.length) {
-      filterJSON.cals = lastCals;
-      Route.nav.query(filterJSON, {replace: true});
-    }
-
-    // No previously selected calendars, proceed normally
-    else {
-      next();
-    }
-  }
-  var lastCals: Calendars.CalSelection[] = [];
-
-
   ////////
 
   /*
@@ -97,7 +73,7 @@ module Esper.Route {
 
   // Calendar labeling page
   route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding, rememberCal,
+    checkOnboarding,
   function(ctx) {
     var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
     var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
@@ -148,7 +124,7 @@ module Esper.Route {
   });
 
   route("/list/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding, rememberCal,
+    checkOnboarding,
   function(ctx) {
     var q = Actions.cleanFilterStrJSON(
       getJSONQuery(ctx)

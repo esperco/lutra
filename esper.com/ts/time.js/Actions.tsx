@@ -27,17 +27,26 @@ module Esper.Actions {
 
   /* Validation, defaults for common params */
 
+  // Remember last cleaned items to use as defaults
+  var lastTeamId: string;
+  var lastCalIds: string;
+
+  // Clean team ID
   export function cleanTeamId(teamId: string) {
     if (teamId && Teams.teamStore.has(teamId)) {
+      lastTeamId = teamId;
       return teamId;
+    }
+
+    else if (lastTeamId && Teams.teamStore.has(lastTeamId)) {
+      return lastTeamId;
     }
 
     var teams = Teams.all();
     Log.assert(teams.length > 0, "No teams loaded");
 
-    // Return team where user is NOT exec (i.e. is an EA) or first team by
-    // default
-    var team = _.find(teams, (t) => t.team_executive !== Login.myUid())
+    // Default to first team with calendars
+    var team = _.find(teams, (t) => t.team_timestats_calendars.length > 0)
       || teams[0];
     return team.teamid;
   }
@@ -49,9 +58,10 @@ module Esper.Actions {
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Teams.require(teamId);
-    var calIds = _.filter(Util.some(calIdsStr, "").split(CAL_ID_SEPARATOR));
-    if (_.intersection(team.team_timestats_calendars, calIds).length) {
-      return calIds;
+    lastCalIds = calIdsStr || lastCalIds;
+    if (lastCalIds) {
+      var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
+      return _.intersection(team.team_timestats_calendars, calIds);
     }
     return team.team_timestats_calendars;
   }
