@@ -93,7 +93,7 @@ module Esper.Actions {
 
   ///////
 
-  export function renderChart(params: Charts.EventChartParams<{}>) {
+  export function renderChart(params: Charts.DefaultEventChartParams) {
     // This isn't cleaned in routing
     params = _.clone(params);
     params.chartId = params.chartId || getDefaultChartType();
@@ -121,7 +121,7 @@ module Esper.Actions {
     }
   }
 
-  function getChart(params: Charts.EventChartParams<{}>): ChartVariant {
+  function getChart(params: Charts.DefaultEventChartParams): ChartVariant {
     /*
       Type-checks on ChartId aren't working, so be careful with strings.
 

@@ -15,8 +15,8 @@ module Esper.Charts {
     protected durationsByLabel: LabelsGrouping;
     protected sortedLabels: string[];
 
-    periodIncrs() {
-      return [-1, 0, 1];
+    allowedIncrs() {
+      return [-1, 1];
     }
 
     sync() {

@@ -5,7 +5,7 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
-  interface LabelFilterParams {
+  interface LabelFilterParams extends Actions.RelativePeriodJSON {
     labels: Actions.ListSelectJSON;
   }
 
@@ -18,8 +18,7 @@ module Esper.Charts {
     protected allowUnlabeled: boolean;
 
     cleanFilterParams(params: any = {}): LabelFilterParams {
-      params = params || {};
-      var ret = params as LabelFilterParams;
+      var ret = super.cleanFilterParams(params) as LabelFilterParams;
       ret.labels = Actions.cleanListSelectJSON(ret.labels);
       return ret;
     }
@@ -64,19 +63,22 @@ module Esper.Charts {
     // Render label selector based on what labels are actually there
     renderSelectors() {
       return <div className="esper-menu-section">
-        <div className="esper-subheader">
-          <i className="fa fa-fw fa-tags" />{" "}
-          Labels
+        { super.renderSelectors() }
+        <div className="esper-menu-section">
+          <div className="esper-subheader">
+            <i className="fa fa-fw fa-tags" />{" "}
+            Labels
+          </div>
+          <Components.LabelSelector labels={this.allLabels}
+            totalCount={this.events.length}
+            unlabeledCount={this.eventsByLabel.none.length}
+            selected={this.getSelectedLabels()}
+            allSelected={this.showAll()}
+            unlabeledSelected={this.showUnlabeled()}
+            showUnlabeled={this.allowUnlabeled}
+            updateFn={(x) => this.updateLabels(x)}
+          />
         </div>
-        <Components.LabelSelector labels={this.allLabels}
-          totalCount={this.events.length}
-          unlabeledCount={this.eventsByLabel.none.length}
-          selected={this.getSelectedLabels()}
-          allSelected={this.showAll()}
-          unlabeledSelected={this.showUnlabeled()}
-          showUnlabeled={this.allowUnlabeled}
-          updateFn={(x) => this.updateLabels(x)}
-        />
       </div>;
     }
 

@@ -19,8 +19,8 @@ module Esper.Charts {
     protected durationsByEmail: EmailsGrouping;
     protected sortedEmails: string[];
 
-    periodIncrs() {
-      return [-1, 0, 1];
+    allowedIncrs() {
+      return [-1, 1];
     }
 
     sync() {

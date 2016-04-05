@@ -26,7 +26,7 @@ module Esper.Views {
   }
 
   interface Props {
-    currentChart: Esper.Charts.EventChart<{}>;
+    currentChart: Esper.Charts.DefaultEventChart;
     chartTypes: Actions.ChartTypeInfo[];
   }
 

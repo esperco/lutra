@@ -212,4 +212,27 @@ module Esper.Actions {
     }
     return Option.none<string[]>();
   }
+
+
+  // Pick additional relative time periods to compare to
+  export interface RelativePeriodJSON {
+    incrs: number[];
+  }
+
+  export function cleanRelativePeriodJSON(q: any = {}): RelativePeriodJSON {
+    var typedQ: RelativePeriodJSON = q || {
+      incrs: [0]
+    };
+    if (typedQ.incrs) {
+      typedQ.incrs = _(typedQ.incrs)
+        .filter(_.isNumber)
+        .map((i) => Math.round(i))
+        .uniq()
+        .sort()
+        .value();
+    } else {
+      typedQ.incrs = [0];
+    }
+    return typedQ;
+  }
 }

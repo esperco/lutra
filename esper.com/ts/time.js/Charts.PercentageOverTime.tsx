@@ -15,8 +15,8 @@ module Esper.Charts {
     protected sortedLabels: string[];
     protected allowUnlabeled = true;
 
-    periodIncrs() {
-      return [-1, 0, 1];
+    allowedIncrs() {
+      return [-1, 1];
     }
 
     sync() {
