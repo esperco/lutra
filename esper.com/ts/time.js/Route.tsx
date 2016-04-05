@@ -72,7 +72,7 @@ module Esper.Route {
   function(ctx) {
     var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
     var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
-    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var interval = Actions.cleanInterval(ctx.params["interval"], "week");
     var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderChart({
       chartId: ctx.params["chartId"],
