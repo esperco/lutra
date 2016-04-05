@@ -5,6 +5,7 @@
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Model2.Batch.ts" />
 /// <reference path="../lib/Model2.ts" />
+/// <reference path="../lib/XDate.ts" />
 /// <reference path="./Period.ts" />
 
 module Esper.Events2 {
