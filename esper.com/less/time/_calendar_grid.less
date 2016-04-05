@@ -40,55 +40,105 @@ table.calendar-grid {
     background: @gray-lighter;
   }
 
+  .in-month.today {
+    .day-header{
+      background: @navbar-inverse-bg;
+      color: @navbar-inverse-color;
+    }
+  }
+
   .day-header {
     text-align: right;
     padding: @padding-xs-vertical @padding-xs-horizontal;
   }
 
-  .daily-metric {
-    white-space: nowrap;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-    padding: 1px;
-    margin: 1px;
-    animation: fadein 0.5s ease-in-out;
-    cursor: default;
+  .metrics-list {
+    margin: @padding-xs-vertical @padding-xs-horizontal;
+    padding: 1px @padding-xs-horizontal;
+    font-size: 0.9em;
 
-    &:hover {
-      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
-      filter: saturate(1.5);
+    .metric {
+      animation: fadein 0.5s ease-in-out;
+      cursor: default;
+      display: inline-block;
+      color: @brand-text;
+
+      &.very-high-intensity {
+        font-weight: bold;
+        background: @brand-danger;
+        border-radius: @border-radius-small;
+        padding: 0 @padding-xs-horizontal;
+        color: white;
+      }
+
+      &.high-intensity {
+        font-weight: bold;
+        color: @brand-warning;
+      }
+
+      &.med-intensity {
+        opacity: 1.0
+      }
+
+      &.low-intensity {
+        opacity: 0.8
+      }
+
+      &.zero-intensity {
+        color: @brand-success;
+        opacity: 0.8;
+      }
+    }
+
+    .count-metric {
+      float: right;
     }
   }
 
   .time-blocks-container {
-    margin: @padding-small-vertical;
+    margin: @padding-xs-vertical @padding-xs-horizontal @padding-base-vertical;
+    line-height: 1;
   }
 
   .time-block {
-    &:last-child .time-segment:last-child {
-      border-right: 0;
-    }
+    transition: opacity 0.6s;
+    opacity: 1.0;
 
-    &:hover .time-segment > span {
-      box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.16);
-      filter: saturate(1.5);
+    &:hover {
+      opacity: 0.5;
     }
   }
 
   .time-segment {
     box-sizing: border-box;
     display: inline-block;
+    height: floor((@font-size-base * 0.75));
     width: 1em; // Should get overriden in code -- but a default
-    border-right: 0;
+    padding-right: 1px;
 
     > span {
-      animation: extendwidth 0.5s ease-in-out;
       display: block;
-      height: 1em;
+      height: 100%;
+      animation: extendwidth 0.5s ease-in-out;
+      background: @gray-lighter;
     }
 
-    &:last-child {
-      border-right: 2px solid white;
+    &.active > span {
+      background: @brand-primary;
+      cursor: pointer;
+
+      // Early => darken slightly
+      &.row-0 {
+        background: lighten(@brand-primary, 15%);
+      }
+
+      &.row-1 {
+        background: @brand-primary;
+      }
+
+      &.row-2 {
+        background: darken(@brand-primary, 15%);
+      }
     }
   }
 }
