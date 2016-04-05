@@ -147,7 +147,7 @@ module Esper.Views {
       return <li className={(selected ? "active" : "") +
         (this.props.hiddenXs ? " hidden-xs" : "")
       }>
-        <a onClick={() => Route.nav.path(this.props.href)}>
+        <a href={"#!" + Route.nav.getPath(this.props.href)}>
           {this.props.children}
         </a>
       </li>;

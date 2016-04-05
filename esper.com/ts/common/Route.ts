@@ -171,17 +171,23 @@ module Esper.Route {
     export function path(frag: string|string[], opts?: Opts) {
       opts = opts || {};
       var fn = opts.replace ? pageJs.redirect : pageJs;
-      var query = opts.queryStr || (opts.jsonQuery ?
-        (jsonParam + "=" + encodeURIComponent(JSON.stringify(opts.jsonQuery)))
-        : null);
-      if (query) { lastQuery = query; }
-      var arg = normalize(frag) + (query ? "?" + query : "");
+      var arg = getPath(frag, opts);
       if (opts.delay) {
         clearTimeout(pathTimeout);
         pathTimeout = setTimeout(() => fn(arg), opts.delay);
       } else {
         fn(arg);
       }
+    }
+
+    // Get path as string
+    export function getPath(frag: string|string[], opts?: Opts) {
+      opts = opts || {};
+      var query = opts.queryStr || (opts.jsonQuery ?
+        (jsonParam + "=" + encodeURIComponent(JSON.stringify(opts.jsonQuery)))
+        : null);
+      if (query) { lastQuery = query; }
+      return normalize(frag) + (query ? "?" + query : "");
     }
 
     export function mkPath(args: string[]) {

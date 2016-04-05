@@ -7,12 +7,15 @@
 /// <reference path="./Actions.tsx" />
 
 module Esper.Charts {
-  export interface EventChartParams<T extends {}> {
+  export interface EventChartParams<T extends Actions.RelativePeriodJSON> {
     chartId: string;
     cals: Calendars.CalSelection[];
     period: Period.Single;
     filterParams: T
   }
+
+  export interface DefaultEventChartParams
+    extends EventChartParams<Actions.RelativePeriodJSON> { }
 
   /*
     Event wrappers grouped by some attribute on the wrapper, with a period
@@ -23,7 +26,7 @@ module Esper.Charts {
     groups: EventStats.DurationsGrouping<W>;
   }
 
-  export abstract class EventChart<T extends {}> {
+  export abstract class EventChart<T extends Actions.RelativePeriodJSON> {
     protected events: Events2.TeamEvent[]; // Unique events across all periods
     protected eventsByPeriod: {            // Events for a single period
       period: Period.Single;
@@ -33,20 +36,34 @@ module Esper.Charts {
     protected busy: boolean;
     public params: EventChartParams<T>;
 
-    constructor(params: EventChartParams<{}>) {
+    constructor(params: DefaultEventChartParams) {
       this.params = _.extend(params, {
         filterParams: this.cleanFilterParams(params.filterParams)
       }) as EventChartParams<T>;
     }
 
     // Optional function for cleaning filter params depending on its def'n
-    cleanFilterParams(params: any): T {
-      return params;
+    cleanFilterParams(params: any = {}): T {
+      params = params || {};
+      var ret = params as T;
+      return Actions.cleanRelativePeriodJSON(ret) as T;
+    }
+
+    // Incrs to allow (0 is implied)
+    allowedIncrs(): number[] {
+      return [];
     }
 
     // Should return a list of relative period indices to fetch / get for
     periodIncrs() {
-      return [0];
+      var ret = _.intersection(
+        this.allowedIncrs(),
+        this.params.filterParams.incrs
+      );
+      if (! _.includes(ret, 0)) {
+        ret = [0].concat(ret);
+      }
+      return ret;
     }
 
     // Fetch data from API if necessary
@@ -209,6 +226,22 @@ module Esper.Charts {
     // Render additional selector in left column (if any) to refine chart
     // data (like label selectors). Must handle lack of store data safely.
     renderSelectors(): React.ReactElement<any> {
+      if (this.allowedIncrs().length) {
+        return <div className="esper-menu-section">
+          <div className="esper-subheader">
+            <i className="fa fa-fw fa-clock-o" />{" "}
+            Compare With
+          </div>
+          <Components.RelativePeriodSelector
+            period={this.params.period}
+            allowedIncrs={this.allowedIncrs()}
+            selectedIncrs={this.periodIncrs()}
+            updateFn={(x) => this.updateParams({
+              incrs: x
+            })}
+          />
+        </div>;
+      }
       return <span />;
     }
 
@@ -216,7 +249,21 @@ module Esper.Charts {
     intervalsAllowed(): Period.Interval[] {
       return ["week", "month", "quarter"];
     }
+
+    // Helper function to update params
+    updateParams(vals: {
+      incrs?: number[]
+    }) {
+      var newParams = _.cloneDeep(this.params.filterParams);
+      if (vals.incrs) {
+        newParams.incrs = vals.incrs;
+      }
+      Route.nav.query(newParams);
+    }
   }
+
+  export abstract class DefaultEventChart
+    extends EventChart<Actions.RelativePeriodJSON> { }
 
 
   /* Misc chart helpers */

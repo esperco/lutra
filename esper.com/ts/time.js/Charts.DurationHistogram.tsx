@@ -27,13 +27,13 @@ module Esper.Charts {
     gte: 8 * 60 * 60
   }];
 
-  export class DurationHistogram extends EventChart<{}> {
+  export class DurationHistogram extends DefaultEventChart {
     protected periodsByBucket: Array<GroupsByPeriod<{
       bucketIndex: number; // Which bucket does this go into
     }>>;
 
-    periodIncrs() {
-      return [-1, 0, 1];
+    allowedIncrs() {
+      return [-1, 1];
     }
 
     sync() {

@@ -6,7 +6,7 @@ module Esper.Charts {
   /*
     Base class for calendar grid-style Autochart
   */
-  export abstract class CalendarGridChart extends EventChart<{}> {
+  export abstract class CalendarGridChart extends DefaultEventChart {
     protected eventsForDates: {
       date: Date;
       durations: EventStats.HasDurations[];
