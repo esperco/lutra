@@ -267,4 +267,21 @@ module Esper.ReactHelpers {
       (p.props as React.HTMLAttributes).className &&
       _.includes((p.props as React.HTMLAttributes).className.split(" "), cls);
   }
+
+
+  /*
+    Helpers for implementing container pattern (binding an otherwise pure
+    Component to some data function)
+  */
+  export function contain(fn: () => JSX.Element) {
+    return React.createElement(Container, { renderFn: fn });
+  }
+
+  class Container extends ReactHelpers.Component<{
+    renderFn: () => JSX.Element;
+  }, {}> {
+    renderWithData() {
+      return this.props.renderFn();
+    }
+  }
 }
