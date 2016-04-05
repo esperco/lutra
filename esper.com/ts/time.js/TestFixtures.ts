@@ -10,11 +10,20 @@
 module Esper.TestFixtures {
   export var uid = "my-uid";
   export var email = "me@esper.com";
+
   export var teamId0 = "team-id-0";
+  export var team0Exec = uid;
+  export var team0Email = email;
   export var team0Labels = ["Label"];
+
   export var teamId1 = "team-id-1";
+  export var team1Exec = "O-w_peter____________w";
+  export var team1Email = "peter@esper.com";
   export var team1Labels = ["Label 1", "Label 2", "Label 3"];
+
   export var teamId2 = "team-id-2";
+  export var team2Exec = "O-w_stewie____________w";
+  export var team2Email = "stewie@esper.com";
   export var team2Labels = ["Label A", "Label B", "Label C"];
 
   // Stub normalization function for tests
@@ -86,7 +95,7 @@ module Esper.TestFixtures {
             is_primary: true
           }],
           team_email_aliases: [],
-          team_executive: uid,
+          team_executive: team0Exec,
           team_labels: team0Labels,
           team_labels_norm: _.map(team0Labels, normalizeLabel),
           team_label_urgent: "Urgent",
@@ -116,7 +125,7 @@ module Esper.TestFixtures {
             is_primary: true
           }],
           team_email_aliases: [],
-          team_executive: "O-w_peter____________w",
+          team_executive: team1Exec,
           team_labels: team1Labels,
           team_labels_norm: _.map(team1Labels, normalizeLabel),
           team_label_urgent: "Urgent",
@@ -156,7 +165,7 @@ module Esper.TestFixtures {
             is_primary: false
           }],
           team_email_aliases: [],
-          team_executive: "O-w_stewie____________w",
+          team_executive: team2Exec,
           team_labels: team2Labels,
           team_labels_norm: _.map(team2Labels, normalizeLabel),
           team_label_urgent: "Urgent",
@@ -199,13 +208,14 @@ module Esper.TestFixtures {
     start?: string,
     end?: string,
     id?: string,
-    calendar_id?: string
+    calendar_id?: string,
+    guests?: ApiT.Attendee[]
   } = {}): ApiT.GenericCalendarEvent {
     var defaultEvent: ApiT.GenericCalendarEvent = {
       id: "id1",
       calendar_id: "calId",
       start: "2016-03-02T12:14:17.000-08:00",
-      end: "2016-03-02T2:14:17.000-08:00",
+      end: "2016-03-02T13:14:17.000-08:00",
       title: "Event",
       all_day: false,
       labels: [],
@@ -216,5 +226,69 @@ module Esper.TestFixtures {
       description_messageids: []
     };
     return _.extend(defaultEvent, props) as ApiT.GenericCalendarEvent;
+  }
+
+
+  ///////
+
+  export interface ProfileOpts {
+    profile_uid: string;
+    email?: string;
+    other_emails?: string[];
+    google_access?: boolean;
+    display_name?: string;
+    has_ios_app?: boolean;
+  }
+
+  export function mockProfiles(add?: ProfileOpts[]) {
+    var store = ApiC.getAllProfiles.store;
+    var key = ApiC.getAllProfiles.strFunc([]);
+    Test.spySafe(ApiC.getAllProfiles.store, "val")
+      .and.returnValue(getProfileList(add));
+  }
+
+  export function getProfileList(add?: ProfileOpts[]): ApiT.ProfileList {
+    var defaults: ApiT.Profile[] = [{
+      profile_uid: team0Exec,
+      email: team0Email,
+      other_emails: <string[]> [],
+      google_access: true,
+      display_name: "Lois",
+      has_ios_app: false
+    }, {
+      profile_uid: team1Exec,
+      email: team1Email,
+      other_emails: <string[]> [],
+      google_access: true,
+      display_name: "Peter",
+      has_ios_app: false
+    }, {
+      profile_uid: team2Exec,
+      email: team2Email,
+      other_emails: <string[]> [],
+      google_access: true,
+      display_name: "Stewie",
+      has_ios_app: false
+    }];
+
+    _.each(add, (a) => {
+      var currentIndex = _.findIndex(defaults,
+        (d) => a.profile_uid === d.profile_uid
+      );
+      if (currentIndex) {
+        var current = defaults[currentIndex];
+        defaults[currentIndex] = (<ApiT.Profile> _.extend(current, a));
+      } else {
+        defaults.push(<ApiT.Profile> _.extend({
+          email: "something@example.com",
+          other_emails: [],
+          google_access: true,
+          display_name: "Something",
+          has_ios_app: false
+        }, a));
+      }
+    })
+
+    return { profile_list: defaults };
   }
 }
