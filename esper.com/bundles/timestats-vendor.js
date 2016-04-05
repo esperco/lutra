@@ -27,7 +27,6 @@ inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap/js/modal");
   require("bootstrap/js/tooltip");
   require("bootstrap/js/transition");
-  require("bootstrap-daterangepicker");
 
   highcharts = require("highcharts");
   require("highcharts/modules/drilldown")(highcharts);

@@ -2,7 +2,6 @@
   "ambientDependencies": {
     "MediaStream": "github:esperco/DefinitelyTyped/webrtc/MediaStream.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "bootstrap": "github:esperco/DefinitelyTyped/bootstrap/bootstrap.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
-    "bootstrap-daterangepicker": "github:esperco/DefinitelyTyped/bootstrap-daterangepicker/bootstrap-daterangepicker.d.ts#95c9b8d2d4070c35f40295a45efef95af6913579",
     "chrome": "github:esperco/DefinitelyTyped/chrome/chrome.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "cryptojs": "github:esperco/DefinitelyTyped/cryptojs/cryptojs.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "es6-promise": "github:esperco/DefinitelyTyped/es6-promise/es6-promise.d.ts#f53108644c2f32b93de423d844650297fc415a8b",

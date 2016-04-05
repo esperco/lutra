@@ -41,7 +41,6 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "bootstrap-daterangepicker": "git://github.com/esperco/bootstrap-daterangepicker.git",
     "crypto-js": "^3.1.6",
     "eventemitter3": "^1.1.1",
     "filepicker-js": "^2.3.1",
