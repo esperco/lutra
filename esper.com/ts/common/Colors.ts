@@ -118,11 +118,13 @@ module Esper.Colors {
   export var second = presets[1];
   export var black = "#000000";
   export var lightGray = "#CECEDD";
+  export var gray = "#999";
   export var offWhite = "#FCFCFC";
   export var green = "#5CB85C";
   export var yellow = "#FADD00";
   export var orange = "#F0AD4E";
   export var red = "#D9534F";
+  export var brand = "#a25cc6"; // Purple
 
   // Already assigned colors
   export type ColorMap = { [index: string]: string };

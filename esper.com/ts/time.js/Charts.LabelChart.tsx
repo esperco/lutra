@@ -6,147 +6,51 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
-
-  /*
-    Don't use EventFilterJSON's label options because these are distinct
-    from the one used for charting. The former controls which events to
-    include (not implemented as of 2016-03-16) and the latter controls
-    which labels to actually show in the chart.
-  */
-  export interface LabelChartJSON extends Actions.EventFilterJSON {
-    chartParams?: {
-      labels?: string[];
-      unlabeled?: boolean;
-      allLabels?: boolean;
-    };
+  interface LabelFilterParams {
+    labels: Actions.ListSelectJSON;
   }
 
   /*
     Base class for chart with labels (using stats2 API)
   */
-  export abstract class LabelChart<T extends LabelChartJSON>
-    extends Chart<T>
-  {
-    cleanParams(params: T|ChartJSON): T {
-      var cleanedParams = super.cleanParams(params);
-      var chartParams = (cleanedParams.chartParams =
-        cleanedParams.chartParams || {});
+  export abstract class LabelChart extends EventChart<LabelFilterParams> {
+    protected eventsByLabel: EventStats.EventGrouping;
+    protected allLabels: Labels.Label[];
+    protected allowUnlabeled: boolean;
 
-      // No labels => select all labels
-      if (!chartParams.labels &&
-          !_.isBoolean(chartParams.unlabeled) &&
-          !_.isBoolean(chartParams.allLabels)) {
-        cleanedParams.chartParams = chartParams = {
-          labels: [],
-          unlabeled: false,
-          allLabels: true
-        };
-      }
-
-      // Invalid label entry => no labels
-      else if (!chartParams.labels ||
-               !_.every(chartParams.labels, (l) => _.isString(l))) {
-        chartParams.labels = [];
-      }
-
-      return cleanedParams;
-    }
-
-    async() {
-      var cal = this.getCal();
-      return TimeStats.async(cal.teamId, cal.calId, {
-        windowStart: new Date(this.params.start),
-        windowEnd: new Date(this.params.end)
-      });
+    cleanFilterParams(params: any = {}): LabelFilterParams {
+      params = params || {};
+      var ret = params as LabelFilterParams;
+      ret.labels = Actions.cleanListSelectJSON(ret.labels);
+      return ret;
     }
 
     sync() {
-      // Get stats from store + data status
-      var cal = this.getCal();
-      return TimeStats.get(cal.teamId, cal.calId, {
-        windowStart: new Date(this.params.start),
-        windowEnd: new Date(this.params.end)
-      });
-    }
-
-    // Label Stats currently only supports 1 calendar
-    protected getCal() {
-      // Label Stats currently only support 1 cal
-      var cal = this.params.cals && this.params.cals[0];
-
-      // Must check calendar length > 0 before calling
-      if (! cal) {
-        throw new Error("Must select calendar");
-      }
-      return cal;
-    }
-
-    /*
-      Display results = stored stats with some formatting and normalization.
-      Should only be called once data is available. Automatically filters
-      out unselected labels.
-    */
-    protected getDisplayResults() {
-      var displayResults = this.getRawDisplayResults();
-      var selectedLabels = this.getSelectedLabels(displayResults);
-
-      // Filter by selected labels (if applicable)
-      return _.filter(displayResults,
-        (c) => _.includes(selectedLabels, c.labelNorm)
+      super.sync();
+      this.allLabels = Labels.fromEvents(this.events, Teams.all());
+      this.eventsByLabel = Partition.groupByMany(this.events,
+        (e) => e.labels_norm
       );
     }
 
-    protected getExclusiveDisplayResults() {
-      var displayResults = this.getDisplayResults();
-      var selectedLabels = this.getSelectedLabels(displayResults);
-      var stats = (this.sync()[0].items) || [];
-      var exclusiveResults = TimeStats.getExclusiveDisplayResults(
-        stats, selectedLabels);
-
-      // Produce consistent sort (will have to re-sort for pie charts)
-      return _.sortBy(exclusiveResults, (x) => -x.totalCount);
-    }
-
-    private getRawDisplayResults() {
-      var pair = this.sync();
-      if (!pair || !pair[0]) {
-        throw new Error("getDisplayResults called before data ready");
+    protected getSelectedLabels(): string[] {
+      var params = this.params.filterParams.labels;
+      if (params.all) {
+        return _.map(this.allLabels, (l) => l.id);
       }
-
-      var stats = (pair[0].items) || [];
-      var results = TimeStats.getDisplayResults(stats);
-
-      // Produce consistent sort
-      return _.sortBy(results, (x) => Labels.normalizeForSort(x.displayAs));
+      return params.some;
     }
 
-    // Return label selection, alternatively gets a list of default labels
-    // given (sorted) display results
-    protected getSelectedLabels(displayResults: TimeStats.DisplayResults)
-      : string[]
-    {
-      if (this.params.chartParams.allLabels) {
-        return _.map(displayResults, (r) => r.labelNorm);
-      }
-      return this.params.chartParams.labels || [];
+    protected showAll() {
+      return this.getSelectedLabels().length >= this.allLabels.length
+        && this.showUnlabeled();
     }
 
-    isBusy() {
-      var pair = this.sync();
-      var dataStatus = pair && pair[1] && pair[1].dataStatus;
-      return dataStatus !== Model.DataStatus.READY;
-    }
-
-    getError() {
-      var pair = this.sync();
-      var meta = pair && pair[1];
-      if (meta && meta.dataStatus === Model.DataStatus.FETCH_ERROR) {
-        return meta.lastError || new Error("Unknown Fetch Error");
-      }
-    }
-
-    noData() {
-      return !this.getDisplayResults().length;
+    protected showUnlabeled() {
+      return this.allowUnlabeled && (
+        this.params.filterParams.labels.all ||
+        this.params.filterParams.labels.none
+      );
     }
 
     noDataMsg() {
@@ -160,48 +64,18 @@ module Esper.Charts {
 
     // Render label selector based on what labels are actually there
     renderSelectors() {
-      // Safety check
-      var stats: ApiT.CalendarStats[] = Option.cast(this.sync()).match({
-        none: () => null,
-        some: (d) => d[0] && d[0].items
-      });
-      if (! stats) return;
-
-      var displayResults = this.getRawDisplayResults();
-
-      // Conform to LabelSelector syntax
-      var labels = _.map(displayResults, (r) => ({
-        id: r.labelNorm,
-        displayAs: r.displayAs,
-        count: r.totalCount
-      }));
-      labels = Labels.sortLabels(labels);
-
-      var totalCount = _.sumBy(stats,
-        (s) => _.sumBy(s.partition,
-          (p) => p.event_count));
-      var unlabeledCount = _.sumBy(stats, (s) => {
-        var partitions = _.filter(s.partition,
-          (p) => p.event_labels.length === 0);
-        if (partitions.length) {
-          return partitions[0].event_count;
-        }
-        return 0;
-      });
-
-      var selectedLabels = this.getSelectedLabels(displayResults);
-
       return <div className="esper-menu-section">
         <div className="esper-subheader">
           <i className="fa fa-fw fa-tags" />{" "}
           Labels
         </div>
-        <Components.LabelSelector labels={labels}
-          totalCount={totalCount}
-          unlabeledCount={unlabeledCount}
-          selected={selectedLabels || []}
-          allSelected={this.params.chartParams.allLabels || false}
-          unlabeledSelected={this.params.chartParams.unlabeled || false}
+        <Components.LabelSelector labels={this.allLabels}
+          totalCount={this.events.length}
+          unlabeledCount={this.eventsByLabel.none.length}
+          selected={this.getSelectedLabels()}
+          allSelected={this.showAll()}
+          unlabeledSelected={this.showUnlabeled()}
+          showUnlabeled={this.allowUnlabeled}
           updateFn={(x) => this.updateLabels(x)}
         />
       </div>;
@@ -209,21 +83,20 @@ module Esper.Charts {
 
     /* Actions */
 
-    updateLabels(x: {
+    updateLabels({all, unlabeled, labels}: {
       all: boolean;
       unlabeled: boolean;
       labels: string[];
     }) {
-      var props: LabelChartJSON = {
-        chartParams: {
-          allLabels: x.all,
-          unlabeled: x.unlabeled,
-          labels: x.labels
+      var current = this.params.filterParams.labels;
+      Route.nav.query({
+        labels: {
+          all: all,
+          none: unlabeled,
+          some: labels,
+          unmatched: current.unmatched
         }
-      };
-      this.updateRoute({
-        props: props as T
-      });
+      } as LabelFilterParams);
     }
   }
 }
