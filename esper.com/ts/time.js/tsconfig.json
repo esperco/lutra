@@ -12,14 +12,12 @@
   "devOnly": [
     "../common/JasmineStub.ts",
     "Calendars.Test.ts",
-    "DailyStats.Test.ts",
     "Events2.Test.ts",
     "EventStats.Test.ts",
     "Period.Test.ts",
     "Partition.Test.ts",
     "Route.Test.ts",
-    "Teams.Test.ts",
-    "TimeStats.Test.ts"
+    "Teams.Test.ts"
   ],
 
   "prodOnly": [

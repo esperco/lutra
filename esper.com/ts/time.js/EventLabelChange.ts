@@ -46,9 +46,6 @@ module Esper.EventLabelChange {
       teamId: teamId,
       request: req
     });
-    p.done(() => {
-      TimeStats.StatStore.reset();
-    });
 
     // Include recurring events
     const recurring = "r";

@@ -4,7 +4,6 @@
 
 /// <reference path="./Charts.LabelChart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
@@ -72,7 +71,7 @@ module Esper.Charts {
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: _.indexOf(categories, label),
-              y: TimeStats.toHours(wrapper.duration),
+              y: EventStats.toHours(wrapper.duration),
               events: {
                 click: () => this.onEventClick(wrapper.event)
               }
@@ -95,7 +94,7 @@ module Esper.Charts {
             data: _.map(d.groups.none, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: categories.length,
-              y: TimeStats.toHours(wrapper.duration)
+              y: EventStats.toHours(wrapper.duration)
             }))
           })
         );

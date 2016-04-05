@@ -284,11 +284,11 @@ module Esper.Views {
       if (! events.length) {
         return;
       }
-      var duration = TimeStats.aggregateDuration(events);
+      var duration = EventStats.aggregateDuration(events);
 
       return <div className="event-stats">
         { events.length }{" "}Events,{" "}
-        { Util.roundStr(TimeStats.toHours(duration), 2) }{" "}Hours
+        { Util.roundStr(EventStats.toHours(duration), 2) }{" "}Hours
       </div>;
     }
 

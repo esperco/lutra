@@ -5,7 +5,6 @@
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Actions.tsx" />
-/// <reference path="./TimeStats.ts" />
 
 module Esper.Charts {
   export interface EventChartParams<T extends {}> {

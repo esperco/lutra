@@ -4,8 +4,6 @@
 
 /// <reference path="./Charts.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./TimeStats.ts" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   // Durations for each bar in our histogram
@@ -85,7 +83,7 @@ module Esper.Charts {
             data: _.map(s.items, (w) => ({
               name: Text.eventTitleForChart(w.event),
               x: key,
-              y: TimeStats.toHours(w.duration),
+              y: EventStats.toHours(w.duration),
               events: {
                 click: () => this.onEventClick(w.event)
               }

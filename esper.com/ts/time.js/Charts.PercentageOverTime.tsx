@@ -3,7 +3,6 @@
 */
 
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
@@ -82,11 +81,11 @@ module Esper.Charts {
               name: Labels.getDisplayAs(label),
               color: Colors.getColorForLabel(label),
               x: x,
-              y: TimeStats.toHours(
+              y: EventStats.toHours(
                 _.sumBy(s.items, (i) => i.adjustedDuration)
               ),
               count: s.items.length,
-              hours: TimeStats.toHours(
+              hours: EventStats.toHours(
                 _.sumBy(s.items, (i) => i.duration)
               ),
               events: {
@@ -104,11 +103,11 @@ module Esper.Charts {
             name: "Unlabeled Events",
             color: Colors.lightGray,
             x: x,
-            y: TimeStats.toHours(
+            y: EventStats.toHours(
               _.sumBy(d.groups.none, (i) => i.adjustedDuration)
             ),
             count: d.groups.none.length,
-            hours: TimeStats.toHours(
+            hours: EventStats.toHours(
               _.sumBy(d.groups.none, (i) => i.duration)
             ),
             events: {
