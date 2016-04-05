@@ -2,7 +2,7 @@
 
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Login.ts" />
-/// <reference path="../lib/XDate.ts" />
+/// <reference path="../lib/ApiC.ts" />
 
 /// <reference path="./Route.tsx" />
 /// <reference path="./Teams.ts" />
@@ -28,6 +28,7 @@ module Esper.Main {
     Colors.init();
     Calendars.init();
     Login.init();
+    ApiC.getAllProfiles();
   }
 }
 

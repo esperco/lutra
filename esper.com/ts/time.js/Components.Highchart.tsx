@@ -9,6 +9,9 @@ module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
+  // Custom drillup button
+  const DRILLUP_ID_CLS = 'highchart-drillup';
+
   export interface HighchartsOpts {
     opts: HighchartsOptions;
     units?: string;
@@ -17,6 +20,8 @@ module Esper.Components {
   // Simple wrapper around HighCharts config object
   export class Highchart extends Component<HighchartsOpts, {}> {
     _container: HTMLElement;
+    _chart: HighchartsChartObject;
+    _drilldownLevels: number;
 
     render() {
       return <div ref={(c) => this._container = c }
@@ -28,6 +33,13 @@ module Esper.Components {
       var defaults: HighchartsOptions = {
         credits: { enabled: false },
         title: { text: "" },
+
+        chart: {
+          events: {
+            drilldown: this.onDrilldown.bind(this),
+            drillup: this.onDrillup.bind(this)
+          }
+        },
 
         plotOptions: {
           series: {
@@ -52,6 +64,14 @@ module Esper.Components {
           },
           borderWidth: 0,
           borderRadius: 1
+        },
+
+        drilldown: {
+          drillUpButton: {
+            theme: {
+              display: "none"
+            }
+          }
         }
       };
 
@@ -60,6 +80,7 @@ module Esper.Components {
 
     componentDidMount() {
       $(this._container).highcharts(this.getOpts());
+      this._chart = $(this._container).highcharts();
     }
 
     /*
@@ -68,6 +89,40 @@ module Esper.Components {
     */
     componentDidUpdate() {
       $(this._container).highcharts(this.getOpts())
+      this._chart = $(this._container).highcharts();
+      this.resetDrillupBtn();
+    }
+
+    // Use jQuery to draw our custom drillUp button because sticking React
+    // here is a bit weird
+    onDrilldown() {
+      // Only insert if drilldown button is not already there
+      if (! $(this._container).find("." + DRILLUP_ID_CLS).length) {
+        var btn = $("<button type=\"button\" />");
+        btn.append($("<i class=\"fa fa-fw fa-angle-left\" />"));
+        btn.addClass("btn btn-secondary");
+        btn.addClass(DRILLUP_ID_CLS);
+        btn.click(() => {
+          this._chart.drillUp();
+        });
+        $(this._container).append(btn);
+      }
+      this._drilldownLevels = this._drilldownLevels || 0;
+      this._drilldownLevels += 1;
+    }
+
+    onDrillup() {
+      if (this._drilldownLevels) {
+        this._drilldownLevels -= 1;
+      }
+      if (! this._drilldownLevels) {
+        this.resetDrillupBtn()
+      }
+    }
+
+    resetDrillupBtn() {
+      $(this._container).find("." + DRILLUP_ID_CLS).remove();
+      this._drilldownLevels = 0;
     }
   }
 }

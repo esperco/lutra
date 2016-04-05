@@ -9,9 +9,10 @@
 
 module Esper.Actions {
 
-  export function renderCalendarLabeling(cals: {
-    teamId: string, calId: string
-  }[], period: Period.Single) {
+  export function renderCalendarLabeling(
+    cals: Calendars.CalSelection[],
+    period: Period.Single
+  ) {
 
     // Fetch
     _.each(cals, (cal) => Events2.fetchForPeriod({

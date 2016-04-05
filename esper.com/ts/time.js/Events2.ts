@@ -283,4 +283,52 @@ module Esper.Events2 {
       event.calendar_id === storeId.calId &&
       event.teamId === storeId.teamId;
   }
+
+
+  /* Helpers for extracting some value we're charting by */
+
+  export function getGuests(event: TeamEvent) {
+    // Ignore exec on team
+    var execId = Teams.require(event.teamId).team_executive;
+
+    // Need profiles to get exec email
+    var store = ApiC.getAllProfiles.store;
+    var key = ApiC.getAllProfiles.strFunc([]);
+    var optEmails = Option.cast(store.val(key))
+      .flatMap((profiles) =>
+        Option.wrap(_.find(profiles.profile_list,
+          (p) => p.profile_uid === execId)
+        )
+      )
+      .flatMap((execProfile) => Option.some(
+        [execProfile.email].concat(execProfile.other_emails || [])
+      ));
+
+    return _.filter(event.guests,
+      (g) => g.response !== 'Declined' && optEmails.match({
+        none: () => true,
+        some: (execEmails) => !_.includes(
+          _.map(execEmails, (e) => e.toLowerCase()),
+          (g.email || "").toLowerCase()
+        )
+      })
+    );
+  }
+
+  export function getGuestEmails(event: TeamEvent,
+                                 allowedDomains?: string[]) {
+    var ret = _.map(getGuests(event), (g) => (g.email || "").toLowerCase());
+    if (allowedDomains) {
+      ret = _.filter(ret,
+        (email) => _.includes(allowedDomains, email.split('@')[1])
+      );
+    }
+    return ret;
+  }
+
+  export function getGuestDomains(event: TeamEvent) {
+    return _.uniq(
+      _.map(getGuestEmails(event), (email) => email.split('@')[1])
+    );
+  }
 }

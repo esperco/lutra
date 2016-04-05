@@ -2,6 +2,7 @@
   A wrapper around the EventEmitter class for simplified updates based on
   changes.
 */
+/// <reference path="./Util.ts" />
 
 declare module Esper {
   export var EventEmitter: typeof EventEmitter3.EventEmitter;
@@ -9,6 +10,13 @@ declare module Esper {
 
 module Esper.Emit {
   export abstract class EmitBase extends EventEmitter {
+    public id: string;
+
+    constructor() {
+      super();
+      this.id = Util.randomString(); // Random identifier for each emitter
+    }
+
     /*
       For simplicity we just emit a single change variable whenever any
       modification happens to a store. We can pass along a list of _id changes

@@ -8,24 +8,80 @@
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
-  export class PercentageRecent extends LabelChart<Charts.LabelChartJSON> {
+  export class PercentageRecent extends LabelChart {
+    protected allowUnlabeled = true;
+    protected durationsByLabel: EventStats.DurationsGrouping<{
+      labels_norm: string[];
+    }>;
+
+    sync() {
+      super.sync();
+
+      var bounds = Period.boundsFromPeriod(this.params.period);
+      var durations = EventStats.wrapWithDurations(this.events,
+        (e) => Actions.applyListSelectJSON(
+          e.labels_norm,
+          this.params.filterParams.labels
+        ).flatMap((labels) => labels.length > 1 ?
+          Option.some([Labels.MULTI_LABEL_ID]) :
+          Option.some(labels)
+        ).flatMap((labels) => Option.some({
+          event: e,
+          labels_norm: labels
+        })),
+        { truncateStart: bounds[0], truncateEnd: bounds[1] }
+      );
+
+      this.durationsByLabel = Partition.groupByMany(durations,
+        (e) => e.labels_norm
+      );
+      this.durationsByLabel.some = _.sortBy(this.durationsByLabel.some,
+        (s) => {
+          if (s.key === Labels.MULTI_LABEL_ID) {
+            return Infinity;
+          }
+          return 0 - _.sumBy(s.items, (i) => i.adjustedDuration);
+        }
+      );
+    }
+
+    onSeriesClick(events: Events2.TeamEvent[]) {
+      Layout.renderModal(Containers.eventListModal(events));
+      return false;
+    }
+
     renderChart() {
-      // Filter to include only user-selected labels
-      var results = this.getExclusiveDisplayResults();
+      var data = _.map(this.durationsByLabel.some, (d) => ({
+        name: Labels.getDisplayAs(d.key),
+        color: Colors.getColorForLabel(d.key),
+        count: d.items.length,
+        hours: TimeStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        y: TimeStats.toHours(
+          _.sumBy(d.items, (i) => i.adjustedDuration)
+        ),
+        events: {
+          click: () => this.onSeriesClick(_.map(d.items, (i) => i.event))
+        }
+      }));
 
-      // Resort by duration (because pie)
-      results = _.sortBy(results, (x) => -x.totalDuration);
-
-      var labelCounts: {[index: string]: number} = {};
-      var data = _.map(results, (c) => {
-        labelCounts[c.labelNorm] = c.totalCount;
-        return {
-          id: c.labelNorm,
-          name: c.displayAs,
-          color: Colors.getColorForLabel(c.labelNorm),
-          y: TimeStats.toHours(c.totalDuration)
-        };
-      });
+      if (this.showUnlabeled() && this.durationsByLabel.none.length) {
+        data.push({
+          name: "Unlabeled Events",
+          color: Colors.lightGray,
+          count: this.durationsByLabel.none.length,
+          hours: TimeStats.toHours(
+            _.sumBy(this.durationsByLabel.none, (i) => i.duration)
+          ),
+          y: TimeStats.toHours(
+            _.sumBy(this.durationsByLabel.none, (i) => i.adjustedDuration)
+          ),
+          events: {
+            click: () => this.onSeriesClick(
+              _.map(this.durationsByLabel.none, (i) => i.event)
+            )
+          }
+        })
+      }
 
       return <Components.Highchart opts={{
         chart: {
@@ -49,20 +105,12 @@ module Esper.Charts {
           }
         },
 
-        tooltip: {
-          formatter: function() {
-            return `<b>${this.point.name}:</b> ${this.y} Adjusted Hours / ` +
-              `${labelCounts[this.point.id]} Events` +
-              (this.percentage ?
-                ` (${Util.roundStr(this.percentage, 1)}%)`
-                : "");
-          }
-        },
+        tooltip: countPointTooltip,
 
         series: [{
           data: data
         }]
-      }} units="Adjusted Hours" />
+      }} />
     }
   }
 }

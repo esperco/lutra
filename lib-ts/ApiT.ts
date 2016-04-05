@@ -242,7 +242,7 @@ module Esper.ApiT {
   export interface Attendee {
     display_name?: string;
     email: string;
-    response: string; // NeedsAction | Declined | Tentative | Accepted
+    response: "NeedsAction"|"Declined"|"Tentative"|"Accepted";
   }
 
   export interface LoginResponse {

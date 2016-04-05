@@ -59,6 +59,19 @@ module Esper.Period {
           new Date(2016, 1, 29, 23, 59, 59, 999)
         ]);
       });
+
+      it("should handle week boundaries properly", function() {
+        // NB: We should make this test locale independent, but for now, we
+        // assume that the week starts on Sunday
+        var localeData: any = moment.localeData();
+        expect(localeData.firstDayOfWeek()).toEqual(0);
+
+        var period: Single = { interval: "week", index: 1 };
+        expect(boundsFromPeriod(period)).toEqual([
+          new Date(1970, 0, 4),
+          new Date(1970, 0, 10, 23, 59, 59, 999)
+        ]);
+      });
     });
 
     describe("relativeIndex", function() {

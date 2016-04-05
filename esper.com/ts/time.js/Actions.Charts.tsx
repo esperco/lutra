@@ -13,28 +13,26 @@
 module Esper.Actions {
 
   type ChartVariant =
-    ["labels-bar", Charts.DurationsOverTime]|
+    ["activity", Charts.EventGrid]|
+    ["durations", Charts.DurationHistogram]|
+    ["guest-domains", Charts.GuestDomains]|
+    ["labels-bar", Charts.TopLabels]|
     ["labels-pie", Charts.PercentageRecent]|
     ["labels-stack", Charts.PercentageOverTime]|
-    ["activity", Charts.ActivityGrid]|
-    ["top-guests", Charts.TopGuests]|
-    ["guest-domains", Charts.GuestDomains]|
-    ["durations", Charts.DurationHistogram]|
-    ["availability", Charts.WorkHoursGrid];
+    ["top-guests", Charts.TopGuests];
 
   /*
     Make sure this matches first part of chart variant above. Not sure if
     there's a good way to have TypeScript check this automatically.
   */
   export type ChartId =
+    "activity"|
+    "durations"|
+    "guest-domains"|
     "labels-bar"|
     "labels-pie"|
     "labels-stack"|
-    "activity"|
-    "top-guests"|
-    "guest-domains"|
-    "durations"|
-    "availability";
+    "top-guests";
 
   /* Display Info */
 
@@ -45,38 +43,34 @@ module Esper.Actions {
   }
 
   var chartInfo: ChartTypeInfo[] = [{
-    id: "labels-bar",
-    icon: "fa-bar-chart",
-    displayAs: "Labels Bar Chart"
-  }, {
-    id: "labels-pie",
-    icon: "fa-pie-chart",
-    displayAs: "Labels Pie Chart"
-  }, {
-    id: "labels-stack",
-    icon: "fa-tasks fa-rotate-270",
-    displayAs: "Labels Stacked Bar Chart"
-  }, {
     id: "activity",
     icon: "fa-calendar",
     displayAs: "Activity Grid"
   }, {
-    id: "top-guests",
-    icon: "fa-align-left",
-    displayAs: "Top Guests"
-  }, {
-    id: "guest-domains",
-    icon: "fa-pie-chart",
-    displayAs: "Guest Groups Pie Chart"
-  }, {
     id: "durations",
-    icon: "fa-bar-chart",
+    icon: "fa-clock-o",
     displayAs: "Event Durations"
   }, {
-    id: "availability",
-    icon: "fa-calendar",
-    displayAs: "Availability Grid"
-  }]
+    id: "guest-domains",
+    icon: "fa-globe",
+    displayAs: "Guest Groups Pie Chart"
+  }, {
+    id: "labels-bar",
+    icon: "fa-tags",
+    displayAs: "Label Hours"
+  }, {
+    id: "labels-stack",
+    icon: "fa-tags",
+    displayAs: "Label Percentages"
+  }, {
+    id: "labels-pie",
+    icon: "fa-tags",
+    displayAs: "Labels Pie Chart"
+  }, {
+    id: "top-guests",
+    icon: "fa-users",
+    displayAs: "Top Guests"
+  }];
   chartInfo = _.sortBy(chartInfo, (c) => c.displayAs);
 
 
@@ -86,32 +80,31 @@ module Esper.Actions {
 
   function trackChart(variant: ChartVariant) {
     var params = variant[1].params;
-    var periodLength = (params.end - params.start) / (24 * 60 * 60 * 1000);
 
     // Delay tracking by 2 seconds to ensure user is actually looking at chart
     Util.delayOne(analyticsId, function() {
       Analytics.page(Analytics.Page.TimeStatsCharts, {
         chartType: variant[0],
         params: variant[1].params,
-        periodLength: Math.round(periodLength)
+        interval: params.period.interval
       });
     }, 2000);
   }
 
   ///////
 
-  export function renderChart<T extends Charts.ChartJSON>
-    (chartType?: string, chartJSON?: T)
-  {
-    chartType = chartType || getDefaultChartType();
-    var chartVariant = getChart(chartType as ChartId, chartJSON);
+  export function renderChart(params: Charts.EventChartParams<{}>) {
+    // This isn't cleaned in routing
+    params = _.clone(params);
+    params.chartId = params.chartId || getDefaultChartType();
+
+    var chartVariant = getChart(params);
     var chartId = chartVariant[0];
     var chart = chartVariant[1];
     chart.async();
 
     render(<Views.Charts
       currentChart={chart}
-      chartId={chartId}
       chartTypes={chartInfo}
     />);
 
@@ -128,9 +121,7 @@ module Esper.Actions {
     }
   }
 
-  function getChart<T extends Charts.ChartJSON>
-    (chartType: ChartId, chartJSON?: T): ChartVariant
-  {
+  function getChart(params: Charts.EventChartParams<{}>): ChartVariant {
     /*
       Type-checks on ChartId aren't working, so be careful with strings.
 
@@ -139,29 +130,27 @@ module Esper.Actions {
       https://github.com/Microsoft/TypeScript/issues/7112 or
       https://github.com/Microsoft/TypeScript/pull/6196
     */
-    switch (chartType) {
+    switch (params.chartId) {
       case "labels-bar":
-        return ["labels-bar", new Charts.DurationsOverTime(chartJSON)];
+        return ["labels-bar", new Charts.TopLabels(params)];
       case "labels-pie":
-        return ["labels-pie", new Charts.PercentageRecent(chartJSON)];
+        return ["labels-pie", new Charts.PercentageRecent(params)];
       case "labels-stack":
-        return ["labels-stack", new Charts.PercentageOverTime(chartJSON)];
-      case "activity":
-        return ["activity", new Charts.ActivityGrid(chartJSON)];
+        return ["labels-stack", new Charts.PercentageOverTime(params)];
       case "top-guests":
-        return ["top-guests", new Charts.TopGuests(chartJSON)];
+        return ["top-guests", new Charts.TopGuests(params)];
       case "guest-domains":
-        return ["guest-domains", new Charts.GuestDomains(chartJSON)];
+        return ["guest-domains", new Charts.GuestDomains(params)];
       case "durations":
-        return ["durations", new Charts.DurationHistogram(chartJSON)];
-      case "availability":
-        return ["availability", new Charts.WorkHoursGrid(chartJSON)];
+        return ["durations", new Charts.DurationHistogram(params)];
+      case "activity":
+        return ["activity", new Charts.EventGrid(params)];
       default:
         // Error!
-        Log.e("Invalid chart type - " + chartType);
-
-        // Return default
-        return getChart(chartInfo[0].id, chartJSON);
+        Log.e("Invalid chart type - " + params.chartId);
+        params = _.clone(params);
+        params.chartId = chartInfo[0].id;
+        return getChart(params);
     }
   }
 }

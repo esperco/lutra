@@ -6,11 +6,25 @@
 
 module Esper.Labels {
   // For new teams
-  export var DEFAULTS = [
+  export const DEFAULTS = [
     "Product", "Business Development", "Sales",
     "Email", "Internal Team", "Networking",
     "Health & Wellness", "Personal", "Travel"
   ];
+
+  // Pick a MULTI_LABEL_ID that doesn't match normalized form of any label
+  export const MULTI_LABEL_ID = "Esper-multi-label-id";
+  export const MULTI_LABEL_STR = "Multiple Labels";
+
+  // Global map of normalized labels to display forms
+  var displayAsMap: {[index: string]: string} = {};
+
+  export function getDisplayAs(norm: string) {
+    if (norm === MULTI_LABEL_ID) {
+      return MULTI_LABEL_STR;
+    }
+    return displayAsMap[norm] || norm;
+  }
 
   export interface Label {
     id: string;        // Noralized form
@@ -26,9 +40,6 @@ module Esper.Labels {
   export function fromEvents(events: Events2.TeamEvent[],
                              teams: ApiT.Team[] = [])
   {
-    // Map of normalized to displayAs
-    var map: {[index: string]: string} = {};
-
     // Counts for each normalized item
     var counts: {[index: string]: number} = {};
 
@@ -38,14 +49,14 @@ module Esper.Labels {
     _.each(teams, (t) => {
       _.each(t.team_labels_norm, (id, i) => {
         var teamLabel = t.team_labels[i];
-        map[id] = map[id] || teamLabel;
+        displayAsMap[id] = displayAsMap[id] || teamLabel;
         labels.push(id);
       })
     });
 
     _.each(events, (e) => {
       _.each(e.labels_norm, (id, index) => {
-        map[id] = e.labels[index];
+        displayAsMap[id] = e.labels[index];
         counts[id] = counts[id] || 0;
         counts[id] += 1;
         labels.push(id);
@@ -55,7 +66,7 @@ module Esper.Labels {
     labels = _.uniq(labels);
     return _.map(labels, (id): LabelCount => ({
       id: id,
-      displayAs: map[id],
+      displayAs: displayAsMap[id],
       count: counts[id] || 0
     }));
   }

@@ -27,17 +27,26 @@ module Esper.Actions {
 
   /* Validation, defaults for common params */
 
+  // Remember last cleaned items to use as defaults
+  var lastTeamId: string;
+  var lastCalIds: string;
+
+  // Clean team ID
   export function cleanTeamId(teamId: string) {
     if (teamId && Teams.teamStore.has(teamId)) {
+      lastTeamId = teamId;
       return teamId;
+    }
+
+    else if (lastTeamId && Teams.teamStore.has(lastTeamId)) {
+      return lastTeamId;
     }
 
     var teams = Teams.all();
     Log.assert(teams.length > 0, "No teams loaded");
 
-    // Return team where user is NOT exec (i.e. is an EA) or first team by
-    // default
-    var team = _.find(teams, (t) => t.team_executive !== Login.myUid())
+    // Default to first team with calendars
+    var team = _.find(teams, (t) => t.team_timestats_calendars.length > 0)
       || teams[0];
     return team.teamid;
   }
@@ -46,13 +55,46 @@ module Esper.Actions {
   // if this proves to be untrue.
   export const CAL_ID_SEPARATOR = ",";
 
+  // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Teams.require(teamId);
-    var calIds = _.filter(Util.some(calIdsStr, "").split(CAL_ID_SEPARATOR));
-    if (_.intersection(team.team_timestats_calendars, calIds).length) {
-      return calIds;
+    lastCalIds = calIdsStr || lastCalIds;
+    if (lastCalIds) {
+      var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
+      return _.intersection(team.team_timestats_calendars, calIds);
     }
     return team.team_timestats_calendars;
+  }
+
+  // Like cleanCalIds, but returns team/cal objects
+  export function cleanCalSelections(teamId: string, calIdsStr: string)
+    : Calendars.CalSelection[]
+  {
+    return _.map(cleanCalIds(teamId, calIdsStr), (calId) => ({
+      teamId: teamId,
+      calId: calId
+    }));
+  }
+
+  /*
+    Given a (potentially empty) list of CalSections, return a teamId / calId
+    path format. Currently only supports one team
+  */
+  export function pathForCals(cals: Calendars.CalSelection[]) {
+    /*
+      Default values don't need to match anything specific -- just need
+      to not match an actual teamId or calendarId to trigger "empty" set
+      behavior
+    */
+    var teamId = "default";
+    var calIds = "empty";
+
+    // If cals, then actually format something
+    if (cals.length) {
+      teamId = cals[0].teamId;
+      calIds = _.map(cals, (c) => c.calId).join(CAL_ID_SEPARATOR);
+    }
+    return [teamId, calIds];
   }
 
   export function cleanInterval(intervalStr: string,
@@ -151,6 +193,25 @@ module Esper.Actions {
     return q;
   }
 
+  /*
+    Compares a list of strings against selection criteria. Returns Option.Some
+    with the matching strings (if any, empty list is possible) or Option.None
+    if not matching
+  */
+  export function applyListSelectJSON(items: string[], q: ListSelectJSON) {
+    if (q.all) {
+      return Option.some(items);
+    }
+    if (q.none && items.length === 0) {
+      return Option.some(items);
+    }
+
+    var matches = _.filter(items, (i) => _.includes(q.some, i));
+    if (matches.length) {
+      return Option.some(matches);
+    }
+    return Option.none<string[]>();
+  }
 
   /*
     Interface for filtering out a bunch of events

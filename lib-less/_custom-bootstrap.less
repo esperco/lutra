@@ -7,14 +7,14 @@
 
 // Addition button classes
 .btn-secondary {
-  color: @brand-text;
-  background: @gray-lighter;
-  border: 1px solid @btn-default-border;
-  transition: color 0.5s, border 0.5s;
+  color: @link-color;
+  background: transparent;
+  border: 1px solid @link-color;
+  transition: color 0.5s, background 0.5s;
 
   &:hover, &:active {
-    color: @brand-hover;
-    border: 1px solid lighten(@btn-default-border, 5%);
+    color: white;
+    background: @link-color;
   }
 }
 

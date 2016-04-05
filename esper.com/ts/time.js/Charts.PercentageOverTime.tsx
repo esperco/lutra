@@ -2,53 +2,154 @@
   Bar chart for showing label percentages over time using split time
 */
 
-/// <reference path="./Charts.DurationsOverTime.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
-  export class PercentageOverTime extends DurationsOverTime {
+  type LabelsGrouping = GroupsByPeriod<{
+    labels_norm: string[];
+  }>[];
+
+  export class PercentageOverTime extends LabelChart {
+    protected durationsByLabel: LabelsGrouping;
+    protected sortedLabels: string[];
+    protected allowUnlabeled = true;
+
+    periodIncrs() {
+      return [-1, 0, 1];
+    }
+
+    sync() {
+      super.sync();
+      this.durationsByLabel = this.getGroupsByPeriod(
+
+        // Filter + wrapping function
+        (e) => Actions.applyListSelectJSON(
+          e.labels_norm,
+          this.params.filterParams.labels
+        ).flatMap((labels) => labels.length > 1 ?
+          Option.some([Labels.MULTI_LABEL_ID]) :
+          Option.some(labels)
+        ).flatMap((labels) => Option.some({
+          event: e,
+          labels_norm: labels
+        })),
+
+        // Group by labels
+        (w) => w.labels_norm
+      );
+
+      this.sortedLabels = this.sortByForCurrentPeriod(
+        this.durationsByLabel, (w) => -w.adjustedDuration
+      );
+
+      // Push multi-label to end of label sort
+      _.pull(this.sortedLabels, Labels.MULTI_LABEL_ID);
+      this.sortedLabels.push(Labels.MULTI_LABEL_ID);
+    }
+
+    onPointClick(events: Events2.TeamEvent[]) {
+      Layout.renderModal(Containers.eventListModal(events));
+      return false;
+    }
+
     renderChart() {
-      var formatted = TimeStats.formatWindowStarts(
-        this.sync()[0].items,
-        this.params.chartParams.interval);
+      var durations = this.durationsByLabel;
+      var categories = _.map(durations, (d) => Text.fmtPeriod(d.period));
 
-      // Filter to include only user-selected labels
-      var results = this.getExclusiveDisplayResults();
+      // One series for each period
+      var series: {
+        name: string,
+        cursor: string,
+        data: {
+          name?: string,
+          color: string,
+          x: number,
+          y: number,
+          count: number,
+          hours: number,
+          events: HighchartsPointEvents
+        }[]
+      }[] = _.map(durations, (d, x) => ({
+        name: Text.fmtPeriod(d.period),
+        cursor: "pointer",
+        data: _(d.groups.some)
+          .sortBy((s) => _.indexOf(this.sortedLabels, s.key))
+          .map((s) => {
+            var label = s.key;
+            return {
+              name: Labels.getDisplayAs(label),
+              color: Colors.getColorForLabel(label),
+              x: x,
+              y: TimeStats.toHours(
+                _.sumBy(s.items, (i) => i.adjustedDuration)
+              ),
+              count: s.items.length,
+              hours: TimeStats.toHours(
+                _.sumBy(s.items, (i) => i.duration)
+              ),
+              events: {
+                click: () => this.onPointClick(_.map(s.items, (i) => i.event))
+              }
+            }
+          })
+          .value()
+        })
+      );
 
-      // Actual HighCharts data
-      var series = _.map(results, (c) => {
-        return {
-          name: c.displayAs,
-          color: Colors.getColorForLabel(c.labelNorm),
-          data: _.map(c.durations, (value) => TimeStats.toHours(value))
-        }
-      });
+      if (this.showUnlabeled()) {
+        _.each(durations, (d, x) =>
+          series[x].data.push({
+            name: "Unlabeled Events",
+            color: Colors.lightGray,
+            x: x,
+            y: TimeStats.toHours(
+              _.sumBy(d.groups.none, (i) => i.adjustedDuration)
+            ),
+            count: d.groups.none.length,
+            hours: TimeStats.toHours(
+              _.sumBy(d.groups.none, (i) => i.duration)
+            ),
+            events: {
+              click: () => this.onPointClick(
+                _.map(d.groups.none, (w) => w.event)
+              )
+            }
+          })
+        );
+      }
 
       return <div className="percentage-recent-chart">
         <Components.Highchart opts={{
           chart: {
-            type: 'column'
+            type: 'bar',
+            height: categories.length * 100 + 120
+          },
+
+          legend: {
+            enabled: false
           },
 
           plotOptions: {
-            column: {
+            bar: {
               stacking: 'percent',
               borderWidth: 1
             }
           },
 
           xAxis: {
-            categories: formatted.groupLabels
+            categories: categories
           },
 
           yAxis: {
             title: { text: "Percentage" }
           },
 
+          tooltip: countPointTooltip,
+
           series: series
-        }} units="Adjusted Hours" />
+        }} />
       </div>;
     }
   }

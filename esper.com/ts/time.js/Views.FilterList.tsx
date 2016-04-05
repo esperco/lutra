@@ -15,28 +15,13 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface FilterListProps extends Actions.FilterListJSON {
-    teamId: string;
-    calIds: string[];
+    cals: Calendars.CalSelection[];
     period: Period.Single;
   }
 
   interface FilterListState {
     selected?: Events2.TeamEvent[];
     actionsPinned?: boolean;
-  }
-
-  function updateRoute(props: FilterListProps, opts: Route.nav.Opts = {}) {
-    var path = "/list/" + (_.map([
-      props.teamId,
-      props.calIds.join(","),
-      props.period.interval[0],
-      props.period.index.toString()
-    ], encodeURIComponent)).join("/");
-    opts.jsonQuery = {
-      filterStr: props.filterStr,
-      labels: props.labels
-    } as Actions.FilterListJSON;
-    Route.nav.path(path, opts);
   }
 
   export class FilterList extends Component<FilterListProps, FilterListState> {
@@ -87,10 +72,10 @@ module Esper.Views {
     getEventData() {
       // Merge event lists for multiple calendars
       var eventData = Option.flatten(
-        _.map(this.props.calIds, (calId) =>
+        _.map(this.props.cals, (c) =>
           Events2.getForPeriod({
-            teamId: this.props.teamId,
-            calId: calId,
+            teamId: c.teamId,
+            calId: c.calId,
             period: this.props.period
           })
         )
@@ -169,28 +154,21 @@ module Esper.Views {
           teams={teams}
           allowMulti={true}
           calendarsByTeamId={calendarsByTeamId}
-          selected={_.map(this.props.calIds, (calId) => ({
-            teamId: this.props.teamId, calId: calId
-          }))}
-          updateFn={(x) => updateRoute(_.extend({}, this.props, x.length > 0 ?
-            {
-              teamId: x[0].teamId,
-              calIds: _.map(x, (s) => s.calId)
-            } : {
-              teamId: null,
-              calIds: null
-            }) as FilterListProps)}
+          selected={this.props.cals}
+          updateFn={(x) => this.updateRoute({
+            cals: x
+          })}
         />
       </div>;
     }
 
     renderMonthSelector() {
       return <div className="col-sm-6 form-group">
-        <Components.PeriodSelector
+        <Components.PeriodSelectorWithIcon
           period={this.props.period}
-          updateFn={(x) => updateRoute(_.extend({}, this.props, {
+          updateFn={(x) => this.updateRoute({
             period: x
-          }) as FilterListProps)}
+          })}
         />
       </div>;
     }
@@ -207,25 +185,25 @@ module Esper.Views {
             allSelected={this.props.labels.all}
             unlabeledSelected={this.props.labels.none}
             showUnlabeled={true}
-            updateFn={(x) => updateRoute(_.extend({}, this.props, {
+            updateFn={(x) => this.updateRoute({
               labels: {
                 all: x.all,
                 none: x.unlabeled,
                 some: x.all ? [] : x.labels,
                 unmatched: false
               }
-            }) as FilterListProps)} />
+            })} />
           {
             !this.props.labels.all ?
             <span className="esper-clear-action" onClick={
-              () => updateRoute(_.extend({}, this.props, {
+              () => this.updateRoute({
                 labels: {
                   all: true,
                   none: true,
                   some: [],
                   unmatched: false
                 }
-              }) as FilterListProps)
+              })
             }>
               <i className="fa fa-fw fa-times" />
             </span> :
@@ -238,9 +216,9 @@ module Esper.Views {
     renderFilterStr() {
       return <div className="col-sm-6 form-group">
         <FilterStr value={this.props.filterStr} onUpdate={(val) => {
-          updateRoute(_.extend({}, this.props, {
+          this.updateRoute({
             filterStr: val
-          }) as FilterListProps, { replace: true })
+          }, { replace: true })
         }}/>
       </div>;
     }
@@ -315,19 +293,21 @@ module Esper.Views {
     }
 
     resetFilters() {
-      updateRoute(_.extend({}, this.props, {
-        allLabels: true,
-        unlabeled: true,
-        filterStr: null,
-        labels: []
-      }) as FilterListProps);
+      this.updateRoute({
+        labels: {
+          all: true,
+          none: true,
+          some: [],
+          unmatched: false
+        }
+      });
     }
 
     refreshEvents() {
-      _.each(this.props.calIds, (c) =>
+      _.each(this.props.cals, (c) =>
         Events2.fetchForPeriod({
-          teamId: this.props.teamId,
-          calId: c,
+          teamId: c.teamId,
+          calId: c.calId,
           period: this.props.period,
           force: true
         })
@@ -335,107 +315,20 @@ module Esper.Views {
     }
 
     renderMain(events: Events2.TeamEvent[]) {
-      if (events.length === 0) {
-        return <div className="esper-no-content">
-          No events found
-        </div>;
-      }
-
-      var groupByDays = _.groupBy(events,
-        (e) => moment(e.start).clone().startOf('day').valueOf()
-      );
-      var sortedKeys = _.sortBy(_.keys(groupByDays), (k) => parseInt(k));
-
-      return <div>
-        {
-          _.map(sortedKeys, (k) =>
-            this.renderDay(parseInt(k), groupByDays[k])
-          )
-        }
-      </div>;
-    }
-
-    renderDay(timestamp: number, events: Events2.TeamEvent[]) {
-      var m = moment(timestamp);
-      return <div className="day" key={timestamp}>
-        <div className="day-title">{ m.format("MMM D - dddd") }</div>
-        <div className="list-group">
-          { _.map(events, (e) => this.renderEvent(e)) }
-        </div>
-      </div>
-    }
-
-    renderEvent(event: Events2.TeamEvent) {
-      return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
-                  className="list-group-item event">
-        <div className="event-checkbox"
-             onClick={() => this.toggleEvent(event)}>
-          { this.isSelected(event) ?
-            <i className="fa fa-fw fa-check-square-o" /> :
-            <i className="fa fa-fw fa-square-o" />
+      return <Components.EventList
+        events={events}
+        selectedEvents={this.state.selected}
+        onEventClick={(event) => this.editEvent(event)}
+        onEventToggle={(event) => this.toggleEvent(event)}
+        onLabelClick={(event, id) => this.updateRoute({
+          labels: {
+            some: [id],
+            all: false,
+            none: false,
+            unmatched: false
           }
-        </div>
-        <div className="event-content">
-          <div className={"title esper-link" +
-                 (event.feedback.attended === false ? " no-attend" : "")}
-               onClick={() => this.editEvent(event)}>
-            {event.title}
-          </div>
-          <div className="time">
-            <span className="start">
-              { moment(event.start).format("h:mm a") }
-            </span>{" to "}<span className="end">
-              { moment(event.end).format("h:mm a") }
-            </span>{" "}
-            { event.recurring_event_id ?
-              <span className="recurring" title="Recurring">
-                <i className="fa fa-fw fa-refresh" />
-              </span> :
-              null
-            }
-          </div>
-          <div className="event-rating">
-            { _.times((event.feedback.attended !== false &&
-                       event.feedback.rating) || 0, (i) =>
-              <i key={i.toString()} className="fa fa-fw fa-star" />
-            )}
-          </div>
-          <div className="event-labels">
-            { _.map(event.labels_norm,
-              (l, i) => this.renderLabel(event, l, event.labels[i])
-            ) }
-          </div>
-        </div>
-      </div>;
-    }
-
-    renderLabel(event: Events2.TeamEvent, id: string, displayAs: string) {
-      var labelColor = Colors.getColorForLabel(id)
-      var style = {
-        background: labelColor,
-        color: Colors.colorForText(labelColor)
-      };
-
-      var onClick = () => updateRoute(_.extend({}, this.props, {
-        labels: [id],
-        unlabeled: false,
-        allLabels: false
-      }) as FilterListProps);
-      var clearLabel = ((e: __React.MouseEvent) => {
-        e.stopPropagation();
-        EventLabelChange.remove([event], displayAs);
-      });
-
-      return <span style={style} key={id} className="event-label"
-        onClick={onClick}
-      >
-        <i className="fa fa-fw fa-tag" />{" "}
-        {displayAs}
-        <span className="hidden-xs esper-clear-action"
-              onClick={(e) => clearLabel(e)}>{" "}
-          <i className="fa fa-fw fa-times" />
-        </span>
-      </span>;
+        })}
+      />;
     }
 
     editEvent(event: Events2.TeamEvent) {
@@ -523,6 +416,27 @@ module Esper.Views {
     isSomeSelected(events: Events2.TeamEvent[]) {
       return this.state.selected.length &&
         !!_.find(events, (e) => this.isSelected(e));
+    }
+
+    updateRoute(newProps: {
+      cals?: Calendars.CalSelection[];
+      period?: Period.Single;
+      filterStr?: string;
+      labels?: Actions.ListSelectJSON;
+    }, opts: Route.nav.Opts = {}) {
+      var pathForCals = Actions.pathForCals(newProps.cals || this.props.cals);
+      var period = newProps.period || this.props.period;
+      var path = "/list/" + (_.map([
+        pathForCals[0],
+        pathForCals[1],
+        period.interval[0],
+        period.index.toString()
+      ], encodeURIComponent)).join("/");
+      opts.jsonQuery = {
+        filterStr: Util.some(newProps.filterStr, this.props.filterStr),
+        labels: Util.some(newProps.labels, this.props.labels)
+      } as Actions.FilterListJSON;
+      Route.nav.path(path, opts);
     }
   }
 

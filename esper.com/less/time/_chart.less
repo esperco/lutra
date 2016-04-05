@@ -1,10 +1,31 @@
 @import "../lib/_helpers";
 
+#charts-page {
+  @media (max-width: @screen-xs-max) {
+    .period-selector {
+      text-align: center;
+
+      .esper-subheader-link {
+        display: inline-block;
+        text-align: center;
+        padding: 0 @padding-base-horizontal;
+        min-width: 30%;
+      }
+    }
+  }
+}
+
 .chart-holder {
   .esper-expanded;
   .esper-expanded.padded;
   .esper-expanded.minus-subheader;
 
   padding-top: @padding-base-vertical;
+
+  .highchart-drillup {
+    position: absolute;
+    top: @padding-base-vertical;
+    left: @padding-base-horizontal;
+  }
 }
 

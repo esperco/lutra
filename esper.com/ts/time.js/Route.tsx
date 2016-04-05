@@ -46,30 +46,6 @@ module Esper.Route {
     });
   }
 
-  // Helper to default to the last selected team / calendar selection
-  var rememberCal: PageJS.Callback = function(ctx, next) {
-    var filterJSON: Actions.EventFilterJSON = getJSONQuery(ctx) || {};
-
-    // Request has calendars, remember them, then next
-    if (filterJSON.cals && filterJSON.cals.length) {
-      lastCals = filterJSON.cals;
-      next();
-    }
-
-    // Has previously selected calendars, stub into request
-    else if (lastCals.length) {
-      filterJSON.cals = lastCals;
-      Route.nav.query(filterJSON, {replace: true});
-    }
-
-    // No previously selected calendars, proceed normally
-    else {
-      next();
-    }
-  }
-  var lastCals: Calendars.CalSelection[] = [];
-
-
   ////////
 
   /*
@@ -91,13 +67,24 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts/:chartType?", checkOnboarding, function(ctx) {
-    Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
+  route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding,
+  function(ctx) {
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderChart({
+      chartId: ctx.params["chartId"],
+      cals: _.map(calIds, (c) => ({ calId: c, teamId: teamId })),
+      period: period,
+      filterParams: getJSONQuery(ctx)
+    });
   });
 
   // Calendar labeling page
   route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding, rememberCal,
+    checkOnboarding,
   function(ctx) {
     var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
     var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
@@ -148,7 +135,7 @@ module Esper.Route {
   });
 
   route("/list/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding, rememberCal,
+    checkOnboarding,
   function(ctx) {
     var q = Actions.cleanFilterStrJSON(
       getJSONQuery(ctx)
@@ -159,8 +146,7 @@ module Esper.Route {
     var interval = Actions.cleanInterval(ctx.params["interval"], "month");
     var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderFilterList({
-      teamId: teamId,
-      calIds: Actions.cleanCalIds(teamId, ctx.params["calIds"]),
+      cals: Actions.cleanCalSelections(teamId, ctx.params["calIds"]),
       period: period
     }, q)
   });

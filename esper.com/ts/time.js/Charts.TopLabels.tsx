@@ -1,24 +1,20 @@
 /*
-  Pie chart for showing guests by domain
+  Pie chart for showing label percentages using split time
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Charts.GuestChart.tsx" />
+/// <reference path="./Charts.LabelChart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./DailyStats.ts" />
+/// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
-  // Shorten references to React Component class
-  var Component = ReactHelpers.Component;
-
-  type EmailsGrouping = GroupsByPeriod<{
-    emails: string[];
+  type LabelsGrouping = GroupsByPeriod<{
+    labels_norm: string[];
   }>[];
 
-  export class TopGuests extends GuestChart {
-    protected durationsByEmail: EmailsGrouping;
-    protected sortedEmails: string[];
+  export class TopLabels extends LabelChart {
+    protected durationsByLabel: LabelsGrouping;
+    protected sortedLabels: string[];
 
     periodIncrs() {
       return [-1, 0, 1];
@@ -26,23 +22,22 @@ module Esper.Charts {
 
     sync() {
       super.sync();
-      this.durationsByEmail = this.getGroupsByPeriod(
+      this.durationsByLabel = this.getGroupsByPeriod(
 
         // Filter + wrapping function
         (e) => Actions.applyListSelectJSON(
-          Events2.getGuestDomains(e),
-          this.params.filterParams.domains
-        ).flatMap((domains) => Option.some({
+          e.labels_norm,
+          this.params.filterParams.labels
+        ).flatMap((labels) => Option.some({
           event: e,
-          domains: domains,
-          emails: Events2.getGuestEmails(e, domains)
+          labels_norm: labels
         })),
 
         // Group by labels
-        (w) => w.emails
+        (w) => w.labels_norm
       );
-      this.sortedEmails = this.sortByForCurrentPeriod(
-        this.durationsByEmail, (w) => -w.duration
+      this.sortedLabels = this.sortByForCurrentPeriod(
+        this.durationsByLabel, (w) => -w.duration
       );
     }
 
@@ -52,8 +47,8 @@ module Esper.Charts {
     }
 
     renderChart() {
-      var categories = this.sortedEmails;
-      var durations = this.durationsByEmail;
+      var categories = this.sortedLabels;
+      var durations = this.durationsByLabel;
       var series: {
         name: string,
         cursor: string,
@@ -65,27 +60,47 @@ module Esper.Charts {
 
       _.each(durations, (d) =>
         _.each(d.groups.some, (s) => {
-          let email = s.key;
-          let domain = email.split('@')[1] || "";
+          let label = s.key;
           var color = _.isEqual(d.period, this.params.period) ?
-            Colors.getColorForDomain(domain) : Colors.lightGray;
+            Colors.getColorForLabel(label) : Colors.lightGray;
           series.push({
-            name: email,
+            name: Labels.getDisplayAs(label),
             cursor: "pointer",
             color: color,
             stack: Text.fmtPeriod(d.period),
             index: d.period.index,
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
-              x: _.indexOf(categories, email),
+              x: _.indexOf(categories, label),
               y: TimeStats.toHours(wrapper.duration),
               events: {
                 click: () => this.onEventClick(wrapper.event)
               }
-            }) as HighchartsDataPoint)
+            } as HighchartsDataPoint))
           })
         })
       );
+
+      if (this.showUnlabeled()) {
+        _.each(this.durationsByLabel, (d) =>
+          series.push({
+            name: "Unlabeled Events",
+            cursor: "pointer",
+            color: (
+              _.isEqual(d.period, this.params.period) ?
+              Colors.gray : Colors.lightGray
+            ),
+            stack: Text.fmtPeriod(d.period),
+            index: d.period.index,
+            data: _.map(d.groups.none, (wrapper) => ({
+              name: Text.eventTitleForChart(wrapper.event),
+              x: categories.length,
+              y: TimeStats.toHours(wrapper.duration)
+            }))
+          })
+        );
+        categories.push("Unlabeled Events");
+      }
 
       return <Components.Highchart opts={{
         chart: {

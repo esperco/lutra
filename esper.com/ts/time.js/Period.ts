@@ -51,7 +51,8 @@ module Esper.Period {
   }
 
   export function boundsFromPeriod(period: Single): [Date, Date] {
-    var startM = moment(Epoch).add(period.index, period.interval);
+    var startM = moment(Epoch).startOf(period.interval)
+                  .add(period.index, period.interval);
     var endM = startM.clone().endOf(period.interval);
     return [startM.toDate(), endM.toDate()];
   }

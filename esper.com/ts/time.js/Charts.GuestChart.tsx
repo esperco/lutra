@@ -3,114 +3,82 @@
 */
 
 /// <reference path="./Colors.ts" />
-/// <reference path="./Charts.AutoChart.tsx" />
-/// <reference path="./DailyStats.ts" />
+/// <reference path="./Charts.tsx" />
 /// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Charts {
-  interface DomainChartParams {
-    emptyDomain?: boolean;  // Is the "no guests" domain selected?
-    allDomains?: boolean;   // Show all domains -- alternate to listing
-    domains?: string[];
-  }
-
-  export interface GuestChartJSON extends Charts.ChartJSON {
-    chartParams?: DomainChartParams
+  interface DomainFilterParams {
+    domains: Actions.ListSelectJSON;
   }
 
   /*
     Base class for auto-chart with guest domain selector
   */
-  export abstract class GuestChart extends AutoChart<GuestChartJSON> {
-    protected allowEmpty = false;
+  export abstract class GuestChart extends EventChart<DomainFilterParams> {
+    protected allowEmpty: boolean;
+    protected eventsByDomain: EventStats.EventGrouping;
 
-    cleanParams(params: GuestChartJSON|ChartJSON): GuestChartJSON {
-      var cleaned = super.cleanParams(params);
-      if (! _.isBoolean(cleaned.chartParams.emptyDomain)) {
-        cleaned.chartParams.emptyDomain = this.allowEmpty;
-      }
-      if (! _.isBoolean(cleaned.chartParams.allDomains)) {
-        cleaned.chartParams.allDomains = true;
-      }
-      if (! cleaned.chartParams.domains) {
-        cleaned.chartParams.domains = [];
-      }
-      if (! _.every(cleaned.chartParams.domains, (d) => _.isString(d))) {
-        cleaned.chartParams.domains = [];
-      }
-      return cleaned;
+    cleanFilterParams(params: any = {}): DomainFilterParams {
+      params = params || {};
+      var ret = params as DomainFilterParams;
+      ret.domains = Actions.cleanListSelectJSON(ret.domains);
+      return ret;
     }
 
-    noData() {
-      if (this.allowEmpty) {
-        return super.noData();
-      }
-      var data = this.sync()[0];
-      return !_.find(data.daily_stats,
-        (s) => s.with_guests && s.with_guests.length
+    sync() {
+      super.sync();
+      this.eventsByDomain = Partition.groupByMany(this.events,
+        (e) => Events2.getGuestDomains(e)
       );
     }
 
-    protected getSelectedDomains(
-      domains?: DailyStats.GuestDomainDisplayResult[])
-    {
-      if (! this.params.chartParams.allDomains) {
-        return this.params.chartParams.domains;
+    protected getSelectedDomains() {
+      var params = this.params.filterParams.domains;
+      var domains = _.map(this.eventsByDomain.some, (d) => d.key);
+      if (params.all) {
+        return domains;
       }
-
-      if (! domains) {
-        // All domains
-        var pair = this.sync();
-        var stats = pair && pair[0];
-        domains = stats ? DailyStats.topGuestDomains(stats) : [];
-      }
-
-      // Default selection => all domains
-      return _.map(domains, (d) => d.domain);
+      return params.some;
     }
 
     protected showEmptyDomain() {
       return this.allowEmpty && (
-        this.params.chartParams.allDomains ||
-        this.params.chartParams.emptyDomain
+        this.params.filterParams.domains.all ||
+        this.params.filterParams.domains.none
       );
     }
 
     renderSelectors() {
-      var pair = this.sync();
-      var stats = pair && pair[0];
-      if (! stats) {
+      if (!this.events || !this.events.length) {
         return <span />
       }
 
-      var domains = DailyStats.topGuestDomains(stats);
       var groups = [{
         id: "",
-        choices: _.map(domains, (g) => {
-          return {
-            id: g.domain,
-            displayAs: g.domain,
-            badgeText: g.guests.length.toString(),
-            badgeColor: Colors.getColorForDomain(g.domain)
-          }
-        })
+        choices: _.map(this.eventsByDomain.some, (d) => ({
+          id: d.key,
+          displayAs: d.key,
+          badgeText: d.items.length.toString(),
+          badgeHoverText: d.items.length.toString() + " Events",
+          badgeColor: Colors.getColorForDomain(d.key)
+        }))
       }];
 
       // Default selection => all domains
-      var selectedIds = this.getSelectedDomains(domains);
+      var selectedIds = this.getSelectedDomains();
 
       // Use empty string as the "no guests" domain
       if (this.allowEmpty) {
-        var noGuestsCount =
-          DailyStats.sumScheduledCount(stats) -
-          DailyStats.sumWithGuestsCount(stats)
-
+        var noGuestsCount = this.eventsByDomain.none.length.toString();
         var emptySelector = <div className="esper-select-menu">
           <a className="esper-selectable"
              onClick={this.toggleEmpty.bind(this)}>
             {
               noGuestsCount ?
-              <span className="badge">{ noGuestsCount }</span> :
+              <Components.Badge
+                text={noGuestsCount}
+                hoverText={noGuestsCount + " Events"}
+              /> :
               null
             }
             <i className={"fa fa-fw " + (this.showEmptyDomain() ?
@@ -121,12 +89,9 @@ module Esper.Charts {
         </div>;
       }
 
-      var totalCount = this.allowEmpty ?
-        DailyStats.sumScheduledCount(stats) :
-        DailyStats.sumWithGuestsCount(stats);
-
+      var totalCount = this.events.length.toString();
       var selectAllIcon = (() => {
-        if (this.params.chartParams.allDomains) {
+        if (this.params.filterParams.domains.all) {
           return "fa-check-square-o";
         } else if (selectedIds.length) {
           return "fa-minus-square-o";
@@ -143,7 +108,10 @@ module Esper.Charts {
         <div className="esper-select-menu">
           <a className="esper-selectable"
              onClick={this.toggleAll.bind(this)}>
-            <span className="badge">{ totalCount }</span>
+            <Components.Badge
+              text={totalCount}
+              hoverText={totalCount + " Events"}
+            />
             <i className={"fa fa-fw " + selectAllIcon} />{" "}
             Select All
           </a>
@@ -166,24 +134,19 @@ module Esper.Charts {
     //////
 
     updateDomains(selections: {id: string}[]) {
-      var pair = this.sync();
-      var stats = pair && pair[0];
-      if (! stats) { return; }
-      var domains = DailyStats.topGuestDomains(stats);
-      var maxDomains = domains.length;
-
+      var maxDomains = this.eventsByDomain.some.length;
       if (selections.length === maxDomains &&
           (this.showEmptyDomain() || !this.allowEmpty))
       {
         this.updateSelections({
-          allDomains: true,
-          emptyDomain: this.allowEmpty,
-          domains: []
+          all: true,
+          none: this.allowEmpty,
+          some: [],
         });
       } else {
         this.updateSelections({
-          allDomains: false,
-          domains: _.map(selections, (s) => s.id)
+          all: false,
+          some: _.map(selections, (s) => s.id)
         });
       }
     }
@@ -191,52 +154,51 @@ module Esper.Charts {
     toggleAll() {
       if (this.getSelectedDomains().length) {
         this.updateSelections({
-          allDomains: false,
-          emptyDomain: false,
-          domains: []
+          all: false,
+          none: false,
+          some: []
         });
       } else {
         this.updateSelections({
-          allDomains: true,
-          emptyDomain: this.allowEmpty,
-          domains: []
+          all: true,
+          none: this.allowEmpty,
+          some: []
         });
       }
     }
 
     toggleEmpty() {
-      var pair = this.sync();
-      var stats = pair && pair[0];
-      if (! stats) { return; }
-      var allDomains = _.map(DailyStats.topGuestDomains(stats),
-        (d) => d.domain
-      );
-      var currentDomains = this.params.chartParams.domains || [];
-
+      var allDomains = _.map(this.eventsByDomain.some, (d) => d.key);
+      var currentDomains = this.params.filterParams.domains.some || [];
       if (this.showEmptyDomain()) {
         this.updateSelections({
-          allDomains: false,
-          emptyDomain: false,
-          domains: (currentDomains.length ? currentDomains : allDomains)
+          all: false,
+          none: false,
+          some: (currentDomains.length ? currentDomains : allDomains)
         });
       } else {
         this.updateSelections({
-          allDomains: currentDomains.length === allDomains.length,
-          emptyDomain: true,
-          domains: currentDomains
+          all: currentDomains.length === allDomains.length,
+          none: true,
+          some: currentDomains
         });
       }
     }
 
-    updateSelections(newParams: DomainChartParams) {
-      newParams = _.extend({},
-        this.params.chartParams,
-        newParams) as DomainChartParams;
-      this.updateRoute({
-        props: this.extendCurrentProps({
-          chartParams: newParams
-        })
-      });
+    updateSelections({all, none, some}: {
+      all?: boolean;
+      none?: boolean;
+      some?: string[]
+    }) {
+      var current = this.params.filterParams.domains;
+      Route.nav.query({
+        domains: {
+          all: Util.some(all, current.all),
+          none: Util.some(none, current.none),
+          some: Util.some(some, current.some),
+          unmatched: current.unmatched
+        }
+      } as DomainFilterParams);
     }
   }
 }

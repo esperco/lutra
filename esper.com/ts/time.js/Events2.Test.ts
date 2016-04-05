@@ -313,5 +313,77 @@ module Esper.Events2 {
         expect(getVal().isBusy).toBeTruthy();
       });
     });
+
+
+    /////
+
+    const guest1: ApiT.Attendee = {
+      email: "a@example.com",
+      response: "NeedsAction"
+    };
+    const guest2: ApiT.Attendee = {
+      email: "b@example.com",
+      response: "Accepted"
+    };
+    const guest3: ApiT.Attendee = {
+      email: "c@example.com",
+      response: "Declined"
+    };
+    const guest4: ApiT.Attendee = {
+      email: "d@other.com",
+      response: "Accepted"
+    };
+    const guestEvent = asTeamEvent(TestFixtures.teamId1,
+      TestFixtures.makeGenericCalendarEvent({
+        guests: [guest1, guest2, guest3, guest4]
+      }));
+
+    describe("getGuests", function() {
+      beforeEach(function() {
+        TestFixtures.mockLogin();
+      });
+
+      afterEach(function() {
+        TestFixtures.reset();
+      });
+
+      it("should return all guests who did not decline", function() {
+        expect(getGuests(guestEvent)).toEqual([guest1, guest2, guest4]);
+      });
+
+      describe("if team exec is defined", function() {
+        beforeEach(function() {
+          TestFixtures.mockProfiles([{
+            profile_uid: TestFixtures.team1Exec,
+            other_emails: ["a@example.com"]
+          }]);
+        });
+
+        it("should exclude team exec from guest list", function() {
+          expect(getGuests(guestEvent)).toEqual([guest2, guest4]);
+        });
+      });
+
+      describe("getGuestEmails", function() {
+        it("should return emails for guests who did not decline", function() {
+          var emails = getGuestEmails(guestEvent);
+          expect(emails).toEqual(
+            _.map([guest1, guest2, guest4], (g) => g.email)
+          );
+        });
+
+        it("should allow filtering by domain", function() {
+          var emails = getGuestEmails(guestEvent, ["example.com"]);
+          expect(emails).toEqual(_.map([guest1, guest2], (g) => g.email));
+        });
+      });
+
+      describe("getGuestDomains", function() {
+        it("should return a unique set of domains for guests", function() {
+          expect(getGuestDomains(guestEvent))
+            .toEqual(["example.com", "other.com"]);
+        });
+      });
+    });
   });
 }

@@ -13,24 +13,24 @@ module Esper.Actions {
     labels: ListSelectJSON;
   }
 
+  const analyticsId = "list-analytics-id";
+
   /* List action => render a list of events */
   export function renderFilterList(params: {
-    teamId: string;
-    calIds: string[];
+    cals: Calendars.CalSelection[];
     period: Period.Single;
   }, queryJSON: FilterListJSON) {
 
     // Async load of events
-    _.each(params.calIds, (calId) => Events2.fetchForPeriod({
-      teamId: params.teamId,
-      calId: calId,
+    _.each(params.cals, (cal) => Events2.fetchForPeriod({
+      teamId: cal.teamId,
+      calId: cal.calId,
       period: params.period
     }));
 
     // Render view
     render(<Views.FilterList
-      teamId={params.teamId}
-      calIds={params.calIds}
+      cals={params.cals}
       period={params.period}
       labels={queryJSON.labels}
       filterStr={queryJSON.filterStr}
@@ -38,14 +38,16 @@ module Esper.Actions {
 
     /////
 
-    Analytics.page(Analytics.Page.EventList, {
-      calendars: params.calIds.length,
-      teamId: params.teamId,
-      interval: params.period.interval,
-      relativePeriod: Period.relativeIndex(params.period),
-      hasFilterStr: !!queryJSON.filterStr,
-      hasLabelFilter: !queryJSON.labels.all
-    });
+    // Delay tracking by 2 seconds to ensure user is actually looking at list
+    Util.delayOne(analyticsId, function() {
+      Analytics.page(Analytics.Page.EventList, {
+        calendars: params.cals.length,
+        interval: params.period.interval,
+        relativePeriod: Period.relativeIndex(params.period),
+        hasFilterStr: !!queryJSON.filterStr,
+        hasLabelFilter: !queryJSON.labels.all
+      });
+    }, 2000);
   }
 
 }

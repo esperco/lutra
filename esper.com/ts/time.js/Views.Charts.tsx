@@ -3,20 +3,11 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/AB.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.IntervalRangeSelector.tsx" />
+/// <reference path="./Components.IntervalSelector.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
-/// <reference path="./Charts.ActivityGrid.tsx" />
-/// <reference path="./Charts.DurationsOverTime.tsx" />
-/// <reference path="./Charts.PercentageRecent.tsx" />
-/// <reference path="./Charts.PercentageOverTime.tsx" />
-/// <reference path="./Charts.GuestDomains.tsx" />
-/// <reference path="./Charts.TopGuests.tsx" />
-/// <reference path="./Charts.WorkHoursGrid.tsx" />
-/// <reference path="./Charts.DurationHistogram.tsx" />
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./DailyStats.ts" />
@@ -27,7 +18,6 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  type ChartType = typeof Esper.Charts.Chart;
   interface ChartTypeInfo {
     // Used in URL to identify which chart we're looking at
     id: string;
@@ -35,14 +25,10 @@ module Esper.Views {
     // Display Name
     displayAs: string;
     icon: string;
-
-    // Actual chart Object
-    chartType: ChartType;
   }
 
   interface Props {
-    currentChart: Esper.Charts.Chart<Esper.Charts.ChartJSON>;
-    chartId: Actions.ChartId;
+    currentChart: Esper.Charts.EventChart<{}>;
     chartTypes: Actions.ChartTypeInfo[];
   }
 
@@ -51,6 +37,8 @@ module Esper.Views {
   export class Charts extends Component<Props, {}> {
     renderWithData() {
       var chart = this.props.currentChart;
+      chart.sync(); // Call once per renderWithData to update chart data
+
       var teams = Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
@@ -61,9 +49,12 @@ module Esper.Views {
       })();
 
       // Render view
-      return <div id="charts-page"
-                  className="esper-full-screen minus-nav">
+      return <div id="charts-page" className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
+          <a className="pull-right" onClick={() => this.refresh()}>
+            <i className="fa fa-fw fa-refresh" title="refresh" />
+          </a>
+          { this.renderChartSelector() }
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
@@ -75,33 +66,13 @@ module Esper.Views {
               calendarsByTeamId={calendarsByTeamId}
               selected={chart.params.cals}
               updateFn={(c) => this.updateCalSelection(c)}
+              allowMulti={true}
             />
           </div>
           { chart ? chart.renderSelectors() : null }
         </Components.SidebarWithToggle>
         <div className="esper-right-content padded">
-          <div className="esper-header fixed row clearfix">
-            <div className="col-xs-8 col-sm-4">
-              { this.renderChartSelector() }
-            </div>
-            <div className="col-xs-4 col-sm-2 clearfix">
-              <div className="pull-left">
-                <a className="esper-subtle" href="/help-charts"
-                   target="_blank">
-                  <i className="fa fa-fw fa-question-circle" />
-                </a>
-              </div>
-              <div className="pull-right">
-                <button className="btn btn-default"
-                        onClick={() => this.refresh()}>
-                  <i className="fa fa-fw fa-refresh" title="refresh" />
-                </button>
-              </div>
-            </div>
-            <div className="col-xs-12 col-sm-6">
-              { chart ? this.renderPeriodSelector() : null }
-            </div>
-          </div>
+          { this.renderPeriodSelector() }
           { this.renderChartCheck() }
         </div>
       </div>;
@@ -109,10 +80,18 @@ module Esper.Views {
 
     renderChartSelector() {
       var selected = this.getCurrentChartInfo();
-      return (
+      return (<div className="esper-menu-section">
+        <label htmlFor={this.getId("chart-type")}>
+          <i className="fa fa-fw fa-bar-chart" />{" "}
+          Chart Type{" "}
+          <a className="esper-subtle" href="/help-charts"
+             target="_blank">
+            <i className="fa fa-fw fa-question-circle" />
+          </a>
+        </label>
         <Components.DropdownModal>
-          <input type="text" className="form-control dropdown-toggle"
-                 readOnly={true}
+          <input type="text" id={this.getId("chart-type")}
+                 className="form-control dropdown-toggle" readOnly={true}
                  value={ selected.displayAs } />
           <ul className="dropdown-menu">
             {
@@ -129,11 +108,25 @@ module Esper.Views {
               )
             }
           </ul>
-        </Components.DropdownModal>);
+        </Components.DropdownModal>
+      </div>);
     }
 
     renderPeriodSelector() {
-      return this.props.currentChart.renderPeriodSelector();
+      return <div className="esper-header period-selector row fixed clearfix">
+        <Components.IntervalSelector
+          className="col-sm-6"
+          period={this.props.currentChart.params.period}
+          show={this.props.currentChart.intervalsAllowed()}
+          updateFn={(period) => this.updatePeriod(period)}
+        />
+        <div className="col-sm-6">
+          <Components.PeriodSelector
+            period={this.props.currentChart.params.period}
+            updateFn={(period) => this.updatePeriod(period)}
+          />
+        </div>
+      </div>;
     }
 
     /*
@@ -142,14 +135,14 @@ module Esper.Views {
     */
     renderChartCheck() {
       var chart = this.props.currentChart;
-      if (! chart) {
+      if (!chart || !chart.params.cals.length) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-calendar"></i>{" "}
           Please select a calendar.
         </span>);
       }
 
-      else if (chart.getError()) {
+      else if (chart.hasError()) {
         return this.renderMessage(<span>
           <i className="fa fa-fw fa-warning"></i>{" "}
           Error loading data
@@ -185,7 +178,7 @@ module Esper.Views {
     getCurrentChartInfo() {
       return Option.wrap(
         _.find(this.props.chartTypes,
-          (ct) => this.props.chartId === ct.id
+          (ct) => this.props.currentChart.params.chartId === ct.id
         )
       ).match({
         none: () => this.props.chartTypes[0],
@@ -197,45 +190,53 @@ module Esper.Views {
     /* Actions */
 
     refresh() {
-      TimeStats.StatStore.reset();
-      DailyStats.StatStore.reset();
+      Events2.invalidate();
       Route.nav.refresh();
     }
 
-    updateRoute<T extends Esper.Charts.ChartJSON>(
-      {chartTypeId, props, opts}: {
-        chartTypeId?: string;
-        props?: T;
-        opts?: Route.nav.Opts;
-      })
-    {
-      chartTypeId = chartTypeId || this.getCurrentChartInfo().id;
-      var frag = "/charts/" + chartTypeId;
+    updateRoute({chartId, cals, period, opts}: {
+      chartId?: string;
+      cals?: Calendars.CalSelection[];
+      period?: Period.Single;
+      opts?: Route.nav.Opts;
+    }) {
+      var chart = this.props.currentChart;
+      chartId = chartId || chart.params.chartId;
+      cals    = cals    || chart.params.cals;
+      period  = period  || chart.params.period;
+
+      // Assume at most one team, maybe multiple calendars
+      var pathForCals = Actions.pathForCals(cals);
 
       opts = opts || {};
-      opts.jsonQuery = props;
-      Route.nav.path(frag, opts);
+      opts.jsonQuery = chart.params.filterParams;
+
+      Route.nav.path([
+        "charts",
+        chartId,
+        pathForCals[0],
+        pathForCals[1],
+        period.interval,
+        period.index.toString()
+      ], opts);
     }
 
     updateChartType(val: string) {
       this.updateRoute({
-        chartTypeId: val,
-        props: this.props.currentChart.params
+        chartId: val
       });
     }
 
     updateCalSelection(selections: Calendars.CalSelection[]) {
       this.updateRoute({
-        props: this.extendCurrentProps({
-          cals: selections
-        })
+        cals: selections
       });
     }
 
-    extendCurrentProps(newParams: Esper.Charts.ChartJSON)
-      : Esper.Charts.ChartJSON
-    {
-      return _.extend({}, this.props.currentChart.params, newParams);
+    updatePeriod(period: Period.Single) {
+      this.updateRoute({
+        period: period
+      });
     }
   }
 }

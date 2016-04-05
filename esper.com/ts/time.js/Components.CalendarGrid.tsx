@@ -64,8 +64,13 @@ module Esper.Components {
 
     renderDay(day: moment.Moment) {
       var inMonth = moment(this.props.date).month() === day.month();
-      return <td key={day.toISOString()} className={"cal-day " +
-                 (inMonth ? "in-month": "out-month")}>
+      var classes = ["cal-day"];
+      classes.push(inMonth ? "in-month": "out-month");
+      if (day.clone().startOf('day').isSame(moment().startOf('day'))) {
+        classes.push("today");
+      }
+
+      return <td key={day.toISOString()} className={classes.join(" ")}>
         <div className="day-header">
           {day.format("D")}
         </div>
