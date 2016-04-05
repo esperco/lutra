@@ -46,6 +46,7 @@ module Esper.Actions {
   // if this proves to be untrue.
   export const CAL_ID_SEPARATOR = ",";
 
+  // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Teams.require(teamId);
     var calIds = _.filter(Util.some(calIdsStr, "").split(CAL_ID_SEPARATOR));
@@ -53,6 +54,37 @@ module Esper.Actions {
       return calIds;
     }
     return team.team_timestats_calendars;
+  }
+
+  // Like cleanCalIds, but returns team/cal objects
+  export function cleanCalSelections(teamId: string, calIdsStr: string)
+    : Calendars.CalSelection[]
+  {
+    return _.map(cleanCalIds(teamId, calIdsStr), (calId) => ({
+      teamId: teamId,
+      calId: calId
+    }));
+  }
+
+  /*
+    Given a (potentially empty) list of CalSections, return a teamId / calId
+    path format. Currently only supports one team
+  */
+  export function pathForCals(cals: Calendars.CalSelection[]) {
+    /*
+      Default values don't need to match anything specific -- just need
+      to not match an actual teamId or calendarId to trigger "empty" set
+      behavior
+    */
+    var teamId = "default";
+    var calIds = "empty";
+
+    // If cals, then actually format something
+    if (cals.length) {
+      teamId = cals[0].teamId;
+      calIds = _.map(cals, (c) => c.calId).join(CAL_ID_SEPARATOR);
+    }
+    return [teamId, calIds];
   }
 
   export function cleanInterval(intervalStr: string,

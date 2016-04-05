@@ -159,8 +159,7 @@ module Esper.Route {
     var interval = Actions.cleanInterval(ctx.params["interval"], "month");
     var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderFilterList({
-      teamId: teamId,
-      calIds: Actions.cleanCalIds(teamId, ctx.params["calIds"]),
+      cals: Actions.cleanCalSelections(teamId, ctx.params["calIds"]),
       period: period
     }, q)
   });

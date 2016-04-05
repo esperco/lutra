@@ -174,13 +174,10 @@ module Esper.Views {
     /////////
 
     updateCalSelection(selections: Calendars.CalSelection[]) {
-      // Only one calendar supported for now
-      if (selections.length) {
-        this.updateRoute({
-          cals: selections,
-          period: this.props.period
-        });
-      }
+      this.updateRoute({
+        cals: selections,
+        period: this.props.period
+      });
     }
 
     updatePeriod(period: Period.Single) {
@@ -191,11 +188,12 @@ module Esper.Views {
     }
 
     updateRoute(props: Props) {
+      var pathForCals = Actions.pathForCals(props.cals);
       Route.nav.path([
         "calendar-labeling",
-        props.cals[0].teamId,  // Only one team supported per view right now
-        _.map(props.cals, (c) => c.calId).join(Actions.CAL_ID_SEPARATOR),
-        props.period.interval,
+        pathForCals[0],
+        pathForCals[1],
+        props.period.interval[0],
         props.period.index.toString()
       ]);
     }
