@@ -30,6 +30,7 @@ inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap-daterangepicker");
 
   highcharts = require("highcharts");
+  require("highcharts/modules/drilldown")(highcharts);
 });
 
 // Create a global Esper object with our vendor dependencies
