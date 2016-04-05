@@ -193,6 +193,25 @@ module Esper.Actions {
     return q;
   }
 
+  /*
+    Compares a list of strings against selection criteria. Returns Option.Some
+    with the matching strings (if any, empty list is possible) or Option.None
+    if not matching
+  */
+  export function applyListSelectJSON(items: string[], q: ListSelectJSON) {
+    if (q.all) {
+      return Option.some(items);
+    }
+    if (q.none && items.length === 0) {
+      return Option.some(items);
+    }
+
+    var matches = _.filter(items, (i) => _.includes(q.some, i));
+    if (matches.length) {
+      return Option.some(matches);
+    }
+    return Option.none<string[]>();
+  }
 
   /*
     Interface for filtering out a bunch of events
