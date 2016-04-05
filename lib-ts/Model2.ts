@@ -57,9 +57,7 @@ module Esper.Model2 {
     idForData: (data: TData) => TKey
     validate: (data: TData) => boolean;
     cap: number;
-
-    // FIFO queue of alias lists
-    capList: TKey[][];
+    size: number;
 
     //////
 
@@ -79,7 +77,6 @@ module Esper.Model2 {
 
       opts = opts || {};
       this.cap = opts.cap;
-      this.capList = [];
       this.idForData = opts.idForData;
       this.validate = opts.validate;
     }
@@ -87,7 +84,7 @@ module Esper.Model2 {
     // Clears all data in store
     reset(): void {
       this.data = {};
-      this.capList = [];
+      this.size = 0;
     }
 
 
@@ -246,6 +243,11 @@ module Esper.Model2 {
         " reference different objects"
       );
 
+      // Increment count if new
+      if (allExisting.length === 0) {
+        this.size += 1;
+      }
+
       // Compute final list of aliases based on existing data
       var existing = Option.wrap(allExisting[0]);
       aliases = aliases.concat(existing.match({
@@ -272,20 +274,23 @@ module Esper.Model2 {
         this.data[Util.cmpStringify(a)] = storeData;
       });
 
-      // Update cap list
-      var aliasesToRm = Util.pushToCapped(this.capList, aliases, this.cap,
-        (a, b) => _.intersectionBy(a, b, Util.cmpStringify).length > 0
-      );
-      if (aliasesToRm instanceof Array) {
+      // Remove excess items if capped
+      if (this.size > this.cap) {
+
+        // Pick out oldest (last updated) item
+        var sortedItems = _.sortBy(this.all(), (d) => d.lastUpdate.getTime());
 
         /*
           Don't call this.remove because we don't necessarily want to emit
           a change event if the element is already rendered in the DOM. Just
           remove from internal data reference.
         */
-        _.each(aliasesToRm, (a) => {
+        _.each(sortedItems[0].aliases, (a) => {
           delete this.data[Util.cmpStringify(a)];
         });
+
+        // Implicit assumption we're never more than one over cap
+        this.size = this.cap;
       }
 
       this.emitChange(aliases);
@@ -411,9 +416,7 @@ module Esper.Model2 {
           _.each(d.aliases, (a) => {
             delete this.data[Util.cmpStringify(a)]
           });
-          this.capList = _.filter(this.capList,
-            (l) => _.intersection(l, d.aliases).length === 0
-          );
+          this.size -= 1;
           this.emitChange(d.aliases);
           return true;
         }

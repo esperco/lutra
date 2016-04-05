@@ -722,8 +722,11 @@ module Esper.Model2 {
       describe("with just enough objects", function() {
         beforeEach(function() {
           setRabbit(["Rabbit", "1"], 1);
+          jasmine.clock().tick(1);
           setRabbit(["Rabbit", "2"], 2);
+          jasmine.clock().tick(1);
           setRabbit(["Rabbit", "3"], 3);
+          jasmine.clock().tick(1);
         });
 
         it("should preserve all objects", function() {
