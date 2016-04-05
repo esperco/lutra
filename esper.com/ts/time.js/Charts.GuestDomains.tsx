@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.Guestchart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./DailyStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
@@ -90,8 +89,8 @@ module Esper.Charts {
         drilldown: d.key,
         color: Colors.getColorForDomain(d.key),
         count: d.items.length,
-        hours: TimeStats.toHours(_.sumBy(d.items, (i) => i.duration)),
-        y: TimeStats.toHours(
+        hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        y: EventStats.toHours(
           _.sumBy(d.items, (i) =>
             Events2.getGuestEmails(i.event, [d.key]).length *
             i.adjustedDuration /
@@ -107,10 +106,10 @@ module Esper.Charts {
           drilldown: null,
           color: Colors.lightGray,
           count: this.durationsByDomain.none.length,
-          hours: TimeStats.toHours(
+          hours: EventStats.toHours(
             _.sumBy(this.durationsByDomain.none, (i) => i.duration)
           ),
-          y: TimeStats.toHours(
+          y: EventStats.toHours(
             _.sumBy(this.durationsByDomain.none, (i) => i.adjustedDuration)
           ),
           events: {
@@ -134,8 +133,8 @@ module Esper.Charts {
               name: s.key,
               color: Colors.lighten(baseColor, i * colorStep),
               count: s.items.length,
-              hours: TimeStats.toHours(_.sumBy(s.items, (d) => d.duration)),
-              y: TimeStats.toHours(
+              hours: EventStats.toHours(_.sumBy(s.items, (d) => d.duration)),
+              y: EventStats.toHours(
                 _.sumBy(s.items, (d) => d.adjustedDuration / d.emails.length)
               ),
               events: {

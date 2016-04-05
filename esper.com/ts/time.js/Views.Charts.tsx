@@ -9,8 +9,6 @@
 /// <reference path="./Components.IntervalSelector.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
 /// <reference path="./Onboarding.ts" />
-/// <reference path="./TimeStats.ts" />
-/// <reference path="./DailyStats.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 

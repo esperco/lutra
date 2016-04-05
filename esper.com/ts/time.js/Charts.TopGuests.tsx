@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.GuestChart.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./DailyStats.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Charts {
@@ -78,7 +77,7 @@ module Esper.Charts {
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: _.indexOf(categories, email),
-              y: TimeStats.toHours(wrapper.duration),
+              y: EventStats.toHours(wrapper.duration),
               events: {
                 click: () => this.onEventClick(wrapper.event)
               }

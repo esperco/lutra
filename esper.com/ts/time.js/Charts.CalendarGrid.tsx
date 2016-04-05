@@ -1,7 +1,5 @@
 /// <reference path="./Components.CalendarGrid.tsx" />
-/// <reference path="./Components.MonthSelector.tsx" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./TimeStats.ts" />
 
 module Esper.Charts {
 

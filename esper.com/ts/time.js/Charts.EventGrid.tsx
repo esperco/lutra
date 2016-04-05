@@ -27,7 +27,7 @@ module Esper.Charts {
       if (! data) return <span />;
 
       var totalDuration = _.sumBy(data.durations, (d) => d.adjustedDuration);
-      var hours = TimeStats.toHours(totalDuration);
+      var hours = EventStats.toHours(totalDuration);
       var durationIntensity = ((duration: number): Intensity => {
         if (duration > VERY_HIGH_DURATION) {
           return "very-high";
@@ -152,7 +152,7 @@ module Esper.Charts {
       if (this.props.event) {
         tooltip += this.props.event.title + " @ ";
         tooltip += Text.time(this.props.event.start) + " / ";
-        tooltip += Text.hours(TimeStats.toHours(this.props.seconds))
+        tooltip += Text.hours(EventStats.toHours(this.props.seconds))
       }
 
       return <span className="time-block" ref={(c) => this._block = c }
