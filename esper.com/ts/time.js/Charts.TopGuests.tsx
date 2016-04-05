@@ -12,30 +12,88 @@ module Esper.Charts {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
+  type EmailsGrouping = GroupsByPeriod<{
+    emails: string[];
+  }>[];
+
   export class TopGuests extends GuestChart {
-    renderChart() {
-      var data = this.sync()[0];
-      var domains = this.getSelectedDomains();
-      var guests = DailyStats.topGuests(data, false, this.getSelectedDomains());
-      var guestNames = _.map(guests,
-        (g) => g.name ? `${g.name} (${g.email})` : g.email
+    protected durationsByEmail: EmailsGrouping;
+    protected sortedEmails: string[];
+
+    periodIncrs() {
+      return [-1, 0, 1];
+    }
+
+    sync() {
+      super.sync();
+      this.durationsByEmail = this.getGroupsByPeriod(
+
+        // Filter + wrapping function
+        (e) => Actions.applyListSelectJSON(
+          Events2.getGuestDomains(e),
+          this.params.filterParams.domains
+        ).flatMap((domains) => Option.some({
+          event: e,
+          domains: domains,
+          emails: Events2.getGuestEmails(e, domains)
+        })),
+
+        // Group by labels
+        (w) => w.emails
       );
-      var guestTimes = _.map(guests, (g) => ({
-        color: Colors.getColorForDomain(g.email.split('@')[1]),
-        y: TimeStats.toHours(g.time)
-      }));
-      var guestCounts = _.flatten(
-        _.map(guests, (g, i) => _.times(g.count, () => ({
-          x: i, y: 1,
-          color: Colors.lighten(
-            Colors.getColorForDomain(g.email.split('@')[1]), 0.5)
-        }))));
+      this.sortedEmails = this.sortByForCurrentPeriod(
+        this.durationsByEmail, (w) => -w.duration
+      );
+    }
+
+    onEventClick(event: Events2.TeamEvent) {
+      Layout.renderModal(Containers.eventEditorModal([event]));
+      return false;
+    }
+
+    renderChart() {
+      var categories = this.sortedEmails;
+      var durations = this.durationsByEmail;
+      var series: {
+        name: string,
+        cursor: string,
+        color: string,
+        stack: string,
+        index: number,
+        data: HighchartsDataPoint[]
+      }[] = [];
+
+      _.each(durations, (d) =>
+        _.each(d.groups.some, (s) => {
+          let email = s.key;
+          let domain = email.split('@')[1] || "";
+          var color = _.isEqual(d.period, this.params.period) ?
+            Colors.getColorForDomain(domain) : Colors.lightGray;
+          series.push({
+            name: email,
+            cursor: "pointer",
+            color: color,
+            stack: Text.fmtPeriod(d.period),
+            index: d.period.index,
+            data: _.map(s.items, (wrapper) => ({
+              name: Text.eventTitleForChart(wrapper.event),
+              x: _.indexOf(categories, email),
+              y: TimeStats.toHours(wrapper.duration),
+              events: {
+                click: () => this.onEventClick(wrapper.event)
+              }
+            }) as HighchartsDataPoint)
+          })
+        })
+      );
 
       return <Components.Highchart opts={{
         chart: {
           type: 'bar',
-          height: guestTimes.length * 50 + 120
+          height: categories.length * 50 + 120
         },
+
+        tooltip: eventPointTooltip,
 
         legend: {
           enabled: false
@@ -48,41 +106,15 @@ module Esper.Charts {
           }
         },
 
-        tooltip: {
-          shared: true,
-          formatter: function() {
-            var events = this.points[0].total;
-            var hours = this.points[1].y;
-            return `${hours} hour${hours != 1 ? 's' : ''} / ` +
-                  `${events} event${events != 1 ? 's' : ''}`;
-          }
-        },
-
         xAxis: {
-          categories: guestNames
+          categories: categories
         },
 
         yAxis: [{
-          title: { text: "Number of Events" },
-          allowDecimals: false,
-          visible: false
-        }, {
-          title: { text: "Duration (Hours)" },
+          title: { text: "Duration (Hours)" }
         }],
 
-        series: [{
-          name: "Number of Events",
-          yAxis: 0,
-          stack: 0,
-          color: Colors.second,
-          data: guestCounts
-        } as HighchartsBarChartSeriesOptions, {
-          name: "Duration (Hours)",
-          yAxis: 1,
-          stack: 1,
-          color: Colors.first,
-          data: guestTimes
-        } as HighchartsBarChartSeriesOptions]
+        series: series
       }} />;
     }
   }

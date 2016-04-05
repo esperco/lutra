@@ -22,135 +22,138 @@ module Esper.Charts {
   const MAX_COLOR_CHANGE = 0.7;
 
   // This is the maximum to lighten any slice relative to the previous one
-  const MAX_COLOR_DELTA = 0.2;
+  const MAX_COLOR_DELTA = 0.3;
+
+
+  /////
+
+  interface DurationsGroupingMap<T> {
+    [index: string]: EventStats.DurationsGrouping<T>;
+  }
 
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
   export class GuestDomains extends GuestChart {
     protected allowEmpty = true;
+    protected durationsByDomain: EventStats.DurationsGrouping<{
+      domains: string[];
+      emails: string[];
+    }>;
+    protected emailDurationsByDomain: DurationsGroupingMap<{
+      emails: string[];
+    }>;
+
+    sync() {
+      super.sync();
+      var bounds = Period.boundsFromPeriod(this.params.period);
+      var durations = EventStats.wrapWithDurations(this.events,
+        (e) => Actions.applyListSelectJSON(
+          Events2.getGuestDomains(e),
+          this.params.filterParams.domains
+        ).flatMap((domains) => Option.some({
+          event: e,
+          domains: domains,
+          emails: Events2.getGuestEmails(e, domains)
+        })),
+        { truncateStart: bounds[0], truncateEnd: bounds[1] }
+      );
+
+      this.durationsByDomain = Partition.groupByMany(durations,
+        (e) => _.uniq(e.domains)
+      );
+      this.durationsByDomain.some = _.sortBy(this.durationsByDomain.some,
+        (s) => 0 - _.sumBy(s.items, (i) => i.adjustedDuration)
+      );
+
+      // For drilldown
+      this.emailDurationsByDomain = {};
+      _.each(this.durationsByDomain.some, (s) => {
+        var grouping = Partition.groupByMany(s.items,
+          (e) => Events2.getGuestEmails(e.event, [s.key])
+        );
+        grouping.some = _.sortBy(grouping.some,
+          (s) => 0 - _.sumBy(s.items, (i) => i.adjustedDuration)
+        );
+        this.emailDurationsByDomain[s.key] = grouping;
+      });
+    }
+
+    onSeriesClick(events: Events2.TeamEvent[]) {
+      Layout.renderModal(Containers.eventListModal(events));
+      return false;
+    }
 
     renderChart() {
-      var data = this.sync()[0];
-      var domains = DailyStats.topGuestDomains(data, this.getSelectedDomains());
+      var data = _.map(this.durationsByDomain.some, (d) => ({
+        name: d.key,
+        drilldown: d.key,
+        color: Colors.getColorForDomain(d.key),
+        count: d.items.length,
+        hours: TimeStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        y: TimeStats.toHours(
+          _.sumBy(d.items, (i) =>
+            Events2.getGuestEmails(i.event, [d.key]).length *
+            i.adjustedDuration /
+            i.emails.length
+          )
+        ),
+        events: { click: () => true }
+      }));
 
-      // Some math and filtering with totals
-      var totalScheduled = DailyStats.sumScheduled(data);
-      var totalWithGuests = DailyStats.sumWithGuests(data);
-      var totalNoGuests = totalScheduled - totalWithGuests;
-
-      var totalDomain = _.sumBy(domains, (d) => d.time);
-      var totalDisplayed = this.showEmptyDomain() ?
-        totalNoGuests + totalDomain : totalDomain;
-      var cutOffTime = TOP_GUESTS_CUT_OFF * totalDisplayed;
-      domains = _.filter(domains, (d) => d.time >= cutOffTime);
-
-      var totalNamedDomain = _.sumBy(domains, (d) => d.time)
-      var totalUnnamedDomain = totalDomain - totalNamedDomain;
-
-      /////
-
-      var addressData: HighchartsDataPoint[] = [];
-      var domainData: HighchartsDataPoint[] = _.map(domains,
-        (d) => {
-          // Filter from largest to smallest
-          var domainGuests = _.filter(d.guests,
-            (g) => g.time >= cutOffTime
-          );
-          var remainder = d.time - _.sumBy(domainGuests, (g) => g.time);
-
-          // Each guest is colored a shade of base color for domain
-          var baseColor = Colors.getColorForDomain(d.domain);
-          var totalGuests = domainGuests.length;
-          if (remainder && remainder > 0) {
-            totalGuests += 1;
+      if (this.durationsByDomain.none.length && this.showEmptyDomain()) {
+        data.push({
+          name: "No Guests",
+          drilldown: null,
+          color: Colors.lightGray,
+          count: this.durationsByDomain.none.length,
+          hours: TimeStats.toHours(
+            _.sumBy(this.durationsByDomain.none, (i) => i.duration)
+          ),
+          y: TimeStats.toHours(
+            _.sumBy(this.durationsByDomain.none, (i) => i.adjustedDuration)
+          ),
+          events: {
+            click: () => this.onSeriesClick(
+              _.map(this.durationsByDomain.none, (w) => w.event)
+            )
           }
+        })
+      }
+
+      var drilldownData = _.map(this.emailDurationsByDomain,
+        (grouping, domain) => {
+          var baseColor = Colors.getColorForDomain(domain);
           var colorStep = Math.min(
-            MAX_COLOR_CHANGE / (totalGuests - 1),
+            MAX_COLOR_CHANGE / (grouping.some.length - 1),
             MAX_COLOR_DELTA);
-
-          _.each(domainGuests, (g, i) => {
-            addressData.push({
-              name: g.name ? `${g.name} (${g.email})` : g.email,
-              color: Colors.lighten(baseColor, i * colorStep),
-              y: TimeStats.toHours(g.time)
-            });
-          });
-
-          // Guests less than cutoff get labeled as "Other"
-          if (remainder && remainder > 0) {
-            addressData.push({
-              name: "Other " + d.domain,
-              color: Colors.lighten(baseColor, totalGuests * colorStep),
-              y: TimeStats.toHours(remainder)
-            });
-          }
-
           return {
-            name: d.domain,
-            color: baseColor,
-            y: TimeStats.toHours(d.time)
-          }
-        });
-
-        // Add "no guests"
-        if (this.showEmptyDomain() && totalNoGuests > 0) {
-          let color = Colors.lightGray;
-          let hours = TimeStats.toHours(totalNoGuests);
-          addressData.unshift({
-            name: "No Guests",
-            color: color,
-            y: hours
-          });
-
-          domainData.unshift({
-            name: "No Guests",
-            color: color,
-            y: hours
-          });
+            name: domain,
+            id: domain,
+            data: _.map(grouping.some, (s, i) => ({
+              name: s.key,
+              color: Colors.lighten(baseColor, i * colorStep),
+              count: s.items.length,
+              hours: TimeStats.toHours(_.sumBy(s.items, (d) => d.duration)),
+              y: TimeStats.toHours(
+                _.sumBy(s.items, (d) => d.adjustedDuration / d.emails.length)
+              ),
+              events: {
+                click: () => this.onSeriesClick(_.map(s.items, (w) => w.event))
+              }
+            }))
+          };
         }
-
-        // Add "other"
-        if (totalUnnamedDomain > 0) {
-          var color = Colors.getColorForDomain("");
-          var hours = TimeStats.toHours(totalUnnamedDomain);
-          addressData.unshift({
-            name: "Other",
-            color: color,
-            y: hours
-          });
-
-          domainData.unshift({
-            name: "Other",
-            color: color,
-            y: hours
-          });
-        }
+      );
 
       return <Components.Highchart opts={{
         chart: {
           type: 'pie'
         },
 
-        series: [
-          {
-            size: '60%',
-            data: domainData,
-            dataLabels: {
-              enabled: true,
-              formatter: function () {
-                return this.percentage > 10 ? this.point.name : null;
-              },
-              color: Colors.black,
-              style: { textShadow: "" },
-              backgroundColor: Colors.offWhite,
-              distance: -30
-            }
-          } as HighchartsPieChartSeriesOptions,
-          {
-            size: '80%',
-            innerSize: '60%',
-            data: addressData,
+        plotOptions: {
+          pie: {
+            cursor: 'pointer',
             dataLabels: {
               enabled: true,
               formatter: function() {
@@ -159,10 +162,21 @@ module Esper.Charts {
                     `(${Util.roundStr(this.percentage, 1)}%)`;
                 }
               }
-            }
-          } as HighchartsPieChartSeriesOptions
-        ]
-      }} units="Adjusted Hours" />;
+            },
+            size: '80%'
+          }
+        },
+
+        tooltip: countPointTooltip,
+
+        drilldown: {
+          series: drilldownData
+        },
+
+        series: [{
+          data: data
+        }]
+      }} />;
     }
   }
 }
