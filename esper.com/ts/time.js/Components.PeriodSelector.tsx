@@ -1,10 +1,9 @@
 /*
-  Component for selecting a month
+  Component for selecting a single period give an interval type
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
-/// <reference path="./Events2.ts" />
 
 module Esper.Components {
   export class PeriodSelector extends ReactHelpers.Component<{
@@ -14,52 +13,45 @@ module Esper.Components {
   }, {}> {
 
     render() {
+      return this.renderBase(false);
+    }
+
+    renderBase(showIcon?: boolean) {
       var interval = this.props.period.interval;
-      var intervalProps = ((interval: Period.Interval) => {
-        var current = Period.current(interval).index;
+      var minMax = ((interval: Period.Interval) => {
         switch (interval) {
           case "quarter":
-            return {
-              min: current + Events2.MIN_QUARTER_INCR,
-              max: current + Events2.MAX_QUARTER_INCR,
-              str: (start: moment.Moment) => start.format("[Q]Q YYYY")
-            };
+            return [Events2.MIN_QUARTER_INCR, Events2.MAX_QUARTER_INCR]
           case "month":
-            return {
-              min: current + Events2.MIN_MONTH_INCR,
-              max: current + Events2.MAX_MONTH_INCR,
-              str: (start: moment.Moment) => start.format("MMMM YYYY")
-            };
+            return [Events2.MIN_MONTH_INCR, Events2.MAX_MONTH_INCR]
           default: // Week
-            return {
-              min: current + Events2.MIN_WEEK_INCR,
-              max: current + Events2.MAX_WEEK_INCR,
-              str: (start: moment.Moment) => start.format("[Week of] MMM D")
-            };
+            return [Events2.MIN_WEEK_INCR, Events2.MAX_WEEK_INCR]
         }
       })(interval);
 
-      var start = moment(Period.boundsFromPeriod({
-        interval: interval,
-        index: intervalProps.min
-      })[0]);
-      var index = intervalProps.min;
-      var periodStrs: string[] = [];
+      var current = Period.current(interval).index;
+      var minIndex = current + minMax[0];
+      var maxIndex = current + minMax[1];
 
-      while (index <= intervalProps.max) {
-        periodStrs.push(intervalProps.str(start));
-        start.add(1, interval);
-        index += 1;
-      }
+      var periodStrs = _.map(
+        _.range(minIndex, maxIndex + 1),
+        (index) => Text.fmtPeriod({
+          interval: interval,
+          index: index
+        })
+      );
 
-      var selectedIndex = this.props.period.index - intervalProps.min;
-      var disableLeft = this.props.period.index <= intervalProps.min;
-      var disableRight = this.props.period.index >= intervalProps.max;
+      var selectedIndex = this.props.period.index - minIndex;
+      var disableLeft = this.props.period.index <= minIndex;
+      var disableRight = this.props.period.index >= maxIndex;
 
       return <div className="input-group month-selector">
-        <span className="input-group-addon">
-          <i className="fa fa-fw fa-clock-o" />
-        </span>
+        { showIcon ?
+          <span className="input-group-addon">
+            <i className="fa fa-fw fa-clock-o" />
+          </span> :
+          null
+        }
         <DropdownModal>
           <input type="text" id={this.props.id || this.getId("")}
                  className="form-control dropdown-toggle" readOnly={true}
@@ -70,7 +62,7 @@ module Esper.Components {
                 <li key={p}
                     onClick={() => this.props.updateFn({
                       interval: this.props.period.interval,
-                      index: intervalProps.min + i
+                      index: minIndex + i
                     })}>
                   <a>{ p }</a>
                 </li>
@@ -97,6 +89,12 @@ module Esper.Components {
           </button>
         </div>
       </div>;
+    }
+  }
+
+  export class PeriodSelectorWithIcon extends PeriodSelector {
+    render() {
+      return this.renderBase(true);
     }
   }
 }

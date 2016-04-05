@@ -83,6 +83,7 @@ module Esper.Components {
         <div className={"hidden-sm hidden-md hidden-lg " +
                         (this.props.className || "")}>
           { xsChildren }
+          <span /> {/* Extra span so CSS behaves like Dropdown */}
         </div>
       </div>;
     }
