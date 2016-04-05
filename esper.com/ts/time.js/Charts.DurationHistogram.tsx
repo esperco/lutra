@@ -2,7 +2,7 @@
   Bar chart for showing label durations over time
 */
 
-/// <reference path="./Charts.AutoChart.tsx" />
+/// <reference path="./Charts.tsx" />
 /// <reference path="./Components.Highchart.tsx" />
 /// <reference path="./TimeStats.ts" />
 /// <reference path="./Colors.ts" />
@@ -29,30 +29,69 @@ module Esper.Charts {
     gte: 8 * 60 * 60
   }];
 
-  export class DurationHistogram extends AutoChart<Charts.ChartJSON> {
+  export class DurationHistogram extends EventChart<{}> {
+    protected periodsByBucket: Array<GroupsByPeriod<{
+      bucketIndex: number; // Which bucket does this go into
+    }>>;
+
+    periodIncrs() {
+      return [-1, 0, 1];
+    }
+
+    sync() {
+      super.sync();
+
+      this.periodsByBucket = this.getGroupsByPeriod(
+        (e: Events2.TeamEvent) => {
+          var duration = moment(e.end).diff(moment(e.start), 'seconds');
+          return Option.some({
+            event: e,
+            bucketIndex: _.findLastIndex(DURATION_BUCKETS,
+              (b) => duration >= b.gte
+            )
+          });
+        },
+
+        (y) => [y.bucketIndex.toString()]
+      );
+    }
+
+    onEventClick(event: Events2.TeamEvent) {
+      Layout.renderModal(Containers.eventEditorModal([event]));
+      return false;
+    }
+
     renderChart() {
-      var data = this.sync()[0];
       var series: {
         name: string,
+        cursor: string,
         color: string,
-        data: {name?: string, x: number, y: number}[]
-      }[] = _.map(DURATION_BUCKETS, (b, i) => ({
-        name: b.label,
-        color: Colors.presets[i],
-        data: []
-      }))
+        stack: number,
+        index: number,
+        data: HighchartsDataPoint[]
+      }[] = []
 
-      _.each(data.daily_stats, function(stat) {
-        _.each(stat.scheduled, function(duration) {
-          var i = _.findLastIndex(DURATION_BUCKETS, (b) => {
-            return duration >= b.gte;
+      _.each(this.periodsByBucket, (p) => {
+        _.each(p.groups.some, (s) => {
+          var key = parseInt(s.key);
+          var bucket = DURATION_BUCKETS[key];
+          series.push({
+            name:  bucket.label,
+            cursor: "pointer",
+            color: _.isEqual(p.period, this.params.period) ?
+              Colors.presets[key] : Colors.lightGray,
+            stack: p.period.index,
+            index: p.period.index,
+            data: _.map(s.items, (w) => ({
+              name: Text.eventTitleForChart(w.event),
+              x: key,
+              y: TimeStats.toHours(w.duration),
+              events: {
+                click: () => this.onEventClick(w.event)
+              }
+            }))
           });
-          series[i].data.push({
-            name: "Event on " + moment(stat.window_start).format("MMM D"),
-            x: i,
-            y: TimeStats.toHours(duration)
-          })
-        });
+        })
       });
 
       return <Components.Highchart opts={{
@@ -60,16 +99,7 @@ module Esper.Charts {
           type: 'column'
         },
 
-        tooltip: {
-          formatter: function() {
-            if (this.point.name) {
-              return `<b>${this.point.name}:</b>` +
-                     `${this.y} hour${this.y != 1 ? 's' : ''}`;
-            } else {
-              return `${this.y} hours`;
-            }
-          }
-        },
+        tooltip: eventPointTooltip,
 
         legend: {
           enabled: false
