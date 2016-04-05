@@ -148,4 +148,25 @@ module Esper.Util {
     clearTimeout(delayTimeouts[id]);
     delayTimeouts[id] = setTimeout(fn, delay);
   }
+
+  /*
+    Iterates over a list with a filter function, returns both matching
+    and unmatching values
+  */
+  export function matches<T>(list: T[], fn: (t: T) => boolean) {
+    var matched: T[] = [];
+    var unmatched: T[] = [];
+    _.each(list, (i) => {
+      if (fn(i)) {
+        matched.push(i)
+      } else {
+        unmatched.push(i)
+      }
+    });
+
+    return {
+      some: matched,
+      none: unmatched
+    };
+  }
 }

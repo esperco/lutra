@@ -67,8 +67,19 @@ module Esper.Route {
   });
 
   // Charts
-  route("/charts/:chartType?", checkOnboarding, function(ctx) {
-    Actions.renderChart(ctx.params["chartType"], getJSONQuery(ctx));
+  route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
+    checkOnboarding,
+  function(ctx) {
+    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
+    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    Actions.renderChart({
+      chartId: ctx.params["chartId"],
+      cals: _.map(calIds, (c) => ({ calId: c, teamId: teamId })),
+      period: period,
+      filterParams: getJSONQuery(ctx)
+    });
   });
 
   // Calendar labeling page
