@@ -5,17 +5,17 @@
 /// <reference path="./Events2.ts" />
 
 module Esper.EventStats {
-  export interface EventDurations {
-     // End - start (seconds)
+  export interface HasEvent {
+    event: Events2.TeamEvent;
+  }
+
+  export interface HasDurations extends HasEvent {
+    // End - start (seconds)
     duration: number;
 
     // Duration may need to be adjusted for overlapping events and other
     // weirdness
     adjustedDuration: number;
-  }
-
-  export interface HasEvent {
-    event: Events2.TeamEvent;
   }
 
   export interface DurationOpts {
@@ -26,11 +26,14 @@ module Esper.EventStats {
     truncateEnd?: Date;
   }
 
+  /* Shortcut types */
+  export type EventGrouping = Partition.KeyList<Events2.TeamEvent>;
+  export type DurationsGrouping<T> = Partition.KeyList<T & HasDurations>;
 
   ////
 
   export function getDurations<T extends HasEvent>(eventWrappers: T[],
-    opts: DurationOpts = {}): Array<T & EventDurations>
+    opts: DurationOpts = {}): Array<T & HasDurations>
   {
     // Make sure events are sorted by start date
     eventWrappers = _.sortBy(eventWrappers,
@@ -46,14 +49,14 @@ module Esper.EventStats {
       return _.extend({}, e, {
         duration: duration,
         adjustedDuration: 0
-      }) as T & EventDurations
+      }) as T & HasDurations
     });
 
     /* Overlap, truncate calculation */
 
     // Use strings for maps because numbers convert to Array
-    var startMap: {[index: string]: Array<T & EventDurations>} = {};
-    var endMap: {[index: string]: Array<T & EventDurations>} = {};
+    var startMap: {[index: string]: Array<T & HasDurations>} = {};
+    var endMap: {[index: string]: Array<T & HasDurations>} = {};
 
     // Critical points = start / end points
     var criticalPoints: number[] = [];
@@ -93,7 +96,7 @@ module Esper.EventStats {
     var criticalPoints = _.sortedUniq(criticalPoints);
 
     // Stack of active events as we move through time
-    var eventStack:  Array<T & EventDurations> = [];
+    var eventStack:  Array<T & HasDurations> = [];
 
     _.each(criticalPoints, (p, i) => {
       // Add and remove from current stack
@@ -112,5 +115,26 @@ module Esper.EventStats {
     });
 
     return ret;
+  }
+
+  //////
+
+  /*
+    Shortcut for pattern where we:
+    * Filter events
+    * Generate a wrapper around event
+    * Calculate durations
+
+    Takes a list of events and a function that returns an option with
+    the wrapper. If option is none, we leave event out of durations calc.
+  */
+  export function wrapWithDurations<W extends HasEvent>(
+    events: Events2.TeamEvent[],
+    fn: (e: Events2.TeamEvent) => Option.T<W>,
+    opts?: DurationOpts
+  ): Array<W & HasDurations> {
+    var options = _.map(events, fn);
+    var wrappers = Option.flatten(options);
+    return getDurations(wrappers, opts);
   }
 }
