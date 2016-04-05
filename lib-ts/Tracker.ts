@@ -23,6 +23,7 @@ module Esper.Tracker {
     post: (args: TrackingKey[]) => void): T
   {
     trackingKeys = [];
+    trackingMap = {};
     isTrackingActive = true;
     var ret = main();
     post(trackingKeys);
@@ -31,10 +32,11 @@ module Esper.Tracker {
   }
 
   export function register(store: Emit.EmitBase, key?: any) {
+    var mapId = store.id + (key ? Util.cmpStringify(key) : "");
+
     // Avoid duplicate registries
-    if (isTrackingActive && !_.find(trackingKeys,
-      (k) => k.store === store && _.isEqual(k.key, key)
-    )) {
+    if (isTrackingActive && !trackingMap[mapId]) {
+      trackingMap[mapId] = true;
       if (key) {
         trackingKeys.push({
           store: store,
@@ -53,4 +55,7 @@ module Esper.Tracker {
 
   // A list of registered trackingKeys we're tracking
   var trackingKeys: TrackingKey[];
+
+  // A hash map of tracking keys for faster lookup
+  var trackingMap: { [index: string]: boolean; }
 }
