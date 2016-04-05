@@ -24,7 +24,7 @@ module Esper.Charts {
       this.durationsByLabel = this.getGroupsByPeriod(
 
         // Filter + wrapping function
-        (e) => Actions.applyListSelectJSON(
+        (e) => Params.applyListSelectJSON(
           e.labels_norm,
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({

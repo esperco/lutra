@@ -204,7 +204,7 @@ module Esper.Views {
       period  = period  || chart.params.period;
 
       // Assume at most one team, maybe multiple calendars
-      var pathForCals = Actions.pathForCals(cals);
+      var pathForCals = Params.pathForCals(cals);
 
       opts = opts || {};
       opts.jsonQuery = chart.params.filterParams;

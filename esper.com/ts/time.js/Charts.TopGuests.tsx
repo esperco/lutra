@@ -28,7 +28,7 @@ module Esper.Charts {
       this.durationsByEmail = this.getGroupsByPeriod(
 
         // Filter + wrapping function
-        (e) => Actions.applyListSelectJSON(
+        (e) => Params.applyListSelectJSON(
           Events2.getGuestDomains(e),
           this.params.filterParams.domains
         ).flatMap((domains) => Option.some({

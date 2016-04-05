@@ -5,8 +5,8 @@
 /// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
-  interface LabelFilterParams extends Actions.RelativePeriodJSON {
-    labels: Actions.ListSelectJSON;
+  interface LabelFilterParams extends Params.RelativePeriodJSON {
+    labels: Params.ListSelectJSON;
   }
 
   /*
@@ -19,7 +19,7 @@ module Esper.Charts {
 
     cleanFilterParams(params: any = {}): LabelFilterParams {
       var ret = super.cleanFilterParams(params) as LabelFilterParams;
-      ret.labels = Actions.cleanListSelectJSON(ret.labels);
+      ret.labels = Params.cleanListSelectJSON(ret.labels);
       return ret;
     }
 

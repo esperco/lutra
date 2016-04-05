@@ -7,8 +7,8 @@
 /// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Charts {
-  interface DomainFilterParams extends Actions.RelativePeriodJSON {
-    domains: Actions.ListSelectJSON;
+  interface DomainFilterParams extends Params.RelativePeriodJSON {
+    domains: Params.ListSelectJSON;
   }
 
   /*
@@ -20,7 +20,7 @@ module Esper.Charts {
 
     cleanFilterParams(params: any = {}): DomainFilterParams {
       var ret = super.cleanFilterParams(params) as DomainFilterParams;
-      ret.domains = Actions.cleanListSelectJSON(ret.domains);
+      ret.domains = Params.cleanListSelectJSON(ret.domains);
       return ret;
     }
 

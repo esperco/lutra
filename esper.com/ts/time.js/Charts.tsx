@@ -4,10 +4,9 @@
 
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Actions.tsx" />
 
 module Esper.Charts {
-  export interface EventChartParams<T extends Actions.RelativePeriodJSON> {
+  export interface EventChartParams<T extends Params.RelativePeriodJSON> {
     chartId: string;
     cals: Calendars.CalSelection[];
     period: Period.Single;
@@ -15,7 +14,7 @@ module Esper.Charts {
   }
 
   export interface DefaultEventChartParams
-    extends EventChartParams<Actions.RelativePeriodJSON> { }
+    extends EventChartParams<Params.RelativePeriodJSON> { }
 
   /*
     Event wrappers grouped by some attribute on the wrapper, with a period
@@ -26,7 +25,7 @@ module Esper.Charts {
     groups: EventStats.DurationsGrouping<W>;
   }
 
-  export abstract class EventChart<T extends Actions.RelativePeriodJSON> {
+  export abstract class EventChart<T extends Params.RelativePeriodJSON> {
     protected events: Events2.TeamEvent[]; // Unique events across all periods
     protected eventsByPeriod: {            // Events for a single period
       period: Period.Single;
@@ -46,7 +45,7 @@ module Esper.Charts {
     cleanFilterParams(params: any = {}): T {
       params = params || {};
       var ret = params as T;
-      return Actions.cleanRelativePeriodJSON(ret) as T;
+      return Params.cleanRelativePeriodJSON(ret) as T;
     }
 
     // Incrs to allow (0 is implied)
@@ -263,7 +262,7 @@ module Esper.Charts {
   }
 
   export abstract class DefaultEventChart
-    extends EventChart<Actions.RelativePeriodJSON> { }
+    extends EventChart<Params.RelativePeriodJSON> { }
 
 
   /* Misc chart helpers */

@@ -188,7 +188,7 @@ module Esper.Views {
     }
 
     updateRoute(props: Props) {
-      var pathForCals = Actions.pathForCals(props.cals);
+      var pathForCals = Params.pathForCals(props.cals);
       Route.nav.path([
         "calendar-labeling",
         pathForCals[0],

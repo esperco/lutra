@@ -2,19 +2,8 @@
 /// <reference path="../common/Login.ts" />
 /// <reference path="../common/Route.ts" />
 /// <reference path="../lib/Util.ts" />
-/// <reference path="./Esper.ts" />
-/// <reference path="./Onboarding.ts" />
 /// <reference path="./Actions.tsx" />
-/// <reference path="./Views.Index.tsx" />
-/// <reference path="./Views.NotFound.tsx" />
-/// <reference path="./Views.LoadError.tsx" />
-/// <reference path="./Actions.CalendarLabeling.tsx" />
-/// <reference path="./Actions.CalendarSetup.tsx" />
-/// <reference path="./Actions.Charts.tsx" />
-/// <reference path="./Actions.Event.tsx" />
-/// <reference path="./Actions.FilterList.tsx" />
-/// <reference path="./Actions.LabelManage.tsx" />
-/// <reference path="./Actions.NotificationSettings.tsx" />
+/// <reference path="./Esper.ts" />
 
 module Esper.Route {
 
@@ -70,10 +59,10 @@ module Esper.Route {
   route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
     checkOnboarding,
   function(ctx) {
-    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
-    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
-    var interval = Actions.cleanInterval(ctx.params["interval"], "week");
-    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Params.cleanInterval(ctx.params["interval"], "week");
+    var period = Params.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderChart({
       chartId: ctx.params["chartId"],
       cals: _.map(calIds, (c) => ({ calId: c, teamId: teamId })),
@@ -86,10 +75,10 @@ module Esper.Route {
   route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
     checkOnboarding,
   function(ctx) {
-    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
-    var calIds = Actions.cleanCalIds(teamId, ctx.params["calIds"]);
-    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
-    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
+    var interval = Params.cleanInterval(ctx.params["interval"], "month");
+    var period = Params.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderCalendarLabeling(_.map(calIds, (calId) => ({
       teamId: teamId,
       calId: calId
@@ -137,16 +126,16 @@ module Esper.Route {
   route("/list/:teamId?/:calIds?/:interval?/:period?",
     checkOnboarding,
   function(ctx) {
-    var q = Actions.cleanFilterStrJSON(
+    var q = Params.cleanFilterStrJSON(
       getJSONQuery(ctx)
-    ) as Actions.FilterListJSON;
-    q.labels = Actions.cleanListSelectJSON(q.labels);
+    ) as Params.FilterListJSON;
+    q.labels = Params.cleanListSelectJSON(q.labels);
 
-    var teamId = Actions.cleanTeamId(ctx.params["teamId"]);
-    var interval = Actions.cleanInterval(ctx.params["interval"], "month");
-    var period = Actions.cleanSinglePeriod(interval, ctx.params["period"]);
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    var interval = Params.cleanInterval(ctx.params["interval"], "month");
+    var period = Params.cleanSinglePeriod(interval, ctx.params["period"]);
     Actions.renderFilterList({
-      cals: Actions.cleanCalSelections(teamId, ctx.params["calIds"]),
+      cals: Params.cleanCalSelections(teamId, ctx.params["calIds"]),
       period: period
     }, q)
   });
