@@ -218,12 +218,12 @@ module Esper.Charts {
 
     // Return true if no data
     noData() {
-      return !_.flatten(this.eventsByPeriod).length;
+      return !_.find(this.eventsByPeriod, (p) => p.events.length > 0);
     }
 
     // Message to show when no data is avilable
     noDataMsg(): JSX.Element {
-      return <span>No data found</span>;
+      return <span>No events found</span>;
     }
 
     // Render a chart based on filtered events
