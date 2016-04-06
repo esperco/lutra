@@ -53,8 +53,9 @@ module Esper.Charts {
     renderChart() {
       var start = Period.boundsFromPeriod(this.params.period)[0]
       return <Components.CalendarGrid
+        className="calendar-grid-chart"
         date={start}
-        dayFn={this.dayFn.bind(this)}
+        dayFn={(d) => this.dayFn(d)}
       />;
     }
 
@@ -62,7 +63,7 @@ module Esper.Charts {
       return false;
     }
 
-    protected abstract dayFn(m: moment.Moment): JSX.Element;
+    protected abstract dayFn(m: Date): JSX.Element;
 
     intervalsAllowed(): Period.Interval[] {
       return ["month"];
