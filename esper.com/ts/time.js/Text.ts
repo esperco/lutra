@@ -40,7 +40,7 @@ module Esper.Text {
     return moment(d).format("h:mm a");
   }
 
-  export function fmtPeriod(p: Period.Single) {
+  export function fmtPeriod(p: Period.Single|Period.Custom) {
     var bounds = Period.boundsFromPeriod(p);
     var start = bounds[0];
     switch(p.interval) {
@@ -48,8 +48,11 @@ module Esper.Text {
         return moment(start).format("[Q]Q YYYY");
       case "month":
         return moment(start).format("MMMM YYYY");
-      default: // Week
+      case "week":
         return moment(start).format("[Week of] MMM D");
+      default: // Custom
+        var end = bounds[1];
+        return `${date(start)} - ${date(end)}`;
     }
   }
 }

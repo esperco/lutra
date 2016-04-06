@@ -9,7 +9,7 @@ module Esper.Charts {
   export interface EventChartParams<T extends Params.RelativePeriodJSON> {
     chartId: string;
     cals: Calendars.CalSelection[];
-    period: Period.Single;
+    period: Period.Single|Period.Custom;
     filterParams: T
   }
 
@@ -21,14 +21,14 @@ module Esper.Charts {
     variable
   */
   export interface GroupsByPeriod<W> {
-    period: Period.Single;
+    period: Period.Single|Period.Custom;
     groups: EventStats.DurationsGrouping<W>;
   }
 
   export abstract class EventChart<T extends Params.RelativePeriodJSON> {
     protected events: Events2.TeamEvent[]; // Unique events across all periods
     protected eventsByPeriod: {            // Events for a single period
-      period: Period.Single;
+      period: Period.Single|Period.Custom;
       events: Events2.TeamEvent[];
     }[];
     protected error: boolean;
@@ -55,6 +55,11 @@ module Esper.Charts {
 
     // Should return a list of relative period indices to fetch / get for
     periodIncrs() {
+      // No relative periods for custom charts
+      if (Period.isCustom(this.params.period)) {
+        return [0];
+      }
+
       var ret = _.intersection(
         this.allowedIncrs(),
         this.params.filterParams.incrs
@@ -87,7 +92,9 @@ module Esper.Charts {
 
     relativePeriod(incr: number) {
       var rp = _.clone(this.params.period);
-      rp.index += incr;
+      if (! Period.isCustom(rp)) {
+        rp.index += incr;
+      }
       return rp;
     }
 
@@ -225,14 +232,15 @@ module Esper.Charts {
     // Render additional selector in left column (if any) to refine chart
     // data (like label selectors). Must handle lack of store data safely.
     renderSelectors(): React.ReactElement<any> {
-      if (this.allowedIncrs().length) {
+      var period = this.params.period;
+      if (this.allowedIncrs().length && !Period.isCustom(period)) {
         return <div className="esper-menu-section">
           <div className="esper-subheader">
             <i className="fa fa-fw fa-clock-o" />{" "}
             Compare With
           </div>
           <Components.RelativePeriodSelector
-            period={this.params.period}
+            period={period}
             allowedIncrs={this.allowedIncrs()}
             selectedIncrs={this.periodIncrs()}
             updateFn={(x) => this.updateParams({
@@ -245,8 +253,8 @@ module Esper.Charts {
     }
 
     // Return which intervals should be shown
-    intervalsAllowed(): Period.Interval[] {
-      return ["week", "month", "quarter"];
+    intervalsAllowed(): Period.IntervalOrCustom[] {
+      return ["week", "month", "quarter", "custom"];
     }
 
     // Helper function to update params

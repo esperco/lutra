@@ -73,7 +73,7 @@ module Esper.Charts {
             cursor: "pointer",
             color: color,
             stack: Text.fmtPeriod(d.period),
-            index: d.period.index,
+            index: Period.asNumber(d.period),
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: _.indexOf(categories, email),
