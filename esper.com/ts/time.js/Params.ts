@@ -91,7 +91,22 @@ module Esper.Params {
     }
   }
 
-  const PERIOD_SEPARATOR = ",";
+  export function cleanIntervalOrCustom(
+      intervalStr: string,
+      defaultInterval: Period.IntervalOrCustom = "week")
+    : Period.IntervalOrCustom
+  {
+    if (intervalStr && intervalStr[0] === "c") {
+      return "custom";
+    }
+    if (Period.isCustomInterval(defaultInterval)) {
+      return "custom";
+    } else {
+      return cleanInterval(intervalStr, defaultInterval);
+    }
+  }
+
+  export const PERIOD_SEPARATOR = ",";
 
   export function cleanPeriodRange(interval: Period.Interval,
                                    periodStr: string,
@@ -121,6 +136,39 @@ module Esper.Params {
     return {
       interval: interval,
       index: num
+    }
+  }
+
+  export function cleanCustomPeriod(periodStr: string): Period.Custom {
+    var split = periodStr.split(PERIOD_SEPARATOR);
+    var start = parseInt(split[0]);
+    var end = parseInt(split[1]);
+    if (!isNaN(start) && !isNaN(end) && end > start) {
+      return {
+        interval: "custom",
+        start: start,
+        end: end
+      };
+    }
+    return Period.current('custom');
+  }
+
+  export function cleanSingleOrCustomPeriod(
+    interval: Period.Interval, periodStr: string): Period.Single;
+  export function cleanSingleOrCustomPeriod(
+    interval: Period.CustomInterval, periodStr: string): Period.Custom;
+  export function cleanSingleOrCustomPeriod(
+    interval: Period.IntervalOrCustom,
+    periodStr: string
+  ): Period.Single|Period.Custom;
+  export function cleanSingleOrCustomPeriod(
+    interval: Period.IntervalOrCustom,
+    periodStr: string
+  ): Period.Single|Period.Custom {
+    if (Period.isCustomInterval(interval)) {
+      return cleanCustomPeriod(periodStr);
+    } else {
+      return cleanSinglePeriod(interval, periodStr);
     }
   }
 
