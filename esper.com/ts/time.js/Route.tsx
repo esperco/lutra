@@ -7,9 +7,6 @@
 
 module Esper.Route {
 
-  // Shortcut for simple routes
-  var render = Actions.render;
-
   // Helper to check default team created and calendars loaded
   var checkTeamAndCalendars: PageJS.Callback = function(ctx, next) {
     Teams.defaultTeamPromise
@@ -19,7 +16,7 @@ module Esper.Route {
 
       .then(next, (err) => {
         Log.e(err);
-        render(<Views.LoadError />);
+        Actions.render(<Views.LoadError />);
       });
   }
 
@@ -53,6 +50,11 @@ module Esper.Route {
       initLoad = false;
       nav.path("/charts");
     }
+  });
+
+  // Redirect stupid Techcrunch link
+  route("/labels-over-time", function(ctx) {
+    nav.path("/charts");
   });
 
   // Charts
@@ -149,7 +151,7 @@ module Esper.Route {
       nav.path(ctx.path.slice(1));
     } else {
       Log.e(ctx);
-      render(<Views.NotFound />, null, null);
+      Actions.render(<Views.NotFound />, null, null);
     }
   });
 }
