@@ -51,9 +51,20 @@ module Esper.Charts {
       );
     }
 
+    noData() {
+      if (this.showUnlabeled() && this.eventsByLabel.none.length > 0) {
+        return false;
+      }
+
+      var labels = this.getSelectedLabels();
+      return !_.find(this.eventsByLabel.some,
+        (s) => s.items.length > 0 && _.includes(labels, s.key)
+      )
+    }
+
     noDataMsg() {
       return <span>
-        No data found.{" "}
+        No events found.{" "}
         <a onClick={() => Route.nav.path("/list")}>
           Click here to label events from your calendar.
         </a>
@@ -62,6 +73,10 @@ module Esper.Charts {
 
     // Render label selector based on what labels are actually there
     renderSelectors() {
+      var total = this.events.length;
+      var unlabeled = this.eventsByLabel.none.length;
+      var showUnlabeled = this.showUnlabeled();
+      var displayTotal = showUnlabeled ? total : total - unlabeled;
       return <div className="esper-menu-section">
         { super.renderSelectors() }
         <div className="esper-menu-section">
@@ -70,11 +85,11 @@ module Esper.Charts {
             Labels
           </div>
           <Components.LabelSelector labels={this.allLabels}
-            totalCount={this.events.length}
+            totalCount={displayTotal}
             unlabeledCount={this.eventsByLabel.none.length}
             selected={this.getSelectedLabels()}
             allSelected={this.showAll()}
-            unlabeledSelected={this.showUnlabeled()}
+            unlabeledSelected={showUnlabeled}
             showUnlabeled={this.allowUnlabeled}
             updateFn={(x) => this.updateLabels(x)}
           />

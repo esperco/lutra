@@ -47,6 +47,17 @@ module Esper.Charts {
       );
     }
 
+    noData() {
+      if (this.showEmptyDomain() && this.eventsByDomain.none.length > 0) {
+        return false;
+      }
+
+      var labels = this.getSelectedDomains();
+      return !_.find(this.eventsByDomain.some,
+        (s) => s.items.length > 0 && _.includes(labels, s.key)
+      )
+    }
+
     renderSelectors() {
       if (!this.events || !this.events.length) {
         return <span />
@@ -65,18 +76,20 @@ module Esper.Charts {
 
       // Default selection => all domains
       var selectedIds = this.getSelectedDomains();
+      var totalCount = this.events.length;
+      var noGuestsCount = this.eventsByDomain.none.length;
 
       // Use empty string as the "no guests" domain
       if (this.allowEmpty) {
-        var noGuestsCount = this.eventsByDomain.none.length.toString();
+        var noGuestsCountStr = noGuestsCount.toString();
         var emptySelector = <div className="esper-select-menu">
           <a className="esper-selectable"
              onClick={this.toggleEmpty.bind(this)}>
             {
               noGuestsCount ?
               <Components.Badge
-                text={noGuestsCount}
-                hoverText={noGuestsCount + " Events"}
+                text={noGuestsCountStr}
+                hoverText={noGuestsCountStr + " Events"}
               /> :
               null
             }
@@ -86,9 +99,11 @@ module Esper.Charts {
           </a>
           <div className="divider" />
         </div>;
+      } else {
+        totalCount -= noGuestsCount;
       }
 
-      var totalCount = this.events.length.toString();
+      var totalCountStr = totalCount.toString();
       var selectAllIcon = (() => {
         if (this.params.filterParams.domains.all) {
           return "fa-check-square-o";
@@ -108,8 +123,8 @@ module Esper.Charts {
           <a className="esper-selectable"
              onClick={this.toggleAll.bind(this)}>
             <Components.Badge
-              text={totalCount}
-              hoverText={totalCount + " Events"}
+              text={totalCountStr}
+              hoverText={totalCountStr + " Events"}
             />
             <i className={"fa fa-fw " + selectAllIcon} />{" "}
             Select All
