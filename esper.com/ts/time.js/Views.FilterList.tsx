@@ -5,16 +5,11 @@
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Components.LabelSelector.tsx" />
-/// <refernece path="./Components.EventEditor.tsx" />
-/// <reference path="./Components.PeriodSelector.tsx" />
-/// <reference path="./Events2.ts" />
-/// <reference path="./Actions.FilterList.tsx" />
 
 module Esper.Views {
   var Component = ReactHelpers.Component;
 
-  interface FilterListProps extends Actions.FilterListJSON {
+  interface FilterListProps extends Params.FilterListJSON {
     cals: Calendars.CalSelection[];
     period: Period.Single;
   }
@@ -422,9 +417,9 @@ module Esper.Views {
       cals?: Calendars.CalSelection[];
       period?: Period.Single;
       filterStr?: string;
-      labels?: Actions.ListSelectJSON;
+      labels?: Params.ListSelectJSON;
     }, opts: Route.nav.Opts = {}) {
-      var pathForCals = Actions.pathForCals(newProps.cals || this.props.cals);
+      var pathForCals = Params.pathForCals(newProps.cals || this.props.cals);
       var period = newProps.period || this.props.period;
       var path = "/list/" + (_.map([
         pathForCals[0],
@@ -435,7 +430,7 @@ module Esper.Views {
       opts.jsonQuery = {
         filterStr: Util.some(newProps.filterStr, this.props.filterStr),
         labels: Util.some(newProps.labels, this.props.labels)
-      } as Actions.FilterListJSON;
+      } as Params.FilterListJSON;
       Route.nav.path(path, opts);
     }
   }

@@ -6,6 +6,36 @@
 /// <reference path="../common/Components.DropdownModal.tsx" />
 
 module Esper.Components {
+  export class SingleOrCustomPeriodSelector extends ReactHelpers.Component<{
+    id?: string;
+    period: Period.Single|Period.Custom;
+    updateFn: (period: Period.Single|Period.Custom) => void;
+  }, {}> {
+    render() {
+      var period = this.props.period;
+      var minDate = moment().startOf('day')
+        .add(Events2.MIN_CUSTOM_INCR, 'days').toDate();
+      var maxDate = moment().endOf('day')
+        .add(Events2.MAX_CUSTOM_INCR, 'days').toDate();
+      if (Period.isCustom(period)) {
+        return <CalendarRangeSelectorDropdown
+          onRangeSelect={(start, end) =>
+            this.props.updateFn(Period.customFromDates(start, end))
+          }
+          selected={Period.boundsFromPeriod(period)}
+          min={minDate}
+          max={maxDate}
+        />;
+      } else {
+        return <PeriodSelector
+          id={this.props.id}
+          period={period}
+          updateFn={(p) => this.props.updateFn(p)}
+        />;
+      }
+    }
+  }
+
   export class PeriodSelector extends ReactHelpers.Component<{
     id?: string;
     period: Period.Single;

@@ -47,7 +47,7 @@ module Esper.Charts {
       super.sync();
       var bounds = Period.boundsFromPeriod(this.params.period);
       var durations = EventStats.wrapWithDurations(this.events,
-        (e) => Actions.applyListSelectJSON(
+        (e) => Params.applyListSelectJSON(
           Events2.getGuestDomains(e),
           this.params.filterParams.domains
         ).flatMap((domains) => Option.some({

@@ -18,7 +18,7 @@ module Esper.Charts {
 
       var bounds = Period.boundsFromPeriod(this.params.period);
       var durations = EventStats.wrapWithDurations(this.events,
-        (e) => Actions.applyListSelectJSON(
+        (e) => Params.applyListSelectJSON(
           e.labels_norm,
           this.params.filterParams.labels
         ).flatMap((labels) => labels.length > 1 ?

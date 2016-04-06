@@ -78,8 +78,8 @@ module Esper.Charts {
             cursor: "pointer",
             color: _.isEqual(p.period, this.params.period) ?
               Colors.presets[key] : Colors.lightGray,
-            stack: p.period.index,
-            index: p.period.index,
+            stack: Period.asNumber(p.period),
+            index: Period.asNumber(p.period),
             data: _.map(s.items, (w) => ({
               name: Text.eventTitleForChart(w.event),
               x: key,

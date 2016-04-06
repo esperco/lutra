@@ -24,7 +24,7 @@ module Esper.Charts {
       this.durationsByLabel = this.getGroupsByPeriod(
 
         // Filter + wrapping function
-        (e) => Actions.applyListSelectJSON(
+        (e) => Params.applyListSelectJSON(
           e.labels_norm,
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({
@@ -67,7 +67,7 @@ module Esper.Charts {
             cursor: "pointer",
             color: color,
             stack: Text.fmtPeriod(d.period),
-            index: d.period.index,
+            index: Period.asNumber(d.period),
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: _.indexOf(categories, label),
@@ -90,7 +90,7 @@ module Esper.Charts {
               Colors.gray : Colors.lightGray
             ),
             stack: Text.fmtPeriod(d.period),
-            index: d.period.index,
+            index: Period.asNumber(d.period),
             data: _.map(d.groups.none, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: categories.length,

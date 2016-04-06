@@ -5,13 +5,8 @@
 
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Layout.tsx" />
-/// <reference path="./Views.FilterList.tsx" />
 
 module Esper.Actions {
-
-  export interface FilterListJSON extends FilterStrJSON {
-    labels: ListSelectJSON;
-  }
 
   const analyticsId = "list-analytics-id";
 
@@ -19,7 +14,7 @@ module Esper.Actions {
   export function renderFilterList(params: {
     cals: Calendars.CalSelection[];
     period: Period.Single;
-  }, queryJSON: FilterListJSON) {
+  }, queryJSON: Params.FilterListJSON) {
 
     // Async load of events
     _.each(params.cals, (cal) => Events2.fetchForPeriod({

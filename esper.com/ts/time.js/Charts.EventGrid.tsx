@@ -20,7 +20,8 @@ module Esper.Charts {
     Grid that shows fragmentation, meeting count, and meeting durations
   */
   export class EventGrid extends CalendarGridChart {
-    protected dayFn(m: moment.Moment) {
+    protected dayFn(date: Date) {
+      var m = moment(date);
       var data = _.find(this.eventsForDates, (d) =>
         moment(d.date).startOf('day').diff(m.clone().startOf('day')) === 0
       );
