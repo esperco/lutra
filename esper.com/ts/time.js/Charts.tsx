@@ -39,6 +39,12 @@ module Esper.Charts {
       this.params = _.extend(params, {
         filterParams: this.cleanFilterParams(params.filterParams)
       }) as EventChartParams<T>;
+
+      // Sanity check periods
+      var allowed = this.intervalsAllowed();
+      if (! _.includes(allowed, this.params.period.interval)) {
+        this.params.period = Period.current(allowed[0] || 'month');
+      }
     }
 
     // Optional function for cleaning filter params depending on its def'n
