@@ -4,7 +4,7 @@
 
 // Custom Esper variables
 @min-fullscreen-height: 350px;
-@esper-collapse-max-height: 450px;
+@esper-collapse-max-height: 400px;
 
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
@@ -521,6 +521,7 @@ flexibility with non-UL elements */
 
     &.open {
       max-height: @esper-collapse-max-height;
+      height: 50vh;
       overflow: auto;
 
       .navbar-default & {

@@ -49,6 +49,7 @@ module Esper.Period {
 
   export function current(interval: Interval): Single;
   export function current(interval: CustomInterval): Custom;
+  export function current(interval: IntervalOrCustom): Single|Custom;
   export function current(interval: IntervalOrCustom): Single|Custom {
     if (isCustomInterval(interval)) {
       // Default to current week
