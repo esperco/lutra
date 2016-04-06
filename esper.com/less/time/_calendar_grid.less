@@ -3,16 +3,7 @@
 @import "../lib/_helpers";
 @import "../lib/_animations";
 
-.calendar-grid-holder {
-  .esper-expanded;
-  .esper-expanded.padded;
-  .esper-expanded.minus-subheader;
-
-  padding-top: @padding-base-vertical;
-}
-
 table.calendar-grid {
-  height: 95%;
   width: 100%;
   margin-bottom: @padding-large-vertical;
   table-layout:fixed;
@@ -36,20 +27,103 @@ table.calendar-grid {
     color: @gray-lighter;
   }
 
-  .in-month .day-header {
-    background: @gray-lighter;
-  }
-
-  .in-month.today {
-    .day-header{
-      background: @navbar-inverse-bg;
-      color: @navbar-inverse-color;
-    }
-  }
-
-  .day-header {
+  .day-number {
     text-align: right;
     padding: @padding-xs-vertical @padding-xs-horizontal;
+  }
+}
+
+.cal-day-selector {
+  .cal-month-selector {
+    text-align: center;
+    padding: 0 @padding-base-horizontal;
+    font-weight: bold;
+    line-height: 2em;
+  }
+
+  table.calendar-grid {
+    border-top: 1px solid @table-border-color;
+    border-bottom: 1px solid @table-border-color;
+
+    td, th {
+      border: 0;
+    }
+
+    .cal-header {
+      line-height: 2em;
+      color: @gray;
+      background: @table-border-color;
+      border-left: @padding-xs-horizontal solid @table-border-color;
+      border-right: @padding-xs-horizontal solid @table-border-color;
+    }
+
+    .cal-week {
+      border-left: @padding-xs-horizontal solid transparent;
+      border-right: @padding-xs-horizontal solid transparent;
+    }
+
+    .in-month .day-number {
+      background: white;
+    }
+
+    .in-month.today .day-number {
+      font-weight: bold;
+      color: @brand-text;
+
+      &.active {
+        color: @navbar-inverse-color;
+      }
+    }
+
+    .day-number {
+      cursor: pointer;
+      text-align: center;
+      line-height: 2em;
+      margin: @padding-base-vertical 0;
+
+      &.active {
+        background: @navbar-inverse-bg;
+        color: @navbar-inverse-color;
+      }
+
+      &.active-start {
+        border-top-left-radius: @border-radius-base;
+        border-bottom-left-radius: @border-radius-base;
+      }
+
+      &.active-end {
+        border-top-right-radius: @border-radius-base;
+        border-bottom-right-radius: @border-radius-base;
+      }
+    }
+  }
+}
+
+.dropdown .calendar-selector-menu.dropdown-menu {
+  max-width: 300px;
+  min-width: 0;
+}
+
+.calendar-grid-chart {
+  // // Uncomment to fill right content area
+  // .esper-expanded;
+  // .esper-expanded.padded;
+  // .esper-expanded.minus-subheader;
+  // .calendar-grid { height: 95% }
+
+  padding-top: @padding-large-vertical;
+
+  table.calendar-grid {
+    .in-month .day-number {
+      background: @gray-lighter;
+    }
+
+    .in-month.today {
+      .day-number {
+        background: @navbar-inverse-bg;
+        color: @navbar-inverse-color;
+      }
+    }
   }
 
   .metrics-list {

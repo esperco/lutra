@@ -30,6 +30,16 @@ module Esper.Events2 {
   export const MAX_WEEK_INCR = 10;
   export const MIN_WEEK_INCR = -10;
 
+  // Custom (how many days relative to tody)
+  export const MAX_CUSTOM_INCR = moment()
+    .endOf('quarter')
+    .add(MAX_QUARTER_INCR, 'quarter')
+    .diff(moment(), 'days');
+  export const MIN_CUSTOM_INCR = moment()
+    .startOf('quarter')
+    .add(MIN_QUARTER_INCR, 'quarter')
+    .diff(moment(), 'days');
+
 
   ///////
 
@@ -101,7 +111,7 @@ module Esper.Events2 {
   export function fetchForPeriod({teamId, calId, period, force=false}: {
     teamId: string,
     calId: string,
-    period: Period.Single,
+    period: Period.Single|Period.Custom,
     force?: boolean;
   }) {
 
@@ -162,7 +172,7 @@ module Esper.Events2 {
   export function getForPeriod({teamId, calId, period}: {
     teamId: string,
     calId: string,
-    period: Period.Single,
+    period: Period.Single|Period.Custom,
   }): Option.T<EventListData> {
     var bounds = Period.boundsFromPeriod(period);
     return get({

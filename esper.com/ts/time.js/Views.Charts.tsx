@@ -111,17 +111,18 @@ module Esper.Views {
     }
 
     renderPeriodSelector() {
+      var period = this.props.currentChart.params.period;
       return <div className="esper-header period-selector row fixed clearfix">
-        <Components.IntervalSelector
+        <Components.IntervalOrCustomSelector
           className="col-sm-6"
-          period={this.props.currentChart.params.period}
+          period={period}
           show={this.props.currentChart.intervalsAllowed()}
-          updateFn={(period) => this.updatePeriod(period)}
+          updateFn={(p) => this.updatePeriod(p)}
         />
         <div className="col-sm-6">
-          <Components.PeriodSelector
-            period={this.props.currentChart.params.period}
-            updateFn={(period) => this.updatePeriod(period)}
+          <Components.SingleOrCustomPeriodSelector
+            period={period}
+            updateFn={(p) => this.updatePeriod(p)}
           />
         </div>
       </div>;
@@ -195,7 +196,7 @@ module Esper.Views {
     updateRoute({chartId, cals, period, opts}: {
       chartId?: string;
       cals?: Calendars.CalSelection[];
-      period?: Period.Single;
+      period?: Period.Single|Period.Custom;
       opts?: Route.nav.Opts;
     }) {
       var chart = this.props.currentChart;
@@ -209,13 +210,17 @@ module Esper.Views {
       opts = opts || {};
       opts.jsonQuery = chart.params.filterParams;
 
+      var periodStr = Period.isCustom(period) ?
+        [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
+        period.index.toString();
+
       Route.nav.path([
         "charts",
         chartId,
         pathForCals[0],
         pathForCals[1],
-        period.interval,
-        period.index.toString()
+        period.interval[0],
+        periodStr
       ], opts);
     }
 
@@ -231,7 +236,7 @@ module Esper.Views {
       });
     }
 
-    updatePeriod(period: Period.Single) {
+    updatePeriod(period: Period.Single|Period.Custom) {
       this.updateRoute({
         period: period
       });
