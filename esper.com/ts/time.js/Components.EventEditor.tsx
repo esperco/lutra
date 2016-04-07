@@ -13,6 +13,7 @@ module Esper.Components {
     eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
     teamPairs: [ApiT.Team, Model.StoreMetadata][];
 
+    minFeedback?: boolean;
     initAction?: boolean;
     onDone?: () => void;
     className?: string;
@@ -33,7 +34,8 @@ module Esper.Components {
         { props.eventData.length === 1 ?
           <EventFeedback event={firstEvent}
                          status={props.eventData[0].dataStatus}
-                         initAction={props.initAction} /> :
+                         initAction={props.initAction}
+                         initMin={props.minFeedback} /> :
           null
         }
         <Components.LabelEditor2
@@ -61,7 +63,8 @@ module Esper.Components {
       return <Modal icon="fa-calendar-o" title={heading}>
         <EventEditor eventData={this.props.eventData}
                      teamPairs={this.props.teamPairs}
-                     onDone={() => Layout.closeModal()} />
+                     onDone={() => Layout.closeModal()}
+                     minFeedback={this.props.minFeedback} />
       </Modal>;
     }
   }
@@ -106,6 +109,7 @@ module Esper.Components {
     event: Events2.TeamEvent;
     status: Model2.DataStatus;
     initAction?: boolean;
+    initMin?: boolean;
   }
 
   export class EventFeedback extends Component<OneEventProps, {
@@ -114,13 +118,18 @@ module Esper.Components {
 
     // Current state of event notes (not yet committed, saved yet)
     notes?: string;
+
+    minimize?: boolean;
   }> {
     inputNotes: HTMLTextAreaElement;
     inputSaveTimeout: number;
 
     constructor(props: OneEventProps) {
       super(props);
-      this.state = { notes: this.props.event.feedback.notes };
+      this.state = {
+        notes: this.props.event.feedback.notes,
+        minimize: this.props.initMin
+      };
     }
 
     render() {
@@ -136,10 +145,30 @@ module Esper.Components {
         _.isEqual(this.state.lastSavedEvent, event)
       );
 
+      if (this.state.minimize) {
+        return <div onClick={() => this.setState({ minimize: false })}
+          className="event-min-feedback esper-panel-section action clearfix">
+          <a className="event-rating pull-left">
+            { this.renderMinFeedback(event) }
+          </a>
+          <a className="pull-right min-feedback-action">
+            <i className="fa fa-fw fa-caret-down" />
+          </a>
+        </div>;
+      }
+
       return <Components.ModalPanel busy={busy} error={error} success={success}
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
           className="event-notes esper-panel-section">
-        <label htmlFor={this.getId("notes")}>Post-Meeting Feedback</label>
+        <div>
+          <label htmlFor={this.getId("notes")}>
+            { Text.FeedbackTitle }
+          </label>
+          <a className="pull-right action min-feedback-action"
+                onClick={() => this.setState({ minimize: true })}>
+            <i className="fa fa-fw fa-caret-up" />
+          </a>
+        </div>
         <p className="text-muted">
           Don't worry! Ratings and notes are NOT shared with other
           meeting guests.
@@ -151,6 +180,25 @@ module Esper.Components {
           onChange={(e) => this.notesChange(e)}
         />
       </Components.ModalPanel>;
+    }
+
+    renderMinFeedback(event: Events2.TeamEvent): JSX.Element|string {
+     if (event.feedback.attended === false) {
+       return Events2.isFuture(event) ?
+         Text.NoAttendFuture : Text.NoAttendPast;
+     }
+
+     if (event.feedback.rating) {
+      return <span>{
+         _.times(event.feedback.rating || 0, (i) =>
+          <i key={i.toString()} className="fa fa-fw fa-star" />
+        )
+       }</span>
+     }
+
+     return <span className="esper-link">
+       { Text.FeedbackTitle }
+     </span>;
     }
 
     renderRating(event: Events2.TeamEvent) {
@@ -165,7 +213,8 @@ module Esper.Components {
                     (event.feedback.attended === false ? " active" : "")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
-            { Events2.isFuture(event) ? "Won't Attend" : "Didn't Attend" }
+            { Events2.isFuture(event) ?
+              Text.NoAttendFuture : Text.NoAttendPast }
           </button>
         </div>
       </div>;

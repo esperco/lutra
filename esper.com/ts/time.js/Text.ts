@@ -4,6 +4,13 @@
 
 module Esper.Text {
 
+  // For post-meeding feedback
+  export const FeedbackTitle  = "Meeting Feedback"
+  export const NoAttendPast   = "Didn't Attend";
+  export const NoAttendFuture = "Won't Attend";
+
+  /////
+
   function s(n: number) {
     return n != 1 ? 's' : '';
   }
