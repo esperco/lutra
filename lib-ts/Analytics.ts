@@ -8,12 +8,8 @@ module Esper.Analytics {
 
   // Events to track
   export enum Trackable {
-    // Most trackable events have the form
-    // (Verb)(Module)(Icon/HTMLElement)
-    // Anything that deviates from the above form should
-    // always be immediately obvious as to where the event
-    // is fired from, e.g. ClickSaveTaskNotes - there is only one
-    // place where you can save your task notes
+
+    /////* Old extension or settings page trackables */////
 
     ArchiveTaskTabTask = 1,
     CancelTaskTabTask,
@@ -78,14 +74,12 @@ module Esper.Analytics {
     CopySelectionToTaskNotes,
     CreateTask,
     CreateTaskTabLinkedEvent,
-    DeleteTimeStatsLabel,
     DisablePreferencesTabDailyAgenda,
     DisablePreferencesTabTasksUpdate,
     EditCalendarPickerEventTitle,
     EditCalendarPickerLocation,
     EditGcalEventLabels,
     EditGmailEventLabels,
-    EditTimeEsperEventLabels,
     EditTaskNotes,
     EnablePreferencesTabDailyAgenda,
     EnablePreferencesTabTasksUpdate,
@@ -102,7 +96,6 @@ module Esper.Analytics {
     OpenTimeStatsAddLabelsModal,
     OpenTimeStatsGifModal,
     RenameTaskTabTask,
-    RenameTimeStatsLabel,
     SaveTaskNotes,
     SelectCalendarPickerExecutiveTimezone,
     SelectCalendarPickerGuestTimezone,
@@ -110,32 +103,46 @@ module Esper.Analytics {
     SelectTaskTabMeetingType,
     SelectTaskTabTaskProgress,
     SelectTaskTabWorkflow,
-    SetTimeStatsCalendars,
-    SetTimeStatsLabels,
     UnarchiveTaskTabTask,
     UnlinkTaskTabFromExistingTask,
-    ViewTimeStats                // Viewed a particular set of time stats
-                                 // for at least 3 seconds
+
+
+    ///////////* Time Stats *///////////////
+
+    // Onboarding
+    SetTimeStatsLabels,       // Set labels for a team
+    SetTimeStatsCalendars,    // Set calendars for a team
+
+    // Batch Label Changes
+    RenameTimeStatsLabel,     // Rename label on team (and on all events)
+    DeleteTimeStatsLabel,     // Delete label from team (and remove from
+                              // all events)
+
+    // Labeling
+    EditEventLabels           // Edit labels for event(s)
   };
 
   // Named pages to track
   export enum Page {
-    Settings = 1,      // esper.com/settings
-    TeamSettings,      // esper.com/settings/#!/team-settings/...
-    TeamCalendars,     // esper.com/settings/#!/team-settings/.../calendars
-    TeamPreferences,   // esper.com/settings/#!/team-settings/.../preferences
-    TeamWorkflows,     // esper.com/settings/#!/team-settings/.../workflows
-    TeamLabels,        // esper.com/settings/#!/team-settings/.../teamLabels
-    TeamTemplates,     // esper.com/settings/#!/team-settings/.../templates
-    TimeStats,         // esper.com/time
-    TimeStatsCharts,   // esper.com/time/#!/charts
-    CalendarLabeling,  // esper.com/time/#!/calendar-labeling
-    CalendarSetup,     // esper.com/time/#!/calendar-setup
-    EventFeedback,     // esper.com/time/#!/event
-    EventList,         // esper.com/time/#!/list
-    LabelManagement,   // esper.com/time/#!/labels
-    NotificationSettings,  // esper.com/time/#!/notification-settings
-    DirectoryHome      // dir.esper.com
+
+    // esper.com/settings
+    Settings = 1,      // /#!/
+    TeamSettings,      // /#!/team-settings/...
+    TeamCalendars,     // /#!/team-settings/.../calendars
+    TeamPreferences,   // /#!/team-settings/.../preferences
+    TeamWorkflows,     // /#!/team-settings/.../workflows
+    TeamLabels,        // /#!/team-settings/.../teamLabels
+    TeamTemplates,     // /#!/team-settings/.../templates
+
+    // esper.com/time
+    TimeStats,             // /#!/
+    TimeStatsCharts,       // /#!/charts
+    CalendarLabeling,      // /#!/calendar-labeling
+    CalendarSetup,         // /#!/calendar-setup
+    EventFeedback,         // /#!/event
+    EventList,             // /#!/list
+    LabelManagement,       // /#!/labels
+    NotificationSettings   // /#!/notification-settings
   }
 
 
