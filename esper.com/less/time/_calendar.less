@@ -1,11 +1,5 @@
 @import "../lib/_helpers";
 
-@fc-unlabeled-event-color: lighten(#5bc0de, 30%); // Light Blue
-@fc-labeled-event-color: lighten(@brand-primary, 30%);
-@fc-active-unlabled-event-color: #5bc0de;         // Blue
-@fc-active-labeled-event-color: @brand-primary;
-
-
 // Wrap to minimize chance of namespace conflict
 .fullcalendar-holder {
   .esper-expanded;
@@ -52,8 +46,8 @@
     }
 
     .fc-event {
-      background: @fc-unlabeled-event-color;
-      border-color: darken(@fc-unlabeled-event-color, 5%);
+      background: white;
+      border-color: @brand-info;
       color: #333;
       transition: box-shadow 0.6s;
       padding: @padding-xs-vertical @padding-xs-horizontal;
@@ -63,15 +57,9 @@
         cursor: pointer;
       }
 
-      &.labeled {
-        background: @fc-labeled-event-color;
-        border-color: darken(color(@fc-labeled-event-color), 5%);
-      }
-
       &.active {
-        background: @fc-active-unlabled-event-color;
-        border-color: darken(color(@fc-active-unlabled-event-color), 5%);
-        color: white;
+        border-color: @brand-primary;
+        font-weight: bold;
       }
 
       &.recurring-active, &.active {
@@ -82,12 +70,7 @@
           applies some its styles inline, this appears to be the only way
           to get drop-shadows to appear correctly from an external stylesheet.
         */
-        z-index: 2 !important;
-      }
-
-      &.labeled.active {
-        background: @fc-active-labeled-event-color;
-        border-color: darken(color(@fc-active-labeled-event-color), 5%);
+        z-index: 3 !important;
       }
 
       &:hover, &:focus {
@@ -97,7 +80,6 @@
 
     .fc-today, .fc-unthemed .fc-today {
       background: #fffcec;
-
     }
   }
 }
