@@ -5,7 +5,10 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Containers {
-  export function eventEditorModal(events: Events2.TeamEvent[]) {
+  export function eventEditorModal(events: Events2.TeamEvent[], opts?: {
+    minFeedback?: boolean;
+  }) {
+    opts = opts || { minFeedback: true };
     return ReactHelpers.contain(function() {
       // Refresh data from store before rendering modal
       var eventData = _(events)
@@ -24,8 +27,11 @@ module Esper.Containers {
             some: (m) => [t, m]
           }));
 
-      return <Components.EventEditorModal eventData={eventData}
-                                          teamPairs={teamPairs} />;
+      return <Components.EventEditorModal
+        eventData={eventData}
+        teamPairs={teamPairs}
+        minFeedback={opts.minFeedback}
+      />;
     })
   }
 

@@ -369,7 +369,8 @@ module Esper.Views {
           }));
 
       return <Components.EventEditorModal eventData={eventData}
-                                          teamPairs={teamPairs} />;
+                                          teamPairs={teamPairs}
+                                          minFeedback={true} />;
     }
 
     toggleEvent(event: Events2.TeamEvent) {
