@@ -203,6 +203,15 @@ module Esper.Components {
           editable: false,
           className: classNames.join(" ")
         };
+
+        if (event.labels_norm && event.labels_norm.length) {
+          ret.color = Colors.getColorForLabel(
+            event.labels_norm.length > 1 ?
+            Labels.MULTI_LABEL_ID :
+            event.labels[0]
+          );
+        }
+
         return ret;
       }));
     }

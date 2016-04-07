@@ -45,7 +45,7 @@ module Esper.Actions {
   var chartInfo: ChartTypeInfo[] = [{
     id: "activity",
     icon: "fa-calendar",
-    displayAs: "Activity Grid"
+    displayAs: "Monthly Overview"
   }, {
     id: "durations",
     icon: "fa-clock-o",
