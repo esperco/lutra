@@ -112,6 +112,14 @@ module Esper.EventLabelChange {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
+      var numEvents = Option.wrap(r.request.selection[1]).match({
+        some: (s) => s.length,
+        none: () => 0
+      });
+      Analytics.track(Analytics.Trackable.EditEventLabels, {
+        numEvents: numEvents,
+        teamId: r.teamId
+      });
       return Api.changeEventLabels(r.teamId, r.request);
     },
 
