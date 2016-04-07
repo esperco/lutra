@@ -208,7 +208,7 @@ module Esper.Components {
           ret.color = Colors.getColorForLabel(
             event.labels_norm.length > 1 ?
             Labels.MULTI_LABEL_ID :
-            event.labels[0]
+            event.labels_norm[0]
           );
         }
 
