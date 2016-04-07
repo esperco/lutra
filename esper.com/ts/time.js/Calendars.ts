@@ -28,56 +28,6 @@ module Esper.Calendars {
     }
   }
 
-  // Returns a default team and calendar selection
-  export function defaultSelection() {
-    var retTeam: ApiT.Team;
-    var retCal: ApiT.Calendar;
-    var retScore = 0;
-    _.each(Teams.all(), (team) => {
-      _.each(team.team_calendars, (cal) => {
-        var likelihood = 1;
-        if (cal.is_primary) {
-          likelihood += 100;
-        }
-        if (cal.calendar_default_write) {
-          likelihood += 10;
-        }
-        if (cal.calendar_default_agenda) {
-          likelihood += 1;
-        }
-        if (cal.calendar_default_view) {
-          likelihood += 1;
-        }
-        if (likelihood > retScore) {
-          retScore = likelihood;
-          retTeam = team;
-          retCal = cal;
-        }
-      });
-    });
-
-    if (retTeam && retCal) {
-      return {
-        teamId: retTeam.teamid,
-        calId: retCal.google_cal_id
-      };
-    } else {
-      var calLists = CalendarListStore.getAll();
-      var pair = _.find(calLists, (p) => {
-        var calList = p[0];
-        return !!calList[0];
-      });
-      if (pair) {
-        var cal = pair[0][0];
-        var meta = pair[1];
-        return {
-          teamId: meta._id,
-          calId: cal.id
-        };
-      }
-    }
-  }
-
 
   ////////
 
