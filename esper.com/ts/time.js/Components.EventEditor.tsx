@@ -165,7 +165,7 @@ module Esper.Components {
                     (event.feedback.attended === false ? " active" : "")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
-            Didn't Attend
+            { Events2.isFuture(event) ? "Won't Attend" : "Didn't Attend" }
           </button>
         </div>
       </div>;

@@ -295,6 +295,11 @@ module Esper.Events2 {
       event.teamId === storeId.teamId;
   }
 
+  // Does this event occur in the future?
+  export function isFuture(event: TeamEvent) {
+    return moment(event.start).diff(moment()) > 0;
+  }
+
 
   /* Helpers for extracting some value we're charting by */
 
