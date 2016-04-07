@@ -18,10 +18,8 @@ module Esper.Colors {
     return getColorForMap(domain, domainColorMap);
   }
 
-  export function getColorForCal(cal: {
-    teamId: string, calId: string
-  }): string {
-    return getColorForMap(cal.teamId + cal.calId, calColorMap);
+  export function getColorForCal(calId: string): string {
+    return getColorForMap(calId, calColorMap);
   }
 
   // Reset remembered colors

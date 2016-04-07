@@ -14,6 +14,9 @@ module Esper.Actions {
 
   type ChartVariant =
     ["activity", Charts.EventGrid]|
+    ["cal-comp-hours", Charts.CalendarCompHoursChart]|
+    ["cal-comp-percent", Charts.CalendarCompPercentageChart]|
+    ["cal-comp-pie", Charts.CalendarCompPieChart]|
     ["durations", Charts.DurationHistogram]|
     ["guest-domains", Charts.GuestDomains]|
     ["labels-bar", Charts.TopLabels]|
@@ -27,6 +30,9 @@ module Esper.Actions {
   */
   export type ChartId =
     "activity"|
+    "cal-comp-hours"|
+    "cal-comp-percent"|
+    "cal-comp-pie"|
     "durations"|
     "guest-domains"|
     "labels-bar"|
@@ -44,8 +50,20 @@ module Esper.Actions {
 
   var chartInfo: ChartTypeInfo[] = [{
     id: "activity",
-    icon: "fa-calendar",
+    icon: "fa-th",
     displayAs: "Monthly Overview"
+  }, {
+    id: "cal-comp-hours",
+    icon: "fa-calendar-o",
+    displayAs: "Calendar Hours"
+  },{
+    id: "cal-comp-percent",
+    icon: "fa-calendar-o",
+    displayAs: "Calendar Percentages"
+  }, {
+    id: "cal-comp-pie",
+    icon: "fa-calendar-o",
+    displayAs: "Calendar Pie Chart"
   }, {
     id: "durations",
     icon: "fa-clock-o",
@@ -143,6 +161,13 @@ module Esper.Actions {
         return ["guest-domains", new Charts.GuestDomains(params)];
       case "durations":
         return ["durations", new Charts.DurationHistogram(params)];
+      case "cal-comp-pie":
+        return ["cal-comp-pie", new Charts.CalendarCompPieChart(params)];
+      case "cal-comp-percent":
+        return ["cal-comp-percent",
+                new Charts.CalendarCompPercentageChart(params)];
+      case "cal-comp-hours":
+        return ["cal-comp-hours", new Charts.CalendarCompHoursChart(params)];
       case "activity":
         return ["activity", new Charts.EventGrid(params)];
       default:
