@@ -10,7 +10,7 @@ module Esper.Charts {
   }
 
   /*
-    Base class for chart with labels (using stats2 API)
+    Base class for chart with labels
   */
   export abstract class LabelChart extends EventChart<LabelFilterParams> {
     protected eventsByLabel: EventStats.EventGrouping;

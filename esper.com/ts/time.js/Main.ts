@@ -28,7 +28,9 @@ module Esper.Main {
     Colors.init();
     Calendars.init();
     Login.init();
-    ApiC.getAllProfiles();
+    Login.promise.done(function() {
+      ApiC.getAllProfiles()
+    });
   }
 }
 
