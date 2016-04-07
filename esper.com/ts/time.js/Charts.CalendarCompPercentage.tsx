@@ -17,6 +17,9 @@ module Esper.Charts {
       var categories = _.map(this.groupings,
         (d) => Text.fmtPeriod(d.period)
       );
+      var groupings = _.sortBy(this.groupings,
+        (g) => Period.asNumber(g.period)
+      );
 
       // One series for each period
       var series: {
@@ -31,7 +34,7 @@ module Esper.Charts {
           hours: number,
           events: HighchartsPointEvents
         }[]
-      }[] = _.map(this.groupings, (d, x) => ({
+      }[] = _.map(groupings, (d, x) => ({
         name: Text.fmtPeriod(d.period),
         cursor: "pointer",
         data: _(d.groups.some)

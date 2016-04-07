@@ -54,7 +54,9 @@ module Esper.Charts {
     }
 
     renderChart() {
-      var durations = this.durationsByLabel;
+      var durations = _.sortBy(this.durationsByLabel,
+        (d) => Period.asNumber(d.period)
+      );
       var categories = _.map(durations, (d) => Text.fmtPeriod(d.period));
 
       // One series for each period
