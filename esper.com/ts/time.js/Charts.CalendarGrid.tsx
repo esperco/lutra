@@ -1,15 +1,20 @@
 /// <reference path="./Components.CalendarGrid.tsx" />
 /// <reference path="./Esper.ts" />
+/// <reference path="./Charts.LabelChart.tsx" />
 
 module Esper.Charts {
+
+  interface HasLabel extends EventStats.HasDurations {
+    label: Option.T<string>;
+  }
 
   /*
     Base class for calendar grid-style Autochart
   */
-  export abstract class CalendarGridChart extends DefaultEventChart {
+  export abstract class CalendarGridChart extends LabelChart {
     protected eventsForDates: {
       date: Date;
-      durations: EventStats.HasDurations[];
+      durations: HasLabel[];
     }[];
 
     sync() {
@@ -37,7 +42,21 @@ module Esper.Charts {
         });
 
         events = this.filterEvents(events, this.params.filterParams);
-        var wrappers = _.map(events, (e) => ({ event: e }));
+        var wrappers = Option.flatten(
+          _.map(events, (e) =>
+            Params.applyListSelectJSON(
+              e.labels_norm,
+              this.params.filterParams.labels
+            ).flatMap((labels) => labels.length > 1 ?
+              Option.some(Labels.MULTI_LABEL_ID) :
+              Option.some(labels[0])
+            ).flatMap((label) => Option.some({
+              event: e,
+              label: Option.wrap(label)
+            }))
+          )
+        );
+
         var durations = EventStats.getDurations(wrappers, {
           truncateStart: moment(d).startOf('day').toDate(),
           truncateEnd: moment(d).endOf('day').toDate(),

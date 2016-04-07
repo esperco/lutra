@@ -194,25 +194,29 @@ table.calendar-grid {
       display: block;
       height: 100%;
       animation: extendwidth 0.5s ease-in-out;
-      background: @gray-lighter;
+      // background: @gray-lighter;
+      background: white;
+      border: 1px solid @table-border-color;
+      box-sizing: border-box;;
     }
 
     &.active > span {
-      background: @brand-primary;
+      background: @gray;
+      border: 0;
       cursor: pointer;
 
       // Early => darken slightly
-      &.row-0 {
-        background: lighten(@brand-primary, 15%);
-      }
+      // &.row-0 {
+      //   background: lighten(@brand-primary, 15%);
+      // }
 
-      &.row-1 {
-        background: @brand-primary;
-      }
+      // &.row-1 {
+      //   background: @brand-primary;
+      // }
 
-      &.row-2 {
-        background: darken(@brand-primary, 15%);
-      }
+      // &.row-2 {
+      //   background: darken(@brand-primary, 15%);
+      // }
     }
   }
 }

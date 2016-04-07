@@ -16,10 +16,16 @@ module Esper.Charts {
   const HIGH_EVENTS        = 6;
   const VERY_HIGH_EVENTS   = 9;
 
+  interface HasLabel extends EventStats.HasDurations {
+    label: Option.T<string>;
+  }
+
   /*
     Grid that shows fragmentation, meeting count, and meeting durations
   */
   export class EventGrid extends CalendarGridChart {
+    protected allowUnlabeled = true;
+
     protected dayFn(date: Date) {
       var m = moment(date);
       var data = _.find(this.eventsForDates, (d) =>
@@ -67,17 +73,19 @@ module Esper.Charts {
       </div>
     }
 
-    renderBlocks(date: Date, durations: EventStats.HasDurations[]) {
+    renderBlocks(date: Date, durations: HasLabel[]) {
       var lastEnd = moment(date).startOf('day').unix();
       var blocks: {
         seconds: number;
         event?: Events2.TeamEvent; // No event => open time
+        label: Option.T<string>;
       }[] = []
       _.each(durations, (duration) => {
         var startSeconds = moment(duration.event.start).unix();
         if (startSeconds > lastEnd) {
           blocks.push({
-            seconds: startSeconds - lastEnd
+            seconds: startSeconds - lastEnd,
+            label: Option.none<string>()
           });
         }
         var endSeconds = moment(duration.event.end).unix();
@@ -86,14 +94,16 @@ module Esper.Charts {
         }
         blocks.push({
           seconds: duration.adjustedDuration,
-          event: duration.event
+          event: duration.event,
+          label: duration.label
         });
       });
 
       var endOfDay = moment(date).endOf('day').unix();
       if (lastEnd < endOfDay) {
         blocks.push({
-          seconds: endOfDay - lastEnd
+          seconds: endOfDay - lastEnd,
+          label: Option.none<string>()
         });
       }
 
@@ -110,16 +120,20 @@ module Esper.Charts {
           secondsToAllocate -= nextBlock;
           rowFilled += nextBlock
           var width = (nextBlock / SECONDS_PER_ROW) * 100;
-          let style = { width: width + "%" };
+          let style: { background?: string } = {};
           var classNames = ["time-segment"];
           if (b.event) {
             classNames.push("active");
+            style.background = b.label.match({
+              none: () => Colors.lightGray,
+              some: (l) => Colors.getColorForLabel(l)
+            });
           }
           segments.push(<span key={j++}
             className={classNames.join(" ")}
-            style={style}
+            style={{width: width + "%"}}
           >
-            <span className={"row-" + rowIndex} />
+            <span className={"row-" + rowIndex} style={style} />
           </span>); // Inner span for animation purposes
           if (rowFilled >= SECONDS_PER_ROW) {
             rowFilled = 0;
@@ -127,7 +141,11 @@ module Esper.Charts {
           }
         }
         return <TimeBlock key={i.toString()} event={b.event}
-                          seconds={b.seconds}>
+                          seconds={b.seconds}
+                          label={ b.label.match({
+                            none: () => "",
+                            some: (l) => Labels.getDisplayAs(l)
+                          })}>
           { segments }
         </TimeBlock>
       });
@@ -141,6 +159,7 @@ module Esper.Charts {
   class TimeBlock extends ReactHelpers.Component<{
     seconds: number;
     event?: Events2.TeamEvent;
+    label?: string;
     children?: JSX.Element[];
   }, {}> {
 
@@ -154,12 +173,15 @@ module Esper.Charts {
         tooltip += this.props.event.title + " @ ";
         tooltip += Text.time(this.props.event.start) + " / ";
         tooltip += Text.hours(EventStats.toHours(this.props.seconds))
+        if (this.props.label) {
+          tooltip += " (" + this.props.label + ")";
+        }
       }
 
       return <span className="time-block" ref={(c) => this._block = c }
                    onClick={() => this.onEventClick()}
                    data-toggle={ tooltip ? "tooltip" : null }
-                   title={tooltip}>
+                   title={tooltip} data-original-title={tooltip}>
         { this.props.children }
       </span>;
     }
@@ -170,10 +192,14 @@ module Esper.Charts {
     }
 
     componentDidMount() {
-      $(this._block).tooltip();
+      this.mountTooltip();
     }
 
     componentDidUpdate() {
+      this.mountTooltip();
+    }
+
+    mountTooltip() {
       $(this._block).tooltip();
     }
   }
