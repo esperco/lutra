@@ -5,6 +5,7 @@
 module Esper.Colors {
   var labelColorMap: ColorMap = {};
   var domainColorMap: ColorMap = {};
+  var calColorMap: ColorMap = {};
 
   export function getColorForLabel(labelNorm: string): string {
     if (labelNorm === Labels.MULTI_LABEL_ID) {
@@ -15,6 +16,12 @@ module Esper.Colors {
 
   export function getColorForDomain(domain: string): string {
     return getColorForMap(domain, domainColorMap);
+  }
+
+  export function getColorForCal(cal: {
+    teamId: string, calId: string
+  }): string {
+    return getColorForMap(cal.teamId + cal.calId, calColorMap);
   }
 
   // Reset remembered colors
