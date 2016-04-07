@@ -47,19 +47,34 @@ module Esper.Text {
     return moment(d).format("h:mm a");
   }
 
-  export function fmtPeriod(p: Period.Single|Period.Custom) {
+  export function fmtPeriod(p: Period.Single|Period.Custom, short?: boolean) {
     var bounds = Period.boundsFromPeriod(p);
     var start = bounds[0];
     switch(p.interval) {
       case "quarter":
-        return moment(start).format("[Q]Q YYYY");
+        return moment(start).format(short ? "[Q]Q 'YY" : "[Q]Q YYYY");
       case "month":
-        return moment(start).format("MMMM YYYY");
+        return moment(start).format(short ? "MMMM" : "MMMM YYYY");
       case "week":
-        return moment(start).format("[Week of] MMM D");
+        return moment(start).format(short ? "MMM D" : "[Week of] MMM D");
       default: // Custom
         var end = bounds[1];
         return `${date(start)} - ${date(end)}`;
+    }
+  }
+
+  export function fmtRelPeriod(interval: Period.Interval, incr: number) {
+    var capInterval = _.capitalize(interval);
+    if (incr === 0) {
+      return "This " + capInterval;
+    } else if (incr === -1) {
+      return "Last " + capInterval;
+    } else if (incr === 1) {
+      return "Next " + capInterval;
+    } else if (incr < -1) {
+      return `In ${incr.toString()} ${capInterval}s`;
+    } else { // Incr > 1
+      return `${(-incr).toString()} ${capInterval}s Ago`;
     }
   }
 }

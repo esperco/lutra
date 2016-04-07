@@ -19,10 +19,11 @@ module Esper.Components {
       id: "",
       choices: _.map(props.allowedIncrs, (i) => ({
         id: i.toString(),
-        displayAs: Text.fmtPeriod({
-          interval: props.period.interval,
-          index: props.period.index + i
-        })
+        displayAs: Text.fmtRelPeriod(props.period.interval, i) + " (" +
+          Text.fmtPeriod({
+            interval: props.period.interval,
+            index: props.period.index + i
+          }, true) + ")"
       }))
     }];
     var selected = _.map(props.selectedIncrs, (i) => ({
