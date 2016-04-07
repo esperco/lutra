@@ -14,79 +14,133 @@
   </div>
 
   <div class="section-container left-align">
-    <div class="section-content narrow short">
-      <h4>Activity Grid</h4>
-      <p>This calendar grid shows the total number of events, the aggregate
-      duration of those events, and your scheduling fragmentation for
-      each day of the month.</p>
-      <p>Fragmentation measures whether your events are scheduled together
-      in blocks (i.e. back-to-back meetings) are are scattered (fragmented)
-      throughout the day.</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Calendar Hours</h4>
+      <img class="chart-img" src="/img/calendar-hours.png" />
+      <p>This bar chart shows the total amount of hours you've allocated to
+      each of your calendars. If you have separate work and personal calendars,
+      you can use this chart to compare how much time you're allocating
+      between your professional and personal goals.</p>
+
+      <p>Each segment in the bar
+      chart represents an event. Hover over
+      or click them for more details on that event.</p>
     </div>
 
-    <div class="section-content narrow short">
+    <div class="section-content clearfix narrow short">
+      <h4>Calendar Percentages</h4>
+      <img class="chart-img" src="/img/calendar-percentages.png" />
+      <p>This stacked bar chart shows the relative percentage of time between
+      each of your calendars. If you have separate work and personal calendars,
+      you can use this chart to compare how much time you're allocating
+      between your professional and personal goals.</p>
+
+      <p>Click on a bar segment to
+      see the list of events that count towards that segment.</p>
+    </div>
+
+    <div class="section-content clearfix narrow short">
+      <h4>Calendar Pie Chart</h4>
+      <img class="chart-img" src="/img/calendar-hours.png" />
+      <p>This pie chart shows relative percentages you've allocated to
+      each of your calendars. This works just like the "Calendar Percentages"
+      stacked bar chart, except it's a pie.</p>
+    </div>
+
+    <div class="section-content clearfix narrow short">
       <h4>Event Durations</h4>
-      <p>This histogram groups your events by how long they take and shows
-      the aggregate duration and frequency of those events for a given
-      time period.</p>
+      <img class="chart-img" src="/img/durations.png" />
+      <p>This histogram groups your events by how long they take. You can use
+      this chart to spot unusually long events or to check whether your time is
+      being taken up by a few big events or lots of little things.</p>
+
+      <p>Each segment in the bar
+      chart represents an event. Hover over
+      or click them for more details on that event.
+      </p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Frequent Meeting Attendees</h4>
-      <p>This horizontal bar chart lists the people who are most frequently
-      invited to events on your calendar. It shows both the aggregate duration
-      and the number of events for each person.</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Guest Groups Pie Chart</h4>
+      <img class="chart-img" src="/img/guests-pie.png" />
+      <p>This pie chart shows which groups or organizations (as determined by
+      e-mail address) are the most common among guests invited to events on
+      your calendar. You can use this chart
+      to make sure you're spending time with the right people.</p>
+
+      <p>Click on a segment of the pie to drill down into how much
+      time you spend with each person in that group.</p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Guest Domains</h4>
-      <p>This pie chart shows which domain names are the most common
-      among guests invited to events on your calendar and the most
-      common guests for each domain.</p>
-      <p>For the purposes of this pie chart, time is divided evenly among
-      all guests invited to an event. Filtering out certain domain names
-      will re-allocate time in the chart among the domain names still included
-      in the chart.</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Label Hours</h4>
+      <img class="chart-img" src="/img/label-hours.png" />
+      <p>This bar chart shows the total number of hours allocated to
+      your own custom categories over fixed intervals of time. You can use this
+      to figure out whether you're on track to hit your goals.</p>
+
+      <p>Each segment in the bar
+      chart represents an event. Hover over
+      or click them for more details on that event.</p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Label Duration Over Time</h4>
-      <p>This bar chart shows the total number of hours allocated to each
-      category over fixed intervals of time -- e.g. how many hours do
-      you spend on Sales Meetings each week?</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Label Percentages</h4>
+      <img class="chart-img" src="/img/label-percentages.png" />
+      <p>This stacked bar chart shows the relative allocation of time between
+      each of your different custom categories. You can use this to see if
+      you're spending too much time on the wrong things.</p>
+
+      <p>Click on a bar segment to
+      see the list of events that count towards that segment</p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Label Allocation Percentage</h4>
-      <p>This pie chart shows percentages for how you allocate time
-      between different categories -- e.g. what percentage of your time
-      was spent on Sales Meetings between November 1 and December 1?</p>
-      <p>If an event was assigned multiple labels, the time for that
-      event is divided evenly between each <i>visible</i> label for the
-      purpose of calculating percentages. Divided time will be labeled with
-      a unit of "adjusted hours".</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Label Pie Chart</h4>
+      <img class="chart-img" src="/img/label-pie.png" />
+      <p>This stacked bar chart shows the relative allocation of time between
+      each of your different custom categories. This works just like the
+      "Labels Percentages" stacked bar chart, except it's a pie.</p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Label Percentage Over Time</h4>
-      <p>This stacked bar chart shows how the percentage of time you
-      allocate between different categories changes over a fixed interval
-      -- e.g. how did the percentage of time you spend on Sales Meetings
-      change between November and December?</p>
-      <p>This chart will use adjusted hours if an event was assigned
-      multiple labels.</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Monthly Overview</h4>
+      <img class="chart-img" src="/img/monthly-overview.png" />
+      <p>This calendar grid shows you how many events and how much time you're
+      scheduled for on each day of the month. If you have custom labels
+      defined, it will colorize each day based on which labels apply to that
+      day. You can use this to get a quick heads-up view of how your week or
+      month is headed.</p>
     </div>
 
-    <div class="section-content narrow short">
-      <h4>Working Hours Availability</h4>
-      <p>This calendar grid shows uninterrupted blocks of free time during
-      your working hours for each calendar day.</p>
-      <p>We consider working hours to be 9AM to 6PM in your local timezone
-      by default but will adjust the period in the chart if your calendar
-      frequently has events scheduled outside that period.</p>
+    <div class="section-content clearfix narrow short">
+      <h4>Top Guests</h4>
+      <img class="chart-img" src="/img/top-guests.png" />
+      <p>This bar chart lists the people who are most frequently
+      invited to events on your calendar. You can use this chart to make
+      sure you're spending enough time with the right people.</p>
+
+      <p>Each segment in the bar
+      chart represents an event. Hover over
+      or click them for more details on that event.
+      </p>
     </div>
 
-    <div class="section-content narrow short">
+    <div class="section-content clearfix narrow short">
+      <h4>A Note on Percentages</h4>
+      <a name="percentages-note"></a>
+      <p>If you have overlapping calendar events, Esper will adjust the
+      <em>percentage</em> of time allocated to each event by dividing the
+      overlapping time evenly among each event. Therefore, a one-hour
+      event may occupy more space on a pie chart than another one-hour
+      event if the latter overlaps another event.</p>
+      <p>Esper will also divided time evenly between different categories
+      of events depending on the chart. For example, in the Guest Groups
+      Pie Chart, time is divided evenly between each attendee in the meeting.
+      </p>
+    </div>
+
+    <div class="section-content clearfix narrow short">
       <h4>Want Something Else?</h4>
       <p>Esper is in beta, and we've currently limited the time
       period and types of charts you can get online. If you have a

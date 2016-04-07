@@ -83,7 +83,7 @@ module Esper.Actions {
   }, {
     id: "labels-pie",
     icon: "fa-tags",
-    displayAs: "Labels Pie Chart"
+    displayAs: "Label Pie Chart"
   }, {
     id: "top-guests",
     icon: "fa-users",
