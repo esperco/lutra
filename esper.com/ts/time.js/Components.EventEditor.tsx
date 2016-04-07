@@ -72,6 +72,8 @@ module Esper.Components {
   ////
 
   export function EventDetails({event}: {event: Events2.TeamEvent}) {
+    var guestEmails = Events2.getGuestEmails(event);
+
     return <div className="event-details esper-panel-section">
       <div className="time">
         <i className="fa fa-fw fa-clock-o" />{" "}
@@ -91,6 +93,14 @@ module Esper.Components {
         <div className="location">
           <i className="fa fa-fw fa-map-marker" />{" "}
           {event.location}
+        </div>
+        : null
+      }
+      {
+        (guestEmails && guestEmails.length) ?
+        <div className="guests">
+          <i className="fa fa-fw fa-users" />{" "}
+          { guestEmails.join(", ") }
         </div>
         : null
       }
