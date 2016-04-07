@@ -32,6 +32,7 @@ module Esper.Params {
   // Assumes calendar IDs never have commas in them. Use something else
   // if this proves to be untrue.
   export const CAL_ID_SEPARATOR = ",";
+  export const MAX_DEFAULT_CALS = 3;
 
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
@@ -41,7 +42,7 @@ module Esper.Params {
       var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
       return _.intersection(team.team_timestats_calendars, calIds);
     }
-    return team.team_timestats_calendars;
+    return team.team_timestats_calendars.slice(0, MAX_DEFAULT_CALS);
   }
 
   // Like cleanCalIds, but returns team/cal objects
