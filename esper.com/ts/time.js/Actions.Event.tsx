@@ -18,7 +18,7 @@ module Esper.Actions {
       optEvent.match({
         none: () => Route.nav.home(),
         some: (event) => {
-          var p = Api.postEventFeedbackAction(teamId, eventId, action)
+          var p = Api.postEventFeedbackAction(teamId, calId, eventId, action)
             .then((feedback: ApiT.EventFeedback) => {
               var newEvent = _.cloneDeep(event);
               newEvent.feedback = feedback;

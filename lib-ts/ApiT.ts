@@ -117,6 +117,7 @@ module Esper.ApiT {
   }
 
   export interface EventFeedback {
+    calid?: string;
     notes?: string;
     attended?: boolean;
     rating?: number;
@@ -552,6 +553,7 @@ module Esper.ApiT {
   export interface EmailTypes {
     daily_agenda: EmailPref;
     tasks_update: EmailPref;
+    feedback_summary?: EmailPref;
   }
 
   export interface EmailPref {
