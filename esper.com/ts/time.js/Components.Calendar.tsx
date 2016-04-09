@@ -193,6 +193,9 @@ module Esper.Components {
         if (event.labels && event.labels.length) {
           classNames.push("labeled");
         }
+        if (event.feedback.attended === false) {
+          classNames.push("no-attend")
+        }
 
         var ret: FullCalendar.EventObject = {
           id: i,

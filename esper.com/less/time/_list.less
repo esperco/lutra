@@ -155,10 +155,6 @@
           color: @link-hover-color;
           text-decoration: underline;
         }
-
-        &.no-attend {
-          text-decoration: line-through;
-        }
       }
     }
 
@@ -188,5 +184,11 @@
 
   .description {
     padding-top: @padding-small-vertical;
+  }
+}
+
+.title, .fc-event, .fc-event:hover {
+  &.no-attend {
+    text-decoration: line-through;
   }
 }
