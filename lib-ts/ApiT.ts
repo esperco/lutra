@@ -123,6 +123,12 @@ module Esper.ApiT {
     rating?: number;
   }
 
+  export interface PredictedLabel {
+    label: string;
+    label_norm: string;
+    score: number; // Float between 0 and 1
+  }
+
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
@@ -134,6 +140,7 @@ module Esper.ApiT {
     description_messageids: string[];
     labels: string[];
     labels_norm: string[];
+    predicted_labels?: PredictedLabel[]; // Sorted by score desc
     feedback: EventFeedback;
     location?: string;
     all_day: boolean;
