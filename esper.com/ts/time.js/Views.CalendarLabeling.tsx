@@ -42,7 +42,8 @@ module Esper.Views {
       })();
 
       return <div id="calendar-page"
-                  className="esper-full-screen minus-nav">
+                  className="esper-full-screen minus-nav"
+                  onClick={() => this.clearEventSelection()}>
         <Components.SidebarWithToggle>
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
@@ -196,6 +197,10 @@ module Esper.Views {
         props.period.interval[0],
         props.period.index.toString()
       ]);
+    }
+
+    clearEventSelection() {
+      this.setState({ selected: [] });
     }
 
     updateEventSelection(event: Events2.TeamEvent, add: boolean) {
