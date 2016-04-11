@@ -42,8 +42,7 @@ module Esper.Views {
       })();
 
       return <div id="calendar-page"
-                  className="esper-full-screen minus-nav"
-                  onClick={() => this.clearEventSelection()}>
+                  className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
           <div className="esper-menu-section">
             <label htmlFor={this.getId("cal-select")}>
@@ -61,7 +60,8 @@ module Esper.Views {
           </div>
           {this.renderLabelEditor()}
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded">
+        <div className="esper-right-content padded"
+             onClick={() => this.clearEventSelection()}>
           {this.renderCalendar()}
         </div>
       </div>;
