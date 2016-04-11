@@ -15,6 +15,7 @@ module Esper.Components {
 
     minFeedback?: boolean;
     initAction?: boolean;
+    focusOnLabels?: boolean;
     onDone?: () => void;
     className?: string;
   }
@@ -42,6 +43,7 @@ module Esper.Components {
           eventData={props.eventData}
           teamPairs={props.teamPairs}
           onDone={props.onDone}
+          autoFocus={props.focusOnLabels}
           doneText="Done"
         />
       </div>
@@ -218,7 +220,7 @@ module Esper.Components {
             value={(event.feedback.attended && event.feedback.rating) || 0}
             onChange={(i) => this.submitStarRating(i)} />
         </div>
-        <div className="col-sm-4 form-group">
+        <div className="col-sm-4 form-group event-no-attend">
           <button className={"form-control btn btn-default" +
                     (event.feedback.attended === false ? " active" : "")}
                   onClick={() => this.toggleAttended()}>

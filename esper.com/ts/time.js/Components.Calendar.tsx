@@ -27,6 +27,16 @@ module Esper.Components {
     error?: boolean;
   }
 
+  // So we can stick additional stuff in event object
+  interface EventObjectPlus extends FullCalendar.EventObject {
+    tooltip?: string;
+  }
+
+  function asEOPlus(e: FullCalendar.EventObject): EventObjectPlus {
+    return e as EventObjectPlus;
+  }
+
+
   export abstract class Calendar extends Component<CalendarProps, {}>
   {
     _fcDiv: HTMLElement;
@@ -99,6 +109,14 @@ module Esper.Components {
         events: this.getEvents.bind(this),
         viewRender: this.onViewChange.bind(this),
         eventClick: this.toggleEvent.bind(this),
+        eventRender: (event, element) => {
+          var eventPlus = asEOPlus(event);
+          if (eventPlus.tooltip) {
+            $(element).tooltip({
+              title: eventPlus.tooltip
+            });
+          }
+        },
         height: fcDiv.parent().height() - 10,
         windowResize: () => {
           fcDiv.fullCalendar('option', 'height', fcDiv.parent().height() - 10);
@@ -193,8 +211,11 @@ module Esper.Components {
         if (event.labels && event.labels.length) {
           classNames.push("labeled");
         }
+        if (event.feedback.attended === false) {
+          classNames.push("no-attend")
+        }
 
-        var ret: FullCalendar.EventObject = {
+        var ret: EventObjectPlus = {
           id: i,
           title: event.title || "",
           allDay: event.all_day,
@@ -210,6 +231,10 @@ module Esper.Components {
             Labels.MULTI_LABEL_ID :
             event.labels_norm[0]
           );
+          ret.textColor = Colors.colorForText(ret.color);
+          ret.tooltip = event.labels_norm.length > 1 ?
+            Labels.MULTI_LABEL_STR :
+            event.labels[0];
         }
 
         return ret;

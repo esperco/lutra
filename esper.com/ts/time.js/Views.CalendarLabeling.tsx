@@ -60,7 +60,8 @@ module Esper.Views {
           </div>
           {this.renderLabelEditor()}
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded">
+        <div className="esper-right-content padded"
+             onClick={() => this.clearEventSelection()}>
           {this.renderCalendar()}
         </div>
       </div>;
@@ -141,7 +142,7 @@ module Esper.Views {
           hasRecurring = true;
         }
 
-        return <div className="esper-menu-section">
+        return <div className="esper-menu-section sidebar-event-editor">
           <div className="esper-subheader select-labels-heading">
             {heading}
             { hasRecurring ?
@@ -154,12 +155,11 @@ module Esper.Views {
                 {" "}(Hold Shift to Select Multiple Events)
               </div>: ""
             }
-         </div>
-          <Components.LabelEditor2
-            eventData={eventData}
-            teamPairs={teamPairs}
-            autoFocus={true}
-          />
+          </div>
+          <Components.EventEditor eventData={eventData}
+                                  teamPairs={teamPairs}
+                                  focusOnLabels={true}
+                                  minFeedback={true} />
         </div>;
       } else {
         return <div className="esper-menu-section">
@@ -196,6 +196,10 @@ module Esper.Views {
         props.period.interval[0],
         props.period.index.toString()
       ]);
+    }
+
+    clearEventSelection() {
+      this.setState({ selected: [] });
     }
 
     updateEventSelection(event: Events2.TeamEvent, add: boolean) {
