@@ -142,7 +142,7 @@ module Esper.Views {
           hasRecurring = true;
         }
 
-        return <div className="esper-menu-section">
+        return <div className="esper-menu-section sidebar-event-editor">
           <div className="esper-subheader select-labels-heading">
             {heading}
             { hasRecurring ?
@@ -155,12 +155,11 @@ module Esper.Views {
                 {" "}(Hold Shift to Select Multiple Events)
               </div>: ""
             }
-         </div>
-          <Components.LabelEditor2
-            eventData={eventData}
-            teamPairs={teamPairs}
-            autoFocus={true}
-          />
+          </div>
+          <Components.EventEditor eventData={eventData}
+                                  teamPairs={teamPairs}
+                                  focusOnLabels={true}
+                                  minFeedback={true} />
         </div>;
       } else {
         return <div className="esper-menu-section">

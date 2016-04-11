@@ -10,6 +10,14 @@
   }
 }
 
+.esper-left-sidebar {
+  .event-star-ratings, .event-no-attend {
+    width: 100%;
+    float: none;
+    text-align: center;
+  }
+}
+
 .event-min-feedback {
   font-style: italic;
   font-size: 90%;
@@ -18,4 +26,47 @@
 
 .min-feedback-action {
   padding: 0 @padding-base-horizontal;
+}
+
+.event-list .event, .event-details {
+  .time {
+    color: @gray-light;
+    font-size: @font-size-small;
+    white-space: nowrap;
+    display: inline-block;
+    margin-right: @padding-small-horizontal;
+  }
+
+  .location, .guests, .description {
+    font-size: @font-size-small;
+  }
+
+  .description {
+    padding-top: @padding-small-vertical;
+  }
+}
+
+.title, .fc-event, .fc-event:hover {
+  &.no-attend {
+    text-decoration: line-through;
+  }
+}
+
+/* Special compact handling for sidebar */
+.sidebar-event-editor {
+  .time {
+    display: none;
+  }
+
+  .description { padding-top: 0; }
+
+  .description, .guests {
+    white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+
+    &:hover {
+      white-space: normal;
+    }
+  }
 }
