@@ -4,10 +4,18 @@
 
 module Esper.Text {
 
-  // For post-meeding feedback
+  // For post-meeting feedback
   export const FeedbackTitle  = "Meeting Feedback"
   export const NoAttendPast   = "Didn't Attend";
   export const NoAttendFuture = "Won't Attend";
+
+  // Label interface
+  export const AddLabel = "Add Label";
+  export function predictionTooltip(score: number) { // Score is 0-1
+    return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +
+           `label is applicable to this event`;
+  }
+
 
   /////
 
