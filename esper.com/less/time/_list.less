@@ -158,13 +158,25 @@
       }
     }
 
-    .event-label {
+    .add-event-label, .event-label {
       padding: @padding-xs-vertical @padding-xs-horizontal;
       margin-top: @padding-small-vertical;
       margin-right: @padding-xs-horizontal;
       border-radius: @border-radius-small;
       display: inline-block;
       cursor: pointer;
+      border: 1px solid @link-color;
+      color: @link-color;
+
+      &:hover {
+        filter: brightness(110%);
+      }
+    }
+
+    .label-score {
+      padding-left: @padding-xs-horizontal;
+      font-size: @font-size-small;
+      line-height: @line-height-small;
     }
   }
 }

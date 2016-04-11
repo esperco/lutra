@@ -314,15 +314,8 @@ module Esper.Views {
         events={events}
         selectedEvents={this.state.selected}
         onEventClick={(event) => this.editEvent(event)}
+        onAddLabelClick={(event) => this.editEvent(event)}
         onEventToggle={(event) => this.toggleEvent(event)}
-        onLabelClick={(event, id) => this.updateRoute({
-          labels: {
-            some: [id],
-            all: false,
-            none: false,
-            unmatched: false
-          }
-        })}
       />;
     }
 

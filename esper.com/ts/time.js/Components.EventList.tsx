@@ -10,7 +10,7 @@ module Esper.Components {
     selectedEvents?: Events2.TeamEvent[];
     onEventToggle?: (event: Events2.TeamEvent) => void;
     onEventClick?: (event: Events2.TeamEvent) => void;
-    onLabelClick?: (event: Events2.TeamEvent, labelNorm: string) => void;
+    onAddLabelClick?: (event: Events2.TeamEvent) => void;
   }
 
   export class EventList extends ReactHelpers.Component<Props, {}> {
@@ -90,42 +90,11 @@ module Esper.Components {
             )}
           </div>
           <div className="event-labels">
-            { _.map(event.labels_norm,
-              (l, i) => this.renderLabel(event, l, event.labels[i])
-            ) }
+            <LabelList event={event}
+                       onAddLabelClick={this.props.onAddLabelClick} />
           </div>
         </div>
       </div>;
-    }
-
-    renderLabel(event: Events2.TeamEvent, id: string, displayAs: string) {
-      var labelColor = Colors.getColorForLabel(id)
-      var style = {
-        background: labelColor,
-        color: Colors.colorForText(labelColor)
-      };
-
-      var onClick = () => {
-        if (this.props.onLabelClick) {
-          this.props.onLabelClick(event, id)
-        }
-      }
-
-      var clearLabel = ((e: __React.MouseEvent) => {
-        e.stopPropagation();
-        EventLabelChange.remove([event], displayAs);
-      });
-
-      return <span style={style} key={id} className="event-label"
-        onClick={onClick}
-      >
-        <i className="fa fa-fw fa-tag" />{" "}
-        {displayAs}
-        <span className="hidden-xs esper-clear-action"
-              onClick={(e) => clearLabel(e)}>{" "}
-          <i className="fa fa-fw fa-times" />
-        </span>
-      </span>;
     }
 
     ////////
@@ -138,6 +107,162 @@ module Esper.Components {
       return _.findIndex(this.props.selectedEvents || [], (e) =>
         Events2.matchRecurring(e, event)
       );
+    }
+  }
+
+
+  /* Helpers for managing predicted labels */
+
+  // Non-predicted label
+  interface LabelVal {
+    label: string;
+    label_norm: string;
+  }
+
+  type LabelOrPredicted = LabelVal|ApiT.PredictedLabel;
+
+  function isPredictedLabel(x: LabelOrPredicted): x is ApiT.PredictedLabel {
+    var typedX = x as ApiT.PredictedLabel;
+    return !!typedX.score;
+  }
+
+  function labelsFomEvent(event: Events2.TeamEvent) {
+    return _.map(event.labels_norm, (n, i) => ({
+      label: event.labels[i],
+      label_norm: n
+    }));
+  }
+
+
+  /////
+
+  interface LabelListProps {
+    event: Events2.TeamEvent;
+    onAddLabelClick?: (event: Events2.TeamEvent) => void;
+  }
+
+  /*
+    A list of toggle-able labels or predicted labels for an event.
+  */
+  class LabelList extends ReactHelpers.Component<LabelListProps, {
+    initLabelList: LabelOrPredicted[];
+  }> {
+    constructor(props: LabelListProps) {
+      super(props);
+
+      /*
+        Track the initial set of labels (or predicted labels) for rendering
+        purposes. We don't want predicted labels or other options to disappear
+        just because the user toggled one.
+      */
+      this.state = {
+        initLabelList: ((event: Events2.TeamEvent) =>
+          Util.notEmpty(props.event.labels_norm) ?
+          labelsFomEvent(event) :
+          ( Util.notEmpty(props.event.predicted_labels) ?
+            props.event.predicted_labels : [] )
+        )(props.event)
+      }
+    }
+
+    render() {
+      var labelList = this.state.initLabelList;
+      var eventList = labelsFomEvent(this.props.event);
+      labelList = labelList.concat(
+        _.differenceBy(eventList, labelList, (e) => e.label_norm)
+      );
+
+      return <div className="event-labels">
+        { _.map(labelList, (labelVal) =>
+          <LabelToggle key={labelVal.label_norm}
+                       label={labelVal} event={this.props.event} />
+        ) }
+        { this.props.onAddLabelClick ?
+          <span className="add-event-label action"
+                onClick={() => this.props.onAddLabelClick(this.props.event)}>
+            <i className="fa fa-fw fa-plus" />
+            {labelList.length ? null : Text.AddLabel}
+          </span> : null }
+      </div>;
+    }
+  }
+
+
+  interface LabelProps {
+    label: LabelOrPredicted;
+    event: Events2.TeamEvent;
+  }
+
+  class LabelToggle extends ReactHelpers.Component<LabelProps, {}> {
+    _predictedLabel: HTMLSpanElement;
+
+    render() {
+      var labelColor = Colors.getColorForLabel(this.props.label.label_norm);
+      var isSelected = this.isSelected();
+      var style = (() => ({
+        border: "1px solid " + labelColor,
+        background: isSelected ? labelColor : "transparent",
+        color: isSelected ? Colors.colorForText(labelColor) :
+                            Colors.darken(labelColor)
+      }))();
+
+      var label = this.props.label;
+      if (isPredictedLabel(label)) {
+        return <span style={style} className="event-label"
+                     ref={(c) => this._predictedLabel = c}
+                     data-toggle="tooltip"
+                     title={isSelected ?
+                            Text.predictionTooltip(label.score) : null}
+                     onClick={() => {
+                       isSelected ? this.toggleOff() : this.toggleOn()
+                     }}>
+          { isSelected ?
+            <i className="fa fa-fw fa-tag" /> :
+            <i className="fa fa-fw fa-question-circle" />
+          }{" "}
+          {label.label}{" "}
+          <span className="label-score">
+            { isSelected ? <i className="fa fa-fw fa-check" /> :
+              Util.roundStr(label.score * 100, 0) + "%" }
+          </span>
+        </span>;
+      }
+
+      return <span style={style} className="event-label"
+                   onClick={() => {
+                     isSelected ? this.toggleOff() : this.toggleOn()
+                   }}>
+        <i className="fa fa-fw fa-tag" />{" "}
+        {this.props.label.label}
+      </span>;
+    }
+
+    componentDidMount() {
+      this.mountTooltip();
+    }
+
+    componentDidUpdate() {
+      this.mountTooltip();
+    }
+
+    mountTooltip() {
+      if (this._predictedLabel) {
+        $(this._predictedLabel).tooltip();
+      }
+    }
+
+    isSelected() {
+      return !!_.find(this.props.event.labels_norm,
+        (n) => n === this.props.label.label_norm
+      );
+    }
+
+    toggleOn() {
+      EventLabelChange.add([this.props.event], this.props.label.label);
+    }
+
+    toggleOff() {
+      EventLabelChange.remove([this.props.event], this.props.label.label);
     }
   }
 
@@ -155,24 +280,12 @@ module Esper.Components {
     // Extend provided props with defaults for modal
     getProps(): Props {
       var newProps = _.clone(this.props);
-      newProps.onLabelClick = newProps.onLabelClick ||
-        function(event: Events2.TeamEvent, label_norm: string) {
-          Route.nav.path("/list", {
-            jsonQuery: {
-              labels: {
-                all: false,
-                none: false,
-                some: [label_norm],
-                unmatched: false
-              }
-            }
-          })
-        };
-
-      newProps.onEventClick = newProps.onEventClick ||
+      newProps.onAddLabelClick = newProps.onAddLabelClick ||
         function(event: Events2.TeamEvent) {
           Layout.renderModal(Containers.eventEditorModal([event]));
         };
+      newProps.onEventClick = newProps.onEventClick ||
+                              newProps.onAddLabelClick;
       return newProps;
     }
   }
