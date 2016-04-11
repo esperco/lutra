@@ -5,6 +5,9 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Components {
+  const PREDICTED_LABEL_COUNT_CUTOFF = 3;
+  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
+
   interface Props {
     events: Events2.TeamEvent[];
     selectedEvents?: Events2.TeamEvent[];
@@ -159,8 +162,11 @@ module Esper.Components {
         initLabelList: ((event: Events2.TeamEvent) =>
           Util.notEmpty(props.event.labels_norm) ?
           labelsFomEvent(event) :
-          ( Util.notEmpty(props.event.predicted_labels) ?
-            props.event.predicted_labels : [] )
+          (() => {
+            var predicted = _.filter(props.event.predicted_labels,
+              (l) => l.score > PREDICTED_LABEL_PERCENT_CUTOFF);
+            return predicted.slice(0, PREDICTED_LABEL_COUNT_CUTOFF);
+          })()
         )(props.event)
       }
     }
