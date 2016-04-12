@@ -1,5 +1,4 @@
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Components.LoginInfo.tsx" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Views {
@@ -103,14 +102,8 @@ module Esper.Views {
           <i className="fa fa-fw fa-legal"></i>{" "}
           Terms
         </a></li>,
-        <li key="6"><a onClick={
-            () => { Layout.renderModal(<Components.Invite />) }
-          }>
-          <i className="fa fa-fw fa-users"></i>{" "}
-          Invite Your Contacts
-        </a></li>,
-        <li key="7" className="divider" />,
-        <li key="8"><a onClick={() => Login.goToLogout()}>
+        <li key="6" className="divider" />,
+        <li key="7"><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
           Logout
         </a></li>

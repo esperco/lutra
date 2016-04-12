@@ -3,7 +3,6 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Invite.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../common/Components.Dropdown.tsx" />
 /// <reference path="../common/Login.ts" />
