@@ -6,7 +6,8 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-var EventEmitter  = require("eventemitter3"),
+var classNames    = require("classnames"),
+    EventEmitter  = require("eventemitter3"),
     fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
@@ -39,10 +40,11 @@ inject({jQuery: jQuery, $: jQuery}, function() {
 // Create a global Esper object with our vendor dependencies
 /* global Esper: true */
 /* global window: false */
-Esper = (function(esperObj) {
+window.Esper = Esper = (function(esperObj) {
   var assignments = {
     _:            lodash.noConflict(),
     $:            jQuery,
+    classNames:   classNames,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,

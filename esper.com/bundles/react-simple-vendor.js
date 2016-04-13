@@ -6,7 +6,8 @@
 // Helpers
 var inject        = require("../../build-helpers/depends").inject;
 
-var EventEmitter  = require("eventemitter3"),
+var classNames    = require("classnames"),
+    EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
@@ -35,6 +36,7 @@ Esper = (function(esperObj) {
   var assignments = {
     _:            lodash.noConflict(),
     $:            jQuery,
+    classNames:   classNames,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
