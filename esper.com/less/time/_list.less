@@ -1,6 +1,10 @@
 @import "../lib/_bootstrap-variables.less";
 
 @event-checkbox-width: 28px;
+@today-color: @brand-bg;
+@unlabeled-color: @list-group-border;
+@labeled-color: @brand-primary;
+@past-event-background: @gray-lighter;
 
 .list-selectors {
   padding: 0 @padding-small-horizontal;
@@ -58,7 +62,8 @@
 
 .list-filter-msg, .list-action-menu {
   margin: @padding-base-vertical 0;
-  padding: @padding-base-vertical @padding-large-horizontal;
+  padding: @padding-base-vertical
+    (@padding-large-horizontal + @border-radius-base);
   border-radius: @border-radius-base;
 
   @media (max-width: @screen-xs-max) {
@@ -126,9 +131,30 @@
       font-weight: bold;
       margin-bottom: @padding-small-vertical;
       padding: 0 @padding-small-horizontal;
+      color: @gray-light;
+    }
+
+    &.future {
+      .day-title { color: @gray-dark; }
+    }
+
+    &.today {
+      .day-title {
+        color: @today-color;
+      }
     }
 
     .event {
+      border-left: @border-radius-base solid @unlabeled-color;
+
+      &.has-labels {
+        border-left: @border-radius-base solid @labeled-color;
+      }
+
+      &.past {
+        background: @past-event-background;
+      }
+
       .event-checkbox + .event-content {
         margin-left: @event-checkbox-width;
       }

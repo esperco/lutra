@@ -57,7 +57,10 @@ module Esper.Components {
 
     renderEvent(event: Events2.TeamEvent) {
       return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
-                  className="list-group-item event">
+                  className={classNames("list-group-item event", {
+                    "has-labels": event.labels_norm.length > 0,
+                    "past": moment(event.end).diff(moment()) < 0
+                  })}>
         {
           this.props.onEventToggle ?
           <div className="event-checkbox"
