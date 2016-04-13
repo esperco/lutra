@@ -3,6 +3,7 @@
     "MediaStream": "github:esperco/DefinitelyTyped/webrtc/MediaStream.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "bootstrap": "github:esperco/DefinitelyTyped/bootstrap/bootstrap.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "chrome": "github:esperco/DefinitelyTyped/chrome/chrome.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
+    "classnames": "registry:dt/classnames#0.0.0+20160316155526",
     "cryptojs": "github:esperco/DefinitelyTyped/cryptojs/cryptojs.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "es6-promise": "github:esperco/DefinitelyTyped/es6-promise/es6-promise.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "eventemitter3": "github:esperco/DefinitelyTyped/eventemitter3/eventemitter3.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
