@@ -44,7 +44,10 @@ module Esper.Components {
 
     renderDay(timestamp: number, events: Events2.TeamEvent[]) {
       var m = moment(timestamp);
-      return <div className="day" key={timestamp}>
+      return <div className={classNames('day', {
+        today: Time.sameDay(m, moment()),
+        future: Time.diffDay(m, moment()) > 0,
+      })} key={timestamp}>
         <div className="day-title">{ m.format("MMM D - dddd") }</div>
         <div className="list-group">
           { _.map(events, (e) => this.renderEvent(e)) }

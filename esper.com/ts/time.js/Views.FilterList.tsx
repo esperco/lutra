@@ -24,6 +24,7 @@ module Esper.Views {
     _actionMenuOffset: number;
     _editModalId: number;
     _editModalEvents: Events2.TeamEvent[];
+    _goToTodayOnUpdate: boolean;
 
     // Use state to track selected events -- reset everytime props change
     constructor(props: FilterListProps) {
@@ -40,6 +41,12 @@ module Esper.Views {
 
     componentDidMount() {
       $(window).scroll(this.pinActions.bind(this));
+    }
+
+    componentDidUpdate() {
+      if (this._goToTodayOnUpdate) {
+        this.goToToday();
+      }
     }
 
     componentWillUnmount() {
@@ -263,6 +270,12 @@ module Esper.Views {
             </div> :
             null
           }
+          <div className="action" onClick={() => this.goToToday()}>
+            <i className="fa fa-fw fa-calendar-o" />
+            <span className="hidden-xs">
+              {" "}Today
+            </span>
+          </div>
           <div className="pull-right">
             { this.getStats() }
             <div className="action"
@@ -272,6 +285,26 @@ module Esper.Views {
           </div>
         </div>
       </div>
+    }
+
+    // Scroll to today (or next day if no event today) -- only if we haven't
+    // scrolled once for this day
+    goToToday() {
+      var current = Period.current(this.props.period.interval);
+      if (this.props.period.index === current.index) {
+        var target = this.find(".today, .future").first().offset();
+        if (target && target.top) {
+           $('html, body').animate({
+            scrollTop: target.top - 150 // To account for header
+          }, 600);
+          this._goToTodayOnUpdate = false;
+        }
+      } else {
+        // Wrong month -> go this month and then call this function again
+        // after data loads
+        this._goToTodayOnUpdate = true;
+        this.updateRoute({period: current});
+      }
     }
 
     getStats() {
