@@ -583,7 +583,6 @@ module Esper.ApiT {
     use_duplicate_events: boolean;
     delete_holds_inquiry: boolean;
     bcc_exec_on_reply: boolean;
-    exec_daily_agenda: boolean;
     current_timezone: string;
     hold_event_color?: CalendarEventColor;
   }

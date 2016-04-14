@@ -125,7 +125,6 @@ module Esper.Preferences {
         send_exec_reminder: false,
         use_duplicate_events: false,
         bcc_exec_on_reply: true,
-        exec_daily_agenda: false
       }
     };
 
