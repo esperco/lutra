@@ -309,7 +309,8 @@ module Esper.Views {
           none: true,
           some: [],
           unmatched: false
-        }
+        },
+        filterStr: ""
       });
     }
 
@@ -504,7 +505,7 @@ module Esper.Views {
     reset() {
       clearTimeout(this._timeout);
       this.setState({ value: null });
-      this.props.onUpdate(null);
+      this.props.onUpdate("");
     }
 
     componentWillReceiveProps(nextProps: FilterStrProps) {
