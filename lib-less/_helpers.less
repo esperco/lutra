@@ -503,6 +503,40 @@ flexibility with non-UL elements */
   white-space: nowrap; // as with > li > a
 }
 
+// Imitates a bootstrap select menu or input but is really a div
+.esper-selector.form-control {
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  float: none;
+  position: relative;
+
+  &:focus, &:hover {
+    border: 1px solid @link-color;
+    z-index: 10;
+  }
+
+  .pull-right, .pull-left {
+    line-height: @line-height-base;
+  }
+
+  .fa-caret-down {
+    color: @gray-light;
+  }
+
+  .esper-selector-content {
+    position: absolute;
+    top: @padding-base-vertical;
+    bottom: @padding-base-vertical;
+    left: @padding-base-horizontal;
+    right: @padding-base-horizontal;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 
 /* Use esper-collapse for drawers or collapsible objects on mobile */
 

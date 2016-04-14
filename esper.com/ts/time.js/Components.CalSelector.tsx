@@ -6,6 +6,7 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
+/// <reference path="../common/Components.Selector.tsx" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
@@ -148,10 +149,9 @@ module Esper.Components {
       return <DropdownModal
               ref={ (c) => this._dropdownModal = c }
               keepOpen={ this.props.allowMulti }>
-        <input type="text" id={this.props.id || this.getId("")}
-               className="form-control dropdown-toggle end-of-group"
-               readOnly={true}
-               value={ selectedText } />
+        <Selector id={this.props.id} className="dropdown-toggle end-of-group">
+          { selectedText }
+        </Selector>
         { super.render() }
       </DropdownModal>;
     }

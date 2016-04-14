@@ -31,7 +31,7 @@
 }
 
 // Animations
-.btn-primary, .btn-secondary, .btn-tertiary {
+.btn {
   transition: color 0.5s, border 0.5s, background-color 0.5s;
 }
 
@@ -40,9 +40,40 @@
 .button-secondary { .btn-secondary }
 .button-tertiary { .btn-tertiary }
 
+
+
 /*
   Minor tweaks to Bootstrap classes that don't normally make sense otherwise
+  (or for stylistic reasons)
 */
+
+// Override .btn-default
+.btn-default:hover, .btn-default:focus {
+  border: 1px solid @link-color;
+  color: @link-color;
+  background: @btn-default-bg;
+  outline: none;
+
+  .input-group & {
+    z-index: 10; // So border stands out
+  }
+}
+
+input.form-control, textarea.form-control {
+  &:focus, &:hover {
+    outline: none;
+    border: 1px solid @link-color;
+    box-shadow: none;
+    z-index: 10;
+  }
+
+  .input-group & {
+    z-index: 10; // So border stands out
+  }
+}
+
+
+////
 
 .container-fluid.padded {
   padding-left: @padding-base-horizontal;

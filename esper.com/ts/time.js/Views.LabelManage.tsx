@@ -7,6 +7,7 @@
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
+/// <reference path="../common/Components.SelectMenu.tsx" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./BatchLabelChange.ts" />
 /// <reference path="./Components.LabelEditor2.tsx" />
@@ -250,31 +251,29 @@ module Esper.Views {
     }
 
     renderTeamSelector() {
-      var allTeamIds = Teams.allIds() || [];
+      var teamOptions = _.map(Teams.all(), (t) => ({
+        val: t.teamid,
+        display: t.team_name
+      }));
       var loginInfo = Login.InfoStore.val();
       var isNylas = loginInfo.platform === "Nylas";
-      if (allTeamIds.length > 1) {
+      if (teamOptions.length > 1) {
         return <div className="form-group">
           <label htmlFor={this.getId("team-select")} className="control-label">
             { isNylas ? "Calendar Owner" : "Executive Team" }
           </label>
-          <select className="form-control"
-                  value={this.props.teamId}
-                  onChange={this.changeTeam.bind(this)}>
-            {_.map(allTeamIds, (_id) => {
-              var t = Teams.get(_id);
-              if (t) {
-                return <option key={_id} value={_id}>{t.team_name}</option>;
-              }
-            })}
-          </select>
+          <Components.SelectMenu
+            id={this.getId("team-select")}
+            options={teamOptions}
+            onChange={(id) => this.changeTeam(id)}
+            selected={this.props.teamId}
+          />
         </div>;
       }
     }
 
-    changeTeam(event: Event) {
-      var target = event.target as HTMLOptionElement;
-      Route.nav.path("/labels/" + target.value);
+    changeTeam(id: string) {
+      Route.nav.path("/labels/" + id);
     }
 
     componentDidUpdate(prevProps: LabelManageProps, prevState: LabelManageState) {

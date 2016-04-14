@@ -4,6 +4,7 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
+/// <reference path="../common/Components.Selector.tsx" />
 /// <reference path="./Labels.ts" />
 
 module Esper.Components {
@@ -176,9 +177,9 @@ module Esper.Components {
         <i className="fa fa-fw fa-tag" />
       </span>
       <DropdownModal keepOpen={true}>
-        <input type="text" className="form-control dropdown-toggle end-of-group"
-               data-toggle="dropdown" readOnly={true}
-               value={ selectedText } />
+        <Selector className="dropdown-toggle end-of-group">
+          { selectedText }
+        </Selector>
         {
           LabelSelector(_.extend({
             className: "dropdown-menu"

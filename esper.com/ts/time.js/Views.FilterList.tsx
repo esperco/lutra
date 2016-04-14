@@ -179,39 +179,21 @@ module Esper.Views {
       var labels = Labels.fromEvents(events, Teams.all());
       labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
-        <div className="esper-clearable">
-          <Components.LabelSelectorDropdown labels={labels}
-            totalCount={events.length}
-            unlabeledCount={Labels.countUnlabeled(events)}
-            selected={this.props.labels.some}
-            allSelected={this.props.labels.all}
-            unlabeledSelected={this.props.labels.none}
-            showUnlabeled={true}
-            updateFn={(x) => this.updateRoute({
-              labels: {
-                all: x.all,
-                none: x.unlabeled,
-                some: x.all ? [] : x.labels,
-                unmatched: false
-              }
-            })} />
-          {
-            !this.props.labels.all ?
-            <span className="esper-clear-action" onClick={
-              () => this.updateRoute({
-                labels: {
-                  all: true,
-                  none: true,
-                  some: [],
-                  unmatched: false
-                }
-              })
-            }>
-              <i className="fa fa-fw fa-times" />
-            </span> :
-            null
-          }
-        </div>
+        <Components.LabelSelectorDropdown labels={labels}
+          totalCount={events.length}
+          unlabeledCount={Labels.countUnlabeled(events)}
+          selected={this.props.labels.some}
+          allSelected={this.props.labels.all}
+          unlabeledSelected={this.props.labels.none}
+          showUnlabeled={true}
+          updateFn={(x) => this.updateRoute({
+            labels: {
+              all: x.all,
+              none: x.unlabeled,
+              some: x.all ? [] : x.labels,
+              unmatched: false
+            }
+          })} />
       </div>;
     }
 
