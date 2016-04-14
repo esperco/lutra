@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../common/Components.Selector.tsx" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
 
 module Esper.Components {
@@ -83,9 +84,10 @@ module Esper.Components {
           null
         }
         <DropdownModal>
-          <input type="text" id={this.props.id || this.getId("")}
-                 className="form-control dropdown-toggle" readOnly={true}
-                 value={ periodStrs[selectedIndex] } />
+          <Selector id={this.props.id || this.getId("")}
+                    className="dropdown-toggle">
+            { periodStrs[selectedIndex] }
+          </Selector>
           <ul className="dropdown-menu">
             {
               _.map(periodStrs, (p, i) =>

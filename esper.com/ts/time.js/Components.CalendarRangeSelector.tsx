@@ -4,6 +4,7 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Components.DropdownModal.tsx" />
+/// <reference path="../common/Components.Selector.tsx" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Components.CalendarDaySelector.tsx" />
 
@@ -126,10 +127,9 @@ module Esper.Components {
       return <DropdownModal
               ref={ (c) => this._dropdownModal = c }
               keepOpen={true}>
-        <input type="text" id={this.getId("")}
-               className="form-control dropdown-toggle end-of-group"
-               readOnly={true}
-               value={ selectedText } />
+        <Selector id={this.getId("")} className="dropdown-toggle">
+          { selectedText }
+        </Selector>
         <div className="dropdown-menu calendar-selector-menu">
           { React.createElement(CalendarRangeSelector, this.props) }
         </div>

@@ -88,9 +88,11 @@ module Esper.Views {
           </a>
         </label>
         <Components.DropdownModal>
-          <input type="text" id={this.getId("chart-type")}
-                 className="form-control dropdown-toggle" readOnly={true}
-                 value={ selected.displayAs } />
+          <Components.Selector id={this.getId("chart-type")}
+                               className="dropdown-toggle end-of-group">
+            <i className={"fa fa-fw " + selected.icon} />{" "}
+            { selected.displayAs }
+          </Components.Selector>
           <ul className="dropdown-menu">
             {
               _.map(this.props.chartTypes, (c, i) =>
