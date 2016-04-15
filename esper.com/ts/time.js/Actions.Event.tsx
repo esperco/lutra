@@ -18,6 +18,10 @@ module Esper.Actions {
       optEvent.match({
         none: () => Route.nav.home(),
         some: (event) => {
+          Analytics.track(Analytics.Trackable.SubmitFeedback, {
+            teamId: teamId,
+            action: action
+          });
           var p = Api.postEventFeedbackAction(teamId, calId, eventId, action)
             .then((feedback: ApiT.EventFeedback) => {
               var newEvent = _.cloneDeep(event);

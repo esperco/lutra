@@ -119,7 +119,10 @@ module Esper.Analytics {
                               // all events)
 
     // Labeling
-    EditEventLabels           // Edit labels for event(s)
+    EditEventLabels,          // Edit labels for event(s)
+
+    // Post-meeting feedback
+    SubmitFeedback            // Submit feedback from within page
   };
 
   // Named pages to track
