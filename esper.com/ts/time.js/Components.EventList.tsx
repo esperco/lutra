@@ -231,7 +231,10 @@ module Esper.Components {
           <span className="add-event-label action"
                 onClick={() => this.props.onAddLabelClick(this.props.event)}>
             {labelList.length ?
-              <i className="fa fa-fw fa-bars" /> :
+              <span>
+                <i className="fa fa-fw fa-tag" />{" "}
+                <i className="fa fa-fw fa-ellipsis-h" />
+              </span> :
               <span>
                 <i className="fa fa-fw fa-plus" />{" "}{Text.AddLabel}
               </span>
