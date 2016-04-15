@@ -4,6 +4,7 @@
 
 /// <reference path="../lib/Model.Batch.ts" />
 /// <reference path="../lib/Queue.ts" />
+/// <reference path="../lib/Save.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../common/Login.ts" />
 /// <reference path="./Esper.ts" />
@@ -71,13 +72,15 @@ module Esper.Teams {
 
   // Create a new team for an executive
   function create(req: ApiT.TeamCreationRequest) {
-    return Api.createTeam(req).then((t) => {
+    var p = Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         upsertTeam(t);
         setDefaultLabels(t.teamid);
       }
       return t;
     });
+    Save.monitor(teamStore, "new-team", p);
+    return p;
   }
 
   var defaultTeamDfd: JQueryDeferred<ApiT.Team> = $.Deferred();

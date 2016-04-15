@@ -42,6 +42,18 @@ module Esper.Model2 {
     lastError?: Error;
   }
 
+  // Push callback gets called whenever a push to a store happens
+  // Used by Save.ts
+  interface PushCallback<K> {
+    (s: Store<K, any>, k: K, p: JQueryPromise<any>): void;
+  }
+
+  var pushCallbacks: PushCallback<any>[] = [];
+
+  export function registerPushCallback<K>(fn: PushCallback<K>) {
+    pushCallbacks.push(fn);
+  }
+
 
   ////////////
 
@@ -375,6 +387,11 @@ module Esper.Model2 {
     pushFetch(_id: TKey, promise: JQueryPromise<Option.T<TData>>,
               initData?: Option.T<TData>)
     {
+      // Call push callbacks if applicable
+      _.each(pushCallbacks,
+        (cb: PushCallback<TKey>) => cb(this, _id, promise)
+      );
+
       // Set to INFLIGHT and populate with initData (if any)
       this.set(_id, Util.some(initData, this.getData(_id)), {
         dataStatus: Model.DataStatus.INFLIGHT
