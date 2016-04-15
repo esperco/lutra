@@ -2,6 +2,7 @@
   Basic component for rendering a list of events
 */
 
+/// <reference path="../common/Components.SignalStrength.tsx" />
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Components {
@@ -223,8 +224,8 @@ module Esper.Components {
         return <span style={style} className="event-label"
                      ref={(c) => this._predictedLabel = c}
                      data-toggle="tooltip"
-                     title={isSelected ?
-                            Text.predictionTooltip(label.score) : null}
+                     title={isSelected ? null :
+                            Text.predictionTooltip(label.score)}
                      onClick={() => {
                        isSelected ? this.toggleOff() : this.toggleOn()
                      }}>
@@ -235,7 +236,7 @@ module Esper.Components {
           {label.label}{" "}
           <span className="label-score">
             { isSelected ? <i className="fa fa-fw fa-check" /> :
-              Util.roundStr(label.score * 100, 0) + "%" }
+              <SignalStrength strength={label.score} /> }
           </span>
         </span>;
       }
