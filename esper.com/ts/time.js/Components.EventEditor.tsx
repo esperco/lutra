@@ -57,7 +57,7 @@ module Esper.Components {
       var heading = (this.props.eventData.length === 1 ?
         this.props.eventData[0].data.match({
           none: () => "",
-          some: (e) => e.title
+          some: (e) => e.title || Text.NoEventTitle
         }) || "1 Event Selected" :
         this.props.eventData.length + " Events Selected"
       );

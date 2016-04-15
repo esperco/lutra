@@ -60,7 +60,13 @@
   }
 }
 
-.list-filter-msg, .list-action-menu {
+// An empty object that only gets rendered when action menu is pinned
+.list-action-menu-filler {
+  height: @line-height-computed;
+  box-sizing: content-box;
+}
+
+.list-filter-msg, .list-action-menu, .list-action-menu-filler {
   margin: @padding-base-vertical 0;
   padding: @padding-base-vertical
     (@padding-large-horizontal + @border-radius-base);

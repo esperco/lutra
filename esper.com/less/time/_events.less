@@ -43,12 +43,27 @@
 
   .description {
     padding-top: @padding-small-vertical;
+    max-height: 5em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+
+    &:focus, &:hover {
+      max-height: none;
+      display: block;
+    }
   }
 }
 
 .title, .fc-event, .fc-event:hover {
   &.no-attend {
     text-decoration: line-through;
+  }
+
+  .no-title {
+    font-style: italic;
+    font-size: 90%;
   }
 }
 

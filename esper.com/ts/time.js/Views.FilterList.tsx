@@ -101,7 +101,8 @@ module Esper.Views {
 
       if (this.props.filterStr) {
         events = _.filter(events,
-          (e) => _.includes(e.title.toLowerCase(),
+          (e) => e.title &&
+                 _.includes(e.title.toLowerCase(),
                             this.props.filterStr.toLowerCase())
         );
       }
@@ -128,6 +129,8 @@ module Esper.Views {
           </div>
         </div>
         { this.renderActionMenu(filteredEvents) }
+        { this.state.actionsPinned ?
+          <div className="list-action-menu-filler" /> : null }
         { hiddenEvents ? this.renderFilterMsg(hiddenEvents) : null }
         { (() => {
           if (eventData.hasError) {
@@ -275,6 +278,9 @@ module Esper.Views {
       var current = Period.current(this.props.period.interval);
       if (this.props.period.index === current.index) {
         var target = this.find(".today, .future").first().offset();
+        if (!target || !target.top) {
+          target = this.find(".day").last().offset();
+        }
         if (target && target.top) {
            $('html, body').animate({
             scrollTop: target.top - 150 // To account for header

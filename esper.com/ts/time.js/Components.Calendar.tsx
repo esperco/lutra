@@ -217,7 +217,7 @@ module Esper.Components {
 
         var ret: EventObjectPlus = {
           id: i,
-          title: event.title || "",
+          title: (event.title || Text.NoEventTitle),
           allDay: event.all_day,
           start: this.adjustTz(event.start, event.timezone),
           end: this.adjustTz(event.end, event.timezone),
