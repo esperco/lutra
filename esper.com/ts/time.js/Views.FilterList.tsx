@@ -326,8 +326,10 @@ module Esper.Views {
     }
 
     renderMain(events: Events2.TeamEvent[]) {
+      var teams = Events2.getTeams(events);
       return <Components.EventList
         events={events}
+        teams={teams}
         selectedEvents={this.state.selected}
         onEventClick={(event) => this.editEvent(event)}
         onAddLabelClick={(event) => this.editEvent(event)}

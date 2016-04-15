@@ -14,7 +14,7 @@ module Esper.Teams {
   export var allTeamsStore = new Model.BatchStore(teamStore, 1);
   var batchKey = "";
 
-  export function get(teamId: string, ensure=false): ApiT.Team {
+  export function get(teamId: string): ApiT.Team {
     return teamStore.val(teamId);
   }
 
@@ -163,6 +163,13 @@ module Esper.Teams {
   function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
     // Store values immutable so clone
     var teamCopy = _.cloneDeep(team);
+
+    /*
+      Alphabetize when setting labels (better performance to sort now
+      than in the gajillion places where we pull a list of team labels)
+    */
+    labels = _.sortBy(labels, Labels.normalizeForSort);
+
     teamCopy.team_labels = labels;
     teamCopy.team_labels_norm = _.map(labels, getNormLabel);
     nextLabelUpdates[_id] = labels;

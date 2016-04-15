@@ -2,15 +2,17 @@
   Basic component for rendering a list of events
 */
 
+/// <reference path="../common/Components.SignalStrength.tsx" />
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Components {
-  const PREDICTED_LABEL_COUNT_CUTOFF = 3;
+  const LABEL_COUNT_CUTOFF = 5;
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
 
   interface Props {
     events: Events2.TeamEvent[];
     selectedEvents?: Events2.TeamEvent[];
+    teams: ApiT.Team[];
     onEventToggle?: (event: Events2.TeamEvent) => void;
     onEventClick?: (event: Events2.TeamEvent) => void;
     onAddLabelClick?: (event: Events2.TeamEvent) => void;
@@ -100,10 +102,15 @@ module Esper.Components {
           </div>
           <div className="event-labels">
             <LabelList event={event}
+                       team={this.getTeam(event)}
                        onAddLabelClick={this.props.onAddLabelClick} />
           </div>
         </div>
       </div>;
+    }
+
+    getTeam(event: Events2.TeamEvent) {
+      return _.find(this.props.teams, (t) => t.teamid === event.teamId);
     }
 
     ////////
@@ -142,11 +149,19 @@ module Esper.Components {
     }));
   }
 
+  function labelsFromTeam(team: ApiT.Team) {
+    return _.map(team.team_labels_norm, (n, i) => ({
+      label: team.team_labels[i],
+      label_norm: n
+    }));
+  }
+
 
   /////
 
   interface LabelListProps {
     event: Events2.TeamEvent;
+    team: ApiT.Team;
     onAddLabelClick?: (event: Events2.TeamEvent) => void;
   }
 
@@ -168,13 +183,36 @@ module Esper.Components {
         initLabelList: ((event: Events2.TeamEvent) =>
           Util.notEmpty(props.event.labels_norm) ?
           labelsFomEvent(event) :
-          (() => {
-            var predicted = _.filter(props.event.predicted_labels,
-              (l) => l.score > PREDICTED_LABEL_PERCENT_CUTOFF);
-            return predicted.slice(0, PREDICTED_LABEL_COUNT_CUTOFF);
-          })()
+          this.getInitLabels(props)
         )(props.event)
       }
+    }
+
+    /*
+      If new labels outside of the initial list are assigned, that means
+      user has added labels from outside the label toggle interface, so
+      reset our initial toggle list.
+    */
+    componentWillReceiveProps(props: LabelListProps) {
+      var eventLabels = labelsFomEvent(props.event);
+      if (_.differenceBy(eventLabels, this.state.initLabelList,
+          (l) => l.label_norm).length > 0) {
+        this.setState({ initLabelList: eventLabels })
+      }
+    }
+
+    // Returns a combination of predicted labels and team labels,
+    // up to threshold, for selection purposes.
+    getInitLabels(props: LabelListProps): LabelOrPredicted[] {
+      var ret: LabelOrPredicted[] =
+        _.filter(props.event.predicted_labels,
+          (l) => l.score > PREDICTED_LABEL_PERCENT_CUTOFF
+        );
+      if (ret.length < LABEL_COUNT_CUTOFF) {
+        ret = _.uniqBy(ret.concat(labelsFromTeam(props.team)),
+          (l) => l.label_norm)
+      }
+      return ret.slice(0, LABEL_COUNT_CUTOFF);
     }
 
     render() {
@@ -192,8 +230,15 @@ module Esper.Components {
         { this.props.onAddLabelClick ?
           <span className="add-event-label action"
                 onClick={() => this.props.onAddLabelClick(this.props.event)}>
-            <i className="fa fa-fw fa-plus" />
-            {labelList.length ? null : Text.AddLabel}
+            {labelList.length ?
+              <span>
+                <i className="fa fa-fw fa-tag" />{" "}
+                <i className="fa fa-fw fa-ellipsis-h" />
+              </span> :
+              <span>
+                <i className="fa fa-fw fa-plus" />{" "}{Text.AddLabel}
+              </span>
+            }
           </span> : null }
       </div>;
     }
@@ -212,7 +257,8 @@ module Esper.Components {
       var labelColor = Colors.getColorForLabel(this.props.label.label_norm);
       var isSelected = this.isSelected();
       var style = (() => ({
-        border: "1px solid " + labelColor,
+        borderStyle: "solid",
+        borderColor: labelColor,
         background: isSelected ? labelColor : "transparent",
         color: isSelected ? Colors.colorForText(labelColor) :
                             Colors.darken(labelColor)
@@ -220,11 +266,11 @@ module Esper.Components {
 
       var label = this.props.label;
       if (isPredictedLabel(label)) {
-        return <span style={style} className="event-label"
+        return <span style={style} className="event-label predicted-label"
                      ref={(c) => this._predictedLabel = c}
                      data-toggle="tooltip"
-                     title={isSelected ?
-                            Text.predictionTooltip(label.score) : null}
+                     title={isSelected ? null :
+                            Text.predictionTooltip(label.score)}
                      onClick={() => {
                        isSelected ? this.toggleOff() : this.toggleOn()
                      }}>
@@ -235,7 +281,7 @@ module Esper.Components {
           {label.label}{" "}
           <span className="label-score">
             { isSelected ? <i className="fa fa-fw fa-check" /> :
-              Util.roundStr(label.score * 100, 0) + "%" }
+              <SignalStrength strength={label.score} /> }
           </span>
         </span>;
       }

@@ -347,4 +347,13 @@ module Esper.Events2 {
       _.map(getGuestEmails(event), (email) => email.split('@')[1])
     );
   }
+
+  export function getTeams(events: TeamEvent[]) {
+    // Get the team(s) for events
+    return _(events)
+      .map((e) => e.teamId)
+      .uniq()
+      .map((teamId) => Teams.require(teamId))
+      .value();
+  }
 }

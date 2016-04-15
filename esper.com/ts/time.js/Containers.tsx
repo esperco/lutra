@@ -44,7 +44,10 @@ module Esper.Containers {
             .flatMap((storeData) => storeData.data)
           )
       );
-      return <Components.EventListModal events={events} />
+
+      // Get the team(s) for events
+      var teams = Events2.getTeams(events);
+      return <Components.EventListModal events={events} teams={teams} />
     });
   }
 }
