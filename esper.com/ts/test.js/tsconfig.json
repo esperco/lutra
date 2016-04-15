@@ -14,7 +14,6 @@
     "../lib/Test.ts",
     "../lib/ApiC.Test.ts",
     "../lib/Util.Test.ts",
-    "../lib/Emit.Test.ts",
     "../lib/LocalStore.Test.ts",
     "../lib/Model.Test.ts",
     "../lib/Model.Capped.Test.ts",
