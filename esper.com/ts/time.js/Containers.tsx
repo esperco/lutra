@@ -7,6 +7,7 @@
 module Esper.Containers {
   export function eventEditorModal(events: Events2.TeamEvent[], opts?: {
     minFeedback?: boolean;
+    onDone?: () => void;
   }) {
     opts = opts || { minFeedback: true };
     return ReactHelpers.contain(function() {
@@ -30,7 +31,9 @@ module Esper.Containers {
       return <Components.EventEditorModal
         eventData={eventData}
         teamPairs={teamPairs}
+        focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
+        onDone={opts.onDone}
       />;
     })
   }
@@ -47,7 +50,30 @@ module Esper.Containers {
 
       // Get the team(s) for events
       var teams = Events2.getTeams(events);
-      return <Components.EventListModal events={events} teams={teams} />
+
+      // Set up actions so that hitting "done" goes back to the list
+      var backFn = () => Layout.renderModal(eventListModal(events));
+      var labelFn = (event: Events2.TeamEvent) =>
+        Layout.renderModal(
+          eventEditorModal([event], {
+            minFeedback: true,
+            onDone: backFn
+          })
+        );
+      var feedbackFn = (event: Events2.TeamEvent) =>
+        Layout.renderModal(
+          eventEditorModal([event], {
+            minFeedback: false,
+            onDone: backFn
+          })
+        );
+
+      return <Components.EventListModal
+        events={events} teams={teams}
+        onEventClick={labelFn}
+        onAddLabelClick={labelFn}
+        onFeedbackClick={feedbackFn}
+      />;
     });
   }
 }

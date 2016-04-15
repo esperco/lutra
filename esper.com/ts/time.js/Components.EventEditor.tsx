@@ -65,7 +65,8 @@ module Esper.Components {
       return <Modal icon="fa-calendar-o" title={heading}>
         <EventEditor eventData={this.props.eventData}
                      teamPairs={this.props.teamPairs}
-                     onDone={() => Layout.closeModal()}
+                     onDone={() => (this.props.onDone || Layout.closeModal)()}
+                     focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />
       </Modal>;
     }
@@ -188,7 +189,8 @@ module Esper.Components {
         { this.renderRating(event) }
         <textarea id={this.getId("notes")} placeholder="Notes"
           ref={(ref) => this.inputNotes = ref}
-          className="form-control" value={this.state.notes}
+          className="form-control esper-modal-focus"
+          value={this.state.notes}
           onChange={(e) => this.notesChange(e)}
         />
       </Components.ModalPanel>;
