@@ -120,6 +120,7 @@ module Esper.Components {
 
     renderLabelInput(events: Events2.TeamEvent[]) {
       return <LabelInput
+        className={ this.props.autoFocus ? "esper-modal-focus" : null }
         onSubmit={(val) => {
           if (this.state.labelSelected) {
             if (_.every(events,
@@ -215,6 +216,7 @@ module Esper.Components {
   ///////
 
   interface LabelInputProps {
+    className?: string;
     onSubmit: (val: string) => string;
 
     // Triggered by user typing (not changes by onSubmit, onUp, onDown)
@@ -239,8 +241,9 @@ module Esper.Components {
           Find / Add Labels
         </label>
         <div className="input-group">
-          <div className={ this.state.value ? "esper-clearable" : "" }>
-            <input type="text" className="form-control"
+          <div className={this.state.value ? "esper-clearable" : ""}>
+            <input type="text"
+                   className={classNames("form-control", this.props.className)}
                    id={this.getId("new-labels")}
                    onKeyDown={this.inputKeydown.bind(this)}
                    onChange={(e) => this.onChange(e)}

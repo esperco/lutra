@@ -333,21 +333,23 @@ module Esper.Views {
         selectedEvents={this.state.selected}
         onEventClick={(event) => this.editEvent(event)}
         onAddLabelClick={(event) => this.editEvent(event)}
+        onFeedbackClick={(event) => this.editEvent(event, false)}
         onEventToggle={(event) => this.toggleEvent(event)}
       />;
     }
 
-    editEvent(event: Events2.TeamEvent) {
-      this.renderModal([event]);
+    editEvent(event: Events2.TeamEvent, minFeedback=true) {
+      this.renderModal([event], minFeedback);
     }
 
     editSelectedEvents() {
       this.renderModal(this.state.selected);
     }
 
-    renderModal(events: Events2.TeamEvent[]) {
+    renderModal(events: Events2.TeamEvent[], minFeedback=true) {
       this._editModalEvents = events;
-      this._editModalId = Layout.renderModal(this.getModal(events));
+      this._editModalId = Layout.renderModal(
+        this.getModal(events, minFeedback));
     }
 
     updateModal() {
@@ -361,7 +363,7 @@ module Esper.Views {
       }
     }
 
-    getModal(events: Events2.TeamEvent[]) {
+    getModal(events: Events2.TeamEvent[], minFeedback=true) {
       // Refresh data from store before rendering modal
       var eventData = _(events)
         .map((e) => Events2.EventStore.get({
@@ -381,7 +383,8 @@ module Esper.Views {
 
       return <Components.EventEditorModal eventData={eventData}
                                           teamPairs={teamPairs}
-                                          minFeedback={true} />;
+                                          focusOnLabels={minFeedback}
+                                          minFeedback={minFeedback} />;
     }
 
     toggleEvent(event: Events2.TeamEvent) {

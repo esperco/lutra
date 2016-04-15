@@ -15,6 +15,7 @@ module Esper.Components {
     teams: ApiT.Team[];
     onEventToggle?: (event: Events2.TeamEvent) => void;
     onEventClick?: (event: Events2.TeamEvent) => void;
+    onFeedbackClick?: (event: Events2.TeamEvent) => void;
     onAddLabelClick?: (event: Events2.TeamEvent) => void;
   }
 
@@ -94,11 +95,9 @@ module Esper.Components {
               null
             }
           </div>
-          <div className="event-rating">
-            { _.times((event.feedback.attended !== false &&
-                       event.feedback.rating) || 0, (i) =>
-              <i key={i.toString()} className="fa fa-fw fa-star" />
-            )}
+          <div className="action event-feedback"
+               onClick={() => this.handleFeedbackClick(event)}>
+            <EventFeedback feedback={event.feedback} />
           </div>
           <div className="event-labels">
             <LabelList event={event}
@@ -113,6 +112,12 @@ module Esper.Components {
       return _.find(this.props.teams, (t) => t.teamid === event.teamId);
     }
 
+    handleFeedbackClick(event: Events2.TeamEvent) {
+      if (this.props.onFeedbackClick) {
+        this.props.onFeedbackClick(event);
+      }
+    }
+
     ////////
 
     isSelected(event: Events2.TeamEvent) {
@@ -124,6 +129,26 @@ module Esper.Components {
         Events2.matchRecurring(e, event)
       );
     }
+  }
+
+  function EventFeedback({feedback}: {feedback: ApiT.EventFeedback}) {
+    // Check if no feedback
+    if (!feedback || (_.isUndefined(feedback.attended) && !feedback.rating
+        && !feedback.notes)) {
+      return <span />;
+    }
+
+    // Format feedback
+    return <span>
+      { feedback.attended === false ?
+        <i className="fa fa-fw fa-ban" /> :
+        _.times(feedback.rating || 0, (i) =>
+          <i key={i.toString()} className="fa fa-fw fa-star" />
+        )
+      }
+      {" "}
+      { feedback.notes ? <i className="fa fa-fw fa-comment" /> : null }
+    </span>;
   }
 
 

@@ -30,6 +30,7 @@ module Esper.Containers {
       return <Components.EventEditorModal
         eventData={eventData}
         teamPairs={teamPairs}
+        focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
       />;
     })
