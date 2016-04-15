@@ -27,9 +27,30 @@
         color: @btn-default-color;
         background: @btn-default-bg;
 
+        &:hover, {
+          border-color: @link-color;
+          color: @link-color;
+          z-index: 5;
+        }
+
+        &:focus {
+          outline: none;
+        }
+
+        &.fc-state-active, &.fc-state-down {
+          box-shadow: none;
+          text-shadow: none;
+        }
+
         &.fc-state-active {
-          border-color: darken(@btn-default-border, 12%);
-          background-color: darken(@btn-default-bg, 10%);
+          border-color: @brand-bg;
+          background-color: @brand-bg;
+          color: white;
+
+          &:hover {
+            border-color: @brand-bg;
+            color: white;
+          }
         }
 
         .fc-icon {
