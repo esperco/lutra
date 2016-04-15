@@ -268,6 +268,12 @@ module Esper.Components {
     submitFeedback(feedback: ApiT.EventFeedback) {
       var event = _.cloneDeep(this.props.event);
       event.feedback = feedback;
+      Analytics.track(Analytics.Trackable.SubmitFeedback, {
+        teamId: event.teamId,
+        hasRating: !!feedback.rating,
+        hasAttended: !_.isUndefined(feedback.attended),
+        hasNotes: !!feedback.notes
+      });
       var p = Api.postEventFeedback(event.teamId, event.id, event.feedback);
       Events2.EventStore.push(Events2.storeId(event), p, Option.some(event));
       this.setState({lastSavedEvent: event});
