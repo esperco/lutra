@@ -4,6 +4,7 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../common/Components.ModalPanel.tsx" />
+/// <reference path="../common/Components.SelectMenu.tsx" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.RequestExec.tsx" />
 
@@ -190,23 +191,20 @@ module Esper.Views {
         <label htmlFor={selectId} className="control-label">
           Managing Time For &hellip;
         </label>
-        <select id={selectId || ""} className="form-control"
-                value={selectedId}
-                onChange={changeTeamEvent.bind(this)}>
-          { _.map(teams, (t) =>
-            <option key={t.teamid} value={t.teamid}>
-              {t.team_name}
-            </option>)
-          }
-        </select>
+        <Components.SelectMenu
+          options={_.map(teams, (t) => ({
+            val: t.teamid,
+            display: <span>
+              <i className="fa fa-fw fa-user" />
+              {" "}{ t.team_name }
+            </span>
+          }))}
+          selected={selectedId}
+          onChange={(id) => changeTeam(id)}
+        />
       </div>;
     }
     return <span />;
-  }
-
-  function changeTeamEvent(event: Event) {
-    var target = event.target as HTMLOptionElement;
-    changeTeam(target.value);
   }
 
   function changeTeamPromise(p: JQueryPromise<ApiT.Team>) {
