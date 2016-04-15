@@ -20,6 +20,9 @@ module Esper.Labels {
   var displayAsMap: {[index: string]: string} = {};
 
   export function getDisplayAs(norm: string) {
+    if (! norm.trim()) {
+      return "";
+    }
     if (norm === MULTI_LABEL_ID) {
       return MULTI_LABEL_STR;
     }

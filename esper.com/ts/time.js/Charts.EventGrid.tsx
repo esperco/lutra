@@ -77,7 +77,7 @@ module Esper.Charts {
       var lastEnd = moment(date).startOf('day').unix();
       var blocks: {
         seconds: number;
-        event?: Events2.TeamEvent; // No event => open time
+        event: Option.T<Events2.TeamEvent>; // No event => open time
         label: Option.T<string>;
       }[] = []
       _.each(durations, (duration) => {
@@ -85,6 +85,7 @@ module Esper.Charts {
         if (startSeconds > lastEnd) {
           blocks.push({
             seconds: startSeconds - lastEnd,
+            event: Option.none<Events2.TeamEvent>(),
             label: Option.none<string>()
           });
         }
@@ -94,7 +95,7 @@ module Esper.Charts {
         }
         blocks.push({
           seconds: duration.adjustedDuration,
-          event: duration.event,
+          event: Option.some(duration.event),
           label: duration.label
         });
       });
@@ -103,6 +104,7 @@ module Esper.Charts {
       if (lastEnd < endOfDay) {
         blocks.push({
           seconds: endOfDay - lastEnd,
+          event: Option.none<Events2.TeamEvent>(),
           label: Option.none<string>()
         });
       }
@@ -142,10 +144,9 @@ module Esper.Charts {
         }
         return <TimeBlock key={i.toString()} event={b.event}
                           seconds={b.seconds}
-                          label={ b.label.match({
-                            none: () => "",
-                            some: (l) => Labels.getDisplayAs(l)
-                          })}>
+                          label={ b.label.flatMap(
+                            (l) => Option.wrap(Labels.getDisplayAs(l))
+                          )}>
           { segments }
         </TimeBlock>
       });
@@ -158,25 +159,29 @@ module Esper.Charts {
 
   class TimeBlock extends ReactHelpers.Component<{
     seconds: number;
-    event?: Events2.TeamEvent;
-    label?: string;
+    event: Option.T<Events2.TeamEvent>;
+    label: Option.T<string>;
     children?: JSX.Element[];
   }, {}> {
 
     _block: HTMLSpanElement;
 
     render() {
-      var tooltip = "";
-
       // NB: Disable tooltip for unscheduled for now
-      if (this.props.event) {
-        tooltip += this.props.event.title + " @ ";
-        tooltip += Text.time(this.props.event.start) + " / ";
-        tooltip += Text.hours(EventStats.toHours(this.props.seconds))
-        if (this.props.label) {
-          tooltip += " (" + this.props.label + ")";
+      var tooltip = this.props.event.match({
+        none: () => "",
+        some: (event) => {
+          var ret = "";
+          ret += event.title + " @ ";
+          ret += Text.time(event.start) + " / ";
+          ret += Text.hours(EventStats.toHours(this.props.seconds));
+          ret += this.props.label.match({
+            none: () => "",
+            some: (l) => " (" + l + ")"
+          });
+          return ret;
         }
-      }
+      })
 
       return <span className="time-block" ref={(c) => this._block = c }
                    onClick={() => this.onEventClick()}
@@ -187,7 +192,12 @@ module Esper.Charts {
     }
 
     onEventClick() {
-      Layout.renderModal(Containers.eventEditorModal([this.props.event]));
+      this.props.event.match({
+        none: () => null,
+        some: (event) => Layout.renderModal(
+          Containers.eventEditorModal([event])
+        )
+      });
       return false;
     }
 
