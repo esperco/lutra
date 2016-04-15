@@ -49,6 +49,18 @@ module Esper.Model {
     _id: string;
   }
 
+  // Push callback gets called whenever a push to a store happens
+  // Used by Save.ts
+  interface PushCallback {
+    (s: Store<any>, k: string, p: JQueryPromise<any>): void;
+  }
+
+  var pushCallbacks: PushCallback[] = [];
+
+  export function registerPushCallback<K>(fn: PushCallback) {
+    pushCallbacks.push(fn);
+  }
+
 
   ////////////
 
@@ -424,6 +436,9 @@ module Esper.Model {
       data in store pending promise resolution.
     */
     pushFetch(_id: string, promise: JQueryPromise<TData>, initData?: TData) {
+      // Call push callbacks as applicable
+      _.each(pushCallbacks, (cb) => cb(this, _id, promise));
+
       // Set to INFLIGHT and populate with initData (if any)
       this.upsert(_id, function(data, metadata) {
         return [
