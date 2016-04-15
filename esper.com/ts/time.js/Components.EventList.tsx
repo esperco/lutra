@@ -6,7 +6,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Components {
-  const LABEL_COUNT_CUTOFF = 5;
+  const LABEL_COUNT_CUTOFF = 4;
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
 
   interface Props {
@@ -170,6 +170,7 @@ module Esper.Components {
   */
   class LabelList extends ReactHelpers.Component<LabelListProps, {
     initLabelList: LabelOrPredicted[];
+    expanded: boolean;
   }> {
     constructor(props: LabelListProps) {
       super(props);
@@ -180,11 +181,8 @@ module Esper.Components {
         just because the user toggled one.
       */
       this.state = {
-        initLabelList: ((event: Events2.TeamEvent) =>
-          Util.notEmpty(props.event.labels_norm) ?
-          labelsFomEvent(event) :
-          this.getInitLabels(props)
-        )(props.event)
+        initLabelList: this.getInitLabels(props),
+        expanded: false
       }
     }
 
@@ -195,40 +193,47 @@ module Esper.Components {
     */
     componentWillReceiveProps(props: LabelListProps) {
       var eventLabels = labelsFomEvent(props.event);
-      if (_.differenceBy(eventLabels, this.state.initLabelList,
-          (l) => l.label_norm).length > 0) {
-        this.setState({ initLabelList: eventLabels })
+      if (!this.state.expanded &&
+          _.differenceBy(eventLabels, this.state.initLabelList,
+            (l) => l.label_norm).length > 0) {
+        this.setState({
+          initLabelList: eventLabels,
+          expanded: this.state.expanded
+        });
       }
     }
 
     // Returns a combination of predicted labels and team labels,
     // up to threshold, for selection purposes.
     getInitLabels(props: LabelListProps): LabelOrPredicted[] {
+      if (Util.notEmpty(props.event.labels_norm)) {
+        return labelsFomEvent(props.event);
+      }
+
       var ret: LabelOrPredicted[] =
         _.filter(props.event.predicted_labels,
           (l) => l.score > PREDICTED_LABEL_PERCENT_CUTOFF
         );
       if (ret.length < LABEL_COUNT_CUTOFF) {
         ret = _.uniqBy(ret.concat(labelsFromTeam(props.team)),
-          (l) => l.label_norm)
+          (l) => l.label_norm);
       }
       return ret.slice(0, LABEL_COUNT_CUTOFF);
     }
 
     render() {
       var labelList = this.state.initLabelList;
-      var eventList = labelsFomEvent(this.props.event);
-      labelList = labelList.concat(
-        _.differenceBy(eventList, labelList, (e) => e.label_norm)
-      );
-
+      if (this.state.expanded) {
+        labelList = labelList.concat(labelsFromTeam(this.props.team));
+        labelList = _.uniqBy(labelList, (l) => l.label_norm);
+      }
       return <div className="event-labels">
         { _.map(labelList, (labelVal) =>
           <LabelToggle key={labelVal.label_norm}
                        label={labelVal} event={this.props.event} />
         ) }
-        { this.props.onAddLabelClick ?
-          <span className="add-event-label action"
+        { this.state.expanded && this.props.onAddLabelClick ?
+          <span className="add-event-label action label-list-action"
                 onClick={() => this.props.onAddLabelClick(this.props.event)}>
             {labelList.length ?
               <span>
@@ -240,7 +245,25 @@ module Esper.Components {
               </span>
             }
           </span> : null }
+        <span className="toggle-label-expansion action label-list-action"
+              onClick={() => this.toggleExpand()}>
+          <i className={classNames("fa", "fa-fw", {
+            "fa-chevron-left": this.state.expanded,
+            "fa-chevron-right": !this.state.expanded
+          })} />
+        </span>
       </div>;
+    }
+
+    // When contracting, re-adjust init label list
+    toggleExpand() {
+      this.setState({
+        initLabelList: (this.state.expanded ?
+          this.getInitLabels(this.props) :
+          this.state.initLabelList
+        ),
+        expanded: !this.state.expanded
+      });
     }
   }
 
