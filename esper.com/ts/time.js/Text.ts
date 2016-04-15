@@ -16,6 +16,9 @@ module Esper.Text {
            `label is applicable to this event`;
   }
 
+  export const DefaultErrorTooltip = `There was an error connecting to the ` +
+    `server. Try refreshing or contacting us at https://esper.com/contact`;
+
 
   /////
 

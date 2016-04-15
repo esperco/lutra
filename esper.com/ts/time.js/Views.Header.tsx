@@ -1,4 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Save.ts" />
 /// <reference path="./Route.tsx" />
 
 module Esper.Views {
@@ -31,9 +32,13 @@ module Esper.Views {
               data-target={this.getId(toggleId)}>
               <i className={"fa " + (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
-            <a className="navbar-brand lg" href="#!/">
-              <img alt="Esper" src="/img/esper-logo-purple.svg" />
-            </a>
+            <span className="navbar-square">
+              <SaveIndicator>
+                <a className="navbar-brand lg" href="#!/">
+                  <img alt="Esper" src="/img/esper-logo-purple.svg" />
+                </a>
+              </SaveIndicator>
+            </span>
           </div>
 
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
@@ -145,5 +150,55 @@ module Esper.Views {
         </a>
       </li>;
     }
+  }
+
+  class SaveIndicator extends React.Component<{
+    children?: JSX.Element[];
+  }, Save.Status> {
+    _error: HTMLSpanElement;
+
+    constructor(props: { children?: JSX.Element[] }) {
+      super(props);
+      this.state = { busy: false, error: false };
+    }
+
+    render() {
+      if (this.state.busy) {
+        return <span className="esper-spinner" />;
+      }
+      if (this.state.error) {
+        return <span ref={(c) => this._error = c}
+                     className="esper-save-error text-danger"
+                     data-toggle="tooltip" data-placement="right"
+                     title={Text.DefaultErrorTooltip}>
+          <i className="fa fa-fw fa-warning" />
+        </span>;
+      }
+      return <span>
+        { this.props.children }
+      </span>
+    }
+
+    componentDidMount() {
+      Save.Emitter.addChangeListener(this.onChange);
+      this.mountTooltip();
+    }
+
+    componentWillUnmount() {
+      Save.Emitter.removeChangeListener(this.onChange);
+    }
+
+    componentDidUpdate() {
+      this.mountTooltip();
+    }
+
+    mountTooltip() {
+      if (this._error) {
+        $(this._error).tooltip();
+      }
+    }
+
+    // Arrow notation to create a single reference for change listener
+    onChange = (status: Save.Status) => this.setState(status)
   }
 }

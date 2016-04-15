@@ -57,6 +57,22 @@ body, .footer {
   }
 }
 
+/* Header formating */
+.navbar-square {
+  display: block;
+  width: @navbar-height;
+  text-align: center;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .esper-save-error .fa {
+    font-size: 2em;
+    line-height: @navbar-height;
+    vertical-align: middle;
+    animation: flash 0.2s ease-in-out 0s 5;
+  }
+}
+
 // Other props for left/right set in marten/less/_helpers.less
 .esper-full-screen .esper-left-sidebar {
   @media (max-width: @screen-xs-max) {
