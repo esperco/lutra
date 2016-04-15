@@ -36,7 +36,8 @@ module Esper.Labels {
   }
 
   // Takes a list of events and returns a list of unique normalized / display
-  // label combos. Optionally includes team labels too.
+  // label combos. Optionally includes team labels too (if team matches
+  // one of the teams on events)
   export function fromEvents(events: Events2.TeamEvent[],
                              teams: ApiT.Team[] = [])
   {
@@ -46,12 +47,19 @@ module Esper.Labels {
     // Order of labels as we encounter them (team labels come first)
     var labels: string[] = [];
 
+    var teamIds = _(events)
+      .map((e) => e.teamId)
+      .uniq()
+      .value();
+
     _.each(teams, (t) => {
-      _.each(t.team_labels_norm, (id, i) => {
-        var teamLabel = t.team_labels[i];
-        displayAsMap[id] = displayAsMap[id] || teamLabel;
-        labels.push(id);
-      })
+      if (_.includes(teamIds, t.teamid)) {
+        _.each(t.team_labels_norm, (id, i) => {
+          var teamLabel = t.team_labels[i];
+          displayAsMap[id] = displayAsMap[id] || teamLabel;
+          labels.push(id);
+        })
+      }
     });
 
     _.each(events, (e) => {
