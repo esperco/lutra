@@ -3,7 +3,6 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Api.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Teams.ts" />
 
