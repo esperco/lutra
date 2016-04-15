@@ -101,7 +101,8 @@ module Esper.Views {
 
       if (this.props.filterStr) {
         events = _.filter(events,
-          (e) => _.includes(e.title.toLowerCase(),
+          (e) => e.title &&
+                 _.includes(e.title.toLowerCase(),
                             this.props.filterStr.toLowerCase())
         );
       }

@@ -80,7 +80,8 @@ module Esper.Components {
                  (event.feedback.attended === false ? " no-attend" : "")}
                onClick={() => this.props.onEventClick &&
                               this.props.onEventClick(event)}>
-            {event.title}
+            { event.title ||
+              <span className="no-title">{Text.NoEventTitle}</span> }
           </div>
           <div className="time">
             <span className="start">

@@ -172,7 +172,7 @@ module Esper.Charts {
         none: () => "",
         some: (event) => {
           var ret = "";
-          ret += event.title + " @ ";
+          ret += (event.title || Text.NoEventTitle) + " @ ";
           ret += Text.time(event.start) + " / ";
           ret += Text.hours(EventStats.toHours(this.props.seconds));
           ret += this.props.label.match({

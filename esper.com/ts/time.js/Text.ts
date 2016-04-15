@@ -19,6 +19,7 @@ module Esper.Text {
   export const DefaultErrorTooltip = `There was an error connecting to the ` +
     `server. Try refreshing or contacting us at https://esper.com/contact`;
 
+  export const NoEventTitle = `Untitled Event`;
 
   /////
 
@@ -43,7 +44,7 @@ module Esper.Text {
   }
 
   export function eventTitleForChart(event: Events2.TeamEvent) {
-    return `${event.title} (${date(event.start)})`;
+    return `${event.title || NoEventTitle} (${date(event.start)})`;
   }
 
   export function date(d: Date|moment.Moment|string) {

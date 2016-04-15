@@ -53,7 +53,9 @@ module Esper.Views {
           return <Components.ErrorMsg />;
         },
         some: (event) => <div className="panel panel-default">
-          <div className="panel-heading title">{event.title}</div>
+          <div className="panel-heading title">{event.title ||
+            <span className="no-title">{Text.NoEventTitle}</span>
+          }</div>
             <Components.EventEditor
               className="panel-body"
               eventData={[eventData]}
