@@ -28,7 +28,23 @@ module Esper.Actions {
               newEvent.feedback = feedback;
               return Option.some(newEvent);
             });
-          Events2.EventStore.pushFetch(storeId, p);
+          var initNewData = _.cloneDeep(event);
+          switch ((action || "").toLowerCase()) {
+            case "good":
+              initNewData.feedback.attended = true;
+              initNewData.feedback.rating = 5;
+              break;
+            case "bad":
+              initNewData.feedback.attended = true;
+              initNewData.feedback.rating = 5;
+              break;
+            case "didnt_attend":
+              initNewData.feedback.attended = false;
+              break;
+            default:
+              break;
+          }
+          Events2.EventStore.pushFetch(storeId, p, Option.some(initNewData));
         }
       })
     });
