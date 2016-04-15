@@ -65,7 +65,7 @@ module Esper.Components {
       return <Modal icon="fa-calendar-o" title={heading}>
         <EventEditor eventData={this.props.eventData}
                      teamPairs={this.props.teamPairs}
-                     onDone={() => Layout.closeModal()}
+                     onDone={() => (this.props.onDone || Layout.closeModal)()}
                      focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />
       </Modal>;

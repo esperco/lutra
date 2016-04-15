@@ -379,20 +379,8 @@ module Esper.Components {
     render() {
       var heading = Text.events(this.props.events.length);
       return <Modal icon="fa-calendar-o" title={heading}>
-        { React.createElement(EventList, this.getProps()) }
+        { React.createElement(EventList, this.props) }
       </Modal>;
-    }
-
-    // Extend provided props with defaults for modal
-    getProps(): Props {
-      var newProps = _.clone(this.props);
-      newProps.onAddLabelClick = newProps.onAddLabelClick ||
-        function(event: Events2.TeamEvent) {
-          Layout.renderModal(Containers.eventEditorModal([event]));
-        };
-      newProps.onEventClick = newProps.onEventClick ||
-                              newProps.onAddLabelClick;
-      return newProps;
     }
   }
 }
