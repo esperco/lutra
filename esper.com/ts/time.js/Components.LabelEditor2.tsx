@@ -36,6 +36,8 @@ module Esper.Components {
     // Which label is selected?
     labelSelected?: string;
   }> {
+    _input: LabelInput;
+
     constructor(props: LabelEditorProps) {
       super(props);
       this.state = {};
@@ -101,7 +103,8 @@ module Esper.Components {
       // NB: Use cancel button instead of OK button because purpose of button
       // is just to close panel, not do anything
       return <ModalPanel busy={busy} error={error} busyText={busyText}
-              onCancel={props.onDone} cancelText={props.doneText || "Close"}
+              onCancel={props.onDone ? (() => this.handleDone()) : null}
+              cancelText={props.doneText || "Close"}
               success={success} className="esper-panel-section">
         <div className="esper-panel-section">
           { this.renderLabelInput(events) }
@@ -118,32 +121,21 @@ module Esper.Components {
       </ModalPanel>
     }
 
+    handleDone() {
+      if (this._input) {
+        var val = this._input.getValue();
+        if (val) {
+          this.onSubmit(val, this.getEvents());
+        }
+      }
+      this.props.onDone();
+    }
+
     renderLabelInput(events: Events2.TeamEvent[]) {
       return <LabelInput
+        ref={(c) => this._input = c}
         className={ this.props.autoFocus ? "esper-modal-focus" : null }
-        onSubmit={(val) => {
-          if (this.state.labelSelected) {
-            if (_.every(events,
-              (e) => _.includes(e.labels_norm, this.state.labelSelected)
-            )) {
-              EventLabelChange.remove(events, val);
-            } else {
-              EventLabelChange.add(events, val);
-            }
-            return val;
-          }
-
-          else {
-            var teamIds = _.map(events, (e) => e.teamId);
-            teamIds = _.uniq(teamIds);
-            _.each(teamIds, (teamId) => {
-              Teams.addLabel(teamId, val);
-            });
-            EventLabelChange.add(events, val);
-            this.setState({ labelFilter: null })
-            return "";
-          }
-        }}
+        onSubmit={(val) => this.onSubmit(val, events)}
         onChange={(val) => this.setState({
           labelFilter: val,
           labelSelected: null
@@ -151,6 +143,30 @@ module Esper.Components {
         onDown={(val) => this.handleUpDown(val, 1)}
         onUp={(val) => this.handleUpDown(val, -1)}
       />;
+    }
+
+    onSubmit(val: string, events: Events2.TeamEvent[]) {
+      if (this.state.labelSelected) {
+        if (_.every(events,
+          (e) => _.includes(e.labels_norm, this.state.labelSelected)
+        )) {
+          EventLabelChange.remove(events, val);
+        } else {
+          EventLabelChange.add(events, val);
+        }
+        return val;
+      }
+
+      else {
+        var teamIds = _.map(events, (e) => e.teamId);
+        teamIds = _.uniq(teamIds);
+        _.each(teamIds, (teamId) => {
+          Teams.addLabel(teamId, val);
+        });
+        EventLabelChange.add(events, val);
+        this.setState({ labelFilter: null })
+        return "";
+      }
     }
 
     renderLabelList(events: Events2.TeamEvent[]) {
@@ -233,6 +249,10 @@ module Esper.Components {
     constructor(props: LabelInputProps) {
       super(props);
       this.state = { value: "" }
+    }
+
+    getValue() {
+      return (this.state.value || "").trim();
     }
 
     render() {
