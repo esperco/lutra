@@ -1142,13 +1142,21 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  // Temporary compatibility fix. Field `label` is now optional.
+  function forceLabels(x: {labels?: string[]}) {
+    if (! _.isArray(x.labels)) {
+      x.labels = [];
+    }
+    return x;
+  }
+
   export function getEventLabels(team_id: string, event_id: string):
-    JQueryPromise<{labels: string[]}>
+    JQueryPromise<{labels?: string[]}>
   {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
             + "/" + encodeURIComponent(event_id);
-    return JsonHttp.get(url);
+    return JsonHttp.get(url).then(forceLabels);
   }
 
   export function updateEventLabels(team_id: string, event_id: string,
