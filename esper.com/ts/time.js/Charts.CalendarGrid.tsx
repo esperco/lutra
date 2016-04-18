@@ -47,9 +47,8 @@ module Esper.Charts {
             Params.applyListSelectJSON(
               e.labels_norm,
               this.params.filterParams.labels
-            ).flatMap((labels) => labels.length > 1 ?
-              Option.some(Labels.MULTI_LABEL_ID) :
-              Option.some(labels[0])
+            ).flatMap(
+              (labels) => Option.some(labels[0])
             ).flatMap((label) => Option.some({
               event: e,
               label: Option.wrap(label)

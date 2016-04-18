@@ -12,19 +12,12 @@ module Esper.Labels {
     "Health & Wellness", "Personal", "Travel"
   ];
 
-  // Pick a MULTI_LABEL_ID that doesn't match normalized form of any label
-  export const MULTI_LABEL_ID = "Esper-multi-label-id";
-  export const MULTI_LABEL_STR = "Multiple Labels";
-
   // Global map of normalized labels to display forms
   var displayAsMap: {[index: string]: string} = {};
 
   export function getDisplayAs(norm: string) {
     if (! norm.trim()) {
       return "";
-    }
-    if (norm === MULTI_LABEL_ID) {
-      return MULTI_LABEL_STR;
     }
     return displayAsMap[norm] || norm;
   }
