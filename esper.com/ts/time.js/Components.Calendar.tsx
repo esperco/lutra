@@ -227,14 +227,10 @@ module Esper.Components {
 
         if (event.labels_norm && event.labels_norm.length) {
           ret.color = Colors.getColorForLabel(
-            event.labels_norm.length > 1 ?
-            Labels.MULTI_LABEL_ID :
             event.labels_norm[0]
           );
           ret.textColor = Colors.colorForText(ret.color);
-          ret.tooltip = event.labels_norm.length > 1 ?
-            Labels.MULTI_LABEL_STR :
-            event.labels[0];
+          ret.tooltip = event.labels[0];
         }
 
         return ret;

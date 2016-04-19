@@ -27,9 +27,6 @@ module Esper.Charts {
         (e) => Params.applyListSelectJSON(
           e.labels_norm,
           this.params.filterParams.labels
-        ).flatMap((labels) => labels.length > 1 ?
-          Option.some([Labels.MULTI_LABEL_ID]) :
-          Option.some(labels)
         ).flatMap((labels) => Option.some({
           event: e,
           labels_norm: labels
@@ -42,10 +39,6 @@ module Esper.Charts {
       this.sortedLabels = this.sortByForCurrentPeriod(
         this.durationsByLabel, (w) => -w.adjustedDuration
       );
-
-      // Push multi-label to end of label sort
-      _.pull(this.sortedLabels, Labels.MULTI_LABEL_ID);
-      this.sortedLabels.push(Labels.MULTI_LABEL_ID);
     }
 
     onPointClick(events: Events2.TeamEvent[]) {
@@ -84,7 +77,9 @@ module Esper.Charts {
               color: Colors.getColorForLabel(label),
               x: x,
               y: EventStats.toHours(
-                _.sumBy(s.items, (i) => i.adjustedDuration)
+                _.sumBy(s.items,
+                  (i) => i.adjustedDuration / i.labels_norm.length
+                )
               ),
               count: s.items.length,
               hours: EventStats.toHours(

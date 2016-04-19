@@ -21,9 +21,6 @@ module Esper.Charts {
         (e) => Params.applyListSelectJSON(
           e.labels_norm,
           this.params.filterParams.labels
-        ).flatMap((labels) => labels.length > 1 ?
-          Option.some([Labels.MULTI_LABEL_ID]) :
-          Option.some(labels)
         ).flatMap((labels) => Option.some({
           event: e,
           labels_norm: labels
@@ -35,12 +32,9 @@ module Esper.Charts {
         (e) => e.labels_norm
       );
       this.durationsByLabel.some = _.sortBy(this.durationsByLabel.some,
-        (s) => {
-          if (s.key === Labels.MULTI_LABEL_ID) {
-            return Infinity;
-          }
-          return 0 - _.sumBy(s.items, (i) => i.adjustedDuration);
-        }
+        (s) => 0 - _.sumBy(s.items,
+          (i) => i.adjustedDuration / i.labels_norm.length
+        )
       );
     }
 
@@ -56,7 +50,7 @@ module Esper.Charts {
         count: d.items.length,
         hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
         y: EventStats.toHours(
-          _.sumBy(d.items, (i) => i.adjustedDuration)
+          _.sumBy(d.items, (i) => i.adjustedDuration / i.labels_norm.length)
         ),
         events: {
           click: () => this.onSeriesClick(_.map(d.items, (i) => i.event))
@@ -72,7 +66,9 @@ module Esper.Charts {
             _.sumBy(this.durationsByLabel.none, (i) => i.duration)
           ),
           y: EventStats.toHours(
-            _.sumBy(this.durationsByLabel.none, (i) => i.adjustedDuration)
+            _.sumBy(this.durationsByLabel.none,
+              (i) => i.adjustedDuration
+            )
           ),
           events: {
             click: () => this.onSeriesClick(

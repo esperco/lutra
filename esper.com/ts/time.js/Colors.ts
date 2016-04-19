@@ -8,9 +8,6 @@ module Esper.Colors {
   var calColorMap: ColorMap = {};
 
   export function getColorForLabel(labelNorm: string): string {
-    if (labelNorm === Labels.MULTI_LABEL_ID) {
-      return gray;
-    }
     return getColorForMap(labelNorm, labelColorMap);
   }
 
