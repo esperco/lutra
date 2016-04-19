@@ -199,23 +199,18 @@ module Esper.Params {
 
     // Show items with at least one of the items in this list
     some: string[];
-
-    // Show items not matching any of the above?
-    unmatched: boolean;
   }
 
   export function cleanListSelectJSON(q: any = {}): ListSelectJSON {
     q = q || {
       all: true,
       none: true,
-      some: [],
-      unmatched: false
+      some: []
     } as ListSelectJSON;
 
     if (! _.isBoolean(q.all)) { q.all = true; }
     if (! _.isBoolean(q.none)) { q.none = false; }
     if (!q.some || !_.every(q.some, (i) => _.isString(i))) { q.some = []; }
-    if (! _.isBoolean(q.unmatched)) { q.unmatched = false; }
 
     return q;
   }

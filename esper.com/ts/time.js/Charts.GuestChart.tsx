@@ -209,8 +209,7 @@ module Esper.Charts {
         domains: {
           all: Util.some(all, current.all),
           none: Util.some(none, current.none),
-          some: Util.some(some, current.some),
-          unmatched: current.unmatched
+          some: Util.some(some, current.some)
         }
       } as DomainFilterParams);
     }

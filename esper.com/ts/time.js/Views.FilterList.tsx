@@ -193,8 +193,7 @@ module Esper.Views {
             labels: {
               all: x.all,
               none: x.unlabeled,
-              some: x.all ? [] : x.labels,
-              unmatched: false
+              some: x.all ? [] : x.labels
             }
           })} />
       </div>;
@@ -313,8 +312,7 @@ module Esper.Views {
         labels: {
           all: true,
           none: true,
-          some: [],
-          unmatched: false
+          some: []
         },
         filterStr: ""
       });
