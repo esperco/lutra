@@ -622,6 +622,21 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  // Temporary compatibility fix. Fields `labels` and `labels_norm` are
+  // now optional.
+  function fixGenericCalendarEvent(x: ApiT.GenericCalendarEvent) {
+    if (! _.isArray(x.labels)) {
+      x.labels = [];
+      x.labels_norm = [];
+    }
+    return x;
+  }
+
+  function fixGenericCalendarEvents(x: ApiT.GenericCalendarEvents) {
+    _.each(x.events, fixGenericCalendarEvent);
+    return x;
+  }
+
 // supports generic calendar
   export function postForGenericCalendarEvents(teamid: string, calid: string,
     q: ApiT.CalendarRequest):
@@ -629,7 +644,7 @@ module Esper.Api {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, JSON.stringify(q));
+    return JsonHttp.post(url, JSON.stringify(q)).then(fixGenericCalendarEvents);
   }
 
   export function getGenericEvent(teamid:string, calid:string, eventid:string):
@@ -638,7 +653,7 @@ module Esper.Api {
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid))
             + "/" + encodeURIComponent(string(eventid));
-    return JsonHttp.get(url);
+    return JsonHttp.get(url).then(fixGenericCalendarEvent);
   }
 
   // supports generic calendar
@@ -1127,13 +1142,21 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(body));
   }
 
+  // Temporary compatibility fix. Field `label` is now optional.
+  function forceLabels(x: {labels?: string[]}) {
+    if (! _.isArray(x.labels)) {
+      x.labels = [];
+    }
+    return x;
+  }
+
   export function getEventLabels(team_id: string, event_id: string):
-    JQueryPromise<{labels: string[]}>
+    JQueryPromise<{labels?: string[]}>
   {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
             + "/" + encodeURIComponent(event_id);
-    return JsonHttp.get(url);
+    return JsonHttp.get(url).then(forceLabels);
   }
 
   export function updateEventLabels(team_id: string, event_id: string,

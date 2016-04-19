@@ -138,8 +138,8 @@ module Esper.ApiT {
     title?: string;
     description?: string;
     description_messageids: string[];
-    labels: string[];
-    labels_norm: string[];
+    labels?: string[];
+    labels_norm?: string[];
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
     feedback: EventFeedback;
     location?: string;
