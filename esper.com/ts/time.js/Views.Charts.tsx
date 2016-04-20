@@ -160,7 +160,15 @@ module Esper.Views {
         return this.renderMessage(chart.noDataMsg());
       }
 
-      return chart.renderChart();
+      var totals = chart.getTotals();
+      return <div className="chart-content">
+        {
+          totals && totals.length ?
+          <Components.TotalsBar periodTotals={totals} /> :
+          null
+        }
+        { chart.renderChart() }
+      </div>;
     }
 
     renderMessage(elm: JSX.Element|string) {

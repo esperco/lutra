@@ -46,6 +46,14 @@ module Esper.Charts {
       return false;
     }
 
+    getTotals() {
+      return _.map(this.durationsByLabel, (d) => ({
+        period: d.period,
+        duration: d.totalAdjusted,
+        count: d.totalCount
+      }));
+    }
+
     renderChart() {
       var durations = _.sortBy(this.durationsByLabel,
         (d) => Period.asNumber(d.period)
@@ -116,37 +124,35 @@ module Esper.Charts {
         );
       }
 
-      return <div className="percentage-recent-chart">
-        <Components.Highchart opts={{
-          chart: {
-            type: 'bar',
-            height: categories.length * 100 + 120
-          },
+      return <Components.Highchart opts={{
+        chart: {
+          type: 'bar',
+          height: categories.length * 100 + 120
+        },
 
-          legend: {
-            enabled: false
-          },
+        legend: {
+          enabled: false
+        },
 
-          plotOptions: {
-            bar: {
-              stacking: 'percent',
-              borderWidth: 1
-            }
-          },
+        plotOptions: {
+          bar: {
+            stacking: 'percent',
+            borderWidth: 1
+          }
+        },
 
-          xAxis: {
-            categories: categories
-          },
+        xAxis: {
+          categories: categories
+        },
 
-          yAxis: {
-            title: { text: "Percentage" }
-          },
+        yAxis: {
+          title: { text: "Percentage" }
+        },
 
-          tooltip: countPointTooltip,
+        tooltip: countPointTooltip,
 
-          series: series
-        }} />
-      </div>;
+        series: series
+      }} />;
     }
   }
 }

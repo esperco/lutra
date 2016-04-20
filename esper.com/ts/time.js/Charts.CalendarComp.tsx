@@ -36,6 +36,14 @@ module Esper.Charts {
       );
     }
 
+    getTotals() {
+      return _.map(this.groupings, (d) => ({
+        period: d.period,
+        duration: d.totalAdjusted,
+        count: d.totalCount
+      }));
+    }
+
     onSeriesClick(events: Events2.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;

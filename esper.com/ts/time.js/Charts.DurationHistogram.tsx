@@ -54,6 +54,14 @@ module Esper.Charts {
       );
     }
 
+    getTotals() {
+      return _.map(this.periodsByBucket, (d) => ({
+        period: d.period,
+        duration: d.totalAdjusted,
+        count: d.totalCount
+      }));
+    }
+
     onEventClick(event: Events2.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;

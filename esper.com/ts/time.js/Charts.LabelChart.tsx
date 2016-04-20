@@ -109,8 +109,7 @@ module Esper.Charts {
         labels: {
           all: all,
           none: unlabeled,
-          some: labels,
-          unmatched: current.unmatched
+          some: labels
         }
       } as LabelFilterParams);
     }

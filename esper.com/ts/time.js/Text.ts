@@ -35,6 +35,10 @@ module Esper.Text {
     return `hour${s(n)}`;
   }
 
+  export function hoursShort(n: number) {
+    return `${Util.roundStr(n, 1)}h`;
+  }
+
   export function events(n: number) {
     return `${n} event${s(n)}`;
   }
@@ -66,7 +70,7 @@ module Esper.Text {
       case "quarter":
         return moment(start).format(short ? "[Q]Q 'YY" : "[Q]Q YYYY");
       case "month":
-        return moment(start).format(short ? "MMMM" : "MMMM YYYY");
+        return moment(start).format(short ? "MMM" : "MMMM YYYY");
       case "week":
         return moment(start).format(short ? "MMM D" : "[Week of] MMM D");
       default: // Custom

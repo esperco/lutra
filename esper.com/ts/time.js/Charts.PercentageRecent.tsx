@@ -8,6 +8,9 @@
 
 module Esper.Charts {
   export class PercentageRecent extends LabelChart {
+    totalDuration: number;
+    totalCount: number;
+
     protected allowUnlabeled = true;
     protected durationsByLabel: EventStats.DurationsGrouping<{
       labels_norm: string[];
@@ -28,6 +31,8 @@ module Esper.Charts {
         { truncateStart: bounds[0], truncateEnd: bounds[1] }
       );
 
+      this.totalDuration = _.sumBy(durations, (d) => d.adjustedDuration);
+      this.totalCount = durations.length;
       this.durationsByLabel = Partition.groupByMany(durations,
         (e) => e.labels_norm
       );
@@ -41,6 +46,14 @@ module Esper.Charts {
     onSeriesClick(events: Events2.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
+    }
+
+    getTotals() {
+      return [{
+        period: this.params.period,
+        duration: this.totalDuration,
+        count: this.totalCount
+      }];
     }
 
     renderChart() {
@@ -105,7 +118,7 @@ module Esper.Charts {
         series: [{
           data: data
         }]
-      }} />
+      }} />;
     }
   }
 }
