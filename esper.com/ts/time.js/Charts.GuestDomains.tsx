@@ -42,6 +42,8 @@ module Esper.Charts {
     protected emailDurationsByDomain: DurationsGroupingMap<{
       emails: string[];
     }>;
+    totalDuration: number;
+    totalCount: number;
 
     sync() {
       super.sync();
@@ -58,6 +60,8 @@ module Esper.Charts {
         { truncateStart: bounds[0], truncateEnd: bounds[1] }
       );
 
+      this.totalDuration = _.sumBy(durations, (d) => d.adjustedDuration);
+      this.totalCount = durations.length;
       this.durationsByDomain = Partition.groupByMany(durations,
         (e) => _.uniq(e.domains)
       );
@@ -81,6 +85,14 @@ module Esper.Charts {
     onSeriesClick(events: Events2.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
+    }
+
+    getTotals(): Components.Types.PeriodTotal[] {
+      return [{
+        period: this.params.period,
+        duration: this.totalDuration,
+        count: this.totalCount
+      }];
     }
 
     renderChart() {

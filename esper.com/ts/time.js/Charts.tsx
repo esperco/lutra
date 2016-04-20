@@ -22,6 +22,9 @@ module Esper.Charts {
   */
   export interface GroupsByPeriod<W> {
     period: Period.Single|Period.Custom;
+    totalAdjusted: number;
+    totalDuration: number;
+    totalCount: number;
     groups: EventStats.DurationsGrouping<W>;
   }
 
@@ -173,13 +176,26 @@ module Esper.Charts {
           truncateEnd: bounds[1]
         });
 
+        var totalAdjusted = _.sumBy(durations, (d) => d.adjustedDuration);
+        var totalDuration = _.sumBy(durations, (d) => d.duration);
+        var totalCount = durations.length;
         var groups = Partition.groupByMany(durations, groupFn);
 
         return {
           period: e.period,
-          groups: groups
+          groups: groups,
+          totalAdjusted: totalAdjusted,
+          totalDuration: totalDuration,
+          totalCount: totalCount
         };
       });
+    }
+
+    /*
+      Used to populate values for totals bar
+    */
+    getTotals(): Components.Types.PeriodTotal[] {
+      return [];
     }
 
     /*

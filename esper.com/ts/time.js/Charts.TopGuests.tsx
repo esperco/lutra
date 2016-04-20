@@ -31,11 +31,11 @@ module Esper.Charts {
         (e) => Params.applyListSelectJSON(
           Events2.getGuestDomains(e),
           this.params.filterParams.domains
-        ).flatMap((domains) => Option.some({
+        ).flatMap((domains) => domains.length ? Option.some({
           event: e,
           domains: domains,
           emails: Events2.getGuestEmails(e, domains)
-        })),
+        }) : Option.none<any>()),
 
         // Group by labels
         (w) => w.emails
@@ -48,6 +48,14 @@ module Esper.Charts {
     onEventClick(event: Events2.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;
+    }
+
+    getTotals() {
+      return _.map(this.durationsByEmail, (d) => ({
+        period: d.period,
+        duration: d.totalAdjusted,
+        count: d.totalCount
+      }));
     }
 
     renderChart() {

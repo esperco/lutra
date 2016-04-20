@@ -14,14 +14,32 @@
       }
     }
   }
+
+  .esper-right-content {
+    display: flex;
+    flex-direction: column;
+
+    .esper-header {
+      flex-shrink: 0;
+      flex-grow: 0;
+      margin-bottom: @padding-large-vertical;
+    }
+  }
+
+  .chart-content {
+    flex-grow: 1;
+    min-height: 400px;
+
+    // Chart content is also a flexbox -- yay!
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .chart-holder {
-  .esper-expanded;
-  .esper-expanded.padded;
-  .esper-expanded.minus-subheader;
-
-  padding-top: @padding-base-vertical;
+  flex-grow: 1;
+  min-height: 400px;
+  position: relative;
 
   .highchart-drillup {
     position: absolute;
@@ -30,3 +48,36 @@
   }
 }
 
+.totals-bar {
+  .esper-padded;
+
+  background: @neutral-bg;
+  color: @neutral-text-color;
+  border: 1px solid @neutral-border;
+  border-radius: @border-radius-base;
+  margin-bottom: @padding-large-vertical;
+  flex-shrink: 0;
+  flex-grow: 0;
+  text-align: center;
+
+  .period-total {
+    .period-desc, .total-hours, .total-count {
+      display: inline-block;
+      padding-right: @padding-base-horizontal;
+    }
+  }
+
+  .period-desc {
+    font-weight: bold;
+  }
+
+  @media (min-width: @screen-md-min) {
+    display: flex;
+
+    .period-total {
+      display: inline-block;
+      flex-grow: 1;
+      text-align: center;
+    }
+  }
+}

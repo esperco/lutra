@@ -45,6 +45,14 @@ module Esper.Charts {
       return false;
     }
 
+    getTotals() {
+      return _.map(this.durationsByLabel, (d) => ({
+        period: d.period,
+        duration: d.totalAdjusted,
+        count: d.totalCount
+      }));
+    }
+
     renderChart() {
       var categories = this.sortedLabels;
       var durations = this.durationsByLabel;
