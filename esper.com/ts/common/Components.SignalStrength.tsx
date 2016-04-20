@@ -25,8 +25,8 @@ module Esper.Components {
 
     return <span className="fa fa-fw" style={{position: "relative"}}>
       <i className="fa fa-fw fa-signal text-muted" style={{
-        opacity: 0.8
-      }}/>
+        opacity: 0.25
+      }} />
       <span style={{
         width: pct,
         overflow: "hidden",
