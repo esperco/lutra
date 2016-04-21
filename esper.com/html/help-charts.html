@@ -147,17 +147,20 @@
     </div>
 
     <div class="section-content clearfix narrow short">
-      <h4>A Note on Percentages</h4>
+      <h4>A Note on Durations</h4>
       <a name="percentages-note"></a>
-      <p>If you have overlapping calendar events, Esper will adjust the
-      <em>percentage</em> of time allocated to each event by dividing the
-      overlapping time evenly among each event. Therefore, a one-hour
-      event may occupy more space on a pie chart than another one-hour
-      event if the latter overlaps another event.</p>
-      <p>Esper will also divided time evenly between different categories
-      of events depending on the chart. For example, in the Guest Groups
-      Pie Chart, time is divided evenly between each attendee in the meeting.
-      </p>
+      <p>If you have overlapping calendar events, Esper will calculdate the
+      duration of each event by dividing the overlapping time evenly among each
+      event. Therefore, an event that appears as one hour on the calendar may
+      show up as only 45 minutes it overlaps another event by 30 minutes.</p>
+      <p>Esper will also divide time evenly between different categories
+      of events depending on the chart. For example, in guest charts, time is
+      divided evenly between each attendee in the meeting, and in Label charts,
+      time is divided among each of the labels on an event.</p>
+      <p>When dividing time, Esper will only consider the <em>selected</em>
+      labels. For example, if a one-hour event has two labels on it, but
+      one of the labels is hidden, the event will be counted as a full hour
+      for that chart.</p>
     </div>
 
     <div class="section-content clearfix narrow short">
