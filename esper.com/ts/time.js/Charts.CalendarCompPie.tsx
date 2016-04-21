@@ -17,7 +17,7 @@ module Esper.Charts {
         name: this.getCalendarName(d.key),
         color: Colors.getColorForCal(d.key),
         count: d.items.length,
-        hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        // hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
         y: EventStats.toHours(
           _.sumBy(d.items, (i) => i.adjustedDuration)
         ),

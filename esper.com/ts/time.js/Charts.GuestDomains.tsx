@@ -101,7 +101,7 @@ module Esper.Charts {
         drilldown: d.key,
         color: Colors.getColorForDomain(d.key),
         count: d.items.length,
-        hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        // hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
         y: EventStats.toHours(
           _.sumBy(d.items, (i) =>
             Events2.getGuestEmails(i.event, [d.key]).length *
@@ -118,9 +118,9 @@ module Esper.Charts {
           drilldown: null,
           color: Colors.lightGray,
           count: this.durationsByDomain.none.length,
-          hours: EventStats.toHours(
-            _.sumBy(this.durationsByDomain.none, (i) => i.duration)
-          ),
+          // hours: EventStats.toHours(
+          //   _.sumBy(this.durationsByDomain.none, (i) => i.duration)
+          // ),
           y: EventStats.toHours(
             _.sumBy(this.durationsByDomain.none, (i) => i.adjustedDuration)
           ),
@@ -145,7 +145,7 @@ module Esper.Charts {
               name: s.key,
               color: Colors.lighten(baseColor, i * colorStep),
               count: s.items.length,
-              hours: EventStats.toHours(_.sumBy(s.items, (d) => d.duration)),
+              // hours: EventStats.toHours(_.sumBy(s.items, (d) => d.duration)),
               y: EventStats.toHours(
                 _.sumBy(s.items, (d) => d.adjustedDuration / d.emails.length)
               ),

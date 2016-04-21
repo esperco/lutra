@@ -70,7 +70,7 @@ module Esper.Charts {
           x: number,
           y: number,
           count: number,
-          hours: number,
+          // hours: number,
           events: HighchartsPointEvents
         }[]
       }[] = _.map(durations, (d, x) => ({
@@ -90,9 +90,9 @@ module Esper.Charts {
                 )
               ),
               count: s.items.length,
-              hours: EventStats.toHours(
-                _.sumBy(s.items, (i) => i.duration)
-              ),
+              // hours: EventStats.toHours(
+              //   _.sumBy(s.items, (i) => i.duration)
+              // ),
               events: {
                 click: () => this.onPointClick(_.map(s.items, (i) => i.event))
               }
@@ -112,9 +112,9 @@ module Esper.Charts {
               _.sumBy(d.groups.none, (i) => i.adjustedDuration)
             ),
             count: d.groups.none.length,
-            hours: EventStats.toHours(
-              _.sumBy(d.groups.none, (i) => i.duration)
-            ),
+            // hours: EventStats.toHours(
+            //   _.sumBy(d.groups.none, (i) => i.duration)
+            // ),
             events: {
               click: () => this.onPointClick(
                 _.map(d.groups.none, (w) => w.event)
