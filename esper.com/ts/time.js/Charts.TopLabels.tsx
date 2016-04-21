@@ -79,7 +79,9 @@ module Esper.Charts {
             data: _.map(s.items, (wrapper) => ({
               name: Text.eventTitleForChart(wrapper.event),
               x: _.indexOf(categories, label),
-              y: EventStats.toHours(wrapper.duration),
+              y: EventStats.toHours(
+                wrapper.adjustedDuration / wrapper.labels_norm.length
+              ),
               events: {
                 click: () => this.onEventClick(wrapper.event)
               }

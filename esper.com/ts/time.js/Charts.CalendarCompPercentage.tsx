@@ -31,7 +31,7 @@ module Esper.Charts {
           x: number,
           y: number,
           count: number,
-          hours: number,
+          // hours: number,
           events: HighchartsPointEvents
         }[]
       }[] = _.map(groupings, (d, x) => ({
@@ -49,9 +49,9 @@ module Esper.Charts {
                 _.sumBy(s.items, (i) => i.adjustedDuration)
               ),
               count: s.items.length,
-              hours: EventStats.toHours(
-                _.sumBy(s.items, (i) => i.duration)
-              ),
+              // hours: EventStats.toHours(
+              //   _.sumBy(s.items, (i) => i.duration)
+              // ),
               events: {
                 click: () => this.onSeriesClick(_.map(s.items, (i) => i.event))
               }

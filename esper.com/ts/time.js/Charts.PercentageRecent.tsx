@@ -61,7 +61,7 @@ module Esper.Charts {
         name: Labels.getDisplayAs(d.key),
         color: Colors.getColorForLabel(d.key),
         count: d.items.length,
-        hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
+        // hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
         y: EventStats.toHours(
           _.sumBy(d.items, (i) => i.adjustedDuration / i.labels_norm.length)
         ),
@@ -75,9 +75,9 @@ module Esper.Charts {
           name: "Unlabeled Events",
           color: Colors.lightGray,
           count: this.durationsByLabel.none.length,
-          hours: EventStats.toHours(
-            _.sumBy(this.durationsByLabel.none, (i) => i.duration)
-          ),
+          // hours: EventStats.toHours(
+          //   _.sumBy(this.durationsByLabel.none, (i) => i.duration)
+          // ),
           y: EventStats.toHours(
             _.sumBy(this.durationsByLabel.none,
               (i) => i.adjustedDuration
