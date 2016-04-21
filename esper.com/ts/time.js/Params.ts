@@ -181,11 +181,13 @@ module Esper.Params {
     filterStr: string;
   }
 
-  export function cleanFilterStrJSON(q: any = {}): FilterStrJSON {
-    if (q && _.isString(q.filterStr)) {
-      return q;
+  export function cleanFilterStrJSON(q: any): FilterStrJSON {
+    q = q || {};
+    var typedQ = q as FilterStrJSON;
+    if (! _.isString(typedQ.filterStr)) {
+      typedQ.filterStr = "";
     }
-    return { filterStr: "" };
+    return typedQ;
   }
 
 
@@ -208,7 +210,7 @@ module Esper.Params {
       some: []
     } as ListSelectJSON;
 
-    if (! _.isBoolean(q.all)) { q.all = true; }
+    if (! _.isBoolean(q.all)) { q.all = !_.isBoolean(q.none) && !q.some; }
     if (! _.isBoolean(q.none)) { q.none = false; }
     if (!q.some || !_.every(q.some, (i) => _.isString(i))) { q.some = []; }
 
