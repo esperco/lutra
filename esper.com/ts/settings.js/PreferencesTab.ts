@@ -1690,7 +1690,8 @@ module Esper.PreferencesTab {
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
-      if (prefs.label_reminder && prefs.label_reminder.recipients_.length > 0)
+      if (prefs.label_reminder.recipients_
+       && prefs.label_reminder.recipients_.length > 0)
         sendLabelReminders.prop("checked", true);
       if (general.send_followup_reminders)
         sendFollowupReminders.prop("checked", true);

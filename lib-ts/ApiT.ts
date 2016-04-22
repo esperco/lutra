@@ -575,7 +575,7 @@ module Esper.ApiT {
   }
 
   export interface SimpleEmailPref {
-    recipients_: string[];
+    recipients_?: string[];
   }
 
   export interface GeneralPrefs {
