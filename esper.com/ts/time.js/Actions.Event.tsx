@@ -7,7 +7,7 @@ module Esper.Actions {
     teamId: string;
     calId: string;
     eventId: string;
-    action: string;
+    action: ApiT.EventFeedbackAction;
   }) {
     var storeId = {
       teamId: teamId,
@@ -18,33 +18,7 @@ module Esper.Actions {
       optEvent.match({
         none: () => Route.nav.home(),
         some: (event) => {
-          Analytics.track(Analytics.Trackable.SubmitFeedback, {
-            teamId: teamId,
-            action: action
-          });
-          var p = Api.postEventFeedbackAction(teamId, calId, eventId, action)
-            .then((feedback: ApiT.EventFeedback) => {
-              var newEvent = _.cloneDeep(event);
-              newEvent.feedback = feedback;
-              return Option.some(newEvent);
-            });
-          var initNewData = _.cloneDeep(event);
-          switch ((action || "").toLowerCase()) {
-            case "good":
-              initNewData.feedback.attended = true;
-              initNewData.feedback.rating = 5;
-              break;
-            case "bad":
-              initNewData.feedback.attended = true;
-              initNewData.feedback.rating = 5;
-              break;
-            case "didnt_attend":
-              initNewData.feedback.attended = false;
-              break;
-            default:
-              break;
-          }
-          Events2.EventStore.pushFetch(storeId, p, Option.some(initNewData));
+          Feedback.postAction(event, action);
         }
       })
     });

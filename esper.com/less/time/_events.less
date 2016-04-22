@@ -21,11 +21,19 @@
 .event-min-feedback {
   font-style: italic;
   font-size: 90%;
-  padding-left: @padding-base-horizontal;
-}
-
-.min-feedback-action {
   padding: 0 @padding-base-horizontal;
+
+  a.action {
+    color: @text-muted;
+
+    &.active {
+      color: @link-color;
+    }
+
+    &:hover {
+      color: @link-hover-color;
+    }
+  }
 }
 
 .event-list .event, .event-details {
