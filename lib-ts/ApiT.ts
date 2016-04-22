@@ -454,6 +454,7 @@ module Esper.ApiT {
     transportation?: string[];
     meeting_types: MeetingTypes;
     email_types: EmailTypes;
+    label_reminder?: SimpleEmailPref;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
@@ -566,7 +567,6 @@ module Esper.ApiT {
   }
 
   export interface EmailPref {
-    enabled: boolean;
     recipients: string[];
     send_time: HourMinute;
     day_of?: boolean;
@@ -574,10 +574,13 @@ module Esper.ApiT {
     include_task_notes?: boolean;
   }
 
+  export interface SimpleEmailPref {
+    recipients_: string[];
+  }
+
   export interface GeneralPrefs {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
-    send_label_reminders: boolean;
     send_followup_reminders: boolean;
     double_booking_warning: boolean;
     no_location_warning: boolean;

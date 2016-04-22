@@ -112,12 +112,23 @@ module Esper.PreferencesTab {
     var format = li.find(".esper-prefs-html-format").prop("checked");
     var includeTaskNotes = li.find(".esper-prefs-include-task-notes").prop("checked");
     return {
-      enabled: li.find("div.preference-toggle-switch").hasClass("on"),
       recipients: sendTo,
       send_time: { hour: parseInt(sendTime), minute: 0 },
       day_of: dayOf,
       html_format: format,
       include_task_notes: includeTaskNotes
+    }
+  }
+
+  function readLabelReminderPrefs(div, team):
+  JQueryPromise<ApiT.SimpleEmailPref> {
+    if (div.find(".esper-prefs-label-reminders").is(":checked")) {
+      return Api.getProfile(team.team_executive, team.teamid)
+        .then(function(profile) {
+          return {recipients_: [profile.email]};
+        });
+    } else {
+      return $.Deferred().resolve({recipients_:[]});
     }
   }
 
@@ -131,8 +142,6 @@ module Esper.PreferencesTab {
         div.find(".esper-prefs-confirmation").is(":checked"),
       send_exec_reminder:
         div.find(".esper-prefs-reminder").is(":checked"),
-      send_label_reminders:
-        div.find(".esper-prefs-label-reminders").is(":checked"),
       send_followup_reminders:
         div.find(".esper-prefs-followup-reminders").is(":checked"),
       double_booking_warning:
@@ -241,6 +250,10 @@ module Esper.PreferencesTab {
     return email_types;
   }
 
+  export function currentLabelReminderPrefs(team) {
+    return readLabelReminderPrefs($(".esper-prefs-general").eq(0), team);
+  }
+
   export function currentGeneralPrefs() {
     return readGeneralPrefs($(".esper-prefs-general").eq(0));
   }
@@ -312,6 +325,14 @@ module Esper.PreferencesTab {
       .done(function() {
         Log.d("Email types saved.");
       });
+  }
+
+  export function saveLabelReminderPrefs(team) {
+    currentLabelReminderPrefs(team).done(function(prefs) {
+      Api.setLabelReminderPrefs(team.teamid, prefs).done(function() {
+        Log.d("Label reminder prefs saved.");
+      });
+    });
   }
 
   export function saveGeneralPrefs() {
@@ -1239,10 +1260,6 @@ module Esper.PreferencesTab {
   function viewOfEmailType(type, defaults, team) {
 '''
 <li #view class="preference">
-  <div #toggle>
-    <div #toggleBg class="preference-toggle-bg on"/>
-    <div #toggleSwitch class="preference-toggle-switch on"/>
-  </div>
   <div #title class="preference-title semibold"/>
   <hr/>
   <div #options class="preference-options">
@@ -1342,23 +1359,6 @@ module Esper.PreferencesTab {
           teamMembers.append(createEmailTeamMemberOption(email, send));
         });
       });
-
-    if (defaults.enabled === false) togglePreference(_view, team.teamid, false);
-    toggle.click(function() {
-      togglePreference(_view, team.teamid, undefined);
-      saveEmailTypes();
-      if (name === "Daily Agenda") {
-        if (toggleBg.hasClass("on"))
-          Analytics.track(Analytics.Trackable.EnablePreferencesTabDailyAgenda);
-        else
-          Analytics.track(Analytics.Trackable.DisablePreferencesTabDailyAgenda);
-      } else {
-        if (toggleBg.hasClass("on"))
-          Analytics.track(Analytics.Trackable.EnablePreferencesTabTasksUpdate);
-        else
-          Analytics.track(Analytics.Trackable.DisablePreferencesTabTasksUpdate);
-      }
-    });
 
     view.addClass("esper-prefs-" + type);
     return view;
@@ -1594,7 +1594,7 @@ module Esper.PreferencesTab {
     });
   }
 
-  function viewOfGeneralPrefs(general : ApiT.GeneralPrefs,
+  function viewOfGeneralPrefs(prefs : ApiT.Preferences,
                               team : ApiT.Team) {
 '''
 <li #view class="preference">
@@ -1684,13 +1684,13 @@ module Esper.PreferencesTab {
   </div>
 </li>
 '''
-
+    var general = prefs.general;
     if (general !== undefined) {
       if (general.send_exec_confirmation)
         sendConfirmation.prop("checked", true);
       if (general.send_exec_reminder)
         sendReminder.prop("checked", true);
-      if (general.send_label_reminders)
+      if (prefs.label_reminder && prefs.label_reminder.recipients_.length > 0)
         sendLabelReminders.prop("checked", true);
       if (general.send_followup_reminders)
         sendFollowupReminders.prop("checked", true);
@@ -1712,7 +1712,6 @@ module Esper.PreferencesTab {
 
     sendConfirmation.click(saveGeneralPrefs);
     sendReminder.click(saveGeneralPrefs);
-    sendLabelReminders.click(saveGeneralPrefs);
     sendFollowupReminders.click(saveGeneralPrefs);
     doubleBookingWarning.click(saveGeneralPrefs);
     noLocationWarning.click(saveGeneralPrefs);
@@ -1720,6 +1719,9 @@ module Esper.PreferencesTab {
     deleteHoldsInquiry.click(saveGeneralPrefs);
     useDuplicate.click(saveGeneralPrefs);
     bccExec.click(saveGeneralPrefs);
+    sendLabelReminders.click(function() {
+      saveLabelReminderPrefs(team);
+    });
 
     if (Login.usesGoogle()) {
       var savedColor = general.hold_event_color;
@@ -1868,7 +1870,7 @@ function viewOfGeneralTimezonePrefs(general : ApiT.GeneralPrefs,
         setDividerHeight("emails", emailsDivider, 1);
       }
 
-      general.append(viewOfGeneralPrefs(initial.general, team));
+      general.append(viewOfGeneralPrefs(initial, team));
       general.append(viewOfGeneralTimezonePrefs(initial.general, team));
       setDividerHeight("general", generalDivider, 1);
 
