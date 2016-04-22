@@ -161,11 +161,14 @@ module Esper.Components {
       if (this.state.minimize) {
         return <div onClick={() => this.setState({ minimize: false })}
           className="event-min-feedback esper-panel-section action clearfix">
-          <a className="event-rating pull-left">
-            { this.renderMinFeedback(event) }
-          </a>
-          <a className="pull-right min-feedback-action">
+          <a className="event-rating action pull-left">
+            { this.renderMinFeedback(event) }{" "}
             <i className="fa fa-fw fa-caret-down" />
+          </a>
+          <a className={classNames("pull-right no-attend-action action", {
+            active: event.feedback.attended === false
+          })} onClick={() => this.toggleAttended()}>
+            <i className="fa fa-fw fa-ban" />
           </a>
         </div>;
       }
@@ -173,12 +176,12 @@ module Esper.Components {
       return <Components.ModalPanel busy={busy} error={error} success={success}
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
           className="event-notes esper-panel-section">
-        <div>
+        <div className="action"
+             onClick={() => this.setState({ minimize: true })}>
           <label htmlFor={this.getId("notes")}>
             { Text.FeedbackTitle }
           </label>
-          <a className="pull-right action min-feedback-action"
-                onClick={() => this.setState({ minimize: true })}>
+          <a className="pull-right action min-feedback-action">
             <i className="fa fa-fw fa-caret-up" />
           </a>
         </div>
