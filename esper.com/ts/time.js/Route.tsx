@@ -119,7 +119,7 @@ module Esper.Route {
       teamId  : Util.getParamByName("team",   q),
       calId   : Util.getParamByName("cal",    q),
       eventId : Util.getParamByName("event",  q),
-      action  : Util.getParamByName("action", q)
+      action  : Params.cleanFeedbackAction(Util.getParamByName("action", q))
     });
   });
 

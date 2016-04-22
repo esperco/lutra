@@ -691,7 +691,8 @@ module Esper.Api {
   }
 
   export function postEventFeedbackAction(teamid: string, calid: string,
-    eventid: string, action: string): JQueryPromise<ApiT.EventFeedback>
+    eventid: string, action: ApiT.EventFeedbackAction)
+    : JQueryPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))

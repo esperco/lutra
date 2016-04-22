@@ -123,6 +123,8 @@ module Esper.ApiT {
     rating?: number;
   }
 
+  export type EventFeedbackAction = "good"|"bad"|"didnt_attend";
+
   export interface PredictedLabel {
     label: string;
     label_norm: string;
