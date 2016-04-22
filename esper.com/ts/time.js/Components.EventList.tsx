@@ -4,6 +4,7 @@
 
 /// <reference path="../common/Components.SignalStrength.tsx" />
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Components.Tooltip.tsx" />
 
 module Esper.Components {
   const LABEL_COUNT_CUTOFF = 4;
@@ -62,6 +63,7 @@ module Esper.Components {
       return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
                   className={classNames("list-group-item event", {
                     "has-labels": event.labels_norm.length > 0,
+                    "no-attend": event.feedback.attended === false,
                     "past": moment(event.end).diff(moment()) < 0
                   })}>
         {
@@ -254,6 +256,7 @@ module Esper.Components {
         labelList = _.uniqBy(labelList, (l) => l.label_norm);
       }
       return <div className="event-labels">
+        <NoAttendToggle event={this.props.event} />
         { _.map(labelList, (labelVal) =>
           <LabelToggle key={labelVal.label_norm}
                        label={labelVal} event={this.props.event} />
@@ -315,14 +318,14 @@ module Esper.Components {
 
       var label = this.props.label;
       if (isPredictedLabel(label)) {
-        return <span style={style} className="event-label predicted-label"
-                     ref={(c) => this._predictedLabel = c}
-                     data-toggle="tooltip"
-                     title={isSelected ? null :
-                            Text.predictionTooltip(label.score)}
-                     onClick={() => {
-                       isSelected ? this.toggleOff() : this.toggleOn()
-                     }}>
+        return <Tooltip style={style}
+          className="event-label predicted-label"
+          data-toggle="tooltip"
+          title={isSelected ? null :
+                 Text.predictionTooltip(label.score)}
+          onClick={() => {
+            isSelected ? this.toggleOff() : this.toggleOn()
+        }}>
           { isSelected ?
             <i className="fa fa-fw fa-tag" /> :
             <i className="fa fa-fw fa-question-circle" />
@@ -332,7 +335,7 @@ module Esper.Components {
             { isSelected ? <i className="fa fa-fw fa-check" /> :
               <SignalStrength strength={label.score} /> }
           </span>
-        </span>;
+        </Tooltip>;
       }
 
       return <span style={style} className="event-label"
@@ -342,20 +345,6 @@ module Esper.Components {
         <i className="fa fa-fw fa-tag" />{" "}
         {this.props.label.label}
       </span>;
-    }
-
-    componentDidMount() {
-      this.mountTooltip();
-    }
-
-    componentDidUpdate() {
-      this.mountTooltip();
-    }
-
-    mountTooltip() {
-      if (this._predictedLabel) {
-        $(this._predictedLabel).tooltip();
-      }
     }
 
     isSelected() {
@@ -370,6 +359,25 @@ module Esper.Components {
 
     toggleOff() {
       EventLabelChange.remove([this.props.event], this.props.label.label);
+    }
+  }
+
+  class NoAttendToggle extends ReactHelpers.Component<{
+    event: Events2.TeamEvent
+  }, {}> {
+    render() {
+      return <Tooltip className={classNames("no-attend-action",
+          "action", "label-list-action", {
+            active: this.props.event.feedback.attended === false
+          })} title="Did Not Attend" onClick={() => this.toggleAttend()}>
+        <i className="fa fa-fw fa-ban" />
+      </Tooltip>;
+    }
+
+    toggleAttend() {
+      Actions.Feedback.post(this.props.event, {
+        attended: this.props.event.feedback.attended === false
+      });
     }
   }
 
