@@ -119,6 +119,10 @@ module Esper.Views {
     });
   }
 
+  function prefsHasLabelReminders(prefs: ApiT.Preferences): boolean {
+    return 0 <= _.indexOf(prefs.label_reminder.recipients_, Login.myEmail());
+  }
+
   class GeneralPrefs extends Component<{
     prefsList: Option.T<ApiT.PreferencesList>;
     status: Model.DataStatus;
@@ -140,8 +144,7 @@ module Esper.Views {
           return <div className="esper-spinner esper-centered esper-large" />;
         },
         some: (p) => {
-          var sendLabelReminders = !!_.find(p.preferences_list,
-            (l) => l.general.send_label_reminders);
+          var sendLabelReminders = this.sendLabelReminders();
           return <div className="panel panel-default">
             <div className="panel-heading">
               <i className="fa fa-fw fa-envelope" />{" "}
@@ -166,13 +169,22 @@ module Esper.Views {
       });
     }
 
+    sendLabelReminders(): boolean {
+      return this.props.prefsList.match({
+        none: () => false,
+        some: (p) => {
+          return _.some(p.preferences_list, prefsHasLabelReminders);
+        }
+      });
+    }
+
     toggleLabelReminders() {
       this.props.prefsList.match({
         none: () => null,
         some: (p) => {
           var prefsList = _.cloneDeep(p);
           var prefsWithLabelReminders = _.filter(prefsList.preferences_list,
-            (l) => l.general.send_label_reminders)
+                                                 prefsHasLabelReminders);
 
           var store = ApiC.getAllPreferences.store;
           var storeKey = ApiC.getAllPreferences.strFunc([]);
@@ -181,8 +193,11 @@ module Esper.Views {
           if (prefsWithLabelReminders.length === 0) {
             let prefs = prefsList.preferences_list[0];
             let teamId = prefs.teamid;
-            prefs.general.send_label_reminders = true;
-            let promise = Api.setGeneralPrefs(teamId, prefs.general);
+            if (! prefsHasLabelReminders(prefs)) {
+              prefs.label_reminder.recipients_.push(Login.myEmail());
+            }
+            let promise = Api.setLabelReminderPrefs(teamId,
+                            prefs.label_reminder);
             store.push(storeKey, promise, prefsList);
           }
 
@@ -191,8 +206,10 @@ module Esper.Views {
             var promises: JQueryPromise<any>[] = [];
             _.each(prefsWithLabelReminders, (prefs) => {
               let teamId = prefs.teamid;
-              prefs.general.send_label_reminders = false;
-              promises.push(Api.setGeneralPrefs(teamId, prefs.general))
+              prefs.label_reminder.recipients_ =
+                _.without(prefs.label_reminder.recipients_, Login.myEmail());
+              promises.push(Api.setLabelReminderPrefs(teamId,
+                              prefs.label_reminder))
             });
             let promise = $.when.apply($, promises);
             store.push(storeKey, promise, prefsList);

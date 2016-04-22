@@ -1384,6 +1384,15 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(email_types));
   }
 
+  /** Sets email types given the correct JSON object. */
+  export function setLabelReminderPrefs(teamid: string,
+                                        email_pref: ApiT.SimpleEmailPref):
+    JQueryPromise<void> {
+    var url = prefix + "/api/preferences/label-reminder/"
+            + string(Login.me()) + "/" + string(teamid);
+    return JsonHttp.put(url, JSON.stringify(email_pref));
+  }
+
   /** Sets general prefs given the correct JSON object. */
   export var setGeneralPrefs = setGeneralPreferences;
 
