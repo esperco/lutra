@@ -375,11 +375,9 @@ module Esper.Components {
     }
 
     toggleAttend() {
-      Actions.Feedback.post(this.props.event, {
-        rating: this.props.event.feedback.rating,
-        attended: this.props.event.feedback.attended === false,
-        notes: this.props.event.feedback.notes
-      });
+      var newFeedback = _.clone(this.props.event.feedback);
+      newFeedback.attended = this.props.event.feedback.attended === false;
+      Actions.Feedback.post(this.props.event, newFeedback);
     }
   }
 
