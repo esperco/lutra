@@ -120,7 +120,8 @@ module Esper.Views {
   }
 
   function prefsHasLabelReminders(prefs: ApiT.Preferences): boolean {
-    return 0 <= _.indexOf(prefs.label_reminder.recipients_, Login.myEmail());
+    return prefs.label_reminder.recipients_
+        && 0 <= _.indexOf(prefs.label_reminder.recipients_, Login.myEmail());
   }
 
   class GeneralPrefs extends Component<{
@@ -194,7 +195,11 @@ module Esper.Views {
             let prefs = prefsList.preferences_list[0];
             let teamId = prefs.teamid;
             if (! prefsHasLabelReminders(prefs)) {
-              prefs.label_reminder.recipients_.push(Login.myEmail());
+              if (prefs.label_reminder.recipients_) {
+                prefs.label_reminder.recipients_.push(Login.myEmail());
+              } else {
+                prefs.label_reminder.recipients_ = [Login.myEmail()];
+              }
             }
             let promise = Api.setLabelReminderPrefs(teamId,
                             prefs.label_reminder);
@@ -206,8 +211,10 @@ module Esper.Views {
             var promises: JQueryPromise<any>[] = [];
             _.each(prefsWithLabelReminders, (prefs) => {
               let teamId = prefs.teamid;
-              prefs.label_reminder.recipients_ =
-                _.without(prefs.label_reminder.recipients_, Login.myEmail());
+              if (prefs.label_reminder.recipients_) {
+                prefs.label_reminder.recipients_ =
+                  _.without(prefs.label_reminder.recipients_, Login.myEmail());
+              }
               promises.push(Api.setLabelReminderPrefs(teamId,
                               prefs.label_reminder))
             });
