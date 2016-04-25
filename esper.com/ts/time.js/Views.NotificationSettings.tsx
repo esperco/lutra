@@ -66,13 +66,6 @@ module Esper.Views {
           )} />{" "}
           Receive email for meeting feedback
         </div>
-        <div className="esper-selectable" onClick={() => this.toggleUseSlack()}>
-          <i className={"fa fa-fw " + (
-            prefs.slack_for_meeting_feedback ?
-            "fa-check-square-o" : "fa-square-o"
-          )} />{" "}
-          Receive Slack message for meeting feedback
-        </div>
       </div>;
     }
   }
@@ -119,14 +112,8 @@ module Esper.Views {
     });
   }
 
-  function prefsHasLabelReminders(prefs: ApiT.Preferences): boolean {
-    return prefs.label_reminder
-        && prefs.label_reminder.recipients_
-        && 0 <= _.indexOf(prefs.label_reminder.recipients_, Login.myEmail());
-  }
-
-  class GeneralPrefs extends Component<{
-    prefsList: Option.T<ApiT.PreferencesList>;
+  class TeamGeneralPrefs extends Component<{
+    prefs: Option.T<ApiT.Preferences>;
     status: Model.DataStatus;
   }, {}> {
     render() {
@@ -138,7 +125,7 @@ module Esper.Views {
         status === Model.DataStatus.PUSH_ERROR ||
         status === Model.DataStatus.FETCH_ERROR);
 
-      return this.props.prefsList.match({
+      return this.props.prefs.match({
         none: () => {
           if (! isBusy) {
             return <span />;
@@ -146,7 +133,6 @@ module Esper.Views {
           return <div className="esper-spinner esper-centered esper-large" />;
         },
         some: (p) => {
-          var sendLabelReminders = this.sendLabelReminders();
           return <div className="panel panel-default">
             <div className="panel-heading">
               <i className="fa fa-fw fa-envelope" />{" "}
@@ -159,10 +145,26 @@ module Esper.Views {
                 <div className="esper-selectable"
                      onClick={() => this.toggleLabelReminders()}>
                   <i className={"fa fa-fw " + (
-                    sendLabelReminders ?
+                    this.sendLabelReminders() ?
                     "fa-check-square-o" : "fa-square-o"
                   )} />{" "}
                   Send reminder emails to label calendar events
+                </div>
+                <div className="esper-selectable"
+                     onClick={() => this.toggleDailyAgenda()}>
+                  <i className={"fa fa-fw " + (
+                    this.sendDailyAgenda() ?
+                    "fa-check-square-o" : "fa-square-o"
+                  )} />{" "}
+                  Send daily agenda
+                </div>
+                <div className="esper-selectable"
+                     onClick={() => this.toggleFeedbackSummary()}>
+                  <i className={"fa fa-fw " + (
+                    this.sendFeedbackSummary() ?
+                    "fa-check-square-o" : "fa-square-o"
+                  )} />{" "}
+                  Send daily summary for meeting feedbacks
                 </div>
               </div>
             </div>
@@ -172,75 +174,165 @@ module Esper.Views {
     }
 
     sendLabelReminders(): boolean {
-      return this.props.prefsList.match({
+      return this.props.prefs.match({
         none: () => false,
         some: (p) => {
-          return _.some(p.preferences_list, prefsHasLabelReminders);
+          return p.label_reminder
+              && p.label_reminder.recipients_
+              && 0 <= _.indexOf(p.label_reminder.recipients_,
+                                Login.myEmail());
+        }
+      });
+    }
+
+    sendDailyAgenda(): boolean {
+      return this.props.prefs.match({
+        none: () => false,
+        some: (p) => {
+          return 0 <= _.indexOf(p.email_types.daily_agenda.recipients,
+                                Login.myEmail());
+        }
+      });
+    }
+
+    sendFeedbackSummary(): boolean {
+      return this.props.prefs.match({
+        none: () => false,
+        some: (p) => {
+          var emailPrefs = p.email_types.feedback_summary;
+          if (! emailPrefs) {
+            emailPrefs = p.email_types.daily_agenda;
+          }
+          return 0 <= _.indexOf(emailPrefs.recipients, Login.myEmail());
         }
       });
     }
 
     toggleLabelReminders() {
-      this.props.prefsList.match({
+      this.props.prefs.match({
         none: () => null,
         some: (p) => {
-          var prefsList = _.cloneDeep(p);
-          var prefsWithLabelReminders = _.filter(prefsList.preferences_list,
-                                                 prefsHasLabelReminders);
-
-          var store = ApiC.getAllPreferences.store;
-          var storeKey = ApiC.getAllPreferences.strFunc([]);
-
-          // If enabling label-reminders, only enable for first team
-          if (prefsWithLabelReminders.length === 0) {
-            let prefs = prefsList.preferences_list[0];
-            let teamId = prefs.teamid;
-            if (! prefsHasLabelReminders(prefs)) {
-              if (! prefs.label_reminder) {
-                prefs.label_reminder = {recipients_:[Login.myEmail()]};
-              } else if (! prefs.label_reminder.recipients_) {
-                prefs.label_reminder.recipients_ = [Login.myEmail()];
-              } else {
-                prefs.label_reminder.recipients_.push(Login.myEmail());
-              }
+          var prefs = _.cloneDeep(p);
+          if (this.sendLabelReminders()) {
+            prefs.label_reminder.recipients_ =
+              _.without(prefs.label_reminder.recipients_, Login.myEmail());
+          } else {
+            if (! prefs.label_reminder) {
+              prefs.label_reminder = {recipients_:[Login.myEmail()]};
+            } else if (! prefs.label_reminder.recipients_) {
+              prefs.label_reminder.recipients_ = [Login.myEmail()];
+            } else {
+              prefs.label_reminder.recipients_.push(Login.myEmail());
             }
-            let promise = Api.setLabelReminderPrefs(teamId,
-                            prefs.label_reminder);
-            store.push(storeKey, promise, prefsList);
           }
+          updateTeamPreferences(prefs,
+            Api.setLabelReminderPrefs(prefs.teamid, prefs.label_reminder));
+        }
+      });
+    }
 
-          // If disabling label-reminders, disable for all teams
-          else {
-            var promises: JQueryPromise<any>[] = [];
-            _.each(prefsWithLabelReminders, (prefs) => {
-              let teamId = prefs.teamid;
-              if (prefs.label_reminder && prefs.label_reminder.recipients_) {
-                prefs.label_reminder.recipients_ =
-                  _.without(prefs.label_reminder.recipients_, Login.myEmail());
-              }
-              promises.push(Api.setLabelReminderPrefs(teamId,
-                              prefs.label_reminder))
-            });
-            let promise = $.when.apply($, promises);
-            store.push(storeKey, promise, prefsList);
+    toggleDailyAgenda() {
+      this.props.prefs.match({
+        none: () => null,
+        some: (p) => {
+          var prefs = setupEmailPrefs(p);
+          if (this.sendDailyAgenda()) {
+            prefs.email_types.daily_agenda.recipients =
+              _.without(prefs.email_types.daily_agenda.recipients,
+                        Login.myEmail());
+          } else {
+            if (prefs.email_types.daily_agenda.recipients) {
+              prefs.email_types.daily_agenda.recipients.push(Login.myEmail());
+            } else {
+              prefs.email_types.daily_agenda.recipients = [Login.myEmail()];
+            }
           }
+          updateTeamPreferences(prefs,
+            Api.setEmailTypes(prefs.teamid, prefs.email_types));
+        }
+      });
+    }
+
+    toggleFeedbackSummary() {
+      this.props.prefs.match({
+        none: () => null,
+        some: (p) => {
+          var prefs = setupEmailPrefs(p);
+          if (this.sendFeedbackSummary()) {
+            prefs.email_types.feedback_summary.recipients =
+              _.without(prefs.email_types.feedback_summary.recipients,
+                        Login.myEmail());
+          } else {
+            if (prefs.email_types.feedback_summary.recipients) {
+              prefs.email_types.feedback_summary.recipients
+                .push(Login.myEmail());
+            } else {
+              prefs.email_types.feedback_summary.recipients
+                = [Login.myEmail()];
+            }
+          }
+          updateTeamPreferences(prefs,
+            Api.setEmailTypes(prefs.teamid, prefs.email_types));
         }
       });
     }
   }
 
+  interface TeamPreferences {
+    [index: string]: ApiT.Preferences;
+  }
+
+  function getTeamPreferences(): TeamPreferences {
+    var teamPrefs: TeamPreferences = {};
+
+    var store = ApiC.getAllPreferences.store;
+    var key = ApiC.getAllPreferences.strFunc([]);
+    var prefsList = store.val(key);
+    if (prefsList) {
+      _.each(prefsList.preferences_list, (prefs) => {
+        teamPrefs[prefs.teamid] = prefs;
+      });
+    }
+    return teamPrefs;
+  }
+
+  function updateTeamPreferences(prefs: ApiT.Preferences,
+                                 promise: JQueryPromise<any>) {
+    var store = ApiC.getAllPreferences.store;
+    var key = ApiC.getAllPreferences.strFunc([]);
+
+    var prefsList = store.val(key);
+    if (prefsList) {
+      var ps = _.filter(prefsList.preferences_list, (p) => {
+        return p.teamid != prefs.teamid;
+      });
+      ps.push(prefs);
+
+      store.push(key, promise, {preferences_list:ps});
+    }
+  }
+
+  function setupEmailPrefs(prefs: ApiT.Preferences): ApiT.Preferences {
+    prefs = _.cloneDeep(prefs);
+    if (! prefs.email_types.feedback_summary) {
+      prefs.email_types.feedback_summary =
+        _.cloneDeep(prefs.email_types.daily_agenda);
+    }
+    return prefs;
+  }
+
   export class NotificationSettings extends Component<{message?: string}, {}> {
     renderWithData() {
+      var teamPrefs = getTeamPreferences();
       return <div className="container">
         { this.props.message ?
           <div className="alert alert-info">{this.props.message}</div> :
           null }
-        { _.map(Teams.all(), (t) => this.renderTeam(t)) }
-        { this.renderGeneralPrefs() }
+        { _.map(Teams.all(), (t) => this.renderTeam(t, teamPrefs[t.teamid])) }
       </div>;
     }
 
-    renderTeam(team: ApiT.Team) {
+    renderTeam(team: ApiT.Team, prefs: ApiT.Preferences) {
       var calendars = Option.cast(
         Calendars.CalendarListStore.val(team.teamid)
       );
@@ -251,22 +343,14 @@ module Esper.Views {
         some: (m) => m.dataStatus
       });
 
-      return <TeamCalendarSettings key={team.teamid}
-        team={team}
-        calendars={calendars}
-        status={status}
-      />;
-    }
-
-    renderGeneralPrefs() {
-      var store = ApiC.getAllPreferences.store;
-      var key = ApiC.getAllPreferences.strFunc([]);
-      var prefsList = Option.cast(store.val(key));
-      var status = Option.cast(store.metadata(key)).match({
-        none: () => Model.DataStatus.FETCH_ERROR,
-        some: (m) => m.dataStatus
-      });
-      return <GeneralPrefs prefsList={prefsList} status={status} />;
+      return <div>
+        <TeamCalendarSettings key={team.teamid}
+          team={team}
+          calendars={calendars}
+          status={status}
+        />
+        <TeamGeneralPrefs prefs={Option.cast(prefs)} status={status}/>
+      </div>
     }
   }
 }
