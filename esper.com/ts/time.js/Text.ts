@@ -21,6 +21,16 @@ module Esper.Text {
 
   export const NoEventTitle = `Untitled Event`;
 
+  // Notification Settings
+  export const GeneralPrefsHeading = "General Subscriptions";
+  export const SendFeedbackEmail = "Email requesting meeting feedback";
+  export const SendLabelReminder =
+    "Weekly emails reminding me to label calendar events";
+  export const SendDailyAgenda = "Daily agenda email";
+  export const SendFeedbackSummary =
+    "Daily meeting feedback summary email";
+
+
   /////
 
   function s(n: number) {

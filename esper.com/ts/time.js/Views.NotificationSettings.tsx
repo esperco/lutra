@@ -64,7 +64,7 @@ module Esper.Views {
             prefs.email_for_meeting_feedback ?
             "fa-check-square-o" : "fa-square-o"
           )} />{" "}
-          Receive email for meeting feedback
+          {Text.SendFeedbackEmail}
         </div>
       </div>;
     }
@@ -120,31 +120,28 @@ module Esper.Views {
     render() {
       return <div className="esper-select-menu">
         <div className="esper-select-header">
-          General Subscriptions
+          {Text.GeneralPrefsHeading}
         </div>
         <div className="esper-selectable"
              onClick={() => this.toggleLabelReminders()}>
           <i className={"fa fa-fw " + (
             this.sendLabelReminders() ?
             "fa-check-square-o" : "fa-square-o"
-          )} />{" "}
-          Send reminder emails to label calendar events
+          )} />{" "}{Text.SendLabelReminder}
         </div>
         <div className="esper-selectable"
              onClick={() => this.toggleDailyAgenda()}>
           <i className={"fa fa-fw " + (
             this.sendDailyAgenda() ?
             "fa-check-square-o" : "fa-square-o"
-          )} />{" "}
-          Send daily agenda
+          )} />{" "}{Text.SendDailyAgenda}
         </div>
         <div className="esper-selectable"
              onClick={() => this.toggleFeedbackSummary()}>
           <i className={"fa fa-fw " + (
             this.sendFeedbackSummary() ?
             "fa-check-square-o" : "fa-square-o"
-          )} />{" "}
-          Send daily summary for meeting feedbacks
+          )} />{" "}{Text.SendFeedbackSummary}
         </div>
       </div>;
     }
@@ -300,7 +297,7 @@ module Esper.Views {
   export class NotificationSettings extends Component<{message?: string}, {}> {
     renderWithData() {
       var teamPrefs = getTeamPreferences();
-      return <div className="container">
+      return <div id="notification-settings" className="container">
         { this.props.message ?
           <div className="alert alert-info">{this.props.message}</div> :
           null }
