@@ -64,15 +64,16 @@ module Esper.Views {
             prefs.email_for_meeting_feedback ?
             "fa-check-square-o" : "fa-square-o"
           )} />{" "}
-          Receive email for meeting feedback
+          {Text.SendFeedbackEmail}
         </div>
       </div>;
     }
   }
 
-  function TeamCalendarSettings({team, calendars, status}: {
+  function TeamSettings({team, calendars, prefs, status}: {
     team: ApiT.Team;
     calendars: Option.T<ApiT.GenericCalendar[]>;
+    prefs: Option.T<ApiT.Preferences>;
     status: Model.DataStatus;
   }) {
     return calendars.match({
@@ -106,6 +107,7 @@ module Esper.Views {
                 team={team} cal={c}
               />
             )}
+            <TeamGeneralPrefs prefs={prefs} />
           </div>
         </div>;
       }
@@ -114,63 +116,34 @@ module Esper.Views {
 
   class TeamGeneralPrefs extends Component<{
     prefs: Option.T<ApiT.Preferences>;
-    status: Model.DataStatus;
   }, {}> {
     render() {
-      var status = this.props.status;
-      var isBusy = (
-        status === Model.DataStatus.FETCHING ||
-        status === Model.DataStatus.INFLIGHT);
-      var hasError = (
-        status === Model.DataStatus.PUSH_ERROR ||
-        status === Model.DataStatus.FETCH_ERROR);
-
-      return this.props.prefs.match({
-        none: () => {
-          if (! isBusy) {
-            return <span />;
-          }
-          return <div className="esper-spinner esper-centered esper-large" />;
-        },
-        some: (p) => {
-          return <div className="panel panel-default">
-            <div className="panel-heading">
-              <i className="fa fa-fw fa-envelope" />{" "}
-              E-mail Subscriptions
-              {isBusy ? <span className="esper-spinner" /> : null}
-            </div>
-            <div className="panel-body">
-              { hasError ? <Components.ErrorMsg /> : null }
-              <div className="esper-select-menu">
-                <div className="esper-selectable"
-                     onClick={() => this.toggleLabelReminders()}>
-                  <i className={"fa fa-fw " + (
-                    this.sendLabelReminders() ?
-                    "fa-check-square-o" : "fa-square-o"
-                  )} />{" "}
-                  Send reminder emails to label calendar events
-                </div>
-                <div className="esper-selectable"
-                     onClick={() => this.toggleDailyAgenda()}>
-                  <i className={"fa fa-fw " + (
-                    this.sendDailyAgenda() ?
-                    "fa-check-square-o" : "fa-square-o"
-                  )} />{" "}
-                  Send daily agenda
-                </div>
-                <div className="esper-selectable"
-                     onClick={() => this.toggleFeedbackSummary()}>
-                  <i className={"fa fa-fw " + (
-                    this.sendFeedbackSummary() ?
-                    "fa-check-square-o" : "fa-square-o"
-                  )} />{" "}
-                  Send daily summary for meeting feedbacks
-                </div>
-              </div>
-            </div>
-          </div>
-        }
-      });
+      return <div className="esper-select-menu">
+        <div className="esper-select-header">
+          {Text.GeneralPrefsHeading}
+        </div>
+        <div className="esper-selectable"
+             onClick={() => this.toggleLabelReminders()}>
+          <i className={"fa fa-fw " + (
+            this.sendLabelReminders() ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}{Text.SendLabelReminder}
+        </div>
+        <div className="esper-selectable"
+             onClick={() => this.toggleDailyAgenda()}>
+          <i className={"fa fa-fw " + (
+            this.sendDailyAgenda() ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}{Text.SendDailyAgenda}
+        </div>
+        <div className="esper-selectable"
+             onClick={() => this.toggleFeedbackSummary()}>
+          <i className={"fa fa-fw " + (
+            this.sendFeedbackSummary() ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}{Text.SendFeedbackSummary}
+        </div>
+      </div>;
     }
 
     sendLabelReminders(): boolean {
@@ -324,7 +297,7 @@ module Esper.Views {
   export class NotificationSettings extends Component<{message?: string}, {}> {
     renderWithData() {
       var teamPrefs = getTeamPreferences();
-      return <div className="container">
+      return <div id="notification-settings" className="container">
         { this.props.message ?
           <div className="alert alert-info">{this.props.message}</div> :
           null }
@@ -343,14 +316,12 @@ module Esper.Views {
         some: (m) => m.dataStatus
       });
 
-      return <div>
-        <TeamCalendarSettings key={team.teamid}
-          team={team}
-          calendars={calendars}
-          status={status}
-        />
-        <TeamGeneralPrefs prefs={Option.cast(prefs)} status={status}/>
-      </div>
+      return <TeamSettings key={team.teamid}
+        team={team}
+        calendars={calendars}
+        prefs={Option.cast(prefs)}
+        status={status}
+      />;
     }
   }
 }
