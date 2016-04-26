@@ -19,7 +19,7 @@ module Esper.Views {
 
       // Update local state
       var newCal = _.cloneDeep(this.props.cal);
-      newCal.prefs = _.extend(newCal.prefs, prefs);
+      newCal.prefs = prefs;
 
       var calendarList = _.clone(Calendars.CalendarListStore.val(teamId));
       var index = _.findIndex(calendarList, (c) => c.id === calId);
@@ -28,21 +28,27 @@ module Esper.Views {
       Calendars.CalendarListStore.push(teamId, p, calendarList);
     }
 
+    toggleDailyAgenda() {
+      var newPrefs = _.cloneDeep(this.props.cal.prefs);
+      newPrefs.add_to_daily_agenda = ! newPrefs.add_to_daily_agenda;
+      this.updateCalendarPrefs(newPrefs);
+    }
+
     toggleUseEmail() {
-      var current = this.props.cal.prefs.email_for_meeting_feedback;
-      this.updateCalendarPrefs({
-        email_for_meeting_feedback: !current
-      });
+      var newPrefs = _.cloneDeep(this.props.cal.prefs);
+      newPrefs.email_for_meeting_feedback =
+        ! newPrefs.email_for_meeting_feedback;
+      this.updateCalendarPrefs(newPrefs);
     }
 
     toggleUseSlack() {
-      var current = this.props.cal.prefs.slack_for_meeting_feedback;
-      this.updateCalendarPrefs({
-        slack_for_meeting_feedback: !current
-      });
+      var newPrefs = _.cloneDeep(this.props.cal.prefs);
+      newPrefs.slack_for_meeting_feedback =
+        ! newPrefs.slack_for_meeting_feedback;
+      this.updateCalendarPrefs(newPrefs);
 
       // Check if we need Slack authorization
-      if (! current) {
+      if (newPrefs.slack_for_meeting_feedback) {
         ApiC.getSlackAuthInfo().then(function(x:ApiT.SlackAuthInfo) {
           if (! x.slack_authorized) {
             // Uncache non-authorized status b/c this is likely to change
@@ -54,7 +60,7 @@ module Esper.Views {
     }
 
     render() {
-      var prefs = this.props.cal.prefs || {};
+      var prefs = this.props.cal.prefs || {add_to_daily_agenda:false};
       return <div className="esper-select-menu">
         <div className="esper-select-header">
           { this.props.cal.title }
@@ -65,6 +71,14 @@ module Esper.Views {
             "fa-check-square-o" : "fa-square-o"
           )} />{" "}
           {Text.SendFeedbackEmail}
+        </div>
+        <div className="esper-selectable"
+             onClick={() => this.toggleDailyAgenda()}>
+          <i className={"fa fa-fw " + (
+            prefs.add_to_daily_agenda ?
+            "fa-check-square-o" : "fa-square-o"
+          )} />{" "}
+          {Text.AddToDailyAgenda}
         </div>
       </div>;
     }

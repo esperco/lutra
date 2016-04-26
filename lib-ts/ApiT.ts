@@ -463,6 +463,7 @@ module Esper.ApiT {
   export interface CalendarPrefs {
     email_for_meeting_feedback?: boolean;
     slack_for_meeting_feedback?: boolean;
+    add_to_daily_agenda: boolean;
   }
 
   export interface SlackAuthInfo {
