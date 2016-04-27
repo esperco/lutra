@@ -637,7 +637,7 @@ module Esper.CalPicker {
       },
       height: calHeight,
       defaultView: 'agendaWeek',
-      snapDuration: "00:15:00",
+      snapDuration: moment.duration(15, "minutes"),
       selectable: true,
       selectHelper: true,
       select: select,

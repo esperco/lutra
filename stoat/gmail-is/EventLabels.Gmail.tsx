@@ -28,6 +28,7 @@ module Esper.EventLabels {
           title: ev.title,
           start: ev.start.local,
           end: ev.end.local,
+          feedback: {},
           description_messageids: ev.description_messageids,
           labels: ev.labels,
           labels_norm: _.map(ev.labels, (l) => l.toLowerCase()),

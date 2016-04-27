@@ -30,6 +30,7 @@ module Esper.EventLabels {
         title: this.props.event.title,
         start: this.props.event.start.local,
         end: this.props.event.end.local,
+        feedback: {},
         description_messageids: this.props.event.description_messageids,
         labels: this.props.event.labels,
         labels_norm: _.map(this.props.event.labels, (l) => l.toLowerCase()),
