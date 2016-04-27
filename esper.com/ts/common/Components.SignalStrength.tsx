@@ -31,7 +31,7 @@ module Esper.Components {
         width: pct,
         overflow: "hidden",
         position: "absolute",
-        left: "0"
+        left: "0px"
       }}>
         <i className="fa fa-fw fa-signal" />
       </span>
