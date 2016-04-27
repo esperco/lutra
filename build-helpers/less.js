@@ -18,7 +18,7 @@ var _ = require("lodash"),
   out: string - Directory to output compiled CSS
 */
 module.exports = function(globs, out) {
-  var partialFilter = filter(['*', '!_*.less']);
+  var partialFilter = filter(['**', '!**/_*.less']);
   var baseDirs = deglob(globs);
 
   var ret = gulp.src(globs)

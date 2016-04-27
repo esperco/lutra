@@ -42,11 +42,13 @@ module.exports = function(globs, out, context) {
 
   var ret = gulp.src(globs)
     .pipe(data(function() { return context; }))
-    .pipe(nunjucksRender()
+    .pipe(nunjucksRender({
+      path: baseDirs
+    }))
     .on("error", function(err) {
       gutil.log(gutil.colors.red(err.name),
         "in", err.fileName, ":", err.message);
-    }));
+    });
 
   if (production.isSet()) {
     ret = ret.pipe(minify({
