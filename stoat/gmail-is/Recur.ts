@@ -422,7 +422,7 @@ module Esper.Recur {
       startsOn.change(updateState);
     } else {
       if (eventObj.start['toISOString']) {
-        localDateTime = (<Date> eventObj.start).toISOString();
+        localDateTime = eventObj.start.toDate().toISOString();
       }
       startsOn.val(localDateTime.split("T")[0]);
       var utcDateTime = moment(eventObj.start).utc().toISOString();

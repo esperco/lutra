@@ -118,8 +118,8 @@ gulp.task("build", gulp.parallel("build-html",
                                  "build-ts",
                                  "build-less"));
 
-gulp.task("clean", function(cb) {
-  helpers.clean(config.pubDir, cb);
+gulp.task("clean", function() {
+  return helpers.clean(config.pubDir);
 });
 
 gulp.task("production", helpers.setProduction);

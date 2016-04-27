@@ -9,6 +9,6 @@ var del = require("del");
   pubDir: string - Pub directory to clean
   cb: () => any - Callback for when task is complete
 */
-module.exports = function(pubDir, cb) {
-  del(pubDir, cb);
+module.exports = function(pubDir) {
+  return del(pubDir);
 };

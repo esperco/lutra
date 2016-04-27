@@ -484,7 +484,7 @@ module Esper.Views {
           </span>
           <input type="text" className="form-control"
             placeholder="Search Title"
-            value={this.state.value || null}
+            value={this.state.value || ""}
             onChange={
               (e) => this.onChange((e.target as HTMLInputElement).value)
             } />
