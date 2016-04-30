@@ -25,7 +25,7 @@ module Esper.Components {
 
       if (this.props.loginInfo) {
         return <Dropdown className="dropdown">
-          <a className="dropdown-toggle">
+          <a className="dropdown-toggle navbar-link">
             {this.props.loginInfo.email}{" "}
             <span className="caret"></span>
           </a>

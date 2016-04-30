@@ -22,7 +22,8 @@ module Esper.Views {
         some: (m) => m.dataStatus !== Model.DataStatus.READY
       });
 
-      return <nav className="navbar navbar-default navbar-fixed-top">
+      return <nav
+              className="navbar navbar-default navbar-shadow navbar-fixed-top">
         <div className="container-fluid padded">
           <div className="navbar-header">
             <button type="button" className={"navbar-toggle collapsed " +
