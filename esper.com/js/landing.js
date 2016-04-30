@@ -32,7 +32,7 @@ function resizer() {
 
 function loadElements() {
   $(".nav-menu").click(function() { toggleNavMenu(); });
-  $(".nav-menu-toggle").click(function() { toggleNavMenu(); });
+  $(".navbar-toggle").click(function() { toggleNavMenu(); });
 }
 
 function main() {

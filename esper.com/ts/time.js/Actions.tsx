@@ -6,7 +6,6 @@
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <reference path="./Views.Header.tsx" />
-/// <reference path="./Views.Footer.tsx" />
 
 module Esper.Actions {
   // Set defaults for header and footer render
@@ -15,9 +14,6 @@ module Esper.Actions {
                          footer?: React.ReactElement<any>) {
     if (header !== null) { // Null => intentionally blank
       header = header || <Views.Header />;
-    }
-    if (footer !== null) {
-      footer = footer || <Views.Footer />;
     }
     Layout.render(main, header, footer);
   }

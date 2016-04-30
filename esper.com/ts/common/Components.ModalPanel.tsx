@@ -77,7 +77,10 @@ module Esper.Components {
       }
       {
         props.onCancel && !(props.busyText && props.busy) ?
-        <button className="btn btn-default"
+        <button className={classNames("btn", {
+                  "btn-default": !props.onOK,
+                  "btn-secondary": !!props.onOK
+                })}
                 onClick={props.onCancel}
                 disabled={props.disableCancel}>
           {props.cancelText || "Cancel"}

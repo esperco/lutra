@@ -4,10 +4,10 @@
 
 {% block main %}
   <!-- Overview -->
-  <div class="section-container gray left-align">
+  <div class="section-container white left-align">
     <div class="section-content verynarrow">
       Thanks for signing up. We'll reach out to you shortly!
-      <br>You can also <a href="mailto:allofus@esper.com">contact us directly</a>.
+      <br>You can also <a href="/contact">contact us directly</a>.
     </div>
 
     <!-- Signup Form -->
@@ -16,30 +16,36 @@
       <form onkeydown="if (event.keyCode == 13) document.getElementById('signup-btn').click()"
         action="http://esper.us9.list-manage.com/subscribe/post?u=8158de07fd0008052ebb78ee6&amp;id=31f4c34dec"
         method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
-        <div class="name-field left">
-          <input type="text" placeholder="First Name" name="FNAME" class="required" id="first-name" autofocus>
+        <div class="row">
+          <div class="col-sm-6 form-group">
+            <input type="text" placeholder="First Name" name="FNAME"
+                   class="required form-control" id="first-name" autofocus />
+          </div>
+          <div class="col-sm-6 form-group">
+            <input type="text" placeholder="Last Name" name="LNAME"
+                   class="required form-control" id="last-name">
+          </div>
         </div>
-        <div class="name-field right">
-          <input type="text" placeholder="Last Name" name="LNAME" class="required" id="last-name">
+        <div class="form-group">
+          <input type="tel" placeholder="Phone Number" name="PHONE" id="phone"
+                 class="form-control">
         </div>
-        <div style="color: black">
-          <input type="tel" placeholder="Phone Number" name="PHONE" id="phone">
+        <div class="form-group">
+          <input type="email" placeholder="Email Address" name="EMAIL"
+                 class="required form-control" id="email">
         </div>
-        <div style="color: black">
-          <input type="email" placeholder="Email Address" name="EMAIL" class="required" id="email">
-        </div>
-        <div class="clearfix">
-          <select name="MMERGE3" class="required esper-select" style="font-size: 16px" id="platform" onchange="this.className=this.options[this.selectedIndex].className">
+        <div class="form-group clearfix">
+          <select name="MMERGE3" class="required form-control" id="platform">
             <option selected disabled value="none">Email / Calendar Client</option>
-            <option class="esper-select option-black" value="Google Apps">Google Apps</option>
-            <option class="esper-select option-black" value="Microsoft Exchange">Microsoft Exchange</option>
-            <option class="esper-select option-black" value="Microsoft Office 365">Microsoft Office 365</option>
-            <option class="esper-select option-black" value="IBM (Lotus) Notes">IBM (Lotus) Notes</option>
-            <option class="esper-select option-black" value="Other/I Don't Know">Other / I don't know</option>
+            <option value="Google Apps">Google Apps</option>
+            <option value="Microsoft Exchange">Microsoft Exchange</option>
+            <option value="Microsoft Office 365">Microsoft Office 365</option>
+            <option value="IBM (Lotus) Notes">IBM (Lotus) Notes</option>
+            <option value="Other/I Don't Know">Other / I don't know</option>
           </select>
         </div>
         <div class="submit-button-row" align="right">
-          <button id="signup-btn" class="button-primary" type="submit">Request Demo</button>
+          <button id="signup-btn" class="btn btn-primary" type="submit">Request Demo</button>
         </div>
         <div id="mce-responses" class="clear">
           <div class="response" id="mce-error-response" style="display:none"></div>

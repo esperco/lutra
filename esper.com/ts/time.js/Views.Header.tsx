@@ -22,7 +22,8 @@ module Esper.Views {
         some: (m) => m.dataStatus !== Model.DataStatus.READY
       });
 
-      return <nav className="navbar navbar-default navbar-fixed-top">
+      return <nav
+              className="navbar navbar-default navbar-shadow navbar-fixed-top">
         <div className="container-fluid padded">
           <div className="navbar-header">
             <button type="button" className={"navbar-toggle collapsed " +
@@ -110,7 +111,10 @@ module Esper.Views {
         <li key="6" className="divider" />,
         <li key="7"><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
-          Logout
+          Log out
+          <span className="visible-xs-inline">
+            {" of "}{Login.myEmail()}
+          </span>
         </a></li>
       ];
     }

@@ -5,6 +5,11 @@
 // Override variables
 @import "./_bootstrap-variables";
 
+// Tweak primary class
+.btn-primary {
+  font-weight: bold;
+}
+
 // Addition button classes
 .btn-secondary {
   color: @link-color;
@@ -28,6 +33,11 @@
     color: white;
     border: 1px solid white;
   }
+
+  &.active {
+    color: @brand-text;
+    background: rgba(255, 255, 255, 0.95);
+  }
 }
 
 // Animations
@@ -39,7 +49,18 @@
 .button-primary { .btn-primary }
 .button-secondary { .btn-secondary }
 .button-tertiary { .btn-tertiary }
+.left { .pull-left; }
+.right { .pull-right; }
 
+
+/*
+  Global, generics
+*/
+
+body {
+  text-rendering: optimizeLegibility;
+  font-smoothing: antialiased;
+}
 
 
 /*
@@ -59,7 +80,7 @@
   }
 }
 
-input.form-control, textarea.form-control {
+input.form-control, textarea.form-control, select.form-control {
   &:focus, &:hover {
     outline: none;
     border: 1px solid @link-color;
@@ -104,6 +125,29 @@ input.form-control, textarea.form-control {
     text-overflow: ellipsis;
     overflow-x: hidden;
   }
+}
+
+.list-group-item-success,
+.list-group-item-info,
+.list-group-item-warning,
+.list-group-item-danger, {
+  z-index: 1;
+}
+
+.list-group-item-success {
+  border: 1px solid @state-success-border;
+}
+
+.list-group-item-info {
+  border: 1px solid @state-info-border;
+}
+
+.list-group-item-warning {
+  border: 1px solid @state-warning-border;
+}
+
+.list-group-item-danger {
+  border: 1px solid @state-danger-border;
 }
 
 .list-group.compact {
@@ -226,6 +270,12 @@ a {
 .dropdown {
   .dropdown-menu {
     min-width: 100%;
+
+    > li > a {
+      &:hover, &:focus {
+        opacity: 1.0;
+      }
+    }
   }
 }
 
@@ -301,3 +351,40 @@ input.form-control.dropdown-toggle[readonly] {
     }
   }
 }
+
+.navbar-default .navbar-toggle {
+  border: 0;
+  color: @navbar-default-link-color;
+  cursor: pointer;
+
+  &:hover, &:focus {
+    background-color: transparent;
+    color: @navbar-default-link-hover-color;
+  }
+}
+
+.alert a {
+  font-weight: bold;
+}
+
+.alert-success a {
+  color: @brand-success;
+  &:hover { color: @brand-success; }
+}
+
+.alert-info a {
+  color: @brand-info;
+  &:hover { color: @brand-info; }
+}
+
+.alert-warning a {
+  color: @brand-warning;
+  &:hover { color: @brand-warning; }
+}
+
+.alert-danger a {
+  color: @brand-danger;
+  &:hover { color: @brand-danger; }
+}
+
+

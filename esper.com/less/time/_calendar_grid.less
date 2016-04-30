@@ -3,6 +3,8 @@
 @import "../lib/_helpers";
 @import "../lib/_animations";
 
+@active-span: @text-muted;
+
 table.calendar-grid {
   width: 100%;
   margin-bottom: @padding-large-vertical;
@@ -24,7 +26,7 @@ table.calendar-grid {
   }
 
   .out-month {
-    color: @gray-lighter;
+    color: @panel-default-heading-bg;
   }
 
   .day-number {
@@ -51,7 +53,7 @@ table.calendar-grid {
 
     .cal-header {
       line-height: 2em;
-      color: @gray;
+      color: @panel-default-text;
       background: @table-border-color;
       border-left: @padding-xs-horizontal solid @table-border-color;
       border-right: @padding-xs-horizontal solid @table-border-color;
@@ -115,7 +117,7 @@ table.calendar-grid {
 
   table.calendar-grid {
     .in-month .day-number {
-      background: @gray-lighter;
+      background: @panel-default-heading-bg;
     }
 
     .in-month.today {
@@ -194,14 +196,13 @@ table.calendar-grid {
       display: block;
       height: 100%;
       animation: extendwidth 0.5s ease-in-out;
-      // background: @gray-lighter;
       background: white;
       border: 1px solid @table-border-color;
       box-sizing: border-box;;
     }
 
     &.active > span {
-      background: @gray;
+      background: @active-span;
       border: 0;
       cursor: pointer;
 

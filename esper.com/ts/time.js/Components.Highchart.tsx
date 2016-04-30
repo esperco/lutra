@@ -35,6 +35,7 @@ module Esper.Components {
         title: { text: "" },
 
         chart: {
+          backgroundColor: 'transparent',
           events: {
             drilldown: this.onDrilldown.bind(this),
             drillup: this.onDrillup.bind(this)

@@ -1,15 +1,21 @@
 {% extends "_app.html" %}
 
 {% set PAGE_NAME = "Login" %}
+{% set BODY_CLASS = "login" %}
 
 {% block head %}
   {{ super() }}
   <link rel="stylesheet" href="css/login.css" media="screen" />
 {% endblock %}
 
-{% block postscripts %}
+{% block header %}
+  {% include "_navbar.html" %}
+  {% include "_nav-menu.html" %}
+{% endblock %}
 
+{% block postscripts %}
   {{ super() }}
   <script type="text/javascript" src="/js/react-simple-vendor.js"></script>
+  <script type="text/javascript" src="js/landing.js"></script>
   <script type="text/javascript" src="/js/login.js"></script>
 {% endblock %}

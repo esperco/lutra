@@ -125,32 +125,34 @@ module Esper {
   function renderLogin(message?: string, error?: string) {
     var ext = Util.getParamByName(Login.extParam);
     var platform = Util.getParamByName(Login.platformParam);
-    Layout.render(<div id="esper-login-container">
-      <Components.LoginPrompt
-        landingUrl={getLandingUrl()}
-        inviteCode={getInviteCode()}
-        email={getEmail()}
-        platform={platform}
-        showGoogle={true}
-        showExchange={!ext}
-        showNylas={!ext}>
-        <div className={
-          "alert text-center alert-" + (error ? "danger" : "info")
-        }>{ error || message || <span>
+    Layout.render(<div id="esper-login-container" className="container">
+      <div className="panel panel-default"><div className="panel-body">
+        <Components.LoginPrompt
+          landingUrl={getLandingUrl()}
+          inviteCode={getInviteCode()}
+          email={getEmail()}
+          platform={platform}
+          showGoogle={true}
+          showExchange={!ext}
+          showNylas={!ext}>
+          <div className={
+            "alert text-center alert-" + (error ? "danger" : "info")
+          }>{ error || message || <span>
               Esper uses data from your calendar and other sources to provide
               you insight into how you spend your time. Please log in with your
               calendar provider to continue.
             </span>
-         }{
-           error ? <span>
-             {" "}Please {" "}<a href="/contact">contact us</a> if this
-             continues to happen.
-           </span> : ""
-         }</div>
-      </Components.LoginPrompt>
-      { showStagingLogin() ? <a onClick={renderStagingLogin}>
-        Staging Login
-      </a> : null }
+           }{
+            error ? <span>
+              {" "}Please {" "}<a href="/contact">contact us</a> if this
+              continues to happen.
+            </span> : ""
+           }</div>
+        </Components.LoginPrompt>
+        { showStagingLogin() ? <a onClick={renderStagingLogin}>
+          Staging Login
+        </a> : null }
+      </div></div>
     </div>);
   }
 
