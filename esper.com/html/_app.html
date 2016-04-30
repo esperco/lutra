@@ -11,19 +11,10 @@
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 {% endblock %}
 
-{% block body %}
-  {% block header %}
-    <div id="esper-header"></div>
-  {% endblock %}
+{# Clear header by default -- app will re-render #}
+{% block header %}{% endblock %}
 
-  {% block main %}
-    <div id="esper-main"></div>
-  {% endblock %}
-
-  {% block footer %}
-    <div id="esper-footer"></div>
-  {% endblock %}
-
+{% block postfooter %}
   {% block loading %}
     <div id="esper-loading">
       <div class="esper-center">
@@ -35,10 +26,10 @@
   {% block modal %}
     <div id="esper-modal"></div>
   {% endblock %}
+{% endblock %}
 
-  {% block postscripts %}
-    {% include "_segment.html" %}
-    {% include "_olark.html" %}
-    {% include "_raven.html" %}
-  {% endblock %}
+{% block postscripts %}
+  {% include "_segment.html" %}
+  {% include "_olark.html" %}
+  {% include "_raven.html" %}
 {% endblock %}

@@ -24,17 +24,25 @@
   {% endblock %}
 </head>
 
-<body class="esper">{% block body %}
-  {% block header %}
-    {% include "_navbar.html" %}
-    {% include "_nav-menu.html" %}
-  {% endblock %}
+<body class="esper {{ BODY_CLASS }}">{% block body %}
+  <div id="esper-header">
+    {% block header %}
+      {% include "_navbar.html" %}
+      {% include "_nav-menu.html" %}
+    {% endblock %}
+  </div>
 
-  {% block main %}{% endblock %}
+  <div id="esper-main">
+    {% block main %}{% endblock %}
+  </div>
 
-  {% block footer %}
-    {% include "_footer.html" %}
-  {% endblock %}
+  <div id="esper-footer">
+    {% block footer %}
+      {% include "_footer.html" %}
+    {% endblock %}
+  </div>
+
+  {% block postfooter %}{% endblock %}
 
   {% block postscripts %}
     {% include "_segment.html" %}

@@ -189,7 +189,7 @@
     height: 95%;
     font-size: 250%;
     margin: 0;
-    color: @gray-light;
+    color: @text-muted;
 
     @media screen and (max-width: @screen-xs-max) {
       min-height: @min-fullscreen-height * .95;
@@ -278,7 +278,7 @@
 .esper-placeholder {
   width: 80%;
   height: @font-size-small;
-  background: @gray-lighter;
+  background: @input-color-placeholder;
   display: inline-block;
   vertical-align: middle;
 }
@@ -399,13 +399,13 @@
 
 // Low-key text
 .esper-advisory {
-  color: @gray-light;
+  color: @text-muted;
   font-size: @font-size-small;
 
   a, .esper-link {
-    color: @gray-light;
+    color: @text-muted;
     &:hover {
-      color: @gray;
+      color: @text-muted-hover;
       text-decoration: underline;
     }
   }
@@ -417,7 +417,7 @@
   height: 1em;
   vertical-align: middle;
   margin-right: @padding-small-horizontal;
-  border-right: 1px solid @gray-light;
+  border-right: 1px solid @hr-border;
 }
 
 .esper-one-line {
@@ -425,11 +425,11 @@
 }
 
 .esper-subtle, a.esper-subtle {
-  color: @gray-light;
+  color: @text-muted;
 
   &:hover,
   &:focus {
-    color: @gray-dark;
+    color: @text-muted-hover;
   }
 }
 
@@ -470,6 +470,7 @@ flexibility with non-UL elements */
       text-decoration: none;
       color: @dropdown-link-hover-color;
       background-color: @dropdown-link-hover-bg;
+      opacity: 1.0;
     }
 
     .nav & {
@@ -522,7 +523,7 @@ flexibility with non-UL elements */
   }
 
   .fa-caret-down {
-    color: @gray-light;
+    color: @input-color;
   }
 
   .esper-selector-content {

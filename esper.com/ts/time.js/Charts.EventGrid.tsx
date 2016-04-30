@@ -124,13 +124,16 @@ module Esper.Charts {
           var width = (nextBlock / SECONDS_PER_ROW) * 100;
           let style: { background?: string } = {};
           var classNames = ["time-segment"];
-          if (b.event) {
-            classNames.push("active");
-            style.background = b.label.match({
-              none: () => Colors.lightGray,
-              some: (l) => Colors.getColorForLabel(l)
-            });
-          }
+          b.event.match({
+            none: () => null,
+            some: () => {
+              classNames.push("active");
+              style.background = b.label.match({
+                none: () => Colors.lightGray,
+                some: (l) => Colors.getColorForLabel(l)
+              });
+            }
+          });
           segments.push(<span key={j++}
             className={classNames.join(" ")}
             style={{width: width + "%"}}

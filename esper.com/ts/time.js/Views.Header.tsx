@@ -110,7 +110,10 @@ module Esper.Views {
         <li key="6" className="divider" />,
         <li key="7"><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
-          Logout
+          Log out
+          <span className="visible-xs-inline">
+            {" of "}{Login.myEmail()}
+          </span>
         </a></li>
       ];
     }

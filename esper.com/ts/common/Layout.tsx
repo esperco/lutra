@@ -21,13 +21,15 @@ module Esper.Layout {
   export function render(main: React.ReactElement<any>,
                          header?: React.ReactElement<any>,
                          footer?: React.ReactElement<any>) {
-    header = header || <span />;
-    $(headerSelector).show().renderReact(header);
+    if (! _.isUndefined(header)) {
+      $(headerSelector).show().renderReact(header);
+    }
 
     $(mainSelector).renderReact(main);
 
-    footer = footer || <span />;
-    $(footerSelector).renderReact(footer);
+    if (! _.isUndefined(footer)) {
+      $(footerSelector).renderReact(footer);
+    }
 
     /*
       window.requestAnimationFrame ensures that all synchronous JS operations

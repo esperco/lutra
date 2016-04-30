@@ -4,37 +4,28 @@
 @import "./lib/_bootstrap-variables";
 @import "./_loading";
 @import "./_login-buttons";
+@import "./_header";
+@import "./_footer";
 
 @esper-button-container-shift: 110%;
 
+#esper-main {
+  padding-top: @navbar-height;
+}
+
 #esper-login-container {
-  width: 350px;
   margin: @padding-large-vertical auto;
   padding: @padding-large-vertical;
   text-align: center;
-  border: 1px solid @gray-lighter;
-  border-radius: @border-radius-large;
 
   @media (min-width: @screen-sm-min) {
-    margin: 100px auto;
+    width: 350px;
+    margin: 25px auto;
   }
 }
 
 #esper-login {
   overflow-x: hidden;
-
-  #sign-in-hero-mark {
-    -webkit-animation-duration: 1.5s;
-       -moz-animation-duration: 1.5s;
-           -animation-duration: 1.5s;
-  }
-
-  .hero-mark {
-    width: 40px;
-    height: 50px;
-    margin-right: auto;
-    margin-left: auto;
-  }
 
   .buttons-container {
     position: relative;
@@ -64,8 +55,8 @@
     margin-bottom: 20px;
     padding-top: @padding-base-vertical;
     text-align: center;
-    color: @gray-light;
-    border-top: 1px solid @gray-lighter;
+    color: @text-muted;
+    border-top: 1px solid @hr-border;
   }
 }
 
