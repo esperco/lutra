@@ -15,7 +15,7 @@ var highcharts;
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap");
-  highcharts = require("highcharts");
+  // highcharts = require("highcharts");
 });
 
 // Create a global Esper object with our vendor dependencies
@@ -30,7 +30,7 @@ Esper = (function(esperObj) {
     _:            lodash.noConflict(),
     $:            jQuery,
     jQuery:       jQuery,
-    Highcharts:   highcharts,
+    // Highcharts:   highcharts,
     PRODUCTION:   (process.env.NODE_ENV === "production")
   };
   for (var name in assignments) {

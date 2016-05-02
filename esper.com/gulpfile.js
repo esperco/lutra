@@ -37,7 +37,6 @@ var config = {
   ],
   tsProjects: [
     "ts/chrome-ext.js/tsconfig.json",
-    "ts/landing-charts.js/tsconfig.json",
     "ts/login.js/tsconfig.json",
     "ts/settings.js/tsconfig.json",
     "ts/test.js/tsconfig.json",
