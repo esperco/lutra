@@ -2,9 +2,9 @@
 @import "./_login-buttons";
 
 @splash-height: 500px;
-@chart-height-md: 600px;
+@chart-height-md: 525px;
 @chart-height-sm: 500px;
-@chart-height-xs: 350px;
+@chart-height-xs: 200px;
 @cta-margin: 20px;
 
 #chart-splash {
@@ -31,6 +31,7 @@
 
   h2.splash-text-subheader {
     font-size: 1.5rem;
+    line-height: 1.5;
     color: rgba(255, 255, 255, 0.8);
     font-weight: normal;
   }
@@ -49,16 +50,35 @@
 }
 
 #chart-container {
+  position: relative;
   max-height: @splash-height;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 #chart-target {
   height: @chart-height-xs;
+  overflow: hidden;
+  position: relative;
 
   @media (min-width: @screen-sm-min) {
     height: @chart-height-sm;
   }
+}
+
+@keyframes chart-up {
+  0% { margin-top: 100%; }
+  25% { margin-top: 100%; }
+  100% { margin-top: 0; }
+}
+
+#chart-img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  animation: chart-up 1.5s ease-in-out 0s 1;
 }
 
 @media (min-width: @screen-md-min) {
@@ -92,5 +112,13 @@
     height: @chart-height-md;
     margin-top: 0;
     padding-top: 0;
+  }
+
+  #chart-img {
+    // Vertical center img inside target, shift left slightly
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
   }
 }
