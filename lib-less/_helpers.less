@@ -5,6 +5,10 @@
 // Custom Esper variables
 @min-fullscreen-height: 350px;
 @esper-collapse-max-height: 400px;
+@sidebar-sm-width: 33%;
+@sidebar-md-width: 28%;
+@sidebar-lg-width: 25%;
+
 
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
@@ -13,6 +17,8 @@
 .esper-simple-content {
   margin: 50px auto;
   max-width: 800px;
+  min-height: @min-fullscreen-height;
+  position: relative;
 }
 
 ///////
@@ -24,33 +30,14 @@
 
 ///////
 
-/*
-  full-screen => intended for covering all or most of the screen
-  expanded => intended for expanding to the edges of a given container
-
-  These are mostly identical but differ in how padding is handled.
-*/
 .esper-full-screen.padded {
   .esper-padded;
-}
-
-.esper-expanded.padded {
-  @media screen and (max-width: @screen-xs-max) {
-    padding: @padding-base-vertical 0;
-  }
-
-  @media screen and (min-width: @screen-sm-min) {
-    top: @padding-large-vertical;
-    bottom: @padding-large-vertical;
-    left: @padding-base-horizontal;
-    right: @padding-base-horizontal;
-  }
 }
 
 // Use for absolutely positioning a center div on screen
 .esper-center {
   position: absolute;
-  top: 50%;
+  top: 45%; // Nudge up slightly
   left: 50%;
   min-width: 80%;
   transform: translate(-50%, -50%);
@@ -65,10 +52,6 @@
     border-radius: @border-radius-base;
     min-width: 42%;
   }
-
-  .esper-full-screen &, .esper-expanded  & {
-    top: 45%; // Intentionally nudge a little higher because of header margins
-  }
 }
 
 .esper-full-screen {
@@ -82,7 +65,7 @@
   }
 }
 
-.esper-full-screen, .esper-expanded {
+.esper-full-screen {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   z-index: 1;
@@ -99,17 +82,9 @@
     }
   }
 
-  &.minus-subheader, &.padded.minus-subheader {
-    @media screen and (min-width: @screen-sm-min) {
-      top: @font-size-h4 + @line-height-computed +
-           @panel-body-padding + @padding-base-vertical;
-    }
-  }
-
   .esper-left-sidebar, .esper-right-content {
     position: absolute;
     overflow-y: auto;
-    background: @body-bg;
     top: 0;
     bottom: 0;
 
@@ -120,10 +95,22 @@
 
   .esper-left-sidebar {
     left: 0;
-    width: 30%;
+    border-right: 1px solid @brand-border;
 
     .sidebar-backdrop, .sidebar-toggle {
       display: none;
+    }
+
+    @media (min-width: @screen-sm-min) {
+      width: @sidebar-sm-width;
+    }
+
+    @media (min-width: @screen-md-min) {
+      width: @sidebar-md-width;
+    }
+
+    @media (min-width: @screen-lg-min) {
+      width: @sidebar-lg-width;
     }
 
     @media screen and (max-width: @screen-xs-max) {
@@ -137,6 +124,7 @@
       right: 0;
       padding: 0;
       margin: 0;
+      border-right: 0;
 
       &.padded {
         padding: 0;
@@ -154,7 +142,8 @@
       .sidebar-content {
         display: block;
         overflow: hidden;
-        background: @body-bg;
+        background: @panel-bg;
+        border-top: 1px solid @brand-border;
       }
 
       &.open {
@@ -171,50 +160,61 @@
         }
       }
     }
+
+    &.esper-shade {
+      .sidebar-toggle, .sidebar-content {
+        background: @shade-bg;
+      }
+
+      .sidebar-content {
+        border-color: @shade-border;
+      }
+    }
   }
 
   .esper-right-content {
     right: 0;
-    width: 70%;
+    background: @body-bg;
+
+    &.padded {
+      padding-top: @padding-large-vertical;
+    }
+
+    @media (min-width: @screen-sm-min) {
+      width: 100% - @sidebar-sm-width;
+    }
+
+    @media (min-width: @screen-md-min) {
+      width: 100% - @sidebar-md-width;
+    }
+
+    @media (min-width: @screen-lg-min) {
+      width: 100% - @sidebar-lg-width;
+    }
 
     @media screen and (max-width: @screen-xs-max) {
       position: relative;
       width: 100%;
       min-height: @min-fullscreen-height;
     }
-  }
 
-  // e.g. if panel is only element
-  .esper-focus-message {
-    height: 95%;
-    font-size: 250%;
-    margin: 0;
-    color: @text-muted;
+    display: flex;
+    flex-direction: column;
 
-    @media screen and (max-width: @screen-xs-max) {
-      min-height: @min-fullscreen-height * .95;
+    > .esper-content-header {
+      flex-shrink: 0;
+      flex-grow: 0;
+      margin-bottom: @padding-large-vertical;
     }
 
-    @media screen and (min-width: @screen-sm-min) {
-      font-size: 200%;
-    }
+    > .esper-expanded {
+      flex-grow: 1;
+      min-height: @min-fullscreen-height / 2;
+      position: relative;
 
-    @media screen and (min-width: @screen-md-min) {
-      font-size: 150%;
-    }
-
-    > *:first-child {
-      .esper-center;
-    }
-
-    &.panel {
-      font-size: @font-size-large;
-    }
-
-    h2 {
-      font-weight: bold;
-      font-size: 150%;
-      margin-bottom: 20px;
+      &.esper-no-content > *:first-child {
+        .esper-center;
+      }
     }
   }
 }
@@ -321,12 +321,17 @@
   .esper-subheader {
     margin: 0 0 @padding-base-vertical;
     font-weight: bold;
+    color: @brand-text-header;
+
+    .esper-shade & {
+      color: @shade-text-header;
+    }
   }
 }
 
 .esper-menu-section + .esper-menu-section,
 .esper-panel-section + .esper-panel-section {
-  border-top: 1px solid @dropdown-divider-bg;
+  border-top: 1px solid @brand-divider;
 }
 
 .esper-menu-section + .esper-menu-section,
@@ -347,11 +352,16 @@
   text-align: center;
   padding: @panel-body-padding;
   font-size: @font-size-large;
-  color: @panel-default-border;
-  border: 1px solid @panel-default-border;
+  color: @text-muted;
+  border: 1px solid @brand-border;
   border-radius: @panel-border-radius;
   text-align: center;
   margin-bottom: @padding-large-vertical;
+
+  .esper-shade {
+    color: @shade-text-muted;
+    border-color: @shade-border;
+  }
 }
 
 .esper-wide-button {
@@ -376,9 +386,10 @@
 .esper-subheader-link {
   padding: 0 @padding-base-horizontal;
   cursor: pointer;
-  color: @brand-text;
+  color: @brand-text-header;
   text-transform: uppercase;
   text-decoration: none;
+  line-height: @input-height-base;
 
   &.active {
     font-weight: bold;
@@ -393,13 +404,18 @@
     cursor: pointer;
     text-decoration: none;
   }
+
+  .esper-shade & {
+    color: @shade-text-header;
+  }
 }
 
 /////
 
 // Low-key text
-.esper-advisory {
+.esper-note {
   color: @text-muted;
+  font-weight: normal;
   font-size: @font-size-small;
 
   a, .esper-link {
@@ -407,6 +423,17 @@
     &:hover {
       color: @text-muted-hover;
       text-decoration: underline;
+    }
+  }
+
+  .esper-shade & {
+    color: @shade-text-muted;
+
+    a, .esper-link {
+      color: @shade-text-muted;
+      &:hover {
+        color: @shade-text-muted-hover;
+      }
     }
   }
 }
@@ -418,19 +445,14 @@
   vertical-align: middle;
   margin-right: @padding-small-horizontal;
   border-right: 1px solid @hr-border;
+
+  .esper-shade & {
+    border-color: @shade-divider;
+  }
 }
 
 .esper-one-line {
   white-space: nowrap;
-}
-
-.esper-subtle, a.esper-subtle {
-  color: @text-muted;
-
-  &:hover,
-  &:focus {
-    color: @text-muted-hover;
-  }
 }
 
 
@@ -451,7 +473,7 @@ flexibility with non-UL elements */
     clear: both;
     font-weight: normal;
     line-height: @line-height-base;
-    color: @dropdown-link-color;
+    color: @text-color;
     white-space: nowrap; // prevent links from randomly breaking onto new lines
     overflow-x: hidden;
     text-overflow: ellipsis;
@@ -468,8 +490,8 @@ flexibility with non-UL elements */
     &:hover,
     &:focus {
       text-decoration: none;
-      color: @dropdown-link-hover-color;
-      background-color: @dropdown-link-hover-bg;
+      color: @brand-text-highlight;
+      background-color: @brand-text-highlight-bg;
       opacity: 1.0;
     }
 
@@ -487,11 +509,46 @@ flexibility with non-UL elements */
     height: 1px;
     margin: ((@line-height-computed / 2) - 1) 0;
     overflow: hidden;
-    background-color: @dropdown-divider-bg;
+    background-color: @brand-divider;
   }
 
   + .modal-footer {
     margin-top: @padding-large-vertical;
+  }
+
+  .esper-shade & {
+    .esper-selectable, li > a {
+      color: @shade-text;
+
+      &.highlight,
+      &:hover,
+      &:focus {
+        color: @shade-text-highlight;
+        background-color: @shade-text-highlight-bg;
+      }
+    }
+
+    .divider {
+      background-color: @shade-divider;
+    }
+  }
+
+  // Ignore shading for menu
+  .esper-shade .dropdown-menu & {
+    .esper-selectable, li > a {
+      color: @brand-text;
+
+      &.highlight,
+      &:hover,
+      &:focus {
+        color: @brand-text-highlight;
+        background-color: @brand-text-highlight-bg;
+      }
+    }
+
+    .divider {
+      background-color: @brand-divider;
+    }
   }
 }
 
@@ -500,7 +557,7 @@ flexibility with non-UL elements */
   padding: @padding-xs-vertical @padding-large-horizontal;
   font-size: @font-size-small;
   line-height: @line-height-base;
-  color: @dropdown-header-color;
+  color: @brand-text-header;
   white-space: nowrap; // as with > li > a
 }
 
@@ -619,15 +676,6 @@ flexibility with non-UL elements */
 }
 
 
-/* Text formatting */
-
-.esper-note {
-  font-size: 80%;
-  font-weight: normal;
-  color: @text-muted;
-}
-
-
 /* Generic */
 
 .action {
@@ -644,5 +692,29 @@ a.action {
 
   &:hover {
     text-decoration: none;
+  }
+}
+
+
+/* Misc formatting for "shaded" elements */
+.esper-shade {
+  background: @shade-bg;
+  border-color: @shade-border;
+  color: @shade-text;
+
+  label {
+    color: @shade-text-header;
+  }
+
+  .text-muted {
+    color: @shade-text-muted;
+  }
+
+  .modal-footer, .modal-header, hr {
+    border-color: @shade-border;
+  }
+
+  input, .form-control, .dropdown-toggle {
+    background: @input-bg;
   }
 }

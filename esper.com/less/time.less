@@ -1,11 +1,6 @@
 @import "./lib/_bootstrap-variables";
 @import "./lib/_helpers";
 
-@sidebar-sm-width: 33%;
-@sidebar-md-width: 28%;
-@sidebar-lg-width: 20%;
-
-
 /* Project-specific imports */
 @import "./login";
 @import "./_loading";
@@ -56,40 +51,5 @@
     line-height: @navbar-height;
     vertical-align: middle;
     animation: flash 0.2s ease-in-out 0s 5;
-  }
-}
-
-// Other props for left/right set in marten/less/_helpers.less
-.esper-full-screen .esper-left-sidebar {
-  @media (max-width: @screen-xs-max) {
-    .sidebar-content {
-      border-top: 1px solid @navbar-inverse-border;
-    }
-  }
-
-  @media (min-width: @screen-sm-min) {
-    width: @sidebar-sm-width;
-    border-right: 1px solid @table-border-color;
-  }
-
-  @media (min-width: @screen-md-min) {
-    width: @sidebar-md-width;
-  }
-
-  @media (min-width: @screen-lg-min) {
-    width: @sidebar-lg-width;
-  }
-}
-.esper-full-screen .esper-right-content {
-  @media (min-width: @screen-sm-min) {
-    width: 100% - @sidebar-sm-width;
-  }
-
-  @media (min-width: @screen-md-min) {
-    width: 100% - @sidebar-md-width;
-  }
-
-  @media (min-width: @screen-lg-min) {
-    width: 100% - @sidebar-lg-width;
   }
 }
