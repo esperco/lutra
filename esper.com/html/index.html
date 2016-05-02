@@ -4,7 +4,7 @@
 
 {% block main %}
 <!-- Splash -->
-<div id="default-splash" class="splash-content large"
+{# <div id="default-splash" class="splash-content large"
      style="background-image:url(img/splash_home.jpg)">
   <div class="splash-text-container" align="center">
     <div class="splash-text" style="padding-bottom: 30px">
@@ -45,20 +45,23 @@
       </div>
     </div>
   </div>
-</div>
+</div> #}
 
 <!-- A/B Variant for Splash -->
-<div id="chart-splash" style="display: none">
+<div id="chart-splash">
   <div class="container-fluid"><div class="row">
 
     <!-- Login + CTA -->
-    <div class="col-md-5 cta-signup-container"><div class="cta-signup">
+    <div class="col-md-5 col-lg-4 cta-signup-container"><div class="cta-signup">
       <h1 class="splash-text-header">
-        See where your <span class="no-break">time's going</span>
+        Make time count
       </h1>
       <h2 class="splash-text-subheader">
-        Sign up with your calendar provider to
-        <span class="no-break">get started</span>
+        Esper analyzes your calendar to help
+        you focus on
+        <span class="no-break">what matters most.</span>
+        Sign up with your calendar
+        <span class="no-break">provider to get started.</span>
       </h2>
       <div class="login-buttons">
         <div class="visible-xs-block visible-sm-inline visible-md-block
@@ -95,9 +98,10 @@
 
     <!-- Chart goes here -->
     <div id="chart-container" class="col-md-7">
-      <div id="chart-target"></div>
+      <div id="chart-target">
+        <img id="chart-img" src="img/chart-splash.svg" />
+      </div>
     </div>
-
   </div></div>
 </div>
 
@@ -333,9 +337,4 @@
     </a>
   </div>
 </div>
-{% endblock %}
-
-{% block postscripts %}
-  {{ super() }}
-  <script type="text/javascript" src="js/landing-charts.js"></script>
 {% endblock %}

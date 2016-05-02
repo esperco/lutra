@@ -13,7 +13,9 @@
     <script type="text/javascript" src="js/landing-vendor.js"></script>
 
     {# Optimizely should go after vendor ensure jQuery loaded #}
-    {% include "_optimizely.html" %}
+    {# NB: 2016-05-02 - Disabling Optimizely since no experiment running
+      {% include "_optimizely.html" %}
+    #}
 
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" />
