@@ -8,8 +8,9 @@ module Esper.AB {
 
   // List strings rather declaring ambient booleans because we want to handle
   // scenario where AB vars are undefined gracefully
-  export const TOP_GUESTS_SPLASH = "ESPER_TOP_GUESTS_SPLASH";
-  export const GUEST_DOMAINS_SPLASH = "ESPER_GUEST_DOMAINS_SPLASH";
+  //
+  // export const TOP_GUESTS_SPLASH = "ESPER_TOP_GUESTS_SPLASH";
+  // export const GUEST_DOMAINS_SPLASH = "ESPER_GUEST_DOMAINS_SPLASH";
 
   // Short cut to cast to boolean
   export function get(name: string) {

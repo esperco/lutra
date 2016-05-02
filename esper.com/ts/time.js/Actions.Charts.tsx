@@ -3,7 +3,6 @@
   stay relatively short and easy to parse for routing patterns.
 */
 
-/// <reference path="../common/AB.ts" />
 /// <reference path="../common/Analytics.Web.ts" />
 /// <reference path="../common/Layout.tsx" />
 /// <refernece path="./Actions" />
@@ -130,13 +129,7 @@ module Esper.Actions {
   }
 
   function getDefaultChartType(): ChartId {
-    if (AB.get(AB.TOP_GUESTS_SPLASH)) {
-      return "top-guests";
-    } else if (AB.get(AB.GUEST_DOMAINS_SPLASH)) {
-      return "guest-domains";
-    } else {
-      return "labels-bar";
-    }
+    return "labels-pie";
   }
 
   function getChart(params: Charts.DefaultEventChartParams): ChartVariant {
