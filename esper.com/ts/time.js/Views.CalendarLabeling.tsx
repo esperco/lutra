@@ -107,11 +107,10 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className="esper-expanded padded">
-        <div className="panel panel-default esper-focus-message">
-          <div className="panel-body">
-            {elm}
-          </div>
+      return <div className={"esper-expanded padded panel panel-default " +
+                             "esper-no-content"}>
+        <div className="panel-body">
+          {elm}
         </div>
       </div>;
     }

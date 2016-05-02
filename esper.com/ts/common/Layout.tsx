@@ -22,12 +22,14 @@ module Esper.Layout {
                          header?: React.ReactElement<any>,
                          footer?: React.ReactElement<any>) {
     if (! _.isUndefined(header)) {
+      header = header || <span />;
       $(headerSelector).show().renderReact(header);
     }
 
     $(mainSelector).renderReact(main);
 
     if (! _.isUndefined(footer)) {
+      footer = footer || <span />;
       $(footerSelector).renderReact(footer);
     }
 

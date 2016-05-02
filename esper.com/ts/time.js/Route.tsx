@@ -151,7 +151,7 @@ module Esper.Route {
       nav.path(ctx.path.slice(1));
     } else {
       Log.e(ctx);
-      Actions.render(<Views.NotFound />, null, null);
+      Actions.render(<Views.NotFound />);
     }
   });
 }

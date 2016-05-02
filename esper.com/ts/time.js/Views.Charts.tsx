@@ -114,7 +114,8 @@ module Esper.Views {
 
     renderPeriodSelector() {
       var period = this.props.currentChart.params.period;
-      return <div className="esper-header period-selector row fixed clearfix">
+      return <div className={"esper-content-header period-selector " +
+                             "row fixed clearfix"}>
         <Components.IntervalOrCustomSelector
           className="col-sm-6"
           period={period}
@@ -172,11 +173,10 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className="esper-expanded minus-subheader padded">
-        <div className="panel panel-default esper-focus-message">
-          <div className="panel-body">
-            {elm}
-          </div>
+      return <div className={"esper-expanded padded panel panel-default " +
+                             "esper-no-content"}>
+        <div className="panel-body">
+          {elm}
         </div>
       </div>;
     }
