@@ -89,6 +89,11 @@
 //** Link hover decoration.
 @link-hover-decoration: underline;
 
+// Alt-link colors for more muted links
+@muted-link-color:       @gray-dark;
+@muted-link-hover-color: @link-hover-color;
+@muted-link-hover-bg:    transparent;
+
 
 //== Typography
 //
@@ -422,9 +427,9 @@
 @navbar-default-border:            @brand-bg;
 
 // Navbar links
-@navbar-default-link-color:                @brand-text-header;
-@navbar-default-link-hover-color:          @brand-text-highlight;
-@navbar-default-link-hover-bg:             @brand-text-highlight-bg;
+@navbar-default-link-color:                @muted-link-color;
+@navbar-default-link-hover-color:          @muted-link-hover-color;
+@navbar-default-link-hover-bg:             @muted-link-hover-bg;
 @navbar-default-link-active-color:         @brand-text-highlight;
 @navbar-default-link-active-bg:            @brand-text-highlight-bg;
 @navbar-default-link-disabled-color:       @brand-text-muted;
