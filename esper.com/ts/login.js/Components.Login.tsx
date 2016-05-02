@@ -80,12 +80,12 @@ module Esper.Components {
           { this.renderNylasInput() }
         </div>
 
-        <div className="esper-advisory text-center"><p>
+        <div className="esper-note text-center"><p>
           By signing in, you agree to Esper&apos;s{" "}
           <a href="https://esper.com/terms-of-use">Terms of Use.</a>
         </p></div>
 
-        <div className="sign-in-footer esper-advisory">
+        <div className="sign-in-footer esper-note">
           <div className="esper-copyright">
             &copy; {" "}{ (new Date()).getFullYear() }{" "}
             Esper Technologies, Inc.{" "}

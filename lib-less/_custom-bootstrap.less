@@ -62,6 +62,18 @@ body {
   font-smoothing: antialiased;
 }
 
+label {
+  color: @brand-text-header;
+}
+
+a.text-muted {
+  color: @text-muted;
+
+  &:hover, &:focus {
+    color: @text-muted-hover;
+  }
+}
+
 
 /*
   Minor tweaks to Bootstrap classes that don't normally make sense otherwise
@@ -279,8 +291,8 @@ a {
   }
 }
 
-input.form-control.dropdown-toggle[readonly] {
-  background: white;
+input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
+  background: @input-bg;
   float: none;
   cursor: pointer;
 }
@@ -311,25 +323,6 @@ input.form-control.dropdown-toggle[readonly] {
         border-bottom-right-radius: @input-border-radius-large;
       }
     }
-  }
-}
-
-
-/* Navbar should be (this lets us add transparent elements to navbar) */
-
-.navbar-default, .navbar-inverse {
-  background-color: transparent;
-}
-
-.navbar-default {
-  .container, .container-fluid {
-    background-color: @navbar-default-bg;
-  }
-}
-
-.navbar-inverse {
-  .container, .container-fluid {
-    background-color: @navbar-default-bg;
   }
 }
 

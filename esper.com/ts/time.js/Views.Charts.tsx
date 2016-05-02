@@ -82,7 +82,7 @@ module Esper.Views {
         <label htmlFor={this.getId("chart-type")}>
           <i className="fa fa-fw fa-bar-chart" />{" "}
           Chart Type{" "}
-          <a className="esper-subtle" href="/help-charts"
+          <a className="text-muted" href="/help-charts"
              target="_blank">
             <i className="fa fa-fw fa-question-circle" />
           </a>

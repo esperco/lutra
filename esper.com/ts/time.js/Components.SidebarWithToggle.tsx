@@ -16,10 +16,11 @@ module Esper.Components {
     }
 
     render() {
-      return <div className={"esper-left-sidebar padded" +
+      return <div className={"esper-left-sidebar esper-shade padded" +
                              ( this.state.open ? " open" : "")}>
         { this.state.open ?
-          <div className="esper-collapse-backdrop" onClick={() => this.toggle()} /> :
+          <div className="esper-collapse-backdrop"
+               onClick={() => this.toggle()} /> :
           null }
         <div className="sidebar-content">
           <div className="visible-xs-block sidebar-toggle"
