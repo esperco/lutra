@@ -2,7 +2,7 @@
 @import "./_login-buttons";
 
 @splash-height: 500px;
-@chart-height-md: 525px;
+@chart-height-md: 500px;
 @chart-height-sm: 500px;
 @chart-height-xs: 200px;
 @cta-margin: 20px;
@@ -76,7 +76,6 @@
   margin-left: auto;
   margin-right: auto;
   width: 100%;
-  max-width: 800px;
   height: auto;
   animation: chart-up 1.5s ease-in-out 0s 1;
 }
@@ -115,10 +114,19 @@
   }
 
   #chart-img {
-    // Vertical center img inside target, shift left slightly
+    // Vertical center img inside target
     position: absolute;
     left: 50%;
     top: 50%;
+    width: auto;
+    height: 90%;
     transform: translateX(-50%) translateY(-50%);
+  }
+}
+
+@media (min-width: @screen-lg-min) {
+  #chart-img {
+    width: 100%;
+    height: auto;
   }
 }
