@@ -2,7 +2,9 @@
 @import "./lib/_helpers";
 
 #esper-loading {
-  .esper-full-screen;
+  // Don't use Esper full-screen because that goes inline on mobile
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   background: @body-bg;
 
   // Add .fade-out class to transition loading screen out
