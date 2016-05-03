@@ -264,18 +264,4 @@ module Esper.Params {
   export interface FilterListJSON extends FilterStrJSON {
     labels: ListSelectJSON;
   }
-
-
-  export function cleanFeedbackAction(action: string)
-    : ApiT.EventFeedbackAction
-  {
-    action = action.toLowerCase().trim();
-    if (action === "good") {
-      return "good";
-    }
-    if (action === "bad") {
-      return "bad";
-    }
-    return "didnt_attend";
-  }
 }
