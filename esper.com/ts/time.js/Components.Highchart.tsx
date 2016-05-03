@@ -147,9 +147,7 @@ module Esper.Components {
 
     exportChart() {
       if (this._chart) {
-
-        // TODO: Update
-        (this._chart as any).exportChartLocal({
+        this._chart.exportChartLocal({
           type: "image/png",
           fallbackToExportServer: false
         }, {
