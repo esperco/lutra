@@ -1,7 +1,7 @@
 @import "./lib/_bootstrap-variables";
 @import "./_login-buttons";
 
-@splash-height: 500px;
+@splash-height: 400px;
 @chart-height-md: 500px;
 @chart-height-sm: 500px;
 @chart-height-xs: 200px;
@@ -126,7 +126,12 @@
 
 @media (min-width: @screen-lg-min) {
   #chart-img {
+    position: relative;
+    top: 0;
+    left: 0;
     width: 100%;
     height: auto;
+    transform: none;
+    padding-top: @cta-margin;
   }
 }
