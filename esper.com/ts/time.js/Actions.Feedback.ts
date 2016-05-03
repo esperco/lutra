@@ -51,7 +51,7 @@ module Esper.Actions.Feedback {
         break;
       case "bad":
         initNewData.feedback.attended = true;
-        initNewData.feedback.rating = 5;
+        initNewData.feedback.rating = 1;
         break;
       case "didnt_attend":
         initNewData.feedback.attended = false;
