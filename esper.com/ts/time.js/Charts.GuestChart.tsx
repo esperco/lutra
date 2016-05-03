@@ -18,8 +18,10 @@ module Esper.Charts {
     protected allowEmpty: boolean;
     protected eventsByDomain: EventStats.EventGrouping;
 
-    cleanFilterParams(params: any = {}): DomainFilterParams {
-      var ret = super.cleanFilterParams(params) as DomainFilterParams;
+    cleanFilterParams(filterParams: any = {},
+                      params: DefaultEventChartParams): DomainFilterParams {
+      var ret = super.cleanFilterParams(filterParams,
+                                        params) as DomainFilterParams;
       ret.domains = Params.cleanListSelectJSON(ret.domains);
       return ret;
     }
