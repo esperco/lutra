@@ -39,6 +39,17 @@ module Esper.Views {
       newPrefs.email_for_meeting_feedback =
         ! newPrefs.email_for_meeting_feedback;
       this.updateCalendarPrefs(newPrefs);
+
+      if (newPrefs.email_for_meeting_feedback) {
+        Api.getGoogleAuthInfo(null).then(function(x:ApiT.GoogleAuthInfo) {
+          if (x.google_auth_scope.search("//mail.google.com") < 0) {
+            Api.getGoogleAuthUrl(location.href, null, null, null, true)
+            .then(function(x:ApiT.UrlResult) {
+              location.href = x.url;
+            });
+          }
+        });
+      }
     }
 
     toggleUseSlack() {
