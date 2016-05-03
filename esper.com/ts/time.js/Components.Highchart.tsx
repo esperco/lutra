@@ -12,6 +12,9 @@ module Esper.Components {
   // Custom drillup button
   const DRILLUP_ID_CLS = 'highchart-drillup';
 
+  // Custom export button
+  const EXPORT_ID_CLS = 'highchart-export';
+
   export interface HighchartsOpts {
     opts: HighchartsOptions;
     units?: string;
@@ -20,12 +23,27 @@ module Esper.Components {
   // Simple wrapper around HighCharts config object
   export class Highchart extends Component<HighchartsOpts, {}> {
     _container: HTMLElement;
+    _target: HTMLElement;
     _chart: HighchartsChartObject;
     _drilldownLevels: number;
 
     render() {
-      return <div ref={(c) => this._container = c }
-                  className="chart-holder" />;
+      return <div ref={(c) => this._container = c}
+                  className="chart-holder-parent">
+        <div ref={(c) => this._target = c}
+             className="chart-holder" />
+        <button type="button"
+                style={{display: "none"}}
+                onClick={() => this.drillUp()}
+                className={classNames("btn", "btn-secondary", DRILLUP_ID_CLS)}>
+          <i className="fa fa-fw fa-angle-left" />
+        </button>
+        <button type="button"
+                onClick={() => this.exportChart()}
+                className={classNames("btn", "btn-secondary", EXPORT_ID_CLS)}>
+          <i className="fa fa-fw fa-download" />
+        </button>
+      </div>;
     }
 
     getOpts(): HighchartsOptions {
@@ -39,8 +57,13 @@ module Esper.Components {
           events: {
             drilldown: this.onDrilldown.bind(this),
             drillup: this.onDrillup.bind(this)
+          },
+          style: {
+            fontFamily: 'Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif'
           }
         },
+
+        exporting: { enabled: false },
 
         plotOptions: {
           series: {
@@ -80,8 +103,8 @@ module Esper.Components {
     }
 
     componentDidMount() {
-      $(this._container).highcharts(this.getOpts());
-      this._chart = $(this._container).highcharts();
+      $(this._target).highcharts(this.getOpts());
+      this._chart = $(this._target).highcharts();
     }
 
     /*
@@ -89,25 +112,15 @@ module Esper.Components {
       use update system if this leads to poor UX.
     */
     componentDidUpdate() {
-      $(this._container).highcharts(this.getOpts())
-      this._chart = $(this._container).highcharts();
+      $(this._target).highcharts(this.getOpts())
+      this._chart = $(this._target).highcharts();
       this.resetDrillupBtn();
     }
 
-    // Use jQuery to draw our custom drillUp button because sticking React
-    // here is a bit weird
+    // Use jQuery to show / hide our custom drill-up button because using React
+    // directly may result in Highchart being clobbered / redrawn
     onDrilldown() {
-      // Only insert if drilldown button is not already there
-      if (! $(this._container).find("." + DRILLUP_ID_CLS).length) {
-        var btn = $("<button type=\"button\" />");
-        btn.append($("<i class=\"fa fa-fw fa-angle-left\" />"));
-        btn.addClass("btn btn-secondary");
-        btn.addClass(DRILLUP_ID_CLS);
-        btn.click(() => {
-          this._chart.drillUp();
-        });
-        $(this._container).append(btn);
-      }
+      $(this._container).find("." + DRILLUP_ID_CLS).show();
       this._drilldownLevels = this._drilldownLevels || 0;
       this._drilldownLevels += 1;
     }
@@ -122,8 +135,25 @@ module Esper.Components {
     }
 
     resetDrillupBtn() {
-      $(this._container).find("." + DRILLUP_ID_CLS).remove();
+      $(this._container).find("." + DRILLUP_ID_CLS).hide();
       this._drilldownLevels = 0;
+    }
+
+    drillUp() {
+      if (this._chart) {
+        this._chart.drillUp();
+      }
+    }
+
+    exportChart() {
+      if (this._chart) {
+        this._chart.exportChartLocal({
+          type: "image/png",
+          fallbackToExportServer: false
+        }, {
+          chart: { backgroundColor: '#FFFFFF' }
+        });
+      }
     }
   }
 }

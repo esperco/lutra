@@ -31,6 +31,8 @@ inject({jQuery: jQuery, $: jQuery}, function() {
 
   highcharts = require("highcharts");
   require("highcharts/modules/drilldown")(highcharts);
+  require("highcharts/modules/exporting")(highcharts);
+  require("highcharts/modules/offline-exporting")(highcharts);
 });
 
 // Create a global Esper object with our vendor dependencies

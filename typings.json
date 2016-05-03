@@ -8,7 +8,7 @@
     "es6-promise": "github:esperco/DefinitelyTyped/es6-promise/es6-promise.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "eventemitter3": "github:esperco/DefinitelyTyped/eventemitter3/eventemitter3.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "fullcalendar": "registry:dt/fullcalendar#1.6.1+20160317120654",
-    "highcharts": "github:esperco/DefinitelyTyped/highcharts/highcharts.d.ts#7c749215797e4a18066f3a5e6fc99d82d7bf144e",
+    "highcharts": "github:fongandrew/DefinitelyTyped/highcharts/highcharts.d.ts#333a3e05ae1f762b1ec068f0e508e4967c6119f4",
     "jasmine": "github:esperco/DefinitelyTyped/jasmine/jasmine.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "jquery": "github:esperco/DefinitelyTyped/jquery/jquery.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "jqueryui": "github:esperco/DefinitelyTyped/jqueryui/jqueryui.d.ts#f53108644c2f32b93de423d844650297fc415a8b",

@@ -25,15 +25,30 @@
   }
 }
 
-.chart-holder {
+.chart-holder, .chart-holder-parent {
   flex-grow: 1;
+}
+
+.chart-holder {
   min-height: 400px;
+}
+
+.chart-holder-parent {
   position: relative;
+  display: flex;
+
+  .highchart-drillup, .highchart-export {
+    position: absolute;
+  }
 
   .highchart-drillup {
-    position: absolute;
     top: @padding-base-vertical;
     left: @padding-base-horizontal;
+  }
+
+  .highchart-export {
+    bottom: @padding-base-vertical;
+    right: @padding-base-horizontal
   }
 }
 
