@@ -41,6 +41,10 @@ module Esper.Components {
   {
     _fcDiv: HTMLElement;
 
+    // Capture scroll position so we can reset properly after fetching
+    // Work around https://github.com/fullcalendar/fullcalendar/issues/3153
+    _scrollTop: number;
+
     constructor(props: CalendarProps) {
       super(props);
     }
@@ -155,11 +159,19 @@ module Esper.Components {
       }
     }
 
-    componentDidUpdate() {
+    componentDidUpdate(prevProps: CalendarProps) {
       if (!this.props.busy && !this.props.error) {
-        $(this._fcDiv).fullCalendar('gotoDate',
-          Period.boundsFromPeriod(this.props.period)[0]
-        );
+        // Capture scroll position before it's lost during refetch
+        // Work around https://github.com/fullcalendar/fullcalendar/issues/3153
+        this._scrollTop = this.find('.fc-scroller').scrollTop();
+
+        if (prevProps.period &&
+            ! _.isEqual(this.props.period, prevProps.period))
+        {
+          $(this._fcDiv).fullCalendar('gotoDate',
+            Period.boundsFromPeriod(this.props.period)[0]
+          );
+        }
         $(this._fcDiv).fullCalendar('refetchEvents');
       }
     }
@@ -235,6 +247,11 @@ module Esper.Components {
 
         return ret;
       }));
+
+      // Fix scroll position after callback -- looks like
+      if (this._scrollTop) {
+        $('.fc-scroller').scrollTop(this._scrollTop);
+      }
     }
 
     // Adjust a timetamp based on the currently selected event's timezone
