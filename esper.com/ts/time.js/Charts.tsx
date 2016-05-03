@@ -40,7 +40,7 @@ module Esper.Charts {
 
     constructor(params: DefaultEventChartParams) {
       this.params = _.extend(params, {
-        filterParams: this.cleanFilterParams(params.filterParams)
+        filterParams: this.cleanFilterParams(params.filterParams, params)
       }) as EventChartParams<T>;
 
       // Sanity check periods
@@ -51,9 +51,11 @@ module Esper.Charts {
     }
 
     // Optional function for cleaning filter params depending on its def'n
-    cleanFilterParams(params: any = {}): T {
-      params = params || {};
-      var ret = params as T;
+    cleanFilterParams(filterParams: any = {},
+                      params: DefaultEventChartParams): T
+    {
+      filterParams = filterParams || {};
+      var ret = filterParams as T;
       return Params.cleanRelativePeriodJSON(ret) as T;
     }
 

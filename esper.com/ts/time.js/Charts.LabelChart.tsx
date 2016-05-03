@@ -17,9 +17,19 @@ module Esper.Charts {
     protected allLabels: Labels.Label[];
     protected allowUnlabeled: boolean;
 
-    cleanFilterParams(params: any = {}): LabelFilterParams {
-      var ret = super.cleanFilterParams(params) as LabelFilterParams;
-      ret.labels = Params.cleanListSelectJSON(ret.labels);
+    cleanFilterParams(filterParams: any = {},
+                      params: DefaultEventChartParams): LabelFilterParams
+    {
+      var ret = super.cleanFilterParams(filterParams,
+                                        params) as LabelFilterParams;
+
+      // By default, select first team labels only
+      ret.labels = ret.labels ? Params.cleanListSelectJSON(ret.labels) : {
+        all: false,
+        none: true,
+        some: params.cals[0] ?
+          Teams.require(params.cals[0].teamId).team_labels_norm : []
+      };
       return ret;
     }
 
