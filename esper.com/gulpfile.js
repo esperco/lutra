@@ -3,6 +3,7 @@
 // NB: This gulp file is intended to be used with Gulp 4.x and won't
 // work with Gulp 3.x or below.
 var _ = require("lodash"),
+    argv = require('yargs').argv,
     gulp = require("gulp"),
     helpers = require("../build-helpers/gulp"),
     watch = helpers.watch(gulp);
@@ -74,7 +75,9 @@ gulp.task("build-js", function() {
 
 gulp.task("watch-js", watch(config.jsGlobs, "build-js"));
 
-var ts = helpers.typescript(config.tsProjects,
+// Focus on one project with the 'ts' flag
+var projects = argv.ts ? [argv.ts] : config.tsProjects;
+var ts = helpers.typescript(projects,
                             config.tsCommonGlobs,
                             config.jsOut);
 gulp.task("build-ts", ts.build);
