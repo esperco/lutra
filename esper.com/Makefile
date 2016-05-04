@@ -29,4 +29,4 @@ clean:
 	gulp clean
 
 watch:
-	gulp watch
+	if [ -z ${ts} ]; then gulp watch; else gulp watch --ts ${ts}; fi
