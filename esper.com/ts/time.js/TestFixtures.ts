@@ -2,7 +2,7 @@
   Zorilla-specific test fixutres
 */
 
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="./Teams.ts" />

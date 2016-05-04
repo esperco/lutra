@@ -1,7 +1,7 @@
 // Integration test helpers
 
 /// <reference path="../lib/Util.ts" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 
 module Esper.Integration {
   // Should we run integration tests?

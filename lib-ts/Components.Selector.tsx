@@ -3,7 +3,7 @@
   DropdownModal for the actual menu itself).
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
   export class Selector extends ReactHelpers.Component<{

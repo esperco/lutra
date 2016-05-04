@@ -25,8 +25,8 @@
   "dropdown-modal-menu" class. All other elements are disregarded.
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Modal.tsx" />
+/// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Components.Modal.tsx" />
 /// <reference path="./Components.Dropdown.tsx" />
 /// <reference path="./Layout.tsx" />
 

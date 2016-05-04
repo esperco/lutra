@@ -3,8 +3,8 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Components.ModalPanel.tsx" />
-/// <reference path="../common/Components.SelectMenu.tsx" />
+/// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.SelectMenu.tsx" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.RequestExec.tsx" />
 

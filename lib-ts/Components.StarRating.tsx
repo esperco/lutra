@@ -2,7 +2,7 @@
   A component used for a "star" menu
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
 

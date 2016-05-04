@@ -1,6 +1,6 @@
 /// <reference path="../../../typings/browser.d.ts" />
 /// <reference path="../lib/Util.ts" />
-/// <reference path="../common/Layout.tsx" />
+/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Login.Oauth.ts" />
 /// <reference path="./Components.Login.tsx" />
 /// <reference path="./Views.ApproveTeam.tsx" />

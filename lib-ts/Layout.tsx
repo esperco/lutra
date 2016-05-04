@@ -1,12 +1,13 @@
 /*
-  Module for rendering things (mostly React components) into our HTML page
+  Module for rendering things (mostly React components) into an HTML page
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Route.ts" />
 
 module Esper.Layout {
-  // References to our jQuery selectors
+  // References to our jQuery selectors (defaults to one's in esper.com pages,
+  // can replace if using in a Chrome extension or other)
   export var mainSelector = "#esper-main";
   export var headerSelector = "#esper-header";
   export var footerSelector = "#esper-footer";

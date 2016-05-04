@@ -6,7 +6,7 @@
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/Save.ts" />
 /// <reference path="../lib/Util.ts" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Calendars.ts" />
 

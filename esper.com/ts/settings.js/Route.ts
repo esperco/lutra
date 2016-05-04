@@ -4,7 +4,7 @@
   See https://visionmedia.github.io/page.js/ for details on Routing.
 */
 
-/// <reference path="../common/Route.ts" />
+/// <reference path="../lib/Route.ts" />
 
 module Esper.Route {
   var paths = {

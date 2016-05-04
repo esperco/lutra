@@ -3,7 +3,7 @@
   and completion buttons that can also be used outside of a modal
 */
 
-/// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <reference path="./Components.ErrorMsg.tsx" />
 
 module Esper.Components {
   interface FooterProps {

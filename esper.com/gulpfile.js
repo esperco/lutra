@@ -33,7 +33,6 @@ var config = {
   jasmineDir: "pub/jasmine",
 
   tsCommonGlobs: [
-    "ts/common/**/*.{ts,tsx}",
     "ts/lib/**/*.{ts,tsx}"
   ],
   tsProjects: [

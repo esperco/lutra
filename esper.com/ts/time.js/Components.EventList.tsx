@@ -2,7 +2,7 @@
   Basic component for rendering a list of events
 */
 
-/// <reference path="../common/Components.SignalStrength.tsx" />
+/// <reference path="../lib/Components.SignalStrength.tsx" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 

@@ -10,7 +10,7 @@
   },
 
   "devOnly": [
-    "../common/JasmineStub.ts",
+    "../lib/JasmineStub.ts",
     "Events2.Test.ts",
     "EventStats.Test.ts",
     "Period.Test.ts",

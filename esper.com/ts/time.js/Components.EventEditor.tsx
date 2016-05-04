@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Components.StarRating.tsx" />
+/// <reference path="../lib/Components.StarRating.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 
 module Esper.Components {

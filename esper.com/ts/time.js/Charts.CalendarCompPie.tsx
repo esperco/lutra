@@ -1,5 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Layout.tsx" />
+/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Charts.CalendarComp.tsx" />
 /// <reference path="./Colors.ts" />
 
