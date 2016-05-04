@@ -6,7 +6,7 @@
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="../lib/Util.ts" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 
 module Esper.Login {
   var nonceKey = "login_nonce";

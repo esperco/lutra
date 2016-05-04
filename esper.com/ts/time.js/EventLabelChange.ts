@@ -6,7 +6,7 @@
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue2.ts" />
-/// <reference path="../common/Analytics.Web.ts" />
+/// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="./Events2.ts" />
 
 module Esper.EventLabelChange {

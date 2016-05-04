@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Components.DropdownModal.tsx" />
+/// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="./Labels.ts" />
 
 module Esper.Components {

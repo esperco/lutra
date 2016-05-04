@@ -4,7 +4,7 @@
 */
 
 /// <reference path="../../../typings/browser.d.ts" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/ApiT.ts" />
 
 module Esper {

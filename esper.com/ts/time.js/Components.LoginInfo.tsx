@@ -4,8 +4,8 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Modal.tsx" />
-/// <reference path="../common/Components.Dropdown.tsx" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Components.Dropdown.tsx" />
+/// <reference path="../lib/Login.Web.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class

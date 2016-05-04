@@ -4,9 +4,9 @@
   or global scope.
 */
 
-/// <reference path="../lib/Analytics.ts" />
-/// <reference path="../lib/Login.ts" />
-/// <reference path="../lib/ApiT.ts" />
+/// <reference path="./Analytics.ts" />
+/// <reference path="./Login.ts" />
+/// <reference path="./ApiT.ts" />
 
 module Esper.Analytics {
   // Stub in case Segment doesn't load (e.g. ad-blocker)

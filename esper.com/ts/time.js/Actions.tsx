@@ -3,8 +3,8 @@
   or do other one-off or asynchronous things necessary to render a view.
 */
 
-/// <reference path="../common/Analytics.Web.ts" />
-/// <reference path="../common/Layout.tsx" />
+/// <reference path="../lib/Analytics.Web.ts" />
+/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Views.Header.tsx" />
 
 module Esper.Actions {

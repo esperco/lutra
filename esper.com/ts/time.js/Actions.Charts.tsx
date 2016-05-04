@@ -3,8 +3,8 @@
   stay relatively short and easy to parse for routing patterns.
 */
 
-/// <reference path="../common/Analytics.Web.ts" />
-/// <reference path="../common/Layout.tsx" />
+/// <reference path="../lib/Analytics.Web.ts" />
+/// <reference path="../lib/Layout.tsx" />
 /// <refernece path="./Actions" />
 /// <reference path="./Charts.tsx" />
 /// <reference path="./Views.Charts.tsx" />

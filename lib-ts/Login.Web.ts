@@ -2,11 +2,11 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
-/// <reference path="../lib/Api.ts" />
-/// <reference path="../lib/LocalStore.ts" />
-/// <reference path="../lib/Login.ts" />
-/// <reference path="../lib/Model.StoreOne.ts" />
-/// <reference path="../lib/Util.ts" />
+/// <reference path="./Api.ts" />
+/// <reference path="./LocalStore.ts" />
+/// <reference path="./Login.ts" />
+/// <reference path="./Model.StoreOne.ts" />
+/// <reference path="./Util.ts" />
 /// <reference path="./Analytics.Web.ts" />
 
 module Esper.Login {

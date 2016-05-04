@@ -3,8 +3,8 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../common/Layout.tsx" />
-/// <reference path="../common/Components.DropdownModal.tsx" />
+/// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalSelector.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />

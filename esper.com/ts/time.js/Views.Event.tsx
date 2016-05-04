@@ -1,4 +1,4 @@
-/// <reference path="../common/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="./Components.EventEditor.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 

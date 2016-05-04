@@ -6,7 +6,7 @@
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
-/// <reference path="../common/Analytics.Web.ts" />
+/// <reference path="../lib/Analytics.Web.ts" />
 
 module Esper.BatchLabelChange {
 

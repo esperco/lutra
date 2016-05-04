@@ -26,9 +26,8 @@
   "dropdown-modal-menu" class. All other elements are disregarded.
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Modal.tsx" />
-/// <reference path="./Layout.tsx" />
+/// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
   export class Dropdown extends ReactHelpers.Component<{

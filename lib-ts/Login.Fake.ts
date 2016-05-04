@@ -2,7 +2,7 @@
   Convenience functions for logging in as certain users in dev mode
 */
 
-/// <reference path="./Login.ts" />
+/// <reference path="./Login.Web.ts" />
 
 module Esper.Login {
   // Stubs credentials for our "Lois" user

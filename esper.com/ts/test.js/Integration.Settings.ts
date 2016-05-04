@@ -1,5 +1,5 @@
 /// <reference path="../lib/Test.ts" />
-/// <reference path="../common/Login.Fake.ts" />
+/// <reference path="../lib/Login.Fake.ts" />
 /// <reference path="./Integration.ts" />
 
 module Esper.Integration {

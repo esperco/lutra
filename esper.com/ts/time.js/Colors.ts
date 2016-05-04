@@ -1,4 +1,4 @@
-/// <reference path="../common/Colors.ts" />
+/// <reference path="../lib/Colors.ts" />
 /// <refernece path="./Labels.ts" />
 /// <reference path="./Teams.ts" />
 

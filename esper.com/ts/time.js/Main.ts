@@ -1,7 +1,7 @@
 /// <reference path="./Esper.ts" />
 
-/// <reference path="../common/Analytics.Web.ts" />
-/// <reference path="../common/Login.ts" />
+/// <reference path="../lib/Analytics.Web.ts" />
+/// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/ApiC.ts" />
 
 /// <reference path="./Route.tsx" />

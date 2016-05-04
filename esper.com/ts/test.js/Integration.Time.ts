@@ -1,6 +1,6 @@
 /// <reference path="../lib/Test.ts" />
-/// <reference path="../common/Layout.tsx" />
-/// <reference path="../common/Login.Fake.ts" />
+/// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Login.Fake.ts" />
 /// <reference path="./Integration.ts" />
 
 module Esper.Integration {
