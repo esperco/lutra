@@ -222,7 +222,8 @@ module Esper.Components {
       return <div className="row">
         <div className="col-sm-8 form-group event-star-ratings">
           <StarRating
-            value={(event.feedback.attended && event.feedback.rating) || 0}
+            value={(event.feedback.attended != false // null or true
+                    && event.feedback.rating) || 0}
             onChange={(i) => this.submitStarRating(i)} />
         </div>
         <div className="col-sm-4 form-group event-no-attend">
