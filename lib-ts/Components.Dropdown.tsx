@@ -34,6 +34,7 @@ module Esper.Components {
     children?: JSX.Element[];
     className?: string;
     keepOpen?: boolean;
+    onOpen?: () => void;
   }, {
     open?: boolean;
   }> {
@@ -80,9 +81,16 @@ module Esper.Components {
 
     toggle() {
       if (this.state && this.state.open) {
-        this.setState({open: false});
+        this.close();
       } else {
-        this.setState({open: true});
+        this.open();
+      }
+    }
+
+    open() {
+      this.setState({ open: true });
+      if (this.props.onOpen) {
+        this.props.onOpen();
       }
     }
 
