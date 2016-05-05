@@ -1,0 +1,31 @@
+@import "./_helpers";
+
+@expando-max-height: 1000px;
+
+.esper-expando {
+  .esper-expando-header {
+    cursor: pointer;
+    font-weight: bold;
+    color: @brand-text-header;
+    transition: color 0.6s;
+
+    &:hover {
+      color: @link-hover-color;
+    }
+
+    .esper-expando-caret {
+      float: right;
+    }
+  }
+
+  .esper-expando-body {
+    display: none;
+    clear: both;
+
+    &.open {
+      display: block;
+      border-top: 1px solid @brand-border;
+      animation: slidedown 1.0s ease-in-out 0s;
+    }
+  }
+}
