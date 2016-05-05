@@ -10,3 +10,27 @@
 .onboarding-img {
   border: 1px solid black;
 }
+
+.onboarding-panel {
+  .panel-heading {
+    font-weight: bold;
+  }
+
+  .alert {
+    text-align: center;
+  }
+
+  .esper-expando {
+    padding: @padding-small-vertical @padding-small-horizontal;
+    border: 1px solid @brand-border;
+    border-radius: @border-radius-small;
+
+    & + .esper-expando {
+      margin-top: @padding-base-vertical;
+    }
+  }
+
+  .esper-expando-header, .onboarding-expando-content {
+    padding: @padding-small-vertical @padding-xs-horizontal;
+  }
+}

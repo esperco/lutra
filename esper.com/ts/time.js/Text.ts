@@ -4,6 +4,15 @@
 
 module Esper.Text {
 
+  // Onboarding
+  export const TeamSetupHeading = "Let's Get Started";
+  export const TeamSetupDescription = "Welcome to Esper! Are you managing " +
+    "time for just yourself or someone else (for instance, as an " +
+    "assistant or supervisor)?";
+  export const TeamSelfDescription = "Great! We need a little more info to " +
+    "continue.";
+  export const TeamExecDescription = "OK. Who are you managing time for?"
+
   // For post-meeting feedback
   export const FeedbackTitle  = "Meeting Feedback"
   export const NoAttendPast   = "Didn't Attend";

@@ -144,6 +144,10 @@ module Esper.Route {
     }, q)
   });
 
+  route("/team-setup", function(ctx) {
+    Actions.renderTeamSetup();
+  });
+
   // 404 page
   route('*', function(ctx) {
     // To deal with weird issue where hrefs get too many slashes prepended.
