@@ -35,6 +35,7 @@ module Esper.Components {
     children?: JSX.Element[];
     className?: string;
     keepOpen?: boolean;
+    onOpen?: () => void;
   }, {}> {
 
     _dropdown: Dropdown;
@@ -76,7 +77,7 @@ module Esper.Components {
       return <div>
         <Dropdown ref={(c) => this._dropdown = c} className={
           "hidden-xs dropdown " + (this.props.className || "")
-        } keepOpen={this.props.keepOpen}>
+        } keepOpen={this.props.keepOpen} onOpen={this.props.onOpen}>
           { this.props.children }
         </Dropdown>
 
