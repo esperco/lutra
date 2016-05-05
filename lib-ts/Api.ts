@@ -320,13 +320,15 @@ module Esper.Api {
 
   export function getSyncedLabels(teamid: string):
     JQueryPromise<ApiT.Labels> {
-    var url = prefix + "/api/labels/synced/" + string(teamid);
+    var url = prefix + "/api/team/labels/" + string(Login.me()) +
+      "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function putSyncedLabels(teamid: string, labels: {labels: string[]}):
     JQueryPromise<void> {
-    var url = prefix + "/api/labels/synced/" + string(teamid);
+    var url = prefix + "/api/team/labels/" + string(Login.me()) +
+      "/" + string(teamid);
     return JsonHttp.put(url, JSON.stringify(labels));
   }
 
