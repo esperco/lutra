@@ -7,7 +7,7 @@ module Esper.Actions {
     teamId: string;
     calId: string;
     eventId: string;
-    action: ApiT.EventFeedbackAction;
+    action?: ApiT.EventFeedbackAction;
   }) {
     var storeId = {
       teamId: teamId,
@@ -18,7 +18,9 @@ module Esper.Actions {
       optEvent.match({
         none: () => Route.nav.home(),
         some: (event) => {
-          Feedback.postAction(event, action);
+          if (action) {
+            Feedback.postAction(event, action);
+          }
         }
       })
     });
