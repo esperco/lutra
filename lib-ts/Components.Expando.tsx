@@ -57,7 +57,7 @@ module Esper.Components {
 
     open() {
       this.setState({open: true});
-      if (this.props.onClose) { this.props.onClose(); }
+      if (this.props.onOpen) { this.props.onOpen(); }
       if (this.props.group) {
         _.each(this.props.group, (g) => {
           if (g !== this) {
@@ -69,7 +69,7 @@ module Esper.Components {
 
     close() {
       this.setState({open: false});
-      if (this.props.onOpen) { this.props.onOpen(); }
+      if (this.props.onClose) { this.props.onClose(); }
     }
 
     toggle() {
