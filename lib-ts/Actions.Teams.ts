@@ -118,7 +118,7 @@ module Esper.Actions.Teams {
     teamCopy.team_labels = labels;
     teamCopy.team_labels_norm = _.map(labels, Stores.Teams.getNormLabel);
 
-
+    console.info(labels);
     var p = LabelUpdateQueue.enqueue(_id, {
       teamId: _id,
       labels: labels

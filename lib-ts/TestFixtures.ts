@@ -1,11 +1,12 @@
 /*
-  Zorilla-specific test fixutres
+  Generic test fixutres
 */
 
-/// <reference path="../lib/Login.Web.ts" />
-/// <reference path="../lib/Test.ts" />
-/// <reference path="../lib/Api.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="./Login.Web.ts" />
+/// <reference path="./Test.ts" />
+/// <reference path="./Api.ts" />
+/// <reference path="./ApiC.ts" />
+/// <reference path="./Stores.Teams.ts" />
 
 module Esper.TestFixtures {
   export var uid = "my-uid";
@@ -36,7 +37,6 @@ module Esper.TestFixtures {
     reset();
     Test.mockAPIs();
     mockLoginInfo();
-    Main.initAll();
   }
 
   // Mock response to getLoginInfo call
@@ -57,12 +57,6 @@ module Esper.TestFixtures {
     Stores.Teams.TeamStore.removeAllChangeListeners();
     Stores.Teams.TeamListStore.reset();
     Stores.Teams.TeamListStore.removeAllChangeListeners();
-    Calendars.CalendarListStore.reset();
-    Calendars.CalendarListStore.removeAllChangeListeners();
-    Events2.EventsForDateStore.reset();
-    Events2.EventsForDateStore.removeAllChangeListeners();
-    Events2.EventStore.reset();
-    Events2.EventStore.removeAllChangeListeners();
   }
 
   export function getLoginInfo(): ApiT.LoginResponse {
