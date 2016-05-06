@@ -69,9 +69,12 @@ module Esper.Components {
             />
           </div>
         </div>
-        <div className="esper-note">
-          * Required
-        </div>
+        { this.props.supportsExec ?
+          <div className="esper-note">
+            * Required
+          </div> :
+          null
+        }
       </div>;
     }
 
