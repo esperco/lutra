@@ -11,7 +11,10 @@ module Esper.Text {
     "assistant or supervisor)?";
   export const TeamSelfDescription = "Great! We need a little more info to " +
     "continue.";
-  export const TeamExecDescription = "OK. Who are you managing time for?"
+  export const TeamExecDescription = "Fantastic. Who are you managing time " +
+    "for? We'll invite that person to Esper and set things up " +
+    "so that person can retain access to his or her Esper data if you " +
+    "decide to hand off calendar duties to someone else."
 
   // For post-meeting feedback
   export const FeedbackTitle  = "Meeting Feedback"

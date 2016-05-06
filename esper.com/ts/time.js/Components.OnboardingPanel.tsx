@@ -6,7 +6,12 @@ module Esper.Components {
   interface Props {
     heading: JSX.Element|JSX.Element[]|string;
     progress: number; // 0 - 1
+    busy?: boolean;
+    disableNext?: boolean;
     backPath?: string;
+    nextText?: string;
+    onNext: () => void;
+    onSkip?: () => void;
     children?: JSX.Element[];
   }
 
@@ -37,14 +42,22 @@ module Esper.Components {
                 }}>
               </div>
             </div>
-            <div className="panel-footer">
-              Footer
+            <div className="panel-footer clearfix">
+              { this.props.busy ? <div className="esper-spinner" /> : null }
+              <div className="pull-right">
+                <button className="btn btn-default"
+                        disabled={this.props.busy}>
+                  Skip
+                </button>
+                <button className="btn btn-primary"
+                        onClick={() => this.props.onNext()}
+                        disabled={this.props.busy || this.props.disableNext}>
+                  { this.props.nextText || "Next" }
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-
-
       </div></div>;
     }
   }
