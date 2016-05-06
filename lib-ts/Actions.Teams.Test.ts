@@ -7,7 +7,7 @@ module Esper.Actions.Teams {
     beforeEach(function() {
       TestFixtures.mockLogin();
       Test.mockAPIs();
-      Queue2.reset();
+      LabelUpdateQueue.reset();
       Stores.Teams.init();
       Login.init();
 
