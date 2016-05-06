@@ -12,6 +12,7 @@
   "devOnly": [
     "test.js.ts",
     "../lib/Test.ts",
+    "../lib/Actions.Teams.Test.ts",
     "../lib/ApiC.Test.ts",
     "../lib/Util.Test.ts",
     "../lib/LocalStore.Test.ts",

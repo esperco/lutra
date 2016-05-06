@@ -15,8 +15,7 @@
     "EventStats.Test.ts",
     "Period.Test.ts",
     "Partition.Test.ts",
-    "Route.Test.ts",
-    "Teams.Test.ts"
+    "Route.Test.ts"
   ],
 
   "prodOnly": [

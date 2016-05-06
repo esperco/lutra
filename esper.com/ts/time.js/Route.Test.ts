@@ -41,7 +41,7 @@ module Esper.Route {
       spyOn(history, 'pushState');
       spyOn(history, 'replaceState');
 
-      TestFixtures.mockLogin();
+      TestFixtures.mockTimeLogin();
     });
 
     it("should navigate to charts page with default route", function() {

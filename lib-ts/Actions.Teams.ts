@@ -74,7 +74,7 @@ module Esper.Actions.Teams {
     labels: string[];
   }
 
-  var LabelUpdateQueue = new Queue2.Processor(
+  export var LabelUpdateQueue = new Queue2.Processor(
     function(update: LabelUpdate) {
       Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
         numLabels: update.labels.length,
@@ -118,7 +118,6 @@ module Esper.Actions.Teams {
     teamCopy.team_labels = labels;
     teamCopy.team_labels_norm = _.map(labels, Stores.Teams.getNormLabel);
 
-    console.info(labels);
     var p = LabelUpdateQueue.enqueue(_id, {
       teamId: _id,
       labels: labels

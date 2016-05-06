@@ -59,7 +59,7 @@ module Esper.Calendars {
     if (_id) {
       Stores.Teams.TeamStore.pushFetch(_id, p,
         Stores.Teams.get(_id).flatMap(
-          (t) => {
+          (team) => {
             var newTeam = _.cloneDeep(team);
             newTeam.team_timestats_calendars = calIds;
             return Option.some(newTeam);
