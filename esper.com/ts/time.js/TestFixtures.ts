@@ -14,8 +14,6 @@ module Esper.TestFixtures {
 
   export function resetTime() {
     reset();
-    Calendars.CalendarListStore.reset();
-    Calendars.CalendarListStore.removeAllChangeListeners();
     Events2.EventsForDateStore.reset();
     Events2.EventsForDateStore.removeAllChangeListeners();
     Events2.EventStore.reset();

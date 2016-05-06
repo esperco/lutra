@@ -5,12 +5,13 @@
 
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="./Views.CalendarLabeling.tsx" />
 
 module Esper.Actions {
 
   export function renderCalendarLabeling(
-    cals: Calendars.CalSelection[],
+    cals: Stores.Calendars.CalSelection[],
     period: Period.Single
   ) {
 

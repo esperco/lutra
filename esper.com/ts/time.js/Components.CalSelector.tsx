@@ -8,9 +8,9 @@
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./Onboarding.ts" />
-/// <reference path="./Calendars.ts" />
 /// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Components {
@@ -22,8 +22,8 @@ module Esper.Components {
     className?: string;
     teams: ApiT.Team[];
     calendarsByTeamId: {[index: string]: ApiT.GenericCalendar[]};
-    selected: Calendars.CalSelection[];
-    updateFn: (selections: Calendars.CalSelection[]) => void;
+    selected: Stores.Calendars.CalSelection[];
+    updateFn: (selections: Stores.Calendars.CalSelection[]) => void;
     minimized?: boolean;
     toggleMinimized?: () => void;
     allowMulti?: boolean;

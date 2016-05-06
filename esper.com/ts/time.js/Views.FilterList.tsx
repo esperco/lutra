@@ -6,12 +6,13 @@
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 
 module Esper.Views {
   var Component = ReactHelpers.Component;
 
   interface FilterListProps extends Params.FilterListJSON {
-    cals: Calendars.CalSelection[];
+    cals: Stores.Calendars.CalSelection[];
     period: Period.Single;
   }
 
@@ -147,13 +148,7 @@ module Esper.Views {
 
     renderCalSelector() {
       var teams = Stores.Teams.all();
-      var calendarsByTeamId = (() => {
-        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(teams, (t) => {
-          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
-        });
-        return ret;
-      })();
+      var calendarsByTeamId = Stores.Calendars.byTeamId();
 
       return <div className="col-sm-6 form-group">
         <Components.CalSelectorDropdownWithIcon
@@ -428,7 +423,7 @@ module Esper.Views {
     }
 
     updateRoute(newProps: {
-      cals?: Calendars.CalSelection[];
+      cals?: Stores.Calendars.CalSelection[];
       period?: Period.Single;
       filterStr?: string;
       labels?: Params.ListSelectJSON;

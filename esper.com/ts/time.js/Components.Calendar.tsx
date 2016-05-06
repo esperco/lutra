@@ -8,10 +8,9 @@
   else for week / agenda view.
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
+/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Events2.ts" />
-/// <reference path="./Calendars.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class

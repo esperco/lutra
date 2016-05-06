@@ -6,11 +6,11 @@
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalSelector.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
 /// <reference path="./Onboarding.ts" />
-/// <reference path="./Calendars.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Views {
@@ -39,13 +39,7 @@ module Esper.Views {
       chart.sync(); // Call once per renderWithData to update chart data
 
       var teams = Stores.Teams.all();
-      var calendarsByTeamId = (() => {
-        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(teams, (t) => {
-          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
-        });
-        return ret;
-      })();
+      var calendarsByTeamId = Stores.Calendars.byTeamId();
 
       // Render view
       return <div id="charts-page" className="esper-full-screen minus-nav">
@@ -206,7 +200,7 @@ module Esper.Views {
 
     updateRoute({chartId, cals, period, opts}: {
       chartId?: string;
-      cals?: Calendars.CalSelection[];
+      cals?: Stores.Calendars.CalSelection[];
       period?: Period.Single|Period.Custom;
       opts?: Route.nav.Opts;
     }) {
@@ -241,7 +235,7 @@ module Esper.Views {
       });
     }
 
-    updateCalSelection(selections: Calendars.CalSelection[]) {
+    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
       this.updateRoute({
         cals: selections
       });

@@ -6,6 +6,7 @@
 /// <reference path="./Test.ts" />
 /// <reference path="./Api.ts" />
 /// <reference path="./ApiC.ts" />
+/// <reference path="./Stores.Calendars.ts" />
 /// <reference path="./Stores.Teams.ts" />
 
 module Esper.TestFixtures {
@@ -57,6 +58,8 @@ module Esper.TestFixtures {
     Stores.Teams.TeamStore.removeAllChangeListeners();
     Stores.Teams.TeamListStore.reset();
     Stores.Teams.TeamListStore.removeAllChangeListeners();
+    Stores.Calendars.ListStore.reset();
+    Stores.Calendars.ListStore.removeAllChangeListeners();
   }
 
   export function getLoginInfo(): ApiT.LoginResponse {

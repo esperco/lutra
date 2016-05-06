@@ -5,8 +5,9 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.SelectMenu.tsx" />
+/// <reference path="../lib/Actions.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="./Calendars.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="./Components.RequestExec.tsx" />
 
 module Esper.Views {
@@ -19,9 +20,7 @@ module Esper.Views {
   }, {}> {
     renderWithData() {
       var _id = this.props.teamId || newTeamCalendarListId;
-      var metadataOpt = Option.cast(
-        Calendars.CalendarListStore.metadata(_id)
-      );
+      var metadataOpt = Stores.Calendars.ListStore.get(_id);
       var busy = metadataOpt.match({
         none: () => false,
         some: (m) => m.dataStatus === Model.DataStatus.INFLIGHT
@@ -66,7 +65,10 @@ module Esper.Views {
   //////
 
   function selectedCalendars(teamId: string) {
-    return Calendars.CalendarListStore.val(teamId) || [];
+    return Stores.Calendars.list(teamId).match({
+      none: (): ApiT.GenericCalendar[] => [],
+      some: (list) => list
+    })
   }
 
   function availableCalendars(teamId: string) {
@@ -172,9 +174,9 @@ module Esper.Views {
 
     toggleCalendar(cal: ApiT.GenericCalendar, selected: boolean) {
       if (selected) {
-        Calendars.addTeamCalendar(this.props.calendarListId, cal);
+        Actions.Calendars.add(this.props.calendarListId, cal);
       } else {
-        Calendars.removeTeamCalendar(this.props.calendarListId, cal);
+        Actions.Calendars.remove(this.props.calendarListId, cal);
       }
     }
   }
