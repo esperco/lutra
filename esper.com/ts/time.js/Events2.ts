@@ -5,6 +5,7 @@
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Model2.Batch.ts" />
 /// <reference path="../lib/Model2.ts" />
+/// <reference path="../lib/Store.Teams.ts" />
 /// <reference path="../lib/XDate.ts" />
 /// <reference path="./Period.ts" />
 
@@ -305,7 +306,7 @@ module Esper.Events2 {
 
   export function getGuests(event: TeamEvent) {
     // Ignore exec on team
-    var execId = Teams.require(event.teamId).team_executive;
+    var execId = Stores.Teams.require(event.teamId).team_executive;
 
     // Need profiles to get exec email
     var store = ApiC.getAllProfiles.store;
@@ -353,7 +354,7 @@ module Esper.Events2 {
     return _(events)
       .map((e) => e.teamId)
       .uniq()
-      .map((teamId) => Teams.require(teamId))
+      .map((teamId) => Stores.Teams.require(teamId))
       .value();
   }
 }

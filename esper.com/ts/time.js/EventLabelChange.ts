@@ -2,11 +2,12 @@
   Module for applying labels to events
 */
 
+/// <reference path="../lib/Analytics.Web.ts" />
 /// <refernece path="../lib/Api.ts" />
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue2.ts" />
-/// <reference path="../lib/Analytics.Web.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Events2.ts" />
 
 module Esper.EventLabelChange {
@@ -78,7 +79,7 @@ module Esper.EventLabelChange {
           var eventOpt = Events2.EventStore.cloneData(storeId).flatMap(
             (newEvent) => {
               _.each(opt.addLabels, (l) => {
-                var normalized = Teams.getNormLabel(l);
+                var normalized = Stores.Teams.getNormLabel(l);
                 if (! _.includes(newEvent.labels_norm, normalized)) {
                   newEvent.labels_norm.push(normalized);
                   newEvent.labels.push(l);
@@ -86,7 +87,7 @@ module Esper.EventLabelChange {
               });
 
               _.each(opt.removeLabels, (l) => {
-                var normalized = Teams.getNormLabel(l);
+                var normalized = Stores.Teams.getNormLabel(l);
                 var index = _.indexOf(newEvent.labels_norm, normalized);
                 if (index >= 0) {
                   newEvent.labels.splice(index, 1);

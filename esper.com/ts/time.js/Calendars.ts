@@ -5,8 +5,8 @@
 /// <reference path="../lib/Model.StoreOne.ts" />
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Queue2.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Teams.ts" />
 
 module Esper.Calendars {
   export interface CalSelection {
@@ -53,13 +53,18 @@ module Esper.Calendars {
     var p = CalendarUpdateQueue.enqueue(_id, {
       teamId: _id,
       calIds: calIds
-    });
-    CalendarListStore.push(_id, p, calendars);
+    }).then((t) => Option.wrap(t));
+    CalendarListStore.push(_id, p, calendars)
 
     if (_id) {
-      var team = _.cloneDeep(Teams.get(_id));
-      team.team_timestats_calendars = calIds;
-      Teams.teamStore.pushFetch(_id, p, team);
+      Stores.Teams.TeamStore.pushFetch(_id, p,
+        Stores.Teams.get(_id).flatMap(
+          (t) => {
+            var newTeam = _.cloneDeep(team);
+            newTeam.team_timestats_calendars = calIds;
+            return Option.some(newTeam);
+          }
+        ));
 
       /*
         TODO: There is a potential bug here if multiple people are editing
@@ -100,7 +105,7 @@ module Esper.Calendars {
     teams?: ApiT.Team[];
     force?: boolean;
   }) {
-    teams = teams || Teams.all();
+    teams = teams || Stores.Teams.all();
     var promises = _.map(teams, (t) => {
 
       var calendars = CalendarListStore.val(t.teamid);

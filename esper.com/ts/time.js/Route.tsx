@@ -7,29 +7,14 @@
 
 module Esper.Route {
 
-  // Helper to check default team created and calendars loaded
-  var checkTeamAndCalendars: PageJS.Callback = function(ctx, next) {
-    Teams.defaultTeamPromise
-
-      // Uncomment if we want to wait for calendar names to finish loading
-      // .then(() => Calendars.calendarLoadPromise)
-
-      .then(next, (err) => {
-        Log.e(err);
-        Actions.render(<Views.LoadError />);
-      });
-  }
-
   // Helper to require onboarding for certain pages -- also checks team and
   // calendar promises
   var checkOnboarding: PageJS.Callback = function(ctx, next) {
-    checkTeamAndCalendars(ctx, () => {
-      if (Onboarding.needsCalendars()) {
-        Route.nav.path("/calendar-setup");
-      } else {
-        next();
-      }
-    });
+    if (Onboarding.needsCalendars()) {
+      Route.nav.path("/calendar-setup");
+    } else {
+      next();
+    }
   }
 
   ////////
@@ -103,7 +88,7 @@ module Esper.Route {
   });
 
   // Page for setting up initial teams and calendars
-  route("/calendar-setup/:teamid?", checkTeamAndCalendars, function(ctx) {
+  route("/calendar-setup/:teamid?", function(ctx) {
     Actions.renderCalendarSetup(ctx.params["teamid"]);
   });
 

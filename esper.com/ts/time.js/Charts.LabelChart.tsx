@@ -28,14 +28,14 @@ module Esper.Charts {
         all: false,
         none: true,
         some: params.cals[0] ?
-          Teams.require(params.cals[0].teamId).team_labels_norm : []
+          Stores.Teams.require(params.cals[0].teamId).team_labels_norm : []
       };
       return ret;
     }
 
     sync() {
       super.sync();
-      this.allLabels = Labels.fromEvents(this.events, Teams.all());
+      this.allLabels = Labels.fromEvents(this.events, Stores.Teams.all());
       this.eventsByLabel = Partition.groupByMany(this.events,
         (e) => e.labels_norm
       );

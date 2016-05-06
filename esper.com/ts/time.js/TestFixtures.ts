@@ -5,7 +5,7 @@
 /// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/Test.ts" />
 /// <reference path="../lib/Api.ts" />
-/// <reference path="./Teams.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.TestFixtures {
   export var uid = "my-uid";
@@ -53,10 +53,10 @@ module Esper.TestFixtures {
 
   export function reset() {
     Login.reset();
-    Teams.teamStore.reset();
-    Teams.teamStore.removeAllChangeListeners();
-    Teams.allTeamsStore.reset();
-    Teams.allTeamsStore.removeAllChangeListeners();
+    Stores.Teams.TeamStore.reset();
+    Stores.Teams.TeamStore.removeAllChangeListeners();
+    Stores.Teams.TeamListStore.reset();
+    Stores.Teams.TeamListStore.removeAllChangeListeners();
     Calendars.CalendarListStore.reset();
     Calendars.CalendarListStore.removeAllChangeListeners();
     Events2.EventsForDateStore.reset();

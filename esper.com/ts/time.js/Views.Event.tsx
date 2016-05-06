@@ -1,4 +1,5 @@
 /// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Components.EventEditor.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 
@@ -59,7 +60,7 @@ module Esper.Views {
             <Components.EventEditor
               className="panel-body"
               eventData={[eventData]}
-              teamPairs={Teams.allPairs()}
+              teams={Stores.Teams.all()}
               initAction={this.props.initAction}
               onDone={() => Route.nav.path("/list")}
             />

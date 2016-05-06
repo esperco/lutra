@@ -9,7 +9,6 @@
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Teams.ts" />
 /// <reference path="./Onboarding.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.ListSelector.tsx" />

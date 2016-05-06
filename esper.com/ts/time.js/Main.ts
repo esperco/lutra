@@ -3,9 +3,9 @@
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/ApiC.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 
 /// <reference path="./Route.tsx" />
-/// <reference path="./Teams.ts" />
 /// <reference path="./Colors.ts" />
 
 module Esper.Conf {
@@ -24,7 +24,7 @@ module Esper.Main {
   }
 
   export function initAll() {
-    Teams.init();
+    Stores.Teams.init();
     Colors.init();
     Calendars.init();
     Login.init();

@@ -1,6 +1,6 @@
 /// <reference path="../lib/Colors.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <refernece path="./Labels.ts" />
-/// <reference path="./Teams.ts" />
 
 module Esper.Colors {
   var labelColorMap: ColorMap = {};
@@ -27,8 +27,9 @@ module Esper.Colors {
 
   export function init() {
     // Set initial colors based on team labels to ensure reasonable consistency
-    Teams.defaultTeamPromise.done(() => {
-      var labels = _(Teams.all())
+    // We assume this is called after Teams.init
+    Login.promise.done(() => {
+      var labels = _(Stores.Teams.all())
         .map((t) => t.team_labels_norm)
         .flatten<string>()
         .uniq()

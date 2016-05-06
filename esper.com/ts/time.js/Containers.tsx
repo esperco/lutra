@@ -2,6 +2,7 @@
   Simple bindings of Components to data sources
 */
 
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 
 module Esper.Containers {
@@ -21,16 +22,10 @@ module Esper.Containers {
         .filter((e) => e.isSome())
         .map((e) => e.unwrap())
         .value();
-      var teamPairs = _.map(Teams.all(),
-        (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
-          .match<[ApiT.Team, Model.StoreMetadata]>({
-            none: () => null,
-            some: (m) => [t, m]
-          }));
 
       return <Components.EventEditorModal
         eventData={eventData}
-        teamPairs={teamPairs}
+        teams={Stores.Teams.all()}
         focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
         onDone={opts.onDone}

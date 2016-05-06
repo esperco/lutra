@@ -1,6 +1,5 @@
 /// <reference path="../lib/ApiC.ts" />
 /// <reference path="./Calendars.ts" />
-/// <reference path="./Teams.ts" />
 /// <reference path="./Views.NotificationSettings.tsx" />
 
 module Esper.Actions {
