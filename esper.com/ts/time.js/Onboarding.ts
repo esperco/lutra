@@ -2,16 +2,16 @@
   Module to manage onboarding process
 */
 
-/// <reference path="./Teams.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.Onboarding {
 
   // Does user need to hook up calendars?
   export function needsCalendars() {
-    var teamWithCal = _.find(Teams.all(), (t) => {
-      var teamReady = Option.cast(Teams.teamStore.metadata(t.teamid)).match({
+    var teamWithCal = _.find(Stores.Teams.all(), (t) => {
+      var teamReady = Stores.Teams.status(t.teamid).match({
         none: () => false,
-        some: (m) => m.dataStatus === Model.DataStatus.READY
+        some: (m) => m === Model2.DataStatus.READY
       });
       if (! teamReady) return false;
 

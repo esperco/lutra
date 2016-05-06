@@ -340,11 +340,11 @@ module Esper.Events2 {
 
     describe("getGuests", function() {
       beforeEach(function() {
-        TestFixtures.mockLogin();
+        TestFixtures.mockTimeLogin();
       });
 
       afterEach(function() {
-        TestFixtures.reset();
+        TestFixtures.resetTime();
       });
 
       it("should return all guests who did not decline", function() {

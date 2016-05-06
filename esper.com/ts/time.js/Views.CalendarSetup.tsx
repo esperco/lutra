@@ -5,6 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.SelectMenu.tsx" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Calendars.ts" />
 /// <reference path="./Components.RequestExec.tsx" />
 
@@ -43,12 +44,12 @@ module Esper.Views {
                   Which calendars do you use to track your time?
                 </div>
                 <TeamSelector
-                  teams={Teams.all()}
+                  teams={Stores.Teams.all()}
                   selectedId={this.props.teamId}
                 />
                 <CalendarList
                   calendarListId={_id}
-                  selectedTeam={Option.wrap(Teams.get(this.props.teamId))}
+                  selectedTeam={Stores.Teams.get(this.props.teamId)}
                   calendarStatus={availableCalendarsStatus(_id)}
                   selectedCalendars={selectedCalendars(_id)}
                   availableCalendars={availableCalendars(_id)}

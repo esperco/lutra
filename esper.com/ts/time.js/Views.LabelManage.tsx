@@ -3,15 +3,16 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
+/// <reference path="../lib/Components.SelectMenu.tsx" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Queue.ts" />
-/// <reference path="../lib/Components.SelectMenu.tsx" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./BatchLabelChange.ts" />
 /// <reference path="./Components.LabelEditor2.tsx" />
-/// <reference path="./Teams.ts" />
 /// <reference path="./Calendars.ts" />
 
 module Esper.Views {
@@ -63,7 +64,10 @@ module Esper.Views {
     }
 
     renderWithData() {
-      var teamStatus = Teams.dataStatus(this.props.teamId);
+      var teamStatus = Stores.Teams.status(this.props.teamId).match({
+        none: () => Model.DataStatus.FETCH_ERROR,
+        some: (d) => d
+      });
       var changeStatus = BatchLabelChange.getStatus(this.props.teamId);
       if (teamStatus === Model.DataStatus.FETCH_ERROR ||
           teamStatus === Model.DataStatus.PUSH_ERROR ||
@@ -104,15 +108,18 @@ module Esper.Views {
     }
 
     getLabels() {
-      var team = Teams.get(this.props.teamId);
-      var ret = (team && team.team_labels) || [];
+      var team = Stores.Teams.get(this.props.teamId);
+      var ret = team.match({
+        none: (): string[] => [],
+        some: (t) => t.team_labels
+      });
       return Labels.sortLabelStrs(ret);
     }
 
     renderLabelInput() {
       return <Components.LabelInput
         onSubmit={(val) => {
-          Teams.addLabel(this.props.teamId, val);
+          Actions.Teams.addLabel(this.props.teamId, val);
           this.setState({ labelFilter: null })
           return "";
         }}
@@ -209,7 +216,7 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Teams.rmLabel(this.props.teamId, label);
+      Actions.Teams.rmLabel(this.props.teamId, label);
     }
 
     promptRmFor(label: string) {
@@ -244,14 +251,14 @@ module Esper.Views {
       var val = input.val().trim();
       var orig = this.state.editLabel.trim();
       if (val && val !== orig) {
-        Teams.renameLabel(this.props.teamId, orig, val);
+        Actions.Teams.renameLabel(this.props.teamId, orig, val);
         BatchLabelChange.rename(this.props.teamId, orig, val);
       }
       this.resetState();
     }
 
     renderTeamSelector() {
-      var teamOptions = _.map(Teams.all(), (t) => ({
+      var teamOptions = _.map(Stores.Teams.all(), (t) => ({
         val: t.teamid,
         display: t.team_name
       }));
@@ -285,7 +292,10 @@ module Esper.Views {
     }
 
     renderFooter() {
-      var dataStatus = Teams.dataStatus(this.props.teamId);
+      var dataStatus = Stores.Teams.status(this.props.teamId).match({
+        none: () => Model2.DataStatus.FETCH_ERROR,
+        some: (d) => d
+      });
       var changeStatus = BatchLabelChange.getStatus(this.props.teamId);
       var busy = (dataStatus === Model.DataStatus.INFLIGHT ||
                   changeStatus === Model.DataStatus.INFLIGHT);

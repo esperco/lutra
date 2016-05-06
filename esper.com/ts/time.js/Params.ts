@@ -2,6 +2,8 @@
   Namespace for helpers that clean up querystring params and the like
 */
 
+/// <reference path="../lib/Stores.Teams.ts"/>
+
 module Esper.Params {
   /* Validation, defaults for common params */
 
@@ -11,16 +13,16 @@ module Esper.Params {
 
   // Clean team ID
   export function cleanTeamId(teamId: string) {
-    if (teamId && Teams.teamStore.has(teamId)) {
+    if (teamId && Stores.Teams.get(teamId).isSome()) {
       lastTeamId = teamId;
       return teamId;
     }
 
-    else if (lastTeamId && Teams.teamStore.has(lastTeamId)) {
+    else if (lastTeamId && Stores.Teams.get(lastTeamId).isSome()) {
       return lastTeamId;
     }
 
-    var teams = Teams.all();
+    var teams = Stores.Teams.all();
     Log.assert(teams.length > 0, "No teams loaded");
 
     // Default to first team with calendars
@@ -36,7 +38,7 @@ module Esper.Params {
 
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
-    var team = Teams.require(teamId);
+    var team = Stores.Teams.require(teamId);
     lastCalIds = calIdsStr || lastCalIds;
     if (lastCalIds) {
       var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));

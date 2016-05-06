@@ -2,6 +2,7 @@
   Component for updating labels for a given task
 */
 
+/// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Option.ts" />
@@ -10,7 +11,6 @@
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="./Events2.ts" />
 /// <reference path="./EventLabelChange.ts" />
-/// <reference path="./Teams.ts" />
 /// <reference path="./Components.EventEditor.tsx" />
 
 module Esper.Components {
@@ -20,7 +20,7 @@ module Esper.Components {
 
   interface LabelEditorProps {
     eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
-    teamPairs: [ApiT.Team, Model.StoreMetadata][];
+    teams: ApiT.Team[];
     onDone?: () => void;
     doneText?: string;
     autoFocus?: boolean;
@@ -85,7 +85,6 @@ module Esper.Components {
     render() {
       var props = this.props;
       var events = this.getEvents();
-      var teams = _.map(props.teamPairs, (t) => t[0]);
 
       var error = !!_.find(props.eventData, (data) =>
         data.dataStatus === Model.DataStatus.PUSH_ERROR ||
@@ -161,7 +160,7 @@ module Esper.Components {
         var teamIds = _.map(events, (e) => e.teamId);
         teamIds = _.uniq(teamIds);
         _.each(teamIds, (teamId) => {
-          Teams.addLabel(teamId, val);
+          Actions.Teams.addLabel(teamId, val);
         });
         EventLabelChange.add(events, val);
         this.setState({ labelFilter: null })
@@ -193,8 +192,7 @@ module Esper.Components {
 
     getLabels() {
       var events = this.getEvents();
-      var teams = _.map(this.props.teamPairs, (t) => t[0]);
-      var labels = Labels.fromEvents(events, teams);
+      var labels = Labels.fromEvents(events, this.props.teams);
       labels = Labels.sortLabels(labels);
 
       if (this.state.labelFilter) {

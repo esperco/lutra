@@ -5,6 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.IntervalSelector.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
@@ -37,10 +38,10 @@ module Esper.Views {
       var chart = this.props.currentChart;
       chart.sync(); // Call once per renderWithData to update chart data
 
-      var teams = Teams.all();
+      var teams = Stores.Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(Teams.all(), (t) => {
+        _.each(teams, (t) => {
           ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
         });
         return ret;

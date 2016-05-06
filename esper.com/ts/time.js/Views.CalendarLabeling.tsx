@@ -1,4 +1,5 @@
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 /// <reference path="./Components.Calendar.tsx" />
@@ -32,10 +33,10 @@ module Esper.Views {
     }
 
     renderWithData() {
-      var teams = Teams.all();
+      var teams = Stores.Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(Teams.all(), (t) => {
+        _.each(teams, (t) => {
           ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
         });
         return ret;
@@ -125,7 +126,6 @@ module Esper.Views {
       );
 
       if (eventData.length) {
-        var teamPairs = Teams.allPairs();
         var heading = (eventData.length === 1 ?
           eventData[0].data.match({
             none: () => "",
@@ -156,7 +156,7 @@ module Esper.Views {
             }
           </div>
           <Components.EventEditor eventData={eventData}
-                                  teamPairs={teamPairs}
+                                  teams={Stores.Teams.all()}
                                   focusOnLabels={true}
                                   minFeedback={true} />
         </div>;

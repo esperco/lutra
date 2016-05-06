@@ -2,9 +2,9 @@
   Component for requesting an exec to share calendar access (Nylas only)
 */
 
+/// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Esper.ts" />
-/// <reference path="./Teams.ts" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -67,14 +67,18 @@ module Esper.Components {
 
     submitInput() {
       var input = $(this._input);
-      var val = input.val().trim();
+      var val: string = input.val().trim();
       if (val) {
         this.setState({
           busy: true,
           error: false
         })
 
-        var p = Teams.createExecTeam(val);
+        var p = Actions.Teams.createExecTeam({
+          name: val,
+          email: val,
+          timezone: moment.tz.guess()
+        });
         p.done(() => this.setState({
             busy: false,
             error: false

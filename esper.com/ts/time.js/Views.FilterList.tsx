@@ -5,6 +5,7 @@
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.Views {
   var Component = ReactHelpers.Component;
@@ -145,10 +146,10 @@ module Esper.Views {
     }
 
     renderCalSelector() {
-      var teams = Teams.all();
+      var teams = Stores.Teams.all();
       var calendarsByTeamId = (() => {
         var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(Teams.all(), (t) => {
+        _.each(teams, (t) => {
           ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
         });
         return ret;
@@ -179,7 +180,7 @@ module Esper.Views {
     }
 
     renderLabelSelector(events: Events2.TeamEvent[]) {
-      var labels = Labels.fromEvents(events, Teams.all());
+      var labels = Labels.fromEvents(events, Stores.Teams.all());
       labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
         <Components.LabelSelectorDropdown labels={labels}
@@ -378,15 +379,9 @@ module Esper.Views {
         .filter((e) => e.isSome())
         .map((e) => e.unwrap())
         .value();
-      var teamPairs = _.map(Teams.all(),
-        (t) => Option.cast(Teams.teamStore.metadata(t.teamid))
-          .match<[ApiT.Team, Model.StoreMetadata]>({
-            none: () => null,
-            some: (m) => [t, m]
-          }));
 
       return <Components.EventEditorModal eventData={eventData}
-                                          teamPairs={teamPairs}
+                                          teams={Stores.Teams.all()}
                                           focusOnLabels={minFeedback}
                                           minFeedback={minFeedback} />;
     }

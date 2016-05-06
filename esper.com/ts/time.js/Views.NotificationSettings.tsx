@@ -1,6 +1,7 @@
 /// <reference path="../lib/ApiC.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -315,7 +316,9 @@ module Esper.Views {
         { this.props.message ?
           <div className="alert alert-info">{this.props.message}</div> :
           null }
-        { _.map(Teams.all(), (t) => this.renderTeam(t, teamPrefs[t.teamid])) }
+        { _.map(Stores.Teams.all(),
+          (t) => this.renderTeam(t, teamPrefs[t.teamid]))
+        }
       </div>;
     }
 

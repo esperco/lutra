@@ -1,16 +1,16 @@
+/// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Views.CalendarSetup.tsx" />
 /// <refernece path="./Actions" />
 
 module Esper.Actions {
-
   export function renderCalendarSetup(teamId?: string) {
 
     // Select default team if none provided
     if (! teamId) {
       teamId = Option.cast(
-        _.find(Teams.all(), (t) => t.team_executive === Login.myUid())
+        _.find(Stores.Teams.all(), (t) => t.team_executive === Login.myUid())
       ).match({
-        none: () => Teams.firstId(),
+        none: () => Stores.Teams.firstId(),
         some: (t) => t.teamid
       });
     }

@@ -39,6 +39,10 @@ module Esper.Queue2 {
     constructor(processFn: IProcessFn<T, P>, preFn?: IPreprocessFn<T>) {
       this.preFn = preFn || ((x: T[]) => x);
       this.processFn = processFn;
+      this.reset();
+    }
+
+    reset() {
       this.stateMap = {};
       this.deferredMap = {};
     }

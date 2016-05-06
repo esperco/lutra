@@ -11,7 +11,7 @@ module Esper.Components {
 
   interface EventEditorProps {
     eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
-    teamPairs: [ApiT.Team, Model.StoreMetadata][];
+    teams: ApiT.Team[];
 
     minFeedback?: boolean;
     initAction?: boolean;
@@ -41,7 +41,7 @@ module Esper.Components {
         }
         <Components.LabelEditor2
           eventData={props.eventData}
-          teamPairs={props.teamPairs}
+          teams={props.teams}
           onDone={props.onDone}
           autoFocus={props.focusOnLabels}
           doneText="Done"
@@ -64,7 +64,7 @@ module Esper.Components {
 
       return <Modal icon="fa-calendar-o" title={heading}>
         <EventEditor eventData={this.props.eventData}
-                     teamPairs={this.props.teamPairs}
+                     teams={this.props.teams}
                      onDone={() => (this.props.onDone || Layout.closeModal)()}
                      focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />

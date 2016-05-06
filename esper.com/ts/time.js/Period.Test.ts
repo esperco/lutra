@@ -1,6 +1,5 @@
 /// <reference path="../lib/Test.ts" />
 /// <reference path="./Period.ts" />
-/// <reference path="./TestFixtures.ts" />
 
 module Esper.Period {
   describe("Period", function() {
