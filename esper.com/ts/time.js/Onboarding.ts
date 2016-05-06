@@ -2,6 +2,7 @@
   Module to manage onboarding process
 */
 
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.Onboarding {
@@ -15,7 +16,7 @@ module Esper.Onboarding {
       });
       if (! teamReady) return false;
 
-      var cals = Option.cast(Calendars.CalendarListStore.val(t.teamid));
+      var cals = Stores.Calendars.list(t.teamid);
       return cals.match({
         none: () => false,
         some: (s) => s.length > 0

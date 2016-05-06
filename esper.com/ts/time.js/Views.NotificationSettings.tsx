@@ -1,6 +1,7 @@
 /// <reference path="../lib/ApiC.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <refernece path="../lib/Actions.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 
 module Esper.Views {
@@ -16,17 +17,7 @@ module Esper.Views {
       // Post to server
       var teamId = this.props.team.teamid;
       var calId = this.props.cal.id
-      var p = Api.postCalendarPrefs(teamId, calId, prefs);
-
-      // Update local state
-      var newCal = _.cloneDeep(this.props.cal);
-      newCal.prefs = prefs;
-
-      var calendarList = _.clone(Calendars.CalendarListStore.val(teamId));
-      var index = _.findIndex(calendarList, (c) => c.id === calId);
-      calendarList[index] = newCal;
-
-      Calendars.CalendarListStore.push(teamId, p, calendarList);
+      Actions.Calendars.updatePrefs(teamId, calId, prefs);
     }
 
     toggleDailyAgenda() {
@@ -323,12 +314,8 @@ module Esper.Views {
     }
 
     renderTeam(team: ApiT.Team, prefs: ApiT.Preferences) {
-      var calendars = Option.cast(
-        Calendars.CalendarListStore.val(team.teamid)
-      );
-      var status = Option.cast(
-        Calendars.CalendarListStore.metadata(team.teamid)
-      ).match({
+      var calendars = Stores.Calendars.list(team.teamid)
+      var status = Stores.Calendars.ListStore.get(team.teamid).match({
         none: () => Model.DataStatus.FETCH_ERROR,
         some: (m) => m.dataStatus
       });

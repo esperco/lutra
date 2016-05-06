@@ -4,6 +4,7 @@
 /// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/ApiC.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 
 /// <reference path="./Route.tsx" />
 /// <reference path="./Colors.ts" />
@@ -25,8 +26,8 @@ module Esper.Main {
 
   export function initAll() {
     Stores.Teams.init();
+    Stores.Calendars.init();
     Colors.init();
-    Calendars.init();
     Login.init();
     Login.promise.done(function() {
       ApiC.getAllProfiles()

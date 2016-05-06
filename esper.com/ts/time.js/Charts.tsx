@@ -3,12 +3,13 @@
 */
 
 /// <reference path="../lib/Model.StoreOne.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="./Esper.ts" />
 
 module Esper.Charts {
   export interface EventChartParams<T extends Params.RelativePeriodJSON> {
     chartId: string;
-    cals: Calendars.CalSelection[];
+    cals: Stores.Calendars.CalSelection[];
     period: Period.Single|Period.Custom;
     filterParams: T
   }

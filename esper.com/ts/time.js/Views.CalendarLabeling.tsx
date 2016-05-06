@@ -1,9 +1,9 @@
 /// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Components.CalSelector.tsx" />
 /// <reference path="./Components.LabelEditor2.tsx" />
 /// <reference path="./Components.Calendar.tsx" />
-/// <refernece path="./Calendars.ts" />
 
 module Esper.Views {
   interface Props {
@@ -34,13 +34,7 @@ module Esper.Views {
 
     renderWithData() {
       var teams = Stores.Teams.all();
-      var calendarsByTeamId = (() => {
-        var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
-        _.each(teams, (t) => {
-          ret[t.teamid] = Calendars.CalendarListStore.val(t.teamid)
-        });
-        return ret;
-      })();
+      var calendarsByTeamId = Stores.Calendars.byTeamId();
 
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
@@ -172,7 +166,7 @@ module Esper.Views {
 
     /////////
 
-    updateCalSelection(selections: Calendars.CalSelection[]) {
+    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
       this.updateRoute({
         cals: selections,
         period: this.props.period

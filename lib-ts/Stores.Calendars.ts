@@ -36,6 +36,22 @@ module Esper.Stores.Calendars {
       );
   }
 
+  // Like get, but throw an error if not found
+  export function require(teamId: string, calId: string) {
+    return get(teamId, calId).unwrap();
+  }
+
+  export function byTeamId() {
+    var ret: {[index: string]: ApiT.GenericCalendar[]} = {};
+    _.each(Teams.allIds(), (_id) => {
+      Stores.Calendars.list(_id).match({
+        none: () => null,
+        some: (list) => ret[_id] = list
+      })
+    });
+    return ret;
+  }
+
 
   //////
 

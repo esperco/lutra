@@ -1,5 +1,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Stores.Calendars.ts" />
+/// <reference path="../lib/Option.ts" />
 /// <reference path="./Charts.tsx" />
 /// <reference path="./Colors.ts" />
 
@@ -31,9 +33,9 @@ module Esper.Charts {
         this.groupings, (w) => -w.adjustedDuration
       );
 
-      this.cals = _.map(this.params.cals,
-        (c) => Calendars.get(c.teamId, c.calId)
-      );
+      this.cals = Option.flatten(_.map(this.params.cals,
+        (c) => Stores.Calendars.get(c.teamId, c.calId)
+      ));
     }
 
     getTotals() {

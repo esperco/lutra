@@ -2,6 +2,7 @@
   Namespace for helpers that clean up querystring params and the like
 */
 
+/// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts"/>
 
 module Esper.Params {
@@ -49,7 +50,7 @@ module Esper.Params {
 
   // Like cleanCalIds, but returns team/cal objects
   export function cleanCalSelections(teamId: string, calIdsStr: string)
-    : Calendars.CalSelection[]
+    : Stores.Calendars.CalSelection[]
   {
     return _.map(cleanCalIds(teamId, calIdsStr), (calId) => ({
       teamId: teamId,
@@ -61,7 +62,7 @@ module Esper.Params {
     Given a (potentially empty) list of CalSections, return a teamId / calId
     path format. Currently only supports one team
   */
-  export function pathForCals(cals: Calendars.CalSelection[]) {
+  export function pathForCals(cals: Stores.Calendars.CalSelection[]) {
     /*
       Default values don't need to match anything specific -- just need
       to not match an actual teamId or calendarId to trigger "empty" set

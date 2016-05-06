@@ -8,26 +8,43 @@
 
 module Esper.Actions.Calendars {
 
+  // Helper function that clones a list of calendars for update purposes
+  function cloneCalList(teamId: string) {
+    return Stores.Calendars.list(teamId).match({
+      none: () => [],
+      some: (cals) => _.cloneDeep(cals)
+    });
+  }
+
   /*
     Code for adding and removing calendars for Google-based teams (currently
     not an option for Nylas teams that the user doesn't control)
   */
-  export function addTeamCalendar(_id: string, cal: ApiT.GenericCalendar) {
-    var calendars = Stores.Calendars.list(_id).match({
-      none: () => [],
-      some: (cals) => _.cloneDeep(cals)
-    });
+  export function add(teamId: string, cal: ApiT.GenericCalendar) {
+    var calendars = cloneCalList(teamId);
     calendars.push(_.cloneDeep(cal));
-    queueUpdate(_id, calendars);
+    queueUpdate(teamId, calendars);
   }
 
-  export function removeTeamCalendar(_id: string, cal: ApiT.GenericCalendar) {
-    var calendars = Stores.Calendars.list(_id).match({
-      none: () => [],
-      some: (cals) => _.cloneDeep(cals)
-    });
+  export function remove(teamId: string, cal: ApiT.GenericCalendar) {
+    var calendars = cloneCalList(teamId);
     _.remove(calendars, (c) => c.id === cal.id);
-    queueUpdate(_id, calendars);
+    queueUpdate(teamId, calendars);
+  }
+
+  // Update a single calendar's prefs
+  export function updatePrefs(
+    teamId: string, calId: string, prefs: ApiT.CalendarPrefs
+  ) {
+    // Post to server
+    var p = Api.postCalendarPrefs(teamId, calId, prefs);
+    var cal = _.cloneDeep(Stores.Calendars.require(teamId, calId));
+    cal.prefs = prefs;
+
+    var calendars = cloneCalList(teamId);
+    var index = _.findIndex(calendars, (c) => c.id === cal.id);
+    calendars[index] = cal;
+    return Stores.Calendars.ListStore.push(teamId, p, Option.wrap(calendars));
   }
 
   // Queues update to server to match calendars on a given team object

@@ -5,6 +5,7 @@
 
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Stores.Calendars.ts" />
 
 module Esper.Actions {
 
@@ -12,7 +13,7 @@ module Esper.Actions {
 
   /* List action => render a list of events */
   export function renderFilterList(params: {
-    cals: Calendars.CalSelection[];
+    cals: Stores.Calendars.CalSelection[];
     period: Period.Single;
   }, queryJSON: Params.FilterListJSON) {
 
