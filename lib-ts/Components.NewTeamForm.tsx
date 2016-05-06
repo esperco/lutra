@@ -2,6 +2,8 @@
   A form for creating a new Team
 */
 
+/// <reference path="./Actions.Teams.ts" />
+/// <reference path="./Login.ts" />
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Components.TimezoneSelector.tsx" />
 
@@ -10,13 +12,7 @@ module Esper.Components {
     supportsExec?: boolean;
   }
 
-  interface TeamValues {
-    name: string;
-    email?: string;
-    timezone: string;
-  }
-
-  interface State extends TeamValues {
+  interface State extends Actions.Teams.ExecTeamData {
     emailError?: boolean;
   }
 
@@ -25,7 +21,7 @@ module Esper.Components {
       super(props);
       this.state = {
         name: "",
-        email: props.supportsExec ? "" : null,
+        email: "",
         timezone: moment.tz.guess()
       };
     }
@@ -101,16 +97,16 @@ module Esper.Components {
     }
 
     // Ref the component and call this to get values
-    validate(): Option.T<TeamValues> {
+    validate(): Option.T<Actions.Teams.ExecTeamData>
+    {
       if (this.props.supportsExec &&
           !Util.validateEmailAddress(this.state.email)) {
         var newState = _.clone(this.state);
         newState.emailError = true;
         this.setState(newState);
-        return Option.none<TeamValues>();
+        return Option.none<Actions.Teams.ExecTeamData>();
       }
       return Option.wrap(this.state);
     }
-
   }
 }
