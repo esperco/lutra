@@ -1,3 +1,5 @@
+@close-action-width: @input-height-base;
+
 // Used to "quote" icons and text used on buttons and links
 .symbol-quote {
   font-weight: bold;
@@ -32,11 +34,40 @@
     border-radius: @border-radius-small;
 
     & + .esper-expando {
-      margin-top: @padding-base-vertical;
+      margin-top: @padding-large-vertical;
     }
   }
 
   .esper-expando-header, .onboarding-expando-content {
     padding: @padding-small-vertical @padding-xs-horizontal;
+  }
+
+  .form-set + .form-set {
+    margin-top: @padding-large-vertical;
+    padding-top: @padding-large-vertical;
+    border-top: 1px solid @brand-border;
+  }
+
+  .new-team {
+    .close-action {
+      float: right;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      .close-action {
+        line-height: @close-action-width;
+        vertical-align: middle;
+      }
+
+      .close-action + .form-set {
+        margin-right: @close-action-width;
+      }
+    }
+  }
+
+  .add-team-div {
+    padding: @padding-small-vertical 0;
+    border-top: 1px solid @brand-border;
+    margin-top: @padding-small-vertical;
   }
 }

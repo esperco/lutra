@@ -8,23 +8,30 @@
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
 
 module Esper.Views {
-  export class TeamSetup extends ReactHelpers.Component<{}, {
+  interface State {
     busy: boolean;
 
     // Which expando is open?
     selfSelected: boolean;
     execSelected: boolean;
-  }> {
+
+    // List of temporary identifiers that React can use to identify coponents
+    newTeamIds: string[];
+  }
+
+  export class TeamSetup extends ReactHelpers.Component<{}, State> {
     _expandos: Components.Expando[] = [];
     _selfForm: Components.NewTeamForm;
-    _execForm: Components.NewTeamForm;
+    _execForms: {[index: string]: Components.NewTeamForm};
 
     constructor(props: {}) {
       super(props);
+      this._execForms = {};
       this.state = {
         busy: false,
         selfSelected: false,
-        execSelected: false
+        execSelected: false,
+        newTeamIds: [Util.randomString()]
       };
     }
 
@@ -56,26 +63,59 @@ module Esper.Views {
         >
           <div className="onboarding-expando-content">
             <p>{ Text.TeamExecDescription }</p>
-            <Components.NewTeamForm
-             ref={(c) => this._execForm = c}
-             supportsExec={true} />
+            { _.map(this.state.newTeamIds, (id) =>
+              <div key={id} className="new-team">
+                { this.state.newTeamIds.length > 1 ?
+                  <span className="action close-action"
+                        onClick={() => this.rmTeam(id)}>
+                    <i className="fa fa-fw fa-close" />
+                  </span> : null
+                }
+                <Components.NewTeamForm
+                 ref={(c) => this._execForms[id] = c}
+                 supportsExec={true} />
+              </div>
+            )}
+            <div className="add-team-div clearfix">
+              <span className="action pull-right"
+                    onClick={() => this.addTeam()}>
+                <i className="fa fa-fw fa-plus" />{" "}Add Someone Else
+              </span>
+            </div>
           </div>
         </Components.Expando>
       </Components.OnboardingPanel>
     }
 
+
+
+    // On open the self expando
     onOpenSelf() {
-      var newState = _.clone(this.state);
-      newState.selfSelected = true;
-      newState.execSelected = false;
-      this.setState(newState);
+      this.mutateState((state) => {
+        state.selfSelected = true;
+        state.execSelected = false;
+      });
     }
 
+    // On open the support someone else / exec expando
     onOpenExec() {
-      var newState = _.clone(this.state);
-      newState.selfSelected = false;
-      newState.execSelected = true;
-      this.setState(newState);
+      this.mutateState((state) => {
+        state.selfSelected = false;
+        state.execSelected = true;
+      });
+    }
+
+    // On clicking the "Add someone else" action
+    addTeam() {
+      this.mutateState(
+        (state) => state.newTeamIds.push(Util.randomString())
+      );
+    }
+
+    rmTeam(id: string) {
+      this.mutateState(
+        (state) => _.pull(state.newTeamIds, id)
+      );
     }
 
     onNext() {
@@ -86,10 +126,18 @@ module Esper.Views {
           some: (d) => promises.push(Actions.Teams.createSelfTeam(d))
         });
       } else { // Assume exec selected
-        this._execForm.validate().match({
-          none: () => null,
-          some: (d) => promises.push(Actions.Teams.createExecTeam(d))
-        });
+        var execForms = _.filter(
+          _.values<Components.NewTeamForm>(this._execForms)
+        );
+        var validations = _.map(execForms, (f) => f.validate());
+
+        // Only post if all teams valid
+        if (_.every(validations, (v) => v.isSome())) {
+          _.each(validations, (v) => v.match({
+            none: () => null,
+            some: (d) => promises.push(Actions.Teams.createExecTeam(d))
+          }));
+        }
       }
 
       if (promises.length) {

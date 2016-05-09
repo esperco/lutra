@@ -679,11 +679,24 @@ flexibility with non-UL elements */
 /* Generic */
 
 .action {
+  color: @text-muted;
   cursor: pointer;
 
   &.fa {
     font-size: @input-height-base - (2 * @padding-small-vertical);
     line-height: @input-height-base;
+  }
+
+  &:hover {
+    color: @text-muted-hover;
+  }
+
+  .esper-shade {
+    color: @shade-text-muted;
+
+    &:hover {
+      color: @shade-text-muted-hover;
+    }
   }
 }
 

@@ -219,6 +219,13 @@ module Esper.ReactHelpers {
       return src;
     }
 
+    // Helper for updating the state object via mutation
+    protected mutateState(fn: (state: S) => void) {
+      var newState = _.clone(this.state);
+      fn(newState);
+      this.setState(newState);
+    }
+
     // Update state using getState function
     protected updateState(newProps?: P) {
       var newState = <S> this.getState(newProps || this.props);

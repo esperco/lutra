@@ -47,7 +47,7 @@ module Esper.Components {
           })}>
             <label htmlFor={this.getId("email")}
                    className="col-md-2 control-label">
-              Email*
+              Email
             </label>
             <div className="col-md-10">
               <input id={this.getId("email") } type="email" name="email"
@@ -69,12 +69,6 @@ module Esper.Components {
             />
           </div>
         </div>
-        { this.props.supportsExec ?
-          <div className="esper-note">
-            * Required
-          </div> :
-          null
-        }
       </div>;
     }
 
