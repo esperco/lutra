@@ -7,10 +7,13 @@
 
 module Esper.Route {
 
-  // Helper to require onboarding for certain pages -- also checks team and
-  // calendar promises
+  // Helper to require onboarding for certain pages
   var checkOnboarding: PageJS.Callback = function(ctx, next) {
-    if (Onboarding.needsCalendars()) {
+    if (Onboarding.needsTeam()) {
+      Route.nav.path("/team-setup");
+    } else if (Onboarding.needsLabels()) {
+      Route.nav.path("/label-setup");
+    } else if (Onboarding.needsCalendars()) {
       Route.nav.path("/calendar-setup");
     } else {
       next();
@@ -92,6 +95,11 @@ module Esper.Route {
     Actions.renderCalendarSetup(ctx.params["teamid"]);
   });
 
+  // Temp page for managing calendars (until we get separate settings page)
+  route("/calendar-manage/:teamid?", checkOnboarding, function(ctx) {
+    Actions.renderCalendarManage(ctx.params["teamid"]);
+  });
+
   // Event feedback landing page
   route("/event", checkOnboarding, function(ctx) {
     var q = decodeURIComponent(ctx.querystring);
@@ -129,9 +137,16 @@ module Esper.Route {
     }, q)
   });
 
+  /* Onboarding */
+
   route("/team-setup", function(ctx) {
     Actions.renderTeamSetup();
   });
+
+  route("/label-setup", function(ctx) {
+    Actions.renderLabelSetup();
+  });
+
 
   // 404 page
   route('*', function(ctx) {

@@ -141,10 +141,12 @@ module Esper.Analytics {
     TimeStats,             // /#!/
     TimeStatsCharts,       // /#!/charts
     CalendarLabeling,      // /#!/calendar-labeling
+    CalendarManage,        // /#!/calendar-manage
     CalendarSetup,         // /#!/calendar-setup
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
     LabelManagement,       // /#!/labels
+    LabelSetup,            // /#!/label-setup
     NotificationSettings,  // /#!/notification-settings
     TeamSetup              // /#!/team-setup
   }

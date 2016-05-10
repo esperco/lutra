@@ -4,6 +4,10 @@
 
 module Esper.Text {
 
+  // Basics
+  export const Label = "Goal";
+  export const Labels = "Goals";
+
   // Onboarding
   export const TeamSetupHeading = "Let's Get Started";
   export const TeamSetupDescription = "Welcome to Esper! Are you managing " +
@@ -11,7 +15,24 @@ module Esper.Text {
     "assistant or supervisor)?";
   export const TeamSelfDescription = "Great! We need a little more info to " +
     "continue.";
-  export const TeamExecDescription = "OK. Who are you managing time for?"
+  export const TeamExecDescription = "Fantastic. Who are you managing time " +
+    "for? We'll invite that person to Esper and set things up " +
+    "so that person can retain access to his or her Esper data if you " +
+    "decide to hand off calendar duties to someone else."
+
+  export const LabelSetupHeading = "Set Some Goals";
+  export const LabelSetupSelfDescription = "What do you want to spend more " +
+    "time on? We'll use these to categorize your calendar events and " +
+    "calculate how much time you're spending towards each goal.";
+  export const LabelSetupExecDescription = "Pick some goals for each person " +
+    "you're supporting. We'll use these to categorize their calendar " +
+    "events and calculate how much time they're spending towards each goal.";
+
+  export const CalendarSetupHeading = "Hook Up Your Calendar";
+  export const CalendarSetupSelfDescription = "Which calendars do you want " +
+    "connect to Esper?"
+  export const CalendarSetupExecDescription = "Pick which calendars Esper " +
+    "should use for each person you're supporting.";
 
   // For post-meeting feedback
   export const FeedbackTitle  = "Meeting Feedback"

@@ -107,7 +107,7 @@ module Esper.Components {
     editCalendars() {
       // Delay to avoid React trying to close dropdown after redirect
       window.requestAnimationFrame(() =>
-        Route.nav.path("/calendar-setup" + (
+        Route.nav.path("/calendar-manage" + (
           this.props.selected.length ? "/" + this.props.selected[0].teamId : ""
         ))
       );

@@ -1,9 +1,9 @@
 /// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="./Views.CalendarSetup.tsx" />
+/// <reference path="./Views.CalendarManage.tsx" />
 /// <refernece path="./Actions" />
 
 module Esper.Actions {
-  export function renderCalendarSetup(teamId?: string) {
+  export function renderCalendarManage(teamId?: string) {
 
     // Select default team if none provided
     if (! teamId) {
@@ -16,10 +16,10 @@ module Esper.Actions {
     }
 
     // Trigger async -> does nothing if already loaded
-    _.each(Stores.Teams.allIds(), (_id) => ApiC.getGenericCalendarList(_id));
+    ApiC.getGenericCalendarList(teamId);
 
-    render(<Views.CalendarSetup teamId={teamId} />);
-    Analytics.page(Analytics.Page.CalendarSetup, {
+    render(<Views.CalendarManage teamId={teamId} />);
+    Analytics.page(Analytics.Page.CalendarManage, {
       teamId: teamId
     });
   }

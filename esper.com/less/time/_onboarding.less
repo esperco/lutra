@@ -1,3 +1,5 @@
+@onboarding-close-action-width: @input-height-base;
+
 // Used to "quote" icons and text used on buttons and links
 .symbol-quote {
   font-weight: bold;
@@ -16,8 +18,18 @@
     font-weight: bold;
   }
 
+  .panel-footer {
+    .btn + .btn {
+      margin-left: @padding-base-horizontal;
+    }
+  }
+
   .alert {
     text-align: center;
+  }
+
+  .back-action {
+    padding-right: @padding-small-horizontal;
   }
 
   .esper-expando {
@@ -26,11 +38,52 @@
     border-radius: @border-radius-small;
 
     & + .esper-expando {
-      margin-top: @padding-base-vertical;
+      margin-top: @padding-large-vertical;
     }
   }
 
-  .esper-expando-header, .onboarding-expando-content {
+  .esper-expando-header {
     padding: @padding-small-vertical @padding-xs-horizontal;
+  }
+
+  .onboarding-expando-content {
+    padding: @padding-large-vertical @padding-xs-horizontal 0;
+
+    .esper-select-menu {
+      margin: 0 -(@padding-xs-horizontal + @padding-small-horizontal)
+        @padding-small-vertical;
+    }
+  }
+
+  .form-set + .form-set {
+    margin-top: @padding-large-vertical;
+    padding-top: @padding-large-vertical;
+    border-top: 1px solid @brand-border;
+  }
+
+  .new-team {
+    .close-action {
+      float: right;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      .close-action {
+        line-height: @onboarding-close-action-width;
+        vertical-align: middle;
+      }
+
+      .close-action + .form-set {
+        margin-right: @onboarding-close-action-width;
+      }
+    }
+  }
+
+  .add-team-div {
+    padding: @padding-small-vertical 0;
+    margin-top: @padding-small-vertical;
+
+    .esper-expando & {
+      border-top: 1px solid @brand-border;
+    }
   }
 }

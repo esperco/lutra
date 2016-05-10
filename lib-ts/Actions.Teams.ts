@@ -49,6 +49,19 @@ module Esper.Actions.Teams {
     });
   }
 
+  // Used with Onboarding skip
+  export function createDefaultTeam() {
+    if (Stores.Teams.allIds().length > 0) {
+      return $.Deferred<ApiT.Team>()
+        .resolve(Stores.Teams.first())
+        .promise();
+    }
+    return createSelfTeam({
+      name: "",
+      timezone: moment.tz.guess()
+    });
+  }
+
 
   /* Team label management */
 
@@ -103,6 +116,17 @@ module Esper.Actions.Teams {
     newLabels = _.uniqBy(newLabels, Stores.Teams.getNormLabel);
 
     return setTeamLabels(_id, team, newLabels);
+  }
+
+  export function putLabels(_id: string, labels: string[]) {
+    var team = Stores.Teams.require(_id);
+    if (! team) return;
+
+    if (_.isEqual(team.team_labels, labels)) {
+      return $.Deferred<void>().resolve().promise();
+    }
+
+    return setTeamLabels(_id, team, labels);
   }
 
   function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
