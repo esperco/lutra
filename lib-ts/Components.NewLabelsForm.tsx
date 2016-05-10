@@ -100,6 +100,7 @@ module Esper.Components {
     // Ref the component and call this to get values
     validate(): Option.T<string[]> {
       var labels = _.map(this.state.labels, (l) => l.display);
+      labels = _.filter(labels);
       if (labels.length) {
         return Option.some(labels)
       }

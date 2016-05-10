@@ -105,6 +105,17 @@ module Esper.Actions.Teams {
     return setTeamLabels(_id, team, newLabels);
   }
 
+  export function putLabels(_id: string, labels: string[]) {
+    var team = Stores.Teams.require(_id);
+    if (! team) return;
+
+    if (_.isEqual(team.team_labels, labels)) {
+      return $.Deferred<void>().resolve().promise();
+    }
+
+    return setTeamLabels(_id, team, labels);
+  }
+
   function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
     // Store values immutable so clone
     var teamCopy = _.cloneDeep(team);

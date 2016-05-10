@@ -17,11 +17,14 @@ module Esper.Views {
   }
 
   export class LabelSetup extends ReactHelpers.Component<Props, State> {
+    _teamForms: { [index: string]: Components.NewLabelsForm }
+
     constructor(props: Props) {
       super(props);
       this.state = {
         busy: false,
       };
+      this._teamForms = {};
     }
 
     renderWithData() {
@@ -44,14 +47,41 @@ module Esper.Views {
         <Components.OnboardingTeams
           teams={Stores.Teams.all()}
           initOpenId={this.props.teamId}
-          renderFn={(t) => <Components.NewLabelsForm team={t} />}
+          renderFn={(t) => this.renderTeamForm(t)}
           onAddTeam={() => Route.nav.path("team-setup")}
         />
       </Components.OnboardingPanel>
     }
 
+    renderTeamForm(team: ApiT.Team) {
+      return <Components.NewLabelsForm
+        ref={(c) => this._teamForms[team.teamid] = c}
+        team={team} />;
+    }
+
     onNext() {
-      Route.nav.path("calendar-setup");
+      var promises: JQueryPromise<any>[] = []
+
+      _.each(this._teamForms, (t, teamId) => {
+        if (t) {
+          t.validate().match({
+            none: () => null,
+            some: (labels) => {
+              promises.push(Actions.Teams.putLabels(teamId, labels))
+            }
+          })
+        }
+      });
+
+      console.info(promises);
+      if (promises.length) {
+        this.mutateState((state) => state.busy = true)
+        $.when.apply($, promises)
+          .done(() => Route.nav.path("calendar-setup"))
+          .fail(() => {
+            this.mutateState((state) => state.busy = false)
+          });
+      }
     }
   }
 }
