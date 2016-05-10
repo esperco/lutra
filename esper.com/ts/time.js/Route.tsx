@@ -92,6 +92,11 @@ module Esper.Route {
     Actions.renderCalendarSetup(ctx.params["teamid"]);
   });
 
+  // Temp page for managing calendars (until we get separate settings page)
+  route("/calendar-manage/:teamid?", function(ctx) {
+    Actions.renderCalendarManage(ctx.params["teamid"]);
+  });
+
   // Event feedback landing page
   route("/event", checkOnboarding, function(ctx) {
     var q = decodeURIComponent(ctx.querystring);
