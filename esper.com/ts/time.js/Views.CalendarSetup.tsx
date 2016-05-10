@@ -3,61 +3,75 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.ModalPanel.tsx" />
-/// <reference path="../lib/Components.SelectMenu.tsx" />
 /// <reference path="../lib/Actions.Calendars.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="./Components.RequestExec.tsx" />
 
 module Esper.Views {
 
-  // If no teams exist yet, use this as _id of the calendarList
-  const newTeamCalendarListId: string = "NEW";
+  interface Props {
+    teamId: string; // Init only
+  }
 
-  export class CalendarSetup extends ReactHelpers.Component<{
-    teamId: string;
-  }, {}> {
+  interface State {  }
+
+  export class CalendarSetup extends ReactHelpers.Component<Props, State> {
     renderWithData() {
-      var _id = this.props.teamId || newTeamCalendarListId;
-      var metadataOpt = Stores.Calendars.ListStore.get(_id);
-      var busy = metadataOpt.match({
-        none: () => false,
-        some: (m) => m.dataStatus === Model.DataStatus.INFLIGHT
-      });
-      var error = metadataOpt.match({
-        none: () => false,
-        some: (m) => m.dataStatus === Model.DataStatus.PUSH_ERROR ||
-                     m.dataStatus === Model.DataStatus.FETCH_ERROR
-      });
+      var disableNext = !_.find(Stores.Teams.all(),
+        (t) => t.team_timestats_calendars.length);
+      var hasExec = !!_.find(Stores.Teams.all(),
+        (t) => t.team_executive !== Login.myUid());
+      var busy =  !!_.find(Stores.Teams.allIds(), (_id) =>
+        Stores.Calendars.ListStore.get(_id).match({
+          none: () => false,
+          some: (data) => data.dataStatus === Model.DataStatus.INFLIGHT
+        })
+      );
 
-      return <div className="container"><div className="row">
-        <div className="col-sm-offset-2 col-sm-8">
-          <div className="panel panel-default">
-            <div className="panel-body">
-              <Components.ModalPanel busy={busy} error={error}
-                disableCancel={Onboarding.needsCalendars()}
-                cancelText={"Done"} onCancel={() => Route.nav.home()}
-              >
-                <div className="alert alert-info">
-                  Which calendars do you use to track your time?
-                </div>
-                <TeamSelector
-                  teams={Stores.Teams.all()}
-                  selectedId={this.props.teamId}
-                />
-                <CalendarList
-                  calendarListId={_id}
-                  selectedTeam={Stores.Teams.get(this.props.teamId)}
-                  calendarStatus={availableCalendarsStatus(_id)}
-                  selectedCalendars={selectedCalendars(_id)}
-                  availableCalendars={availableCalendars(_id)}
-                />
-              </Components.ModalPanel>
-            </div>
-          </div>
+      // Make ApiC calls here so they're registered by tracker
+      _.each(Stores.Teams.allIds(), (_id) => availableCalendars(_id));
+
+      return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
+              progress={3/3} busy={busy}
+              backPath={"#!" + Route.nav.getPath("label-setup")}
+              disableNext={disableNext}
+              onNext={() => this.onNext()}>
+        <div className="alert alert-info">
+          { hasExec ?
+            Text.CalendarSetupExecDescription :
+            Text.CalendarSetupSelfDescription }
         </div>
-      </div></div>;
+
+        <Components.OnboardingTeams
+          teams={Stores.Teams.all()}
+          initOpenId={this.props.teamId}
+          renderFn={(t) => this.renderCalendarForm(t)}
+          onAddTeam={() => Route.nav.path("team-setup")}
+        />
+
+        <div className="alert">
+          Can't find the calendar you're looking for? Please
+          {" "}<a href="/contact">contact us</a> for help.
+        </div>
+      </Components.OnboardingPanel>;
+    }
+
+    renderCalendarForm(team: ApiT.Team) {
+      return <CalendarList
+        calendarListId={team.teamid}
+        team={team}
+        calendarStatus={availableCalendarsStatus(team.teamid)}
+        selectedCalendars={selectedCalendars(team.teamid)}
+        availableCalendars={availableCalendars(team.teamid)}
+      />;
+    }
+
+    onNext() {
+      Route.nav.path("charts");
+    }
+
+    protected setSources(newSources: Array<Emit.EmitBase|Tracker.TrackingKey>) {
+      super.setSources(newSources);
+      console.info(newSources);
     }
   }
 
@@ -95,7 +109,7 @@ module Esper.Views {
 
   class CalendarList extends ReactHelpers.Component<{
     calendarListId: string;
-    selectedTeam: Option.T<ApiT.Team>;
+    team: ApiT.Team;
     calendarStatus: Model.DataStatus;
     selectedCalendars: ApiT.GenericCalendar[];
     availableCalendars: ApiT.GenericCalendar[];
@@ -115,14 +129,9 @@ module Esper.Views {
       }
 
       var calendars = this.props.availableCalendars;
-      var teamApproved = this.props.selectedTeam.match({
-        none: () => false,
-        some: (t) => t.team_approved && !!t.team_calendars.length
-      });
-      var isExec = this.props.selectedTeam.match({
-        none: () => true,
-        some: (t) => Login.myUid() === t.team_executive
-      });
+      var teamApproved = this.props.team.team_approved &&
+        !!this.props.team.team_calendars.length;
+      var isExec = Login.myUid() === this.props.team.team_executive;
 
       return <div>
         { (Login.usesNylas() && !isExec && !teamApproved) ?
@@ -136,25 +145,26 @@ module Esper.Views {
           <div>
             { calendars && calendars.length ?
               // Calendars
-              <div>
-                <label>Select Calendars</label>
-                <div className="list-group">
-                  { _.map(calendars, (c) => this.renderCalendar(c)) }
-                </div>
+              <div className="esper-select-menu">
+                { _.map(calendars, (c) => this.renderCalendar(c)) }
               </div> :
 
               // No calendars
               <div className="esper-no-content">
-                No calendars found
+                No calendars found.{" "}
+                { Login.usesNylas() ?
+                  <span>
+                    It may take a few minutes for your calendar provider
+                    to sync with Esper. Please try{" "}
+                    <a onClick={() => location.reload()}>
+                      refreshing the page
+                    </a>
+                    {" "}in a few minutes.
+                  </span> : null }
               </div>
             }
           </div>
         }
-        <div className="alert">
-          Can't find the calendar you're looking for? Please
-          {" "}<a href="/contact">contact us</a> for help.
-        </div>
-        <Components.RequestExec onSave={changeTeamPromise} />
       </div>;
     }
 
@@ -164,8 +174,9 @@ module Esper.Views {
       );
       return <a key={cal.id}
               onClick={() => this.toggleCalendar(cal, !selected)}
-              className={"list-group-item" + (selected ?
-                         " list-group-item-success" : "")}>
+              className={classNames("esper-selectable", {
+                "active": selected
+              })}>
         <i className={"fa fa-fw " + (selected ?
                       "fa-calendar-check-o" : "fa-calendar-o")} />{" "}
         {cal.title}
@@ -179,42 +190,5 @@ module Esper.Views {
         Actions.Calendars.remove(this.props.calendarListId, cal);
       }
     }
-  }
-
-
-  /////////
-
-  function TeamSelector({teams, selectedId}: {
-    teams: ApiT.Team[];
-    selectedId?: string;
-  }) {
-    var selectId = "calendar-setup-team-select";
-    if (teams.length > 1) {
-      return <div className="form-group">
-        <label htmlFor={selectId} className="control-label">
-          Managing Time For &hellip;
-        </label>
-        <Components.SelectMenu
-          options={_.map(teams, (t) => ({
-            val: t.teamid,
-            display: <span>
-              <i className="fa fa-fw fa-user" />
-              {" "}{ t.team_name }
-            </span>
-          }))}
-          selected={selectedId}
-          onChange={(id) => changeTeam(id)}
-        />
-      </div>;
-    }
-    return <span />;
-  }
-
-  function changeTeamPromise(p: JQueryPromise<ApiT.Team>) {
-    p.done((team) => changeTeam(team.teamid));
-  }
-
-  function changeTeam(teamId?: string) {
-    Route.nav.path("/calendar-setup" + (teamId ? "/" + teamId : ""));
   }
 }

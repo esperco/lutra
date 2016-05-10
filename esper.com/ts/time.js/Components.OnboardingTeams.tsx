@@ -7,24 +7,25 @@ module Esper.Components {
     teams: ApiT.Team[];
     initOpenId?: string;
     onAddTeam: () => void;
-    renderFn: (team: ApiT.Team) => void;
+
+    // Must be pure function of team (or other bound elements)
+    renderFn: (team: ApiT.Team) => JSX.Element;
   }
 
   export class OnboardingTeams extends ReactHelpers.Component<Props, {}> {
-    _expandos: Components.Expando[] = [];
-
     render() {
       return <div>
         { _.map(this.props.teams, (t) =>
           <Components.Expando key={t.teamid}
             initOpen={t.teamid === this.props.initOpenId}
-            group={this._expandos}
             header={<div className="esper-subheader">
               <i className="fa fa-fw fa-user" />
               {" "}{t.team_name}
             </div>}
           >
-            { this.props.renderFn(t) }
+            <div className="onboarding-expando-content">
+              { this.props.renderFn(t) }
+            </div>
           </Components.Expando>
         )}
 

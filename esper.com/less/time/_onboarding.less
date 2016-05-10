@@ -42,8 +42,17 @@
     }
   }
 
-  .esper-expando-header, .onboarding-expando-content {
+  .esper-expando-header {
     padding: @padding-small-vertical @padding-xs-horizontal;
+  }
+
+  .onboarding-expando-content {
+    padding: @padding-large-vertical @padding-xs-horizontal 0;
+
+    .esper-select-menu {
+      margin: 0 -(@padding-xs-horizontal + @padding-small-horizontal)
+        @padding-small-vertical;
+    }
   }
 
   .form-set + .form-set {

@@ -85,7 +85,7 @@ module Esper.Components {
     /* Group management */
 
     componentDidMount() {
-      this.props.group.push(this);
+      this.props.group && this.props.group.push(this);
     }
 
     componentWillUnmount() {

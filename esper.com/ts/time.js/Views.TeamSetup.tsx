@@ -37,7 +37,7 @@ module Esper.Views {
 
     renderWithData() {
       return <Components.OnboardingPanel heading={Text.TeamSetupHeading}
-              progress={1/4} busy={this.state.busy}
+              progress={1/3} busy={this.state.busy}
               disableNext={!(this.state.selfSelected ||
                              this.state.execSelected)}
               onNext={() => this.onNext()}>

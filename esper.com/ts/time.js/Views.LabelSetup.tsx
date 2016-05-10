@@ -4,7 +4,6 @@
 
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
-/// <reference path="../lib/Components.Expando.tsx" />
 /// <reference path="../lib/Components.NewLabelsForm.tsx" />
 
 module Esper.Views {
@@ -34,7 +33,7 @@ module Esper.Views {
         (t) => t.team_executive !== Login.myUid());
 
       return <Components.OnboardingPanel heading={Text.LabelSetupHeading}
-              progress={2/4} busy={this.state.busy}
+              progress={2/3} busy={this.state.busy}
               backPath={"#!" + Route.nav.getPath("team-setup")}
               disableNext={disableNext}
               onNext={() => this.onNext()}>

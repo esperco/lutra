@@ -16,7 +16,7 @@ module Esper.Actions {
     }
 
     // Trigger async -> does nothing if already loaded
-    ApiC.getGenericCalendarList(teamId);
+    _.each(Stores.Teams.allIds(), (_id) => ApiC.getGenericCalendarList(_id));
 
     render(<Views.CalendarSetup teamId={teamId} />);
     Analytics.page(Analytics.Page.CalendarSetup, {
