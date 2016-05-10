@@ -46,6 +46,7 @@ module Esper.Components {
               { this.props.busy ? <div className="esper-spinner" /> : null }
               <div className="pull-right">
                 <button className="btn btn-default"
+                        onClick={() => this.skip()}
                         disabled={this.props.busy}>
                   Skip
                 </button>
@@ -59,6 +60,13 @@ module Esper.Components {
           </div>
         </div>
       </div></div>;
+    }
+
+    skip() {
+      this.props.onSkip ?
+        this.props.onSkip() :
+        Actions.Teams.createDefaultTeam()
+          .then(() => Route.nav.home())
     }
   }
 

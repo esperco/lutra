@@ -49,6 +49,19 @@ module Esper.Actions.Teams {
     });
   }
 
+  // Used with Onboarding skip
+  export function createDefaultTeam() {
+    if (Stores.Teams.allIds().length > 0) {
+      return $.Deferred<ApiT.Team>()
+        .resolve(Stores.Teams.first())
+        .promise();
+    }
+    return createSelfTeam({
+      name: "",
+      timezone: moment.tz.guess()
+    });
+  }
+
 
   /* Team label management */
 
