@@ -1,4 +1,4 @@
-@close-action-width: @input-height-base;
+@onboarding-close-action-width: @input-height-base;
 
 // Used to "quote" icons and text used on buttons and links
 .symbol-quote {
@@ -28,6 +28,10 @@
     text-align: center;
   }
 
+  .back-action {
+    padding-right: @padding-small-horizontal;
+  }
+
   .esper-expando {
     padding: @padding-small-vertical @padding-small-horizontal;
     border: 1px solid @brand-border;
@@ -55,19 +59,22 @@
 
     @media screen and (min-width: @screen-md-min) {
       .close-action {
-        line-height: @close-action-width;
+        line-height: @onboarding-close-action-width;
         vertical-align: middle;
       }
 
       .close-action + .form-set {
-        margin-right: @close-action-width;
+        margin-right: @onboarding-close-action-width;
       }
     }
   }
 
   .add-team-div {
     padding: @padding-small-vertical 0;
-    border-top: 1px solid @brand-border;
     margin-top: @padding-small-vertical;
+
+    .esper-expando & {
+      border-top: 1px solid @brand-border;
+    }
   }
 }

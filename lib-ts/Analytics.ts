@@ -145,6 +145,7 @@ module Esper.Analytics {
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
     LabelManagement,       // /#!/labels
+    LabelSetup,            // /#!/label-setup
     NotificationSettings,  // /#!/notification-settings
     TeamSetup              // /#!/team-setup
   }

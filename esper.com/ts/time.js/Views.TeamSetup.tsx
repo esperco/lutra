@@ -15,7 +15,7 @@ module Esper.Views {
     selfSelected: boolean;
     execSelected: boolean;
 
-    // List of temporary identifiers that React can use to identify coponents
+    // List of temporary identifiers that React can use to identify components
     newTeamIds: string[];
   }
 
@@ -146,7 +146,7 @@ module Esper.Views {
         this.setState(newState);
 
         $.when.apply($, promises)
-          .done(() => Route.nav.path("calendar-setup"))
+          .done(() => Route.nav.path("label-setup"))
           .fail(() => {
             let newState = _.clone(this.state);
             newState.busy = false;

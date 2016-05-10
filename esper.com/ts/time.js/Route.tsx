@@ -129,9 +129,16 @@ module Esper.Route {
     }, q)
   });
 
+  /* Onboarding */
+
   route("/team-setup", function(ctx) {
     Actions.renderTeamSetup();
   });
+
+  route("/label-setup", function(ctx) {
+    Actions.renderLabelSetup();
+  });
+
 
   // 404 page
   route('*', function(ctx) {

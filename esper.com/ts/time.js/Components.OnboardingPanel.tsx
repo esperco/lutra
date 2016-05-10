@@ -1,5 +1,5 @@
 /*
-  Base component for onboarding panes
+  Base component for onboarding panel
 */
 module Esper.Components {
 
@@ -26,7 +26,7 @@ module Esper.Components {
           <div className="panel panel-default onboarding-panel">
             <div className="panel-heading">
               { this.props.backPath ?
-                <a className="action" href={this.props.backPath}>
+                <a className="action back-action" href={this.props.backPath}>
                   <i className="fa fa-fw fa-arrow-circle-left" />
                 </a> : null
               }
