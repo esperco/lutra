@@ -7,6 +7,16 @@
 
 module Esper.Onboarding {
 
+  export function needsTeam() {
+    return !Util.notEmpty(Stores.Teams.all());
+  }
+
+  export function needsLabels() {
+    return !_.find(Stores.Teams.all(), (t) =>
+      t.team_labels.length > 0
+    );
+  }
+
   // Does user need to hook up calendars?
   export function needsCalendars() {
     var teamWithCal = _.find(Stores.Teams.all(), (t) => {

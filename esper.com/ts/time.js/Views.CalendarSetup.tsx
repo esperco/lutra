@@ -68,11 +68,6 @@ module Esper.Views {
     onNext() {
       Route.nav.path("charts");
     }
-
-    protected setSources(newSources: Array<Emit.EmitBase|Tracker.TrackingKey>) {
-      super.setSources(newSources);
-      console.info(newSources);
-    }
   }
 
 

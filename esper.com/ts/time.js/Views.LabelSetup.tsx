@@ -21,21 +21,18 @@ module Esper.Views {
     constructor(props: Props) {
       super(props);
       this.state = {
-        busy: false,
+        busy: false
       };
       this._teamForms = {};
     }
 
     renderWithData() {
-      var disableNext = !_.find(Stores.Teams.all(),
-        (t) => t.team_labels.length);
       var hasExec = !!_.find(Stores.Teams.all(),
         (t) => t.team_executive !== Login.myUid());
 
       return <Components.OnboardingPanel heading={Text.LabelSetupHeading}
               progress={2/3} busy={this.state.busy}
               backPath={"#!" + Route.nav.getPath("team-setup")}
-              disableNext={disableNext}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
           { hasExec ?
