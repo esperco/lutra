@@ -1,0 +1,39 @@
+@label-icon-width: @input-height-base;
+@label-rm-action-width: @input-height-base;
+
+.esper-new-labels {
+  padding-top: @padding-large-vertical;
+
+  .label-icon {
+    float: left;
+    width: @label-icon-width;
+  }
+
+  .label-input-container {
+    margin-left: @label-icon-width;
+  }
+
+  .rm-action {
+    float: right;
+    width: @label-rm-action-width;
+  }
+
+  .label-icon, .rm-action {
+    text-align: center;
+    line-height: @input-height-base;
+    vertical-align: middle;
+  }
+
+  .rm-action + .label-input-container {
+    margin-right: @label-rm-action-width;
+  }
+
+  .add-label-div {
+    padding: @padding-small-vertical 0;
+    margin-top: @padding-small-vertical;
+
+    .esper-expando & {
+      border-top: 1px solid @brand-border;
+    }
+  }
+}
