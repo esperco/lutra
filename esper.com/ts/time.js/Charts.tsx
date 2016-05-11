@@ -93,13 +93,11 @@ module Esper.Charts {
     */
     fetchRelative(incr: number) {
       var fetchPeriod = this.relativePeriod(incr);
-      _.each(this.params.cals, (cal) => {
-        Events2.fetchForPeriod({
-          teamId: cal.teamId,
-          calId: cal.calId,
-          period: fetchPeriod
-        });
-      });
+      var teamIds = _.uniq(_.map(this.params.cals, (c) => c.teamId));
+      _.each(teamIds, (teamId) => Events2.fetchPredictionsForPeriod({
+        teamId: teamId,
+        period: fetchPeriod
+      }));
     }
 
     relativePeriod(incr: number) {

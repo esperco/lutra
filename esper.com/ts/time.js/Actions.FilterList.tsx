@@ -18,9 +18,9 @@ module Esper.Actions {
   }, queryJSON: Params.FilterListJSON) {
 
     // Async load of events
-    _.each(params.cals, (cal) => Events2.fetchForPeriod({
-      teamId: cal.teamId,
-      calId: cal.calId,
+    var teamIds = _.uniq(_.map(params.cals, (c) => c.teamId));
+    _.each(teamIds, (teamId) => Events2.fetchPredictionsForPeriod({
+      teamId: teamId,
       period: params.period
     }));
 

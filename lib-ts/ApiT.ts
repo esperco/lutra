@@ -156,6 +156,10 @@ module Esper.ApiT {
     events: GenericCalendarEvent[];
   }
 
+  export interface GenericCalendarEventsCollection {
+    [teamId: string]: GenericCalendarEvents;
+  }
+
   export interface Calendar {
     google_cal_id: string;
     authorized_as?: any;
