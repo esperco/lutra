@@ -3,8 +3,9 @@
 */
 
 /// <reference path="./Esper.ts" />
+/// <refernece path="../lib/Actions.EventLabels.ts" />
+/// <refernece path="../lib/Actions.Feedback.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
-
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Colors.ts" />
@@ -16,6 +17,7 @@
 /// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Events.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="../lib/Text.ts" />
 /// <reference path="../lib/Queue.ts" />
 
 /// <reference path="../lib/Components.Dropdown.tsx" />
