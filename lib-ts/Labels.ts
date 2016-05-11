@@ -3,21 +3,18 @@
 */
 
 module Esper.Labels {
-  export interface Label {
-    id: string;        // Noralized form
+  interface LabelBase {
+    id: string;        // Normalized form
     displayAs: string; // Display form
   }
 
-  export interface LabelCount extends Label {
-    count: number;
+  export interface Label extends LabelBase {
+    score: number;     // 0 - 1 (1 = user-selected label)
   }
 
-  // For new teams
-  export const DEFAULTS = [
-    "Product", "Business Development", "Sales",
-    "Email", "Internal Team", "Networking",
-    "Health & Wellness", "Personal", "Travel"
-  ];
+  export interface LabelCount extends LabelBase {
+    count: number;
+  }
 
   /*
     Helper to normalize display versions of labels for sorting. Note that
@@ -43,7 +40,7 @@ module Esper.Labels {
   // Takes a list of events and returns a list of unique normalized / display
   // label combos. Optionally includes team labels too (if team matches
   // one of the teams on events)
-  export function fromEvents(events: Events2.TeamEvent[],
+  export function fromEvents(events: Stores.Events.TeamEvent[],
                              teams: ApiT.Team[] = [])
   {
     // Counts for each normalized item
@@ -63,18 +60,19 @@ module Esper.Labels {
           var teamLabel = t.team_labels[i];
           displayAsMap[id] = displayAsMap[id] || teamLabel;
           labels.push(id);
-        })
+        });
       }
     });
 
-    _.each(events, (e) => {
-      _.each(e.labels_norm, (id, index) => {
-        displayAsMap[id] = e.labels[index];
-        counts[id] = counts[id] || 0;
-        counts[id] += 1;
-        labels.push(id);
-      });
-    });
+    _.each(events, (e) => e.labelScores.match({
+      none: () => null,
+      some: (scores) => _.each(scores, (s) => {
+        displayAsMap[s.id] = displayAsMap[s.id] || s.displayAs;
+        counts[s.id] = counts[s.id] || 0;
+        counts[s.id] += 1;
+        labels.push(s.id);
+      })
+    }));
 
     labels = _.uniq(labels);
     return _.map(labels, (id): LabelCount => ({
@@ -88,15 +86,11 @@ module Esper.Labels {
     return _.filter(events, (e) => e.labels_norm.length === 0).length;
   }
 
-  export function hasCount(l: Label|LabelCount): l is LabelCount {
-    return l.hasOwnProperty('count');
-  }
-
   /*
     Sort a list of labels by normalized version of display text -- note
     that this is distinct from
   */
-  export function sortLabels<T extends Label>(labels: T[]): T[] {
+  export function sortLabels<T extends LabelBase>(labels: T[]): T[] {
     return _.sortBy(labels, (l) => normalizeForSort(l.displayAs));
   }
 

@@ -624,21 +624,6 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  // Temporary compatibility fix. Fields `labels` and `labels_norm` are
-  // now optional.
-  function fixGenericCalendarEvent(x: ApiT.GenericCalendarEvent) {
-    if (! _.isArray(x.labels)) {
-      x.labels = [];
-      x.labels_norm = [];
-    }
-    return x;
-  }
-
-  function fixGenericCalendarEvents(x: ApiT.GenericCalendarEvents) {
-    _.each(x.events, fixGenericCalendarEvent);
-    return x;
-  }
-
   // supports generic calendar
   export function postForGenericCalendarEvents(teamid: string, calid: string,
     q: ApiT.CalendarRequest):
@@ -646,7 +631,7 @@ module Esper.Api {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid));
-    return JsonHttp.post(url, JSON.stringify(q)).then(fixGenericCalendarEvents);
+    return JsonHttp.post(url, JSON.stringify(q));
   }
 
   export function postForTeamEvents(teamId: string, q: ApiT.CalendarRequest):
@@ -654,10 +639,7 @@ module Esper.Api {
   {
     var url = prefix + "/api/ts/events-team/" + string(Login.myUid())
             + "/" + string(teamId);
-    var ret: JQueryPromise<ApiT.GenericCalendarEventsCollection>
-      = JsonHttp.post(url, JSON.stringify(q));
-    ret.done((collection) => _.each(collection, fixGenericCalendarEvents));
-    return ret;
+    return JsonHttp.post(url, JSON.stringify(q));
   }
 
   export function getGenericEvent(teamid:string, calid:string, eventid:string):
@@ -666,7 +648,7 @@ module Esper.Api {
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid))
             + "/" + encodeURIComponent(string(eventid));
-    return JsonHttp.get(url).then(fixGenericCalendarEvent);
+    return JsonHttp.get(url);
   }
 
   // supports generic calendar

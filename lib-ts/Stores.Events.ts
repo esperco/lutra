@@ -3,6 +3,7 @@
 */
 
 /// <reference path="./Api.ts" />
+/// <reference path="./Labels.ts" />
 /// <reference path="./Model2.Batch.ts" />
 /// <reference path="./Model2.ts" />
 /// <reference path="./Stores.Teams.ts" />
@@ -11,13 +12,78 @@
 
 module Esper.Stores.Events {
 
-  export interface TeamEvent extends ApiT.GenericCalendarEvent {
+  /* Type modification */
+
+  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
+  const PREDICTED_LABEL_MODIFIER = 0.95;
+
+  /*
+    Similar to ApiT.GenericCalendarEvent but with some teamId and different
+    representation of labels, camelCase, and removal of fields we don't care
+    about at the moment
+  */
+  export interface TeamEvent {
+    id: string;
+    calendarId: string;
     teamId: string;
+    start: Date;
+    end: Date;
+    timezone: string;
+    title: string;
+    description: string;
+
+    labelScores: Option.T<Labels.Label[]>;
+
+    feedback: ApiT.EventFeedback;
+    location: string;
+    allDay: boolean;
+    guests: ApiT.Attendee[];
+    transparent: boolean;
+    recurringEventId?: string;
   }
 
   export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent) {
-    return _.extend({teamId: teamId}, e) as TeamEvent;
+    var labelScores = (() => {
+      if (e.labels_norm) {
+        return Option.some(_.map(e.labels_norm, (n, i) => ({
+          id: n,
+          displayAs: e.labels[i],
+          score: 1
+        })));
+      } else if (Util.notEmpty(e.predicted_labels)) {
+        var topPrediction = e.predicted_labels[0];
+        if (e.predicted_labels[0].score > PREDICTED_LABEL_PERCENT_CUTOFF) {
+          return Option.some([{
+            id: topPrediction.label_norm,
+            displayAs: topPrediction.label,
+            score: PREDICTED_LABEL_MODIFIER * topPrediction.score
+          }]);
+        }
+      }
+      return Option.none<Labels.Label[]>();
+    })();
+
+    return {
+      id: e.id,
+      calendarId: e.calendar_id,
+      teamId: teamId,
+      start: moment(e.start).toDate(),
+      end: moment(e.end).toDate(),
+      timezone: e.timezone || moment.tz.guess(),
+      title: e.title || "",
+      description: e.description || "",
+      labelScores: labelScores,
+      feedback: e.feedback,
+      location: e.location || "",
+      allDay: e.all_day,
+      guests: e.guests,
+      transparent: e.transparent,
+      recurringEventId: e.recurring_event_id
+    };
   }
+
+
+  /* Store Interfaces */
 
   export interface FullEventId {
     teamId: string;
@@ -34,7 +100,7 @@ module Esper.Stores.Events {
   }
 
   export type EventData =
-    Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>;
+    Model2.StoreData<FullEventId, TeamEvent>;
 
   /*
     Convenience interface for grouping together merged event list with
@@ -314,17 +380,17 @@ module Esper.Stores.Events {
 
   // Returns true if two events are part of the same recurring event
   export function matchRecurring(e1: TeamEvent, e2: TeamEvent) {
-    return e1.calendar_id === e2.calendar_id &&
+    return e1.calendarId === e2.calendarId &&
       e1.teamId === e2.teamId &&
-      (e1.recurring_event_id ?
-       e1.recurring_event_id === e2.recurring_event_id :
+      (e1.recurringEventId ?
+       e1.recurringEventId === e2.recurringEventId :
        e1.id === e2.id);
   }
 
   export function storeId(event: TeamEvent): FullEventId {
     return {
       teamId: event.teamId,
-      calId: event.calendar_id,
+      calId: event.calendarId,
       eventId: event.id
     }
   }
@@ -332,7 +398,7 @@ module Esper.Stores.Events {
   export function matchId(event: TeamEvent, storeId: FullEventId) {
     return event && storeId &&
       event.id === storeId.eventId &&
-      event.calendar_id === storeId.calId &&
+      event.calendarId === storeId.calId &&
       event.teamId === storeId.teamId;
   }
 
