@@ -44,11 +44,11 @@ module Esper.Components {
       // Check if labels changed
       var oldLabels = _.map(this.props.eventData, (d) => d.data.match({
         none: (): string[] => [],
-        some: (e) => e.labels_norm
+        some: (e) => Stores.Events.getLabelIds(e)
       }));
       var newLabels = _.map(newProps.eventData, (d) => d.data.match({
         none: (): string[] => [],
-        some: (e) => e.labels_norm
+        some: (e) => Stores.Events.getLabelIds(e)
       }));
       if (!_.isEqual(oldLabels, newLabels)) {
         this.setState({ labelsChanged: true });
@@ -136,7 +136,10 @@ module Esper.Components {
     onSubmit(val: string, events: Stores.Events.TeamEvent[]) {
       if (this.state.labelSelected) {
         if (_.every(events,
-          (e) => _.includes(e.labels_norm, this.state.labelSelected)
+          (e) => _.includes(
+            Stores.Events.getLabelIds(e),
+            this.state.labelSelected
+          )
         )) {
           EventLabelChange.remove(events, val);
         } else {

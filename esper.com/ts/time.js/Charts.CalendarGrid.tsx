@@ -43,7 +43,7 @@ module Esper.Charts {
         var wrappers = Option.flatten(
           _.map(events, (e) =>
             Params.applyListSelectJSON(
-              e.labels_norm,
+              Stores.Events.getLabelIds(e),
               this.params.filterParams.labels
             ).flatMap(
               (labels) => Option.some(labels[0])

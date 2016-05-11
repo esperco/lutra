@@ -455,6 +455,18 @@ module Esper.Stores.Events {
     );
   }
 
+  export function getLabels(event: TeamEvent, includePredicted=true) {
+    return event.labelScores.match({
+      none: (): Labels.Label[] => [],
+      some: (scores) => includePredicted ?
+        scores : _.filter(scores, (s) => s.score === 1)
+    });
+  }
+
+  export function getLabelIds(event: TeamEvent, includePredicted=true) {
+    return _.map(getLabels(event), (l) => l.id);
+  }
+
   export function getTeams(events: TeamEvent[]) {
     // Get the team(s) for events
     return _(events)

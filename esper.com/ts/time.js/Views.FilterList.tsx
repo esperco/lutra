@@ -90,8 +90,12 @@ module Esper.Views {
     filterEvents(events: Stores.Events.TeamEvent[]) {
       if (! this.props.labels.all) {
         events = _.filter(events, (e) =>
-          (this.props.labels.none && e.labels_norm.length === 0) ||
-          (_.intersection(this.props.labels.some, e.labels_norm).length > 0)
+          ( this.props.labels.none &&
+            Stores.Events.getLabels(e).length === 0) ||
+          ( _.intersection(
+              this.props.labels.some,
+              Stores.Events.getLabelIds(e)
+            ).length > 0)
         );
       }
 

@@ -20,7 +20,7 @@ module Esper.Charts {
       var bounds = Period.boundsFromPeriod(this.params.period);
       var durations = EventStats.wrapWithDurations(this.events,
         (e) => Params.applyListSelectJSON(
-          e.labels_norm,
+          Stores.Events.getLabelIds(e),
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({
           event: e,

@@ -23,7 +23,7 @@ module Esper.Charts {
 
         // Filter + wrapping function
         (e) => Params.applyListSelectJSON(
-          e.labels_norm,
+          Stores.Events.getLabelIds(e),
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({
           event: e,

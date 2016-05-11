@@ -72,23 +72,25 @@ module Esper.EventLabelChange {
 
           var eventOpt = Stores.Events.EventStore.cloneData(storeId).flatMap(
             (newEvent) => {
+              var labels = Stores.Events.getLabels(newEvent);
+
               _.each(opt.addLabels, (l) => {
                 var normalized = Stores.Teams.getNormLabel(l);
-                if (! _.includes(newEvent.labels_norm, normalized)) {
-                  newEvent.labels_norm.push(normalized);
-                  newEvent.labels.push(l);
+                if (! _.find(labels, (l) => l.id === normalized)) {
+                  labels.push({
+                    id: normalized,
+                    displayAs: l,
+                    score: 1
+                  });
                 }
               });
 
               _.each(opt.removeLabels, (l) => {
                 var normalized = Stores.Teams.getNormLabel(l);
-                var index = _.indexOf(newEvent.labels_norm, normalized);
-                if (index >= 0) {
-                  newEvent.labels.splice(index, 1);
-                  newEvent.labels_norm.splice(index, 1);
-                }
+                _.remove(labels, (l) => l.id === normalized);
               });
 
+              newEvent.labelScores = Option.some(labels);
               return Option.wrap(newEvent);
             });
 

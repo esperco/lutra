@@ -33,7 +33,7 @@ module Esper.Charts {
       super.sync();
       this.allLabels = Labels.fromEvents(this.events, Stores.Teams.all());
       this.eventsByLabel = Partition.groupByMany(this.events,
-        (e) => e.labels_norm
+        (e) => Stores.Events.getLabelIds(e)
       );
     }
 

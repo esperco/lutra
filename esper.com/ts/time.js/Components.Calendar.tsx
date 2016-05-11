@@ -232,12 +232,12 @@ module Esper.Components {
           className: classNames.join(" ")
         };
 
-        if (event.labels_norm && event.labels_norm.length) {
-          ret.color = Colors.getColorForLabel(
-            event.labels_norm[0]
-          );
+        var labels = Stores.Events.getLabels(event);
+        if (Util.notEmpty(labels)) {
+          var label = labels[0];
+          ret.color = Colors.getColorForLabel(label.id);
           ret.textColor = Colors.colorForText(ret.color);
-          ret.tooltip = event.labels[0];
+          ret.tooltip = label.displayAs;
         }
 
         return ret;
