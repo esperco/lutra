@@ -1,6 +1,6 @@
-/// <reference path="../lib/Colors.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <refernece path="./Labels.ts" />
+/*
+  Time-stats specific color handling
+*/
 
 module Esper.Colors {
   var labelColorMap: ColorMap = {};

@@ -3,8 +3,6 @@
 */
 
 /// <reference path="./Charts.LabelChart.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   export class PercentageRecent extends LabelChart {
@@ -43,7 +41,7 @@ module Esper.Charts {
       );
     }
 
-    onSeriesClick(events: Events2.TeamEvent[]) {
+    onSeriesClick(events: Stores.Events.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
     }

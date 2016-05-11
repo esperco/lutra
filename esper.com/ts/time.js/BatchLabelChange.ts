@@ -2,12 +2,6 @@
   Manage batch label changes
 */
 
-/// <refernece path="../lib/Api.ts" />
-/// <reference path="../lib/Model.Capped.ts" />
-/// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/Queue.ts" />
-/// <reference path="../lib/Analytics.Web.ts" />
-
 module Esper.BatchLabelChange {
 
   // Not storing anything -- just using to track status of batch updates
@@ -61,7 +55,7 @@ module Esper.BatchLabelChange {
       () => Api.changeEventLabels(teamId, req)
     );
     p.done(() => {
-      Events2.invalidate();
+      Stores.Events.invalidate();
     });
     Store.push(teamId, p, {});
   }

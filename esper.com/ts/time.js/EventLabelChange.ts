@@ -2,25 +2,17 @@
   Module for applying labels to events
 */
 
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <refernece path="../lib/Api.ts" />
-/// <reference path="../lib/Model.Capped.ts" />
-/// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/Queue2.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="./Events2.ts" />
-
 module Esper.EventLabelChange {
 
-  export function add(events: Events2.TeamEvent[], label: string) {
+  export function add(events: Stores.Events.TeamEvent[], label: string) {
     apply(events, { addLabels: [label] })
   }
 
-  export function remove(events: Events2.TeamEvent[], label: string) {
+  export function remove(events: Stores.Events.TeamEvent[], label: string) {
     apply(events, { removeLabels: [label] })
   }
 
-  export function apply(events: Events2.TeamEvent[], opts: {
+  export function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
   }) {
@@ -30,11 +22,13 @@ module Esper.EventLabelChange {
     });
   }
 
-  function applyForTeam(teamId: string, events: Events2.TeamEvent[], opt: {
-    addLabels?: string[];
-    removeLabels?: string[];
-  }) {
-    var eventIds = _.map(events, (e) => e.recurring_event_id || e.id);
+  function applyForTeam(teamId: string, events: Stores.Events.TeamEvent[],
+    opt: {
+      addLabels?: string[];
+      removeLabels?: string[];
+    })
+  {
+    var eventIds = _.map(events, (e) => e.recurringEventId || e.id);
     var req: ApiT.LabelChangeRequest = { selection: ["Eventids", eventIds] };
     if (opt.removeLabels) {
       req.remove_labels = opt.removeLabels;
@@ -52,18 +46,18 @@ module Esper.EventLabelChange {
     const recurring = "r";
     const notRecurring = "n";
     var eventGroups = _.groupBy(events,
-      (e) => e.recurring_event_id ? recurring : notRecurring
+      (e) => e.recurringEventId ? recurring : notRecurring
     );
     var events = eventGroups[notRecurring] || [];
     if ((eventGroups[recurring] || []).length) {
       var recurringEventIds = _.map(eventGroups[recurring],
-        (e) => e.recurring_event_id
+        (e) => e.recurringEventId
       );
       events = events.concat(
-        _(Events2.EventStore.all())
+        _(Stores.Events.EventStore.all())
           .filter((d) => d.data.match({
             none: () => false,
-            some: (e) => _.includes(recurringEventIds, e.recurring_event_id)
+            some: (e) => _.includes(recurringEventIds, e.recurringEventId)
           }))
           .map((d) => d.data.unwrap())
           .value()
@@ -71,12 +65,12 @@ module Esper.EventLabelChange {
     }
 
     // Wrap the whole kaboodle in a transaction
-    Events2.EventStore.transact(() => {
-      Events2.EventStore.transactP(p, (tP) => {
+    Stores.Events.EventStore.transact(() => {
+      Stores.Events.EventStore.transactP(p, (tP) => {
         _.each(events, (e) => {
-          var storeId = Events2.storeId(e);
+          var storeId = Stores.Events.storeId(e);
 
-          var eventOpt = Events2.EventStore.cloneData(storeId).flatMap(
+          var eventOpt = Stores.Events.EventStore.cloneData(storeId).flatMap(
             (newEvent) => {
               _.each(opt.addLabels, (l) => {
                 var normalized = Stores.Teams.getNormLabel(l);
@@ -98,7 +92,7 @@ module Esper.EventLabelChange {
               return Option.wrap(newEvent);
             });
 
-          Events2.EventStore.push(storeId, tP, eventOpt);
+          Stores.Events.EventStore.push(storeId, tP, eventOpt);
         });
       });
     });

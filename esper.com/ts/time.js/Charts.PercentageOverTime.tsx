@@ -2,9 +2,6 @@
   Bar chart for showing label percentages over time using split time
 */
 
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
-
 module Esper.Charts {
   type LabelsGrouping = GroupsByPeriod<{
     labels_norm: string[];
@@ -41,7 +38,7 @@ module Esper.Charts {
       );
     }
 
-    onPointClick(events: Events2.TeamEvent[]) {
+    onPointClick(events: Stores.Events.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
     }

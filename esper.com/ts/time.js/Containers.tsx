@@ -2,11 +2,8 @@
   Simple bindings of Components to data sources
 */
 
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-
 module Esper.Containers {
-  export function eventEditorModal(events: Events2.TeamEvent[], opts?: {
+  export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
     onDone?: () => void;
   }) {
@@ -14,9 +11,9 @@ module Esper.Containers {
     return ReactHelpers.contain(function() {
       // Refresh data from store before rendering modal
       var eventData = _(events)
-        .map((e) => Events2.EventStore.get({
+        .map((e) => Stores.Events.EventStore.get({
           teamId: e.teamId,
-          calId: e.calendar_id,
+          calId: e.calendarId,
           eventId: e.id
         }))
         .filter((e) => e.isSome())
@@ -33,29 +30,29 @@ module Esper.Containers {
     })
   }
 
-  export function eventListModal(events: Events2.TeamEvent[]) {
+  export function eventListModal(events: Stores.Events.TeamEvent[]) {
     return ReactHelpers.contain(function() {
       // Refresh store data before sending to modal
       events = Option.flatten(
         _.map(events, (e) =>
-          Events2.EventStore.get(Events2.storeId(e))
+          Stores.Events.EventStore.get(Stores.Events.storeId(e))
             .flatMap((storeData) => storeData.data)
           )
       );
 
       // Get the team(s) for events
-      var teams = Events2.getTeams(events);
+      var teams = Stores.Events.getTeams(events);
 
       // Set up actions so that hitting "done" goes back to the list
       var backFn = () => Layout.renderModal(eventListModal(events));
-      var labelFn = (event: Events2.TeamEvent) =>
+      var labelFn = (event: Stores.Events.TeamEvent) =>
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
             onDone: backFn
           })
         );
-      var feedbackFn = (event: Events2.TeamEvent) =>
+      var feedbackFn = (event: Stores.Events.TeamEvent) =>
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: false,

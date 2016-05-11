@@ -27,42 +27,48 @@ module Esper.EventStats {
       ------------------
               1 | 332321
     */
-    var e1 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 1, 23)),
-      end:   XDate.toString(new Date(2016, 0, 2)),
-      calendar_id: calId,
-      id: eventId1
-    }));
-    var e2 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 2)),
-      calendar_id: calId,
-      id: eventId2
-    }));
-    var e3 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 5)),
-      calendar_id: calId,
-      id: eventId3
-    }));
-    var e4 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 1)),
-      calendar_id: calId,
-      id: eventId4
-    }));
-    var e5 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2, 1)),
-      end:   XDate.toString(new Date(2016, 0, 2, 4)),
-      calendar_id: calId,
-      id: eventId5
-    }));
-    var e6 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2, 3)),
-      end:   XDate.toString(new Date(2016, 0, 2, 6)),
-      calendar_id: calId,
-      id: eventId5
-    }));
+    var e1 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 1, 23)),
+        end:   XDate.toString(new Date(2016, 0, 2)),
+        calendar_id: calId,
+        id: eventId1
+      }));
+    var e2 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 2)),
+        calendar_id: calId,
+        id: eventId2
+      }));
+    var e3 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 5)),
+        calendar_id: calId,
+        id: eventId3
+      }));
+    var e4 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 1)),
+        calendar_id: calId,
+        id: eventId4
+      }));
+    var e5 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2, 1)),
+        end:   XDate.toString(new Date(2016, 0, 2, 4)),
+        calendar_id: calId,
+        id: eventId5
+      }));
+    var e6 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2, 3)),
+        end:   XDate.toString(new Date(2016, 0, 2, 6)),
+        calendar_id: calId,
+        id: eventId5
+      }));
 
     describe("getDurations", function() {
       function getVal() {

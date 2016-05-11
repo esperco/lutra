@@ -89,7 +89,7 @@ module Esper.Text {
     return `event${s(n)}`;
   }
 
-  export function eventTitleForChart(event: Events2.TeamEvent) {
+  export function eventTitleForChart(event: Stores.Events.TeamEvent) {
     return `${event.title || NoEventTitle} (${date(event.start)})`;
   }
 

@@ -2,10 +2,6 @@
   Component for selecting a single period give an interval type
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Selector.tsx" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
-
 module Esper.Components {
   export class SingleOrCustomPeriodSelector extends ReactHelpers.Component<{
     id?: string;
@@ -15,9 +11,9 @@ module Esper.Components {
     render() {
       var period = this.props.period;
       var minDate = moment().startOf('day')
-        .add(Events2.MIN_CUSTOM_INCR, 'days').toDate();
+        .add(Config.MIN_CUSTOM_INCR, 'days').toDate();
       var maxDate = moment().endOf('day')
-        .add(Events2.MAX_CUSTOM_INCR, 'days').toDate();
+        .add(Config.MAX_CUSTOM_INCR, 'days').toDate();
       if (Period.isCustom(period)) {
         return <CalendarRangeSelectorDropdown
           onRangeSelect={(start, end) =>
@@ -52,11 +48,11 @@ module Esper.Components {
       var minMax = ((interval: Period.Interval) => {
         switch (interval) {
           case "quarter":
-            return [Events2.MIN_QUARTER_INCR, Events2.MAX_QUARTER_INCR]
+            return [Config.MIN_QUARTER_INCR, Config.MAX_QUARTER_INCR]
           case "month":
-            return [Events2.MIN_MONTH_INCR, Events2.MAX_MONTH_INCR]
+            return [Config.MIN_MONTH_INCR, Config.MAX_MONTH_INCR]
           default: // Week
-            return [Events2.MIN_WEEK_INCR, Events2.MAX_WEEK_INCR]
+            return [Config.MIN_WEEK_INCR, Config.MAX_WEEK_INCR]
         }
       })(interval);
 

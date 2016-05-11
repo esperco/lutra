@@ -8,19 +8,15 @@
   else for week / agenda view.
 */
 
-/// <reference path="./Esper.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Events2.ts" />
-
 module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
   interface CalendarProps {
     period: Period.Single;
-    events: Events2.TeamEvent[];
-    selectedEvents: Events2.TeamEvent[];
-    onEventClick: (event: Events2.TeamEvent, add: boolean) => void;
+    events: Stores.Events.TeamEvent[];
+    selectedEvents: Stores.Events.TeamEvent[];
+    onEventClick: (event: Stores.Events.TeamEvent, add: boolean) => void;
     onViewChange: (period: Period.Single) => void;
     busy?: boolean;
     error?: boolean;
@@ -151,7 +147,7 @@ module Esper.Components {
         btn.addClass("fc-corner-left fc-corner-right");
         btn.attr("id", btnId);
         btn.click(() => {
-          Events2.invalidate();
+          Stores.Events.invalidate();
           Route.nav.refreshOnce();
         });
         container.prepend(btn);
@@ -204,7 +200,7 @@ module Esper.Components {
       // For inferring which events are "selected" by virtue of being a
       // recurring event
       var recurringEventIds = _.map(this.props.selectedEvents,
-        (e) => e && e.recurring_event_id
+        (e) => e && e.recurringEventId
       );
       recurringEventIds = _.uniq(_.filter(recurringEventIds));
 
@@ -213,10 +209,10 @@ module Esper.Components {
         if (_.includes(selectedEventIds, event.id)) {
           classNames.push("active");
         }
-        if (_.includes(recurringEventIds, event.recurring_event_id)) {
+        if (_.includes(recurringEventIds, event.recurringEventId)) {
           classNames.push("recurring-active");
         }
-        if (event.recurring_event_id) {
+        if (event.recurringEventId) {
           classNames.push("recurring");
         }
         if (event.labels && event.labels.length) {
@@ -229,7 +225,7 @@ module Esper.Components {
         var ret: EventObjectPlus = {
           id: i,
           title: (event.title || Text.NoEventTitle),
-          allDay: event.all_day,
+          allDay: event.allDay,
           start: this.adjustTz(event.start, event.timezone),
           end: this.adjustTz(event.end, event.timezone),
           editable: false,
@@ -254,11 +250,11 @@ module Esper.Components {
     }
 
     // Adjust a timetamp based on the currently selected event's timezone
-    adjustTz(timestamp: string, timezone?: string) {
+    adjustTz(date: Date, timezone?: string) {
       if (timezone) {
-        return moment.tz(timestamp, timezone);
+        return moment.tz(date, timezone);
       } else {
-        return moment(timestamp);
+        return moment(date);
       }
     }
 

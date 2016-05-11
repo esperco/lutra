@@ -1,7 +1,4 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Charts.CalendarComp.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   /*

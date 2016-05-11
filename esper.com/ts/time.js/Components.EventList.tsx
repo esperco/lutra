@@ -2,22 +2,18 @@
   Basic component for rendering a list of events
 */
 
-/// <reference path="../lib/Components.SignalStrength.tsx" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Tooltip.tsx" />
-
 module Esper.Components {
   const LABEL_COUNT_CUTOFF = 4;
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
 
   interface Props {
-    events: Events2.TeamEvent[];
-    selectedEvents?: Events2.TeamEvent[];
+    events: Stores.Events.TeamEvent[];
+    selectedEvents?: Stores.Events.TeamEvent[];
     teams: ApiT.Team[];
-    onEventToggle?: (event: Events2.TeamEvent) => void;
-    onEventClick?: (event: Events2.TeamEvent) => void;
-    onFeedbackClick?: (event: Events2.TeamEvent) => void;
-    onAddLabelClick?: (event: Events2.TeamEvent) => void;
+    onEventToggle?: (event: Stores.Events.TeamEvent) => void;
+    onEventClick?: (event: Stores.Events.TeamEvent) => void;
+    onFeedbackClick?: (event: Stores.Events.TeamEvent) => void;
+    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
   }
 
   export class EventList extends ReactHelpers.Component<Props, {}> {
@@ -46,7 +42,7 @@ module Esper.Components {
       </div>;
     }
 
-    renderDay(timestamp: number, events: Events2.TeamEvent[]) {
+    renderDay(timestamp: number, events: Stores.Events.TeamEvent[]) {
       var m = moment(timestamp);
       return <div className={classNames('day', {
         today: Time.sameDay(m, moment()),
@@ -59,8 +55,8 @@ module Esper.Components {
       </div>
     }
 
-    renderEvent(event: Events2.TeamEvent) {
-      return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
+    renderEvent(event: Stores.Events.TeamEvent) {
+      return <div key={[event.teamId, event.calendarId, event.id].join(",")}
                   className={classNames("list-group-item event", {
                     "has-labels": event.labels_norm.length > 0,
                     "no-attend": event.feedback.attended === false,
@@ -91,7 +87,7 @@ module Esper.Components {
             </span>{" to "}<span className="end">
               { moment(event.end).format("h:mm a") }
             </span>{" "}
-            { event.recurring_event_id ?
+            { event.recurringEventId ?
               <span className="recurring" title="Recurring">
                 <i className="fa fa-fw fa-refresh" />
               </span> :
@@ -111,11 +107,11 @@ module Esper.Components {
       </div>;
     }
 
-    getTeam(event: Events2.TeamEvent) {
+    getTeam(event: Stores.Events.TeamEvent) {
       return _.find(this.props.teams, (t) => t.teamid === event.teamId);
     }
 
-    handleFeedbackClick(event: Events2.TeamEvent) {
+    handleFeedbackClick(event: Stores.Events.TeamEvent) {
       if (this.props.onFeedbackClick) {
         this.props.onFeedbackClick(event);
       }
@@ -123,13 +119,13 @@ module Esper.Components {
 
     ////////
 
-    isSelected(event: Events2.TeamEvent) {
+    isSelected(event: Stores.Events.TeamEvent) {
       return this.findIndex(event) >= 0;
     }
 
-    findIndex(event: Events2.TeamEvent) {
+    findIndex(event: Stores.Events.TeamEvent) {
       return _.findIndex(this.props.selectedEvents || [], (e) =>
-        Events2.matchRecurring(e, event)
+        Stores.Events.matchRecurring(e, event)
       );
     }
   }
@@ -170,7 +166,7 @@ module Esper.Components {
     return !!typedX.score;
   }
 
-  function labelsFomEvent(event: Events2.TeamEvent) {
+  function labelsFomEvent(event: Stores.Events.TeamEvent) {
     return _.map(event.labels_norm, (n, i) => ({
       label: event.labels[i],
       label_norm: n
@@ -188,9 +184,9 @@ module Esper.Components {
   /////
 
   interface LabelListProps {
-    event: Events2.TeamEvent;
+    event: Stores.Events.TeamEvent;
     team: ApiT.Team;
-    onAddLabelClick?: (event: Events2.TeamEvent) => void;
+    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
   }
 
   /*
@@ -299,7 +295,7 @@ module Esper.Components {
 
   interface LabelProps {
     label: LabelOrPredicted;
-    event: Events2.TeamEvent;
+    event: Stores.Events.TeamEvent;
   }
 
   class LabelToggle extends ReactHelpers.Component<LabelProps, {}> {
@@ -363,7 +359,7 @@ module Esper.Components {
   }
 
   class NoAttendToggle extends ReactHelpers.Component<{
-    event: Events2.TeamEvent
+    event: Stores.Events.TeamEvent
   }, {}> {
     render() {
       return <Tooltip className={classNames("no-attend-action",

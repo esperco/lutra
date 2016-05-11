@@ -2,10 +2,6 @@
   Abstractions for managing different chart types
 */
 
-/// <reference path="../lib/Model.StoreOne.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="./Esper.ts" />
-
 module Esper.Charts {
   export interface EventChartParams<T extends Params.RelativePeriodJSON> {
     chartId: string;
@@ -30,10 +26,10 @@ module Esper.Charts {
   }
 
   export abstract class EventChart<T extends Params.RelativePeriodJSON> {
-    protected events: Events2.TeamEvent[]; // Unique events across all periods
+    protected events: Stores.Events.TeamEvent[]; // Unique events across all periods
     protected eventsByPeriod: {            // Events for a single period
       period: Period.Single|Period.Custom;
-      events: Events2.TeamEvent[];
+      events: Stores.Events.TeamEvent[];
     }[];
     protected error: boolean;
     protected busy: boolean;
@@ -94,7 +90,7 @@ module Esper.Charts {
     fetchRelative(incr: number) {
       var fetchPeriod = this.relativePeriod(incr);
       var teamIds = _.uniq(_.map(this.params.cals, (c) => c.teamId));
-      _.each(teamIds, (teamId) => Events2.fetchPredictionsForPeriod({
+      _.each(teamIds, (teamId) => Stores.Events.fetchPredictionsForPeriod({
         teamId: teamId,
         period: fetchPeriod
       }));
@@ -132,7 +128,7 @@ module Esper.Charts {
       // Events should be unique
       if (this.eventsByPeriod.length > 1) {
         this.events = _.uniqBy(this.events,
-          (e) => [e.teamId, e.calendar_id, e.id].join("|")
+          (e) => [e.teamId, e.calendarId, e.id].join("|")
         );
       }
     }
@@ -144,7 +140,7 @@ module Esper.Charts {
       var fetchPeriod = this.relativePeriod(incr);
       var data = Option.flatten(
         _.map(this.params.cals, (cal) =>
-          Events2.getForPeriod({
+          Stores.Events.getForPeriod({
             teamId: cal.teamId,
             calId: cal.calId,
             period: fetchPeriod
@@ -167,7 +163,7 @@ module Esper.Charts {
       and then group by a list of criteria
     */
     getGroupsByPeriod<W extends EventStats.HasEvent>(
-      wrapFn: (e: Events2.TeamEvent) => Option.T<W>,
+      wrapFn: (e: Stores.Events.TeamEvent) => Option.T<W>,
       groupFn: (e: W & EventStats.HasDurations) => string[]
     ): GroupsByPeriod<W>[] {
       return _.map(this.eventsByPeriod, (e) => {
@@ -224,7 +220,7 @@ module Esper.Charts {
     }
 
     // Auto-filter team events, by default just remove not attended events
-    filterEvents(events: Events2.TeamEvent[], filterParams: T) {
+    filterEvents(events: Stores.Events.TeamEvent[], filterParams: T) {
       return _.filter(events, (e) => e.feedback.attended !== false);
     }
 

@@ -3,7 +3,6 @@
 */
 
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
 
 module Esper.Charts {
   // Durations for each bar in our histogram
@@ -40,7 +39,7 @@ module Esper.Charts {
       super.sync();
 
       this.periodsByBucket = this.getGroupsByPeriod(
-        (e: Events2.TeamEvent) => {
+        (e: Stores.Events.TeamEvent) => {
           var duration = moment(e.end).diff(moment(e.start), 'seconds');
           return Option.some({
             event: e,
@@ -62,7 +61,7 @@ module Esper.Charts {
       }));
     }
 
-    onEventClick(event: Events2.TeamEvent) {
+    onEventClick(event: Stores.Events.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;
     }

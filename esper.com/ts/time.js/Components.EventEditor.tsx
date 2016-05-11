@@ -2,15 +2,11 @@
   Component for editing event details, labels, etc.
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.StarRating.tsx" />
-/// <reference path="./Components.LabelEditor2.tsx" />
-
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface EventEditorProps {
-    eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
+    eventData: Model2.StoreData<Stores.Events.FullEventId, Stores.Events.TeamEvent>[];
     teams: ApiT.Team[];
 
     minFeedback?: boolean;
@@ -74,8 +70,8 @@ module Esper.Components {
 
   ////
 
-  export function EventDetails({event}: {event: Events2.TeamEvent}) {
-    var guestEmails = Events2.getGuestEmails(event);
+  export function EventDetails({event}: {event: Stores.Events.TeamEvent}) {
+    var guestEmails = Stores.Events.getGuestEmails(event);
 
     return <div className="event-details esper-panel-section">
       <div className="time">
@@ -85,7 +81,7 @@ module Esper.Components {
         </span>{" to "}<span className="end">
           { moment(event.end).format("h:mm a") }
         </span>{" "}
-        { event.recurring_event_id ?
+        { event.recurringEventId ?
           <span className="recurring" title="Recurring">
             <i className="fa fa-fw fa-refresh" />
           </span> :
@@ -119,7 +115,7 @@ module Esper.Components {
   ////
 
   interface OneEventProps {
-    event: Events2.TeamEvent;
+    event: Stores.Events.TeamEvent;
     status: Model2.DataStatus;
     initAction?: boolean;
     initMin?: boolean;
@@ -127,7 +123,7 @@ module Esper.Components {
 
   export class EventFeedback extends Component<OneEventProps, {
     // Track last saved event so we only show success on save
-    lastSavedEvent?: Events2.TeamEvent;
+    lastSavedEvent?: Stores.Events.TeamEvent;
 
     // Current state of event notes (not yet committed, saved yet)
     notes?: string;
@@ -199,9 +195,9 @@ module Esper.Components {
       </Components.ModalPanel>;
     }
 
-    renderMinFeedback(event: Events2.TeamEvent): JSX.Element|string {
+    renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {
      if (event.feedback.attended === false) {
-       return Events2.isFuture(event) ?
+       return Stores.Events.isFuture(event) ?
          Text.NoAttendFuture : Text.NoAttendPast;
      }
 
@@ -218,7 +214,7 @@ module Esper.Components {
      </span>;
     }
 
-    renderRating(event: Events2.TeamEvent) {
+    renderRating(event: Stores.Events.TeamEvent) {
       return <div className="row">
         <div className="col-sm-8 form-group event-star-ratings">
           <StarRating
@@ -231,7 +227,7 @@ module Esper.Components {
                     (event.feedback.attended === false ? " active" : "")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
-            { Events2.isFuture(event) ?
+            { Stores.Events.isFuture(event) ?
               Text.NoAttendFuture : Text.NoAttendPast }
           </button>
         </div>

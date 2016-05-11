@@ -2,17 +2,6 @@
   View for all of the charts
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.IntervalSelector.tsx" />
-/// <reference path="./Components.SidebarWithToggle.tsx" />
-/// <reference path="./Onboarding.ts" />
-/// <reference path="./Colors.ts" />
-
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
@@ -194,7 +183,7 @@ module Esper.Views {
     /* Actions */
 
     refresh() {
-      Events2.invalidate();
+      Stores.Events.invalidate();
       Route.nav.refresh();
     }
 
