@@ -315,14 +315,13 @@ module Esper.Views {
     }
 
     refreshEvents() {
-      _.each(this.props.cals, (c) =>
-        Events2.fetchForPeriod({
-          teamId: c.teamId,
-          calId: c.calId,
+      if (Util.notEmpty(this.props.cals)) {
+        Events2.fetchPredictionsForPeriod({
+          teamId: this.props.cals[0].teamId,
           period: this.props.period,
           force: true
-        })
-      );
+        });
+      }
     }
 
     renderMain(events: Events2.TeamEvent[]) {

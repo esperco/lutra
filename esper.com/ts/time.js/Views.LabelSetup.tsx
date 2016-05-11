@@ -69,7 +69,6 @@ module Esper.Views {
         }
       });
 
-      console.info(promises);
       if (promises.length) {
         this.mutateState((state) => state.busy = true)
         $.when.apply($, promises)
