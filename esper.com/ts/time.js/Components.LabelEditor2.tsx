@@ -141,9 +141,9 @@ module Esper.Components {
             this.state.labelSelected
           )
         )) {
-          EventLabelChange.remove(events, val);
+          Actions.EventLabels.remove(events, val);
         } else {
-          EventLabelChange.add(events, val);
+          Actions.EventLabels.add(events, val);
         }
         return val;
       }
@@ -154,7 +154,7 @@ module Esper.Components {
         _.each(teamIds, (teamId) => {
           Actions.Teams.addLabel(teamId, val);
         });
-        EventLabelChange.add(events, val);
+        Actions.EventLabels.add(events, val);
         this.setState({ labelFilter: null })
         return "";
       }
@@ -354,9 +354,9 @@ module Esper.Components {
 
     var handler = () => {
       if (checkedByAll) {
-        EventLabelChange.remove(props.events, props.label.displayAs);
+        Actions.EventLabels.remove(props.events, props.label.displayAs);
       } else {
-        EventLabelChange.add(props.events, props.label.displayAs);
+        Actions.EventLabels.add(props.events, props.label.displayAs);
       }
     };
 
