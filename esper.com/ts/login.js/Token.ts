@@ -49,6 +49,12 @@ module Esper.Token {
         case "Unsub_label_reminder":
           renderLogin("You've been unsubscribed from these emails.");
           break;
+        case "Unsub_feedback_summary":
+          renderLogin("You've been unsubscribed from these emails.");
+          break;
+        case "Unsub_ask_feedback":
+          renderLogin("You've been unsubscribed from these emails.");
+          break;
 
         /* Other cases are either obsolete or not supported yet */
         default:
