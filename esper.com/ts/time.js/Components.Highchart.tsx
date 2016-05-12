@@ -111,10 +111,13 @@ module Esper.Components {
       For now, just blow away and redraw chart everytime props change. Maybe
       use update system if this leads to poor UX.
     */
-    componentDidUpdate() {
-      $(this._target).highcharts(this.getOpts())
-      this._chart = $(this._target).highcharts();
-      this.resetDrillupBtn();
+    componentDidUpdate(oldProps: HighchartsOpts) {
+      // Expensive check, but only re-draw if props actually changed
+      if (Util.cmpStringify(oldProps) !== Util.cmpStringify(this.props)) {
+        $(this._target).highcharts(this.getOpts())
+        this._chart = $(this._target).highcharts();
+        this.resetDrillupBtn();
+      }
     }
 
     // Use jQuery to show / hide our custom drill-up button because using React
