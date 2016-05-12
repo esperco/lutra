@@ -8,6 +8,7 @@ module Esper.Labels {
     displayAs: string; // Display form
   }
 
+  // Either a predicted or user-predicted label
   export interface Label extends LabelBase {
     score: number;     // 0 - 1 (1 = user-selected label)
   }

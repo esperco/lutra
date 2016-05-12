@@ -15,6 +15,18 @@ module Esper.Actions.EventLabels {
     apply(events, { removeLabels: [label] })
   }
 
+  // Confirm any predicted labels
+  export function confirm(events: Stores.Events.TeamEvent[]) {
+    // Only confirm if score < 1 (don't ned to confirm user labels)
+    events = _.filter(events, (e) => e.labelScores.match({
+      none: () => false,
+      some: (l) => l[0] && l[0].score < 1
+    }));
+    if (events.length > 0) {
+      apply(events, {});
+    }
+  }
+
   export function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
@@ -95,6 +107,9 @@ module Esper.Actions.EventLabels {
       let normalized = Stores.Teams.getNormLabel(l);
       _.remove(labels, (l) => l.id === normalized);
     });
+
+    // Predicted labels are now confirmed
+    _.each(labels, (l) => l.score = 1);
 
     return labels;
   }

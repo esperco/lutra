@@ -42,7 +42,9 @@ module Esper.Stores.Events {
     recurringEventId?: string;
   }
 
-  export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent) {
+  export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent)
+    : TeamEvent
+  {
     var labelScores = (() => {
       if (e.labels_norm) {
         return Option.some(_.map(e.labels_norm, (n, i) => ({
