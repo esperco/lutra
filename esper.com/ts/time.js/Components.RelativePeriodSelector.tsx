@@ -2,10 +2,6 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
-/// <reference path="./Labels.ts" />
-
 module Esper.Components {
   interface Props {
     period: Period.Single;

@@ -2,14 +2,9 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
-/// <reference path="../lib/Components.Selector.tsx" />
-/// <reference path="./Labels.ts" />
-
 module Esper.Components {
   interface LabelSelectorProps {
-    labels: Array<Labels.Label|Labels.LabelCount>;
+    labels: Array<Labels.LabelCount>;
     totalCount?: number;
     unlabeledCount?: number;
     selected: string[];
@@ -31,8 +26,8 @@ module Esper.Components {
       choices: _.map(props.labels, (l) => ({
         id: l.id,
         displayAs: l.displayAs,
-        badgeText: Labels.hasCount(l) ? l.count && l.count.toString() : "",
-        badgeHoverText: Labels.hasCount(l) ? (l.count && l.count.toString() +
+        badgeText: l.count ? l.count && l.count.toString() : "",
+        badgeHoverText: l.count ? (l.count && l.count.toString() +
           " Event" + (l.count == 1 ? "" : "s")) : "",
         badgeColor: Colors.getColorForLabel(l.id)
       }))

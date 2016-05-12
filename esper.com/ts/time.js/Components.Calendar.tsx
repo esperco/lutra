@@ -205,23 +205,6 @@ module Esper.Components {
       recurringEventIds = _.uniq(_.filter(recurringEventIds));
 
       callback(_.map(this.props.events, (event, i) => {
-        var classNames: string[] = ["selectable"];
-        if (_.includes(selectedEventIds, event.id)) {
-          classNames.push("active");
-        }
-        if (_.includes(recurringEventIds, event.recurringEventId)) {
-          classNames.push("recurring-active");
-        }
-        if (event.recurringEventId) {
-          classNames.push("recurring");
-        }
-        if (event.labels && event.labels.length) {
-          classNames.push("labeled");
-        }
-        if (event.feedback.attended === false) {
-          classNames.push("no-attend")
-        }
-
         var ret: EventObjectPlus = {
           id: i,
           title: (event.title || Text.NoEventTitle),
@@ -229,7 +212,16 @@ module Esper.Components {
           start: this.adjustTz(event.start, event.timezone),
           end: this.adjustTz(event.end, event.timezone),
           editable: false,
-          className: classNames.join(" ")
+          className: classNames("selectable", {
+            "active": _.includes(selectedEventIds, event.id),
+            "recurring-active": _.includes(recurringEventIds,
+                                           event.recurringEventId),
+            "recurring": !!event.recurringEventId,
+            "has-labels": !!Stores.Events.getLabels(event).length,
+            "has-empty-labels": Stores.Events.hasEmptyLabels(event),
+            "has-predicted-labels": Stores.Events.hasPredictedLabels(event),
+            "no-attend": event.feedback.attended === false
+          })
         };
 
         var labels = Stores.Events.getLabels(event);

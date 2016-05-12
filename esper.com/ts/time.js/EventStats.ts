@@ -140,7 +140,7 @@ module Esper.EventStats {
   //////
 
   // Simple aggregate duration of events, avoids double-counting overlaps
-  export function aggregateDuration(events: ApiT.GenericCalendarEvent[]) {
+  export function aggregateDuration(events: Stores.Events.TeamEvent[]) {
     var agg = 0;
     var lastEnd: number;
 

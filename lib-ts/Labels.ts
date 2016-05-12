@@ -82,8 +82,17 @@ module Esper.Labels {
     }));
   }
 
-  export function countUnlabeled(events: ApiT.GenericCalendarEvent[]) {
-    return _.filter(events, (e) => e.labels_norm.length === 0).length;
+  export function fromTeam(team: ApiT.Team) {
+    return _.map(team.team_labels_norm, (n, i) => ({
+      id: n,
+      displayAs: team.team_labels[i],
+      score: 0
+    }));
+  }
+
+  export function countUnlabeled(events: Stores.Events.TeamEvent[]) {
+    return _.filter(events,
+      (e) => Stores.Events.getLabels(e).length === 0).length;
   }
 
   /*

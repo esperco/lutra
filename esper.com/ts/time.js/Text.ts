@@ -39,14 +39,6 @@ module Esper.Text {
   export const NoAttendPast   = "Didn't Attend";
   export const NoAttendFuture = "Won't Attend";
 
-  // Label interface
-  export const AddLabel = "Add Label";
-  export function predictionTooltip(score: number) { // Score is 0-1
-    score = score * 0.95; // Max => 95%
-    return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +
-           `label is applicable to this event`;
-  }
-
   export const DefaultErrorTooltip = `There was an error connecting to the ` +
     `server. Try refreshing or contacting us at https://esper.com/contact`;
 

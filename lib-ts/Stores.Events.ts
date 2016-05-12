@@ -51,13 +51,19 @@ module Esper.Stores.Events {
           score: 1
         })));
       } else if (Util.notEmpty(e.predicted_labels)) {
-        var topPrediction = e.predicted_labels[0];
-        if (e.predicted_labels[0].score > PREDICTED_LABEL_PERCENT_CUTOFF) {
-          return Option.some([{
-            id: topPrediction.label_norm,
-            displayAs: topPrediction.label,
-            score: PREDICTED_LABEL_MODIFIER * topPrediction.score
-          }]);
+        var team = Teams.require(teamId);
+        if (team) {
+          var labels = _.filter(e.predicted_labels,
+            (l) => _.includes(team.team_labels_norm, l.label_norm));
+          var topPrediction = labels[0];
+
+          if (topPrediction.score > PREDICTED_LABEL_PERCENT_CUTOFF) {
+            return Option.some([{
+              id: topPrediction.label_norm,
+              displayAs: topPrediction.label,
+              score: PREDICTED_LABEL_MODIFIER * topPrediction.score
+            }]);
+          }
         }
       }
       return Option.none<Labels.Label[]>();
@@ -465,6 +471,18 @@ module Esper.Stores.Events {
 
   export function getLabelIds(event: TeamEvent, includePredicted=true) {
     return _.map(getLabels(event), (l) => l.id);
+  }
+
+  export function hasEmptyLabels(event: TeamEvent) {
+    return event.labelScores.match({
+      none: () => false,
+      some: (labels) => labels.length === 0
+    });
+  }
+
+  export function hasPredictedLabels(event: TeamEvent) {
+    var labels = getLabels(event, true);
+    return labels.length && labels[0].score < 1;
   }
 
   export function getTeams(events: TeamEvent[]) {

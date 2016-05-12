@@ -2,14 +2,21 @@
   Module for applying labels to events
 */
 
-module Esper.EventLabelChange {
+/// <reference path="./Queue2.ts" />
+/// <reference path="./Stores.Events.ts" />
 
-  export function add(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { addLabels: [label] })
+module Esper.Actions.EventLabels {
+
+  export function add(events: Stores.Events.TeamEvent[],
+                      label: string|string[]) {
+    var labels = (typeof label === "string" ? [label] : label);
+    apply(events, { addLabels: labels })
   }
 
-  export function remove(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { removeLabels: [label] })
+  export function remove(events: Stores.Events.TeamEvent[],
+                         label: string|string[]) {
+    var labels = (typeof label === "string" ? [label] : label);
+    apply(events, { removeLabels: labels })
   }
 
   export function apply(events: Stores.Events.TeamEvent[], opts: {
