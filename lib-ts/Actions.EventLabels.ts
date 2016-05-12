@@ -8,11 +8,11 @@
 module Esper.Actions.EventLabels {
 
   export function add(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { addLabels: [label] })
+    apply(events, { addLabels: [label] });
   }
 
   export function remove(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { removeLabels: [label] })
+    apply(events, { removeLabels: [label] });
   }
 
   // Confirm any predicted labels
@@ -27,13 +27,21 @@ module Esper.Actions.EventLabels {
     }
   }
 
-  export function apply(events: Stores.Events.TeamEvent[], opts: {
+  function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
     _.each(eventsByTeamId, (teamEvents, teamId) => {
       applyForTeam(teamId, teamEvents, opts);
+
+      // Only fire analytics call if add/remove, not if confirming
+      if (opts.addLabels || opts.removeLabels) {
+        Analytics.track(Analytics.Trackable.EditEventLabels, {
+          numEvents: teamEvents.length,
+          teamIds: teamId
+        });
+      }
     });
   }
 
@@ -123,10 +131,6 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      Analytics.track(Analytics.Trackable.EditEventLabels, {
-        numEvents: r.events.length,
-        teamId: r.teamId
-      });
       return Api.setPredictLabels(r.teamId, {
         set_labels: _.map(r.events, (e) => ({
           id: e.recurringEventId || e.id,
