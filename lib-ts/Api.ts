@@ -1172,6 +1172,15 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(req));
   }
 
+  export function setPredictLabels(teamId: string,
+    req: ApiT.LabelsSetPredictRequest)
+    : JQueryPromise<ApiT.GenericCalendarEvents>
+  {
+    var url = prefix + "/api/event/labels/set-predict/" + string(Login.myUid())
+            + "/" + string(teamId);
+    return JsonHttp.post(url, JSON.stringify(req));
+  }
+
   export function updateGoogleEvent(teamid: string,
                                     alias: string,
                                     eventid: string,
