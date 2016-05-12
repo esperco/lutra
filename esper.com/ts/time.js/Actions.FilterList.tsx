@@ -1,11 +1,6 @@
 /*
-  Actions based on routes -- stick more verbose code here so Route.tsx can
-  stay relatively short and easy to parse for routing patterns.
+  Actions for filter list
 */
-
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="../lib/Stores.Calendars.ts" />
 
 module Esper.Actions {
 
@@ -19,7 +14,7 @@ module Esper.Actions {
 
     // Async load of events
     var teamIds = _.uniq(_.map(params.cals, (c) => c.teamId));
-    _.each(teamIds, (teamId) => Events2.fetchPredictionsForPeriod({
+    _.each(teamIds, (teamId) => Stores.Events.fetchPredictionsForPeriod({
       teamId: teamId,
       period: params.period
     }));

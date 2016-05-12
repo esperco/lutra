@@ -1,4 +1,4 @@
-/// <reference path="../lib/Test.ts" />
+/// <reference path="./Test.ts" />
 /// <reference path="./Period.ts" />
 
 module Esper.Period {

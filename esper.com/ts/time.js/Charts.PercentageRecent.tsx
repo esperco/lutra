@@ -3,8 +3,6 @@
 */
 
 /// <reference path="./Charts.LabelChart.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   export class PercentageRecent extends LabelChart {
@@ -22,7 +20,7 @@ module Esper.Charts {
       var bounds = Period.boundsFromPeriod(this.params.period);
       var durations = EventStats.wrapWithDurations(this.events,
         (e) => Params.applyListSelectJSON(
-          e.labels_norm,
+          Stores.Events.getLabelIds(e),
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({
           event: e,
@@ -43,7 +41,7 @@ module Esper.Charts {
       );
     }
 
-    onSeriesClick(events: Events2.TeamEvent[]) {
+    onSeriesClick(events: Stores.Events.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
     }

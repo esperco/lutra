@@ -1,5 +1,6 @@
-/// <reference path="./Views.Event.tsx" />
-/// <refernece path="./Actions" />
+/*
+  Actions for single event page
+*/
 
 module Esper.Actions {
 
@@ -14,16 +15,17 @@ module Esper.Actions {
       calId: calId,
       eventId: eventId
     };
-    Events2.fetchOne(storeId).then((optEvent: Option.T<Events2.TeamEvent>) => {
-      optEvent.match({
-        none: () => Route.nav.home(),
-        some: (event) => {
-          if (action) {
-            Feedback.postAction(event, action);
+    Stores.Events.fetchOne(storeId)
+      .then((optEvent: Option.T<Stores.Events.TeamEvent>) => {
+        optEvent.match({
+          none: () => Route.nav.home(),
+          some: (event) => {
+            if (action) {
+              Feedback.postAction(event, action);
+            }
           }
-        }
-      })
-    });
+        })
+      });
 
     render(<Views.EventView
       teamId={teamId}

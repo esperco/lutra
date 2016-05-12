@@ -1,6 +1,6 @@
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="./Views.CalendarManage.tsx" />
-/// <refernece path="./Actions" />
+/*
+  Actions for calendar management page
+*/
 
 module Esper.Actions {
   export function renderCalendarManage(teamId?: string) {

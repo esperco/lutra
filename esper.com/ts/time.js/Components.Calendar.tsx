@@ -8,19 +8,15 @@
   else for week / agenda view.
 */
 
-/// <reference path="./Esper.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Events2.ts" />
-
 module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
   interface CalendarProps {
     period: Period.Single;
-    events: Events2.TeamEvent[];
-    selectedEvents: Events2.TeamEvent[];
-    onEventClick: (event: Events2.TeamEvent, add: boolean) => void;
+    events: Stores.Events.TeamEvent[];
+    selectedEvents: Stores.Events.TeamEvent[];
+    onEventClick: (event: Stores.Events.TeamEvent, add: boolean) => void;
     onViewChange: (period: Period.Single) => void;
     busy?: boolean;
     error?: boolean;
@@ -151,7 +147,7 @@ module Esper.Components {
         btn.addClass("fc-corner-left fc-corner-right");
         btn.attr("id", btnId);
         btn.click(() => {
-          Events2.invalidate();
+          Stores.Events.invalidate();
           Route.nav.refreshOnce();
         });
         container.prepend(btn);
@@ -204,44 +200,36 @@ module Esper.Components {
       // For inferring which events are "selected" by virtue of being a
       // recurring event
       var recurringEventIds = _.map(this.props.selectedEvents,
-        (e) => e && e.recurring_event_id
+        (e) => e && e.recurringEventId
       );
       recurringEventIds = _.uniq(_.filter(recurringEventIds));
 
       callback(_.map(this.props.events, (event, i) => {
-        var classNames: string[] = ["selectable"];
-        if (_.includes(selectedEventIds, event.id)) {
-          classNames.push("active");
-        }
-        if (_.includes(recurringEventIds, event.recurring_event_id)) {
-          classNames.push("recurring-active");
-        }
-        if (event.recurring_event_id) {
-          classNames.push("recurring");
-        }
-        if (event.labels && event.labels.length) {
-          classNames.push("labeled");
-        }
-        if (event.feedback.attended === false) {
-          classNames.push("no-attend")
-        }
-
         var ret: EventObjectPlus = {
           id: i,
           title: (event.title || Text.NoEventTitle),
-          allDay: event.all_day,
+          allDay: event.allDay,
           start: this.adjustTz(event.start, event.timezone),
           end: this.adjustTz(event.end, event.timezone),
           editable: false,
-          className: classNames.join(" ")
+          className: classNames("selectable", {
+            "active": _.includes(selectedEventIds, event.id),
+            "recurring-active": _.includes(recurringEventIds,
+                                           event.recurringEventId),
+            "recurring": !!event.recurringEventId,
+            "has-labels": !!Stores.Events.getLabels(event).length,
+            "has-empty-labels": Stores.Events.hasEmptyLabels(event),
+            "has-predicted-labels": Stores.Events.hasPredictedLabels(event),
+            "no-attend": event.feedback.attended === false
+          })
         };
 
-        if (event.labels_norm && event.labels_norm.length) {
-          ret.color = Colors.getColorForLabel(
-            event.labels_norm[0]
-          );
+        var labels = Stores.Events.getLabels(event);
+        if (Util.notEmpty(labels)) {
+          var label = labels[0];
+          ret.color = Colors.getColorForLabel(label.id);
           ret.textColor = Colors.colorForText(ret.color);
-          ret.tooltip = event.labels[0];
+          ret.tooltip = label.displayAs;
         }
 
         return ret;
@@ -254,11 +242,11 @@ module Esper.Components {
     }
 
     // Adjust a timetamp based on the currently selected event's timezone
-    adjustTz(timestamp: string, timezone?: string) {
+    adjustTz(date: Date, timezone?: string) {
       if (timezone) {
-        return moment.tz(timestamp, timezone);
+        return moment.tz(date, timezone);
       } else {
-        return moment(timestamp);
+        return moment(date);
       }
     }
 

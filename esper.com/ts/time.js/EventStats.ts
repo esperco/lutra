@@ -2,11 +2,9 @@
   Client-side time stat calculations
 */
 
-/// <reference path="./Events2.ts" />
-
 module Esper.EventStats {
   export interface HasEvent {
-    event: Events2.TeamEvent;
+    event: Stores.Events.TeamEvent;
   }
 
   export interface HasDurations extends HasEvent {
@@ -27,7 +25,7 @@ module Esper.EventStats {
   }
 
   /* Shortcut types */
-  export type EventGrouping = Partition.KeyList<Events2.TeamEvent>;
+  export type EventGrouping = Partition.KeyList<Stores.Events.TeamEvent>;
   export type DurationsGrouping<T> = Partition.KeyList<T & HasDurations>;
 
   ////
@@ -129,8 +127,8 @@ module Esper.EventStats {
     the wrapper. If option is none, we leave event out of durations calc.
   */
   export function wrapWithDurations<W extends HasEvent>(
-    events: Events2.TeamEvent[],
-    fn: (e: Events2.TeamEvent) => Option.T<W>,
+    events: Stores.Events.TeamEvent[],
+    fn: (e: Stores.Events.TeamEvent) => Option.T<W>,
     opts?: DurationOpts
   ): Array<W & HasDurations> {
     var options = _.map(events, fn);
@@ -142,7 +140,7 @@ module Esper.EventStats {
   //////
 
   // Simple aggregate duration of events, avoids double-counting overlaps
-  export function aggregateDuration(events: ApiT.GenericCalendarEvent[]) {
+  export function aggregateDuration(events: Stores.Events.TeamEvent[]) {
     var agg = 0;
     var lastEnd: number;
 

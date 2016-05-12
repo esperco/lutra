@@ -2,9 +2,7 @@
   Component for selecting guest domain names
 */
 
-/// <reference path="./Colors.ts" />
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Charts {
   interface DomainFilterParams extends Params.RelativePeriodJSON {
@@ -29,7 +27,7 @@ module Esper.Charts {
     sync() {
       super.sync();
       this.eventsByDomain = Partition.groupByMany(this.events,
-        (e) => Events2.getGuestDomains(e)
+        (e) => Stores.Events.getGuestDomains(e)
       );
     }
 

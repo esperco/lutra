@@ -60,6 +60,10 @@ module Esper.TestFixtures {
     Stores.Teams.TeamListStore.removeAllChangeListeners();
     Stores.Calendars.ListStore.reset();
     Stores.Calendars.ListStore.removeAllChangeListeners();
+    Stores.Events.EventsForDateStore.reset();
+    Stores.Events.EventsForDateStore.removeAllChangeListeners();
+    Stores.Events.EventStore.reset();
+    Stores.Events.EventStore.removeAllChangeListeners();
   }
 
   export function getLoginInfo(): ApiT.LoginResponse {

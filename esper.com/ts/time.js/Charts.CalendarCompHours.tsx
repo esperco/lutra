@@ -1,7 +1,4 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Charts.CalendarComp.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
 
@@ -13,7 +10,7 @@ module Esper.Charts {
       return [-1, 1];
     }
 
-    onEventClick(event: Events2.TeamEvent) {
+    onEventClick(event: Stores.Events.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;
     }

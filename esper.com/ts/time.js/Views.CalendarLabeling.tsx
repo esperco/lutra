@@ -1,9 +1,6 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="./Components.CalSelector.tsx" />
-/// <reference path="./Components.LabelEditor2.tsx" />
-/// <reference path="./Components.Calendar.tsx" />
+/*
+  Calendar page
+*/
 
 module Esper.Views {
   interface Props {
@@ -72,7 +69,7 @@ module Esper.Views {
 
       var eventsData = Option.flatten(
         _.map(this.props.cals,
-          (cal) => Events2.getForPeriod({
+          (cal) => Stores.Events.getForPeriod({
             teamId: cal.teamId,
             calId: cal.calId,
             period: this.props.period
@@ -85,7 +82,7 @@ module Esper.Views {
       var selectedEvents = _.filter(events, (e) =>
         !!_.find(this.state.selected, (s) =>
           s.teamId === e.teamId &&
-          s.calId === e.calendar_id &&
+          s.calId === e.calendarId &&
           s.eventId === e.id
         )
       );
@@ -112,7 +109,7 @@ module Esper.Views {
 
     renderLabelEditor() {
       var eventData = Option.flatten(
-        _.map(this.state.selected, (s) => Events2.EventStore.get({
+        _.map(this.state.selected, (s) => Stores.Events.EventStore.get({
           teamId: s.teamId,
           calId: s.calId,
           eventId: s.eventId
@@ -130,7 +127,7 @@ module Esper.Views {
         var hasRecurring = false;
         if (_.find(eventData, (e) => e.data.match({
           none: () => false,
-          some: (e) => !!e.recurring_event_id
+          some: (e) => !!e.recurringEventId
         }))) {
           hasRecurring = true;
         }
@@ -195,10 +192,10 @@ module Esper.Views {
       this.setState({ selected: [] });
     }
 
-    updateEventSelection(event: Events2.TeamEvent, add: boolean) {
+    updateEventSelection(event: Stores.Events.TeamEvent, add: boolean) {
       var selectedList = _.cloneDeep(this.state.selected);
       var selectedIndex = _.findIndex(selectedList,
-        (s) => Events2.matchId(event, s)
+        (s) => Stores.Events.matchId(event, s)
       );
 
       // Add => cumulative, shift key is down
@@ -206,7 +203,7 @@ module Esper.Views {
         if (selectedIndex >= 0) {
           selectedList.splice(selectedIndex, 1);
         } else {
-          selectedList.push(Events2.storeId(event));
+          selectedList.push(Stores.Events.storeId(event));
         }
       }
 
@@ -214,7 +211,7 @@ module Esper.Views {
       else if (selectedIndex >= 0) {
         selectedList = [];
       } else {
-        selectedList = [Events2.storeId(event)];
+        selectedList = [Stores.Events.storeId(event)];
       }
 
       // Set state to trigger display changes

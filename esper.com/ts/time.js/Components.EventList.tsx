@@ -2,22 +2,18 @@
   Basic component for rendering a list of events
 */
 
-/// <reference path="../lib/Components.SignalStrength.tsx" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Tooltip.tsx" />
-
 module Esper.Components {
   const LABEL_COUNT_CUTOFF = 4;
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
 
   interface Props {
-    events: Events2.TeamEvent[];
-    selectedEvents?: Events2.TeamEvent[];
+    events: Stores.Events.TeamEvent[];
+    selectedEvents?: Stores.Events.TeamEvent[];
     teams: ApiT.Team[];
-    onEventToggle?: (event: Events2.TeamEvent) => void;
-    onEventClick?: (event: Events2.TeamEvent) => void;
-    onFeedbackClick?: (event: Events2.TeamEvent) => void;
-    onAddLabelClick?: (event: Events2.TeamEvent) => void;
+    onEventToggle?: (event: Stores.Events.TeamEvent) => void;
+    onEventClick?: (event: Stores.Events.TeamEvent) => void;
+    onFeedbackClick?: (event: Stores.Events.TeamEvent) => void;
+    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
   }
 
   export class EventList extends ReactHelpers.Component<Props, {}> {
@@ -46,7 +42,7 @@ module Esper.Components {
       </div>;
     }
 
-    renderDay(timestamp: number, events: Events2.TeamEvent[]) {
+    renderDay(timestamp: number, events: Stores.Events.TeamEvent[]) {
       var m = moment(timestamp);
       return <div className={classNames('day', {
         today: Time.sameDay(m, moment()),
@@ -59,10 +55,13 @@ module Esper.Components {
       </div>
     }
 
-    renderEvent(event: Events2.TeamEvent) {
-      return <div key={[event.teamId, event.calendar_id, event.id].join(",")}
+    renderEvent(event: Stores.Events.TeamEvent) {
+      return <div key={[event.teamId, event.calendarId, event.id].join(",")}
                   className={classNames("list-group-item event", {
-                    "has-labels": event.labels_norm.length > 0,
+                    "has-labels": !!Stores.Events.getLabels(event).length,
+                    "has-empty-labels": Stores.Events.hasEmptyLabels(event),
+                    "has-predicted-labels":
+                      Stores.Events.hasPredictedLabels(event),
                     "no-attend": event.feedback.attended === false,
                     "past": moment(event.end).diff(moment()) < 0
                   })}>
@@ -91,7 +90,7 @@ module Esper.Components {
             </span>{" to "}<span className="end">
               { moment(event.end).format("h:mm a") }
             </span>{" "}
-            { event.recurring_event_id ?
+            { event.recurringEventId ?
               <span className="recurring" title="Recurring">
                 <i className="fa fa-fw fa-refresh" />
               </span> :
@@ -111,11 +110,11 @@ module Esper.Components {
       </div>;
     }
 
-    getTeam(event: Events2.TeamEvent) {
+    getTeam(event: Stores.Events.TeamEvent) {
       return _.find(this.props.teams, (t) => t.teamid === event.teamId);
     }
 
-    handleFeedbackClick(event: Events2.TeamEvent) {
+    handleFeedbackClick(event: Stores.Events.TeamEvent) {
       if (this.props.onFeedbackClick) {
         this.props.onFeedbackClick(event);
       }
@@ -123,13 +122,13 @@ module Esper.Components {
 
     ////////
 
-    isSelected(event: Events2.TeamEvent) {
+    isSelected(event: Stores.Events.TeamEvent) {
       return this.findIndex(event) >= 0;
     }
 
-    findIndex(event: Events2.TeamEvent) {
+    findIndex(event: Stores.Events.TeamEvent) {
       return _.findIndex(this.props.selectedEvents || [], (e) =>
-        Events2.matchRecurring(e, event)
+        Stores.Events.matchRecurring(e, event)
       );
     }
   }
@@ -152,233 +151,6 @@ module Esper.Components {
       {" "}
       { feedback.notes ? <i className="fa fa-fw fa-comment" /> : null }
     </span>;
-  }
-
-
-  /* Helpers for managing predicted labels */
-
-  // Non-predicted label
-  interface LabelVal {
-    label: string;
-    label_norm: string;
-  }
-
-  type LabelOrPredicted = LabelVal|ApiT.PredictedLabel;
-
-  function isPredictedLabel(x: LabelOrPredicted): x is ApiT.PredictedLabel {
-    var typedX = x as ApiT.PredictedLabel;
-    return !!typedX.score;
-  }
-
-  function labelsFomEvent(event: Events2.TeamEvent) {
-    return _.map(event.labels_norm, (n, i) => ({
-      label: event.labels[i],
-      label_norm: n
-    }));
-  }
-
-  function labelsFromTeam(team: ApiT.Team) {
-    return _.map(team.team_labels_norm, (n, i) => ({
-      label: team.team_labels[i],
-      label_norm: n
-    }));
-  }
-
-
-  /////
-
-  interface LabelListProps {
-    event: Events2.TeamEvent;
-    team: ApiT.Team;
-    onAddLabelClick?: (event: Events2.TeamEvent) => void;
-  }
-
-  /*
-    A list of toggle-able labels or predicted labels for an event.
-  */
-  class LabelList extends ReactHelpers.Component<LabelListProps, {
-    initLabelList: LabelOrPredicted[];
-    expanded: boolean;
-  }> {
-    constructor(props: LabelListProps) {
-      super(props);
-
-      /*
-        Track the initial set of labels (or predicted labels) for rendering
-        purposes. We don't want predicted labels or other options to disappear
-        just because the user toggled one.
-      */
-      this.state = {
-        initLabelList: this.getInitLabels(props),
-        expanded: false
-      }
-    }
-
-    /*
-      If new labels outside of the initial list are assigned, that means
-      user has added labels from outside the label toggle interface, so
-      reset our initial toggle list.
-    */
-    componentWillReceiveProps(props: LabelListProps) {
-      var eventLabels = labelsFomEvent(props.event);
-      if (!this.state.expanded &&
-          _.differenceBy(eventLabels, this.state.initLabelList,
-            (l) => l.label_norm).length > 0) {
-        this.setState({
-          initLabelList: eventLabels,
-          expanded: this.state.expanded
-        });
-      }
-    }
-
-    // Returns a combination of predicted labels and team labels,
-    // up to threshold, for selection purposes.
-    getInitLabels(props: LabelListProps): LabelOrPredicted[] {
-      if (Util.notEmpty(props.event.labels_norm)) {
-        return labelsFomEvent(props.event);
-      }
-
-      var ret: LabelOrPredicted[] =
-        _.filter(props.event.predicted_labels,
-          (l) => l.score > PREDICTED_LABEL_PERCENT_CUTOFF
-        );
-      if (ret.length < LABEL_COUNT_CUTOFF) {
-        ret = _.uniqBy(ret.concat(labelsFromTeam(props.team)),
-          (l) => l.label_norm);
-      }
-      return ret.slice(0, LABEL_COUNT_CUTOFF);
-    }
-
-    render() {
-      var labelList = this.state.initLabelList;
-      if (this.state.expanded) {
-        labelList = labelList.concat(labelsFromTeam(this.props.team));
-        labelList = _.uniqBy(labelList, (l) => l.label_norm);
-      }
-      return <div className="event-labels">
-        <NoAttendToggle event={this.props.event} />
-        { _.map(labelList, (labelVal) =>
-          <LabelToggle key={labelVal.label_norm}
-                       label={labelVal} event={this.props.event} />
-        ) }
-        { this.state.expanded && this.props.onAddLabelClick ?
-          <span className="add-event-label action label-list-action"
-                onClick={() => this.props.onAddLabelClick(this.props.event)}>
-            {labelList.length ?
-              <span>
-                <i className="fa fa-fw fa-tag" />{" "}
-                <i className="fa fa-fw fa-ellipsis-h" />
-              </span> :
-              <span>
-                <i className="fa fa-fw fa-plus" />{" "}{Text.AddLabel}
-              </span>
-            }
-          </span> : null }
-        <span className="toggle-label-expansion action label-list-action"
-              onClick={() => this.toggleExpand()}>
-          <i className={classNames("fa", "fa-fw", {
-            "fa-chevron-left": this.state.expanded,
-            "fa-chevron-right": !this.state.expanded
-          })} />
-        </span>
-      </div>;
-    }
-
-    // When contracting, re-adjust init label list
-    toggleExpand() {
-      this.setState({
-        initLabelList: (this.state.expanded ?
-          this.getInitLabels(this.props) :
-          this.state.initLabelList
-        ),
-        expanded: !this.state.expanded
-      });
-    }
-  }
-
-
-  interface LabelProps {
-    label: LabelOrPredicted;
-    event: Events2.TeamEvent;
-  }
-
-  class LabelToggle extends ReactHelpers.Component<LabelProps, {}> {
-    _predictedLabel: HTMLSpanElement;
-
-    render() {
-      var labelColor = Colors.getColorForLabel(this.props.label.label_norm);
-      var isSelected = this.isSelected();
-      var style = (() => ({
-        borderStyle: "solid",
-        borderColor: labelColor,
-        background: isSelected ? labelColor : "transparent",
-        color: isSelected ? Colors.colorForText(labelColor) :
-                            Colors.darken(labelColor)
-      }))();
-
-      var label = this.props.label;
-      if (isPredictedLabel(label)) {
-        return <Tooltip style={style}
-          className="event-label predicted-label"
-          data-toggle="tooltip"
-          title={isSelected ? null :
-                 Text.predictionTooltip(label.score)}
-          onClick={() => {
-            isSelected ? this.toggleOff() : this.toggleOn()
-        }}>
-          { isSelected ?
-            <i className="fa fa-fw fa-tag" /> :
-            <i className="fa fa-fw fa-question-circle" />
-          }{" "}
-          {label.label}{" "}
-          <span className="label-score">
-            { isSelected ? <i className="fa fa-fw fa-check" /> :
-              <SignalStrength strength={label.score} /> }
-          </span>
-        </Tooltip>;
-      }
-
-      return <span style={style} className="event-label"
-                   onClick={() => {
-                     isSelected ? this.toggleOff() : this.toggleOn()
-                   }}>
-        <i className="fa fa-fw fa-tag" />{" "}
-        {this.props.label.label}
-      </span>;
-    }
-
-    isSelected() {
-      return !!_.find(this.props.event.labels_norm,
-        (n) => n === this.props.label.label_norm
-      );
-    }
-
-    toggleOn() {
-      EventLabelChange.add([this.props.event], this.props.label.label);
-    }
-
-    toggleOff() {
-      EventLabelChange.remove([this.props.event], this.props.label.label);
-    }
-  }
-
-  class NoAttendToggle extends ReactHelpers.Component<{
-    event: Events2.TeamEvent
-  }, {}> {
-    render() {
-      return <Tooltip className={classNames("no-attend-action",
-          "action", "label-list-action", {
-            active: this.props.event.feedback.attended === false
-          })} title="Did Not Attend" onClick={() => this.toggleAttend()}>
-        <i className="fa fa-fw fa-ban" />
-      </Tooltip>;
-    }
-
-    toggleAttend() {
-      var newFeedback = _.clone(this.props.event.feedback);
-      newFeedback.attended = this.props.event.feedback.attended === false;
-      Actions.Feedback.post(this.props.event, newFeedback);
-    }
   }
 
 

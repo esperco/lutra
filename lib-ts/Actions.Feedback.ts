@@ -1,9 +1,13 @@
+/*
+  Meeting feedback-related actions
+*/
+
 module Esper.Actions.Feedback {
 
   /*
     Post event feedback object
   */
-  export function post(event: Events2.TeamEvent,
+  export function post(event: Stores.Events.TeamEvent,
                        feedback: ApiT.EventFeedback) {
     var newEvent = _.cloneDeep(event);
     newEvent.feedback = feedback;
@@ -18,7 +22,7 @@ module Esper.Actions.Feedback {
     var p = Api.postEventFeedback(
       newEvent.teamId, newEvent.id, newEvent.feedback
     );
-    Events2.EventStore.push(Events2.storeId(newEvent), p,
+    Stores.Events.EventStore.push(Stores.Events.storeId(newEvent), p,
       Option.some(newEvent)
     );
 
@@ -28,7 +32,7 @@ module Esper.Actions.Feedback {
   /*
     Post just a string action (used by e-mails)
   */
-  export function postAction(event: Events2.TeamEvent,
+  export function postAction(event: Stores.Events.TeamEvent,
                              action: ApiT.EventFeedbackAction) {
     Analytics.track(Analytics.Trackable.SubmitFeedback, {
       teamId: event.teamId,
@@ -36,7 +40,7 @@ module Esper.Actions.Feedback {
     });
 
     var p = Api.postEventFeedbackAction(
-      event.teamId, event.calendar_id, event.id, action
+      event.teamId, event.calendarId, event.id, action
     ).then((feedback: ApiT.EventFeedback) => {
       var newEvent = _.cloneDeep(event);
       newEvent.feedback = feedback;
@@ -60,9 +64,9 @@ module Esper.Actions.Feedback {
         break;
     }
 
-    Events2.EventStore.pushFetch({
+    Stores.Events.EventStore.pushFetch({
       teamId: event.teamId,
-      calId: event.calendar_id,
+      calId: event.calendarId,
       eventId: event.id
     }, p, Option.some(initNewData));
 

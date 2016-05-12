@@ -2,10 +2,7 @@
   Pie chart for showing guests by domain
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.Guestchart.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   /*
@@ -50,12 +47,12 @@ module Esper.Charts {
       var bounds = Period.boundsFromPeriod(this.params.period);
       var durations = EventStats.wrapWithDurations(this.events,
         (e) => Params.applyListSelectJSON(
-          Events2.getGuestDomains(e),
+          Stores.Events.getGuestDomains(e),
           this.params.filterParams.domains
         ).flatMap((domains) => Option.some({
           event: e,
           domains: domains,
-          emails: Events2.getGuestEmails(e, domains)
+          emails: Stores.Events.getGuestEmails(e, domains)
         })),
         { truncateStart: bounds[0], truncateEnd: bounds[1] }
       );
@@ -73,7 +70,7 @@ module Esper.Charts {
       this.emailDurationsByDomain = {};
       _.each(this.durationsByDomain.some, (s) => {
         var grouping = Partition.groupByMany(s.items,
-          (e) => Events2.getGuestEmails(e.event, [s.key])
+          (e) => Stores.Events.getGuestEmails(e.event, [s.key])
         );
         grouping.some = _.sortBy(grouping.some,
           (s) => 0 - _.sumBy(s.items, (i) => i.adjustedDuration)
@@ -82,7 +79,7 @@ module Esper.Charts {
       });
     }
 
-    onSeriesClick(events: Events2.TeamEvent[]) {
+    onSeriesClick(events: Stores.Events.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
     }
@@ -104,7 +101,7 @@ module Esper.Charts {
         // hours: EventStats.toHours(_.sumBy(d.items, (i) => i.duration)),
         y: EventStats.toHours(
           _.sumBy(d.items, (i) =>
-            Events2.getGuestEmails(i.event, [d.key]).length *
+            Stores.Events.getGuestEmails(i.event, [d.key]).length *
             i.adjustedDuration /
             i.emails.length
           )

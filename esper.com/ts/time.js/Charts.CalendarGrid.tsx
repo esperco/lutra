@@ -1,5 +1,3 @@
-/// <reference path="./Components.CalendarGrid.tsx" />
-/// <reference path="./Esper.ts" />
 /// <reference path="./Charts.LabelChart.tsx" />
 
 module Esper.Charts {
@@ -21,11 +19,11 @@ module Esper.Charts {
       super.sync();
 
       var bounds = Period.boundsFromPeriod(this.params.period);
-      var dates = Events2.datesFromBounds(bounds[0], bounds[1]);
+      var dates = Stores.Events.datesFromBounds(bounds[0], bounds[1]);
       this.eventsForDates = _.map(dates, (d) => {
-        var events: Events2.TeamEvent[] = [];
+        var events: Stores.Events.TeamEvent[] = [];
         _.each(this.params.cals, (cal) => {
-          Events2.EventsForDateStore.batchGet({
+          Stores.Events.EventsForDateStore.batchGet({
             teamId: cal.teamId,
             calId: cal.calId,
             date: d
@@ -45,7 +43,7 @@ module Esper.Charts {
         var wrappers = Option.flatten(
           _.map(events, (e) =>
             Params.applyListSelectJSON(
-              e.labels_norm,
+              Stores.Events.getLabelIds(e),
               this.params.filterParams.labels
             ).flatMap(
               (labels) => Option.some(labels[0])

@@ -1,13 +1,8 @@
 /*
-  Actions based on routes -- stick more verbose code here so Route.tsx can
-  stay relatively short and easy to parse for routing patterns.
+  Actions for charts page
 */
 
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <refernece path="./Actions" />
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Views.Charts.tsx" />
 
 module Esper.Actions {
 

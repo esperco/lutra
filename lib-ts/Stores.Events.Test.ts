@@ -1,9 +1,9 @@
-/// <reference path="../lib/Test.ts" />
-/// <reference path="./Events2.ts" />
+/// <reference path="./Test.ts" />
+/// <reference path="./Stores.Events.ts" />
 /// <reference path="./TestFixtures.ts" />
 
-module Esper.Events2 {
-  describe("Events2", function() {
+module Esper.Stores.Events {
+  describe("Events", function() {
     beforeEach(function() {
       EventsForDateStore.reset();
       EventStore.reset();
@@ -88,30 +88,30 @@ module Esper.Events2 {
 
       e4 is in February.
     */
-    var e1 = asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
+    var e1 = TestFixtures.makeGenericCalendarEvent({
       start: XDate.toString(new Date(2016, 0, 1, 12)),
       end:   XDate.toString(new Date(2016, 0, 1, 13)),
       calendar_id: calId,
       id: eventId1
-    }));
-    var e2 = asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
+    });
+    var e2 = TestFixtures.makeGenericCalendarEvent({
       start: XDate.toString(new Date(2016, 0, 1, 23)),
       end:   XDate.toString(new Date(2016, 0, 2, 1)),
       calendar_id: calId,
       id: eventId2
-    }));
-    var e3 = asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
+    });
+    var e3 = TestFixtures.makeGenericCalendarEvent({
       start: XDate.toString(new Date(2016, 0, 2, 12)),
       end:   XDate.toString(new Date(2016, 0, 2, 15)),
       calendar_id: calId,
       id: eventId3
-    }));
-    var e4 = asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
+    });
+    var e4 = TestFixtures.makeGenericCalendarEvent({
       start: XDate.toString(new Date(2016, 1, 1)),
       end:   XDate.toString(new Date(2016, 1, 1, 1)),
       calendar_id: calId,
       id: eventId4
-    }));
+    });
 
     describe("fetchForPeriod", function() {
       var apiSpy: jasmine.Spy;
@@ -225,14 +225,14 @@ module Esper.Events2 {
             calId: calId,
             eventId: eventId1
           },
-          data: Option.wrap(e1)
+          data: Option.wrap(asTeamEvent(teamId, e1))
         }, {
           itemKey: {
             teamId: teamId,
             calId: calId,
             eventId: eventId2
           },
-          data: Option.wrap(e2)
+          data: Option.wrap(asTeamEvent(teamId, e2))
         }]));
 
         EventsForDateStore.batchSet({
@@ -245,14 +245,14 @@ module Esper.Events2 {
             calId: calId,
             eventId: eventId2
           },
-          data: Option.wrap(e2)
+          data: Option.wrap(asTeamEvent(teamId, e2))
         }, {
           itemKey: {
             teamId: teamId,
             calId: calId,
             eventId: eventId3
           },
-          data: Option.wrap(e3)
+          data: Option.wrap(asTeamEvent(teamId, e3))
         }]));
 
         EventsForDateStore.batchSet({
@@ -265,7 +265,7 @@ module Esper.Events2 {
             calId: calId,
             eventId: eventId4
           },
-          data: Option.wrap(e4)
+          data: Option.wrap(asTeamEvent(teamId, e4))
         }]));
       });
 
@@ -340,11 +340,14 @@ module Esper.Events2 {
 
     describe("getGuests", function() {
       beforeEach(function() {
-        TestFixtures.mockTimeLogin();
+        TestFixtures.mockLogin();
+        Teams.init();
+        Calendars.init();
+        Login.init();
       });
 
       afterEach(function() {
-        TestFixtures.resetTime();
+        TestFixtures.reset();
       });
 
       it("should return all guests who did not decline", function() {

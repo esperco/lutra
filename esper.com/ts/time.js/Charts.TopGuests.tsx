@@ -2,10 +2,7 @@
   Pie chart for showing guests by domain
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="./Charts.GuestChart.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   // Shorten references to React Component class
@@ -29,12 +26,12 @@ module Esper.Charts {
 
         // Filter + wrapping function
         (e) => Params.applyListSelectJSON(
-          Events2.getGuestDomains(e),
+          Stores.Events.getGuestDomains(e),
           this.params.filterParams.domains
         ).flatMap((domains) => domains.length ? Option.some({
           event: e,
           domains: domains,
-          emails: Events2.getGuestEmails(e, domains)
+          emails: Stores.Events.getGuestEmails(e, domains)
         }) : Option.none<any>()),
 
         // Group by labels
@@ -45,7 +42,7 @@ module Esper.Charts {
       );
     }
 
-    onEventClick(event: Events2.TeamEvent) {
+    onEventClick(event: Stores.Events.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;
     }

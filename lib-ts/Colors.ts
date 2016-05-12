@@ -180,4 +180,29 @@ module Esper.Colors {
     var yiq = ((r*299)+(g*587)+(b*114))/1000;
     return (yiq >= 128) ? black : offWhite;
   }
+
+
+  //////
+
+  var labelColorMap: ColorMap = {};
+  var domainColorMap: ColorMap = {};
+  var calColorMap: ColorMap = {};
+
+  export function getColorForLabel(labelNorm: string): string {
+    return getColorForMap(labelNorm, labelColorMap);
+  }
+
+  export function getColorForDomain(domain: string): string {
+    return getColorForMap(domain, domainColorMap);
+  }
+
+  export function getColorForCal(calId: string): string {
+    return getColorForMap(calId, calColorMap);
+  }
+
+  // Reset remembered colors
+  export function resetColorMaps(): void {
+    labelColorMap = {};
+    domainColorMap = {};
+  }
 }

@@ -2,55 +2,94 @@
   Eventual replacement for the Events module
 */
 
-/// <reference path="../lib/Api.ts" />
-/// <reference path="../lib/Model2.Batch.ts" />
-/// <reference path="../lib/Model2.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/XDate.ts" />
+/// <reference path="./Api.ts" />
+/// <reference path="./Labels.ts" />
+/// <reference path="./Model2.Batch.ts" />
+/// <reference path="./Model2.ts" />
+/// <reference path="./Stores.Teams.ts" />
+/// <reference path="./XDate.ts" />
 /// <reference path="./Period.ts" />
 
-module Esper.Events2 {
+module Esper.Stores.Events {
+
+  /* Type modification */
+
+  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
+  const PREDICTED_LABEL_MODIFIER = 0.95;
+
   /*
-    0 is current period. Min and max determine how far forward and back we
-    can go back or advance in relative time
+    Similar to ApiT.GenericCalendarEvent but with some teamId and different
+    representation of labels, camelCase, and removal of fields we don't care
+    about at the moment
   */
-  export const MAX_QUARTER_INCR = 1;
-  export const MIN_QUARTER_INCR = -1;
-
-  // 9 months total convering previous quarter to next
-  export const MAX_MONTH_INCR = moment()
-    .endOf('quarter')
-    .add(MAX_QUARTER_INCR, 'quarter')
-    .diff(moment(), 'month');
-  export const MIN_MONTH_INCR = moment()
-    .startOf('quarter')
-    .add(MIN_QUARTER_INCR, 'quarter')
-    .diff(moment(), 'month');
-
-  // Week => fixed incr (all weeks in a quarter is a lot)
-  export const MAX_WEEK_INCR = 10;
-  export const MIN_WEEK_INCR = -10;
-
-  // Custom (how many days relative to tody)
-  export const MAX_CUSTOM_INCR = moment()
-    .endOf('quarter')
-    .add(MAX_QUARTER_INCR, 'quarter')
-    .diff(moment(), 'days');
-  export const MIN_CUSTOM_INCR = moment()
-    .startOf('quarter')
-    .add(MIN_QUARTER_INCR, 'quarter')
-    .diff(moment(), 'days');
-
-
-  ///////
-
-  export interface TeamEvent extends ApiT.GenericCalendarEvent {
+  export interface TeamEvent {
+    id: string;
+    calendarId: string;
     teamId: string;
+    start: Date;
+    end: Date;
+    timezone: string;
+    title: string;
+    description: string;
+
+    labelScores: Option.T<Labels.Label[]>;
+
+    feedback: ApiT.EventFeedback;
+    location: string;
+    allDay: boolean;
+    guests: ApiT.Attendee[];
+    transparent: boolean;
+    recurringEventId?: string;
   }
 
   export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent) {
-    return _.extend({teamId: teamId}, e) as TeamEvent;
+    var labelScores = (() => {
+      if (e.labels_norm) {
+        return Option.some(_.map(e.labels_norm, (n, i) => ({
+          id: n,
+          displayAs: e.labels[i],
+          score: 1
+        })));
+      } else if (Util.notEmpty(e.predicted_labels)) {
+        var team = Teams.require(teamId);
+        if (team) {
+          var labels = _.filter(e.predicted_labels,
+            (l) => _.includes(team.team_labels_norm, l.label_norm));
+          var topPrediction = labels[0];
+
+          if (topPrediction.score > PREDICTED_LABEL_PERCENT_CUTOFF) {
+            return Option.some([{
+              id: topPrediction.label_norm,
+              displayAs: topPrediction.label,
+              score: PREDICTED_LABEL_MODIFIER * topPrediction.score
+            }]);
+          }
+        }
+      }
+      return Option.none<Labels.Label[]>();
+    })();
+
+    return {
+      id: e.id,
+      calendarId: e.calendar_id,
+      teamId: teamId,
+      start: moment(e.start).toDate(),
+      end: moment(e.end).toDate(),
+      timezone: e.timezone || moment.tz.guess(),
+      title: e.title || "",
+      description: e.description || "",
+      labelScores: labelScores,
+      feedback: e.feedback,
+      location: e.location || "",
+      allDay: e.all_day,
+      guests: e.guests,
+      transparent: e.transparent,
+      recurringEventId: e.recurring_event_id
+    };
   }
+
+
+  /* Store Interfaces */
 
   export interface FullEventId {
     teamId: string;
@@ -67,7 +106,7 @@ module Esper.Events2 {
   }
 
   export type EventData =
-    Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>;
+    Model2.StoreData<FullEventId, TeamEvent>;
 
   /*
     Convenience interface for grouping together merged event list with
@@ -347,17 +386,17 @@ module Esper.Events2 {
 
   // Returns true if two events are part of the same recurring event
   export function matchRecurring(e1: TeamEvent, e2: TeamEvent) {
-    return e1.calendar_id === e2.calendar_id &&
+    return e1.calendarId === e2.calendarId &&
       e1.teamId === e2.teamId &&
-      (e1.recurring_event_id ?
-       e1.recurring_event_id === e2.recurring_event_id :
+      (e1.recurringEventId ?
+       e1.recurringEventId === e2.recurringEventId :
        e1.id === e2.id);
   }
 
   export function storeId(event: TeamEvent): FullEventId {
     return {
       teamId: event.teamId,
-      calId: event.calendar_id,
+      calId: event.calendarId,
       eventId: event.id
     }
   }
@@ -365,7 +404,7 @@ module Esper.Events2 {
   export function matchId(event: TeamEvent, storeId: FullEventId) {
     return event && storeId &&
       event.id === storeId.eventId &&
-      event.calendar_id === storeId.calId &&
+      event.calendarId === storeId.calId &&
       event.teamId === storeId.teamId;
   }
 
@@ -420,6 +459,30 @@ module Esper.Events2 {
     return _.uniq(
       _.map(getGuestEmails(event), (email) => email.split('@')[1])
     );
+  }
+
+  export function getLabels(event: TeamEvent, includePredicted=true) {
+    return event.labelScores.match({
+      none: (): Labels.Label[] => [],
+      some: (scores) => includePredicted ?
+        scores : _.filter(scores, (s) => s.score === 1)
+    });
+  }
+
+  export function getLabelIds(event: TeamEvent, includePredicted=true) {
+    return _.map(getLabels(event), (l) => l.id);
+  }
+
+  export function hasEmptyLabels(event: TeamEvent) {
+    return event.labelScores.match({
+      none: () => false,
+      some: (labels) => labels.length === 0
+    });
+  }
+
+  export function hasPredictedLabels(event: TeamEvent) {
+    var labels = getLabels(event, true);
+    return labels.length && labels[0].score < 1;
   }
 
   export function getTeams(events: TeamEvent[]) {

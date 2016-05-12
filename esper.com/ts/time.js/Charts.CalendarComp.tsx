@@ -1,9 +1,8 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="../lib/Option.ts" />
+/*
+  Base class for comparing two calendars
+*/
+
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   type CalGrouping = GroupsByPeriod<{}>[];
@@ -26,7 +25,7 @@ module Esper.Charts {
         }),
 
         // Group by calendar id
-        (w) => [w.event.calendar_id]
+        (w) => [w.event.calendarId]
       );
 
       this.sortedCalIds = this.sortByForCurrentPeriod(
@@ -46,7 +45,7 @@ module Esper.Charts {
       }));
     }
 
-    onSeriesClick(events: Events2.TeamEvent[]) {
+    onSeriesClick(events: Stores.Events.TeamEvent[]) {
       Layout.renderModal(Containers.eventListModal(events));
       return false;
     }

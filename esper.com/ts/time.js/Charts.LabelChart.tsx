@@ -1,8 +1,4 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
 /// <reference path="./Charts.tsx" />
-/// <reference path="./Colors.ts" />
-/// <reference path="./Components.LabelSelector.tsx" />
 
 module Esper.Charts {
   interface LabelFilterParams extends Params.RelativePeriodJSON {
@@ -14,7 +10,7 @@ module Esper.Charts {
   */
   export abstract class LabelChart extends EventChart<LabelFilterParams> {
     protected eventsByLabel: EventStats.EventGrouping;
-    protected allLabels: Labels.Label[];
+    protected allLabels: Labels.LabelCount[];
     protected allowUnlabeled: boolean;
 
     cleanFilterParams(filterParams: any = {},
@@ -37,7 +33,7 @@ module Esper.Charts {
       super.sync();
       this.allLabels = Labels.fromEvents(this.events, Stores.Teams.all());
       this.eventsByLabel = Partition.groupByMany(this.events,
-        (e) => e.labels_norm
+        (e) => Stores.Events.getLabelIds(e)
       );
     }
 

@@ -3,8 +3,6 @@
 */
 
 /// <reference path="./Charts.LabelChart.tsx" />
-/// <reference path="./Components.Highchart.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
   type LabelsGrouping = GroupsByPeriod<{
@@ -25,7 +23,7 @@ module Esper.Charts {
 
         // Filter + wrapping function
         (e) => Params.applyListSelectJSON(
-          e.labels_norm,
+          Stores.Events.getLabelIds(e),
           this.params.filterParams.labels
         ).flatMap((labels) => Option.some({
           event: e,
@@ -40,7 +38,7 @@ module Esper.Charts {
       );
     }
 
-    onEventClick(event: Events2.TeamEvent) {
+    onEventClick(event: Stores.Events.TeamEvent) {
       Layout.renderModal(Containers.eventEditorModal([event]));
       return false;
     }

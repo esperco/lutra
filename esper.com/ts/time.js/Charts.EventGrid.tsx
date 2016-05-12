@@ -1,5 +1,4 @@
 /// <reference path="./Charts.CalendarGrid.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Charts {
 
@@ -77,7 +76,7 @@ module Esper.Charts {
       var lastEnd = moment(date).startOf('day').unix();
       var blocks: {
         seconds: number;
-        event: Option.T<Events2.TeamEvent>; // No event => open time
+        event: Option.T<Stores.Events.TeamEvent>; // No event => open time
         label: Option.T<string>;
       }[] = []
       _.each(durations, (duration) => {
@@ -85,7 +84,7 @@ module Esper.Charts {
         if (startSeconds > lastEnd) {
           blocks.push({
             seconds: startSeconds - lastEnd,
-            event: Option.none<Events2.TeamEvent>(),
+            event: Option.none<Stores.Events.TeamEvent>(),
             label: Option.none<string>()
           });
         }
@@ -104,7 +103,7 @@ module Esper.Charts {
       if (lastEnd < endOfDay) {
         blocks.push({
           seconds: endOfDay - lastEnd,
-          event: Option.none<Events2.TeamEvent>(),
+          event: Option.none<Stores.Events.TeamEvent>(),
           label: Option.none<string>()
         });
       }
@@ -162,7 +161,7 @@ module Esper.Charts {
 
   class TimeBlock extends ReactHelpers.Component<{
     seconds: number;
-    event: Option.T<Events2.TeamEvent>;
+    event: Option.T<Stores.Events.TeamEvent>;
     label: Option.T<string>;
     children?: JSX.Element[];
   }, {}> {

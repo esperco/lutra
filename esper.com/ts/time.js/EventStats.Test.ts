@@ -27,42 +27,48 @@ module Esper.EventStats {
       ------------------
               1 | 332321
     */
-    var e1 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 1, 23)),
-      end:   XDate.toString(new Date(2016, 0, 2)),
-      calendar_id: calId,
-      id: eventId1
-    }));
-    var e2 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 2)),
-      calendar_id: calId,
-      id: eventId2
-    }));
-    var e3 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 5)),
-      calendar_id: calId,
-      id: eventId3
-    }));
-    var e4 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2)),
-      end:   XDate.toString(new Date(2016, 0, 2, 1)),
-      calendar_id: calId,
-      id: eventId4
-    }));
-    var e5 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2, 1)),
-      end:   XDate.toString(new Date(2016, 0, 2, 4)),
-      calendar_id: calId,
-      id: eventId5
-    }));
-    var e6 = Events2.asTeamEvent(teamId, TestFixtures.makeGenericCalendarEvent({
-      start: XDate.toString(new Date(2016, 0, 2, 3)),
-      end:   XDate.toString(new Date(2016, 0, 2, 6)),
-      calendar_id: calId,
-      id: eventId5
-    }));
+    var e1 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 1, 23)),
+        end:   XDate.toString(new Date(2016, 0, 2)),
+        calendar_id: calId,
+        id: eventId1
+      }));
+    var e2 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 2)),
+        calendar_id: calId,
+        id: eventId2
+      }));
+    var e3 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 5)),
+        calendar_id: calId,
+        id: eventId3
+      }));
+    var e4 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2)),
+        end:   XDate.toString(new Date(2016, 0, 2, 1)),
+        calendar_id: calId,
+        id: eventId4
+      }));
+    var e5 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2, 1)),
+        end:   XDate.toString(new Date(2016, 0, 2, 4)),
+        calendar_id: calId,
+        id: eventId5
+      }));
+    var e6 = Stores.Events.asTeamEvent(teamId,
+      TestFixtures.makeGenericCalendarEvent({
+        start: XDate.toString(new Date(2016, 0, 2, 3)),
+        end:   XDate.toString(new Date(2016, 0, 2, 6)),
+        calendar_id: calId,
+        id: eventId5
+      }));
 
     describe("getDurations", function() {
       function getVal() {
@@ -123,36 +129,42 @@ module Esper.EventStats {
     describe("aggregateDuration", function() {
       it("should count non-overlapping event duration", function() {
         var x = aggregateDuration([
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:00:00.000-08:00",
-            end:   "2016-03-02T12:01:00.000-08:00"
-          }),
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:03:00.000-08:00",
-            end:   "2016-03-02T12:04:00.000-08:00"
-          }),
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:06:00.000-08:00",
-            end:   "2016-03-02T12:07:00.000-08:00"
-          })
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:00:00.000-08:00",
+              end:   "2016-03-02T12:01:00.000-08:00"
+            })),
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:03:00.000-08:00",
+              end:   "2016-03-02T12:04:00.000-08:00"
+            })),
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:06:00.000-08:00",
+              end:   "2016-03-02T12:07:00.000-08:00"
+            }))
         ]);
         expect(x).toEqual(3 * 60);
       });
 
       it("should not double-count overlapping event duration", function() {
         var x = aggregateDuration([
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:00:00.000-08:00",
-            end:   "2016-03-02T12:05:00.000-08:00"
-          }),
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:01:00.000-08:00",
-            end:   "2016-03-02T12:02:00.000-08:00"
-          }),
-          TestFixtures.makeGenericCalendarEvent({
-            start: "2016-03-02T12:04:00.000-08:00",
-            end:   "2016-03-02T12:07:00.000-08:00"
-          })
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:00:00.000-08:00",
+              end:   "2016-03-02T12:05:00.000-08:00"
+            })),
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:01:00.000-08:00",
+              end:   "2016-03-02T12:02:00.000-08:00"
+            })),
+          Stores.Events.asTeamEvent("teamId",
+            TestFixtures.makeGenericCalendarEvent({
+              start: "2016-03-02T12:04:00.000-08:00",
+              end:   "2016-03-02T12:07:00.000-08:00"
+            }))
         ]);
         expect(x).toEqual(7 * 60);
       });

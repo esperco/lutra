@@ -2,24 +2,13 @@
   Component for updating labels for a given task
 */
 
-/// <reference path="../lib/Actions.Teams.ts" />
-/// <reference path="../lib/Components.Modal.tsx" />
-/// <reference path="../lib/Components.ErrorMsg.tsx" />
-/// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="../lib/Components.ModalPanel.tsx" />
-/// <reference path="./Events2.ts" />
-/// <reference path="./EventLabelChange.ts" />
-/// <reference path="./Components.EventEditor.tsx" />
-
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
   //////
 
   interface LabelEditorProps {
-    eventData: Model2.StoreData<Events2.FullEventId, Events2.TeamEvent>[];
+    eventData: Model2.StoreData<Stores.Events.FullEventId, Stores.Events.TeamEvent>[];
     teams: ApiT.Team[];
     onDone?: () => void;
     doneText?: string;
@@ -55,11 +44,11 @@ module Esper.Components {
       // Check if labels changed
       var oldLabels = _.map(this.props.eventData, (d) => d.data.match({
         none: (): string[] => [],
-        some: (e) => e.labels_norm
+        some: (e) => Stores.Events.getLabelIds(e)
       }));
       var newLabels = _.map(newProps.eventData, (d) => d.data.match({
         none: (): string[] => [],
-        some: (e) => e.labels_norm
+        some: (e) => Stores.Events.getLabelIds(e)
       }));
       if (!_.isEqual(oldLabels, newLabels)) {
         this.setState({ labelsChanged: true });
@@ -130,7 +119,7 @@ module Esper.Components {
       this.props.onDone();
     }
 
-    renderLabelInput(events: Events2.TeamEvent[]) {
+    renderLabelInput(events: Stores.Events.TeamEvent[]) {
       return <LabelInput
         ref={(c) => this._input = c}
         className={ this.props.autoFocus ? "esper-modal-focus" : null }
@@ -144,14 +133,17 @@ module Esper.Components {
       />;
     }
 
-    onSubmit(val: string, events: Events2.TeamEvent[]) {
+    onSubmit(val: string, events: Stores.Events.TeamEvent[]) {
       if (this.state.labelSelected) {
         if (_.every(events,
-          (e) => _.includes(e.labels_norm, this.state.labelSelected)
+          (e) => _.includes(
+            Stores.Events.getLabelIds(e),
+            this.state.labelSelected
+          )
         )) {
-          EventLabelChange.remove(events, val);
+          Actions.EventLabels.remove(events, val);
         } else {
-          EventLabelChange.add(events, val);
+          Actions.EventLabels.add(events, val);
         }
         return val;
       }
@@ -162,13 +154,13 @@ module Esper.Components {
         _.each(teamIds, (teamId) => {
           Actions.Teams.addLabel(teamId, val);
         });
-        EventLabelChange.add(events, val);
+        Actions.EventLabels.add(events, val);
         this.setState({ labelFilter: null })
         return "";
       }
     }
 
-    renderLabelList(events: Events2.TeamEvent[]) {
+    renderLabelList(events: Stores.Events.TeamEvent[]) {
       var labels = this.getLabels();
       return <div className="esper-select-menu">
         {
@@ -182,7 +174,7 @@ module Esper.Components {
     }
 
     getEvents() {
-      var events: Events2.TeamEvent[] = [];
+      var events: Stores.Events.TeamEvent[] = [];
       _.each(this.props.eventData, (e) => e.data.match({
         none: () => null,
         some: (e) => events.push(e)
@@ -332,7 +324,7 @@ module Esper.Components {
 
   function Label(props: {
     label: Labels.LabelCount;
-    events: Events2.TeamEvent[];
+    events: Stores.Events.TeamEvent[];
     highlight?: boolean;
   }) {
     var checkedByAll = props.label.count === props.events.length;
@@ -362,9 +354,9 @@ module Esper.Components {
 
     var handler = () => {
       if (checkedByAll) {
-        EventLabelChange.remove(props.events, props.label.displayAs);
+        Actions.EventLabels.remove(props.events, props.label.displayAs);
       } else {
-        EventLabelChange.add(props.events, props.label.displayAs);
+        Actions.EventLabels.add(props.events, props.label.displayAs);
       }
     };
 

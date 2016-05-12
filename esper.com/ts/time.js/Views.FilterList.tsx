@@ -2,12 +2,6 @@
   View for event "search" (really filtering) and drilldown by label
 */
 
-/// <reference path="../lib/Components.ErrorMsg.tsx" />
-/// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-
 module Esper.Views {
   var Component = ReactHelpers.Component;
 
@@ -17,7 +11,7 @@ module Esper.Views {
   }
 
   interface FilterListState {
-    selected?: Events2.TeamEvent[];
+    selected?: Stores.Events.TeamEvent[];
     actionsPinned?: boolean;
   }
 
@@ -25,7 +19,7 @@ module Esper.Views {
     _actionMenu: HTMLDivElement;
     _actionMenuOffset: number;
     _editModalId: number;
-    _editModalEvents: Events2.TeamEvent[];
+    _editModalEvents: Stores.Events.TeamEvent[];
     _goToTodayOnUpdate: boolean;
 
     // Use state to track selected events -- reset everytime props change
@@ -77,7 +71,7 @@ module Esper.Views {
       // Merge event lists for multiple calendars
       var eventData = Option.flatten(
         _.map(this.props.cals, (c) =>
-          Events2.getForPeriod({
+          Stores.Events.getForPeriod({
             teamId: c.teamId,
             calId: c.calId,
             period: this.props.period
@@ -93,11 +87,15 @@ module Esper.Views {
       };
     }
 
-    filterEvents(events: Events2.TeamEvent[]) {
+    filterEvents(events: Stores.Events.TeamEvent[]) {
       if (! this.props.labels.all) {
         events = _.filter(events, (e) =>
-          (this.props.labels.none && e.labels_norm.length === 0) ||
-          (_.intersection(this.props.labels.some, e.labels_norm).length > 0)
+          ( this.props.labels.none &&
+            Stores.Events.getLabels(e).length === 0) ||
+          ( _.intersection(
+              this.props.labels.some,
+              Stores.Events.getLabelIds(e)
+            ).length > 0)
         );
       }
 
@@ -174,7 +172,7 @@ module Esper.Views {
       </div>;
     }
 
-    renderLabelSelector(events: Events2.TeamEvent[]) {
+    renderLabelSelector(events: Stores.Events.TeamEvent[]) {
       var labels = Labels.fromEvents(events, Stores.Teams.all());
       labels = Labels.sortLabels(labels);
       return <div className="col-sm-6 form-group">
@@ -218,7 +216,7 @@ module Esper.Views {
       </div>;
     }
 
-    renderActionMenu(events: Events2.TeamEvent[]) {
+    renderActionMenu(events: Stores.Events.TeamEvent[]) {
       var icon = (() => {
         if (this.isAllSelected(events)) {
           return "fa-check-square-o";
@@ -316,7 +314,7 @@ module Esper.Views {
 
     refreshEvents() {
       if (Util.notEmpty(this.props.cals)) {
-        Events2.fetchPredictionsForPeriod({
+        Stores.Events.fetchPredictionsForPeriod({
           teamId: this.props.cals[0].teamId,
           period: this.props.period,
           force: true
@@ -324,8 +322,8 @@ module Esper.Views {
       }
     }
 
-    renderMain(events: Events2.TeamEvent[]) {
-      var teams = Events2.getTeams(events);
+    renderMain(events: Stores.Events.TeamEvent[]) {
+      var teams = Stores.Events.getTeams(events);
       return <Components.EventList
         events={events}
         teams={teams}
@@ -337,7 +335,7 @@ module Esper.Views {
       />;
     }
 
-    editEvent(event: Events2.TeamEvent, minFeedback=true) {
+    editEvent(event: Stores.Events.TeamEvent, minFeedback=true) {
       this.renderModal([event], minFeedback);
     }
 
@@ -345,7 +343,7 @@ module Esper.Views {
       this.renderModal(this.state.selected);
     }
 
-    renderModal(events: Events2.TeamEvent[], minFeedback=true) {
+    renderModal(events: Stores.Events.TeamEvent[], minFeedback=true) {
       this._editModalEvents = events;
       this._editModalId = Layout.renderModal(
         this.getModal(events, minFeedback));
@@ -362,12 +360,12 @@ module Esper.Views {
       }
     }
 
-    getModal(events: Events2.TeamEvent[], minFeedback=true) {
+    getModal(events: Stores.Events.TeamEvent[], minFeedback=true) {
       // Refresh data from store before rendering modal
       var eventData = _(events)
-        .map((e) => Events2.EventStore.get({
+        .map((e) => Stores.Events.EventStore.get({
           teamId: e.teamId,
-          calId: e.calendar_id,
+          calId: e.calendarId,
           eventId: e.id
         }))
         .filter((e) => e.isSome())
@@ -380,11 +378,13 @@ module Esper.Views {
                                           minFeedback={minFeedback} />;
     }
 
-    toggleEvent(event: Events2.TeamEvent) {
+    toggleEvent(event: Stores.Events.TeamEvent) {
       var selected = this.state.selected;
       var index = this.findIndex(event);
       if (index >= 0) {
-        selected = _.filter(selected, (s) => !Events2.matchRecurring(event, s));
+        selected = _.filter(selected,
+          (s) => !Stores.Events.matchRecurring(event, s)
+        );
       } else {
         selected = selected.concat([event]);
       }
@@ -393,17 +393,17 @@ module Esper.Views {
       });
     }
 
-    isSelected(event: Events2.TeamEvent) {
+    isSelected(event: Stores.Events.TeamEvent) {
       return this.findIndex(event) >= 0;
     }
 
-    findIndex(event: Events2.TeamEvent) {
+    findIndex(event: Stores.Events.TeamEvent) {
       return _.findIndex(this.state.selected, (e) =>
-        Events2.matchRecurring(e, event)
+        Stores.Events.matchRecurring(e, event)
       );
     }
 
-    toggleAll(events: Events2.TeamEvent[]) {
+    toggleAll(events: Stores.Events.TeamEvent[]) {
       if (this.isSomeSelected(events)) {
         this.setState({ selected: [] })
       } else {
@@ -411,12 +411,12 @@ module Esper.Views {
       }
     }
 
-    isAllSelected(events: Events2.TeamEvent[]) {
+    isAllSelected(events: Stores.Events.TeamEvent[]) {
       return this.state.selected.length &&
         _.every(events, (e) => this.isSelected(e));
     }
 
-    isSomeSelected(events: Events2.TeamEvent[]) {
+    isSomeSelected(events: Stores.Events.TeamEvent[]) {
       return this.state.selected.length &&
         !!_.find(events, (e) => this.isSelected(e));
     }
