@@ -48,10 +48,15 @@ module Esper.Components {
     */
     componentWillReceiveProps(props: Props) {
       if (!this.state.expanded) {
-        this.setState({
-          initLabelList: this.getInitLabels(props.event),
-          expanded: this.state.expanded
-        });
+        var labelList = this.getInitLabels(props.event);
+        var newLabels = _.differenceBy(labelList, this.state.initLabelList,
+                                       (l) => l.id);
+        if (newLabels.length > 0) {
+           this.setState({
+            initLabelList: labelList,
+            expanded: this.state.expanded
+          });
+        }
       }
     }
 
@@ -73,9 +78,11 @@ module Esper.Components {
     }
 
     render() {
-      var labelList = this.state.expanded ?
-        Labels.fromTeam(this.props.team) :
-        this.state.initLabelList;
+      var labelList = this.state.initLabelList;
+      if (this.state.expanded) {
+        labelList = labelList.concat(Labels.fromTeam(this.props.team));
+        labelList = _.uniqBy(labelList, (l) => l.id);
+      }
 
       return <div className="event-labels">
         <NoAttendToggle event={this.props.event} />
