@@ -769,6 +769,14 @@ module Esper.ApiT {
     add_labels?: string[];
   }
 
+  export interface LabelsSetPredictRequest {
+    set_labels: {
+      id: string;
+      labels: string[]
+    }[];
+    predict_labels: string[]; // Event IDs
+  }
+
   export interface Random {
     random: string;
   }

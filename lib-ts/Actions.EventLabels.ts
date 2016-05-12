@@ -7,16 +7,12 @@
 
 module Esper.Actions.EventLabels {
 
-  export function add(events: Stores.Events.TeamEvent[],
-                      label: string|string[]) {
-    var labels = (typeof label === "string" ? [label] : label);
-    apply(events, { addLabels: labels })
+  export function add(events: Stores.Events.TeamEvent[], label: string) {
+    apply(events, { addLabels: [label] })
   }
 
-  export function remove(events: Stores.Events.TeamEvent[],
-                         label: string|string[]) {
-    var labels = (typeof label === "string" ? [label] : label);
-    apply(events, { removeLabels: labels })
+  export function remove(events: Stores.Events.TeamEvent[], label: string) {
+    apply(events, { removeLabels: [label] })
   }
 
   export function apply(events: Stores.Events.TeamEvent[], opts: {
@@ -30,25 +26,11 @@ module Esper.Actions.EventLabels {
   }
 
   function applyForTeam(teamId: string, events: Stores.Events.TeamEvent[],
-    opt: {
+    opts: {
       addLabels?: string[];
       removeLabels?: string[];
     })
   {
-    var eventIds = _.map(events, (e) => e.recurringEventId || e.id);
-    var req: ApiT.LabelChangeRequest = { selection: ["Eventids", eventIds] };
-    if (opt.removeLabels) {
-      req.remove_labels = opt.removeLabels;
-    }
-    if (opt.addLabels) {
-      req.add_labels = opt.addLabels;
-    }
-
-    var p = TeamLabelQueue.enqueue(teamId, {
-      teamId: teamId,
-      request: req
-    });
-
     // Include recurring events
     const recurring = "r";
     const notRecurring = "n";
@@ -71,60 +53,75 @@ module Esper.Actions.EventLabels {
       );
     }
 
+    // Modify events
+    var newEvents = _.map(events, (e) => {
+      var newEvent = _.cloneDeep(e);
+      newEvent.labelScores = Option.some(getNewLabels(e, opts));
+      return newEvent;
+    });
+    var p = TeamLabelQueue.enqueue(teamId, {
+      teamId: teamId,
+      events: newEvents
+    });
+
     // Wrap the whole kaboodle in a transaction
     Stores.Events.EventStore.transact(() => {
       Stores.Events.EventStore.transactP(p, (tP) => {
-        _.each(events, (e) => {
+        _.each(newEvents, (e) => {
           var storeId = Stores.Events.storeId(e);
-
-          var eventOpt = Stores.Events.EventStore.cloneData(storeId).flatMap(
-            (newEvent) => {
-              var labels = Stores.Events.getLabels(newEvent);
-
-              _.each(opt.addLabels, (l) => {
-                var normalized = Stores.Teams.getNormLabel(l);
-                if (! _.find(labels, (l) => l.id === normalized)) {
-                  labels.push({
-                    id: normalized,
-                    displayAs: l,
-                    score: 1
-                  });
-                }
-              });
-
-              _.each(opt.removeLabels, (l) => {
-                var normalized = Stores.Teams.getNormLabel(l);
-                _.remove(labels, (l) => l.id === normalized);
-              });
-
-              newEvent.labelScores = Option.some(labels);
-              return Option.wrap(newEvent);
-            });
-
-          Stores.Events.EventStore.push(storeId, tP, eventOpt);
+          Stores.Events.EventStore.push(storeId, tP, Option.wrap(e));
         });
       });
     });
   }
 
+  function getNewLabels(event: Stores.Events.TeamEvent, opts: {
+    addLabels?: string[];
+    removeLabels?: string[];
+  }) {
+    var labels = _.cloneDeep(Stores.Events.getLabels(event));
+    _.each(opts.addLabels, (l) => {
+      let normalized = Stores.Teams.getNormLabel(l);
+      if (! _.find(labels, (l) => l.id === normalized)) {
+        labels.push({
+          id: normalized,
+          displayAs: l,
+          score: 1
+        });
+      }
+    });
+
+    _.each(opts.removeLabels, (l) => {
+      let normalized = Stores.Teams.getNormLabel(l);
+      _.remove(labels, (l) => l.id === normalized);
+    });
+
+    return labels;
+  }
+
 
   interface QueueRequest {
     teamId: string;
-    request: ApiT.LabelChangeRequest
+    events: Stores.Events.TeamEvent[];
   };
 
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      var numEvents = Option.wrap(r.request.selection[1]).match({
-        some: (s) => s.length,
-        none: () => 0
-      });
       Analytics.track(Analytics.Trackable.EditEventLabels, {
-        numEvents: numEvents,
+        numEvents: r.events.length,
         teamId: r.teamId
       });
-      return Api.changeEventLabels(r.teamId, r.request);
+      return Api.setPredictLabels(r.teamId, {
+        set_labels: _.map(r.events, (e) => ({
+          id: e.recurringEventId || e.id,
+          labels: e.labelScores.match({
+            none: (): string[] => [],
+            some: (scores) => _.map(scores, (s) => s.displayAs)
+          })
+        })),
+        predict_labels: [] // Leave blank for now
+      });
     },
 
     // Pre-processor
@@ -134,19 +131,9 @@ module Esper.Actions.EventLabels {
       // Filter out redundant requests, while adding them to the combined
       // request
       requests = _.filter(requests, (r) => {
-        if (r.teamId === next.teamId &&
-            _.isEqual(r.request.selection, next.request.selection))
-        {
-          next.request.add_labels = _(next.request.add_labels)
-            .difference(r.request.remove_labels)
-            .union(r.request.add_labels)
-            .value();
-
-          next.request.remove_labels = _(next.request.remove_labels)
-            .difference(r.request.add_labels)
-            .union(r.request.remove_labels)
-            .value();
-
+        if (r.teamId === next.teamId) {
+          // Ensure next (latter action) takes precedence
+          next.events = _.uniqBy(r.events.concat(next.events), (e) => e.id);
           return false;
         }
         return true;
