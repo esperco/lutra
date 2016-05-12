@@ -12,7 +12,6 @@
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="./Esper.ts" />
 /// <reference path="./BatchLabelChange.ts" />
-/// <reference path="./Components.LabelEditor2.tsx" />
 
 module Esper.Views {
   var Component = ReactHelpers.Component;

@@ -57,12 +57,25 @@ module Esper.Components {
 
     componentDidMount() {
       this.focus();
+      this.confirmEvents();
     }
 
     componentDidUpdate(prevProps: LabelEditorProps) {
       if (! _.isEqual(this.props, prevProps)) {
         this.focus();
+        this.confirmEvents();
       }
+    }
+
+    /*
+      Confirm predicted labels on events when displayed -- not ideal to have
+      this take place as a side effect of rendering, but should be okay so
+      long as we only do this in response to event ids changing (i.e. the
+      action should not change anything that would directly affect the
+      rendering)
+    */
+    confirmEvents() {
+      Actions.EventLabels.confirm(this.getEvents());
     }
 
     focus() {
