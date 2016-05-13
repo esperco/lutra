@@ -227,7 +227,9 @@ module Esper.Views {
       })();
 
       return <div ref={(c) => this._actionMenu = c} className={
-        "list-action-menu" + (this.state.actionsPinned ? " pinned" : "")
+        classNames("list-action-menu", "esper-inverse", {
+          pinned: this.state.actionsPinned
+        })
       }>
         <div className="list-action-menu-container">
           <div className="action" onClick={() => this.toggleAll(events)}>
