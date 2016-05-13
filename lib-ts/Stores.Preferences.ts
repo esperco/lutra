@@ -19,6 +19,12 @@ module Esper.Stores.Preferences {
     return prefsLoadedDfd.promise();
   }
 
+  // Alias for init -- but separate name in case we want to make init
+  // smarter in the future
+  export function reload() {
+    init();
+  }
+
   export function init() {
     prefsLoadedDfd = $.Deferred<void>();
     var apiP = Api.getAllPreferences();

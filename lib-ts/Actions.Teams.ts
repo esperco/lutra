@@ -27,6 +27,9 @@ module Esper.Actions.Teams {
       if (t && t.teamid) {
         Stores.Teams.set(t);
 
+        // New team => new prefs
+        Stores.Preferences.reload();
+
         /*
           If team already existed prior to creation, it's possible values
           in create didn't stick. So make an update call too.
@@ -97,6 +100,12 @@ module Esper.Actions.Teams {
       name: "",
       timezone: moment.tz.guess()
     });
+  }
+
+  // Remove a team (unset its calendars really)
+  export function removeTeam(teamId: string) {
+    var p = Api.putTeamTimestatsCalendars(teamId, []);
+    Stores.Teams.remove(teamId);
   }
 
 

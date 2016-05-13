@@ -91,6 +91,14 @@ module Esper.Stores.Teams {
     return team.teamid;
   }
 
+  export function remove(teamId: string) {
+    TeamStore.remove(teamId);
+
+    var currentTeamIds = _.clone(allIds());
+    _.pull(currentTeamIds, teamId);
+    TeamListStore.setSafe(batchKey, Option.some(currentTeamIds));
+  }
+
 
   //////////
 
