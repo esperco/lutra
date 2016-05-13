@@ -170,6 +170,16 @@
         border-color: @shade-border;
       }
     }
+
+    &.esper-inverse {
+      .sidebar-toggle, .sidebar-content {
+        background: @inverse-bg;
+      }
+
+      .sidebar-content {
+        border-color: @inverse-border;
+      }
+    }
   }
 
   .esper-right-content {
@@ -326,6 +336,10 @@
     .esper-shade & {
       color: @shade-text-header;
     }
+
+    .esper-inverse & {
+      color: @inverse-text-header;
+    }
   }
 }
 
@@ -361,6 +375,11 @@
   .esper-shade {
     color: @shade-text-muted;
     border-color: @shade-border;
+  }
+
+  .esper-inverse {
+    color: @inverse-text-muted;
+    border-color: @inverse-border;
   }
 }
 
@@ -408,6 +427,10 @@
   .esper-shade & {
     color: @shade-text-header;
   }
+
+  .esper-inverse & {
+    color: @inverse-text-header;
+  }
 }
 
 /////
@@ -436,6 +459,17 @@
       }
     }
   }
+
+  .esper-inverse & {
+    color: @inverse-text-muted;
+
+    a, .esper-link {
+      color: @inverse-text-muted;
+      &:hover {
+        color: @inverse-text-muted-hover;
+      }
+    }
+  }
 }
 
 .esper-inline-divider {
@@ -448,6 +482,10 @@
 
   .esper-shade & {
     border-color: @shade-divider;
+  }
+
+  .esper-inverse & {
+    border-color: @inverse-divider;
   }
 }
 
@@ -533,8 +571,25 @@ flexibility with non-UL elements */
     }
   }
 
+  .esper-inverse & {
+    .esper-selectable, li > a {
+      color: @inverse-text;
+
+      &.highlight,
+      &:hover,
+      &:focus {
+        color: @inverse-text-highlight;
+        background-color: @inverse-text-highlight-bg;
+      }
+    }
+
+    .divider {
+      background-color: @inverse-divider;
+    }
+  }
+
   // Ignore shading for menu
-  .esper-shade .dropdown-menu & {
+  .esper-shade .dropdown-menu &, .esper-inverse .dropdown-menu & {
     .esper-selectable, li > a {
       color: @brand-text;
 
@@ -725,6 +780,38 @@ a.action {
 
   .modal-footer, .modal-header, hr {
     border-color: @shade-border;
+  }
+
+  input, .form-control, .dropdown-toggle {
+    background: @input-bg;
+  }
+}
+
+
+/* Misc formatting for "inverted" elements */
+.esper-inverse {
+  background: @inverse-bg;
+  color: @inverse-text;
+  border-color: @inverse-border;
+
+  label {
+    color: @inverse-text-header;
+  }
+
+  .text-muted {
+    color: @inverse-text-muted;
+  }
+
+  .modal-footer, .modal-header, hr {
+    border-color: @inverse-border;
+  }
+
+  a, .action, .esper-link {
+    color: @inverse-link;
+
+    &:hover, &:focus {
+      color: @inverse-link-hover;
+    }
   }
 
   input, .form-control, .dropdown-toggle {
