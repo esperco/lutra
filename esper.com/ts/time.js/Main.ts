@@ -1,13 +1,5 @@
+/// <reference path="./_lib.ts" />
 /// <reference path="./Esper.ts" />
-
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Login.Web.ts" />
-/// <reference path="../lib/ApiC.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-
-/// <reference path="./Route.tsx" />
-/// <reference path="./Colors.ts" />
 
 module Esper.Conf {
   export var segmentKey: string; // Set via Dev.ts or Prod.ts
@@ -30,7 +22,8 @@ module Esper.Main {
     Colors.init();
     Login.init();
     Login.promise.done(function() {
-      ApiC.getAllProfiles()
+      ApiC.getAllProfiles();
+      Stores.Preferences.init();
     });
   }
 }
