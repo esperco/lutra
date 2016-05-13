@@ -202,7 +202,14 @@ module Esper.Views {
       var pathForCals = Params.pathForCals(cals);
 
       opts = opts || {};
-      opts.jsonQuery = chart.params.filterParams;
+
+      // Team change => blank out filter params, else preserve
+      var newTeamId = pathForCals[0];
+      var oldCals = this.props.currentChart.params.cals || [];
+      var oldTeamId = oldCals && oldCals[0] && oldCals[0].teamId;
+      if (oldTeamId === newTeamId) {
+        opts.jsonQuery = chart.params.filterParams;
+      }
 
       var periodStr = Period.isCustom(period) ?
         [period.start, period.end].join(Params.PERIOD_SEPARATOR) :

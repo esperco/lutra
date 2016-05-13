@@ -46,7 +46,8 @@ module Esper.Charts {
     }
 
     protected showAll() {
-      return this.getSelectedLabels().length >= this.allLabels.length
+      var allIds = _.map(this.allLabels, (l) => l.id);
+      return _.difference(allIds, this.getSelectedLabels()).length === 0
         && this.showUnlabeled();
     }
 
