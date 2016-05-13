@@ -1,4 +1,5 @@
 @onboarding-close-action-width: @input-height-base;
+@onboarding-team-rm-action-width: @input-height-base;
 
 // Used to "quote" icons and text used on buttons and links
 .symbol-quote {
@@ -32,14 +33,24 @@
     padding-right: @padding-small-horizontal;
   }
 
+  .onboarding-team > .rm-action {
+    float: left;
+    width: @onboarding-team-rm-action-width;
+    padding: (2 * @padding-small-vertical) @padding-xs-horizontal;
+  }
+
+  .rm-action + .esper-expando {
+    margin-left: @onboarding-team-rm-action-width;
+  }
+
   .esper-expando {
     padding: @padding-small-vertical @padding-small-horizontal;
     border: 1px solid @brand-border;
     border-radius: @border-radius-small;
+  }
 
-    & + .esper-expando {
-      margin-top: @padding-large-vertical;
-    }
+  .onboarding-team + .onboarding-team, .esper-expando + .esper-expando {
+    margin-top: @padding-large-vertical;
   }
 
   .esper-expando-header {
@@ -49,7 +60,7 @@
   .onboarding-expando-content {
     padding: @padding-large-vertical @padding-xs-horizontal 0;
 
-    .esper-select-menu {
+    .calendar-list .esper-select-menu {
       margin: 0 -(@padding-xs-horizontal + @padding-small-horizontal)
         @padding-small-vertical;
     }

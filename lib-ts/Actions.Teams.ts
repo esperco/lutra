@@ -6,6 +6,7 @@
 /// <reference path="./Queue2.ts" />
 /// <reference path="./Save.ts" />
 /// <reference path="./Stores.Teams.ts" />
+/// <reference path="./Actions.Preferences.ts" />
 
 module Esper.Actions.Teams {
 
@@ -25,11 +26,50 @@ module Esper.Actions.Teams {
     var p = Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         Stores.Teams.set(t);
+
+        // New team => new prefs
+        Stores.Preferences.reload();
+
+        /*
+          If team already existed prior to creation, it's possible values
+          in create didn't stick. So make an update call too.
+
+          TODO: Remove if/when creation call also puts.
+        */
+        updateTeam(t.teamid, {
+          name: req.executive_name,
+          timezone: req.executive_timezone
+        });
       }
       return t;
     });
     Save.monitor(Stores.Teams.TeamStore, "new-team", p);
     return p;
+  }
+
+  /*
+    Updates an existing team (doesn't allow us update team exec e-mail yet,
+    although there's a fix e-mail API we could use if need be)
+  */
+  export function updateTeam(teamId: string, data: SelfTeamData) {
+    var team = Stores.Teams.require(teamId);
+    if (! team) return;
+
+    // Clone team and set in store
+    if (data.name) {
+      team = _.cloneDeep(team);
+      team.team_name = data.name;
+
+      var p = Api.setTeamName(teamId, data.name)
+      Stores.Teams.TeamStore.push(teamId, p, Option.wrap(team));
+    };
+
+    // Timezones => update preferences
+    if (data.timezone) {
+      Actions.Preferences.setGeneral(teamId, {
+        current_timezone: data.timezone
+      });
+    }
   }
 
   // Create a team for logged in user
@@ -60,6 +100,12 @@ module Esper.Actions.Teams {
       name: "",
       timezone: moment.tz.guess()
     });
+  }
+
+  // Remove a team (unset its calendars really)
+  export function removeTeam(teamId: string) {
+    var p = Api.putTeamTimestatsCalendars(teamId, []);
+    Stores.Teams.remove(teamId);
   }
 
 

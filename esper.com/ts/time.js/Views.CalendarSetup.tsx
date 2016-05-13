@@ -128,7 +128,7 @@ module Esper.Views {
         !!this.props.team.team_calendars.length;
       var isExec = Login.myUid() === this.props.team.team_executive;
 
-      return <div>
+      return <div className="calendar-list">
         { (Login.usesNylas() && !isExec && !teamApproved) ?
 
           // Not approved or no calendars shared

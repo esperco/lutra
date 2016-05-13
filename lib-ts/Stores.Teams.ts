@@ -91,6 +91,14 @@ module Esper.Stores.Teams {
     return team.teamid;
   }
 
+  export function remove(teamId: string) {
+    TeamStore.remove(teamId);
+
+    var currentTeamIds = _.clone(allIds());
+    _.pull(currentTeamIds, teamId);
+    TeamListStore.setSafe(batchKey, Option.some(currentTeamIds));
+  }
+
 
   //////////
 
@@ -115,7 +123,11 @@ module Esper.Stores.Teams {
   /* Init helpers */
 
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    var data = _.map(loginResponse.teams, (t) => ({
+    var teams = _.filter(loginResponse.teams,
+      (t) => t.team_timestats_calendars &&
+             t.team_timestats_calendars.length > 0
+    );
+    var data = _.map(teams, (t) => ({
       itemKey: t.teamid,
       data: Option.wrap(t)
     }));

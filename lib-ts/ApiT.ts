@@ -583,7 +583,22 @@ module Esper.ApiT {
     recipients_?: string[];
   }
 
-  export interface GeneralPrefs {
+  // This is used for API setting only
+  export interface GeneralPrefsOpts {
+    send_exec_confirmation?: boolean;
+    send_exec_reminder?: boolean;
+    send_followup_reminders?: boolean;
+    double_booking_warning?: boolean;
+    no_location_warning?: boolean;
+    link_email_warning?: boolean;
+    use_duplicate_events?: boolean;
+    delete_holds_inquiry?: boolean;
+    bcc_exec_on_reply?: boolean;
+    current_timezone?: string;
+    hold_event_color?: CalendarEventColor;
+  }
+
+  export interface GeneralPrefs extends GeneralPrefsOpts {
     send_exec_confirmation: boolean;
     send_exec_reminder: boolean;
     send_followup_reminders: boolean;

@@ -16,17 +16,23 @@ module Esper.Components {
     render() {
       return <div>
         { _.map(this.props.teams, (t) =>
-          <Components.Expando key={t.teamid}
-            initOpen={t.teamid === this.props.initOpenId}
-            header={<div className="esper-subheader">
-              <i className="fa fa-fw fa-user" />
-              {" "}{t.team_name}
-            </div>}
-          >
-            <div className="onboarding-expando-content">
-              { this.props.renderFn(t) }
-            </div>
-          </Components.Expando>
+          <div className="onboarding-team" key={t.teamid}>
+            <span className="action rm-action"
+                  onClick={() => Actions.Teams.removeTeam(t.teamid)}>
+              <i className="fa fa-fw fa-close" />
+            </span>
+            <Components.Expando
+              initOpen={t.teamid === this.props.initOpenId}
+              header={<div className="esper-subheader">
+                <i className="fa fa-fw fa-user" />
+                {" "}{t.team_name}
+              </div>}
+            >
+              <div className="onboarding-expando-content">
+                { this.props.renderFn(t) }
+              </div>
+            </Components.Expando>
+          </div>
         )}
 
         <div className="add-team-div clearfix">

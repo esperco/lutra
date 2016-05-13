@@ -1,8 +1,8 @@
-/// <reference path="../lib/ApiC.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.ErrorMsg.tsx" />
-/// <refernece path="../lib/Actions.Calendars.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
+/*
+  Page for notification settings
+
+  TODO: Move to generic settings page
+*/
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -204,8 +204,9 @@ module Esper.Views {
               prefs.label_reminder.recipients_.push(Login.myEmail());
             }
           }
-          updateTeamPreferences(prefs,
-            Api.setLabelReminderPrefs(prefs.teamid, prefs.label_reminder));
+
+          Actions.Preferences.setLabelReminders(prefs.teamid,
+                                                prefs.label_reminder);
         }
       });
     }
@@ -226,8 +227,8 @@ module Esper.Views {
               prefs.email_types.daily_agenda.recipients = [Login.myEmail()];
             }
           }
-          updateTeamPreferences(prefs,
-            Api.setEmailTypes(prefs.teamid, prefs.email_types));
+          Actions.Preferences.setEmailTypes(prefs.teamid,
+                                            prefs.email_types);
         }
       });
     }
@@ -250,44 +251,10 @@ module Esper.Views {
                 = [Login.myEmail()];
             }
           }
-          updateTeamPreferences(prefs,
-            Api.setEmailTypes(prefs.teamid, prefs.email_types));
+          Actions.Preferences.setEmailTypes(prefs.teamid,
+                                            prefs.email_types);
         }
       });
-    }
-  }
-
-  interface TeamPreferences {
-    [index: string]: ApiT.Preferences;
-  }
-
-  function getTeamPreferences(): TeamPreferences {
-    var teamPrefs: TeamPreferences = {};
-
-    var store = ApiC.getAllPreferences.store;
-    var key = ApiC.getAllPreferences.strFunc([]);
-    var prefsList = store.val(key);
-    if (prefsList) {
-      _.each(prefsList.preferences_list, (prefs) => {
-        teamPrefs[prefs.teamid] = prefs;
-      });
-    }
-    return teamPrefs;
-  }
-
-  function updateTeamPreferences(prefs: ApiT.Preferences,
-                                 promise: JQueryPromise<any>) {
-    var store = ApiC.getAllPreferences.store;
-    var key = ApiC.getAllPreferences.strFunc([]);
-
-    var prefsList = store.val(key);
-    if (prefsList) {
-      var ps = _.filter(prefsList.preferences_list, (p) => {
-        return p.teamid != prefs.teamid;
-      });
-      ps.push(prefs);
-
-      store.push(key, promise, {preferences_list:ps});
     }
   }
 
@@ -302,13 +269,15 @@ module Esper.Views {
 
   export class NotificationSettings extends Component<{message?: string}, {}> {
     renderWithData() {
-      var teamPrefs = getTeamPreferences();
       return <div id="notification-settings" className="container">
         { this.props.message ?
           <div className="alert alert-info">{this.props.message}</div> :
           null }
         { _.map(Stores.Teams.all(),
-          (t) => this.renderTeam(t, teamPrefs[t.teamid]))
+          (t) => Stores.Preferences.get(t.teamid).match({
+            none: () => null,
+            some: (prefs) => this.renderTeam(t, prefs)
+          }))
         }
       </div>;
     }
