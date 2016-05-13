@@ -744,7 +744,7 @@ module Esper.Api {
   }
 
   export function setGeneralPreferences(teamid: string,
-    general_prefs: ApiT.GeneralPrefs): JQueryPromise<void>
+    general_prefs: ApiT.GeneralPrefsOpts): JQueryPromise<void>
   {
       var url =
           prefix + "/api/preferences/general/" + string(Login.myUid())
