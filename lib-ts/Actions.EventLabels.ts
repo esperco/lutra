@@ -8,20 +8,40 @@
 module Esper.Actions.EventLabels {
 
   export function add(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { addLabels: [label] })
+    apply(events, { addLabels: [label] });
   }
 
   export function remove(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { removeLabels: [label] })
+    apply(events, { removeLabels: [label] });
   }
 
-  export function apply(events: Stores.Events.TeamEvent[], opts: {
+  // Confirm any predicted labels
+  export function confirm(events: Stores.Events.TeamEvent[]) {
+    // Only confirm if score < 1 (don't ned to confirm user labels)
+    events = _.filter(events, (e) => e.labelScores.match({
+      none: () => false,
+      some: (l) => l[0] && l[0].score < 1
+    }));
+    if (events.length > 0) {
+      apply(events, {});
+    }
+  }
+
+  function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
     _.each(eventsByTeamId, (teamEvents, teamId) => {
       applyForTeam(teamId, teamEvents, opts);
+
+      // Only fire analytics call if add/remove, not if confirming
+      if (opts.addLabels || opts.removeLabels) {
+        Analytics.track(Analytics.Trackable.EditEventLabels, {
+          numEvents: teamEvents.length,
+          teamIds: teamId
+        });
+      }
     });
   }
 
@@ -96,6 +116,9 @@ module Esper.Actions.EventLabels {
       _.remove(labels, (l) => l.id === normalized);
     });
 
+    // Predicted labels are now confirmed
+    _.each(labels, (l) => l.score = 1);
+
     return labels;
   }
 
@@ -108,10 +131,6 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      Analytics.track(Analytics.Trackable.EditEventLabels, {
-        numEvents: r.events.length,
-        teamId: r.teamId
-      });
       return Api.setPredictLabels(r.teamId, {
         set_labels: _.map(r.events, (e) => ({
           id: e.recurringEventId || e.id,

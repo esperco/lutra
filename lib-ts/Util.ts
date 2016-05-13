@@ -102,6 +102,10 @@ module Esper.Util {
       return o;
     }
 
+    if (_.isFunction(o)) {
+      return "function";
+    }
+
     var keys = _.keys(o);
     keys.sort();
 
