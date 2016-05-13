@@ -73,6 +73,20 @@
 @shade-text-muted: @gray-dark;
 @shade-text-muted-hover: @gray-darker;
 
+// Base colors for "inverted" elements (like the action bar)
+@inverse-bg: @brand-bg;
+@inverse-border: @purple-dark;
+@inverse-divider: @inverse-border;
+@inverse-text: @brand-contrast;
+@inverse-text-header: @gray-05;
+@inverse-link: @gray-05;
+@inverse-link-hover: @gray-10;
+@inverse-text-highlight: @inverse-text;
+@inverse-text-highlight-bg: @purple-dark;
+@inverse-text-muted: @gray-20;
+@inverse-text-muted-hover: @gray-40;
+
+
 //== Scaffolding
 //
 //## Settings for some of the most global styles.
@@ -448,17 +462,17 @@
 
 //=== Inverted navbar
 // Reset inverted navbar basics
-@navbar-inverse-color:                      @brand-contrast;
-@navbar-inverse-bg:                         @brand-bg;
-@navbar-inverse-border:                     darken(@navbar-inverse-bg, 10%);
+@navbar-inverse-color:                      @inverse-text;
+@navbar-inverse-bg:                         @inverse-bg;
+@navbar-inverse-border:                     @inverse-border;
 
 // Inverted navbar links
-@navbar-inverse-link-color:                 rgba(255,255,255,0.9);
-@navbar-inverse-link-hover-color:           @brand-contrast;
+@navbar-inverse-link-color:                 @inverse-link;
+@navbar-inverse-link-hover-color:           @inverse-link-hover;
 @navbar-inverse-link-hover-bg:              transparent;
 @navbar-inverse-link-active-color:          @navbar-inverse-link-hover-color;
 @navbar-inverse-link-active-bg:             darken(@navbar-inverse-bg, 10%);
-@navbar-inverse-link-disabled-color:        #444;
+@navbar-inverse-link-disabled-color:        @inverse-text-muted;
 @navbar-inverse-link-disabled-bg:           transparent;
 
 // Inverted navbar brand label

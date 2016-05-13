@@ -731,3 +731,35 @@ a.action {
     background: @input-bg;
   }
 }
+
+
+/* Misc formatting for "inverted" elements */
+.esper-inverse {
+  background: @inverse-bg;
+  color: @inverse-text;
+  border-color: @inverse-border;
+
+  label {
+    color: @inverse-text-header;
+  }
+
+  .text-muted {
+    color: @inverse-text-muted;
+  }
+
+  .modal-footer, .modal-header, hr {
+    border-color: @inverse-border;
+  }
+
+  a, .action, .esper-link {
+    color: @inverse-link;
+
+    &:hover, &:focus {
+      color: @inverse-link-hover;
+    }
+  }
+
+  input, .form-control, .dropdown-toggle {
+    background: @input-bg;
+  }
+}
