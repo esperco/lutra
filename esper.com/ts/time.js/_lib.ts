@@ -9,6 +9,7 @@
 /// <reference path="../lib/Actions.Preferences.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/ApiC.ts" />
 /// <reference path="../lib/Colors.ts" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Model.Capped.ts" />
