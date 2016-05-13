@@ -16,7 +16,6 @@ var config = {
   assetMap: {
     "img/**/*.*": "pub/img",
     "img/favicon.ico": "pub",
-    "../node_modules/bootstrap/fonts/*.*": "pub/fonts",
     "../node_modules/font-awesome/fonts/*.*": "pub/fonts"
   },
 
