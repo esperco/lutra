@@ -1,6 +1,10 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Save.ts" />
-/// <reference path="./Route.tsx" />
+/*
+  Generic header view for loggedi nu sers
+*/
+
+/// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Save.ts" />
+/// <reference path="./Route.ts" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -16,11 +20,8 @@ module Esper.Views {
 
     renderWithData() {
       var toggleId = "esper-nav-toggle";
-      var loginInfo = Login.InfoStore.val();
-      var busy = Option.cast(Login.InfoStore.metadata()).match({
-        none: () => true,
-        some: (m) => m.dataStatus !== Model.DataStatus.READY
-      });
+      var loginInfo = Login.getLoginInfo();
+      var busy = Login.getStatus() !== Model2.DataStatus.READY;
 
       return <nav
               className="navbar navbar-default navbar-shadow navbar-fixed-top">
@@ -45,20 +46,23 @@ module Esper.Views {
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
                id={this.getId(toggleId)}
                onClick={() => this.toggleCollapse()}>
-            { loginInfo ? <ul className="nav navbar-nav">
-              <NavLink href="/charts">
-                <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
-              </NavLink>
-              <NavLink href="/calendar-labeling" hiddenXs={true}>
-                <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
-              </NavLink>
-              <NavLink href="/list">
-                <i className="fa fa-fw fa-th-list"></i>{" "}Event List
-              </NavLink>
-              <NavLink href="/labels">
-                <i className="fa fa-fw fa-tags"></i>{" "}Labels
-              </NavLink>
-            </ul> : null }
+            { loginInfo.match({
+              none: () => null,
+              some: () => <ul className="nav navbar-nav">
+                <NavLink href="/charts">
+                  <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
+                </NavLink>
+                <NavLink href="/calendar-labeling" hiddenXs={true}>
+                  <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
+                </NavLink>
+                <NavLink href="/list">
+                  <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+                </NavLink>
+                <NavLink href="/labels">
+                  <i className="fa fa-fw fa-tags"></i>{" "}Labels
+                </NavLink>
+              </ul>
+            })}
 
             <div className="nav navbar-nav navbar-right">
               <div className="navbar-text hidden-xs">
