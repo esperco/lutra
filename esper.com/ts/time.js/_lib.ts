@@ -15,6 +15,7 @@
 /// <reference path="../lib/Model.Capped.ts" />
 /// <reference path="../lib/Option.ts" />
 /// <reference path="../lib/Params.ts" />
+/// <reference path="../lib/Paths.ts" />
 /// <reference path="../lib/Period.ts" />
 /// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />

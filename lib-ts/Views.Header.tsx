@@ -5,6 +5,7 @@
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Save.ts" />
 /// <reference path="./Route.ts" />
+/// <reference path="./Components.LoginInfo.tsx" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -49,16 +50,17 @@ module Esper.Views {
             { loginInfo.match({
               none: () => null,
               some: () => <ul className="nav navbar-nav">
-                <NavLink href="/charts">
+                <NavLink href={Paths.Time.charts({}).href}>
                   <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
                 </NavLink>
-                <NavLink href="/calendar-labeling" hiddenXs={true}>
+                <NavLink href={Paths.Time.calendarLabeling({}).href}
+                         hiddenXs={true}>
                   <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
                 </NavLink>
-                <NavLink href="/list">
+                <NavLink href={Paths.Time.list({}).href}>
                   <i className="fa fa-fw fa-th-list"></i>{" "}Event List
                 </NavLink>
-                <NavLink href="/labels">
+                <NavLink href={Paths.Time.labels({}).href}>
                   <i className="fa fa-fw fa-tags"></i>{" "}Labels
                 </NavLink>
               </ul>
@@ -153,7 +155,7 @@ module Esper.Views {
       return <li className={(selected ? "active" : "") +
         (this.props.hiddenXs ? " hidden-xs" : "")
       }>
-        <a href={"#!" + Route.nav.getPath(this.props.href)}>
+        <a href={this.props.href}>
           {this.props.children}
         </a>
       </li>;

@@ -32,7 +32,7 @@ module Esper.Views {
 
       return <Components.OnboardingPanel heading={Text.LabelSetupHeading}
               progress={2/3} busy={this.state.busy}
-              backPath={"#!" + Route.nav.getPath("team-setup")}
+              backPath={Paths.Time.teamSetup().href}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
           { hasExec ?

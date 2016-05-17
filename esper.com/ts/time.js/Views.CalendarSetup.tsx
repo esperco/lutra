@@ -32,7 +32,7 @@ module Esper.Views {
 
       return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
               progress={3/3} busy={busy}
-              backPath={"#!" + Route.nav.getPath("label-setup")}
+              backPath={Paths.Time.labelSetup().href}
               disableNext={disableNext}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
