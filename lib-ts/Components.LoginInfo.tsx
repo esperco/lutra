@@ -2,10 +2,10 @@
   Displays login info or link to login via Otter
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.Modal.tsx" />
-/// <reference path="../lib/Components.Dropdown.tsx" />
-/// <reference path="../lib/Login.Web.ts" />
+/// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Components.Modal.tsx" />
+/// <reference path="./Components.Dropdown.tsx" />
+/// <reference path="./Login.Web.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class

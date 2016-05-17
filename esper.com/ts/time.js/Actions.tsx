@@ -3,10 +3,6 @@
   or do other one-off or asynchronous things necessary to render a view.
 */
 
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="./Views.Header.tsx" />
-
 module Esper.Actions {
   // Set defaults for header and footer render
   export function render(main: React.ReactElement<any>,
