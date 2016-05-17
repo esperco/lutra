@@ -2,6 +2,8 @@
   Label helpers
 */
 
+/// <reference path="./Stores.Events.ts" />
+
 module Esper.Labels {
   interface LabelBase {
     id: string;        // Normalized form

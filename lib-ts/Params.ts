@@ -2,8 +2,8 @@
   Namespace for helpers that clean up querystring params and the like
 */
 
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="../lib/Stores.Teams.ts"/>
+/// <reference path="./Stores.Calendars.ts" />
+/// <reference path="./Stores.Teams.ts"/>
 
 module Esper.Params {
   /* Validation, defaults for common params */

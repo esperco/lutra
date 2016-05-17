@@ -3,6 +3,7 @@
 */
 
 /// <reference path="./Api.ts" />
+/// <reference path="./ApiC.ts" />
 /// <reference path="./Labels.ts" />
 /// <reference path="./Model2.Batch.ts" />
 /// <reference path="./Model2.ts" />
@@ -58,8 +59,8 @@ module Esper.Stores.Events {
           var labels = _.filter(e.predicted_labels,
             (l) => _.includes(team.team_labels_norm, l.label_norm));
           var topPrediction = labels[0];
-
-          if (topPrediction.score > PREDICTED_LABEL_PERCENT_CUTOFF) {
+          if (topPrediction &&
+              topPrediction.score > PREDICTED_LABEL_PERCENT_CUTOFF) {
             return Option.some([{
               id: topPrediction.label_norm,
               displayAs: topPrediction.label,
