@@ -1,10 +1,6 @@
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Login.Web.ts" />
-/// <reference path="../lib/Route.ts" />
-/// <reference path="../lib/Util.ts" />
-/// <reference path="./Actions.tsx" />
-/// <reference path="./Esper.ts" />
-
+/*
+  esper.com/time routes go here
+*/
 module Esper.Route {
 
   // Helper to require onboarding for certain pages

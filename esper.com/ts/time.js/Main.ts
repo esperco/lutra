@@ -1,10 +1,6 @@
 /// <reference path="./_lib.ts" />
 /// <reference path="./Esper.ts" />
 
-module Esper.Conf {
-  export var segmentKey: string; // Set via Dev.ts or Prod.ts
-}
-
 module Esper.Main {
   export function init() {
     if (Esper.TESTING) {
