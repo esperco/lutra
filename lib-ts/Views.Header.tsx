@@ -6,6 +6,7 @@
 /// <reference path="./Save.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
+/// <reference path="./Text.ts" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -33,7 +34,8 @@ module Esper.Views {
               onClick={this.toggleCollapse.bind(this)}
               data-toggle="collapse"
               data-target={this.getId(toggleId)}>
-              <i className={"fa " + (this.state.open ? "fa-times" : "fa-bars")} />
+              <i className={"fa " +
+                 (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
             <span className="navbar-square">
               <SaveIndicator>
@@ -93,24 +95,24 @@ module Esper.Views {
 
     loginLinks() {
       return [
-        <li key="0"><a href="#!/notification-settings">
+        <li key="0"><a href={Paths.Time.notificationSettings().href}>
           <i className="fa fa-fw fa-exchange"></i>{" "}
           Notification Settings
         </a></li>,
         <li key="1" className="divider" />,
-        <li key="2"><a href="/" target="_blank">
+        <li key="2"><a href={Paths.Landing.home().href} target="_blank">
           <i className="fa fa-fw fa-home"></i>{" "}
           Home
         </a></li>,
-        <li key="3"><a href="/contact" target="_blank">
+        <li key="3"><a href={Paths.Landing.contact().href} target="_blank">
           <i className="fa fa-fw fa-envelope"></i>{" "}
           Contact Us
         </a></li>,
-        <li key="4"><a href="/privacy-policy" target="_blank">
+        <li key="4"><a href={Paths.Landing.privacy().href} target="_blank">
           <i className="fa fa-fw fa-lock"></i>{" "}
           Privacy
         </a></li>,
-        <li key="5"><a href="/terms-of-use" target="_blank">
+        <li key="5"><a href={Paths.Landing.terms().href} target="_blank">
           <i className="fa fa-fw fa-legal"></i>{" "}
           Terms
         </a></li>,

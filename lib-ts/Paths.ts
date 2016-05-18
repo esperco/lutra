@@ -8,11 +8,17 @@ module Esper.Paths {
   export class Path {
     href: string;
 
-    constructor(public base: string, public hash: string) {
+    constructor(public base: string, public hash?: string) {
       base = base || "";
       if (base[0] !== "/") {
         base = "/" + base;
       }
+
+      if (! _.isString(hash)) {
+        this.href = base;
+        return;
+      }
+
       hash = hash || "";
       if (hash[0] !== "/") {
         hash = "/" + hash;
@@ -23,7 +29,7 @@ module Esper.Paths {
 
   // Generate path based on optional args -- stop at first falsey
   // path param
-  function optPath(base: string, main: string, ...opt: string[]): Paths.Path {
+  function optPath(base: string, main?: string, ...opt: string[]): Paths.Path {
     var i = 0;
     var ret: string[] = [];
     while (i < opt.length) {
@@ -35,7 +41,26 @@ module Esper.Paths {
       i += 1;
     }
 
-    return new Path(base, "/" + main + ret.join(""));
+    return new Path(base, main ? ("/" + main + ret.join("")) : null);
+  }
+
+  // Paths for landing page (/ root)
+  export module Landing {
+    export function home() {
+      return optPath("");
+    }
+
+    export function contact() {
+      return optPath("/contact");
+    }
+
+    export function privacy() {
+      return optPath("/privacy-policy");
+    }
+
+    export function terms() {
+      return optPath("/terms-of-use");
+    }
   }
 
 

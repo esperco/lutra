@@ -4,10 +4,6 @@
 
 module Esper.Text {
 
-  // Basics
-  export const Label = "Goal";
-  export const Labels = "Goals";
-
   // Onboarding
   export const TeamSetupHeading = "Let's Get Started";
   export const TeamSetupDescription = "Welcome to Esper! Are you managing " +
@@ -38,9 +34,6 @@ module Esper.Text {
   export const FeedbackTitle  = "Meeting Feedback"
   export const NoAttendPast   = "Didn't Attend";
   export const NoAttendFuture = "Won't Attend";
-
-  export const DefaultErrorTooltip = `There was an error connecting to the ` +
-    `server. Try refreshing or contacting us at https://esper.com/contact`;
 
   export const NoEventTitle = `Untitled Event`;
 
