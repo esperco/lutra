@@ -6,6 +6,7 @@
 /// <reference path="./Queue2.ts" />
 /// <reference path="./Save.ts" />
 /// <reference path="./Stores.Teams.ts" />
+/// <reference path="./Stores.Profiles.ts" />
 /// <reference path="./Actions.Preferences.ts" />
 
 module Esper.Actions.Teams {
@@ -27,8 +28,9 @@ module Esper.Actions.Teams {
       if (t && t.teamid) {
         Stores.Teams.set(t);
 
-        // New team => new prefs
+        // New team => new prefs and exec
         Stores.Preferences.reload();
+        Stores.Profiles.reload();
 
         /*
           If team already existed prior to creation, it's possible values

@@ -1,5 +1,8 @@
 module Esper.Text {
 
+  // Team info description
+  export const TeamInfoHeading = "General Settings";
+
   // Label actions
   export const LabelRenameDescription =
     `Rename a ${Label.toLowerCase()} across all events.`;

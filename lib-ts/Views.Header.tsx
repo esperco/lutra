@@ -62,8 +62,8 @@ module Esper.Views {
                 <NavLink href={Paths.Time.list({}).href}>
                   <i className="fa fa-fw fa-th-list"></i>{" "}Event List
                 </NavLink>
-                <NavLink href={Paths.Time.labels({}).href}>
-                  <i className="fa fa-fw fa-tags"></i>{" "}Labels
+                <NavLink href={Paths.Manage.home().href}>
+                  <i className="fa fa-fw fa-cog"></i>{" "}Settings
                 </NavLink>
               </ul>
             })}

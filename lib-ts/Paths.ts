@@ -101,10 +101,6 @@ module Esper.Paths {
       return optPath(prefix, "event");
     }
 
-    export function labels({teamId}: {teamId?: string} = {}) {
-      return optPath(prefix, "labels", teamId);
-    }
-
     export function list({teamId, calIds, interval, period}: {
       teamId?: string;
       calIds?: string;
@@ -131,6 +127,10 @@ module Esper.Paths {
   // Paths for /manage
   export module Manage {
     export const prefix = "/manage";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
 
     export function newTeam() {
       return optPath(prefix, "new-team");
