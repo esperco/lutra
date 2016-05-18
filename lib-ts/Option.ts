@@ -44,6 +44,11 @@ module Esper.Option {
         }
       });
     }
+
+    /* Join option with another option */
+    join<B, C>(o: T<B>, f?: (a: E, b: B) => T<C>) {
+      return this.flatMap((a) => o.flatMap((b) => f(a,b)));
+    }
   }
 
   export function some<E>(x : E) : T<E> {
