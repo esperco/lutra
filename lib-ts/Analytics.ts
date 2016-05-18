@@ -127,9 +127,12 @@ module Esper.Analytics {
 
   // Named pages to track
   export enum Page {
+    // esper.com/manage
+    Manage = 1,        // /#!/
+    TeamManage,        // /#!/team/...
 
     // esper.com/settings
-    Settings = 1,      // /#!/
+    Settings,          // /#!/
     TeamSettings,      // /#!/team-settings/...
     TeamCalendars,     // /#!/team-settings/.../calendars
     TeamPreferences,   // /#!/team-settings/.../preferences

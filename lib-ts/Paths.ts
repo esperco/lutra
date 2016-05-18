@@ -126,4 +126,18 @@ module Esper.Paths {
       return optPath(prefix, "team-setup");
     }
   }
+
+
+  // Paths for /manage
+  export module Manage {
+    export const prefix = "/manage";
+
+    export function newTeam() {
+      return optPath(prefix, "new-team");
+    }
+
+    export function team({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "team", teamId);
+    }
+  }
 }

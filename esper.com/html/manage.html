@@ -1,0 +1,20 @@
+{% extends "_app.html" %}
+
+{% set PAGE_NAME = "Manage" %}
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="/css/manage.css" media="screen" />
+{% endblock %}
+
+{% block postscripts %}
+  <script type="text/javascript" src="/js/manage-vendor.js"></script>
+
+  {# Optimizely should go after vendor ensure jQuery loaded #}
+  {# NB: 2016-05-02 - Disabling Optimizely since no experiment running
+    {% include "_optimizely.html" %}
+  #}
+
+  {{ super() }}
+  <script type="text/javascript" src="/js/manage.js"></script>
+{% endblock %}

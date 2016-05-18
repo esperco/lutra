@@ -7,6 +7,9 @@ module Esper.Text {
   export const Label = "Goal";
   export const Labels = "Goals";
 
+  export const TeamExec = "Principal";
+  export const TeamExecs = "Principals";
+
   // Label interface
   export const AddLabel = "Add " + Label;
   export function predictionTooltip(score: number) { // Score is 0-1
