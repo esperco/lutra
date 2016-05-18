@@ -115,11 +115,6 @@ module Esper.Route {
     });
   });
 
-  route(Paths.Time.labels({teamId: ":teamId?"}).hash,
-    checkOnboarding, function(ctx) {
-      Actions.renderLabelManage(ctx.params["teamId"]);
-    });
-
   route(Paths.Time.list({
     teamId: ":teamId?",
     calIds: ":calIds?",
