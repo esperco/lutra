@@ -39,3 +39,4 @@
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
 /// <reference path="../lib/Views.Header.tsx" />
+/// <reference path="../lib/Views.NotFound.tsx" />
