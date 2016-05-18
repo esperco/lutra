@@ -1,4 +1,5 @@
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./Paths.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 /*
   Our "404" page
@@ -16,8 +17,9 @@ module Esper.Views {
           <h2>Whoops.</h2>
           <p>
             We can't find what you're looking for. Please
-            {" "}<a href="http://esper.com/contact">contact us</a>{" "}
-            if you need help.
+            {" "}<a href={Paths.Landing.contact().href}>
+              contact us
+            </a>{" "}if you need help.
           </p>
         </div>
       </div>;

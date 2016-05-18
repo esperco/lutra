@@ -1,5 +1,6 @@
 // Helpers for client-side router
 
+/// <reference path="./Paths.ts" />
 /// <reference path="./Util.ts" />
 /// <reference path="./Login.ts" />
 
@@ -10,6 +11,40 @@ module Esper.Route {
   export function route(pattern: string, ...callbacks: PageJS.Callback[]) {
     var callbacks = preRouteHooks.concat(callbacks);
     pageJs(pattern, ...callbacks);
+  }
+
+  export function redirectHash(newPath: string): PageJS.Callback {
+    return function(ctx) {
+      nav.go(newPath, {
+        queryStr: ctx.querystring,
+        replace: true
+      });
+    }
+  }
+
+  /* Hash-paths for home and not-found pages to handle quirks */
+
+  // Home page -- distinguish between "#" (does nothing) and "#!" (home)
+  var initLoad = true;
+  export function routeHome(...callbacks: PageJS.Callback[]) {
+    pageJs("", function(ctx, next) {
+      if (initLoad || ctx.pathname.indexOf("!") >= 0) {
+        initLoad = false;
+        next();
+      }
+    }, ...callbacks);
+  }
+
+  export function routeNotFound(...callbacks: PageJS.Callback[]) {
+    route('*', function(ctx, next) {
+      // To deal with weird issue where hrefs get too many slashes prepended.
+      if (ctx.path.slice(0,2) === "//") {
+        nav.path(ctx.path.slice(1));
+      } else {
+        Log.e(ctx);
+        next();
+      }
+    }, ...callbacks);
   }
 
 
@@ -146,8 +181,8 @@ module Esper.Route {
       state?: any;
     };
 
-    // Normalize slashes and hashes
-    export function normalize(fragArg: string|string[]) {
+    // Normalize slashes and hashes in a hash
+    function normalize(fragArg: string|string[]) {
       var frag = fragArg instanceof Array ? mkPath(fragArg) : fragArg;
       if (! frag) {
         return "";
@@ -167,11 +202,27 @@ module Esper.Route {
     // Tracker for path timeout
     var pathTimeout: number;
 
-    // Navigate to a particular page
-    export function path(frag: string|string[], opts?: Opts) {
+    /* Is arg an instance of Paths.Path? */
+    function isPath(a: Paths.Path|string|string[]): a is Paths.Path {
+      return (<any> a).hasOwnProperty("base") &&
+             (<any> a).hasOwnProperty("hash");
+    }
+
+    // Navigate to a particular page -- if string or array of strings, treat
+    // as hash. Else if Path with base, go to new page
+    export function go(dest: string|string[]|Paths.Path, opts?: Opts) {
       opts = opts || {};
-      var fn = opts.replace ? pageJs.redirect : pageJs;
-      var arg = getPath(frag, opts);
+      var fn: (x: string) => void;
+      var arg: string;
+
+      if (isPath(dest)) {
+        fn = (p: string) => location.href = p;
+        arg = dest.href + getQueryStr(opts);
+      } else {
+        fn = opts.replace ? pageJs.redirect : pageJs;
+        arg = normalize(dest) + getQueryStr(opts);
+      }
+
       if (opts.delay) {
         clearTimeout(pathTimeout);
         pathTimeout = setTimeout(() => fn(arg), opts.delay);
@@ -180,17 +231,24 @@ module Esper.Route {
       }
     }
 
-    // Get path as string
-    export function getPath(frag: string|string[], opts?: Opts) {
+    // Alias for old code
+    export var path = go;
+
+    // Get hash as string
+    function getHash(frag: string|string[], opts?: Opts) {
+      return normalize(frag) + getQueryStr(opts);
+    }
+
+    function getQueryStr(opts?: Opts) {
       opts = opts || {};
       var query = opts.queryStr || (opts.jsonQuery ?
         (jsonParam + "=" + encodeURIComponent(JSON.stringify(opts.jsonQuery)))
         : null);
       if (query) { lastQuery = query; }
-      return normalize(frag) + (query ? "?" + query : "");
+      return (query ? "?" + query : "");
     }
 
-    export function mkPath(args: string[]) {
+    function mkPath(args: string[]) {
       return _.map(args, encodeURIComponent).join("/");
     }
 
@@ -230,11 +288,6 @@ module Esper.Route {
     }
 
     var refreshRequired = false;
-
-    // Get link for href
-    export function href(frag: string) {
-      return "/#!" + normalize(frag);
-    }
 
     // Is the current path active?
     export function isActive(frag: string) {

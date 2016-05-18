@@ -3,7 +3,7 @@
   part of the store in the Flux pattern (see
   https://facebook.github.io/flux/docs/overview.html for more details).
 
-  Model.Store is a base class for a basic key-value store. It stores 2-tuples
+  Model2.Store is a base class for a basic key-value store. It stores 2-tuples
   of a particular data type and metadata. Stores should registered with
   the dispatcher so they're updated when Actions are dispatched.
 
@@ -37,7 +37,7 @@ module Esper.Model2 {
 
   // Interface for the mutable parts of store metadata
   export interface StoreOpts<K> {
-    dataStatus?: Model.DataStatus,
+    dataStatus?: Model2.DataStatus,
     aliases?: K[];
     lastError?: Error;
   }
@@ -329,8 +329,8 @@ module Esper.Model2 {
           return true;
         },
         some: (d) => {
-          if (d.dataStatus !== Model.DataStatus.UNSAVED &&
-              d.dataStatus !== Model.DataStatus.INFLIGHT) {
+          if (d.dataStatus !== Model2.DataStatus.UNSAVED &&
+              d.dataStatus !== Model2.DataStatus.INFLIGHT) {
             this.set(_id, data, opts);
             return true;
           }
@@ -350,13 +350,13 @@ module Esper.Model2 {
     */
     fetch(_id: TKey, promise: JQueryPromise<Option.T<TData>>) {
       this.setSafeOpt(_id, {
-        dataStatus: Model.DataStatus.FETCHING
+        dataStatus: Model2.DataStatus.FETCHING
       });
 
       return promise.then((optData: Option.T<TData>) => {
         // On success, update store
         this.setSafe(_id, optData, {
-          dataStatus: Model.DataStatus.READY
+          dataStatus: Model2.DataStatus.READY
         });
         return optData;
 
@@ -364,7 +364,7 @@ module Esper.Model2 {
         // On failure, update store to note failure (again, don't override
         // user data)
         this.setSafe(_id, Option.none<TData>(), {
-          dataStatus: Model.DataStatus.FETCH_ERROR,
+          dataStatus: Model2.DataStatus.FETCH_ERROR,
           lastError: err
         });
         return err;
@@ -394,7 +394,7 @@ module Esper.Model2 {
 
       // Set to INFLIGHT and populate with initData (if any)
       this.set(_id, Util.some(initData, this.getData(_id)), {
-        dataStatus: Model.DataStatus.INFLIGHT
+        dataStatus: Model2.DataStatus.INFLIGHT
       });
 
       /*
@@ -404,13 +404,13 @@ module Esper.Model2 {
       */
       var canSave = () => this.get(_id).match({
         none: () => true,
-        some: (d) => d.dataStatus !== Model.DataStatus.UNSAVED
+        some: (d) => d.dataStatus !== Model2.DataStatus.UNSAVED
       });
 
       promise.then((optData: Option.T<TData>) => {
         // On success, update store
         canSave() && this.set(_id, optData, {
-          dataStatus: Model.DataStatus.READY
+          dataStatus: Model2.DataStatus.READY
         });
         return optData;
 
@@ -418,7 +418,7 @@ module Esper.Model2 {
         // On failure, update store to note failure (again, don't override
         // user data)
         canSave() && this.setOpt(_id, {
-          dataStatus: Model.DataStatus.PUSH_ERROR,
+          dataStatus: Model2.DataStatus.PUSH_ERROR,
           lastError: err
         });
         return err;

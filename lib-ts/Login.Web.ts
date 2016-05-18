@@ -5,7 +5,7 @@
 /// <reference path="./Api.ts" />
 /// <reference path="./LocalStore.ts" />
 /// <reference path="./Login.ts" />
-/// <reference path="./Model.StoreOne.ts" />
+/// <reference path="./Model2.ts" />
 /// <reference path="./Util.ts" />
 /// <reference path="./Analytics.Web.ts" />
 
@@ -59,7 +59,9 @@ module Esper.Login {
 
   var loginDeferred: JQueryDeferred<ApiT.LoginResponse> = $.Deferred();
   export var promise = loginDeferred.promise();
-  export var InfoStore = new Model.StoreOne<ApiT.LoginResponse>();
+
+  type infoKey = "";
+  export var InfoStore = new Model2.Store<infoKey, ApiT.LoginResponse>();
 
   // Used by init
   var alreadyInit = false;
@@ -99,8 +101,22 @@ module Esper.Login {
         platform: loginInfo.platform
       });
     }
-    InfoStore.set(loginInfo, { dataStatus: Model.DataStatus.READY });
+    InfoStore.set("", Option.wrap(loginInfo), {
+      dataStatus: Model2.DataStatus.READY
+    });
     Login.data = loginInfo; // Compat with legacy code
+  }
+
+  export function getLoginInfo() {
+    return InfoStore.get("")
+      .flatMap((storeData) => storeData.data);
+  }
+
+  export function getStatus() {
+    return InfoStore.get("").match({
+      none: () => Model2.DataStatus.FETCH_ERROR,
+      some: (d) => d.dataStatus
+    });
   }
 
   function onLoginSuccess(loginInfo: ApiT.LoginResponse) {

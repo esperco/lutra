@@ -1,6 +1,12 @@
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Save.ts" />
-/// <reference path="./Route.tsx" />
+/*
+  Generic header view for loggedi nu sers
+*/
+
+/// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Save.ts" />
+/// <reference path="./Route.ts" />
+/// <reference path="./Components.LoginInfo.tsx" />
+/// <reference path="./Text.ts" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -16,11 +22,8 @@ module Esper.Views {
 
     renderWithData() {
       var toggleId = "esper-nav-toggle";
-      var loginInfo = Login.InfoStore.val();
-      var busy = Option.cast(Login.InfoStore.metadata()).match({
-        none: () => true,
-        some: (m) => m.dataStatus !== Model.DataStatus.READY
-      });
+      var loginInfo = Login.getLoginInfo();
+      var busy = Login.getStatus() !== Model2.DataStatus.READY;
 
       return <nav
               className="navbar navbar-default navbar-shadow navbar-fixed-top">
@@ -31,7 +34,8 @@ module Esper.Views {
               onClick={this.toggleCollapse.bind(this)}
               data-toggle="collapse"
               data-target={this.getId(toggleId)}>
-              <i className={"fa " + (this.state.open ? "fa-times" : "fa-bars")} />
+              <i className={"fa " +
+                 (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
             <span className="navbar-square">
               <SaveIndicator>
@@ -45,20 +49,24 @@ module Esper.Views {
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
                id={this.getId(toggleId)}
                onClick={() => this.toggleCollapse()}>
-            { loginInfo ? <ul className="nav navbar-nav">
-              <NavLink href="/charts">
-                <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
-              </NavLink>
-              <NavLink href="/calendar-labeling" hiddenXs={true}>
-                <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
-              </NavLink>
-              <NavLink href="/list">
-                <i className="fa fa-fw fa-th-list"></i>{" "}Event List
-              </NavLink>
-              <NavLink href="/labels">
-                <i className="fa fa-fw fa-tags"></i>{" "}Labels
-              </NavLink>
-            </ul> : null }
+            { loginInfo.match({
+              none: () => null,
+              some: () => <ul className="nav navbar-nav">
+                <NavLink href={Paths.Time.charts({}).href}>
+                  <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
+                </NavLink>
+                <NavLink href={Paths.Time.calendarLabeling({}).href}
+                         hiddenXs={true}>
+                  <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
+                </NavLink>
+                <NavLink href={Paths.Time.list({}).href}>
+                  <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+                </NavLink>
+                <NavLink href={Paths.Time.labels({}).href}>
+                  <i className="fa fa-fw fa-tags"></i>{" "}Labels
+                </NavLink>
+              </ul>
+            })}
 
             <div className="nav navbar-nav navbar-right">
               <div className="navbar-text hidden-xs">
@@ -87,24 +95,24 @@ module Esper.Views {
 
     loginLinks() {
       return [
-        <li key="0"><a href="#!/notification-settings">
+        <li key="0"><a href={Paths.Time.notificationSettings().href}>
           <i className="fa fa-fw fa-exchange"></i>{" "}
           Notification Settings
         </a></li>,
         <li key="1" className="divider" />,
-        <li key="2"><a href="/" target="_blank">
+        <li key="2"><a href={Paths.Landing.home().href} target="_blank">
           <i className="fa fa-fw fa-home"></i>{" "}
           Home
         </a></li>,
-        <li key="3"><a href="/contact" target="_blank">
+        <li key="3"><a href={Paths.Landing.contact().href} target="_blank">
           <i className="fa fa-fw fa-envelope"></i>{" "}
           Contact Us
         </a></li>,
-        <li key="4"><a href="/privacy-policy" target="_blank">
+        <li key="4"><a href={Paths.Landing.privacy().href} target="_blank">
           <i className="fa fa-fw fa-lock"></i>{" "}
           Privacy
         </a></li>,
-        <li key="5"><a href="/terms-of-use" target="_blank">
+        <li key="5"><a href={Paths.Landing.terms().href} target="_blank">
           <i className="fa fa-fw fa-legal"></i>{" "}
           Terms
         </a></li>,
@@ -149,7 +157,7 @@ module Esper.Views {
       return <li className={(selected ? "active" : "") +
         (this.props.hiddenXs ? " hidden-xs" : "")
       }>
-        <a href={"#!" + Route.nav.getPath(this.props.href)}>
+        <a href={this.props.href}>
           {this.props.children}
         </a>
       </li>;

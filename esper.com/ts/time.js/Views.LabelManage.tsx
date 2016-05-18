@@ -260,8 +260,10 @@ module Esper.Views {
         val: t.teamid,
         display: t.team_name
       }));
-      var loginInfo = Login.InfoStore.val();
-      var isNylas = loginInfo.platform === "Nylas";
+      var isNylas = Login.getLoginInfo().match({
+        none: () => false,
+        some: (info) => info.platform === "Nylas"
+      });
       if (teamOptions.length > 1) {
         return <div className="form-group">
           <label htmlFor={this.getId("team-select")} className="control-label">

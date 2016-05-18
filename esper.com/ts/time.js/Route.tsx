@@ -1,20 +1,16 @@
-/// <reference path="../lib/Analytics.Web.ts" />
-/// <reference path="../lib/Login.Web.ts" />
-/// <reference path="../lib/Route.ts" />
-/// <reference path="../lib/Util.ts" />
-/// <reference path="./Actions.tsx" />
-/// <reference path="./Esper.ts" />
-
+/*
+  esper.com/time routes go here
+*/
 module Esper.Route {
 
   // Helper to require onboarding for certain pages
   var checkOnboarding: PageJS.Callback = function(ctx, next) {
     if (Onboarding.needsTeam()) {
-      Route.nav.path("/team-setup");
+      Route.nav.go(Paths.Time.teamSetup());
     } else if (Onboarding.needsLabels()) {
-      Route.nav.path("/label-setup");
+      Route.nav.go(Paths.Time.labelSetup());
     } else if (Onboarding.needsCalendars()) {
-      Route.nav.path("/calendar-setup");
+      Route.nav.go(Paths.Time.calendarSetup());
     } else {
       next();
     }
@@ -31,24 +27,25 @@ module Esper.Route {
     features in page.js at the moment.
   */
 
-  // Home page -- distinguish between "#" (does nothing) and "#!" (home)
-  var initLoad = true;
-  pageJs("", function(ctx) {
-    if (initLoad || ctx.pathname.indexOf("!") >= 0) {
-      initLoad = false;
-      nav.path("/charts");
-    }
-  });
+  routeHome(
+    redirectHash(
+      Paths.Time.charts().hash
+    )
+  );
 
   // Redirect stupid Techcrunch link
-  route("/labels-over-time", function(ctx) {
-    nav.path("/charts");
-  });
+  route("/labels-over-time", redirectHash(
+    Paths.Time.charts().hash
+  ));
 
   // Charts
-  route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding,
-  function(ctx) {
+  route(Paths.Time.charts({
+    chartId: ":chartId?",
+    teamId: ":teamId?",
+    calIds: ":calIds?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
     var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
@@ -64,9 +61,12 @@ module Esper.Route {
   });
 
   // Calendar labeling page
-  route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding,
-  function(ctx) {
+  route(Paths.Time.calendarLabeling({
+    teamId: ":teamId?",
+    calIds: ":calIds?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, checkOnboarding, function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "month");
@@ -78,30 +78,29 @@ module Esper.Route {
   });
 
   // Notification settings page
-  route("/notification-settings", checkOnboarding, function(ctx) {
-    var msg = Util.getParamByName("msg", ctx.querystring);
-    Actions.renderNotificationSettings(msg);
-  });
+  route(Paths.Time.notificationSettings().hash, checkOnboarding,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      Actions.renderNotificationSettings(msg);
+    });
 
   // Alias for old references to calendar-settings
-  pageJs("/calendar-settings", function(ctx) {
-    nav.path("/notification-settings?" + ctx.querystring, {
-      replace: true
-    });
-  });
+  route("/calendar-settings",
+    redirectHash(Paths.Time.notificationSettings().hash));
 
   // Page for setting up initial teams and calendars
-  route("/calendar-setup/:teamid?", function(ctx) {
-    Actions.renderCalendarSetup(ctx.params["teamid"]);
+  route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
+    Actions.renderCalendarSetup(ctx.params["teamId"]);
   });
 
   // Temp page for managing calendars (until we get separate settings page)
-  route("/calendar-manage/:teamid?", checkOnboarding, function(ctx) {
-    Actions.renderCalendarManage(ctx.params["teamid"]);
-  });
+  route(Paths.Time.calendarManage({teamId: ":teamId?"}).hash,
+    checkOnboarding, function(ctx) {
+      Actions.renderCalendarManage(ctx.params["teamid"]);
+    });
 
   // Event feedback landing page
-  route("/event", checkOnboarding, function(ctx) {
+  route(Paths.Time.event().hash, checkOnboarding, function(ctx) {
     var q = decodeURIComponent(ctx.querystring);
     /* ctx.querystring does not really contain the query of the URL.
        It is just the part of the fragment identifier after '?', i.e.,
@@ -116,13 +115,17 @@ module Esper.Route {
     });
   });
 
-  route("/labels/:teamid?", checkOnboarding, function(ctx) {
-    Actions.renderLabelManage(ctx.params["teamid"]);
-  });
+  route(Paths.Time.labels({teamId: ":teamId?"}).hash,
+    checkOnboarding, function(ctx) {
+      Actions.renderLabelManage(ctx.params["teamId"]);
+    });
 
-  route("/list/:teamId?/:calIds?/:interval?/:period?",
-    checkOnboarding,
-  function(ctx) {
+  route(Paths.Time.list({
+    teamId: ":teamId?",
+    calIds: ":calIds?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, checkOnboarding, function(ctx) {
     var q = Params.cleanFilterStrJSON(
       getJSONQuery(ctx)
     ) as Params.FilterListJSON;
@@ -139,23 +142,17 @@ module Esper.Route {
 
   /* Onboarding */
 
-  route("/team-setup", function(ctx) {
+  route(Paths.Time.teamSetup().hash, function(ctx) {
     Actions.renderTeamSetup();
   });
 
-  route("/label-setup", function(ctx) {
-    Actions.renderLabelSetup();
+  route(Paths.Time.labelSetup({teamId: ":teamId?"}).hash, function(ctx) {
+    Actions.renderLabelSetup(ctx.params["teamId"]);
   });
 
 
   // 404 page
-  route('*', function(ctx) {
-    // To deal with weird issue where hrefs get too many slashes prepended.
-    if (ctx.path.slice(0,2) === "//") {
-      nav.path(ctx.path.slice(1));
-    } else {
-      Log.e(ctx);
-      Actions.render(<Views.NotFound />);
-    }
+  routeNotFound(function(ctx) {
+    Actions.render(<Views.NotFound />);
   });
 }
