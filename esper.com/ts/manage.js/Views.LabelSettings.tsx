@@ -1,8 +1,24 @@
 /*
-  Component for displaying and managing a set of labels
+  Label settings for a given team
 */
 
-module Esper.Components {
+/// <reference path="./Views.TeamSettings.tsx" />
+
+module Esper.Views {
+
+  export class LabelSettings extends TeamSettings {
+    renderMain(team: ApiT.Team) {
+      return <div className="panel panel-default">
+        <div className="panel-body">
+          <LabelManager team={team} />
+        </div>
+      </div>;
+    }
+  }
+
+
+  /* Label manager component used in above view */
+
   interface Props {
     team: ApiT.Team;
   }
@@ -14,8 +30,7 @@ module Esper.Components {
     labelFilter?: string;
   }
 
-  export class LabelManager extends ReactHelpers.Component<Props, State>
-  {
+  class LabelManager extends ReactHelpers.Component<Props, State> {
     _editInput: HTMLInputElement;
 
     constructor(props: Props) {
@@ -253,5 +268,9 @@ module Esper.Components {
       }
     }
   }
-
 }
+
+
+
+
+

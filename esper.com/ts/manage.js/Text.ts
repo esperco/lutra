@@ -1,7 +1,8 @@
 module Esper.Text {
 
   // Team info description
-  export const TeamInfoHeading = "General Settings";
+  export const GeneralSettings = "General";
+  export const NotificationSettings = "Notifications";
 
   // Label actions
   export const LabelRenameDescription =

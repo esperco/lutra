@@ -1,8 +1,36 @@
 /*
-  Component for updating team forms -- NB: can't update e-mail yet
+  General settings page
 */
 
-module Esper.Components {
+/// <reference path="./Views.TeamSettings.tsx" />
+
+module Esper.Views {
+
+  export class GeneralSettings extends TeamSettings {
+    renderMain(team: ApiT.Team) {
+      var busy = Stores.Teams.status(this.props.teamId).match({
+        none: () => false,
+        some: (d) => d === Model2.DataStatus.INFLIGHT
+      });
+      var error = Stores.Teams.status(this.props.teamId).match({
+        none: () => true,
+        some: (d) => d === Model2.DataStatus.PUSH_ERROR
+      });
+
+      var exec = Stores.Profiles.get(team.team_executive);
+      var prefs = Stores.Preferences.get(team.teamid)
+        .flatMap((p) => Option.some(p.general));
+
+      return <TeamInfo
+        exec={exec} prefs={prefs} team={team}
+        busy={busy} error={error}
+      />;
+    }
+  }
+
+
+  /* Separate component for the team settings */
+
   interface Props {
     team: ApiT.Team;
     exec: Option.T<ApiT.Profile>;        // Exec
@@ -16,7 +44,7 @@ module Esper.Components {
   }
 
   export class TeamInfo extends ReactHelpers.Component<Props, State> {
-    _form: TeamForm;
+    _form: Components.TeamForm;
     _saveId = Util.randomString();
 
     constructor(props: Props) {
@@ -28,9 +56,6 @@ module Esper.Components {
 
     render() {
       return <div className="panel panel-default">
-        <div className="panel-heading">
-          { Text.TeamInfoHeading }
-        </div>
         <div className="panel-body">
           {
             this.props.exec.join(this.props.prefs,
@@ -38,18 +63,20 @@ module Esper.Components {
             ).match({
               none: () => <div className="esper-spinner esper-centered" />,
               some: ({exec, prefs}) =>
-                <ModalPanel busy={this.props.busy} error={this.props.error}
+                <Components.ModalPanel
+                    busy={this.props.busy}
+                    error={this.props.error}
                     success={this.state.didSave &&
                              !this.props.busy && !this.props.error}
                     onCancel={() => this.save()} cancelText="Save">
-                  <TeamForm ref={(c) => this._form = c}
+                  <Components.TeamForm ref={(c) => this._form = c}
                     name={this.props.team.team_name}
                     email={exec.email}
                     timezone={prefs.current_timezone}
                     showEmail={false}
                     onUpdate={() => this.delayedSave()}
                   />
-                </ModalPanel>
+                </Components.ModalPanel>
             })
           }
         </div>
@@ -80,3 +107,7 @@ module Esper.Components {
 
 
 }
+
+
+
+

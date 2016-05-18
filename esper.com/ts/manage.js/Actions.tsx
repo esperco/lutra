@@ -13,4 +13,28 @@ module Esper.Actions {
     }
     Layout.render(main, header, footer);
   }
+
+  export function renderGeneralSettings(teamId?: string) {
+    var teamId = Params.cleanTeamId(teamId);
+    render(<Views.GeneralSettings teamId={teamId} />);
+    Analytics.page(Analytics.Page.TeamManage);
+  }
+
+  export function renderCalendarSettings(teamId?: string) {
+    var teamId = Params.cleanTeamId(teamId);
+    render(<Views.CalendarSettings teamId={teamId} />);
+    Analytics.page(Analytics.Page.TeamManage);
+  }
+
+  export function renderLabelSettings(teamId?: string) {
+    var teamId = Params.cleanTeamId(teamId);
+    render(<Views.LabelSettings teamId={teamId} />);
+    Analytics.page(Analytics.Page.TeamManage);
+  }
+
+  export function renderNotificationSettings(teamId?: string) {
+    var teamId = Params.cleanTeamId(teamId);
+    render(<Views.NotificationSettings teamId={teamId} />);
+    Analytics.page(Analytics.Page.TeamManage);
+  }
 }

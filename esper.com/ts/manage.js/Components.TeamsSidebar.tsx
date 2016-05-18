@@ -25,7 +25,7 @@ module Esper.Components {
         <a className={classNames({
           active: team.teamid === this.props.activeTeamId
         })}
-        href={Paths.Manage.team({teamId: team.teamid}).href}>
+        href={Paths.Manage.general({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-user" />{" "}
           { team.team_name }
         </a>
