@@ -27,7 +27,6 @@ module Esper.Route {
     features in page.js at the moment.
   */
 
-  // Home page -- distinguish between "#" (does nothing) and "#!" (home)
   routeHome(
     redirectHash(
       Paths.Time.charts().hash
