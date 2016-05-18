@@ -4,14 +4,15 @@
 
 module Esper.Text {
   // Basics
-  export const Label = "Goal";
-  export const Labels = "Goals";
+  export const Label = "goal";
+  export const Labels = "goals";
 
-  export const TeamExec = "Principal";
-  export const TeamExecs = "Principals";
+  export const TeamExec = "principal";
+  export const TeamExecs = "principals";
 
   // Label interface
-  export const AddLabel = "Add " + Label;
+  export const AddLabel = "add " + Label;
+  export const FindAddLabels = "find / add " + Labels;
   export function predictionTooltip(score: number) { // Score is 0-1
     return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +
            `${Label.toLowerCase()} is applicable to this event`;

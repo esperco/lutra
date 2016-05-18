@@ -21,7 +21,7 @@ module Esper.Components {
     }
 
     renderTeam(team: ApiT.Team) {
-      return <li>
+      return <li key={team.teamid}>
         <a className={classNames({
           active: team.teamid === this.props.activeTeamId
         })}
