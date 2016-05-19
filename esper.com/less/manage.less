@@ -1,0 +1,38 @@
+@import "./lib/_bootstrap-variables";
+@import "./lib/_dropdown-modal";
+@import "./lib/_expando";
+@import "./lib/_new-labels-form";
+@import "./lib/_timezone-selector";
+@import "./lib/_helpers";
+
+/* Project-specific imports */
+@import "./_loading";
+@import "./_header";
+@import "./_footer";
+
+#esper-main {
+  padding: @navbar-height 0;
+  min-height: 50%;
+
+  > .container:first-child {
+    margin-top: @navbar-margin-bottom;
+  }
+}
+
+.team-settings-page {
+  @media screen and (min-width: @screen-sm-min) {
+    .panel {
+       max-width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+
+  .settings-menu {
+    text-align: center;
+  }
+
+  .alert {
+    text-align: center;
+  }
+}

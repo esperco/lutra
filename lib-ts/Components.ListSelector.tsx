@@ -3,27 +3,27 @@
   by a category, badges, and custom icons.
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Components.Badge.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
-  interface ListSelectorProps {
-    groups: Group[];
-    selectedIds: SelectedIds[]; // Id of list choice
-
+  interface ListSelectorBaseProps {
     selectOption?: ListSelectOptions;
     selectedIcon?: string;    // Font-awesome icon
     unselectedIcon?: string;  // Font-awesome icon
 
-    // Classes
     listClasses?: string;
     itemClasses?: string;
     headerClasses?: string;
     dividerClasses?: string;
     selectedItemClasses?: string;
+  }
 
+  interface ListSelectorProps extends ListSelectorBaseProps {
+    groups: Group[];
+    selectedIds: SelectedIds[]; // Id of list choice
     updateFn: (selectedIds: SelectedIds[]) => void;
   }
 
@@ -156,8 +156,48 @@ module Esper.Components {
 
     isSelected(groupId: string, id: string) {
       return !!_.find(this.props.selectedIds,
-        (s) => s.groupId === groupId && s.id === id
+        (s) => (s.groupId || "") === groupId && s.id === id
       );
     }
+  }
+
+
+  /* Variant of the above, with no groups */
+
+  interface ListSelectorSimpleProps extends ListSelectorBaseProps {
+    choices: ListChoice[];
+    selectedIds: string[]; // Subset of chocies
+
+    updateFn: (ids: string[]) => void;
+  }
+
+  export function ListSelectorSimple(props: ListSelectorSimpleProps) {
+    var selectedIds = _.map(props.selectedIds, (s) => ({
+      groupId: "",
+      id: s
+    }));
+
+    // Ignore groupId here
+    var updateFn =
+      (ids: SelectedIds[]) => props.updateFn(_.map(ids, (i) => i.id))
+
+    return <ListSelector
+      groups={[{
+        id: "",
+        choices: props.choices
+      }]}
+      selectedIds={selectedIds}
+      updateFn={updateFn}
+
+      selectOption={props.selectOption}
+      selectedIcon={props.selectedIcon}
+      unselectedIcon={props.unselectedIcon}
+
+      listClasses={props.listClasses}
+      itemClasses={props.itemClasses}
+      headerClasses={props.headerClasses}
+      dividerClasses={props.dividerClasses}
+      selectedItemClasses={props.selectedItemClasses}
+    />;
   }
 }

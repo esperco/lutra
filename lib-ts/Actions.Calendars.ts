@@ -23,13 +23,17 @@ module Esper.Actions.Calendars {
   export function add(teamId: string, cal: ApiT.GenericCalendar) {
     var calendars = cloneCalList(teamId);
     calendars.push(_.cloneDeep(cal));
-    queueUpdate(teamId, calendars);
+    update(teamId, calendars);
   }
 
   export function remove(teamId: string, cal: ApiT.GenericCalendar) {
     var calendars = cloneCalList(teamId);
     _.remove(calendars, (c) => c.id === cal.id);
-    queueUpdate(teamId, calendars);
+    update(teamId, calendars);
+  }
+
+  export function update(teamId: string, cals: ApiT.GenericCalendar[]) {
+    queueUpdate(teamId, cals);
   }
 
   // Update a single calendar's prefs

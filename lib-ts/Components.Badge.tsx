@@ -2,7 +2,7 @@
   Badge used in ListSelector
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
   interface BadgeProps {

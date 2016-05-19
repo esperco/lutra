@@ -2,7 +2,7 @@
   Component for toggling left sidebar
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
   export class SidebarWithToggle extends ReactHelpers.Component<{

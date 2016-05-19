@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noImplicitReturns": false,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "react",
+    "outFile": "manage.js"
+  },
+
+  "devOnly": [
+    "../lib/JasmineStub.ts"
+  ],
+
+  "prodOnly": [
+
+  ]
+}

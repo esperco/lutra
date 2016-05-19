@@ -11,8 +11,13 @@ module Esper.Stores.Calendars {
     calId: string;
   }
 
-  // Store list of calendars by teamId
+  // Store list of *selected* calendars by teamId
   export var ListStore =
+    new Model2.Store<string, ApiT.GenericCalendar[]>();
+
+  // Store list of calendars available for each team id -- used primarily
+  // in settings page and onboarding
+  export var AvailableStore =
     new Model2.Store<string, ApiT.GenericCalendar[]>();
 
 
@@ -34,6 +39,21 @@ module Esper.Stores.Calendars {
           _.find(calList, (cal) => cal && cal.id === calId)
         )
       );
+  }
+
+  export function listAvailable(teamId: string)
+    : Option.T<ApiT.GenericCalendar[]>
+  {
+    return AvailableStore.get(teamId)
+      .flatMap((storeData) => storeData.data);
+  }
+
+  export function fetchAvailable(teamId: string, force=false) {
+    if (force || listAvailable(teamId).isNone()) {
+      var apiP = Api.getGenericCalendarList(teamId)
+        .then((calList) => Option.wrap(calList.calendars))
+      AvailableStore.fetch(teamId, apiP);
+    }
   }
 
   // Like get, but throw an error if not found

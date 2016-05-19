@@ -13,7 +13,7 @@ module Esper.Route {
     pageJs(pattern, ...callbacks);
   }
 
-  export function redirectHash(newPath: string): PageJS.Callback {
+  export function redirectPath(newPath: Paths.Path): PageJS.Callback {
     return function(ctx) {
       nav.go(newPath, {
         queryStr: ctx.querystring,
@@ -27,7 +27,7 @@ module Esper.Route {
   // Home page -- distinguish between "#" (does nothing) and "#!" (home)
   var initLoad = true;
   export function routeHome(...callbacks: PageJS.Callback[]) {
-    pageJs("", function(ctx, next) {
+    route("", function(ctx, next) {
       if (initLoad || ctx.pathname.indexOf("!") >= 0) {
         initLoad = false;
         next();
@@ -151,9 +151,12 @@ module Esper.Route {
   //////
 
   // Use to set base path
-  export function setBase(base: string) {
-    pageJs.base(base);
+  export function setBase(b: string) {
+    pageJs.base(b);
+    base = b;
   }
+
+  export var base = "";
 
   // Turn on router
   export function init() {
@@ -216,8 +219,13 @@ module Esper.Route {
       var arg: string;
 
       if (isPath(dest)) {
-        fn = (p: string) => location.href = p;
-        arg = dest.href + getQueryStr(opts);
+        if (dest.base !== base) {
+          fn = (p: string) => location.href = p;
+          arg = dest.href + getQueryStr(opts);
+        } else {
+          fn = opts.replace ? pageJs.redirect : pageJs;
+          arg = normalize(dest.hash) + getQueryStr(opts);
+        }
       } else {
         fn = opts.replace ? pageJs.redirect : pageJs;
         arg = normalize(dest) + getQueryStr(opts);

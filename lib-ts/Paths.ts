@@ -89,20 +89,8 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function notificationSettings({}: {} = {}) {
-      return optPath(prefix, "notification-settings");
-    }
-
-    export function calendarManage({teamId}: {teamId?: string} = {}) {
-      return optPath(prefix, "calendar-manage", teamId);
-    }
-
     export function event({}: {} = {}) {
       return optPath(prefix, "event");
-    }
-
-    export function labels({teamId}: {teamId?: string} = {}) {
-      return optPath(prefix, "labels", teamId);
     }
 
     export function list({teamId, calIds, interval, period}: {
@@ -124,6 +112,36 @@ module Esper.Paths {
 
     export function teamSetup({}: {} = {}) {
       return optPath(prefix, "team-setup");
+    }
+  }
+
+
+  // Paths for /manage
+  export module Manage {
+    export const prefix = "/manage";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
+
+    export function newTeam() {
+      return optPath(prefix, "new-team");
+    }
+
+    export function general({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "general", teamId);
+    }
+
+    export function labels({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "labels", teamId);
+    }
+
+    export function calendars({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "calendars", teamId);
+    }
+
+    export function notifications({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "notifications", teamId);
     }
   }
 }

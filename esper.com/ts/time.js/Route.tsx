@@ -28,15 +28,13 @@ module Esper.Route {
   */
 
   routeHome(
-    redirectHash(
-      Paths.Time.charts().hash
-    )
+    redirectPath(Paths.Time.charts())
   );
 
   // Redirect stupid Techcrunch link
-  route("/labels-over-time", redirectHash(
-    Paths.Time.charts().hash
-  ));
+  route("/labels-over-time",
+    redirectPath(Paths.Time.charts())
+  );
 
   // Charts
   route(Paths.Time.charts({
@@ -77,27 +75,19 @@ module Esper.Route {
     })), period);
   });
 
-  // Notification settings page
-  route(Paths.Time.notificationSettings().hash, checkOnboarding,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      Actions.renderNotificationSettings(msg);
-    });
-
   // Alias for old references to calendar-settings
-  route("/calendar-settings",
-    redirectHash(Paths.Time.notificationSettings().hash));
+  route("/calendar-settings", redirectPath(Paths.Manage.notifications()));
+  route("/notification-settings", redirectPath(Paths.Manage.notifications()));
+
 
   // Page for setting up initial teams and calendars
   route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
     Actions.renderCalendarSetup(ctx.params["teamId"]);
   });
 
-  // Temp page for managing calendars (until we get separate settings page)
-  route(Paths.Time.calendarManage({teamId: ":teamId?"}).hash,
-    checkOnboarding, function(ctx) {
-      Actions.renderCalendarManage(ctx.params["teamid"]);
-    });
+  // Redirect old settings pages
+  route("/labels", redirectPath(Paths.Manage.labels()));
+  route("/calendar-manage", redirectPath(Paths.Manage.calendars()));
 
   // Event feedback landing page
   route(Paths.Time.event().hash, checkOnboarding, function(ctx) {
@@ -114,11 +104,6 @@ module Esper.Route {
       action  : Util.getParamByName("action", q)
     });
   });
-
-  route(Paths.Time.labels({teamId: ":teamId?"}).hash,
-    checkOnboarding, function(ctx) {
-      Actions.renderLabelManage(ctx.params["teamId"]);
-    });
 
   route(Paths.Time.list({
     teamId: ":teamId?",

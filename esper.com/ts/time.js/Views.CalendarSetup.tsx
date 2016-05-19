@@ -2,10 +2,6 @@
   View to have new users select calendar
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Actions.Calendars.ts" />
-/// <reference path="../lib/Stores.Teams.ts" />
-
 module Esper.Views {
 
   interface Props {
@@ -27,8 +23,11 @@ module Esper.Views {
         })
       );
 
-      // Make ApiC calls here so they're registered by tracker
-      _.each(Stores.Teams.allIds(), (_id) => availableCalendars(_id));
+      // Call render form here so it's tracked by view's tracking system
+      var calendarsForTeam: {[index: string]: JSX.Element} = {};
+      _.each(Stores.Teams.all(), (t) => {
+        calendarsForTeam[t.teamid] = this.renderCalendarForm(t);
+      });
 
       return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
               progress={3/3} busy={busy}
@@ -44,7 +43,7 @@ module Esper.Views {
         <Components.OnboardingTeams
           teams={Stores.Teams.all()}
           initOpenId={this.props.teamId}
-          renderFn={(t) => this.renderCalendarForm(t)}
+          renderFn={(t) => calendarsForTeam[t.teamid]}
           onAddTeam={() => Route.nav.path("team-setup")}
         />
 
@@ -56,134 +55,27 @@ module Esper.Views {
     }
 
     renderCalendarForm(team: ApiT.Team) {
-      return <CalendarList
-        calendarListId={team.teamid}
-        team={team}
-        calendarStatus={availableCalendarsStatus(team.teamid)}
-        selectedCalendars={selectedCalendars(team.teamid)}
-        availableCalendars={availableCalendars(team.teamid)}
-      />;
+      return Stores.Calendars.listAvailable(team.teamid).join(
+        Stores.Calendars.list(team.teamid),
+        (available, selected) => Option.cast({
+          available: available, selected: selected
+        })
+      ).match({
+        none: () => <div className="esper-spinner esper-centered" />,
+        some: ({available, selected}) =>
+          <Components.CalendarList
+            team={team}
+            availableCalendars={available}
+            selectedCalendars={selected}
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+            selectedItemClasses="active"
+          />
+      });
     }
 
     onNext() {
       Route.nav.path("charts");
-    }
-  }
-
-
-  //////
-
-  function selectedCalendars(teamId: string) {
-    return Stores.Calendars.list(teamId).match({
-      none: (): ApiT.GenericCalendar[] => [],
-      some: (list) => list
-    })
-  }
-
-  function availableCalendars(teamId: string) {
-    return Option.cast(calStore.val(calKey(teamId))).match({
-      none: (): ApiT.GenericCalendar[] => [],
-      some: (c) => c.calendars
-    });
-  }
-
-  function availableCalendarsStatus(teamId: string) {
-    return Option.cast(calStore.metadata(calKey(teamId))).match({
-      none: () => Model.DataStatus.FETCHING,
-      some: (m) => m.dataStatus
-    });
-  }
-
-  function calKey(teamId: string) {
-    return ApiC.getGenericCalendarList.strFunc([teamId]);
-  }
-  var calStore = ApiC.getGenericCalendarList.store;
-
-
-  /////
-
-  class CalendarList extends ReactHelpers.Component<{
-    calendarListId: string;
-    team: ApiT.Team;
-    calendarStatus: Model.DataStatus;
-    selectedCalendars: ApiT.GenericCalendar[];
-    availableCalendars: ApiT.GenericCalendar[];
-  }, {}> {
-
-    render() {
-      var status = this.props.calendarStatus;
-      if (status === Model.DataStatus.FETCH_ERROR ||
-          status === Model.DataStatus.PUSH_ERROR) {
-        return <Components.ErrorMsg />;
-      }
-
-      else if (status !== Model.DataStatus.READY &&
-               status !== Model.DataStatus.UNSAVED)
-      {
-        return <div className="esper-spinner esper-centered esper-medium" />;
-      }
-
-      var calendars = this.props.availableCalendars;
-      var teamApproved = this.props.team.team_approved &&
-        !!this.props.team.team_calendars.length;
-      var isExec = Login.myUid() === this.props.team.team_executive;
-
-      return <div className="calendar-list">
-        { (Login.usesNylas() && !isExec && !teamApproved) ?
-
-          // Not approved or no calendars shared
-          <div className="esper-no-content">
-            Waiting for calendar owner to grant access.
-          </div> :
-
-          // Approved (or not Nylas)
-          <div>
-            { calendars && calendars.length ?
-              // Calendars
-              <div className="esper-select-menu">
-                { _.map(calendars, (c) => this.renderCalendar(c)) }
-              </div> :
-
-              // No calendars
-              <div className="esper-no-content">
-                No calendars found.{" "}
-                { Login.usesNylas() ?
-                  <span>
-                    It may take a few minutes for your calendar provider
-                    to sync with Esper. Please try{" "}
-                    <a onClick={() => location.reload()}>
-                      refreshing the page
-                    </a>
-                    {" "}in a few minutes.
-                  </span> : null }
-              </div>
-            }
-          </div>
-        }
-      </div>;
-    }
-
-    renderCalendar(cal: ApiT.GenericCalendar) {
-      var selected = !!_.find(this.props.selectedCalendars,
-        (c) => c.id === cal.id
-      );
-      return <a key={cal.id}
-              onClick={() => this.toggleCalendar(cal, !selected)}
-              className={classNames("esper-selectable", {
-                "active": selected
-              })}>
-        <i className={"fa fa-fw " + (selected ?
-                      "fa-calendar-check-o" : "fa-calendar-o")} />{" "}
-        {cal.title}
-      </a>;
-    }
-
-    toggleCalendar(cal: ApiT.GenericCalendar, selected: boolean) {
-      if (selected) {
-        Actions.Calendars.add(this.props.calendarListId, cal);
-      } else {
-        Actions.Calendars.remove(this.props.calendarListId, cal);
-      }
     }
   }
 }
