@@ -94,15 +94,15 @@ module Esper.Test {
       }
     }
 
-    for (var name in ApiC) {
-      if (ApiC.hasOwnProperty(name) &&
-          (<any> ApiC)[name].orig instanceof Function) {
-        if (! isSpy((<any> ApiC)[name].orig)) {
-          spySafe((<any> ApiC)[name], "orig").and
-            .returnValue($.Deferred<any>().promise());
-        }
-      }
-    }
+    // for (var name in ApiC) {
+    //   if (ApiC.hasOwnProperty(name) &&
+    //       (<any> ApiC)[name].orig instanceof Function) {
+    //     if (! isSpy((<any> ApiC)[name].orig)) {
+    //       spySafe((<any> ApiC)[name], "orig").and
+    //         .returnValue($.Deferred<any>().promise());
+    //     }
+    //   }
+    // }
   }
 
   // Returns true if something has already been spied upon -- uses undocumented

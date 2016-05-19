@@ -16,7 +16,6 @@
   more specific to track API calls.
 */
 
-/// <reference path="./Model.ts" />
 /// <reference path="./Model2.ts" />
 
 module Esper.Save {
@@ -73,8 +72,8 @@ module Esper.Save {
   }
   export var Emitter = new SaveEmitter();
 
-  export function monitor<K>(store: Model.Store<any>, key: string,
-                             promise: JQueryPromise<any>): void;
+  // export function monitor<K>(store: Model.Store<any>, key: string,
+  //                            promise: JQueryPromise<any>): void;
   export function monitor<K>(store: Model2.Store<K, any>, key: K,
                              promise: JQueryPromise<any>): void;
   export function monitor(store: Emit.EmitBase, key: any,
@@ -92,7 +91,7 @@ module Esper.Save {
 
   /////
 
-  Model.registerPushCallback(monitor);
+  // Model.registerPushCallback(monitor);
   Model2.registerPushCallback(monitor);
 
 

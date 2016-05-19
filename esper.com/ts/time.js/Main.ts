@@ -3,10 +3,10 @@
 
 module Esper.Main {
   export function init() {
+    Route.setBase("/time");
     if (Esper.TESTING) {
-      Route.setBase("/test-time");
+      pageJs.base("/test-time");
     } else {
-      Route.setBase("/time");
       initAll();
       Route.init();
     }

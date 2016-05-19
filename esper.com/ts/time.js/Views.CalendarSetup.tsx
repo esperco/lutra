@@ -19,7 +19,7 @@ module Esper.Views {
       var busy =  !!_.find(Stores.Teams.allIds(), (_id) =>
         Stores.Calendars.ListStore.get(_id).match({
           none: () => false,
-          some: (data) => data.dataStatus === Model.DataStatus.INFLIGHT
+          some: (data) => data.dataStatus === Model2.DataStatus.INFLIGHT
         })
       );
 

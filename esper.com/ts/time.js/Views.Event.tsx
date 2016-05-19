@@ -36,12 +36,12 @@ module Esper.Views {
     }
 
     renderContent(eventData: Stores.Events.EventData) {
-      var busy = eventData.dataStatus === Model.DataStatus.FETCHING
+      var busy = eventData.dataStatus === Model2.DataStatus.FETCHING
       if (busy) {
         return <div className="esper-spinner esper-centered esper-medium" />;
       }
 
-      var error = eventData.dataStatus === Model.DataStatus.FETCH_ERROR;
+      var error = eventData.dataStatus === Model2.DataStatus.FETCH_ERROR;
       if (error || eventData.data.isNone()) {
         return <Components.ErrorMsg />;
       }

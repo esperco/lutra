@@ -297,7 +297,7 @@ module Esper.Stores.Events {
           calId: calId,
           date: new Date(2016, 0, 2)
         }, {
-          dataStatus: Model.DataStatus.FETCH_ERROR
+          dataStatus: Model2.DataStatus.FETCH_ERROR
         });
         expect(getVal().hasError).toBeTruthy();
       });
@@ -308,7 +308,7 @@ module Esper.Stores.Events {
           calId: calId,
           date: new Date(2016, 0, 2)
         }, {
-          dataStatus: Model.DataStatus.FETCHING
+          dataStatus: Model2.DataStatus.FETCHING
         });
         expect(getVal().isBusy).toBeTruthy();
       });
