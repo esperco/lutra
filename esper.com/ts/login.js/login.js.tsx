@@ -5,6 +5,8 @@
 /// <reference path="./Components.Login.tsx" />
 /// <reference path="./Views.ApproveTeam.tsx" />
 /// <reference path="./Token.ts" />
+/// <reference path="./LoginMsg.ts" />
+/// <reference path="./ErrMsg.ts" />
 
 module Esper {
   // Where to redirect
@@ -15,8 +17,8 @@ module Esper {
     showSpinner();
 
     var uid = Util.getParamByName(Login.uidParam);
-    var message = Util.getParamByName(Login.messageParam);
-    var error = Util.getParamByName(Login.errorParam);
+    var message = LoginMsg.get(Util.getParamByName(Login.messageParam));
+    var error = ErrMsg.get(Util.getParamByName(Login.errorParam));
     var extLogin = Util.getParamByName(Login.extParam);
     var token = Util.getParamByName(Login.tokenParam);
     var platform = Util.getParamByName(Login.platformParam).toLowerCase();
