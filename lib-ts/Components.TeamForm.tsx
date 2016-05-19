@@ -10,6 +10,7 @@
 module Esper.Components {
   interface Props extends Actions.Teams.ExecTeamData {
     showEmail?: boolean;
+    editableEmail?: boolean;
     onUpdate?: () => void;
   }
 
@@ -25,6 +26,18 @@ module Esper.Components {
         email: props.email,
         timezone: props.timezone
       };
+    }
+
+    // Reset state on prop change
+    componentWillReceiveProps(props: Props) {
+      super.componentWillReceiveProps(props);
+      if (! _.isEqual(this.props, props)) {
+         this.state = {
+          name: props.name,
+          email: props.email,
+          timezone: props.timezone
+        };
+      }
     }
 
     render() {
@@ -51,10 +64,13 @@ module Esper.Components {
               Email
             </label>
             <div className="col-md-10">
-              <input id={this.getId("email") } type="email" name="email"
-                     className="form-control" placeholder="tony@stark.com"
-                     onChange={(e) => this.onEmailInputChange(e)}
-                     value={this.state.email} />
+              { this.props.editableEmail ?
+                <input id={this.getId("email") } type="email" name="email"
+                       className="form-control" placeholder="tony@stark.com"
+                       onChange={(e) => this.onEmailInputChange(e)}
+                       value={this.state.email} /> :
+                <span className="esper-input-align">{ this.state.email }</span>
+              }
             </div>
           </div> : null
         }
@@ -103,7 +119,7 @@ module Esper.Components {
     // Ref the component and call this to get values
     validate(): Option.T<Actions.Teams.ExecTeamData>
     {
-      if (this.props.showEmail &&
+      if (this.props.showEmail && this.props.editableEmail &&
           !Util.validateEmailAddress(this.state.email)) {
         this.mutateState((s) => s.emailError = true);
         return Option.none<Actions.Teams.ExecTeamData>();

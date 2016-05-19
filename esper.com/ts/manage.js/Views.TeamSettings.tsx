@@ -10,6 +10,8 @@ module Esper.Views {
   }
 
   export abstract class TeamSettings extends ReactHelpers.Component<Props, {}> {
+    pathFn: (p: {teamId: string}) => Paths.Path;
+
     renderWithData() {
       var team = Stores.Teams.require(this.props.teamId);
       if (! team) return <span />;
@@ -18,10 +20,14 @@ module Esper.Views {
         <Components.TeamsSidebar
           activeTeamId={this.props.teamId}
           teams={Stores.Teams.all()}
+          pathFn={this.pathFn}
         />
 
         <div className="esper-right-content padded">
-          <Components.SettingsMenu teamId={this.props.teamId} />
+          <Components.SettingsMenu
+            teamId={this.props.teamId}
+            pathFn={this.pathFn}
+          />
           <div className="esper-expanded">
             { this.renderMain(team) }
           </div>

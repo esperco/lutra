@@ -10,7 +10,7 @@ module Esper.Route {
   );
 
   route(Paths.Manage.newTeam().hash, function() {
-    // TODO
+    Actions.renderNewTeam();
   });
 
   route(Paths.Manage.general({teamId: ":teamId?"}).hash, function(ctx) {

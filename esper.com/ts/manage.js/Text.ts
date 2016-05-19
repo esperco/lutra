@@ -4,6 +4,16 @@ module Esper.Text {
   export const GeneralSettings = "General";
   export const NotificationSettings = "Notifications";
 
+  // Add team
+  export const AddTeamLink = `New ${TeamExec}`;
+  export const AddTeamHeading = "Who are you managing time for?";
+
+  // Remove team
+  export const RemoveTeamBtn = "Deactivate";
+  export function removeTeamDescription(person?: string) {
+    return `Deactivate Esper for ${person || "this " + TeamExec}?`;
+  }
+
   // Label actions
   export const LabelRenameDescription =
     `Rename a ${Label.toLowerCase()} across all events.`;
@@ -18,7 +28,7 @@ module Esper.Text {
   export const CalendarSettingsSelfDescription =
     "Which calendars do you want connect to Esper?"
   export const CalendarSettingsExecDescription =
-    "Pick which calendars Esper should use for each person you're supporting.";
+    "Pick which calendars Esper should use for the person you're supporting.";
 
   // Notification Settings
   export const GeneralPrefsHeading = "Other Subscriptions";
