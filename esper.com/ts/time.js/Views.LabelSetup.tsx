@@ -75,7 +75,7 @@ module Esper.Views {
         }
       });
 
-      if (badTeamIds) {
+      if (badTeamIds.length) {
         if (this._onboardingExpandos) {
           this._onboardingExpandos.openTeams(badTeamIds, true);
         }
