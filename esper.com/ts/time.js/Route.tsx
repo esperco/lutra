@@ -85,11 +85,9 @@ module Esper.Route {
     Actions.renderCalendarSetup(ctx.params["teamId"]);
   });
 
-  // Temp page for managing calendars (until we get separate settings page)
-  route(Paths.Time.calendarManage({teamId: ":teamId?"}).hash,
-    checkOnboarding, function(ctx) {
-      Actions.renderCalendarManage(ctx.params["teamid"]);
-    });
+  // Redirect old settings pages
+  route("/labels", redirectPath(Paths.Manage.labels()));
+  route("/calendar-manage", redirectPath(Paths.Manage.calendars()));
 
   // Event feedback landing page
   route(Paths.Time.event().hash, checkOnboarding, function(ctx) {

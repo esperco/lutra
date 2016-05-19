@@ -89,10 +89,6 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function calendarManage({teamId}: {teamId?: string} = {}) {
-      return optPath(prefix, "calendar-manage", teamId);
-    }
-
     export function event({}: {} = {}) {
       return optPath(prefix, "event");
     }
