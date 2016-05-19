@@ -1,5 +1,5 @@
 /*
-  Generic header view for loggedi nu sers
+  Generic header view for logged in users
 */
 
 /// <reference path="./ReactHelpers.ts" />
@@ -39,6 +39,8 @@ module Esper.Views {
       var loginInfo = Login.getLoginInfo();
       var busy = Login.getStatus() !== Model2.DataStatus.READY;
 
+      var hasTeams = Stores.Teams.all().length > 0;
+
       return <nav
               className="navbar navbar-default navbar-shadow navbar-fixed-top">
         <div className="container-fluid padded">
@@ -51,11 +53,16 @@ module Esper.Views {
               <i className={"fa " +
                  (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
-            <span className="navbar-square">
+            <span className={hasTeams ? "navbar-square" : ""}>
               <SaveIndicator>
                 <a className="navbar-brand lg" href="#!/">
                   <img alt="Esper" src="/img/esper-logo-purple.svg" />
                 </a>
+                { hasTeams ? null :
+                  <a href="/" className="navbar-brand word-mark hidden-xs">
+                    <img className="logo-name" src="img/word-mark.svg" />
+                  </a>
+                }
               </SaveIndicator>
             </span>
           </div>
@@ -63,7 +70,7 @@ module Esper.Views {
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
                id={this.getId(toggleId)}
                onClick={() => this.toggleCollapse()}>
-            { loginInfo.match({
+            { hasTeams ? loginInfo.match({
               none: () => null,
               some: () => <ul className="nav navbar-nav">
                 <NavLink href={Paths.Time.charts({}).href}
@@ -84,7 +91,7 @@ module Esper.Views {
                   <i className="fa fa-fw fa-cog"></i>{" "}Settings
                 </NavLink>
               </ul>
-            })}
+            }) : null}
 
             <div className="nav navbar-nav navbar-right">
               <div className="navbar-text hidden-xs">
