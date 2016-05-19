@@ -7,6 +7,9 @@ module Esper.Text {
   export const Label = "goal";
   export const Labels = "goals";
 
+  export const Calendar = "calendar";
+  export const Calendars = "calendars";
+
   export const TeamExec = "principal";
   export const TeamExecs = "principals";
 

@@ -2,17 +2,6 @@
   Component for selecting a calendar + team combo
 */
 
-/// <reference path="../lib/ApiT.ts" />
-/// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
-/// <reference path="../lib/Components.Selector.tsx" />
-/// <reference path="../lib/Layout.tsx" />
-/// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="./Esper.ts" />
-/// <reference path="./Onboarding.ts" />
-/// <reference path="./Components.ListSelector.tsx" />
-
 module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
