@@ -6,9 +6,7 @@ module Esper.Route {
   declare var pageJs: PageJS.Static;
 
   routeHome(
-    redirectHash(
-      Paths.Manage.general().hash
-    )
+    redirectPath(Paths.Manage.general())
   );
 
   route(Paths.Manage.newTeam().hash, function() {

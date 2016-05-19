@@ -13,7 +13,7 @@ module Esper.Route {
     pageJs(pattern, ...callbacks);
   }
 
-  export function redirectHash(newPath: string): PageJS.Callback {
+  export function redirectPath(newPath: Paths.Path): PageJS.Callback {
     return function(ctx) {
       nav.go(newPath, {
         queryStr: ctx.querystring,

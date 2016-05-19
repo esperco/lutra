@@ -28,15 +28,13 @@ module Esper.Route {
   */
 
   routeHome(
-    redirectHash(
-      Paths.Time.charts().hash
-    )
+    redirectPath(Paths.Time.charts())
   );
 
   // Redirect stupid Techcrunch link
-  route("/labels-over-time", redirectHash(
-    Paths.Time.charts().hash
-  ));
+  route("/labels-over-time",
+    redirectPath(Paths.Time.charts())
+  );
 
   // Charts
   route(Paths.Time.charts({
@@ -78,8 +76,9 @@ module Esper.Route {
   });
 
   // Alias for old references to calendar-settings
-  route("/calendar-settings",
-    redirectHash(Paths.Time.notificationSettings().hash));
+  route("/calendar-settings", redirectPath(Paths.Manage.notifications()));
+  route("/notification-settings", redirectPath(Paths.Manage.notifications()));
+
 
   // Page for setting up initial teams and calendars
   route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
