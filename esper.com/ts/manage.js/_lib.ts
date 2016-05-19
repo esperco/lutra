@@ -19,6 +19,7 @@
 /// <reference path="../lib/Text.ts" />
 /// <reference path="../lib/Util.ts" />
 
+/// <reference path="../lib/Components.CalendarList.tsx" />
 /// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />

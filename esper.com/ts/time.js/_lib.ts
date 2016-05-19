@@ -27,10 +27,12 @@
 /// <reference path="../lib/Text.ts" />
 /// <reference path="../lib/Util.ts" />
 
+/// <reference path="../lib/Components.Badge.tsx" />
 /// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.LabelList.tsx" />
+/// <reference path="../lib/Components.ListSelector.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
