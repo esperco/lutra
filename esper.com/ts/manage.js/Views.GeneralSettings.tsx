@@ -21,10 +21,14 @@ module Esper.Views {
       var prefs = Stores.Preferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
-      return <TeamInfo
-        exec={exec} prefs={prefs} team={team}
-        busy={busy} error={error}
-      />;
+      return <div>
+        <TeamInfo
+          exec={exec} prefs={prefs} team={team}
+          busy={busy} error={error}
+        />
+
+        <RemoveTeam team={team} />
+      </div>;
     }
   }
 
@@ -73,7 +77,8 @@ module Esper.Views {
                     name={this.props.team.team_name}
                     email={exec.email}
                     timezone={prefs.current_timezone}
-                    showEmail={false}
+                    showEmail={true}
+                    editableEmail={false}
                     onUpdate={() => this.delayedSave()}
                   />
                 </Components.ModalPanel>
@@ -106,6 +111,26 @@ module Esper.Views {
   }
 
 
+  /* Deactivate Account = really just remove calendars */
+
+  export function RemoveTeam({team} : {team: ApiT.Team}) {
+    return <div className="panel panel-default">
+      <div className="panel-body clearfix">
+        <span className="control-label esper-input-align">
+          { Text.removeTeamDescription(team.team_name) }
+        </span>
+        <button className="pull-right btn btn-danger"
+          onClick={() => removeTeam(team)}>
+          { Text.RemoveTeamBtn }
+        </button>
+      </div>
+    </div>;
+  }
+
+  function removeTeam(team: ApiT.Team) {
+    Actions.Teams.removeTeam(team.teamid);
+    Route.nav.go(Paths.Manage.general());
+  }
 }
 
 

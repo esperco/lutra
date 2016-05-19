@@ -4,6 +4,12 @@ module Esper.Text {
   export const GeneralSettings = "General";
   export const NotificationSettings = "Notifications";
 
+  // Remove team
+  export const RemoveTeamBtn = "Deactivate";
+  export function removeTeamDescription(person?: string) {
+    return `Deactivate Esper for ${person || "this " + TeamExec}?`;
+  }
+
   // Label actions
   export const LabelRenameDescription =
     `Rename a ${Label.toLowerCase()} across all events.`;
