@@ -18,7 +18,7 @@ module Esper.Main {
     Colors.init();
     Login.init();
     Login.promise.done(function() {
-      ApiC.getAllProfiles();
+      Stores.Profiles.init();
       Stores.Preferences.init();
     });
   }

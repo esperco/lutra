@@ -3,10 +3,10 @@
 */
 
 /// <reference path="./Api.ts" />
-/// <reference path="./ApiC.ts" />
 /// <reference path="./Labels.ts" />
 /// <reference path="./Model2.Batch.ts" />
 /// <reference path="./Model2.ts" />
+/// <reference path="./Stores.Profiles.ts" />
 /// <reference path="./Stores.Teams.ts" />
 /// <reference path="./XDate.ts" />
 /// <reference path="./Period.ts" />
@@ -424,14 +424,7 @@ module Esper.Stores.Events {
     var execId = Stores.Teams.require(event.teamId).team_executive;
 
     // Need profiles to get exec email
-    var store = ApiC.getAllProfiles.store;
-    var key = ApiC.getAllProfiles.strFunc([]);
-    var optEmails = Option.cast(store.val(key))
-      .flatMap((profiles) =>
-        Option.wrap(_.find(profiles.profile_list,
-          (p) => p.profile_uid === execId)
-        )
-      )
+    var optEmails = Stores.Profiles.get(execId)
       .flatMap((execProfile) => Option.some(
         [execProfile.email].concat(execProfile.other_emails || [])
       ));
