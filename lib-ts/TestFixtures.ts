@@ -5,7 +5,6 @@
 /// <reference path="./Login.Web.ts" />
 /// <reference path="./Test.ts" />
 /// <reference path="./Api.ts" />
-/// <reference path="./ApiC.ts" />
 /// <reference path="./Stores.Calendars.ts" />
 /// <reference path="./Stores.Teams.ts" />
 
@@ -64,6 +63,10 @@ module Esper.TestFixtures {
     Stores.Events.EventsForDateStore.removeAllChangeListeners();
     Stores.Events.EventStore.reset();
     Stores.Events.EventStore.removeAllChangeListeners();
+    Stores.Preferences.PrefsStore.reset();
+    Stores.Preferences.PrefsStore.removeAllChangeListeners();
+    Stores.Profiles.ProfileStore.reset();
+    Stores.Profiles.ProfileStore.removeAllChangeListeners();
   }
 
   export function getLoginInfo(): ApiT.LoginResponse {
@@ -242,10 +245,10 @@ module Esper.TestFixtures {
   }
 
   export function mockProfiles(add?: ProfileOpts[]) {
-    var store = ApiC.getAllProfiles.store;
-    var key = ApiC.getAllProfiles.strFunc([]);
-    Test.spySafe(ApiC.getAllProfiles.store, "val")
-      .and.returnValue(getProfileList(add));
+    Stores.Profiles.ProfileStore.reset();
+    _.each(getProfileList(add).profile_list, (p) =>
+      Stores.Profiles.ProfileStore.set(p.profile_uid, Option.some(p))
+    );
   }
 
   export function getProfileList(add?: ProfileOpts[]): ApiT.ProfileList {
