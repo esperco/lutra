@@ -141,7 +141,8 @@ module Esper.Components {
       { props.showUnlabeled ? <div className="divider" /> : null }
 
       <div className="esper-select-menu">
-        <a className="esper-selectable" href="#!/labels">
+        <a className="esper-selectable"
+           href={Paths.Manage.labels().href}>
           <i className="fa fa-fw fa-bars" />{" "}
           Manage Labels
         </a>
