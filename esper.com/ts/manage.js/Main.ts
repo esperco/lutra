@@ -7,13 +7,9 @@ declare module Esper {
 
 module Esper.Main {
   export function init() {
-    if (Esper.TESTING) {
-      Route.setBase("/test-manage");
-    } else {
-      Route.setBase("/manage");
-      initAll();
-      Route.init();
-    }
+    Route.setBase("/manage");
+    initAll();
+    Route.init();
   }
 
   export function initAll() {
