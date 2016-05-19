@@ -4,6 +4,10 @@ module Esper.Text {
   export const GeneralSettings = "General";
   export const NotificationSettings = "Notifications";
 
+  // Add team
+  export const AddTeamLink = `New ${TeamExec}`;
+  export const AddTeamHeading = "Who are you managing time for?";
+
   // Remove team
   export const RemoveTeamBtn = "Deactivate";
   export function removeTeamDescription(person?: string) {

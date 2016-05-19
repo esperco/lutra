@@ -4,7 +4,7 @@
 module Esper.Components {
 
   interface Props {
-    activeTeamId: string;
+    activeTeamId?: string;
     teams: ApiT.Team[];
   }
 
@@ -16,6 +16,16 @@ module Esper.Components {
         </label>
         <ul className="esper-select-menu">
           { _.map(this.props.teams, (t) => this.renderTeam(t))}
+          <li className="divider" />
+          <li>
+            <a className={classNames({
+              active: !this.props.activeTeamId
+            })}
+            href={Paths.Manage.newTeam().href}>
+              <i className="fa fa-fw fa-user-plus" />{" "}
+              { Text.AddTeamLink }
+            </a>
+          </li>
         </ul>
       </Components.SidebarWithToggle>;
     }

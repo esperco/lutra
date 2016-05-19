@@ -40,4 +40,9 @@ module Esper.Actions {
     render(<Views.NotificationSettings teamId={teamId} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
+
+  export function renderNewTeam() {
+    render(<Views.NewTeam />);
+    Analytics.page(Analytics.Page.NewTeam);
+  }
 }
