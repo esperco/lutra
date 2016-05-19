@@ -118,7 +118,7 @@ module Esper.Actions {
     render(<Views.Charts
       currentChart={chart}
       chartTypes={chartInfo}
-    />);
+    />, <Views.Header active={Views.Header_.Tab.Charts} />);
 
     trackChart(chartVariant);
   }
