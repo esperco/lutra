@@ -7,6 +7,8 @@
 module Esper.Views {
 
   export class LabelSettings extends TeamSettings {
+    pathFn = Paths.Manage.labels;
+
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">
         <div className="panel-body">

@@ -5,6 +5,7 @@ module Esper.Components {
 
   interface Props {
     activeTeamId?: string;
+    pathFn?: (p: {teamId: string}) => Paths.Path;
     teams: ApiT.Team[];
   }
 
@@ -31,11 +32,14 @@ module Esper.Components {
     }
 
     renderTeam(team: ApiT.Team) {
+      // Use pathFn to preserve current settings "tab" when switching teams
+      var pathFn = this.props.pathFn || Paths.Manage.general;
+
       return <li key={team.teamid}>
         <a className={classNames({
           active: team.teamid === this.props.activeTeamId
         })}
-        href={Paths.Manage.general({teamId: team.teamid}).href}>
+        href={pathFn({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-user" />{" "}
           { team.team_name }
         </a>

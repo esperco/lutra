@@ -7,6 +7,8 @@
 module Esper.Views {
 
   export class NotificationSettings extends TeamSettings {
+    pathFn = Paths.Manage.notifications;
+
     renderMain(team: ApiT.Team) {
       var teamId = team.teamid;
       var calendars = Stores.Calendars.list(teamId).match({

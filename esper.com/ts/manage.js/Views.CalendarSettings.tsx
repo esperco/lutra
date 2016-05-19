@@ -7,10 +7,12 @@
 module Esper.Views {
 
   export class CalendarSettings extends TeamSettings {
+    pathFn = Paths.Manage.calendars;
+
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">
         <div className="panel-body">
-          <div className="alert alert-info">
+          <div className="alert alert-info text-center">
             { team.team_executive === Login.myUid() ?
               Text.CalendarSettingsSelfDescription :
               Text.CalendarSettingsExecDescription }
@@ -18,7 +20,7 @@ module Esper.Views {
 
           { this.renderCalendarList(team) }
 
-          <div className="alert">
+          <div className="alert text-center">
             Can't find the calendar you're looking for? Please
             {" "}<a href={Paths.Landing.contact().href}>contact us</a>{" "}
             for help.

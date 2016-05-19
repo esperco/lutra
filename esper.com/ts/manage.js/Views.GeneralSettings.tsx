@@ -7,6 +7,8 @@
 module Esper.Views {
 
   export class GeneralSettings extends TeamSettings {
+    pathFn = Paths.Manage.general;
+
     renderMain(team: ApiT.Team) {
       var busy = Stores.Teams.status(this.props.teamId).match({
         none: () => false,
