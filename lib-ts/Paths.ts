@@ -136,8 +136,20 @@ module Esper.Paths {
       return optPath(prefix, "new-team");
     }
 
-    export function team({teamId} : {teamId?: string} = {}) {
-      return optPath(prefix, "team", teamId);
+    export function general({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "general", teamId);
+    }
+
+    export function labels({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "labels", teamId);
+    }
+
+    export function calendars({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "calendars", teamId);
+    }
+
+    export function notifications({teamId} : {teamId?: string} = {}) {
+      return optPath(prefix, "notifications", teamId);
     }
   }
 }

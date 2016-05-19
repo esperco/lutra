@@ -14,4 +14,9 @@ module Esper.Text {
     `Delete a ${Label.toLowerCase()} to ` +
     `permanently remove it from all charts and events.`
 
+  // Calendaring
+  export const CalendarSettingsSelfDescription =
+    "Which calendars do you want connect to Esper?"
+  export const CalendarSettingsExecDescription =
+    "Pick which calendars Esper should use for each person you're supporting.";
 }

@@ -128,8 +128,12 @@ module Esper.Analytics {
   // Named pages to track
   export enum Page {
     // esper.com/manage
-    Manage = 1,        // /#!/
-    TeamManage,        // /#!/team/...
+    Manage = 1,            // /#!/
+    TeamManage,            // /#!/general/...
+    LabelManagement,       // /#!/labels/...
+    CalendarManage,        // /#!/calendars/...
+    NotificationSettings,  // /#!/notifications/...
+    NewTeam,               // /#!/new-team/...
 
     // esper.com/settings
     Settings,          // /#!/
@@ -144,13 +148,10 @@ module Esper.Analytics {
     TimeStats,             // /#!/
     TimeStatsCharts,       // /#!/charts
     CalendarLabeling,      // /#!/calendar-labeling
-    CalendarManage,        // /#!/calendar-manage
     CalendarSetup,         // /#!/calendar-setup
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
-    LabelManagement,       // /#!/labels
     LabelSetup,            // /#!/label-setup
-    NotificationSettings,  // /#!/notification-settings
     TeamSetup              // /#!/team-setup
   }
 

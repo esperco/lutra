@@ -22,7 +22,10 @@ module Esper.Actions {
 
   export function renderCalendarSettings(teamId?: string) {
     var teamId = Params.cleanTeamId(teamId);
+
+    Stores.Calendars.fetchAvailable(teamId);
     render(<Views.CalendarSettings teamId={teamId} />);
+
     Analytics.page(Analytics.Page.TeamManage);
   }
 
