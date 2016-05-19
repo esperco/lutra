@@ -19,4 +19,13 @@ module Esper.Text {
     "Which calendars do you want connect to Esper?"
   export const CalendarSettingsExecDescription =
     "Pick which calendars Esper should use for each person you're supporting.";
+
+  // Notification Settings
+  export const GeneralPrefsHeading = "Other Subscriptions";
+  export const SendFeedbackEmail = "Email requesting meeting feedback";
+  export const SendLabelReminder =
+    "Weekly email reminding me to label calendar events";
+  export const SendDailyAgenda = "Daily agenda email";
+  export const SendFeedbackSummary =
+    "Daily meeting feedback summary email";
 }

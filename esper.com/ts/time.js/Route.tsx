@@ -77,13 +77,6 @@ module Esper.Route {
     })), period);
   });
 
-  // Notification settings page
-  route(Paths.Time.notificationSettings().hash, checkOnboarding,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      Actions.renderNotificationSettings(msg);
-    });
-
   // Alias for old references to calendar-settings
   route("/calendar-settings",
     redirectHash(Paths.Time.notificationSettings().hash));

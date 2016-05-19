@@ -89,10 +89,6 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function notificationSettings({}: {} = {}) {
-      return optPath(prefix, "notification-settings");
-    }
-
     export function calendarManage({teamId}: {teamId?: string} = {}) {
       return optPath(prefix, "calendar-manage", teamId);
     }

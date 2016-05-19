@@ -95,29 +95,24 @@ module Esper.Views {
 
     loginLinks() {
       return [
-        <li key="0"><a href={Paths.Time.notificationSettings().href}>
-          <i className="fa fa-fw fa-exchange"></i>{" "}
-          Notification Settings
-        </a></li>,
-        <li key="1" className="divider" />,
-        <li key="2"><a href={Paths.Landing.home().href} target="_blank">
+        <li key="0"><a href={Paths.Landing.home().href} target="_blank">
           <i className="fa fa-fw fa-home"></i>{" "}
           Home
         </a></li>,
-        <li key="3"><a href={Paths.Landing.contact().href} target="_blank">
+        <li key="1"><a href={Paths.Landing.contact().href} target="_blank">
           <i className="fa fa-fw fa-envelope"></i>{" "}
           Contact Us
         </a></li>,
-        <li key="4"><a href={Paths.Landing.privacy().href} target="_blank">
+        <li key="2"><a href={Paths.Landing.privacy().href} target="_blank">
           <i className="fa fa-fw fa-lock"></i>{" "}
           Privacy
         </a></li>,
-        <li key="5"><a href={Paths.Landing.terms().href} target="_blank">
+        <li key="3"><a href={Paths.Landing.terms().href} target="_blank">
           <i className="fa fa-fw fa-legal"></i>{" "}
           Terms
         </a></li>,
-        <li key="6" className="divider" />,
-        <li key="7"><a onClick={() => Login.goToLogout()}>
+        <li key="4" className="divider" />,
+        <li key="5"><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
           Log out
           <span className="visible-xs-inline">
