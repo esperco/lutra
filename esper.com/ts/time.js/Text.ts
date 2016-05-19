@@ -37,6 +37,10 @@ module Esper.Text {
 
   export const NoEventTitle = `Untitled Event`;
 
+  // Selector text
+  export const AllLabels = `All ` + _.capitalize(Labels);
+  export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
+  export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 
   /////
 

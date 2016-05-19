@@ -102,7 +102,7 @@ module Esper.Charts {
       if (this.showUnlabeled()) {
         _.each(durations, (d, x) =>
           series[x].data.push({
-            name: "Unlabeled Events",
+            name: Text.Unlabeled,
             color: Colors.lightGray,
             x: x,
             y: EventStats.toHours(

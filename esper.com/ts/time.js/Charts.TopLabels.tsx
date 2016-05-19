@@ -91,7 +91,7 @@ module Esper.Charts {
       if (this.showUnlabeled()) {
         _.each(this.durationsByLabel, (d) =>
           series.push({
-            name: "Unlabeled Events",
+            name: Text.Unlabeled,
             cursor: "pointer",
             color: (
               _.isEqual(d.period, this.params.period) ?
@@ -106,7 +106,7 @@ module Esper.Charts {
             }))
           })
         );
-        categories.push("Unlabeled Events");
+        categories.push(Text.Unlabeled);
       }
 
       return <Components.Highchart opts={{

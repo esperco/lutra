@@ -89,7 +89,7 @@ module Esper.Charts {
         <div className="esper-menu-section">
           <div className="esper-subheader">
             <i className="fa fa-fw fa-tags" />{" "}
-            Labels
+            { Text.Labels }
           </div>
           <Components.LabelSelector labels={this.allLabels}
             totalCount={displayTotal}
