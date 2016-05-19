@@ -20,6 +20,7 @@ module Esper.Components {
     render() {
       return <TeamForm ref={(c) => this._form = c}
         name="" email="" timezone="" showEmail={this.props.supportsExec}
+        editableEmail={this.props.supportsExec}
       />
     }
 
