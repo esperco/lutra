@@ -146,7 +146,7 @@ module Esper.Views {
         this.setState(newState);
 
         $.when.apply($, promises)
-          .done(() => Route.nav.path("label-setup"))
+          .done(() => Route.nav.go(Paths.Time.calendarSetup()))
           .fail(() => {
             let newState = _.clone(this.state);
             newState.busy = false;

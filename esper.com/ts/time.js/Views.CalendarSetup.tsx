@@ -12,8 +12,6 @@ module Esper.Views {
 
   export class CalendarSetup extends ReactHelpers.Component<Props, State> {
     renderWithData() {
-      var disableNext = !_.find(Stores.Teams.all(),
-        (t) => t.team_timestats_calendars.length);
       var hasExec = !!_.find(Stores.Teams.all(),
         (t) => t.team_executive !== Login.myUid());
       var busy =  !!_.find(Stores.Teams.allIds(), (_id) =>
@@ -31,8 +29,7 @@ module Esper.Views {
 
       return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
               progress={3/3} busy={busy}
-              backPath={Paths.Time.labelSetup().href}
-              disableNext={disableNext}
+              backPath={Paths.Time.teamSetup().href}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
           { hasExec ?
@@ -44,7 +41,7 @@ module Esper.Views {
           teams={Stores.Teams.all()}
           initOpenId={this.props.teamId}
           renderFn={(t) => calendarsForTeam[t.teamid]}
-          onAddTeam={() => Route.nav.path("team-setup")}
+          onAddTeam={() => Route.nav.go(Paths.Time.teamSetup())}
         />
 
         <div className="alert">
@@ -75,7 +72,7 @@ module Esper.Views {
     }
 
     onNext() {
-      Route.nav.path("charts");
+      Route.nav.go(Paths.Time.labelSetup());
     }
   }
 }
