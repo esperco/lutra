@@ -21,6 +21,12 @@ module Esper.Text {
            `${Label.toLowerCase()} is applicable to this event`;
   }
 
+  // Calendar List
+  export const NoCalendarError =
+    "Please wait until calendars are available.";
+  export const MustSelectCalendar =
+    "Please select at least one calendar";
+
   export const DefaultErrorTooltip = `There was an error connecting to the ` +
     `server. Try refreshing or contacting us at https://esper.com/contact`;
 }

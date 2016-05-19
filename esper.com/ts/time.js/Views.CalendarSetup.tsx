@@ -11,6 +11,14 @@ module Esper.Views {
   interface State {  }
 
   export class CalendarSetup extends ReactHelpers.Component<Props, State> {
+    _onboardingExpandos: Components.OnboardingTeams;
+    _teamForms: { [index: string]: Components.CalendarList }
+
+    constructor(props: Props) {
+      super(props);
+      this._teamForms = {};
+    }
+
     renderWithData() {
       var hasExec = !!_.find(Stores.Teams.all(),
         (t) => t.team_executive !== Login.myUid());
@@ -28,6 +36,7 @@ module Esper.Views {
       });
 
       return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
+
               progress={3/3} busy={busy}
               backPath={Paths.Time.teamSetup().href}
               onNext={() => this.onNext()}>
@@ -38,6 +47,7 @@ module Esper.Views {
         </div>
 
         <Components.OnboardingTeams
+          ref={(c) => this._onboardingExpandos = c}
           teams={Stores.Teams.all()}
           initOpenId={this.props.teamId}
           renderFn={(t) => calendarsForTeam[t.teamid]}
@@ -61,6 +71,7 @@ module Esper.Views {
         none: () => <div className="esper-spinner esper-centered" />,
         some: ({available, selected}) =>
           <Components.CalendarList
+            ref={(c) => this._teamForms[team.teamid] = c}
             team={team}
             availableCalendars={available}
             selectedCalendars={selected}
@@ -72,7 +83,21 @@ module Esper.Views {
     }
 
     onNext() {
-      Route.nav.go(Paths.Time.labelSetup());
+      var badTeamIds: string[] = [];
+
+      _.each(this._teamForms, (f, _id) => {
+        if (f) {
+          if (f.validate().isNone()) {
+            badTeamIds.push(_id);
+          }
+        }
+      });
+
+      if (badTeamIds.length) {
+        this._onboardingExpandos.openTeams(badTeamIds, true);
+      } else {
+        Route.nav.go(Paths.Time.labelSetup());
+      }
     }
   }
 }
