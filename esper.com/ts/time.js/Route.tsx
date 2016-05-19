@@ -7,11 +7,15 @@ module Esper.Route {
   var checkOnboarding: PageJS.Callback = function(ctx, next) {
     if (Onboarding.needsTeam()) {
       Route.nav.go(Paths.Time.teamSetup());
-    } else if (Onboarding.needsLabels()) {
-      Route.nav.go(Paths.Time.labelSetup());
-    } else if (Onboarding.needsCalendars()) {
-      Route.nav.go(Paths.Time.calendarSetup());
-    } else {
+    }
+
+    // else if (Onboarding.needsLabels()) {
+    //   Route.nav.go(Paths.Time.labelSetup());
+    // } else if (Onboarding.needsCalendars()) {
+    //   Route.nav.go(Paths.Time.calendarSetup());
+    // }
+
+    else {
       next();
     }
   }
@@ -31,11 +35,6 @@ module Esper.Route {
     redirectPath(Paths.Time.charts())
   );
 
-  // Redirect stupid Techcrunch link
-  route("/labels-over-time",
-    redirectPath(Paths.Time.charts())
-  );
-
   // Charts
   route(Paths.Time.charts({
     chartId: ":chartId?",
@@ -43,7 +42,7 @@ module Esper.Route {
     calIds: ":calIds?",
     interval: ":interval?",
     period: ":period?"
-  }).hash, function(ctx) {
+  }).hash, checkOnboarding, function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
     var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
@@ -74,20 +73,6 @@ module Esper.Route {
       calId: calId
     })), period);
   });
-
-  // Alias for old references to calendar-settings
-  route("/calendar-settings", redirectPath(Paths.Manage.notifications()));
-  route("/notification-settings", redirectPath(Paths.Manage.notifications()));
-
-
-  // Page for setting up initial teams and calendars
-  route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
-    Actions.renderCalendarSetup(ctx.params["teamId"]);
-  });
-
-  // Redirect old settings pages
-  route("/labels", redirectPath(Paths.Manage.labels()));
-  route("/calendar-manage", redirectPath(Paths.Manage.calendars()));
 
   // Event feedback landing page
   route(Paths.Time.event().hash, checkOnboarding, function(ctx) {
@@ -125,15 +110,36 @@ module Esper.Route {
     }, q)
   });
 
+
   /* Onboarding */
 
   route(Paths.Time.teamSetup().hash, function(ctx) {
     Actions.renderTeamSetup();
   });
 
+  route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
+    Actions.renderCalendarSetup(ctx.params["teamId"]);
+  });
+
   route(Paths.Time.labelSetup({teamId: ":teamId?"}).hash, function(ctx) {
     Actions.renderLabelSetup(ctx.params["teamId"]);
   });
+
+
+  /////
+
+  // Redirect stupid Techcrunch link
+  route("/labels-over-time",
+    redirectPath(Paths.Time.charts())
+  );
+
+  // Alias for old references to calendar-settings
+  route("/calendar-settings", redirectPath(Paths.Manage.notifications()));
+  route("/notification-settings", redirectPath(Paths.Manage.notifications()));
+
+  // Redirect old settings pages
+  route("/labels", redirectPath(Paths.Manage.labels()));
+  route("/calendar-manage", redirectPath(Paths.Manage.calendars()));
 
 
   // 404 page
