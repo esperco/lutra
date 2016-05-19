@@ -109,7 +109,7 @@ module Esper.Views {
             "fa-calendar-o": !active,
             "fa-calendar-check-o": active
           })} />{" "}
-          { c.title }
+          { c.title || <span className="esper-placeholder" /> }
         </div>
       })
     }</div>;
