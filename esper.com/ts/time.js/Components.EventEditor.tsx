@@ -145,9 +145,9 @@ module Esper.Components {
     render() {
       var event = this.props.event;
       var status = this.props.status;
-      var busy = status === Model.DataStatus.INFLIGHT;
-      var error = status === Model.DataStatus.FETCH_ERROR ||
-                  status === Model.DataStatus.PUSH_ERROR;
+      var busy = status === Model2.DataStatus.INFLIGHT;
+      var error = status === Model2.DataStatus.FETCH_ERROR ||
+                  status === Model2.DataStatus.PUSH_ERROR;
       var hasChanges = this.state.notes !== event.feedback.notes;
       var disableOk = busy || !hasChanges;
       var success = !busy && !hasChanges && (

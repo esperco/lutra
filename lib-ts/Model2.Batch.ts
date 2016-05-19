@@ -11,7 +11,7 @@ module Esper.Model2 {
 
   export interface BatchResults<ItemKey, ItemData> {
     data: Option.T<StoreData<ItemKey, ItemData>[]>;
-    dataStatus?: Model.DataStatus;
+    dataStatus?: Model2.DataStatus;
   }
 
   export interface BatchStoreData<BatchKey, ItemKey, ItemData> extends

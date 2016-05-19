@@ -89,12 +89,12 @@ module Esper.Components {
       var events = this.getEvents();
 
       var error = !!_.find(props.eventData, (data) =>
-        data.dataStatus === Model.DataStatus.PUSH_ERROR ||
-        data.dataStatus === Model.DataStatus.FETCH_ERROR
+        data.dataStatus === Model2.DataStatus.PUSH_ERROR ||
+        data.dataStatus === Model2.DataStatus.FETCH_ERROR
       );
 
       var busy = !!_.find(props.eventData, (data) =>
-        data.dataStatus === Model.DataStatus.INFLIGHT
+        data.dataStatus === Model2.DataStatus.INFLIGHT
       );
       var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
 

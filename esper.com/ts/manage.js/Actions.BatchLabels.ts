@@ -34,7 +34,7 @@ module Esper.Actions.BatchLabels {
   export function getStatus(teamId: string) {
     return Store.get(teamId)
       .match({
-        none: () => Model.DataStatus.READY,
+        none: () => Model2.DataStatus.READY,
         some: (m) => m.dataStatus
       });
   }

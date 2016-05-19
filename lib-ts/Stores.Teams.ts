@@ -36,7 +36,7 @@ module Esper.Stores.Teams {
       none: (): ApiT.Team => {
         Log.e("Teams.require called with non-existent team - " + teamId);
         TeamStore.setSafe(teamId, Option.none<ApiT.Team>(), {
-          dataStatus: Model.DataStatus.PUSH_ERROR
+          dataStatus: Model2.DataStatus.PUSH_ERROR
         });
         return null;
       },
