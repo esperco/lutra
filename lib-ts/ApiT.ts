@@ -459,6 +459,7 @@ module Esper.ApiT {
     meeting_types: MeetingTypes;
     email_types: EmailTypes;
     label_reminder?: SimpleEmailPref;
+    slack_address?: SlackAddress;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
@@ -467,7 +468,6 @@ module Esper.ApiT {
   export interface CalendarPrefs {
     email_for_meeting_feedback?: boolean;
     slack_for_meeting_feedback?: boolean;
-    slack_address_for_meeting_feedback?: SlackAddress;
     add_to_daily_agenda: boolean;
   }
 

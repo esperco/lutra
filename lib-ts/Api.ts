@@ -311,11 +311,10 @@ module Esper.Api {
   }
 
   /***** Slack *****/
-  export function getSlackAuthInfo(teamid: string, calid: string):
+  export function getSlackAuthInfo(teamid: string):
   JQueryPromise<ApiT.SlackAuthInfo> {
     var url = prefix + "/api/slack/auth-info/" + string(Login.me())
-            + "/" + encodeURIComponent(string(teamid))
-            + "/" + encodeURIComponent(string(calid));
+            + "/" + encodeURIComponent(string(teamid));
     return JsonHttp.get(url);
   }
 
