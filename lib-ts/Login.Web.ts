@@ -127,7 +127,7 @@ module Esper.Login {
     })
 
     if (needApproval(loginInfo)) {
-      goToLogin({error: "For security reasons, please log in again."});
+      goToLogin({error: "login_again"});
       return;
     } else {
       setLoginInfo(loginInfo);
@@ -138,7 +138,7 @@ module Esper.Login {
 
   function onLoginFailure(err?: Error) {
     Log.e(err);
-    goToLogin({error: "There was an error logging you in. Please try again."});
+    goToLogin({error: "login_error"});
   }
 
   // Check if there are unapproved teams that exec user needs to approve
