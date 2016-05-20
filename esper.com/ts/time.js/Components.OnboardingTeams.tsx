@@ -13,6 +13,13 @@ module Esper.Components {
   }
 
   export class OnboardingTeams extends ReactHelpers.Component<Props, {}> {
+    _teamExpandos: { [index: string]: Components.Expando }
+
+    constructor(props: Props) {
+      super(props);
+      this._teamExpandos = {};
+    }
+
     render() {
       return <div>
         { _.map(this.props.teams, (t) =>
@@ -22,6 +29,7 @@ module Esper.Components {
               <i className="fa fa-fw fa-close" />
             </span>
             <Components.Expando
+              ref={(c) => this._teamExpandos[t.teamid] = c}
               initOpen={t.teamid === this.props.initOpenId}
               header={<div className="esper-subheader">
                 <i className="fa fa-fw fa-user" />
@@ -43,6 +51,23 @@ module Esper.Components {
         </div>
       </div>;
     }
-  }
 
+    // Open epxpandos for a given teamid
+    openTeams(teamIds: string[], closeOther=false) {
+      if (closeOther) {
+        _.each(this._teamExpandos, (expando) => {
+          if (expando) {
+            expando.close();
+          }
+        });
+      }
+
+      _.each(teamIds, (_id) => {
+        var expando = this._teamExpandos[_id];
+        if (expando) {
+          expando.open();
+        }
+      });
+    }
+  }
 }

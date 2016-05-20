@@ -69,15 +69,15 @@ module Esper.Actions {
   }, {
     id: "labels-bar",
     icon: "fa-tags",
-    displayAs: "Label Hours"
+    displayAs: _.capitalize(Text.Label) + " Hours"
   }, {
     id: "labels-stack",
     icon: "fa-tags",
-    displayAs: "Label Percentages"
+    displayAs: _.capitalize(Text.Label) + " Percentages"
   }, {
     id: "labels-pie",
     icon: "fa-tags",
-    displayAs: "Label Pie Chart"
+    displayAs: _.capitalize(Text.Label) + " Pie Chart"
   }, {
     id: "top-guests",
     icon: "fa-users",
@@ -118,7 +118,7 @@ module Esper.Actions {
     render(<Views.Charts
       currentChart={chart}
       chartTypes={chartInfo}
-    />);
+    />, <Views.Header active={Views.Header_.Tab.Charts} />);
 
     trackChart(chartVariant);
   }

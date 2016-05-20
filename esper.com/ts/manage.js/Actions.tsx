@@ -9,7 +9,7 @@ module Esper.Actions {
                          header?: React.ReactElement<any>,
                          footer?: React.ReactElement<any>) {
     if (header !== null) { // Null => intentionally blank
-      header = header || <Views.Header />;
+      header = header || <Views.Header active={Views.Header_.Tab.Manage} />;
     }
     Layout.render(main, header, footer);
   }

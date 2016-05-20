@@ -70,7 +70,7 @@ module Esper.Charts {
 
       if (this.showUnlabeled() && this.durationsByLabel.none.length) {
         data.push({
-          name: "Unlabeled Events",
+          name: Text.Unlabeled,
           color: Colors.lightGray,
           count: this.durationsByLabel.none.length,
           // hours: EventStats.toHours(

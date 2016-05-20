@@ -1,5 +1,5 @@
 /*
-  Generic header view for loggedi nu sers
+  Generic header view for logged in users
 */
 
 /// <reference path="./ReactHelpers.ts" />
@@ -12,10 +12,24 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  export class Header extends Component<{}, {
+  // Namespace for Header related vars
+  export module Header_ {
+    export enum Tab {
+      Charts = 1,
+      Calendar,
+      List,
+      Manage
+    }
+  }
+
+  interface Props {
+    active?: Header_.Tab
+  }
+
+  export class Header extends Component<Props, {
     open: boolean;
   }> {
-    constructor(props: {}) {
+    constructor(props: Props) {
       super(props);
       this.state = { open: false };
     }
@@ -24,6 +38,8 @@ module Esper.Views {
       var toggleId = "esper-nav-toggle";
       var loginInfo = Login.getLoginInfo();
       var busy = Login.getStatus() !== Model2.DataStatus.READY;
+
+      var hasTeams = Stores.Teams.all().length > 0;
 
       return <nav
               className="navbar navbar-default navbar-shadow navbar-fixed-top">
@@ -37,11 +53,16 @@ module Esper.Views {
               <i className={"fa " +
                  (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
-            <span className="navbar-square">
+            <span className={hasTeams ? "navbar-square" : ""}>
               <SaveIndicator>
                 <a className="navbar-brand lg" href="#!/">
                   <img alt="Esper" src="/img/esper-logo-purple.svg" />
                 </a>
+                { hasTeams ? null :
+                  <a href="/" className="navbar-brand word-mark hidden-xs">
+                    <img className="logo-name" src="img/word-mark.svg" />
+                  </a>
+                }
               </SaveIndicator>
             </span>
           </div>
@@ -49,24 +70,28 @@ module Esper.Views {
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
                id={this.getId(toggleId)}
                onClick={() => this.toggleCollapse()}>
-            { loginInfo.match({
+            { hasTeams ? loginInfo.match({
               none: () => null,
               some: () => <ul className="nav navbar-nav">
-                <NavLink href={Paths.Time.charts({}).href}>
+                <NavLink href={Paths.Time.charts({}).href}
+                         active={this.props.active === Header_.Tab.Charts}>
                   <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
                 </NavLink>
                 <NavLink href={Paths.Time.calendarLabeling({}).href}
+                         active={this.props.active === Header_.Tab.Calendar}
                          hiddenXs={true}>
                   <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
                 </NavLink>
-                <NavLink href={Paths.Time.list({}).href}>
+                <NavLink href={Paths.Time.list({}).href}
+                         active={this.props.active === Header_.Tab.List}>
                   <i className="fa fa-fw fa-th-list"></i>{" "}Event List
                 </NavLink>
-                <NavLink href={Paths.Manage.home().href}>
+                <NavLink href={Paths.Manage.home().href}
+                         active={this.props.active === Header_.Tab.Manage}>
                   <i className="fa fa-fw fa-cog"></i>{" "}Settings
                 </NavLink>
               </ul>
-            })}
+            }) : null}
 
             <div className="nav navbar-nav navbar-right">
               <div className="navbar-text hidden-xs">
@@ -144,14 +169,16 @@ module Esper.Views {
     href: string;
     children?: JSX.Element[];
     hiddenXs?: boolean;
+    active?: boolean;
   }
 
   class NavLink extends Component<NavLinkProps, {}> {
     render() {
       var selected = Route.nav.isActive(this.props.href);
-      return <li className={(selected ? "active" : "") +
-        (this.props.hiddenXs ? " hidden-xs" : "")
-      }>
+      return <li className={classNames({
+        active: this.props.active,
+        "hidden-xs": this.props.hiddenXs
+      })}>
         <a href={this.props.href}>
           {this.props.children}
         </a>

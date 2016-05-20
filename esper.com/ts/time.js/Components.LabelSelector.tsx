@@ -135,7 +135,7 @@ module Esper.Components {
           }
           <i className={"fa fa-fw " + (unlabeledSelected ?
             "fa-check-square-o" : "fa-square-o")} />{" "}
-          Unlabeled Events
+          { Text.Unlabeled }
         </a>
       </div> : null }
       { props.showUnlabeled ? <div className="divider" /> : null }
@@ -144,7 +144,7 @@ module Esper.Components {
         <a className="esper-selectable"
            href={Paths.Manage.labels().href}>
           <i className="fa fa-fw fa-bars" />{" "}
-          Manage Labels
+          { Text.ManageLabels }
         </a>
       </div>
     </div>;
@@ -157,13 +157,13 @@ module Esper.Components {
     // Dropdown input text
     var selectedText = (() => {
       if (props.allSelected) {
-        return "All Labels";
+        return Text.AllLabels;
       }
       var labels = _.map(
         _.filter(props.labels, (l) => _.includes(props.selected, l.id)),
         (l) => l.displayAs);
       if (props.unlabeledSelected) {
-        labels.push("Unlabeled Events");
+        labels.push(Text.Unlabeled);
       }
       return labels.join(", ");
     })();

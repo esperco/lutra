@@ -20,7 +20,7 @@ module Esper.Actions {
     render(<Views.CalendarLabeling
       cals={cals}
       period={period}
-    />);
+    />, <Views.Header active={Views.Header_.Tab.Calendar} />);
     Analytics.page(Analytics.Page.CalendarLabeling);
   }
 

@@ -23,6 +23,7 @@ module Esper.Text {
   export const LabelSetupExecDescription = "Pick some goals for each person " +
     "you're supporting. We'll use these to categorize their calendar " +
     "events and calculate how much time they're spending towards each goal.";
+  export const LabelRequired = "Please add at least one goal.";
 
   export const CalendarSetupHeading = "Hook Up Your Calendar";
   export const CalendarSetupSelfDescription = "Which calendars do you want " +
@@ -37,6 +38,10 @@ module Esper.Text {
 
   export const NoEventTitle = `Untitled Event`;
 
+  // Selector text
+  export const AllLabels = `All ` + _.capitalize(Labels);
+  export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
+  export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 
   /////
 

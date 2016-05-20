@@ -17,6 +17,7 @@ module Esper.Components {
       id: string; // Temporary id React can use to identify component
       display: string; // Display version of label
     }[];
+    hasError?: boolean;
   }
 
   export class NewLabelsForm extends ReactHelpers.Component<Props, State> {
@@ -41,6 +42,12 @@ module Esper.Components {
 
     render() {
       return <div className="form-set esper-new-labels">
+        {
+          this.state.hasError ?
+          <div className="alert alert-danger">
+            { Text.LabelRequired }
+          </div> : null
+        }
         { _.map(this.state.labels, (l) =>
           <div key={l.id} className="form-group">
             <span className="label-icon">
@@ -69,6 +76,8 @@ module Esper.Components {
 
     onLabelChange(id: string, event: React.FormEvent) {
       this.mutateState((state) => {
+        state.hasError = false;
+
         var label = _.find(state.labels, (l) => l.id === id);
         label.display = (event.target as HTMLInputElement).value || "";
 
@@ -97,13 +106,14 @@ module Esper.Components {
       });
     }
 
-    // Ref the component and call this to get values
+    // Ref the component and call this to get values, updates state if invalid
     validate(): Option.T<string[]> {
       var labels = _.map(this.state.labels, (l) => l.display);
       labels = _.filter(labels);
       if (labels.length) {
         return Option.some(labels)
       }
+      this.mutateState((s) => s.hasError = true);
       return Option.none<string[]>();
     }
   }

@@ -115,7 +115,7 @@ module Esper.Components {
             <a className="esper-selectable"
                href={Paths.Manage.labels({teamId: selectedTeamId}).href}>
             <i className="fa fa-fw fa-bars"></i>
-            {" "}Manage Labels
+            {" "}{ Text.ManageLabels }
             </a>
           </div>
         </div>

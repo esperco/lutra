@@ -16,12 +16,13 @@ module Esper.Views {
   }
 
   export class LabelSetup extends ReactHelpers.Component<Props, State> {
+    _onboardingExpandos: Components.OnboardingTeams;
     _teamForms: { [index: string]: Components.NewLabelsForm }
 
     constructor(props: Props) {
       super(props);
       this.state = {
-        busy: false
+        busy: false,
       };
       this._teamForms = {};
     }
@@ -32,7 +33,8 @@ module Esper.Views {
 
       return <Components.OnboardingPanel heading={Text.LabelSetupHeading}
               progress={2/3} busy={this.state.busy}
-              backPath={Paths.Time.teamSetup().href}
+              backPath={Paths.Time.calendarSetup().href}
+              disableNext={Onboarding.needsTeam()}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
           { hasExec ?
@@ -41,10 +43,11 @@ module Esper.Views {
         </div>
 
         <Components.OnboardingTeams
+          ref={(c) => this._onboardingExpandos = c}
           teams={Stores.Teams.all()}
           initOpenId={this.props.teamId}
           renderFn={(t) => this.renderTeamForm(t)}
-          onAddTeam={() => Route.nav.path("team-setup")}
+          onAddTeam={() => Route.nav.go(Paths.Time.teamSetup())}
         />
       </Components.OnboardingPanel>
     }
@@ -58,10 +61,13 @@ module Esper.Views {
     onNext() {
       var promises: JQueryPromise<any>[] = []
 
+      var badTeamIds: string[] = [];
       _.each(this._teamForms, (t, teamId) => {
         if (t) {
           t.validate().match({
-            none: () => null,
+            none: () => {
+              badTeamIds.push(teamId)
+            },
             some: (labels) => {
               promises.push(Actions.Teams.putLabels(teamId, labels))
             }
@@ -69,10 +75,14 @@ module Esper.Views {
         }
       });
 
-      if (promises.length) {
+      if (badTeamIds.length) {
+        if (this._onboardingExpandos) {
+          this._onboardingExpandos.openTeams(badTeamIds, true);
+        }
+      } else if (promises.length) {
         this.mutateState((state) => state.busy = true)
         $.when.apply($, promises)
-          .done(() => Route.nav.path("calendar-setup"))
+          .done(() => Route.nav.go(Paths.Time.charts()))
           .fail(() => {
             this.mutateState((state) => state.busy = false)
           });

@@ -6,7 +6,7 @@
 /// <reference path="./Components.ListSelector.tsx" />
 
 module Esper.Components {
-  export class CalendarList extends ReactHelpers.Component<{
+  interface Props {
     team: ApiT.Team;
     selectedCalendars: ApiT.GenericCalendar[];
     availableCalendars: ApiT.GenericCalendar[];
@@ -14,7 +14,21 @@ module Esper.Components {
     listClasses?: string;
     itemClasses?: string;
     selectedItemClasses?: string;
-  }, {}> {
+  }
+
+  export class CalendarList extends ReactHelpers.Component<Props, {
+    hasError?: boolean;
+  }> {
+    constructor(props: Props) {
+      super(props);
+      this.state = { hasError: false };
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+      if (Util.notEmpty(newProps.selectedCalendars)) {
+        this.setState({ hasError: false });
+      }
+    }
 
     render() {
       var calendars = this.props.availableCalendars;
@@ -29,6 +43,16 @@ module Esper.Components {
       var calSelected = _.map(this.props.selectedCalendars, (c) => c.id);
 
       return <div className="calendar-list">
+        { this.state.hasError ?
+          ( calendars && calendars.length ?
+            <div className="alert alert-danger">
+              { Text.MustSelectCalendar }
+            </div> : <div className="alert alert-info">
+              { Text.NoCalendarError }
+            </div>
+          ) : null
+        }
+
         { (Login.usesNylas() && !isExec && !teamApproved) ?
 
           // Not approved or no calendars shared
@@ -84,6 +108,22 @@ module Esper.Components {
       );
       cals = _.filter(cals, (c) => _.includes(ids, c.id))
       Actions.Calendars.update(this.props.team.teamid, cals);
+    }
+
+    // Since clicking automatically triggers an action, validation doesn't
+    // do anything other than show an error message if no calendars selected
+    validate() {
+      // If no available calendars, don't hold up validation
+      if (! Util.notEmpty(this.props.availableCalendars)) {
+        return Option.some<ApiT.GenericCalendar[]>([]);
+      }
+
+      if (Util.notEmpty(this.props.selectedCalendars)) {
+        return Option.some(this.props.selectedCalendars);
+      } else {
+        this.mutateState((s) => s.hasError = true);
+        return Option.none<ApiT.GenericCalendar[]>();
+      }
     }
   }
 
