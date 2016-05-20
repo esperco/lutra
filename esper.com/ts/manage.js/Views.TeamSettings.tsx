@@ -7,6 +7,8 @@
 module Esper.Views {
   interface Props {
     teamId: string;
+    msg?: string;
+    err?: string;
   }
 
   export abstract class TeamSettings extends ReactHelpers.Component<Props, {}> {
@@ -28,7 +30,18 @@ module Esper.Views {
             teamId={this.props.teamId}
             pathFn={this.pathFn}
           />
+
           <div className="esper-expanded">
+            {
+              this.props.msg ?
+              <div className="alert msg alert-info">{ this.props.msg }</div> :
+              null
+            }
+            {
+              this.props.err ?
+              <div className="alert msg alert-danger">{ this.props.err }</div> :
+              null
+            }
             { this.renderMain(team) }
           </div>
         </div>
