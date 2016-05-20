@@ -14,8 +14,12 @@ module Esper.ErrMsg {
       return null;
     else {
       switch (code) {
+      case "login_again":
+        return "For security reasons, please log in again.";
+      case "login_error":
+        return "There was an error logging you in. Please try again.";
       case "slack_auth_failure":
-        return "Slack not authorized.";
+        return "Slack authentication failed. Please try again.";
       default:
         return "An error has occurred.";
       }
