@@ -14,30 +14,49 @@ module Esper.Actions {
     Layout.render(main, header, footer);
   }
 
-  export function renderGeneralSettings(teamId?: string) {
+  export function renderGeneralSettings(teamId?: string,
+    msgCode?: string, errCode?: string)
+  {
     var teamId = Params.cleanTeamId(teamId);
-    render(<Views.GeneralSettings teamId={teamId} />);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.GeneralSettings teamId={teamId}
+            msg={msg} err={err} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderCalendarSettings(teamId?: string) {
+  export function renderCalendarSettings(teamId?: string,
+    msgCode?: string, errCode?: string)
+  {
     var teamId = Params.cleanTeamId(teamId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
 
     Stores.Calendars.fetchAvailable(teamId);
-    render(<Views.CalendarSettings teamId={teamId} />);
-
+    render(<Views.CalendarSettings teamId={teamId}
+            msg={msg} err={err}  />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderLabelSettings(teamId?: string) {
+  export function renderLabelSettings(teamId?: string,
+    msgCode?: string, errCode?: string)
+  {
     var teamId = Params.cleanTeamId(teamId);
-    render(<Views.LabelSettings teamId={teamId} />);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.LabelSettings teamId={teamId}
+            msg={msg} err={err}  />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderNotificationSettings(teamId?: string) {
+  export function renderNotificationSettings(teamId?: string,
+    msgCode?: string, errCode?: string)
+  {
     var teamId = Params.cleanTeamId(teamId);
-    render(<Views.NotificationSettings teamId={teamId} />);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.NotificationSettings teamId={teamId}
+            msg={msg} err={err} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 

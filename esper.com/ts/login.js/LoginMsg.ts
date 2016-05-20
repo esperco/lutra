@@ -10,7 +10,7 @@ module Esper.LoginMsg {
     else {
       switch (code) {
       case "slack_auth_success":
-        return "Slack authentication succeeded.";
+        return "Slack authentication successful.";
       default:
         return null;
       }
