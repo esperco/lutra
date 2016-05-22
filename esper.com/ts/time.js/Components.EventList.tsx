@@ -21,29 +21,6 @@ module Esper.Components {
       super(props);
     }
 
-    componentDidMount() {
-      this.confirmEvents();
-    }
-
-    componentDidUpdate(oldProps: Props) {
-      var oldEventIds = _.map(oldProps.events, (e) => e.id);
-      var newEventIds = _.map(this.props.events, (e) => e.id);
-      if (! _.isEqual(oldEventIds, newEventIds)) {
-        this.confirmEvents();
-      }
-    }
-
-    /*
-      Confirm predicted labels on events when updating -- not ideal to have
-      this take place as a side effect of rendering, but should be okay so
-      long as we only do this in response to event ids changing (i.e. the
-      action should not change anything that would directly affect the
-      rendering)
-    */
-    confirmEvents() {
-      Actions.EventLabels.confirm(this.props.events);
-    }
-
     render() {
       var events = this.props.events;
       if (events.length === 0) {
