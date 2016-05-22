@@ -40,5 +40,10 @@ module Esper.Components {
     mountTooltip() {
       $(this._elm).tooltip();
     }
+
+    componentWillUnmount() {
+      super.componentWillUnmount();
+      $(this._elm).tooltip('destroy');
+    }
   }
 }
