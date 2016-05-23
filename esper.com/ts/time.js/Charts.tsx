@@ -221,7 +221,7 @@ module Esper.Charts {
 
     // Auto-filter team events, by default just remove not attended events
     filterEvents(events: Stores.Events.TeamEvent[], filterParams: T) {
-      return _.filter(events, (e) => e.feedback.attended !== false);
+      return _.filter(events, (e) => Stores.Events.isActive(e));
     }
 
     // Returns any error retrieved while loading, if applicable

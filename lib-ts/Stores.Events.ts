@@ -485,7 +485,17 @@ module Esper.Stores.Events {
       .value();
   }
 
+  /*
+    "Active" event means we count it in time-stats. If the event is
+    transparent, i.e. marked as "available", we require explicit user
+    action to make it active. Otherwise, it defaults to "active" unless
+    the user marks it otherwise.
+  */
   export function isActive(event: TeamEvent) {
+    if (event.transparent) {
+      return event.feedback && event.feedback.attended === true;
+    }
+
     return !(event.feedback && event.feedback.attended === false);
   }
 }

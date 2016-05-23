@@ -79,7 +79,7 @@ module Esper.Components {
         <div className="event-content">
           <div className={"title" +
                  (this.props.onEventClick ? " esper-link" : "") +
-                 (event.feedback.attended === false ? " no-attend" : "")}
+                 (Stores.Events.isActive(event) ? "": " no-attend")}
                onClick={() => this.props.onEventClick &&
                               this.props.onEventClick(event)}>
             { event.title ||
@@ -167,7 +167,7 @@ module Esper.Components {
   function noAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
     e.stopPropagation();
     var newFeedback = _.clone(event.feedback);
-    newFeedback.attended = event.feedback.attended === false;
+    newFeedback.attended = !Stores.Events.isActive(event);
     Actions.Feedback.post(event, newFeedback);
   }
 
