@@ -469,18 +469,6 @@ module Esper.Stores.Events {
     return _.map(getLabels(event), (l) => l.id);
   }
 
-  export function hasEmptyLabels(event: TeamEvent) {
-    return event.labelScores.match({
-      none: () => false,
-      some: (labels) => labels.length === 0
-    });
-  }
-
-  export function hasPredictedLabels(event: TeamEvent) {
-    var labels = getLabels(event, true);
-    return labels.length && labels[0].score < 1;
-  }
-
   export function needsConfirmation(event: TeamEvent) {
     return event.labelScores.match({
       none: () => true, // No labels, let user confirm empty set
