@@ -10,11 +10,6 @@ module Esper.Charts {
       return [-1, 1];
     }
 
-    onEventClick(event: Stores.Events.TeamEvent) {
-      Layout.renderModal(Containers.eventEditorModal([event]));
-      return false;
-    }
-
     renderChart() {
       var categories = _.map(this.sortedCalIds,
         (calId) => this.getCalendarName(calId)

@@ -61,11 +61,6 @@ module Esper.Charts {
       }));
     }
 
-    onEventClick(event: Stores.Events.TeamEvent) {
-      Layout.renderModal(Containers.eventEditorModal([event]));
-      return false;
-    }
-
     renderChart() {
       var series: {
         name: string,

@@ -38,11 +38,6 @@ module Esper.Charts {
       );
     }
 
-    onPointClick(events: Stores.Events.TeamEvent[]) {
-      Layout.renderModal(Containers.eventListModal(events));
-      return false;
-    }
-
     getTotals() {
       return _.map(this.durationsByLabel, (d) => ({
         period: d.period,
@@ -91,7 +86,7 @@ module Esper.Charts {
               //   _.sumBy(s.items, (i) => i.duration)
               // ),
               events: {
-                click: () => this.onPointClick(_.map(s.items, (i) => i.event))
+                click: () => this.onSeriesClick(_.map(s.items, (i) => i.event))
               }
             }
           })
@@ -113,7 +108,7 @@ module Esper.Charts {
             //   _.sumBy(d.groups.none, (i) => i.duration)
             // ),
             events: {
-              click: () => this.onPointClick(
+              click: () => this.onSeriesClick(
                 _.map(d.groups.none, (w) => w.event)
               )
             }

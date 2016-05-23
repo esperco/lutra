@@ -42,11 +42,6 @@ module Esper.Charts {
       );
     }
 
-    onEventClick(event: Stores.Events.TeamEvent) {
-      Layout.renderModal(Containers.eventEditorModal([event]));
-      return false;
-    }
-
     getTotals() {
       return _.map(this.durationsByEmail, (d) => ({
         period: d.period,
