@@ -218,8 +218,7 @@ module Esper.Components {
                                            event.recurringEventId),
             "recurring": !!event.recurringEventId,
             "has-labels": !!Stores.Events.getLabels(event).length,
-            "has-empty-labels": Stores.Events.hasEmptyLabels(event),
-            "has-predicted-labels": Stores.Events.hasPredictedLabels(event),
+            "needs-confirmation": Stores.Events.needsConfirmation(event),
             "no-attend": event.feedback.attended === false
           })
         };
@@ -227,8 +226,9 @@ module Esper.Components {
         var labels = Stores.Events.getLabels(event);
         if (Util.notEmpty(labels)) {
           var label = labels[0];
-          ret.color = Colors.getColorForLabel(label.id);
-          ret.textColor = Colors.colorForText(ret.color);
+          var baseColor = Colors.getColorForLabel(label.id);
+          ret.backgroundColor = baseColor;
+          ret.textColor = Colors.colorForText(baseColor);
           ret.tooltip = label.displayAs;
         }
 

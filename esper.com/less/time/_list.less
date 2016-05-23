@@ -1,10 +1,5 @@
 @import "../lib/_bootstrap-variables.less";
-
-@event-checkbox-width: 28px;
-@today-color: @brand-bg;
-@unlabeled-color: @list-group-border;
-@labeled-color: @brand-primary;
-@past-event-background: @panel-default-heading-bg;
+@import "./_time-variables.less";
 
 .list-selectors {
   padding: 0 @padding-small-horizontal;
@@ -138,10 +133,14 @@
     }
 
     .event {
-      border-left: @border-radius-base solid @unlabeled-color;
+      border-left: 1px solid @list-group-border;
 
-      &.has-labels, &.no-attend {
-        border-left: @border-radius-base solid @labeled-color;
+      &.has-labels {
+        border-left: @border-radius-base solid @confirmed-color;
+      }
+
+      &.needs-confirmation {
+        border-left: @border-radius-base solid @needs-confirmation-color;
       }
 
       &.past {
@@ -177,23 +176,46 @@
       }
     }
 
-    .label-list-action, .event-label {
+    .label-list-actions {
+      margin-right: @padding-small-horizontal;
+      border-right: 1px solid @brand-divider;
+    }
+
+    .event-label, .label-list-action {
       padding: @padding-xs-vertical @padding-xs-horizontal;
       margin-top: @padding-small-vertical;
       margin-right: @padding-xs-horizontal;
       border-radius: @border-radius-small;
       display: inline-block;
       cursor: pointer;
-      border: 1px solid @link-color;
-      color: @link-color;
+      border: 1px solid @brand-text-muted;
+      color: @brand-text-muted;
 
+      &.confirm-action {
+        color: @brand-text-muted;
+        border: 0;
+
+        &:hover {
+          color: @brand-success;
+        }
+      }
+    }
+
+    .label-list-action {
       &:hover {
-        filter: brightness(110%);
+        color: @link-color;
+        border-color: @link-color;
       }
 
       &.active {
         background: @link-color;
         color: white;
+      }
+    }
+
+    .event-label {
+      &:hover, &.active {
+        filter: brightness(115%);
       }
     }
 

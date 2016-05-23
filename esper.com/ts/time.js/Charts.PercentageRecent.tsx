@@ -41,11 +41,6 @@ module Esper.Charts {
       );
     }
 
-    onSeriesClick(events: Stores.Events.TeamEvent[]) {
-      Layout.renderModal(Containers.eventListModal(events));
-      return false;
-    }
-
     getTotals() {
       return [{
         period: this.params.period,

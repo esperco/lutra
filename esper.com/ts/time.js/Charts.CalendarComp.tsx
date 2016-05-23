@@ -45,11 +45,6 @@ module Esper.Charts {
       }));
     }
 
-    onSeriesClick(events: Stores.Events.TeamEvent[]) {
-      Layout.renderModal(Containers.eventListModal(events));
-      return false;
-    }
-
     getCalendarName(calId: string) {
       var cal = _.find(this.cals || [], (c) => c.id === calId);
       if (cal) {

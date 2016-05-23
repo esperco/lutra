@@ -196,9 +196,12 @@ module Esper.Charts {
     onEventClick() {
       this.props.event.match({
         none: () => null,
-        some: (event) => Layout.renderModal(
-          Containers.eventEditorModal([event])
-        )
+        some: (event) => {
+          Actions.EventLabels.confirm([event]);
+          Layout.renderModal(
+            Containers.eventEditorModal([event])
+          );
+        }
       });
       return false;
     }

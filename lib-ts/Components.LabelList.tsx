@@ -85,10 +85,15 @@ module Esper.Components {
       }
 
       return <div className="event-labels">
-        <NoAttendToggle event={this.props.event} />
+        { Stores.Events.needsConfirmation(this.props.event) ?
+          <span className="label-list-actions">
+            <ConfirmPredictions event={this.props.event} />
+          </span> : null }
         { _.map(labelList, (labelVal) =>
           <LabelToggle key={labelVal.id}
-                       label={labelVal} event={this.props.event} />
+                       id={labelVal.id}
+                       displayAs={labelVal.displayAs}
+                       event={this.props.event} />
         ) }
         { this.state.expanded && this.props.onAddLabelClick ?
           <span className="add-event-label action label-list-action"
@@ -127,37 +132,37 @@ module Esper.Components {
 
 
   interface LabelProps {
-    label: Labels.Label;
+    id: string;
+    displayAs: string;
     event: Stores.Events.TeamEvent;
   }
 
   class LabelToggle extends ReactHelpers.Component<LabelProps, {}> {
     render() {
-      var labelColor = Colors.getColorForLabel(this.props.label.id);
-      var isSelected = this.isSelected();
+      var labelColor = Colors.getColorForLabel(this.props.id);
+      var score = this.getScore();
       var style = (() => ({
         borderStyle: "solid",
         borderColor: labelColor,
-        background: isSelected ? labelColor : "transparent",
-        color: isSelected ? Colors.colorForText(labelColor) :
-                            Colors.darken(labelColor)
+        background: score > 0 ? labelColor : "transparent",
+        color: score > 0 ? Colors.colorForText(labelColor) :
+                           Colors.darken(labelColor)
       }))();
-      var label = this.props.label;
 
       // Predicted label
-      if (label.score > 0 && label.score < 1) {
+      if (score > 0 && score < 1) {
         return <Tooltip style={style}
           className="event-label predicted-label"
           data-toggle="tooltip"
-          title={Text.predictionTooltip(label.score)}
+          title={Text.predictionTooltip(score)}
           onClick={() => {
-            isSelected ? this.toggleOff() : this.toggleOn()
+            score > 0 ? this.toggleOff() : this.toggleOn()
         }}>
           <i className="fa fa-fw fa-question-circle" />
           {" "}
-          {label.displayAs}{" "}
+          {this.props.displayAs}{" "}
           <span className="label-score">
-            <SignalStrength strength={label.score} />
+            <SignalStrength strength={score} />
           </span>
         </Tooltip>;
       }
@@ -165,48 +170,42 @@ module Esper.Components {
       // User-selected label
       return <span style={style} className="event-label"
                    onClick={() => {
-                     isSelected ? this.toggleOff() : this.toggleOn()
+                     score > 0 ? this.toggleOff() : this.toggleOn()
                    }}>
         <i className="fa fa-fw fa-tag" />{" "}
-        {this.props.label.displayAs}
+        {this.props.displayAs}
       </span>;
     }
 
-    isSelected() {
+    getScore() {
       return this.props.event.labelScores.match({
-        none: () => false,
-        some: (labels) => !!_.find(labels, (l) => l.id === this.props.label.id)
+        none: () => 0,
+        some: (labels) => Option.wrap(
+          _.find(labels, (l) => l.id === this.props.id)
+        ).match({
+          none: () => 0,
+          some: (label) => label.score
+        })
       });
     }
 
     toggleOn() {
       Actions.EventLabels.add([this.props.event],
-        this.props.label.displayAs);
+        this.props.displayAs);
     }
 
     toggleOff() {
       Actions.EventLabels.remove([this.props.event],
-        this.props.label.displayAs);
+        this.props.displayAs);
     }
   }
 
-  class NoAttendToggle extends ReactHelpers.Component<{
-    event: Stores.Events.TeamEvent
-  }, {}> {
-    render() {
-      return <Tooltip className={classNames("no-attend-action",
-          "action", "label-list-action", {
-            active: this.props.event.feedback.attended === false
-          })} title="Did Not Attend" onClick={() => this.toggleAttend()}>
-        <i className="fa fa-fw fa-ban" />
-      </Tooltip>;
-    }
-
-    toggleAttend() {
-      var newFeedback = _.clone(this.props.event.feedback);
-      newFeedback.attended = this.props.event.feedback.attended === false;
-      Actions.Feedback.post(this.props.event, newFeedback);
-    }
+  function ConfirmPredictions({event}: { event: Stores.Events.TeamEvent }) {
+    return <Tooltip className="confirm-action action label-list-action"
+                    title={Text.ConfirmLabels}
+                    onClick={() => Actions.EventLabels.confirm([event])}>
+      <i className="fa fa-fw fa-check" />
+    </Tooltip>;
   }
 
 }

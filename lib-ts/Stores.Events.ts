@@ -469,16 +469,11 @@ module Esper.Stores.Events {
     return _.map(getLabels(event), (l) => l.id);
   }
 
-  export function hasEmptyLabels(event: TeamEvent) {
+  export function needsConfirmation(event: TeamEvent) {
     return event.labelScores.match({
-      none: () => false,
-      some: (labels) => labels.length === 0
-    });
-  }
-
-  export function hasPredictedLabels(event: TeamEvent) {
-    var labels = getLabels(event, true);
-    return labels.length && labels[0].score < 1;
+      none: () => true, // No labels, let user confirm empty set
+      some: (labels) => !!_.find(labels, (l) => l.score > 0 && l.score < 1)
+    }) && isActive(event);
   }
 
   export function getTeams(events: TeamEvent[]) {
@@ -488,5 +483,9 @@ module Esper.Stores.Events {
       .uniq()
       .map((teamId) => Stores.Teams.require(teamId))
       .value();
+  }
+
+  export function isActive(event: TeamEvent) {
+    return !(event.feedback && event.feedback.attended === false);
   }
 }

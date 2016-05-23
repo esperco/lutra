@@ -1,4 +1,5 @@
 @import "../lib/_helpers";
+@import "./_time-variables.less";
 
 // Wrap to minimize chance of namespace conflict
 .fullcalendar-holder {
@@ -66,7 +67,8 @@
 
     .fc-event {
       background: white;
-      border-color: @brand-info;
+      border: 0;
+      margin: 1px 0;
       color: #333;
       transition: box-shadow 0.6s;
       padding: @padding-xs-vertical @padding-xs-horizontal;
@@ -94,6 +96,15 @@
 
       &:hover, &:focus {
         box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.25);
+      }
+
+      &.needs-confirmation {
+        border: 1px solid @needs-confirmation-color;
+        border-left: @border-radius-base solid @needs-confirmation-color;
+
+        &.has-labels {
+          border-width: 0 0 0 @border-radius-base;
+        }
       }
     }
 

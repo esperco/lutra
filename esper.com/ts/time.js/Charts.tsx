@@ -286,6 +286,22 @@ module Esper.Charts {
       }
       Route.nav.query(newParams);
     }
+
+
+    // Click event handlers
+
+    onEventClick(event: Stores.Events.TeamEvent) {
+      // Confirm predicted labels when opening single event
+      Actions.EventLabels.confirm([event]);
+
+      Layout.renderModal(Containers.eventEditorModal([event]));
+      return false;
+    }
+
+    onSeriesClick(events: Stores.Events.TeamEvent[]) {
+      Layout.renderModal(Containers.eventListModal(events));
+      return false;
+    }
   }
 
   export abstract class DefaultEventChart

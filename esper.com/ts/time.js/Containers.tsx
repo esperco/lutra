@@ -45,13 +45,18 @@ module Esper.Containers {
 
       // Set up actions so that hitting "done" goes back to the list
       var backFn = () => Layout.renderModal(eventListModal(events));
-      var labelFn = (event: Stores.Events.TeamEvent) =>
+      var labelFn = (event: Stores.Events.TeamEvent) => {
+
+        // Confirm before opening modal
+        Actions.EventLabels.confirm([event]);
+
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
             onDone: backFn
           })
         );
+      };
       var feedbackFn = (event: Stores.Events.TeamEvent) =>
         Layout.renderModal(
           eventEditorModal([event], {
