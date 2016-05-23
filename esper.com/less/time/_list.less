@@ -2,8 +2,8 @@
 
 @event-checkbox-width: 28px;
 @today-color: @brand-bg;
-@unlabeled-color: @list-group-border;
-@labeled-color: @brand-primary;
+@confirmed-color: @list-group-border;
+@needs-confirmation-color: @brand-primary;
 @past-event-background: @panel-default-heading-bg;
 
 .list-selectors {
@@ -138,10 +138,14 @@
     }
 
     .event {
-      border-left: @border-radius-base solid @unlabeled-color;
+      border-left: 1px solid @list-group-border;
 
-      &.has-labels, &.no-attend {
-        border-left: @border-radius-base solid @labeled-color;
+      &.has-labels {
+        border-left: @border-radius-base solid @confirmed-color;
+      }
+
+      &.needs-confirmation {
+        border-left: @border-radius-base solid @needs-confirmation-color;
       }
 
       &.past {
@@ -177,6 +181,11 @@
       }
     }
 
+    .label-list-actions {
+      margin-right: @padding-small-horizontal;
+      border-right: 1px solid @brand-divider;
+    }
+
     .label-list-action, .event-label {
       padding: @padding-xs-vertical @padding-xs-horizontal;
       margin-top: @padding-small-vertical;
@@ -184,16 +193,26 @@
       border-radius: @border-radius-small;
       display: inline-block;
       cursor: pointer;
-      border: 1px solid @link-color;
-      color: @link-color;
+      border: 1px solid @brand-text-muted;
+      color: @brand-text-muted;
 
       &:hover {
-        filter: brightness(110%);
+        color: @link-color;
+        border-color: @link-color;
       }
 
       &.active {
         background: @link-color;
         color: white;
+      }
+
+      &.confirm-action {
+        color: @brand-text-muted;
+        border: 0;
+
+        &:hover {
+          color: @brand-success;
+        }
       }
     }
 

@@ -85,12 +85,10 @@ module Esper.Components {
       }
 
       return <div className="event-labels">
-        <span className="label-list-actions">
-          <NoAttendToggle event={this.props.event} />
-          { this.showConfirm() ?
-            <ConfirmPredictions event={this.props.event} /> :
-            null }
-        </span>
+        { Stores.Events.needsConfirmation(this.props.event) ?
+          <span className="label-list-actions">
+            <ConfirmPredictions event={this.props.event} />
+          </span> : null }
         { _.map(labelList, (labelVal) =>
           <LabelToggle key={labelVal.id}
                        id={labelVal.id}
@@ -118,13 +116,6 @@ module Esper.Components {
           })} />
         </span>
       </div>;
-    }
-
-    showConfirm() {
-      return this.props.event.labelScores.match({
-        none: () => true, // No labels, let user confirm empty set
-        some: (labels) => !!_.find(labels, (l) => l.score > 0 && l.score < 1)
-      });
     }
 
     // When contracting, re-adjust init label list
@@ -206,25 +197,6 @@ module Esper.Components {
     toggleOff() {
       Actions.EventLabels.remove([this.props.event],
         this.props.displayAs);
-    }
-  }
-
-  class NoAttendToggle extends ReactHelpers.Component<{
-    event: Stores.Events.TeamEvent
-  }, {}> {
-    render() {
-      return <Tooltip className={classNames("no-attend-action",
-          "action", "label-list-action", {
-            active: this.props.event.feedback.attended === false
-          })} title="Did Not Attend" onClick={() => this.toggleAttend()}>
-        <i className="fa fa-fw fa-ban" />
-      </Tooltip>;
-    }
-
-    toggleAttend() {
-      var newFeedback = _.clone(this.props.event.feedback);
-      newFeedback.attended = this.props.event.feedback.attended === false;
-      Actions.Feedback.post(this.props.event, newFeedback);
     }
   }
 

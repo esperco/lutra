@@ -748,6 +748,10 @@ flexibility with non-UL elements */
   color: @text-muted;
   cursor: pointer;
 
+  &.active {
+    color: @brand-text;
+  }
+
   &.fa {
     font-size: @input-height-base - (2 * @padding-small-vertical);
     line-height: @input-height-base;
@@ -759,6 +763,10 @@ flexibility with non-UL elements */
 
   .esper-shade {
     color: @shade-text-muted;
+
+    &.active {
+      color: @shade-text;
+    }
 
     &:hover {
       color: @shade-text-muted-hover;

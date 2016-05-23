@@ -57,13 +57,13 @@ module Esper.Components {
     }
 
     renderEvent(event: Stores.Events.TeamEvent) {
+      var isActive = Stores.Events.isActive(event);
+      var actionRequired = !!Stores.Events.needsConfirmation(event);
       return <div key={[event.teamId, event.calendarId, event.id].join(",")}
                   className={classNames("list-group-item event", {
                     "has-labels": !!Stores.Events.getLabels(event).length,
-                    "has-empty-labels": Stores.Events.hasEmptyLabels(event),
-                    "has-predicted-labels":
-                      Stores.Events.hasPredictedLabels(event),
-                    "no-attend": event.feedback.attended === false,
+                    "needs-confirmation": actionRequired,
+                    "no-attend": !isActive,
                     "past": moment(event.end).diff(moment()) < 0
                   })}>
         {
@@ -100,13 +100,16 @@ module Esper.Components {
           </div>
           <div className="action event-feedback"
                onClick={() => this.handleFeedbackClick(event)}>
-            <EventFeedback feedback={event.feedback} />
+            <EventFeedback event={event} />
           </div>
-          <div className="event-labels">
-            <LabelList event={event}
-                       team={this.getTeam(event)}
-                       onAddLabelClick={this.props.onAddLabelClick} />
-          </div>
+          { isActive ?
+            <div className="event-labels">
+              <LabelList event={event}
+                         team={this.getTeam(event)}
+                         onAddLabelClick={this.props.onAddLabelClick} />
+            </div> :
+            null
+          }
         </div>
       </div>;
     }
@@ -134,24 +137,38 @@ module Esper.Components {
     }
   }
 
-  function EventFeedback({feedback}: {feedback: ApiT.EventFeedback}) {
+  function EventFeedback({event}: {event: Stores.Events.TeamEvent}) {
     // Check if no feedback
-    if (!feedback || (_.isUndefined(feedback.attended) && !feedback.rating
-        && !feedback.notes)) {
-      return <span />;
-    }
+    var feedback = event.feedback || {}
+
+    // Used in tooltip
+    var isActive = Stores.Events.isActive(event);
+    var title = Stores.Events.isFuture(event) ?
+      Text.NoAttendFuture : Text.NoAttendPast;
 
     // Format feedback
     return <span>
-      { feedback.attended === false ?
-        <i className="fa fa-fw fa-ban" /> :
+      <Tooltip className={classNames("action", {
+            active: !isActive
+          })} title={title}
+          onClick={(e) => noAttend(e, event)}>
+        <i className="fa fa-fw fa-close" />
+      </Tooltip>
+      { Stores.Events.isActive(event) ?
         _.times(feedback.rating || 0, (i) =>
           <i key={i.toString()} className="fa fa-fw fa-star" />
-        )
+        ) : null
       }
       {" "}
       { feedback.notes ? <i className="fa fa-fw fa-comment" /> : null }
     </span>;
+  }
+
+  function noAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
+    e.stopPropagation();
+    var newFeedback = _.clone(event.feedback);
+    newFeedback.attended = event.feedback.attended === false;
+    Actions.Feedback.post(event, newFeedback);
   }
 
 

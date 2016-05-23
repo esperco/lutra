@@ -481,6 +481,13 @@ module Esper.Stores.Events {
     return labels.length && labels[0].score < 1;
   }
 
+  export function needsConfirmation(event: TeamEvent) {
+    return event.labelScores.match({
+      none: () => true, // No labels, let user confirm empty set
+      some: (labels) => !!_.find(labels, (l) => l.score > 0 && l.score < 1)
+    }) && isActive(event);
+  }
+
   export function getTeams(events: TeamEvent[]) {
     // Get the team(s) for events
     return _(events)
@@ -488,5 +495,9 @@ module Esper.Stores.Events {
       .uniq()
       .map((teamId) => Stores.Teams.require(teamId))
       .value();
+  }
+
+  export function isActive(event: TeamEvent) {
+    return !(event.feedback && event.feedback.attended === false);
   }
 }
