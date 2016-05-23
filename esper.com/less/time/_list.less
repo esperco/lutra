@@ -186,7 +186,7 @@
       border-right: 1px solid @brand-divider;
     }
 
-    .label-list-action, .event-label {
+    .event-label {
       padding: @padding-xs-vertical @padding-xs-horizontal;
       margin-top: @padding-small-vertical;
       margin-right: @padding-xs-horizontal;
@@ -196,6 +196,17 @@
       border: 1px solid @brand-text-muted;
       color: @brand-text-muted;
 
+      &.confirm-action {
+        color: @brand-text-muted;
+        border: 0;
+
+        &:hover {
+          color: @brand-success;
+        }
+      }
+    }
+
+    .label-list-action {
       &:hover {
         color: @link-color;
         border-color: @link-color;
@@ -205,14 +216,11 @@
         background: @link-color;
         color: white;
       }
+    }
 
-      &.confirm-action {
-        color: @brand-text-muted;
-        border: 0;
-
-        &:hover {
-          color: @brand-success;
-        }
+    .event-label {
+      &:hover, &.active {
+        filter: brightness(115%);
       }
     }
 
