@@ -219,7 +219,7 @@ module Esper.Components {
             "recurring": !!event.recurringEventId,
             "has-labels": !!Stores.Events.getLabels(event).length,
             "needs-confirmation": Stores.Events.needsConfirmation(event),
-            "no-attend": event.feedback.attended === false
+            "no-attend": !Stores.Events.isActive(event)
           })
         };
 

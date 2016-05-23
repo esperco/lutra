@@ -163,7 +163,7 @@ module Esper.Components {
             <i className="fa fa-fw fa-caret-down" />
           </a>
           <a className={classNames("pull-right no-attend-action action", {
-            active: event.feedback.attended === false
+            active: !Stores.Events.isActive(event)
           })} onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />
           </a>
@@ -197,7 +197,7 @@ module Esper.Components {
     }
 
     renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {
-     if (event.feedback.attended === false) {
+     if (! Stores.Events.isActive(event)) {
        return Stores.Events.isFuture(event) ?
          Text.NoAttendFuture : Text.NoAttendPast;
      }
@@ -219,13 +219,13 @@ module Esper.Components {
       return <div className="row">
         <div className="col-sm-8 form-group event-star-ratings">
           <StarRating
-            value={(event.feedback.attended != false // null or true
+            value={(Stores.Events.isActive(event)
                     && event.feedback.rating) || 0}
             onChange={(i) => this.submitStarRating(i)} />
         </div>
         <div className="col-sm-4 form-group event-no-attend">
           <button className={"form-control btn btn-default" +
-                    (event.feedback.attended === false ? " active" : "")}
+                    (Stores.Events.isActive(event) ? "" : " active")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
             { Stores.Events.isFuture(event) ?
@@ -256,7 +256,7 @@ module Esper.Components {
     toggleAttended() {
       var event = this.props.event;
       this.submitFeedback(_.extend({}, event.feedback, {
-        attended: (event.feedback.attended === false ? true : false)
+        attended: !Stores.Events.isActive(event)
       }) as ApiT.EventFeedback);
     }
 
