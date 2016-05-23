@@ -119,6 +119,7 @@ module Esper.Analytics {
                               // all events)
 
     // Labeling
+    ConfirmEventLabels,       // Confirm predicted labels
     EditEventLabels,          // Edit labels for event(s)
 
     // Post-meeting feedback

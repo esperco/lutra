@@ -41,6 +41,11 @@ module Esper.Actions.EventLabels {
           numEvents: teamEvents.length,
           teamIds: teamId
         });
+      } else {
+        Analytics.track(Analytics.Trackable.ConfirmEventLabels, {
+          numEvents: teamEvents.length,
+          teamIds: teamId
+        });
       }
     });
   }
