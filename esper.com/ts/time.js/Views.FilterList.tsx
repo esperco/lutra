@@ -245,7 +245,20 @@ module Esper.Views {
             <div className="action" onClick={() => this.editSelectedEvents()}>
               <i className="fa fa-fw fa-tag" />
               <span className="hidden-xs">
-                {" "}Label
+                {" "}{ Text.EditLabels }
+              </span>
+            </div> :
+            null
+          }
+          {
+            !! _.find(this.state.selected,
+              (s) => Stores.Events.needsConfirmation(s)
+            ) ?
+            <div className="action"
+                 onClick={() => this.confirmSelectedEvents()}>
+              <i className="fa fa-fw fa-check" />
+              <span className="hidden-xs">
+                {" "}{ Text.ConfirmLabels }
               </span>
             </div> :
             null
@@ -344,6 +357,22 @@ module Esper.Views {
 
     editSelectedEvents() {
       this.renderModal(this.state.selected);
+    }
+
+    confirmSelectedEvents() {
+      Actions.EventLabels.confirm(this.state.selected);
+
+      // Update state with new (confirmed) labels
+      var updatedSelections = Option.flatten(
+        _(this.state.selected)
+          .map((s) => Stores.Events.storeId(s))
+          .map((_id) => Stores.Events.EventStore.get(_id))
+          .map((o) => o.flatMap((d) => d.data))
+          .value()
+      );
+      this.setState({
+        selected: updatedSelections
+      });
     }
 
     renderModal(events: Stores.Events.TeamEvent[], minFeedback=true) {
