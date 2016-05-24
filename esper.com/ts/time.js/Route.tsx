@@ -111,6 +111,20 @@ module Esper.Route {
     }, q)
   });
 
+  // Alias for showing unconfirmed events only in list view
+  route(Paths.Time.listNew({
+    teamId: ":teamId?",
+    calIds: ":calIds?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, function(ctx) {
+    Route.nav.go(Paths.Time.list(ctx.params), {
+      jsonQuery: {
+        unconfirmed: true
+      }
+    });
+  });
+
 
   /* Onboarding */
 
