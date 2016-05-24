@@ -13,13 +13,12 @@ module Esper.Components {
     unlabeledSelected?: boolean;
     showUnlabeled?: boolean;
     unconfirmedSelected?: boolean;
-    showUnconfirmed?: boolean;
     updateFn: (x: {
       all: boolean;
       unlabeled: boolean;
       labels: string[];
-      unconfirmed: boolean;
     }) => void;
+    onUnconfirmedClick?: () => void;
     className?: string;
   }
 
@@ -64,13 +63,11 @@ module Esper.Components {
       props.updateFn(someSelected ? {
         all: false,
         unlabeled: false,
-        labels: [],
-        unconfirmed: false
+        labels: []
       } : {
         all: true,
         unlabeled: true,
-        labels: [],
-        unconfirmed: false
+        labels: []
       });
     }
 
@@ -78,27 +75,11 @@ module Esper.Components {
       props.updateFn(props.unlabeledSelected ? {
         all: false,
         unlabeled: false,
-        labels: selectedIds,
-        unconfirmed: false
+        labels: selectedIds
       } : {
         all: props.selected.length === props.labels.length,
         unlabeled: true,
-        labels: selectedIds,
-        unconfirmed: false
-      });
-    }
-
-    function toggleUnconfirmed() {
-      props.updateFn(props.unconfirmedSelected ? {
-        all: true,
-        unlabeled: true,
-        labels: [],
-        unconfirmed: false
-      } : {
-        all: false,
-        unlabeled: false,
-        labels: [],
-        unconfirmed: true
+        labels: selectedIds
       });
     }
 
@@ -106,8 +87,7 @@ module Esper.Components {
       props.updateFn({
         all: labels.length === props.labels.length && unlabeledSelected,
         unlabeled: unlabeledSelected,
-        labels: _.map(labels, (l) => l.id),
-        unconfirmed: false
+        labels: _.map(labels, (l) => l.id)
       });
     }
 
@@ -163,10 +143,10 @@ module Esper.Components {
       </div> : null }
       { props.showUnlabeled ? <div className="divider" /> : null }
 
-      { props.showUnconfirmed ?
+      { props.onUnconfirmedClick ?
         <div className="esper-select-menu">
         <a className="esper-selectable"
-           onClick={toggleUnconfirmed}>
+           onClick={() => props.onUnconfirmedClick()}>
           {
             props.unconfirmedCount ?
             <span className={classNames("badge", "unconfirmed", {
@@ -179,7 +159,7 @@ module Esper.Components {
           { Text.Unconfirmed }
         </a>
       </div> : null }
-      { props.showUnconfirmed ? <div className="divider" /> : null }
+      { props.onUnconfirmedClick ? <div className="divider" /> : null }
 
       <div className="esper-select-menu">
         <a className="esper-selectable"

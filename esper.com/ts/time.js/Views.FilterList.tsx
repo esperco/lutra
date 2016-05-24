@@ -210,16 +210,22 @@ module Esper.Views {
           allSelected={this.props.labels.all}
           unlabeledSelected={this.props.labels.none}
           showUnlabeled={true}
-          showUnconfirmed={true}
           unconfirmedSelected={this.props.unconfirmed}
           updateFn={(x) => this.updateRoute({
             labels: {
               all: x.all,
               none: x.unlabeled,
               some: x.all ? [] : x.labels
-            },
-            unconfirmed: x.unconfirmed
-          })} />
+            }
+          })}
+          onUnconfirmedClick={() => this.updateRoute(this.props.unconfirmed ?
+            {
+              unconfirmed: false,
+              labels: { all: true, none: true, some: [] }
+            } : {
+              unconfirmed: true,
+              labels: { all: false, none: false, some: [] }
+            })} />
       </div>;
     }
 
