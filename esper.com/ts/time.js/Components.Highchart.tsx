@@ -150,11 +150,28 @@ module Esper.Components {
 
     exportChart() {
       if (this._chart) {
+        // Modify chart for export
+        var chartOpts = this.props.opts.chart;
+
+        // Non-transparent background
+        var exportOpts: HighchartsChartOptions = {
+          backgroundColor: '#FFFFFF'
+        };
+
+        // Make pie charts wider (to correct for label cut off)
+        if (chartOpts && chartOpts.type === 'pie') {
+          exportOpts.width = 1500;
+          exportOpts.height = 800;
+        } else {
+          exportOpts.width = 1200;
+          exportOpts.height = 800;
+        }
+
         this._chart.exportChartLocal({
           type: "image/png",
           fallbackToExportServer: false
         }, {
-          chart: { backgroundColor: '#FFFFFF' }
+          chart: exportOpts
         });
       }
     }
