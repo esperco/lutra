@@ -8,6 +8,7 @@ module Esper.Views {
   interface FilterListProps extends Params.FilterListJSON {
     cals: Stores.Calendars.CalSelection[];
     period: Period.Single;
+    unconfirmed: boolean;
   }
 
   interface FilterListState {
@@ -88,6 +89,10 @@ module Esper.Views {
     }
 
     filterEvents(events: Stores.Events.TeamEvent[]) {
+      if (this.props.unconfirmed) {
+        return _.filter(events, (e) => Stores.Events.needsConfirmation(e));
+      }
+
       if (! this.props.labels.all) {
         events = _.filter(events, (e) =>
           ( this.props.labels.none &&
@@ -175,20 +180,28 @@ module Esper.Views {
     renderLabelSelector(events: Stores.Events.TeamEvent[]) {
       var labels = Labels.fromEvents(events, Stores.Teams.all());
       labels = Labels.sortLabels(labels);
+
+      var unconfirmedCount = _.filter(events,
+        (e) => Stores.Events.needsConfirmation(e)
+      ).length;
       return <div className="col-sm-6 form-group">
         <Components.LabelSelectorDropdown labels={labels}
           totalCount={events.length}
           unlabeledCount={Labels.countUnlabeled(events)}
+          unconfirmedCount={unconfirmedCount}
           selected={this.props.labels.some}
           allSelected={this.props.labels.all}
           unlabeledSelected={this.props.labels.none}
           showUnlabeled={true}
+          showUnconfirmed={true}
+          unconfirmedSelected={this.props.unconfirmed}
           updateFn={(x) => this.updateRoute({
             labels: {
               all: x.all,
               none: x.unlabeled,
               some: x.all ? [] : x.labels
-            }
+            },
+            unconfirmed: x.unconfirmed
           })} />
       </div>;
     }
@@ -458,6 +471,7 @@ module Esper.Views {
       period?: Period.Single;
       filterStr?: string;
       labels?: Params.ListSelectJSON;
+      unconfirmed?: boolean;
     }, opts: Route.nav.Opts = {}) {
       var pathForCals = Params.pathForCals(newProps.cals || this.props.cals);
       var period = newProps.period || this.props.period;
@@ -469,7 +483,8 @@ module Esper.Views {
       ], encodeURIComponent)).join("/");
       opts.jsonQuery = {
         filterStr: Util.some(newProps.filterStr, this.props.filterStr),
-        labels: Util.some(newProps.labels, this.props.labels)
+        labels: Util.some(newProps.labels, this.props.labels),
+        unconfirmed: newProps.unconfirmed
       } as Params.FilterListJSON;
       Route.nav.path(path, opts);
     }

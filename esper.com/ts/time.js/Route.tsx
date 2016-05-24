@@ -100,6 +100,7 @@ module Esper.Route {
       getJSONQuery(ctx)
     ) as Params.FilterListJSON;
     q.labels = Params.cleanListSelectJSON(q.labels);
+    q.unconfirmed = Params.cleanBoolean(q.unconfirmed);
 
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "month");
