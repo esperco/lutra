@@ -114,7 +114,12 @@ module Esper.Components {
             $(element).tooltip({
               title: eventPlus.tooltip
             });
+          } else {
+            $(element).tooltip('destroy');
           }
+        },
+        eventDestroy: (event, element) => {
+          $(element).tooltip('destroy');
         },
         height: fcDiv.parent().height() - 10,
         windowResize: () => {
