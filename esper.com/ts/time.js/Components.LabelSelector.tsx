@@ -7,15 +7,18 @@ module Esper.Components {
     labels: Array<Labels.LabelCount>;
     totalCount?: number;
     unlabeledCount?: number;
+    unconfirmedCount?: number;
     selected: string[];
     allSelected?: boolean;
     unlabeledSelected?: boolean;
     showUnlabeled?: boolean;
+    unconfirmedSelected?: boolean;
     updateFn: (x: {
       all: boolean;
       unlabeled: boolean;
       labels: string[];
     }) => void;
+    onUnconfirmedClick?: () => void;
     className?: string;
   }
 
@@ -140,6 +143,24 @@ module Esper.Components {
       </div> : null }
       { props.showUnlabeled ? <div className="divider" /> : null }
 
+      { props.onUnconfirmedClick ?
+        <div className="esper-select-menu">
+        <a className="esper-selectable"
+           onClick={() => props.onUnconfirmedClick()}>
+          {
+            props.unconfirmedCount ?
+            <span className={classNames("badge", "unconfirmed", {
+              active: props.unconfirmedSelected
+            })}>
+              { props.unconfirmedCount }
+            </span> : null
+          }
+          <i className="fa fa-fw fa-question-circle" />{" "}
+          { Text.Unconfirmed }
+        </a>
+      </div> : null }
+      { props.onUnconfirmedClick ? <div className="divider" /> : null }
+
       <div className="esper-select-menu">
         <a className="esper-selectable"
            href={Paths.Manage.labels().href}>
@@ -156,6 +177,9 @@ module Esper.Components {
   export function LabelSelectorDropdown(props: LabelSelectorProps) {
     // Dropdown input text
     var selectedText = (() => {
+      if (props.unconfirmedSelected) {
+        return Text.Unconfirmed;
+      }
       if (props.allSelected) {
         return Text.AllLabels;
       }

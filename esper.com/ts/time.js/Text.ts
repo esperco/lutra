@@ -41,6 +41,7 @@ module Esper.Text {
   // Selector text
   export const AllLabels = `All ` + _.capitalize(Labels);
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
+  export const Unconfirmed = `New Events`;
   export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 
   /////

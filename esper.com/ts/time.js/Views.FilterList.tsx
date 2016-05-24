@@ -8,6 +8,7 @@ module Esper.Views {
   interface FilterListProps extends Params.FilterListJSON {
     cals: Stores.Calendars.CalSelection[];
     period: Period.Single;
+    unconfirmed: boolean;
   }
 
   interface FilterListState {
@@ -22,6 +23,13 @@ module Esper.Views {
     _editModalEvents: Stores.Events.TeamEvent[];
     _goToTodayOnUpdate: boolean;
 
+    /*
+      Map of filtered event _ids -- this is set by the filtering function
+      and reset whenever we receive props. Use this to keep showing events
+      even if filtering means implies the events should be hidden.
+    */
+    _eventIdMap: { [index: string]: boolean };
+
     // Use state to track selected events -- reset everytime props change
     constructor(props: FilterListProps) {
       super(props);
@@ -29,10 +37,12 @@ module Esper.Views {
         selected: [],
         actionsPinned: false
       };
+      this._eventIdMap = {};
     }
 
     componentWillReceiveProps() {
       this.setState({selected: []});
+      this._eventIdMap = {};
     }
 
     componentDidMount() {
@@ -88,25 +98,37 @@ module Esper.Views {
     }
 
     filterEvents(events: Stores.Events.TeamEvent[]) {
-      if (! this.props.labels.all) {
-        events = _.filter(events, (e) =>
-          ( this.props.labels.none &&
-            Stores.Events.getLabels(e).length === 0) ||
-          ( _.intersection(
-              this.props.labels.some,
-              Stores.Events.getLabelIds(e)
-            ).length > 0)
-        );
+      if (_.keys(this._eventIdMap).length) {
+        return _.filter(events, (e) => this._eventIdMap[e.id]);
       }
 
-      if (this.props.filterStr) {
-        events = _.filter(events,
-          (e) => e.title &&
-                 _.includes(e.title.toLowerCase(),
-                            this.props.filterStr.toLowerCase())
-        );
+      if (this.props.unconfirmed) {
+        events = _.filter(events, (e) => Stores.Events.needsConfirmation(e));
       }
 
+      else {
+        if (! this.props.labels.all) {
+          events = _.filter(events, (e) =>
+            ( this.props.labels.none &&
+              Stores.Events.getLabels(e).length === 0) ||
+            ( _.intersection(
+                this.props.labels.some,
+                Stores.Events.getLabelIds(e)
+              ).length > 0)
+          );
+        }
+
+        if (this.props.filterStr) {
+          events = _.filter(events,
+            (e) => e.title &&
+                   _.includes(e.title.toLowerCase(),
+                              this.props.filterStr.toLowerCase())
+          );
+        }
+      }
+
+      // Record - remember events
+      _.each(events, (e) => this._eventIdMap[e.id] = true);
       return events;
     }
 
@@ -175,21 +197,35 @@ module Esper.Views {
     renderLabelSelector(events: Stores.Events.TeamEvent[]) {
       var labels = Labels.fromEvents(events, Stores.Teams.all());
       labels = Labels.sortLabels(labels);
+
+      var unconfirmedCount = _.filter(events,
+        (e) => Stores.Events.needsConfirmation(e)
+      ).length;
       return <div className="col-sm-6 form-group">
         <Components.LabelSelectorDropdown labels={labels}
           totalCount={events.length}
           unlabeledCount={Labels.countUnlabeled(events)}
+          unconfirmedCount={unconfirmedCount}
           selected={this.props.labels.some}
           allSelected={this.props.labels.all}
           unlabeledSelected={this.props.labels.none}
           showUnlabeled={true}
+          unconfirmedSelected={this.props.unconfirmed}
           updateFn={(x) => this.updateRoute({
             labels: {
               all: x.all,
               none: x.unlabeled,
               some: x.all ? [] : x.labels
             }
-          })} />
+          })}
+          onUnconfirmedClick={() => this.updateRoute(this.props.unconfirmed ?
+            {
+              unconfirmed: false,
+              labels: { all: true, none: true, some: [] }
+            } : {
+              unconfirmed: true,
+              labels: { all: false, none: false, some: [] }
+            })} />
       </div>;
     }
 
@@ -245,7 +281,20 @@ module Esper.Views {
             <div className="action" onClick={() => this.editSelectedEvents()}>
               <i className="fa fa-fw fa-tag" />
               <span className="hidden-xs">
-                {" "}Label
+                {" "}{ Text.EditLabels }
+              </span>
+            </div> :
+            null
+          }
+          {
+            !! _.find(this.state.selected,
+              (s) => Stores.Events.needsConfirmation(s)
+            ) ?
+            <div className="action"
+                 onClick={() => this.confirmSelectedEvents()}>
+              <i className="fa fa-fw fa-check" />
+              <span className="hidden-xs">
+                {" "}{ Text.ConfirmLabels }
               </span>
             </div> :
             null
@@ -346,6 +395,22 @@ module Esper.Views {
       this.renderModal(this.state.selected);
     }
 
+    confirmSelectedEvents() {
+      Actions.EventLabels.confirm(this.state.selected);
+
+      // Update state with new (confirmed) labels
+      var updatedSelections = Option.flatten(
+        _(this.state.selected)
+          .map((s) => Stores.Events.storeId(s))
+          .map((_id) => Stores.Events.EventStore.get(_id))
+          .map((o) => o.flatMap((d) => d.data))
+          .value()
+      );
+      this.setState({
+        selected: updatedSelections
+      });
+    }
+
     renderModal(events: Stores.Events.TeamEvent[], minFeedback=true) {
       this._editModalEvents = events;
       this._editModalId = Layout.renderModal(
@@ -429,6 +494,7 @@ module Esper.Views {
       period?: Period.Single;
       filterStr?: string;
       labels?: Params.ListSelectJSON;
+      unconfirmed?: boolean;
     }, opts: Route.nav.Opts = {}) {
       var pathForCals = Params.pathForCals(newProps.cals || this.props.cals);
       var period = newProps.period || this.props.period;
@@ -440,7 +506,8 @@ module Esper.Views {
       ], encodeURIComponent)).join("/");
       opts.jsonQuery = {
         filterStr: Util.some(newProps.filterStr, this.props.filterStr),
-        labels: Util.some(newProps.labels, this.props.labels)
+        labels: Util.some(newProps.labels, this.props.labels),
+        unconfirmed: newProps.unconfirmed
       } as Params.FilterListJSON;
       Route.nav.path(path, opts);
     }

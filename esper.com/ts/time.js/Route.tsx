@@ -100,6 +100,7 @@ module Esper.Route {
       getJSONQuery(ctx)
     ) as Params.FilterListJSON;
     q.labels = Params.cleanListSelectJSON(q.labels);
+    q.unconfirmed = Params.cleanBoolean(q.unconfirmed);
 
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "month");
@@ -108,6 +109,20 @@ module Esper.Route {
       cals: Params.cleanCalSelections(teamId, ctx.params["calIds"]),
       period: period
     }, q)
+  });
+
+  // Alias for showing unconfirmed events only in list view
+  route(Paths.Time.listNew({
+    teamId: ":teamId?",
+    calIds: ":calIds?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, function(ctx) {
+    Route.nav.go(Paths.Time.list(ctx.params), {
+      jsonQuery: {
+        unconfirmed: true
+      }
+    });
   });
 
 

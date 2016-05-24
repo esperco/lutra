@@ -263,8 +263,12 @@ module Esper.Params {
     return typedQ;
   }
 
+  export function cleanBoolean(x: boolean) {
+    return !!x;
+  }
 
   export interface FilterListJSON extends FilterStrJSON {
     labels: ListSelectJSON;
+    unconfirmed: boolean;
   }
 }

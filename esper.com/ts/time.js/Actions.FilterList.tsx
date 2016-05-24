@@ -25,6 +25,7 @@ module Esper.Actions {
       period={params.period}
       labels={queryJSON.labels}
       filterStr={queryJSON.filterStr}
+      unconfirmed={queryJSON.unconfirmed}
     />, <Views.Header active={Views.Header_.Tab.List} />);
 
     /////
