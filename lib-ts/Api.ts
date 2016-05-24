@@ -218,6 +218,93 @@ module Esper.Api {
       + "/member/" + string(memberUid));
   }
 
+  /***** Esper group management *****/
+
+  export function getGroups(teamid: string):
+    JQueryPromise<ApiT.GroupList>
+  {
+    var url = prefix + "/api/group/team/" + string(Login.me())
+      + "/" + string(teamid);
+    return JsonHttp.get(url);
+  }
+
+  export function getGroupsByUid(uid: string):
+    JQueryPromise<ApiT.GroupList>
+  {
+    var url = prefix + "/api/group/user/" + string(Login.me())
+      + "/" + string(uid);
+    return JsonHttp.get(url);
+  }
+
+  export function getGroupDetails(groupid: string):
+    JQueryPromise<ApiT.Group>
+  {
+    var url = prefix + "/api/group/details/" + string(Login.me())
+      + "/" + string(groupid);
+    return JsonHttp.get(url);
+  }
+
+  export function createGroup(uid: string, groupName: string):
+    JQueryPromise<ApiT.Group>
+  {
+    var url = prefix + "/api/group/create/" + string(Login.me())
+      + "/" + string(uid)
+      + "/" + string(groupName);
+    return JsonHttp.post(url);
+  }
+
+  export function deleteGroup(groupid: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/delete/" + string(Login.me())
+      + "/" + string(groupid);
+    return JsonHttp.delete_(url);
+  }
+
+  export function putGroupMember(groupid: string, teamid: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/member/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(teamid);
+    return JsonHttp.put(url);
+  }
+
+  export function removeGroupMember(groupid: string, teamid: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/member" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(teamid);
+    return JsonHttp.delete_(url);
+  }
+
+  export function putGroupIndividual(groupid: string, uid: string):
+    JQueryPromise<ApiT.GroupIndividual>
+  {
+    var url = prefix + "/api/group/individual-member/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(uid);
+    return JsonHttp.put(url);
+  }
+
+  export function removeGroupIndividual(groupid: string, uid: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/individual-member/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(uid);
+    return JsonHttp.delete_(url);
+  }
+
+  export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/event-labels/" + string(Login.me())
+      + "/" + string(groupid);
+    return JsonHttp.put(url, JSON.stringify(labels));
+  }
+
   /***** Opaque URLs with unique token *****/
 
   export function getToken(token: string): JQueryPromise<ApiT.TokenInfo> {

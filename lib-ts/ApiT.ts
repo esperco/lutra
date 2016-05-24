@@ -104,6 +104,33 @@ module Esper.ApiT {
     team?: Team;
   }
 
+  export type GroupList = ListResponse<Group>;
+
+  export type GroupLabels = ListResponse<string>;
+
+  export interface Group {
+    groupid: string;
+    group_name: string;
+    group_labels?: string[];
+    group_labels_norm?: string[];
+    group_member_role?: string;
+    group_teams?: GroupMember[];
+    group_individuals?: GroupIndividual[];
+  }
+
+  export interface GroupMember {
+    teamid: string;
+    email?: string;
+    name?: string;
+  }
+
+  export interface GroupIndividual {
+    uid: string;
+    role: string;
+    email?: string;
+    invite_sent?: string;
+  }
+
   export interface GenericCalendar {
     id: string;
     title: string;
@@ -394,13 +421,14 @@ module Esper.ApiT {
     subject: string;
     snippet: string;
   }
+
   export interface EmailThreadSearch {
-      gmail_owner: string;
-      gmail_thrid: string;
-      first_subject: string;
-      last_snippet: string;
-      first_from: string;
-      last_date: string;
+    gmail_owner: string;
+    gmail_thrid: string;
+    first_subject: string;
+    last_snippet: string;
+    first_from: string;
+    last_date: string;
   }
 
   export interface EmailThreadSearchList {
