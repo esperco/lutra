@@ -153,4 +153,17 @@ module Esper.Paths {
       return optPath(prefix, "notifications", teamId);
     }
   }
+
+  // Paths for /groups
+  export module Groups {
+    export const prefix = "/groups";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
+
+    export function list() {
+      return optPath(prefix, "list");
+    }
+  }
 }
