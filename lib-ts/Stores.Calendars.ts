@@ -53,6 +53,11 @@ module Esper.Stores.Calendars {
       var apiP = Api.getGenericCalendarList(teamId)
         .then((calList) => Option.wrap(calList.calendars))
       AvailableStore.fetch(teamId, apiP);
+
+      // If no list for this team yet, create one
+      if (ListStore.get(teamId).isNone()) {
+        ListStore.set(teamId, Option.some([]));
+      }
     }
   }
 
