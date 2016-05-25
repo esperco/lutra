@@ -13,6 +13,12 @@ module Esper.Text {
   export const TeamExec = "principal";
   export const TeamExecs = "principals";
 
+  export const Group = "group";
+  export const Groups = "groups";
+
+  export const GroupMember = "group member";
+  export const GroupMembers = "group members";
+
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
 
