@@ -1,13 +1,16 @@
 /*
-  New Team page
+  New Group page
 */
 
 module Esper.Views {
+  interface Props {
+    isAdmin?: boolean;
+  }
 
-  export class NewTeam extends ReactHelpers.Component<{}, {
+  export class NewGroup extends ReactHelpers.Component<Props, {
     busy?: boolean;
   }> {
-    _teamForm: Components.NewTeamForm;
+    _groupForm: Components.NewGroupForm;
 
     constructor(props: {}) {
       super(props);
@@ -17,20 +20,20 @@ module Esper.Views {
     renderWithData() {
       return <div className="team-settings-page esper-full-screen minus-nav">
         <Components.TeamsSidebar teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}/>
+          groups={Stores.Groups.all()} />
 
         <div className="esper-right-content padded">
-          <div id="new-team-page" className="esper-expanded">
+          <div id="new-group-page" className="esper-expanded">
             <div className="panel panel-default">
               <div className="panel-heading">
-                { Text.AddTeamHeading }
+                { Text.AddGroupHeading }
               </div>
               <div className="panel-body">
                 <Components.ModalPanel
                  busy={this.state.busy} disableOK={this.state.busy}
                  okText="Save" onOK={() => this.save()}>
-                  <Components.NewTeamForm supportsExec={true}
-                    ref={(c) => this._teamForm = c}
+                  <Components.NewGroupForm isAdmin={this.props.isAdmin}
+                    ref={(c) => this._groupForm = c}
                   />
                 </Components.ModalPanel>
               </div>
@@ -41,13 +44,13 @@ module Esper.Views {
     }
 
     save() {
-      this._teamForm.validate().match({
+      this._groupForm.validate().match({
         none: () => null,
         some: (d) => {
           this.mutateState((s) => s.busy = true)
-          Actions.Teams.createExecTeam(d)
-            .done((t) => Route.nav.go(Paths.Manage.calendars({
-              teamId: t.teamid
+          Actions.Groups.createGroup(d)
+            .done((g) => Route.nav.go(Paths.Groups.list({
+              groupId: g.groupid
             })))
             .fail(() => this.mutateState((s) => s.busy = false))
         }

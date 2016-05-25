@@ -5,29 +5,51 @@ module Esper.Components {
 
   interface Props {
     activeTeamId?: string;
-    pathFn?: (p: {teamId: string}) => Paths.Path;
+    activeGroupId?: string;
+    pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
+    groups: ApiT.Group[];
   }
 
   export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
       return <Components.SidebarWithToggle>
-        <label className="esper-header">
-          { Text.TeamExecs }
-        </label>
-        <ul className="esper-select-menu">
-          { _.map(this.props.teams, (t) => this.renderTeam(t))}
-          <li className="divider" />
-          <li>
-            <a className={classNames({
-              active: !this.props.activeTeamId
-            })}
-            href={Paths.Manage.newTeam().href}>
-              <i className="fa fa-fw fa-user-plus" />{" "}
-              { Text.AddTeamLink }
-            </a>
-          </li>
-        </ul>
+        <div className="esper-sidebar-section">
+          <label className="esper-header">
+            { Text.TeamExecs }
+          </label>
+          <ul className="esper-select-menu">
+            { _.map(this.props.teams, (t) => this.renderTeam(t))}
+            <li className="divider" />
+            <li>
+              <a className={classNames({
+                active: !this.props.activeTeamId
+              })}
+              href={Paths.Manage.newTeam().href}>
+                <i className="fa fa-fw fa-user-plus" />{" "}
+                { Text.AddTeamLink }
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div className="esper-sidebar-section">
+          <label className="esper-header">
+            { Text.Groups }
+          </label>
+          <ul className="esper-select-menu">
+            { _.map(this.props.groups, (g) => this.renderGroup(g))}
+            <li className="divider" />
+            <li>
+              <a className={classNames({
+                active: !this.props.activeGroupId
+              })}
+              href={Paths.Manage.newGroup().href}>
+                <i className="fa fa-fw fa-user-plus" />{" "}
+                { Text.AddGroupLink }
+              </a>
+            </li>
+          </ul>
+        </div>
       </Components.SidebarWithToggle>;
     }
 
@@ -42,6 +64,17 @@ module Esper.Components {
         href={pathFn({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-user" />{" "}
           { team.team_name }
+        </a>
+      </li>;
+    }
+
+    renderGroup(group: ApiT.Group) {
+      var pathFn = this.props.pathFn || Paths.Manage.general;
+
+      return <li key={group.groupid}>
+        <a href={pathFn({groupId: group.groupid}).href}>
+          <i className="fa fa-fw fa-users" />{" "}
+          { group.group_name }
         </a>
       </li>;
     }

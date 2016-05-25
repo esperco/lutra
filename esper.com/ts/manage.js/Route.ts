@@ -21,6 +21,10 @@ module Esper.Route {
     Actions.renderNewTeam();
   });
 
+  route(Paths.Manage.newGroup().hash, function() {
+    Actions.renderNewGroup();
+  });
+
   route(Paths.Manage.general({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
