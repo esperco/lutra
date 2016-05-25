@@ -22,6 +22,16 @@ module Esper.Text {
   export const AddTeamLink = `New ${TeamExec}`;
   export const AddTeamHeading = "Who are you managing time for?";
 
+  // Add group member
+  export const AddGroupMemberLink = "Add team";
+  export function AddGroupMemberHeading(group?: string) {
+    return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
+  }
+
+  // Add group member
+  export const AddGroupLink = `New ${Group}`;
+  export const AddGroupHeading = "Create a new group";
+
   // Remove team
   export const RemoveTeamBtn = "Deactivate";
   export function removeTeamDescription(person?: string) {

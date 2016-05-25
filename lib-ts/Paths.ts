@@ -183,6 +183,10 @@ module Esper.Paths {
       return optPath(prefix, "personal");
     }
 
+    export function newGroup() {
+      return optPath(prefix, "new-group");
+    }
+
     export module Team {
       export const subprefix = "team/";
 
@@ -212,7 +216,7 @@ module Esper.Paths {
       return optPath(prefix, "");
     }
 
-    export function list() {
+    export function list({groupId} : {groupId?: string} = {}) {
       return optPath(prefix, "list");
     }
   }

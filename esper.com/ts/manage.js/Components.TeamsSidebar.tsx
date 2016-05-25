@@ -5,9 +5,11 @@ module Esper.Components {
 
   interface Props {
     activeTeamId?: string;
-    pathFn?: (p: {teamId: string}) => Paths.Path;
+    activeGroupId?: string;
+    pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
     activePersonal?: boolean;
+    groups: ApiT.Group[];
   }
 
   export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
@@ -29,6 +31,25 @@ module Esper.Components {
               href={Paths.Manage.newTeam().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
                 { Text.AddTeamLink }
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="esper-panel-section">
+          <label className="esper-header">
+            { Text.Groups }
+          </label>
+          <ul className="esper-select-menu">
+            { _.map(this.props.groups, (g) => this.renderGroup(g))}
+            <li className="divider" />
+            <li>
+              <a className={classNames({
+                active: !this.props.activeGroupId
+              })}
+              href={Paths.Manage.newGroup().href}>
+                <i className="fa fa-fw fa-user-plus" />{" "}
+                { Text.AddGroupLink }
               </a>
             </li>
           </ul>
@@ -58,6 +79,17 @@ module Esper.Components {
         href={pathFn({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-user" />{" "}
           { team.team_name }
+        </a>
+      </li>;
+    }
+
+    renderGroup(group: ApiT.Group) {
+      var pathFn = this.props.pathFn || Paths.Manage.general;
+
+      return <li key={group.groupid}>
+        <a href={pathFn({groupId: group.groupid}).href}>
+          <i className="fa fa-fw fa-users" />{" "}
+          { group.group_name }
         </a>
       </li>;
     }

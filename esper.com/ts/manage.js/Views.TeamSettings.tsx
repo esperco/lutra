@@ -22,6 +22,7 @@ module Esper.Views {
         <Components.TeamsSidebar
           activeTeamId={this.props.teamId}
           teams={Stores.Teams.all()}
+          groups={Stores.Groups.all()}
           pathFn={this.pathFn}
         />
 
