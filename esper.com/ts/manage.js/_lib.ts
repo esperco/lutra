@@ -15,6 +15,7 @@
 /// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Preferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
+/// <reference path="../lib/Stores.Groups.ts" />
 /// <reference path="../lib/Text.ts" />
 /// <reference path="../lib/Util.ts" />
 
@@ -24,6 +25,7 @@
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.NewGroupForm.tsx" />
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
