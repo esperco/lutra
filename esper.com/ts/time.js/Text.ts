@@ -44,6 +44,10 @@ module Esper.Text {
   export const Unconfirmed = `New Events`;
   export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 
+  // Paginated Predictions
+  export const ConfirmLabelsHeading = ConfirmLabels;
+  export const MorePredictions = `More`;
+
   /////
 
   function s(n: number) {
