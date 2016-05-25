@@ -8,7 +8,7 @@ module Esper.Views {
     renderWithData() {
       return <Components.SidebarWithToggle>
         <label className="esper-header">
-          { Text.TeamExecs }
+          { Text.Groups }
         </label>
       </Components.SidebarWithToggle>;
     }
