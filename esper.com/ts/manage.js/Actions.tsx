@@ -71,4 +71,9 @@ module Esper.Actions {
     render(<Views.NewTeam />);
     Analytics.page(Analytics.Page.NewTeam);
   }
+
+  export function renderNewGroup() {
+    render(<Views.NewGroup />);
+    Analytics.page(Analytics.Page.NewGroup);
+  }
 }
