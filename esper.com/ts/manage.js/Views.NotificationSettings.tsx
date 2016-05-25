@@ -106,7 +106,8 @@ module Esper.Views {
         let active = isActiveFn(c);
         return <div key={c.id} className={classNames("esper-selectable", {
                       active: active
-                    })}>
+                    })}
+                    onClick={() => onToggle(c)}>
           <i className={classNames("fa", "fa-fw", {
             "fa-calendar-o": !active,
             "fa-calendar-check-o": active
