@@ -213,7 +213,8 @@ module Esper.TestFixtures {
     end?: string,
     id?: string,
     calendar_id?: string,
-    guests?: ApiT.Attendee[]
+    guests?: ApiT.Attendee[],
+    recurring_event_id?: string;
   } = {}): ApiT.GenericCalendarEvent {
     var defaultEvent: ApiT.GenericCalendarEvent = {
       id: "id1",
