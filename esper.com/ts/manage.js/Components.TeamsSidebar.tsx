@@ -82,7 +82,7 @@ module Esper.Components {
     }
 
     renderGroup(group: ApiT.Group) {
-      var pathFn = this.props.pathFn || Paths.Manage.general;
+      var pathFn = this.props.pathFn || Paths.Manage.Group.general;
 
       return <li key={group.groupid}>
         <a href={pathFn({groupId: group.groupid}).href}>
