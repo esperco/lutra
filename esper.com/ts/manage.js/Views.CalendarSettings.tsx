@@ -7,7 +7,7 @@
 module Esper.Views {
 
   export class CalendarSettings extends TeamSettings {
-    pathFn = Paths.Manage.calendars;
+    pathFn = Paths.Manage.Team.calendars;
 
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">

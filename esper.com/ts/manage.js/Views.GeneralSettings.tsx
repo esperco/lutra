@@ -7,7 +7,7 @@
 module Esper.Views {
 
   export class GeneralSettings extends TeamSettings {
-    pathFn = Paths.Manage.general;
+    pathFn = Paths.Manage.Team.general;
 
     renderMain(team: ApiT.Team) {
       var busy = Stores.Teams.status(this.props.teamId).match({
@@ -131,7 +131,7 @@ module Esper.Views {
 
   function removeTeam(team: ApiT.Team) {
     Actions.Teams.removeTeam(team.teamid);
-    Route.nav.go(Paths.Manage.general());
+    Route.nav.go(Paths.Manage.Team.general());
   }
 }
 
