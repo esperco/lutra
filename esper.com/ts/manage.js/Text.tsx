@@ -24,6 +24,12 @@ module Esper.Text {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Remove group
+  export const RemoveGroupBtn = "Remove";
+  export function removeGroupDescription(group?: string) {
+    return `Remove ${group || "this" + Group}?`;
+  }
+
   // Label actions
   export const LabelRenameDescription =
     `Rename a ${Label.toLowerCase()} across all events.`;
