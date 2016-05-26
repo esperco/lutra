@@ -9,13 +9,13 @@ module Esper.Components {
   }) {
     return <div className="esper-content-header settings-menu fixed padded">
       <SettingsMenuLink teamId={teamId} text={Text.GeneralSettings}
-        pathFn={Paths.Manage.general} activePathFn={pathFn} />
+        pathFn={Paths.Manage.Team.general} activePathFn={pathFn} />
       <SettingsMenuLink teamId={teamId} text={Text.Calendars}
-        pathFn={Paths.Manage.calendars} activePathFn={pathFn} />
+        pathFn={Paths.Manage.Team.calendars} activePathFn={pathFn} />
       <SettingsMenuLink teamId={teamId} text={Text.Labels}
-        pathFn={Paths.Manage.labels} activePathFn={pathFn} />
+        pathFn={Paths.Manage.Team.labels} activePathFn={pathFn} />
       <SettingsMenuLink teamId={teamId} text={Text.NotificationSettings}
-        pathFn={Paths.Manage.notifications} activePathFn={pathFn} />
+        pathFn={Paths.Manage.Team.notifications} activePathFn={pathFn} />
     </div>;
   }
 
