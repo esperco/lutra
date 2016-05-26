@@ -3,7 +3,7 @@
 */
 
 module Esper.Components {
-  export function SettingsMenu({teamId, pathFn}: {
+  export function TeamSettingsMenu({teamId, pathFn}: {
     teamId: string;
     pathFn?: (p: {teamId: string}) => Paths.Path;
   }) {
