@@ -24,6 +24,12 @@ module Esper.Text {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Remove group
+  export const RemoveGroupBtn = "Remove";
+  export function removeGroupDescription(group?: string) {
+    return `Remove ${group || "this" + Group}?`;
+  }
+
   // Sharing
   export const ExecAssistantsDescription = `These people have permission to ` +
     `manage time for this ${TeamExec}`;
