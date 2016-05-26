@@ -14,13 +14,13 @@ module Esper.Actions {
     Layout.render(main, header, footer);
   }
 
-  export function renderGeneralSettings(teamId?: string,
+  export function renderTeamGeneralSettings(teamId?: string,
     msgCode?: string, errCode?: string)
   {
     var teamId = Params.cleanTeamId(teamId);
     var msg = ManageMsg.get(msgCode);
     var err = ManageMsg.get(errCode);
-    render(<Views.GeneralSettings teamId={teamId}
+    render(<Views.TeamGeneralSettings teamId={teamId}
             msg={msg} err={err} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
@@ -68,5 +68,16 @@ module Esper.Actions {
   export function renderNewGroup() {
     render(<Views.NewGroup />);
     Analytics.page(Analytics.Page.NewGroup);
+  }
+
+  export function renderGroupGeneralSettings(groupId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    var groupId = Params.cleanGroupId(groupId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.GroupGeneralSettings groupId={groupId}
+            msg={msg} err={err} />);
+    Analytics.page(Analytics.Page.GroupManage);
   }
 }

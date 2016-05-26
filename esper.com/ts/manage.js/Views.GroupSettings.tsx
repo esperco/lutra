@@ -1,34 +1,34 @@
 /*
-  Base class for a team settings view
+  Base class for a group settings view
 
   Override renderMain funciton
 */
 
 module Esper.Views {
   interface Props {
-    teamId: string;
+    groupId: string;
     msg?: string;
     err?: string;
   }
 
-  export abstract class TeamSettings extends ReactHelpers.Component<Props, {}> {
-    pathFn: (p: {teamId: string}) => Paths.Path;
+  export abstract class GroupSettings extends ReactHelpers.Component<Props, {}> {
+    pathFn: (p: {groupId: string}) => Paths.Path;
 
     renderWithData() {
-      var team = Stores.Teams.require(this.props.teamId);
-      if (! team) return <span />;
+      var group = Stores.Groups.require(this.props.groupId);
+      if (! group) return <span />;
 
-      return <div className="team-settings-page esper-full-screen minus-nav">
+      return <div className="group-settings-page esper-full-screen minus-nav">
         <Components.TeamsSidebar
-          activeTeamId={this.props.teamId}
+          activeGroupId={this.props.groupId}
           teams={Stores.Teams.all()}
           groups={Stores.Groups.all()}
           pathFn={this.pathFn}
         />
 
         <div className="esper-right-content padded">
-          <Components.TeamSettingsMenu
-            teamId={this.props.teamId}
+          <Components.GroupSettingsMenu
+            groupId={this.props.groupId}
             pathFn={this.pathFn}
           />
 
@@ -43,12 +43,12 @@ module Esper.Views {
               <div className="alert msg alert-danger">{ this.props.err }</div> :
               null
             }
-            { this.renderMain(team) }
+            { this.renderMain(group) }
           </div>
         </div>
       </div>;
     }
 
-    abstract renderMain(team: ApiT.Team): JSX.Element;
+    abstract renderMain(group: ApiT.Group): JSX.Element;
   }
 }
