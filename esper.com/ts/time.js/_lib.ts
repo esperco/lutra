@@ -31,6 +31,7 @@
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.LabelList.tsx" />
+/// <reference path="../lib/Components.LoadingMsg.tsx" />
 /// <reference path="../lib/Components.ListSelector.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
