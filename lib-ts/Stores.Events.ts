@@ -319,19 +319,34 @@ module Esper.Stores.Events {
         var unwrappedEventsByDate = _.map(eventsByDate, (e) => e.unwrap());
 
         var events: TeamEvent[] = [];
-        _.each(unwrappedEventsByDate, (e) => e.data.match({
-          none: () => null,
-          some: (list) => _.each(list, (eventOpt) => eventOpt.data.match({
-            none: () => null,
-            some: (event) => events.push(event)
-          }))
-        }));
-        events = _.uniqBy(events, (e) => e.id);
+        var isBusy = false;
+        var hasError = false;
+        _.each(unwrappedEventsByDate, (e) => {
+          // If date is busy or error, then entire list is busy or error
+          if (e.dataStatus === Model2.DataStatus.FETCHING) {
+            isBusy = true;
+          } else if (e.dataStatus === Model2.DataStatus.FETCH_ERROR) {
+            hasError = true;
+          }
 
-        var isBusy = !!_.find(unwrappedEventsByDate,
-          (e) => e.dataStatus === Model2.DataStatus.FETCHING);
-        var hasError = !!_.find(unwrappedEventsByDate,
-          (e) => e.dataStatus === Model2.DataStatus.FETCH_ERROR);
+          e.data.match({
+            none: () => null,
+            some: (list) => _.each(list, (eventOpt) => {
+              // If event is busy or error, then entire list is busy or error
+              if (eventOpt.dataStatus === Model2.DataStatus.FETCHING) {
+                isBusy = true;
+              }
+              else if (eventOpt.dataStatus === Model2.DataStatus.FETCH_ERROR) {
+                hasError = true;
+              }
+              eventOpt.data.match({
+                none: () => null,
+                some: (event) => events.push(event)
+              });
+            })
+          });
+        });
+        events = _.uniqBy(events, (e) => e.id);
 
         return {
           start: start,
