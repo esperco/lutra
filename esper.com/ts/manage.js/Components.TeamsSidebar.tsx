@@ -23,7 +23,7 @@ module Esper.Components {
             <li className="divider" />
             <li>
               <a className={classNames({
-                active: !this.props.activeTeamId
+                active: !this.props.activeTeamId && !this.props.activeGroupId
               })}
               href={Paths.Manage.newTeam().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
@@ -41,7 +41,7 @@ module Esper.Components {
             <li className="divider" />
             <li>
               <a className={classNames({
-                active: !this.props.activeGroupId
+                active: !this.props.activeGroupId && !this.props.activeTeamId
               })}
               href={Paths.Manage.newGroup().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
@@ -55,7 +55,8 @@ module Esper.Components {
 
     renderTeam(team: ApiT.Team) {
       // Use pathFn to preserve current settings "tab" when switching teams
-      var pathFn = this.props.pathFn || Paths.Manage.Team.general;
+      var pathFn = this.props.activeTeamId ? this.props.pathFn
+                                           : Paths.Manage.Team.general;
 
       return <li key={team.teamid}>
         <a className={classNames({
@@ -69,10 +70,14 @@ module Esper.Components {
     }
 
     renderGroup(group: ApiT.Group) {
-      var pathFn = this.props.pathFn || Paths.Manage.Group.general;
+      var pathFn = this.props.activeGroupId ? this.props.pathFn
+                                            : Paths.Manage.Group.general;
 
       return <li key={group.groupid}>
-        <a href={pathFn({groupId: group.groupid}).href}>
+        <a className={classNames({
+          active: group.groupid === this.props.activeGroupId
+        })}
+        href={pathFn({groupId: group.groupid}).href}>
           <i className="fa fa-fw fa-users" />{" "}
           { group.group_name }
         </a>
