@@ -12,7 +12,7 @@ module Esper.Views {
   }
 
   export abstract class TeamSettings extends ReactHelpers.Component<Props, {}> {
-    pathFn: (p: {teamId: string}) => Paths.Path;
+    pathFn: (p: {teamId?: string, groupId?: string}) => Paths.Path;
 
     renderWithData() {
       var team = Stores.Teams.require(this.props.teamId);
