@@ -51,6 +51,7 @@ module Esper.Actions.Groups {
 
   // Remove a group
   export function removeGroup(groupId: string) {
+    Api.deleteGroup(groupId);
     Stores.Groups.remove(groupId);
   }
 
