@@ -160,6 +160,22 @@ module Esper.Paths {
         return optPath(prefix, subprefix + "notifications", teamId);
       }
     }
+
+    export module Group {
+      export const subprefix = "group/"
+
+      export function general({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "general", groupId);
+      }
+
+      export function labels({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "labels", groupId);
+      }
+
+      export function notifications({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "notifications", groupId);
+      }
+    }
   }
 
   // Paths for /groups
