@@ -46,7 +46,7 @@ module Esper.Views {
         some: (d) => {
           this.mutateState((s) => s.busy = true)
           Actions.Teams.createExecTeam(d)
-            .done((t) => Route.nav.go(Paths.Manage.calendars({
+            .done((t) => Route.nav.go(Paths.Manage.Team.calendars({
               teamId: t.teamid
             })))
             .fail(() => this.mutateState((s) => s.busy = false))

@@ -14,7 +14,7 @@ module Esper.Route {
   }
 
   routeHome(
-    redirectPath(Paths.Manage.general())
+    redirectPath(Paths.Manage.Team.general())
   );
 
   route(Paths.Manage.newTeam().hash, function() {
@@ -25,28 +25,28 @@ module Esper.Route {
     Actions.renderNewGroup();
   });
 
-  route(Paths.Manage.general({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.general({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderGeneralSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.calendars({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.calendars({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderCalendarSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.labels({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.labels({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderLabelSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.notifications({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);

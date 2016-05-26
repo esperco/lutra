@@ -141,20 +141,40 @@ module Esper.Paths {
       return optPath(prefix, "new-group");
     }
 
-    export function general({teamId} : {teamId?: string} = {}) {
-      return optPath(prefix, "general", teamId);
+    export module Team {
+      export const subprefix = "team/"
+
+      export function general({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix + "general", teamId);
+      }
+
+      export function labels({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix + "labels", teamId);
+      }
+
+      export function calendars({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix + "calendars", teamId);
+      }
+
+      export function notifications({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix + "notifications", teamId);
+      }
     }
 
-    export function labels({teamId} : {teamId?: string} = {}) {
-      return optPath(prefix, "labels", teamId);
-    }
+    export module Group {
+      export const subprefix = "group/"
 
-    export function calendars({teamId} : {teamId?: string} = {}) {
-      return optPath(prefix, "calendars", teamId);
-    }
+      export function general({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "general", groupId);
+      }
 
-    export function notifications({teamId} : {teamId?: string} = {}) {
-      return optPath(prefix, "notifications", teamId);
+      export function labels({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "labels", groupId);
+      }
+
+      export function notifications({groupId} : {groupId?: string} = {}) {
+        return optPath(prefix, subprefix + "notifications", groupId);
+      }
     }
   }
 

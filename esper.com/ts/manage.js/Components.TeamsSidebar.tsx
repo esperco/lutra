@@ -55,7 +55,7 @@ module Esper.Components {
 
     renderTeam(team: ApiT.Team) {
       // Use pathFn to preserve current settings "tab" when switching teams
-      var pathFn = this.props.pathFn || Paths.Manage.general;
+      var pathFn = this.props.pathFn || Paths.Manage.Team.general;
 
       return <li key={team.teamid}>
         <a className={classNames({
@@ -69,7 +69,7 @@ module Esper.Components {
     }
 
     renderGroup(group: ApiT.Group) {
-      var pathFn = this.props.pathFn || Paths.Manage.general;
+      var pathFn = this.props.pathFn || Paths.Manage.Group.general;
 
       return <li key={group.groupid}>
         <a href={pathFn({groupId: group.groupid}).href}>

@@ -149,12 +149,12 @@ module Esper.Route {
   );
 
   // Alias for old references to calendar-settings
-  route("/calendar-settings", redirectPath(Paths.Manage.notifications()));
-  route("/notification-settings", redirectPath(Paths.Manage.notifications()));
+  route("/calendar-settings", redirectPath(Paths.Manage.Team.notifications()));
+  route("/notification-settings", redirectPath(Paths.Manage.Team.notifications()));
 
   // Redirect old settings pages
-  route("/labels", redirectPath(Paths.Manage.labels()));
-  route("/calendar-manage", redirectPath(Paths.Manage.calendars()));
+  route("/labels", redirectPath(Paths.Manage.Team.labels()));
+  route("/calendar-manage", redirectPath(Paths.Manage.Team.calendars()));
 
 
   // 404 page

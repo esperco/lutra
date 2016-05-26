@@ -163,7 +163,7 @@ module Esper.Components {
 
       <div className="esper-select-menu">
         <a className="esper-selectable"
-           href={Paths.Manage.labels().href}>
+           href={Paths.Manage.Team.labels().href}>
           <i className="fa fa-fw fa-bars" />{" "}
           { Text.ManageLabels }
         </a>
