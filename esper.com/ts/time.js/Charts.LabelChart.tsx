@@ -104,10 +104,10 @@ module Esper.Charts {
           Place in requestAnimationFrame so modal rendering is outside of our
           current React render loop. Normally we don't want to trigger new
           React renderings from an existing render function (because of
-          the potentional for infinite or long-last loops), but in this case,
-          we're only doing it once, and the rendering is of a modal, which
-          lives outside of the container that this chart selector is being
-          rendered into.
+          the potentional for infinite or long-lasting loops), but in this
+          case, we're only doing it once, and the rendering is of a modal,
+          which lives outside of the container that this chart selector is
+          being rendered into.
         */
         window.requestAnimationFrame(
           () => this.launchConfirmModal(unconfirmed)
