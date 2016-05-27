@@ -14,7 +14,7 @@ module Esper.Predictions {
     // Just filter out recurring for now -- can do more intelligent sorting
     // later
     return _(events)
-      .uniqBy((e) => e.id || e.recurringEventId)
+      .uniqBy((e) => e.recurringEventId || e.id)
       .value()
   }
 }
