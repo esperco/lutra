@@ -1,6 +1,12 @@
 /// <reference path="./Charts.tsx" />
 
 module Esper.Charts {
+  /*
+    Should we auto-launch the modal to confirm events? Only do so first time
+    we encounter un-confirmed events. After that, set this var to false.
+  */
+  var autoLaunchConfirm = true;
+
   interface LabelFilterParams extends Params.RelativePeriodJSON {
     labels: Params.ListSelectJSON;
   }
@@ -88,6 +94,26 @@ module Esper.Charts {
       var unconfirmed = _.filter(this.events,
         (e) => Stores.Events.needsConfirmation(e)
       );
+
+      // Prioritize predictions and filter out recurring
+      unconfirmed = Predictions.prioritize(unconfirmed);
+
+      if (autoLaunchConfirm && unconfirmed.length > 0) {
+
+        /*
+          Place in requestAnimationFrame so modal rendering is outside of our
+          current React render loop. Normally we don't want to trigger new
+          React renderings from an existing render function (because of
+          the potentional for infinite or long-lasting loops), but in this
+          case, we're only doing it once, and the rendering is of a modal,
+          which lives outside of the container that this chart selector is
+          being rendered into.
+        */
+        window.requestAnimationFrame(
+          () => this.launchConfirmModal(unconfirmed)
+        );
+      }
+
       return <div className="esper-menu-section">
         { super.renderSelectors() }
         <div className="esper-menu-section">
@@ -104,12 +130,17 @@ module Esper.Charts {
             showUnlabeled={this.allowUnlabeled}
             updateFn={(x) => this.updateLabels(x)}
             unconfirmedCount={unconfirmed.length}
-            onUnconfirmedClick={() => Layout.renderModal(
-              Containers.confirmListModal(unconfirmed)
-            )}
+            onUnconfirmedClick={() => this.launchConfirmModal(unconfirmed)}
           />
         </div>
       </div>;
+    }
+
+    launchConfirmModal(events: Stores.Events.TeamEvent[]) {
+      autoLaunchConfirm = false;
+      Layout.renderModal(
+        Containers.confirmListModal(events)
+      );
     }
 
     /* Actions */
