@@ -48,7 +48,7 @@ module Esper.Params {
     var groups = Stores.Groups.all();
     Log.assert(groups.length > 0, "No groups loaded");
 
-    // Default to first team with calendars
+    // Default to first group
     var group = groups[0];
     return group.groupid;
   }
