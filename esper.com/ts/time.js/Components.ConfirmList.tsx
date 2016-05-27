@@ -28,37 +28,38 @@ module Esper.Components {
     }
 
     render() {
-      if (this.props.busy) {
-        return <div>
-          <LoadingMsg msg={Text.PredictionsLoading} hellip={true} />
-        </div>;
-      }
-
-      if (this.props.error) {
-        return <div><ErrorMsg /></div>;
-      }
-
       var events = this.getEvents();
       var needsConfirmation = !!_.find(events,
         (e) => Stores.Events.needsConfirmation(e)
       );
 
-      return <ModalPanel onCancel={() => this.onFinish()} cancelText="Done">
+      // Logarithmic progress bar
+      var progress = this.state.pageIndices[1] / this.props.events.length;
+      progress = Math.min(progress, 1);
+      progress = Math.sqrt(progress);
+
+      return <div>
+        {/* Description of why we need confirmation */}
         { this.state.pageIndices[0] === 0 ?
           <div className="alert alert-info">
             { Text.ConfirmationDescription }
           </div> :
-          null
-        }
+          null }
 
-        <EventList events={events}
-          teams={this.props.teams}
-          onEventClick={this.props.onEventClick}
-          onAddLabelClick={this.props.onAddLabelClick}
-        />
+        { this.props.error ? <ErrorMsg /> : null }
 
-        {
-          events.length ?
+        <ProgressBar width={progress} skinny={false} />
+
+        { this.props.busy ?
+          <LoadingMsg msg={Text.PredictionsLoading} hellip={true} /> :
+          <EventList events={events}
+            teams={this.props.teams}
+            onEventClick={this.props.onEventClick}
+            onAddLabelClick={this.props.onAddLabelClick}
+          /> }
+
+        {/* Button to load more events and update predictions, as applicable */}
+        { events.length ?
           <div className="form-group">
           {
             (needsConfirmation || this.hasMore()) ?
@@ -72,9 +73,16 @@ module Esper.Components {
               { Text.ConfirmationDone }
             </div>
           }
-          </div> : null
-        }
-      </ModalPanel>;
+          </div> : null }
+
+        {/* Button to close list / modal / whatever */}
+        <div className="clearfix modal-footer">
+          <button className="btn btn-default"
+                  onClick={() => this.onFinish()}>
+            Done
+          </button>
+        </div>
+      </div>;
     }
 
     getEvents() {
@@ -97,8 +105,8 @@ module Esper.Components {
       }
     }
 
-    // Keep as separate function so our ConfirmListModal can handle this
-    // differently
+    // Keep as separate function from updateRemainder so our ConfirmListModal
+    // (or any other subclasses) can handle this differently
     onFinish() {
       this.updateRemainder();
     }
