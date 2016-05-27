@@ -94,6 +94,10 @@ module Esper.Charts {
       var unconfirmed = _.filter(this.events,
         (e) => Stores.Events.needsConfirmation(e)
       );
+
+      // Prioritize predictions and filter out recurring
+      unconfirmed = Predictions.prioritize(unconfirmed);
+
       if (autoLaunchConfirm && unconfirmed.length > 0) {
 
         /*
