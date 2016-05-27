@@ -51,7 +51,7 @@ module Esper.Route {
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderLabelSettings(ctx.params["teamId"], msg, err);
+      Actions.renderTeamLabelSettings(ctx.params["teamId"], msg, err);
     });
 
   route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash, onboardingCheck,
@@ -66,6 +66,13 @@ module Esper.Route {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderGroupGeneralSettings(ctx.params["groupId"], msg, err);
+  });
+
+  route(Paths.Manage.Group.labels({groupId: ":groupId?"}).hash, groupCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderGroupLabelSettings(ctx.params["groupId"], msg, err);
   });
 
   routeNotFound(function(ctx) {

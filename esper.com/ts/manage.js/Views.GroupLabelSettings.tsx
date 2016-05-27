@@ -1,18 +1,18 @@
 /*
-  Label settings for a given team
+  Label settings for a given group
 */
 
-/// <reference path="./Views.TeamSettings.tsx" />
+/// <reference path="./Views.GroupSettings.tsx" />
 
 module Esper.Views {
 
-  export class LabelSettings extends TeamSettings {
-    pathFn = Paths.Manage.Team.labels;
+  export class GroupLabelSettings extends GroupSettings {
+    pathFn = Paths.Manage.Group.labels;
 
-    renderMain(team: ApiT.Team) {
+    renderMain(group: ApiT.Group) {
       return <div className="panel panel-default">
         <div className="panel-body">
-          <LabelManager team={team} />
+          <LabelManager group={group} />
         </div>
       </div>;
     }
@@ -22,7 +22,7 @@ module Esper.Views {
   /* Label manager component used in above view */
 
   interface Props {
-    team: ApiT.Team;
+    group: ApiT.Group;
   }
 
   interface State {
@@ -70,7 +70,7 @@ module Esper.Views {
     }
 
     getLabels() {
-      return Labels.sortLabelStrs(this.props.team.team_labels);
+      return Labels.sortLabelStrs(this.props.group.group_labels);
     }
 
     renderLabelInput() {
@@ -127,7 +127,7 @@ module Esper.Views {
     addLabel() {
       var val = this.state.labelFilter;
       if (val) {
-        Actions.Teams.addLabel(this.props.team.teamid, val);
+        Actions.Groups.addLabel(this.props.group.groupid, val);
         this.resetState();
       }
     }
@@ -221,7 +221,7 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Actions.Teams.rmLabel(this.props.team.teamid, label);
+      Actions.Groups.rmLabel(this.props.group.groupid, label);
     }
 
     promptRmFor(label: string) {
@@ -233,7 +233,7 @@ module Esper.Views {
 
     rmLabel(label: string) {
       this.archive(label);
-      Actions.BatchLabels.remove(this.props.team.teamid, label);
+      Actions.BatchLabels.remove(this.props.group.groupid, label);
     }
 
     showEditFor(label: string) {
@@ -256,8 +256,8 @@ module Esper.Views {
       var val = input.val().trim();
       var orig = this.state.editLabel.trim();
       if (val && val !== orig) {
-        Actions.Teams.renameLabel(this.props.team.teamid, orig, val);
-        Actions.BatchLabels.rename(this.props.team.teamid, orig, val);
+        Actions.Groups.renameLabel(this.props.group.groupid, orig, val);
+        Actions.BatchLabels.rename(this.props.group.groupid, orig, val);
       }
       this.resetState();
     }
