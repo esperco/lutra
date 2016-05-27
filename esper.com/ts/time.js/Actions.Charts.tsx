@@ -106,9 +106,38 @@ module Esper.Actions {
   ///////
 
   export function renderChart(params: Charts.DefaultEventChartParams) {
-    // This isn't cleaned in routing
+    var chartTypes = chartInfo;
+
+    // ChartID isn't cleaned in routing
     params = _.clone(params);
     params.chartId = params.chartId || getDefaultChartType();
+
+    // Don't show cal comp charts if only one calendar
+    var calCompCharts: ChartId[] = [
+      "cal-comp-hours",
+      "cal-comp-percent",
+      "cal-comp-pie"
+    ];
+    if (params.cals.length === 1) {
+      var calIds = _(params.cals)
+        .map((c) => c.teamId)
+        .uniq()
+        .map((teamId) => Stores.Teams.require(teamId))
+        .map((team) => team ? [] : team.team_timestats_calendars)
+        .flatten<string>()
+        .uniq()
+        .value();
+      if (calIds.length <= 1) {
+        if (_.includes(calCompCharts, params.chartId)) {
+          params.chartId = getDefaultChartType();
+        }
+
+        // Filter out chart info from selector if only one calendar
+        chartTypes = _.filter(chartTypes,
+          (c) => ! _.includes(calCompCharts, c.id)
+        );
+      }
+    }
 
     var chartVariant = getChart(params);
     var chartId = chartVariant[0];
@@ -117,7 +146,7 @@ module Esper.Actions {
 
     render(<Views.Charts
       currentChart={chart}
-      chartTypes={chartInfo}
+      chartTypes={chartTypes}
     />, <Views.Header active={Views.Header_.Tab.Charts} />);
 
     trackChart(chartVariant);

@@ -79,8 +79,8 @@ module Esper.Views {
           </Components.Selector>
           <ul className="dropdown-menu">
             {
-              _.map(this.props.chartTypes, (c, i) =>
-                <li key={i} onClick={() => this.updateChartType(c.id)}>
+              _.map(this.props.chartTypes, (c) =>
+                <li key={c.id} onClick={() => this.updateChartType(c.id)}>
                   <a>
                     { c.icon ? <span>
                         <span className={"fa fa-fw " + c.icon} />{" "}
