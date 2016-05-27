@@ -97,8 +97,14 @@ module Esper.Components {
       }
     }
 
-    // When done, re-predict any remaining events
+    // Keep as separate function so our ConfirmListModal can handle this
+    // differently
     onFinish() {
+      this.updateRemainder();
+    }
+
+    // When done, re-predict any remaining events
+    updateRemainder() {
       var eventsToUpdate = _.filter(this.props.events,
         (e) => Stores.Events.needsConfirmation(e)
       );
@@ -126,13 +132,18 @@ module Esper.Components {
     render() {
       return <Modal icon="fa-question-circle"
                     title={Text.ConfirmLabelsHeading}
-                    onHidden={() => this.onFinish()}>
+                    onHidden={() => this.updateRemainder()}>
         { super.render() }
       </Modal>
     }
 
+    /*
+      Trigger update remainder function via onHidden handler on Modal
+      This avoids calling the problem where we call the function twice
+      because clicking done triggers the onFinish function AND
+      the onHidden handler.
+    */
     onFinish() {
-      super.onFinish();
       Layout.closeModal();
     }
   }
