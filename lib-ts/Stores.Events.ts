@@ -58,14 +58,32 @@ module Esper.Stores.Events {
         if (team) {
           var labels = _.filter(e.predicted_labels,
             (l) => _.includes(team.team_labels_norm, l.label_norm));
-          var topPrediction = labels[0];
-          if (topPrediction &&
-              topPrediction.score > PREDICTED_LABEL_PERCENT_CUTOFF) {
-            return Option.some([{
-              id: topPrediction.label_norm,
-              displayAs: topPrediction.label,
-              score: PREDICTED_LABEL_MODIFIER * topPrediction.score
-            }]);
+          if (labels.length) {
+
+            /*
+              The score required for us to count a label depends on how
+              many labels the team has. The score must exceed random chance
+              by an amount dependent on the PREDICTED_LABEL_PERCENT_CUTOFF
+              value.
+
+              Note that we use the max of the number of labels the team has
+              and the number of label predictions the event has (in case
+              the event has predicted labels currently not included
+              in the team label list).
+            */
+            var labelCount = Math.max(team.team_labels_norm.length,
+                                      e.predicted_labels.length);
+            var threshold = (1 / labelCount) +
+              ((labelCount - 1) / labelCount) * PREDICTED_LABEL_PERCENT_CUTOFF;
+
+            var topPrediction = labels[0];
+            if (topPrediction.score > threshold) {
+              return Option.some([{
+                id: topPrediction.label_norm,
+                displayAs: topPrediction.label,
+                score: PREDICTED_LABEL_MODIFIER * topPrediction.score
+              }]);
+            }
           }
         }
       }
