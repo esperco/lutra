@@ -14,7 +14,7 @@ module Esper.Text {
   export const TeamExecs = "principals";
 
   // Default Loading Message
-  export const DefaultLoadingMsg = "Loading ...";
+  export const DefaultLoadingMsg = "Loading";
 
   // Label interface
   export const AddLabel = "add " + Label;
