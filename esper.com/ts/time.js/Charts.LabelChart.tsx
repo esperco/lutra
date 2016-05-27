@@ -84,6 +84,10 @@ module Esper.Charts {
       var unlabeled = this.eventsByLabel.none.length;
       var showUnlabeled = this.showUnlabeled();
       var displayTotal = showUnlabeled ? total : total - unlabeled;
+
+      var unconfirmed = _.filter(this.events,
+        (e) => Stores.Events.needsConfirmation(e)
+      );
       return <div className="esper-menu-section">
         { super.renderSelectors() }
         <div className="esper-menu-section">
@@ -99,6 +103,10 @@ module Esper.Charts {
             unlabeledSelected={showUnlabeled}
             showUnlabeled={this.allowUnlabeled}
             updateFn={(x) => this.updateLabels(x)}
+            unconfirmedCount={unconfirmed.length}
+            onUnconfirmedClick={() => Layout.renderModal(
+              Containers.confirmListModal(unconfirmed)
+            )}
           />
         </div>
       </div>;

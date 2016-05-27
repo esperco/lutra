@@ -73,4 +73,55 @@ module Esper.Containers {
       />;
     });
   }
+
+  export function confirmListModal(events: Stores.Events.TeamEvent[]) {
+    return ReactHelpers.contain(function() {
+      // Refresh store data before sending to modal, get opts
+      var fetching = false;
+      var hasError = false;
+      events = Option.flatten(
+        _.map(events, (e) =>
+          Stores.Events.EventStore.get(Stores.Events.storeId(e))
+            .flatMap((storeData) => {
+              if (storeData.dataStatus === Model2.DataStatus.FETCHING) {
+                fetching = true;
+              } else if (
+                  storeData.dataStatus === Model2.DataStatus.FETCH_ERROR ||
+                  storeData.dataStatus === Model2.DataStatus.PUSH_ERROR)
+              {
+                hasError = true;
+              }
+              return storeData.data;
+            })
+          )
+      );
+
+      // Get the team(s) for events
+      var teams = Stores.Events.getTeams(events);
+
+      // Set up actions so that hitting "done" goes back to confirmation
+      var backFn = () => Layout.renderModal(confirmListModal(events));
+      var labelFn = (event: Stores.Events.TeamEvent) => {
+
+        // Confirm before opening modal
+        Actions.EventLabels.confirm([event]);
+
+        Layout.renderModal(
+          eventEditorModal([event], {
+            minFeedback: true,
+            onDone: backFn
+          })
+        );
+      };
+
+      return <Components.ConfirmListModal
+        busy={fetching}
+        error={hasError}
+        events={events}
+        teams={teams}
+        onEventClick={labelFn}
+        onAddLabelClick={labelFn}
+      />;
+    });
+  }
 }

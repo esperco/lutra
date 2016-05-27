@@ -35,13 +35,7 @@ module Esper.Components {
             <div className="panel-body">
               { this.props.children }
             </div>
-            <div className="progress skinny">
-              <div className="progress-bar" role="progressbar"
-                style={{
-                  width: Util.roundStr(this.props.progress * 100) + "%"
-                }}>
-              </div>
-            </div>
+            <ProgressBar width={this.props.progress} skinny={true} />
             <div className="panel-footer clearfix">
               { this.props.busy ? <div className="esper-spinner" /> : null }
               <div className="pull-right">

@@ -16,24 +16,45 @@ module Esper.Actions.EventLabels {
   }
 
   // Confirm any predicted labels
-  export function confirm(events: Stores.Events.TeamEvent[]) {
+  export function confirm(events: Stores.Events.TeamEvent[],
+                          fetchEvents: Stores.Events.TeamEvent[] = [])
+  {
     // Only confirm if score < 1 (don't ned to confirm user labels)
     events = _.filter(events, (e) => e.labelScores.match({
       none: () => false,
       some: (l) => l[0] && l[0].score < 1
     }));
-    if (events.length > 0) {
-      apply(events, {});
+
+    if (events.length > 0 || fetchEvents.length > 0) {
+      apply(events, {
+        fetchEvents: fetchEvents
+      });
     }
   }
+
+  // For paginated prediction, confirm and fetch new
 
   function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
+    fetchEvents?: Stores.Events.TeamEvent[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
-    _.each(eventsByTeamId, (teamEvents, teamId) => {
-      applyForTeam(teamId, teamEvents, opts);
+    var fetchEventsByTeamId = _.groupBy(opts.fetchEvents, (e) => e.teamId);
+    var teamIds = _(eventsByTeamId)
+      .keys()
+      .concat(_.keys(fetchEventsByTeamId))
+      .uniq()
+      .value();
+
+    _.each(teamIds, (teamId) => {
+      var teamEvents = eventsByTeamId[teamId] || [];
+      var fetchEvents = fetchEventsByTeamId[teamId] || [];
+      applyForTeam(teamId, teamEvents, {
+        addLabels: opts.addLabels,
+        removeLabels: opts.removeLabels,
+        fetchEvents: fetchEvents
+      });
 
       // Only fire analytics call if add/remove, not if confirming
       if (opts.addLabels || opts.removeLabels) {
@@ -54,6 +75,7 @@ module Esper.Actions.EventLabels {
     opts: {
       addLabels?: string[];
       removeLabels?: string[];
+      fetchEvents?: Stores.Events.TeamEvent[];
     })
   {
     // Include recurring events
@@ -86,15 +108,28 @@ module Esper.Actions.EventLabels {
     });
     var p = TeamLabelQueue.enqueue(teamId, {
       teamId: teamId,
-      events: newEvents
+      events: newEvents,
+      fetchEventIds: _.map(opts.fetchEvents, (e) => e.id)
     });
 
     // Wrap the whole kaboodle in a transaction
     Stores.Events.EventStore.transact(() => {
       Stores.Events.EventStore.transactP(p, (tP) => {
+        // Push confirmations
         _.each(newEvents, (e) => {
-          var storeId = Stores.Events.storeId(e);
+          let storeId = Stores.Events.storeId(e);
           Stores.Events.EventStore.push(storeId, tP, Option.wrap(e));
+        });
+
+        // Fetch any additional events requested
+        _.each(opts.fetchEvents, (e) => {
+          let storeId = Stores.Events.storeId(e);
+          Stores.Events.EventStore.fetch(storeId, tP.then((p) => {
+            var match = _.find(p.events, (newEvent) => newEvent.id === e.id);
+            return match ?
+              Option.some(Stores.Events.asTeamEvent(e.teamId, match)) :
+              Option.none<Stores.Events.TeamEvent>();
+          }));
         });
       });
     });
@@ -131,6 +166,7 @@ module Esper.Actions.EventLabels {
   interface QueueRequest {
     teamId: string;
     events: Stores.Events.TeamEvent[];
+    fetchEventIds: string[];
   };
 
   var TeamLabelQueue = new Queue2.Processor(
@@ -144,7 +180,7 @@ module Esper.Actions.EventLabels {
             some: (scores) => _.map(scores, (s) => s.displayAs)
           })
         })),
-        predict_labels: [] // Leave blank for now
+        predict_labels: r.fetchEventIds
       });
     },
 
@@ -158,6 +194,9 @@ module Esper.Actions.EventLabels {
         if (r.teamId === next.teamId) {
           // Ensure next (latter action) takes precedence
           next.events = _.uniqBy(r.events.concat(next.events), (e) => e.id);
+          next.fetchEventIds = _.uniq(
+            next.fetchEventIds.concat(r.fetchEventIds)
+          );
           return false;
         }
         return true;
