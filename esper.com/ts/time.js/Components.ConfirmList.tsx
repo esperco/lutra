@@ -44,6 +44,13 @@ module Esper.Components {
       );
 
       return <ModalPanel onCancel={() => this.onFinish()} cancelText="Done">
+        { this.state.pageIndices[0] === 0 ?
+          <div className="alert alert-info">
+            { Text.ConfirmationDescription }
+          </div> :
+          null
+        }
+
         <EventList events={events}
           teams={this.props.teams}
           onEventClick={this.props.onEventClick}
@@ -62,7 +69,7 @@ module Esper.Components {
                 Text.MorePredictions }
             </button> :
             <div className="text-center">
-              That's all folks.
+              { Text.ConfirmationDone }
             </div>
           }
           </div> : null
