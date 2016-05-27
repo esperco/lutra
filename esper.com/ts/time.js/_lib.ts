@@ -35,6 +35,7 @@
 /// <reference path="../lib/Components.ListSelector.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.ProgressBar.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.SignalStrength.tsx" />
