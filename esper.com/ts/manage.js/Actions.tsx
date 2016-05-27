@@ -43,13 +43,13 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderLabelSettings(teamId?: string,
+  export function renderTeamLabelSettings(teamId?: string,
     msgCode?: string, errCode?: string)
   {
     var teamId = Params.cleanTeamId(teamId);
     var msg = ManageMsg.get(msgCode);
     var err = ManageMsg.get(errCode);
-    render(<Views.LabelSettings teamId={teamId}
+    render(<Views.TeamLabelSettings teamId={teamId}
             msg={msg} err={err}  />);
     Analytics.page(Analytics.Page.TeamManage);
   }
@@ -72,11 +72,6 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.NewTeam);
   }
 
-  export function renderNewGroup() {
-    render(<Views.NewGroup />);
-    Analytics.page(Analytics.Page.NewGroup);
-  }
-
   export function renderGroupGeneralSettings(groupId?: string,
     msgCode?: string, errCode?: string)
   {
@@ -86,5 +81,21 @@ module Esper.Actions {
     render(<Views.GroupGeneralSettings groupId={groupId}
             msg={msg} err={err} />);
     Analytics.page(Analytics.Page.GroupManage);
+  }
+
+  export function renderGroupLabelSettings(groupId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    var groupId = Params.cleanGroupId(groupId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.GroupLabelSettings groupId={groupId}
+            msg={msg} err={err} />);
+    Analytics.page(Analytics.Page.GroupManage);
+  }
+
+  export function renderNewGroup() {
+    render(<Views.NewGroup />);
+    Analytics.page(Analytics.Page.NewGroup);
   }
 }
