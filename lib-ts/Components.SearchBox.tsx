@@ -44,6 +44,7 @@ module Esper.Components {
           className={Util.some(this.props.className, "form-control")}
           placeholder={this.props.placeholder}
           value={this.state.value || ""}
+          onKeyDown={(e) => this.inputKeydown(e)}
           onChange={
             (e) => this.onChange((e.target as HTMLInputElement).value)
           } />
@@ -61,6 +62,19 @@ module Esper.Components {
     onChange(val: string) {
       this.setState({ value: val });
       this.setTimeout();
+    }
+
+    // Catch enter / up / down keys
+    inputKeydown(e: __React.KeyboardEvent) {
+      var val = (e.target as HTMLInputElement).value;
+      if (e.keyCode === 13) {         // Enter
+        e.preventDefault();
+        clearTimeout(this._timeout);
+        this.props.onUpdate(this.state.value);
+      } else if (e.keyCode === 27) {  // ESC
+        e.preventDefault();
+        this.reset();
+      }
     }
 
     setTimeout() {
