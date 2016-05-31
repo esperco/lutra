@@ -702,21 +702,23 @@ flexibility with non-UL elements */
 }
 
 
-/* For positioning an X in the right corner of text boxes to clear input */
+/*
+  For positioning icons inside inputs, such as an "X" to clear inputs
+*/
 
-.esper-clearable {
+.esper-has-left-icon, .esper-has-right-icon {
   position: relative;
+  color: @input-color-placeholder;
 
   div, input[type=text], input[type=text]:focus {
     z-index: 20;
   }
 
-  .esper-clear-action {
+  .esper-left-icon, .esper-right-icon {
     display: block;
     position: absolute;
     z-index: 21;
     top: 0;
-    right: 0;
     width: @input-height-base;
     height: @input-height-base;
     line-height: @input-height-base;
@@ -725,11 +727,23 @@ flexibility with non-UL elements */
     text-align: center;
   }
 
-  &.has-clear-action {
-    input[type=text] {
-      padding-right: @input-height-base;
-    }
+  .esper-left-icon {
+    left: 0;
+    margin-left: @grid-gutter-width / 2;
   }
+
+  .esper-right-icon {
+    right: 0;
+    margin-right: @grid-gutter-width / 2;
+  }
+}
+
+.esper-has-left-icon input[type=text] {
+  padding-left: @input-height-base;
+}
+
+.esper-has-right-icon input[type=text] {
+  padding-right: @input-height-base;
 }
 
 .esper-clear-action {

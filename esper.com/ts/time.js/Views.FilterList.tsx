@@ -119,11 +119,7 @@ module Esper.Views {
         }
 
         if (this.props.filterStr) {
-          events = _.filter(events,
-            (e) => e.title &&
-                   _.includes(e.title.toLowerCase(),
-                              this.props.filterStr.toLowerCase())
-          );
+          events = Stores.Events.filter(events, this.props.filterStr);
         }
       }
 
@@ -231,11 +227,20 @@ module Esper.Views {
 
     renderFilterStr() {
       return <div className="col-sm-6 form-group">
-        <FilterStr value={this.props.filterStr} onUpdate={(val) => {
-          this.updateRoute({
-            filterStr: val
-          }, { replace: true })
-        }}/>
+        <div className="input-group">
+          <span className="input-group-addon">
+            <i className="fa fa-fw fa-search" />
+          </span>
+          <Components.SearchBox
+            className="form-control end-of-group"
+            placeholder={Text.SearchEventsPlaceholder}
+            value={this.props.filterStr}
+            onUpdate={(val) => {
+              this.updateRoute({
+                filterStr: val
+              }, { replace: true })
+            }}/>
+        </div>
       </div>;
     }
 
@@ -510,80 +515,6 @@ module Esper.Views {
         unconfirmed: newProps.unconfirmed
       } as Params.FilterListJSON;
       Route.nav.path(path, opts);
-    }
-  }
-
-
-  /////////
-
-  interface FilterStrProps {
-    // The "default" or original value
-    value: string;
-    onUpdate: (newValue: string) => void;
-  }
-
-  interface FilterStrState {
-    // The current value in the input
-    value: string;
-  }
-
-  class FilterStr extends Component<FilterStrProps, FilterStrState> {
-    _timeout: number;
-
-    constructor(props: FilterStrProps) {
-      super(props);
-      this.state = { value: this.props.value };
-    }
-
-    render() {
-      return <div className="esper-clearable">
-        <div className="input-group">
-          <span className="input-group-addon">
-            <i className="fa fa-fw fa-search" />
-          </span>
-          <input type="text" className="form-control"
-            placeholder="Search Title"
-            value={this.state.value || ""}
-            onChange={
-              (e) => this.onChange((e.target as HTMLInputElement).value)
-            } />
-        </div>
-        {
-          this.state.value ?
-          <span className="esper-clear-action" onClick={() => this.reset()}>
-            <i className="fa fa-fw fa-times" />
-          </span> :
-          null
-        }
-      </div>;
-    }
-
-    onChange(val: string) {
-      this.setState({ value: val });
-      this.setTimeout();
-    }
-
-    setTimeout() {
-      clearTimeout(this._timeout);
-      this._timeout = setTimeout(
-        () => this.props.onUpdate(this.state.value), 500
-      );
-    }
-
-    reset() {
-      clearTimeout(this._timeout);
-      this.setState({ value: null });
-      this.props.onUpdate("");
-    }
-
-    componentWillReceiveProps(nextProps: FilterStrProps) {
-      clearTimeout(this._timeout);
-      this.setState({value: nextProps.value});
-    }
-
-    componentWillUnmount(){
-      super.componentWillUnmount();
-      clearTimeout(this._timeout);
     }
   }
 }

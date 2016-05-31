@@ -531,4 +531,31 @@ module Esper.Stores.Events {
 
     return !(event.feedback && event.feedback.attended === false);
   }
+
+  /*
+    Filters a list of events by text critiera -- we currently look at event
+    title, description, and guest list. We can remove critieria if this is
+    too CPU intensive.
+   */
+  export function filter(events: TeamEvent[], query: string): TeamEvent[] {
+    query = query.toLowerCase();
+    return _.filter(events, (e) => {
+      var title = e.title || "";
+      var description = e.description || "";
+      var guests = _.map(e.guests,
+        (g) => g.display_name + " " + g.email
+      );
+      var labels = e.labelScores.match({
+        none: (): string[] => [],
+        some: (scores) => _.map(scores, (l) => l.displayAs)
+      });
+
+      var filterText = [title, description]
+                        .concat(guests)
+                        .concat(labels)
+                        .join(" ");
+      filterText = filterText.toLowerCase();
+      return _.includes(filterText, query);
+    });
+  }
 }

@@ -251,7 +251,7 @@ module Esper.Components {
           Find / Add Labels
         </label>
         <div className="input-group">
-          <div className={this.state.value ? "esper-clearable" : ""}>
+          <div className={this.state.value ? "esper-has-right-icon" : ""}>
             <input type="text"
                    className={classNames("form-control", this.props.className)}
                    id={this.getId("new-labels")}
@@ -262,7 +262,7 @@ module Esper.Components {
             />
             {
               this.state.value ?
-              <span className="esper-clear-action"
+              <span className="esper-clear-action esper-right-icon"
                     onClick={() => this.reset()}>
                 <i className="fa fa-fw fa-times" />
               </span> :
