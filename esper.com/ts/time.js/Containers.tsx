@@ -65,7 +65,7 @@ module Esper.Containers {
           })
         );
 
-      return <Components.EventListModal
+      return <Components.FilteredEventListModal
         events={events} teams={teams}
         onEventClick={labelFn}
         onAddLabelClick={labelFn}

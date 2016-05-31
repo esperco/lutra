@@ -6,15 +6,19 @@ module Esper.Components {
   const LABEL_COUNT_CUTOFF = 4;
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
 
-  interface Props {
-    events: Stores.Events.TeamEvent[];
-    selectedEvents?: Stores.Events.TeamEvent[];
-    teams: ApiT.Team[];
-    onEventToggle?: (event: Stores.Events.TeamEvent) => void;
-    onEventClick?: (event: Stores.Events.TeamEvent) => void;
-    onFeedbackClick?: (event: Stores.Events.TeamEvent) => void;
-    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
+  export module EventList_ {
+    export interface Props {
+      events: Stores.Events.TeamEvent[];
+      selectedEvents?: Stores.Events.TeamEvent[];
+      teams: ApiT.Team[];
+      onEventToggle?: (event: Stores.Events.TeamEvent) => void;
+      onEventClick?: (event: Stores.Events.TeamEvent) => void;
+      onFeedbackClick?: (event: Stores.Events.TeamEvent) => void;
+      onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
+    }
   }
+
+  type Props = EventList_.Props;
 
   export class EventList extends ReactHelpers.Component<Props, {}> {
     constructor(props: Props) {
