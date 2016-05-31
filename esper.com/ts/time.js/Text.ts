@@ -35,7 +35,6 @@ module Esper.Text {
   export const FeedbackTitle  = "Meeting Feedback"
   export const NoAttendPast   = "Didn't Attend";
   export const NoAttendFuture = "Won't Attend";
-
   export const NoEventTitle = `Untitled Event`;
 
   // Selector text
@@ -43,6 +42,7 @@ module Esper.Text {
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const Unconfirmed = `New Events`;
   export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
+  export const SearchEventsPlaceholder = `Search Events`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;

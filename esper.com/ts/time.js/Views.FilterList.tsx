@@ -233,7 +233,7 @@ module Esper.Views {
           </span>
           <Components.SearchBox
             className="form-control end-of-group"
-            placeholder="Search Event Title"
+            placeholder={Text.SearchEventsPlaceholder}
             value={this.props.filterStr}
             onUpdate={(val) => {
               this.updateRoute({
