@@ -119,11 +119,7 @@ module Esper.Views {
         }
 
         if (this.props.filterStr) {
-          events = _.filter(events,
-            (e) => e.title &&
-                   _.includes(e.title.toLowerCase(),
-                              this.props.filterStr.toLowerCase())
-          );
+          events = Stores.Events.filter(events, this.props.filterStr);
         }
       }
 
