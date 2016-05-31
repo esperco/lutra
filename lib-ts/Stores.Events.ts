@@ -547,6 +547,7 @@ module Esper.Stores.Events {
       );
 
       var filterText = [title, description].concat(guests).join(" ");
+      filterText = filterText.toLowerCase();
       return _.includes(filterText, query);
     });
   }
