@@ -38,7 +38,9 @@ module Esper.Components {
     }
 
     render() {
-      return <div className="esper-clearable">
+      return <div className={classNames({
+          "esper-has-right-icon": !!this.state.value
+        })}>
 
         <input type="text"
           className={Util.some(this.props.className, "form-control")}
@@ -50,7 +52,8 @@ module Esper.Components {
           } />
         {
           this.state.value ?
-          <span className="esper-clear-action" onClick={() => this.reset()}>
+          <span className="esper-clear-action esper-right-icon"
+                onClick={() => this.reset()}>
             <i className="fa fa-fw fa-times" />
           </span> :
           null

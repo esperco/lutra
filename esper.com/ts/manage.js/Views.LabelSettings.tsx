@@ -79,7 +79,7 @@ module Esper.Views {
           {Text.FindAddLabels}
         </label>
         <div className="input-group">
-          <div className={this.state.labelFilter ? "esper-clearable" : ""}>
+          <div className={this.state.labelFilter ? "esper-has-right-icon" : ""}>
             <input type="text"
                    className="form-control"
                    id={this.getId("new-labels")}
@@ -90,7 +90,7 @@ module Esper.Views {
             />
             {
               this.state.labelFilter ?
-              <span className="esper-clear-action"
+              <span className="esper-clear-action esper-right-icon"
                     onClick={() => this.resetState()}>
                 <i className="fa fa-fw fa-times" />
               </span> :
