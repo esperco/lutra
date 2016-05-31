@@ -22,6 +22,9 @@ module Esper.Components {
     // How long to delay before triggering callback -- defaults to
     // DEFAULT_DELAY above
     delay?: number;
+
+    // Add an icon class?
+    icon?: string;
   }
 
   interface State {
@@ -39,7 +42,8 @@ module Esper.Components {
 
     render() {
       return <div className={classNames({
-          "esper-has-right-icon": !!this.state.value
+          "esper-has-right-icon": !!this.state.value,
+          "esper-has-left-icon": !!this.props.icon
         })}>
 
         <input type="text"
@@ -58,7 +62,13 @@ module Esper.Components {
           </span> :
           null
         }
-
+        {
+          this.props.icon ?
+          <span className="esper-left-icon">
+            <i className={"fa fa-fw " + this.props.icon} />
+          </span> :
+          null
+        }
       </div>;
     }
 
