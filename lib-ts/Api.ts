@@ -1486,6 +1486,14 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(email_pref));
   }
 
+  /** Set meeting feedback notification preferences */
+  export function setTimestatsNotifyPrefs(teamid: string,
+                    prefs: ApiT.TimestatsNotifyPrefs): JQueryPromise<void> {
+    var url = prefix + "/api/preferences/notify/"
+            + string(Login.me()) + "/" + string(teamid);
+    return JsonHttp.put(url, JSON.stringify(prefs));
+  }
+
   /** Sets general prefs given the correct JSON object. */
   export var setGeneralPrefs = setGeneralPreferences;
 

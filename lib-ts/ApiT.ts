@@ -488,20 +488,26 @@ module Esper.ApiT {
     email_types: EmailTypes;
     label_reminder?: SimpleEmailPref;
     slack_address?: SlackAddress;
+    timestats_notify?: TimestatsNotifyPrefs;
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
   }
 
   export interface CalendarPrefs {
-    email_for_meeting_feedback?: boolean;
-    slack_for_meeting_feedback?: boolean;
+    email_for_meeting_feedback?: boolean; //obsolete
+    slack_for_meeting_feedback?: boolean; //obsolete
     add_to_daily_agenda: boolean;
   }
 
   export interface SlackAddress {
     slack_teamid: string;
     slack_username: string;
+  }
+
+  export interface TimestatsNotifyPrefs {
+    email_for_meeting_feedback: boolean;
+    slack_for_meeting_feedback: boolean;
   }
 
   export interface SlackAuthInfo {
