@@ -47,7 +47,6 @@ module Esper.Actions.Calendars {
     var cals = cloneCalList(teamId);
     var promises: JQueryPromise<any>[] = [];
     _.each(cals, (c) => {
-      console.info(c.prefs.add_to_daily_agenda);
       if (! c.prefs.add_to_daily_agenda) {
         c.prefs.add_to_daily_agenda = true;
         promises.push(Api.postCalendarPrefs(teamId, c.id, c.prefs));
