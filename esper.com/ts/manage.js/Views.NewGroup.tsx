@@ -49,7 +49,7 @@ module Esper.Views {
         some: (d) => {
           this.mutateState((s) => s.busy = true)
           Actions.Groups.createGroup(d)
-            .done((g) => Route.nav.go(Paths.Groups.list({
+            .done((g) => Route.nav.go(Paths.Manage.Group.general({
               groupId: g.groupid
             })))
             .fail(() => this.mutateState((s) => s.busy = false))
