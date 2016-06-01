@@ -109,7 +109,20 @@ module Esper.Analytics {
 
     ///////////* Time Stats *///////////////
 
-    // Onboarding
+    // Labeling
+    ConfirmEventLabels,       // Confirm predicted labels
+    EditEventLabels,          // Edit labels for event(s)
+
+    // Post-meeting feedback
+    SubmitFeedback,           // Submit feedback from within page
+
+
+    //////////* Manage + Onboarding */////////////
+
+    // Team Management
+    CreateTeam,
+    DeactivateTeam,
+
     SetTimeStatsLabels,       // Set labels for a team
     SetTimeStatsCalendars,    // Set calendars for a team
 
@@ -118,12 +131,9 @@ module Esper.Analytics {
     DeleteTimeStatsLabel,     // Delete label from team (and remove from
                               // all events)
 
-    // Labeling
-    ConfirmEventLabels,       // Confirm predicted labels
-    EditEventLabels,          // Edit labels for event(s)
-
-    // Post-meeting feedback
-    SubmitFeedback            // Submit feedback from within page
+    // Preferences changes
+    UpdateGeneralPrefs,       // Changes one of the general preferences
+    UpdateNotifications       // Changes one of the notification settings
   };
 
   // Named pages to track
