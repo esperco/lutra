@@ -22,80 +22,184 @@
     </Components.Dropdown>
 
   First child should be the trigger element. Second child should be the
-  dropdown menu or modal. The "dropdown-menu" class will be replaced with the
-  "dropdown-modal-menu" class. All other elements are disregarded.
+  dropdown menu. All other elements are ignored.
 */
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
-  export class Dropdown extends ReactHelpers.Component<{
+  interface Props {
     children?: JSX.Element[];
     className?: string;
+    align?: "left"|"right";
     keepOpen?: boolean;
     onOpen?: () => void;
-  }, {
-    open?: boolean;
-  }> {
+  }
+
+  export class Dropdown extends ReactHelpers.Component<Props, {}> {
+    _menu: DropdownMenu;
+
     render() {
+      // Just render
       var children = React.Children.toArray(this.props.children);
 
-      // Attach dropdown toggle handler
-      var toggleIndex = _.findIndex(children,
-        (p) => ReactHelpers.hasClass(p, "dropdown-toggle")
-      );
-      Log.assert(toggleIndex >= 0, "No dropdown trigger found");
-      var originalToggle = children[toggleIndex] as React.ReactElement<any>;
-      children[toggleIndex] = React.cloneElement(originalToggle, {
-        onClick: this.toggle.bind(this)
-      });
+      // Get dropdown toggle handler
+      var toggle = this.getToggle();
+      if (! toggle) { return; }
 
-      // Attach handler to manage propagation when clicking inside menu
-      var menuIndex = _.findIndex(children,
-        (p) => ReactHelpers.hasClass(p, "dropdown-menu")
-      );
-      Log.assert(menuIndex >= 0, "No dropdown menu found");
-      var originalMenu = children[menuIndex] as React.ReactElement<any>;
-      children[menuIndex] = React.cloneElement(originalMenu, {
-        onClick: (e: React.MouseEvent) => (
-          this.props.keepOpen ? e.stopPropagation() : this.close()
-        )
-      });
+      // Update existing menu if applicable
+      if (this._menu) {
 
-      // Is dropdown open?
-      var isOpen = this.state && this.state.open;
+        /*
+          requestAnimationFrame to avoid accessing DOM node from inside
+          render function. Not ideal, but should be OK so long as we're
+          we only update the dropdow menu itself and don't touch the toggle
+        */
+        window.requestAnimationFrame(
+          () => renderDropdown(this.getMenuWrapper())
+        );
+      }
 
-      return <div className={
-          (this.props.className || "dropdown") + (isOpen ? " open" : "")
-      }>
-        { children.slice(0, toggleIndex + 1) }
-        { isOpen ?
-          <div className="dropdown-backdrop" key="backdrop"
-               onClick={this.toggle.bind(this)} /> :
-          null
-        }
-        { children.slice(toggleIndex + 1) }
+      return <div className={classNames(this.props.className, {
+                    dropdown: _.isUndefined(this.props.className)
+                  })}
+                  onClick={() => this.open()}>
+        {toggle}
       </div>;
     }
 
-    toggle() {
-      if (this.state && this.state.open) {
-        this.close();
-      } else {
-        this.open();
-      }
-    }
-
     open() {
-      this.setState({ open: true });
+      renderDropdown(this.getMenuWrapper())
       if (this.props.onOpen) {
         this.props.onOpen();
       }
     }
 
     close() {
-      this.setState({open: false});
+      clearDropdown();
     }
+
+    /* Get specific toggle element from children */
+    getToggle() {
+      var children = React.Children.toArray(this.props.children);
+      var toggle = _.find(children,
+        (p) => ReactHelpers.hasClass(p, "dropdown-toggle")
+      );
+      if (! toggle) {
+        Log.e("No dropdown trigger found");
+      }
+      return toggle;
+    }
+
+    /* Get specific menu element from children */
+    getMenu() {
+      var children = React.Children.toArray(this.props.children);
+      var menu = _.find(children,
+        (p) => ReactHelpers.hasClass(p, "dropdown-menu")
+      );
+      if (! menu) {
+        Log.e("No dropdown menu found");
+      }
+      return menu;
+    }
+
+    getMenuWrapper() {
+      // Actual toggle should have been rendered in DOM -- we need this
+      // to calculate menu position
+      var toggle = this.find('.dropdown-toggle');
+      if (!(toggle && toggle.length)) {
+        Log.e("getMenu called without active toggle");
+        return;
+      }
+
+      var offset = toggle.offset() || { left: 0, top: 0 };
+      var top = offset.top + toggle.outerHeight();
+      var width = toggle.outerWidth();
+
+      var align: Align = this.props.align === "right" ? {
+        top: top,
+        right: $(window).width() - (offset.left + width)
+      } : {
+        top: top,
+        left: offset.left
+      }
+
+      var menu = this.getMenu();
+      if (! menu) { return; }
+
+      return <DropdownMenu
+        ref={(c) => this._menu = c}
+        align={align}
+        width={width}
+        className={this.props.className}
+        keepOpen={this.props.keepOpen}
+      >
+        { menu }
+      </DropdownMenu>;
+    }
+  }
+
+
+  /*
+    Above component is just the trigger -- this is the acutal menu that gets
+    rendered
+  */
+  type Align = { top: number; left: number; }|{ top: number; right: number; };
+  interface MenuProps {
+    children?: JSX.Element[];
+    className?: string;
+    keepOpen?: boolean;
+    width?: number|string;
+    align: Align;
+  }
+
+  class DropdownMenu extends ReactHelpers.Component<MenuProps, {}> {
+    constructor(props: MenuProps) {
+      super(props);
+    }
+
+    render() {
+      var style = _.extend({
+        width: this.props.width,
+        position: "absolute"
+      }, this.props.align);
+      return <div className="dropdown-backdrop" onClick={() => this.close()}>
+        <div className={classNames(this.props.className, {
+               dropdown: _.isUndefined(this.props.className),
+               open: true
+             })}
+             style={style}
+             onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
+          { this.props.children }
+        </div>
+      </div>;
+    }
+
+    /*
+      No open() function -- use renderDropdown to just render a new menu.
+      If menu already exists, React should be smart enough to re-use DOM
+      elements and components.
+    */
+    close() {
+      clearDropdown();
+    }
+  }
+
+
+  /* Creates divs and whatnot for dropdowns */
+  const dropdownContainerId = "esper-dropdown";
+  function renderDropdown(content: JSX.Element) {
+    var container = $("#" + dropdownContainerId);
+    if (!container || !container.length) {
+      container = $('<div>').attr("id", dropdownContainerId);
+      $('body').append(container);
+    }
+    container.renderReact(content);
+  }
+
+  function clearDropdown() {
+    var container = $("#" + dropdownContainerId);
+    container.remove();
   }
 }
