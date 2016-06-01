@@ -23,8 +23,8 @@ module Esper.Text {
     return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +
            `${Label.toLowerCase()} is applicable to this event`;
   }
-  export const EditLabels = "Edit " + Labels;
-  export const ConfirmLabels = "Confirm " + Labels;
+  export const EditLabels = "Edit " + _.capitalize(Labels);
+  export const ConfirmLabels = "Confirm " + _.capitalize(Labels);
 
   // Calendar List
   export const NoCalendarError =
