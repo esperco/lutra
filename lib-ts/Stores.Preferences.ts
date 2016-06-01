@@ -39,4 +39,33 @@ module Esper.Stores.Preferences {
       ).fail(() => prefsLoadedDfd.reject())
     );
   }
+
+
+  ///////////
+
+  export interface PrefsWithDefaults extends ApiT.Preferences {
+    label_reminder: {
+      recipients_: string[]
+    };
+    timestats_notify: ApiT.TimestatsNotifyPrefs;
+  }
+
+  /*
+    Populate certain null preferences with defaults so we don't have to deal
+    with null/undefined values elsewhere
+  */
+  export function withDefaults(prefs: ApiT.Preferences): PrefsWithDefaults {
+    if (Object.isFrozen(prefs)) {
+      prefs = _.cloneDeep(prefs);
+    }
+    prefs.label_reminder = prefs.label_reminder || {recipients_: []};
+    prefs.label_reminder.recipients_ = prefs.label_reminder.recipients_ || [];
+
+    prefs.timestats_notify = {
+      email_for_meeting_feedback: false,
+      slack_for_meeting_feedback: false
+    };
+
+    return (<PrefsWithDefaults> prefs);
+  }
 }

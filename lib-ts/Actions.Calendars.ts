@@ -11,7 +11,7 @@ module Esper.Actions.Calendars {
   // Helper function that clones a list of calendars for update purposes
   function cloneCalList(teamId: string) {
     return Stores.Calendars.list(teamId).match({
-      none: () => [],
+      none: (): ApiT.GenericCalendar[] => [],
       some: (cals) => _.cloneDeep(cals)
     });
   }
@@ -36,19 +36,28 @@ module Esper.Actions.Calendars {
     queueUpdate(teamId, cals);
   }
 
-  // Update a single calendar's prefs
-  export function updatePrefs(
-    teamId: string, calId: string, prefs: ApiT.CalendarPrefs
-  ) {
-    // Post to server
-    var p = Api.postCalendarPrefs(teamId, calId, prefs);
-    var cal = _.cloneDeep(Stores.Calendars.require(teamId, calId));
-    cal.prefs = prefs;
+  /*
+    Temp function to turn on daily agenda for all calendars. Individual
+    calendar prefs have been removed, but the `add_to_daily_agenda` field
+    is still set for existing users. This function sets that field to true for
+    all calendars. It should be called whenever a user toggles the daily
+    agenda back on.
+  */
+  export function reactivateDailyAgenda(teamId: string) {
+    var cals = cloneCalList(teamId);
+    var promises: JQueryPromise<any>[] = [];
+    _.each(cals, (c) => {
+      console.info(c.prefs.add_to_daily_agenda);
+      if (! c.prefs.add_to_daily_agenda) {
+        c.prefs.add_to_daily_agenda = true;
+        promises.push(Api.postCalendarPrefs(teamId, c.id, c.prefs));
+      }
+    });
 
-    var calendars = cloneCalList(teamId);
-    var index = _.findIndex(calendars, (c) => c.id === cal.id);
-    calendars[index] = cal;
-    return Stores.Calendars.ListStore.push(teamId, p, Option.wrap(calendars));
+    if (promises.length) {
+      var p = $.when.apply($, promises);
+      Stores.Calendars.ListStore.push(teamId, p, Option.wrap(cals));
+    }
   }
 
   // Queues update to server to match calendars on a given team object
