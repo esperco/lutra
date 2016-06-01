@@ -42,6 +42,7 @@ module Esper.Views {
 
     return <div className="panel panel-default">
       <div className="panel-heading">
+        <i className="fa fa-fw fa-envelope" />{" "}
         { Text.GeneralPrefsHeading }
       </div>
       <div className="panel-body">
@@ -109,6 +110,7 @@ module Esper.Views {
 
     return <div className="panel panel-default">
       <div className="panel-heading">
+        <i className="fa fa-fw fa-mail-reply" />{" "}
         { Text.FeedbackHeading }
       </div>
       <div className="panel-body">
