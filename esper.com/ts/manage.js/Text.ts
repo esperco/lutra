@@ -31,11 +31,26 @@ module Esper.Text {
     "Pick which calendars Esper should use for the person you're supporting.";
 
   // Notification Settings
-  export const GeneralPrefsHeading = "Other Subscriptions";
-  export const SendFeedbackEmail = "Email requesting meeting feedback";
+  export const GeneralPrefsHeading = "Subscriptions";
+  export function generalPrefsDescription(email: string) {
+    return `These e-mails will be sent to ${email}.`;
+  }
+  export const SendFeedbackEmail = "Emails requesting meeting feedback";
+  export const SendFeedbackSlack = "Slack messages requesting meeting feedback";
   export const SendLabelReminder =
     "Weekly email reminding me to label calendar events";
   export const SendDailyAgenda = "Daily agenda email";
   export const SendFeedbackSummary =
     "Daily meeting feedback summary email";
+
+  export const FeedbackHeading = 'Meeting Feedback Notifications';
+  export function feedbackDescription(email: string) {
+    return `These notifications will go to ${email}.`;
+  }
+  export function execOnlyFeedbackDescription(exec?: string) {
+    return `Meeting feedback notifications are sent directly to the person ` +
+      `whose time you're tracking. You must be logged in as `+
+      `${exec || "that person"} to ` +
+      `enable meeting feedback notifications`;
+  }
 }
