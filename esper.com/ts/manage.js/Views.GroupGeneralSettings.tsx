@@ -68,6 +68,7 @@ module Esper.Views {
             <Components.GroupForm ref={(c) => this._form = c}
               name={this.props.group.group_name}
               uid={Login.me()}
+              groupMembers={this.props.group.group_teams || []}
               onUpdate={() => this.delayedSave()}
             />
           </Components.ModalPanel>
@@ -89,7 +90,8 @@ module Esper.Views {
             this.setState({ didSave: true });
             Actions.Groups.updateGroup(this.props.group.groupid, {
               name: d.name,
-              uid: d.uid
+              uid: d.uid,
+              groupMembers: d.groupMembers
             });
           }
         });
