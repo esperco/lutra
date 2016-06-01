@@ -33,7 +33,9 @@ module Esper.Text {
   // Notification Settings
   export const GeneralPrefsHeading = "Subscriptions";
   export function generalPrefsDescription(email: string) {
-    return `These e-mails will be sent to ${email}.`;
+    return <span>
+      These notifications will go to {" "}<strong>{email}</strong>.
+    </span>;
   }
   export const SendFeedbackEmail = "Emails requesting meeting feedback";
   export const SendFeedbackSlack = "Slack messages requesting meeting feedback";
@@ -45,12 +47,16 @@ module Esper.Text {
 
   export const FeedbackHeading = 'Meeting Feedback Notifications';
   export function feedbackDescription(email: string) {
-    return `These notifications will go to ${email}.`;
+    return <span>
+      These notifications will go to {" "}<strong>{email}</strong>.
+    </span>;
   }
   export function execOnlyFeedbackDescription(exec?: string) {
-    return `Meeting feedback notifications are sent directly to the person ` +
-      `whose time you're tracking. You must be logged in as `+
-      `${exec || "that person"} to ` +
-      `enable meeting feedback notifications`;
+    return <span>
+      Meeting feedback notifications are sent directly to the person
+      whose time you're tracking. You must be logged in as
+      {" "}{exec ? <strong>{exec}</strong> : "that person"}{" "}
+      to enable meeting feedback notifications.
+    </span>;
   }
 }

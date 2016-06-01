@@ -111,30 +111,34 @@ module Esper.Views {
       <div className="panel-heading">
         { Text.FeedbackHeading }
       </div>
-      <div className="panel-body">{ execTeam ?
+      <div className="panel-body">
         <div className="alert alert-info">
-          { Text.execOnlyFeedbackDescription(email) }
-        </div> :
-        <div className="esper-select-menu">
-          <div className="esper-selectable"
-               onClick={() => null}>
-            <i className={classNames("fa fa-fw", {
-              "fa-check-square-o": sendEmail,
-              "fa-square-o": !sendEmail
-            })} />{" "}
-            { Text.SendFeedbackEmail }
-          </div>
-
-          <div className="esper-selectable"
-               onClick={() => null}>
-            <i className={classNames("fa fa-fw", {
-              "fa-check-square-o": sendSlack,
-              "fa-square-o": !sendSlack
-            })} />{" "}
-            { Text.SendFeedbackSlack }
-          </div>
+          { execTeam ?
+            Text.execOnlyFeedbackDescription(email) :
+            Text.feedbackDescription(email) }
         </div>
-      }</div>
+
+        { execTeam ? null :
+          <div className="esper-select-menu">
+            <div className="esper-selectable"
+                 onClick={() => null}>
+              <i className={classNames("fa fa-fw", {
+                "fa-check-square-o": sendEmail,
+                "fa-square-o": !sendEmail
+              })} />{" "}
+              { Text.SendFeedbackEmail }
+            </div>
+
+            <div className="esper-selectable"
+                 onClick={() => null}>
+              <i className={classNames("fa fa-fw", {
+                "fa-check-square-o": sendSlack,
+                "fa-square-o": !sendSlack
+              })} />{" "}
+              { Text.SendFeedbackSlack }
+            </div>
+          </div> }
+      </div>
     </div>;
   }
 
