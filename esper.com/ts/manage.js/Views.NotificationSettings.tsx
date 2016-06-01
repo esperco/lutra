@@ -121,7 +121,7 @@ module Esper.Views {
         { execTeam ? null :
           <div className="esper-select-menu">
             <div className="esper-selectable"
-                 onClick={() => null}>
+                 onClick={() => toggleEmailFeedback(prefs)}>
               <i className={classNames("fa fa-fw", {
                 "fa-check-square-o": sendEmail,
                 "fa-square-o": !sendEmail
@@ -130,7 +130,7 @@ module Esper.Views {
             </div>
 
             <div className="esper-selectable"
-                 onClick={() => null}>
+                 onClick={() => toggleSlackFeedback(prefs)}>
               <i className={classNames("fa fa-fw", {
                 "fa-check-square-o": sendSlack,
                 "fa-square-o": !sendSlack
@@ -174,6 +174,18 @@ module Esper.Views {
 
   function toggleLabelReminders(p: Stores.Preferences.PrefsWithDefaults) {
     Actions.Preferences.toggleLabelReminders(p);
+  }
+
+  function toggleEmailFeedback(p: Stores.Preferences.PrefsWithDefaults) {
+    p.timestats_notify.email_for_meeting_feedback =
+      !p.timestats_notify.email_for_meeting_feedback;
+    Actions.Preferences.setNotifyPrefs(p.teamid, p.timestats_notify);
+  }
+
+  function toggleSlackFeedback(p: Stores.Preferences.PrefsWithDefaults) {
+    p.timestats_notify.slack_for_meeting_feedback =
+      !p.timestats_notify.slack_for_meeting_feedback;
+    Actions.Preferences.setNotifyPrefs(p.teamid, p.timestats_notify);
   }
 }
 

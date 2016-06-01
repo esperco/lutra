@@ -61,7 +61,7 @@ module Esper.Stores.Preferences {
     prefs.label_reminder = prefs.label_reminder || {recipients_: []};
     prefs.label_reminder.recipients_ = prefs.label_reminder.recipients_ || [];
 
-    prefs.timestats_notify = {
+    prefs.timestats_notify = prefs.timestats_notify || {
       email_for_meeting_feedback: false,
       slack_for_meeting_feedback: false
     };

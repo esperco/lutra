@@ -88,7 +88,6 @@ module Esper.Actions.Preferences {
       prefs.email_types = emailTypes;
       return prefs;
     });
-    return promise;
   }
 
   // Adds or removes current user from a recipipent list
@@ -99,5 +98,15 @@ module Esper.Actions.Preferences {
     } else {
       return recipients.concat([Login.myEmail()]);
     }
+  }
+
+  // Set slack / email notification preferences
+  export function setNotifyPrefs(teamId: string,
+                                 notifyPrefs: ApiT.TimestatsNotifyPrefs) {
+    var p = Api.setTimestatsNotifyPrefs(teamId, notifyPrefs);
+    update(teamId, p, (prefs) => {
+      prefs.timestats_notify = notifyPrefs;
+      return prefs;
+    });
   }
 }
