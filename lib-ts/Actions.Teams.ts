@@ -24,6 +24,7 @@ module Esper.Actions.Teams {
 
   // Base team creation function
   function create(req: ApiT.TeamCreationRequest) {
+    Analytics.track(Analytics.Trackable.CreateTeam, req);
     var p = Api.createTeam(req).then((t) => {
       if (t && t.teamid) {
         Stores.Teams.set(t);
@@ -60,7 +61,13 @@ module Esper.Actions.Teams {
     // Clone team and set in store
     if (data.name) {
       team = _.cloneDeep(team);
-      team.team_name = data.name;
+
+      if (team.team_name !== data.name) {
+        Analytics.track(Analytics.Trackable.UpdateGeneralPrefs, {
+          teamName: data.name
+        });
+        team.team_name = data.name;
+      }
 
       var p = Api.setTeamName(teamId, data.name)
       Stores.Teams.TeamStore.push(teamId, p, Option.wrap(team));
@@ -108,6 +115,9 @@ module Esper.Actions.Teams {
   export function removeTeam(teamId: string) {
     var p = Api.putTeamTimestatsCalendars(teamId, []);
     Stores.Teams.remove(teamId);
+    Analytics.track(Analytics.Trackable.DeactivateTeam, {
+      teamId: teamId
+    });
   }
 
 

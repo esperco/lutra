@@ -2,6 +2,7 @@
   Preferences-related actions
 */
 
+/// <reference path="./Actions.Calendars.ts" />
 /// <reference path="./Stores.Preferences.ts" />
 
 module Esper.Actions.Preferences {
@@ -28,13 +29,35 @@ module Esper.Actions.Preferences {
     });
   }
 
+  // Alters general preferences and saves in store
   export function setGeneral(teamId: string, general: ApiT.GeneralPrefsOpts) {
-    var promise = Api.setGeneralPreferences(teamId, general);
-    update(teamId, promise, (prefs) => {
-      return <ApiT.Preferences> _.extend(prefs, { general: general })
+    var hasChanges = Stores.Preferences.get(teamId).match({
+      none: () => true,
+      some: (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
     });
+
+    if (hasChanges) {
+      var promise = Api.setGeneralPreferences(teamId, general);
+      Analytics.track(Analytics.Trackable.UpdateGeneralPrefs, general);
+      update(teamId, promise, (prefs) => {
+        prefs.general =
+          <ApiT.GeneralPrefs> _.extend({}, prefs.general, general);
+        return prefs;
+      });
+    }
   }
 
+  // Enable or disable label reminder email
+  export function toggleLabelReminders(prefs: ApiT.Preferences) {
+    var labelReminder  = _.cloneDeep(prefs.label_reminder) || {};
+    var active = toggleEmail(labelReminder.recipients_);
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      labelReminders: active
+    });
+    setLabelReminders(prefs.teamid, labelReminder);
+  }
+
+  // Makes actual API call for setting label remainders
   export function setLabelReminders(teamId: string,
                                     labelReminder: ApiT.SimpleEmailPref) {
     var promise = Api.setLabelReminderPrefs(teamId, labelReminder);
@@ -44,12 +67,87 @@ module Esper.Actions.Preferences {
     });
   }
 
+  // Enable or disable daily agenda
+  export function toggleDailyAgenda(prefs: ApiT.Preferences) {
+    var emailTypes = _.cloneDeep(prefs.email_types);
+    var active = toggleEmail(emailTypes.daily_agenda.recipients);
+
+    // Reactivating daily agenda => update calendar prefs
+    if (active) {
+      Actions.Calendars.reactivateDailyAgenda(prefs.teamid);
+    }
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      dailyAgenda: active
+    });
+    setEmailTypes(prefs.teamid, emailTypes);
+  }
+
+  // Enable or disable feedback summary eail
+  export function toggleFeedbackSummary(prefs: ApiT.Preferences) {
+    var emailTypes = _.cloneDeep(prefs.email_types);
+    if (! emailTypes.feedback_summary) {
+      emailTypes.feedback_summary = _.cloneDeep(emailTypes.daily_agenda);
+      emailTypes.feedback_summary.recipients = [];
+    }
+
+    var active = toggleEmail(emailTypes.feedback_summary.recipients);
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      feedbackSummary: active
+    });
+    setEmailTypes(prefs.teamid, emailTypes);
+  }
+
+  // Set email type prefs
   export function setEmailTypes(teamId: string,
                                 emailTypes: ApiT.EmailTypes) {
     var promise = Api.setEmailTypes(teamId, emailTypes);
     update(teamId, promise, (prefs) => {
       prefs.email_types = emailTypes;
       return prefs;
+    });
+  }
+
+  /*
+    Adds or removes current user from a recipipent list -- mutates structure.
+    Returns true if adding, false if removing.
+  */
+  function toggleEmail(recipients: string[]) {
+    if (_.includes(recipients, Login.myEmail())) {
+      _.pull(recipients, Login.myEmail());
+      return false;
+    } else {
+      recipients.push(Login.myEmail());
+      return true;
+    }
+  }
+
+  // Set slack / email notification preferences
+  export function setNotifyPrefs(teamId: string,
+                                 notifyPrefs: ApiT.TimestatsNotifyPrefs) {
+    var p = Api.setTimestatsNotifyPrefs(teamId, notifyPrefs);
+    update(teamId, p, (prefs) => {
+      prefs.timestats_notify = notifyPrefs;
+      return prefs;
+    });
+  }
+
+  export function toggleEmailFeedback(prefs: ApiT.Preferences) {
+    prefs.timestats_notify.email_for_meeting_feedback =
+      !prefs.timestats_notify.email_for_meeting_feedback;
+    setNotifyPrefs(prefs.teamid, prefs.timestats_notify);
+
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      feedbackEmail: prefs.timestats_notify.email_for_meeting_feedback
+    });
+  }
+
+  export function toggleSlackFeedback(prefs: ApiT.Preferences) {
+    prefs.timestats_notify.slack_for_meeting_feedback =
+      !prefs.timestats_notify.slack_for_meeting_feedback;
+    setNotifyPrefs(prefs.teamid, prefs.timestats_notify);
+
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      feedbackSlack: prefs.timestats_notify.slack_for_meeting_feedback
     });
   }
 }
