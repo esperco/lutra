@@ -16,12 +16,14 @@ module Esper.Actions.Groups {
   export interface GroupData {
     name: string;
     uid: string;
+    groupMembers: ApiT.GroupMember[];
   }
 
   // Base group creation function
   function create(data: GroupData) {
     var p = Api.createGroup(data.uid, data.name).done((g) => {
       Stores.Groups.set(g);
+      updateGroup(g.groupid, data);
       return g;
     });
     Save.monitor(Stores.Groups.GroupStore, "new-group", p);
@@ -32,17 +34,19 @@ module Esper.Actions.Groups {
     Updates an existing group
   */
   export function updateGroup(groupId: string, data: GroupData) {
-    // var group = Stores.Groups.require(groupId);
-    // if (! group) return;
+    var group = Stores.Groups.require(groupId);
+    if (! group) return;
 
-    // // Clone group and set in store
-    // if (data.name) {
-    //   group = _.cloneDeep(group);
-    //   group.group_name = data.name;
+    // Clone group and set in store
+    if (data.name) {
+      group = _.cloneDeep(group);
+      group.group_name = data.name;
 
-    //   var p = Api.setGroupName(groupId, data.name)
-    //   Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
-    // };
+      _.each(data.groupMembers, function(member: ApiT.GroupMember) {
+        var p = Api.putGroupMember(groupId, member.teamid);
+        Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+      });
+    };
   }
 
   export function createGroup(data: GroupData) {
