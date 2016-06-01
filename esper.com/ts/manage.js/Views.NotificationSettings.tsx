@@ -179,15 +179,11 @@ module Esper.Views {
   }
 
   function toggleEmailFeedback(p: Stores.Preferences.PrefsWithDefaults) {
-    p.timestats_notify.email_for_meeting_feedback =
-      !p.timestats_notify.email_for_meeting_feedback;
-    Actions.Preferences.setNotifyPrefs(p.teamid, p.timestats_notify);
+    Actions.Preferences.toggleEmailFeedback(p);
   }
 
   function toggleSlackFeedback(p: Stores.Preferences.PrefsWithDefaults) {
-    p.timestats_notify.slack_for_meeting_feedback =
-      !p.timestats_notify.slack_for_meeting_feedback;
-    Actions.Preferences.setNotifyPrefs(p.teamid, p.timestats_notify);
+    Actions.Preferences.toggleSlackFeedback(p);
   }
 }
 
