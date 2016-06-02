@@ -71,9 +71,13 @@ module Esper.LocalStore {
     to be used for things like nonces, but there is no long-term persistence
   */
 
-  // Store value as cookie, expiration in seconds
+  /*
+    Store value as cookie -- NB: the "; secure" flag means that this cookie
+    will not be accessible to JS served over a non-HTTPS connection (e.g.
+    localhost), but it should still be accessible to JS served over HTTPS
+  */
   function createCookie(key: string, value: string) {
-    document.cookie = key + "=" + value + "; path=/";
+    document.cookie = key + "=" + value + "; path=/; secure";
   }
 
   // Read value as cookie
