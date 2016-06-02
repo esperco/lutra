@@ -121,30 +121,53 @@ module Esper.Actions.Preferences {
     }
   }
 
-  // Set slack / email notification preferences
-  export function setNotifyPrefs(teamId: string,
-                                 notifyPrefs: ApiT.TimestatsNotifyPrefs) {
-    var p = Api.setTimestatsNotifyPrefs(teamId, notifyPrefs);
-    update(teamId, p, (prefs) => {
-      prefs.timestats_notify = notifyPrefs;
-      return prefs;
-    });
-  }
-
+  /*
+    Toggles post-meeting feedback e-mails
+  */
   export function toggleEmailFeedback(prefs: ApiT.Preferences) {
     prefs.timestats_notify.email_for_meeting_feedback =
       !prefs.timestats_notify.email_for_meeting_feedback;
-    setNotifyPrefs(prefs.teamid, prefs.timestats_notify);
+
+    var promise = Api.setTimestatsNotifyPrefs(
+      prefs.teamid,
+      prefs.timestats_notify
+    );
+    update(prefs.teamid, promise, (newPrefs) => {
+      newPrefs.timestats_notify = prefs.timestats_notify;
+      return newPrefs;
+    });
 
     Analytics.track(Analytics.Trackable.UpdateNotifications, {
       feedbackEmail: prefs.timestats_notify.email_for_meeting_feedback
     });
   }
 
+  /*
+    Toggles Slack setting -- also checks if Slack authorization is required
+    and redirects as appropriate
+  */
   export function toggleSlackFeedback(prefs: ApiT.Preferences) {
     prefs.timestats_notify.slack_for_meeting_feedback =
       !prefs.timestats_notify.slack_for_meeting_feedback;
-    setNotifyPrefs(prefs.teamid, prefs.timestats_notify);
+
+    var promise = Api.setTimestatsNotifyPrefs(
+      prefs.teamid, prefs.timestats_notify);
+
+    // Check if we need Slack authorization
+    if (prefs.timestats_notify.slack_for_meeting_feedback) {
+      promise = promise.then(function() {
+        return Api.getSlackAuthInfo(prefs.teamid)
+      }).then(function(x: ApiT.SlackAuthInfo) {
+        if (! x.slack_authorized) {
+          location.href = x.slack_auth_url;
+        }
+      });
+    }
+
+    update(prefs.teamid, promise, (newPrefs) => {
+      newPrefs.timestats_notify = prefs.timestats_notify;
+      return newPrefs;
+    });
 
     Analytics.track(Analytics.Trackable.UpdateNotifications, {
       feedbackSlack: prefs.timestats_notify.slack_for_meeting_feedback
