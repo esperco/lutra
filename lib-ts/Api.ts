@@ -199,6 +199,15 @@ module Esper.Api {
     return JsonHttp.post(url);
   }
 
+  export function renameGroup(groupid: string, groupName: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/group-name/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(groupName);
+    return JsonHttp.put(url);
+  }
+
   export function deleteGroup(groupid: string):
     JQueryPromise<void>
   {
