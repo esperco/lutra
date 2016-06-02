@@ -228,11 +228,20 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getGroupsByUid(uid: string):
-    JQueryPromise<ApiT.GroupList>
+  export function getGroupsByUid(uid: string, opts: {
+      withMembers?: boolean,
+      withLabels?: boolean
+    }): JQueryPromise<ApiT.GroupList>
   {
+    var query = opts.withMembers || opts.withLabels ? "?" : "";
+    var membersParam = opts.withMembers ? "members=true" : "";
+    var labelsParam = opts.withLabels ? "labels=true" : "";
+    var paramString = query + (opts.withMembers && opts.withLabels ?
+                               membersParam + "&" + labelsParam :
+                               membersParam + labelsParam);
     var url = prefix + "/api/group/user/" + string(Login.me())
-      + "/" + string(uid);
+      + "/" + string(uid)
+      + paramString;
     return JsonHttp.get(url);
   }
 
@@ -273,7 +282,7 @@ module Esper.Api {
   export function removeGroupMember(groupid: string, teamid: string):
     JQueryPromise<void>
   {
-    var url = prefix + "/api/group/member" + string(Login.me())
+    var url = prefix + "/api/group/member/" + string(Login.me())
       + "/" + string(groupid)
       + "/" + string(teamid);
     return JsonHttp.delete_(url);
