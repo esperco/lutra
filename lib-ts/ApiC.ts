@@ -159,10 +159,6 @@ module Esper.ApiC {
     <typeof Api.getGenericCalendarList, ApiT.GenericCalendars>
     (Api.getGenericCalendarList);
 
-  export var getSlackAuthInfo = makeC
-    <typeof Api.getSlackAuthInfo, ApiT.SlackAuthInfo>
-    (Api.getSlackAuthInfo);
-
   export var postCalendar = makeC
     <typeof Api.postCalendar, ApiT.CalendarEventList>
     (Api.postCalendar, {
