@@ -107,6 +107,7 @@ module Esper.Views {
 
     var sendEmail = prefs.timestats_notify.email_for_meeting_feedback;
     var sendSlack = prefs.timestats_notify.slack_for_meeting_feedback;
+    var teamid = team.teamid;
 
     return <div className="panel panel-default">
       <div className="panel-heading">
@@ -132,7 +133,7 @@ module Esper.Views {
             </div>
 
             <div className="esper-selectable"
-                 onClick={() => toggleSlackFeedback(prefs)}>
+                 onClick={() => toggleSlackFeedback(prefs, teamid)}>
               <i className={classNames("fa fa-fw", {
                 "fa-check-square-o": sendSlack,
                 "fa-square-o": !sendSlack
@@ -182,8 +183,17 @@ module Esper.Views {
     Actions.Preferences.toggleEmailFeedback(p);
   }
 
-  function toggleSlackFeedback(p: Stores.Preferences.PrefsWithDefaults) {
+  function toggleSlackFeedback(p: Stores.Preferences.PrefsWithDefaults,
+                               teamid: string) {
     Actions.Preferences.toggleSlackFeedback(p);
+
+    // Check if we need Slack authorization
+    if (p.timestats_notify.slack_for_meeting_feedback) {
+      Api.getSlackAuthInfo(teamid).then(function(x:ApiT.SlackAuthInfo) {
+        if (! x.slack_authorized) {
+          location.href = x.slack_auth_url;
+        }
+      });
+    }
   }
 }
-
