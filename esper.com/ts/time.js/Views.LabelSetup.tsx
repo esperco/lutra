@@ -81,8 +81,12 @@ module Esper.Views {
         }
       } else if (promises.length) {
         this.mutateState((state) => state.busy = true)
+        var defaultChartId: Actions.ChartId = "labels-pie";
         $.when.apply($, promises)
-          .done(() => Route.nav.go(Paths.Time.charts()))
+          .done(() => Route.nav.go(Paths.Time.charts({
+            chartId: defaultChartId,
+            teamId: this.props.teamId
+          })))
           .fail(() => {
             this.mutateState((state) => state.busy = false)
           });
