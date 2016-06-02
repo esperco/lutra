@@ -1,0 +1,16 @@
+{#
+  Anti-clickjacking script because S3 doesn't let us set X-Frame-Options.
+  Can also be disabled on a case-by-case basis.
+#}
+{% if ALLOW_IFRAME %}
+{% else %}
+  <style id="antiClickjack">body{display:none !important;}</style>
+  <script type="text/javascript">
+    if (self === top) {
+      var antiClickjack = document.getElementById("antiClickjack");
+      antiClickjack.parentNode.removeChild(antiClickjack);
+    } else {
+      top.location = self.location;
+    }
+  </script>
+{% endif %}
