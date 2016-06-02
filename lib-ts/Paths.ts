@@ -111,15 +111,15 @@ module Esper.Paths {
       return optPath(prefix, "list-new", teamId, calIds, interval, period);
     }
 
-    export function labelSetup({teamId}: {teamId?: string} = {}) {
-      return optPath(prefix, "label-setup", teamId);
+    export function labelSetup({} = {}) {
+      return optPath(prefix, "label-setup");
     }
 
-    export function calendarSetup({teamId}: {teamId?: string} = {}) {
+    export function calendarSetup({} = {}) {
       return optPath(prefix, "calendar-setup");
     }
 
-    export function teamSetup({}: {} = {}) {
+    export function teamSetup({} = {}) {
       return optPath(prefix, "team-setup");
     }
   }

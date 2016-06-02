@@ -3,17 +3,13 @@
 */
 
 module Esper.Actions {
-  export function renderCalendarSetup(teamId?: string) {
+  export function renderCalendarSetup() {
 
-    // Select default team if none provided
-    if (! teamId) {
-      teamId = Option.cast(
-        _.find(Stores.Teams.all(), (t) => t.team_executive === Login.myUid())
-      ).match({
-        none: () => Stores.Teams.firstId(),
-        some: (t) => t.teamid
-      });
-    }
+    // Open first team with no calendar, or just first team otherwise
+    var team = _.find(Stores.Teams.all(),
+      (t) => !t.team_timestats_calendars.length
+    );
+    var teamId = team ? team.teamid : Stores.Teams.firstId();
 
     // Trigger async -> does nothing if already loaded
     _.each(Stores.Teams.allIds(),

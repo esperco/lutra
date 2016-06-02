@@ -132,12 +132,12 @@ module Esper.Route {
     Actions.renderTeamSetup();
   });
 
-  route(Paths.Time.calendarSetup({teamId: ":teamId?"}).hash, function(ctx) {
-    Actions.renderCalendarSetup(ctx.params["teamId"]);
+  route(Paths.Time.calendarSetup().hash, function(ctx) {
+    Actions.renderCalendarSetup();
   });
 
-  route(Paths.Time.labelSetup({teamId: ":teamId?"}).hash, function(ctx) {
-    Actions.renderLabelSetup(ctx.params["teamId"]);
+  route(Paths.Time.labelSetup().hash, function(ctx) {
+    Actions.renderLabelSetup();
   });
 
 
