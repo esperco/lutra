@@ -24,6 +24,13 @@ module Esper.Text {
     "you're supporting. We'll use these to categorize their calendar " +
     "events and calculate how much time they're spending towards each goal.";
   export const LabelRequired = "Please add at least one goal.";
+  export const DefaultLabels = [
+    "Personal",
+    "Customer Support",
+    "Product",
+    "Recruiting",
+    "Sales"
+  ];
 
   export const CalendarSetupHeading = "Hook Up Your Calendar";
   export const CalendarSetupSelfDescription = "Which calendars do you want " +

@@ -56,13 +56,7 @@ module Esper.Views {
       return <Components.NewLabelsForm
         ref={(c) => this._teamForms[team.teamid] = c}
         team={team}
-        defaults={[
-          "Personal",
-          "Customer Support",
-          "Product",
-          "Recruiting",
-          "Sales"
-        ]} />;
+        defaults={Text.DefaultLabels} />;
     }
 
     onNext() {
