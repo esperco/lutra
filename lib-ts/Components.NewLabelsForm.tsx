@@ -10,11 +10,12 @@ module Esper.Components {
 
   interface Props {
     team: ApiT.Team;
+    defaults?: string[]; // Default labels to use if none available yet
   }
 
   interface State {
     labels: {
-      id: string; // Temporary id React can use to identify component
+      id: string;      // Temporary id React can use to identify component
       display: string; // Display version of label
     }[];
     hasError?: boolean;
@@ -27,6 +28,13 @@ module Esper.Components {
         id: Util.randomString(),
         display: l
       }));
+
+      if (_.isEmpty(labels) && !_.isEmpty(props.defaults)) {
+        labels = _.map(props.defaults, (d) => ({
+          id: Util.randomString(),
+          display: d
+        }));
+      }
 
       var additionalLabels = Math.max(
         DEFAULT_MIN_LABEL_COUNT - labels.length, 1);

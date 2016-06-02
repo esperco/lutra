@@ -55,7 +55,14 @@ module Esper.Views {
     renderTeamForm(team: ApiT.Team) {
       return <Components.NewLabelsForm
         ref={(c) => this._teamForms[team.teamid] = c}
-        team={team} />;
+        team={team}
+        defaults={[
+          "Personal",
+          "Customer Support",
+          "Product",
+          "Recruiting",
+          "Sales"
+        ]} />;
     }
 
     onNext() {
