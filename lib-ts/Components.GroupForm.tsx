@@ -69,15 +69,14 @@ module Esper.Components {
           </div> : null
         }
         { this.renderMemberInput() }
-        { this.state.groupMembers && this.state.groupMembers.length ?
+        { _.isEmpty(this.state.groupMembers) ?
+          <div className="esper-no-content">
+            No Group Members Found
+          </div>
+          :
           <div className="list-group">
             { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
-          </div> : 
-          (
-            <div className="esper-no-content">
-              No Group Members Found
-            </div>
-          )
+          </div>
         }
       </div>;
     }
@@ -152,6 +151,7 @@ module Esper.Components {
         name: selectedTeam.team_name
       };
       this.mutateState((s) => s.groupMembers.push(member));
+      this.processUpdate();
     }
 
     renderMember(member: ApiT.GroupMember) {
@@ -218,6 +218,7 @@ module Esper.Components {
       this.mutateState((s) => s.groupMembers = _.filter(s.groupMembers, function(member) {
         return member.teamid !== selected.teamid;
       }));
+      this.processUpdate();
     }
 
     onNameInputChange(event: React.FormEvent) {
