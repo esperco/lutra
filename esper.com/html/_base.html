@@ -24,6 +24,14 @@
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
   {% endblock %}
+
+  {#
+    NB: Anti-clickjack code is not in head block because this should be
+    enabled by default. Turning off anti-clickjacking protection to allow
+    iframing should be a conscious decision -- not one caused by forgetting
+    to call super().
+  #}
+  {% include "_anti-clickjack.html" %}
 </head>
 
 <body class="esper {{ BODY_CLASS }}">{% block body %}
