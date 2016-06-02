@@ -107,7 +107,6 @@ module Esper.Views {
 
     var sendEmail = prefs.timestats_notify.email_for_meeting_feedback;
     var sendSlack = prefs.timestats_notify.slack_for_meeting_feedback;
-    var teamid = team.teamid;
 
     return <div className="panel panel-default">
       <div className="panel-heading">
@@ -187,3 +186,4 @@ module Esper.Views {
     Actions.Preferences.toggleSlackFeedback(p);
   }
 }
+
