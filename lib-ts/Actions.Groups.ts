@@ -39,13 +39,22 @@ module Esper.Actions.Groups {
 
     // Clone group and set in store
     if (data.name) {
+      var newMembers = _.differenceBy(data.groupMembers, group.group_teams, 'teamid');
+      var removedMembers = _.differenceBy(group.group_teams, data.groupMembers, 'teamid');
       group = _.cloneDeep(group);
       group.group_name = data.name;
+      group.group_teams = data.groupMembers;
 
-      _.each(data.groupMembers, function(member: ApiT.GroupMember) {
-        var p = Api.putGroupMember(groupId, member.teamid);
-        Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+      var p1 = _.map(newMembers, function(member: ApiT.GroupMember) {
+        return Api.putGroupMember(groupId, member.teamid);
       });
+
+      var p2 = _.map(removedMembers, function(member: ApiT.GroupMember) {
+        return Api.removeGroupMember(groupId, member.teamid);
+      });
+
+      var p = $.when.apply($, p1.concat(p2));
+      Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
     };
   }
 
