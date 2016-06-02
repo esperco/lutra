@@ -124,16 +124,17 @@ module Esper.Stores.Groups {
   /* Init helpers */
 
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    Api.getGroupsByUid(loginResponse.uid).done(function(gl) {
-      if (gl.items) {
-        var data = _.map(gl.items, (g) => ({
-          itemKey: g.groupid,
-          data: Option.wrap(g)
-        }));
+    Api.getGroupsByUid(loginResponse.uid, { withMembers: true, withLabels: true})
+      .done(function(gl) {
+        if (gl.items) {
+          var data = _.map(gl.items, (g) => ({
+            itemKey: g.groupid,
+            data: Option.wrap(g)
+          }));
 
-        GroupListStore.batchSet(batchKey, Option.wrap(data));
-      }
-    });
+          GroupListStore.batchSet(batchKey, Option.wrap(data));
+        }
+      });
   }
 
   export function init() {
