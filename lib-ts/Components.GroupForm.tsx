@@ -183,10 +183,6 @@ module Esper.Components {
              onClick={(e) => this.removeMember(member)}>
             <i className="fa fa-fw fa-trash list-group-item-text" />
           </a>
-          <a className="pull-right text-info" title="Edit"
-             onClick={(e) => this.showEditFor(member)}>
-            <i className="fa fa-fw fa-pencil list-group-item-text" />
-          </a>
         </span>
       </div>;
     }
@@ -198,8 +194,8 @@ module Esper.Components {
       });
     }
 
-    showEditFor(member: ApiT.GroupMember) {
-      this.mutateState((s) => s.editMember = member.teamid);
+    showEditFor(gim: ApiT.GroupIndividual) {
+      this.mutateState((s) => s.editMember = gim.uid);
     }
 
     // Catch enter key on input -- use jQuery to actual examine value
