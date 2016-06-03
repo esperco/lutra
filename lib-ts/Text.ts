@@ -25,6 +25,7 @@ module Esper.Text {
   }
   export const EditLabels = "Edit " + _.capitalize(Labels);
   export const ConfirmLabels = "Confirm " + _.capitalize(Labels);
+  export const LabelRequired = "Please add at least one goal.";
 
   // Calendar List
   export const NoCalendarError =
