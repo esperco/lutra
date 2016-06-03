@@ -19,7 +19,7 @@ module Esper.Views {
       var prefs = Stores.Preferences.get(team.teamid);
       var slackAuthorized = Stores.Preferences.slackAuthorized(team.teamid);
       return prefs.match({
-        none: () => <i className="esper-spinner centered" />,
+        none: () => <i className="esper-spinner esper-medium esper-centered" />,
         some: (p) => {
           let prefsWithDefaults = Stores.Preferences.withDefaults(p);
 
