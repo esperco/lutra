@@ -55,7 +55,7 @@ module Esper.Components {
           </div>
         </div>
         { this.props.isAdmin ?
-          <div className={classNames("form-group")}>
+          <div className="form-group">
             <label htmlFor={this.getId("user")}
                    className="col-md-2 control-label">
               User
@@ -69,12 +69,16 @@ module Esper.Components {
           </div> : null
         }
         { this.renderMemberInput() }
+        <hr />
         { _.isEmpty(this.state.groupMembers) ?
           <div className="esper-no-content">
             No Group Members Found
           </div>
           :
           <div className="list-group">
+            <label className="esper-header">
+              { Text.TeamExecs + " in " + (this.state.name || Text.Group) }
+            </label>
             { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
           </div>
         }
@@ -125,7 +129,7 @@ module Esper.Components {
     }
 
     renderFilteredTeams() {
-        var self = this;
+      var self = this;
       var memberIds = _.map(this.state.groupMembers, function(member) {
         return member.teamid;
       });
@@ -134,6 +138,11 @@ module Esper.Components {
           && _.includes(team.team_name.toLowerCase(),
                         self.state.teamFilter.toLowerCase());
       });
+      if (_.isEmpty(filteredTeams)) {
+        return <div className="esper-no-content">
+          No { Text.TeamExec } with the name containing '{ this.state.teamFilter }' found
+        </div>;
+      }
       var filteredMembers = _.map(filteredTeams, function(team) {
         return {
           id: team.teamid,
