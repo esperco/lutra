@@ -98,3 +98,32 @@
     }
   }
 }
+
+.profile-selector {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 (-@form-group-margin-bottom / 2);
+
+  .profile-selection {
+    display: inline-block;
+    padding: 0 (@form-group-margin-bottom / 2) @form-group-margin-bottom;
+    min-width: 100%;
+    flex-grow: 1;
+
+    .btn {
+      width: 100%;
+    }
+
+    @media screen and (min-width: @screen-sm-min) {
+      min-width: 33.3333%;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      min-width: 25%
+    }
+
+    @media screen and (min-width: @screen-lg-min) {
+      min-width: 20%
+    }
+  }
+}
