@@ -132,8 +132,12 @@ module Esper.Views {
       this.updateModal();
       var eventData = this.getEventData();
       var events = eventData.events;
-      var filteredEvents = this.filterEvents(events);
-      var hiddenEvents = events.length - filteredEvents.length;
+
+      // Don't trigger .filterEvents until we're done fetching (otherwise
+      // new incoming events won't be shown)
+      var filteredEvents = (eventData.isBusy) ? [] : this.filterEvents(events);
+      var hiddenEvents = (eventData.isBusy) ? 0 :
+        (events.length - filteredEvents.length);
 
       return <div className="container filter-list">
         <div className="list-selectors">
