@@ -42,18 +42,20 @@ module Esper.Actions.Groups {
       var newMembers = _.differenceBy(data.groupMembers, group.group_teams, 'teamid');
       var removedMembers = _.differenceBy(group.group_teams, data.groupMembers, 'teamid');
       group = _.cloneDeep(group);
+      var p1 = group.group_name !== data.name ?
+        [Api.renameGroup(group.groupid, data.name)] : [];
       group.group_name = data.name;
       group.group_teams = data.groupMembers;
 
-      var p1 = _.map(newMembers, function(member: ApiT.GroupMember) {
+      var p2 = _.map(newMembers, function(member: ApiT.GroupMember) {
         return Api.putGroupMember(groupId, member.teamid);
       });
 
-      var p2 = _.map(removedMembers, function(member: ApiT.GroupMember) {
+      var p3 = _.map(removedMembers, function(member: ApiT.GroupMember) {
         return Api.removeGroupMember(groupId, member.teamid);
       });
 
-      var p = $.when.apply($, p1.concat(p2));
+      var p = $.when.apply($, p1.concat(p2).concat(p3));
       Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
     };
   }
