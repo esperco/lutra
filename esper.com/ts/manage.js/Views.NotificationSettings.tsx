@@ -17,6 +17,7 @@ module Esper.Views {
       });
 
       var prefs = Stores.Preferences.get(team.teamid);
+      var slackAuthorized = Stores.Preferences.slackAuthorized(team.teamid);
       return prefs.match({
         none: () => <i className="esper-spinner centered" />,
         some: (p) => {
@@ -24,7 +25,9 @@ module Esper.Views {
 
           return <div>
             <GeneralPrefs prefs={prefsWithDefaults} team={team} />
-            <FeedbackPrefs prefs={prefsWithDefaults} team={team} />
+            <FeedbackPrefs prefs={prefsWithDefaults} team={team}
+              slackAuthorized={slackAuthorized}
+            />
           </div>;
         }
       });
@@ -46,7 +49,7 @@ module Esper.Views {
         { Text.GeneralPrefsHeading }
       </div>
       <div className="panel-body">
-        <div className="alert alert-info">
+        <div className="alert alert-info text-center">
           { Text.generalPrefsDescription(email) }
         </div>
 
@@ -93,8 +96,9 @@ module Esper.Views {
     pings exec directly and in some cases, as with Slack, we need that exec
     to authorize Esper access.
   */
-  function FeedbackPrefs({prefs, team}: {
+  function FeedbackPrefs({prefs, slackAuthorized, team}: {
     prefs: Stores.Preferences.PrefsWithDefaults;
+    slackAuthorized: Option.T<boolean>;
     team: ApiT.Team;
   }) {
     var execTeam = team.team_executive !== Login.myUid();
@@ -107,6 +111,10 @@ module Esper.Views {
 
     var sendEmail = prefs.timestats_notify.email_for_meeting_feedback;
     var sendSlack = prefs.timestats_notify.slack_for_meeting_feedback;
+    var showSlackError = sendSlack && !execTeam && !slackAuthorized.match({
+      none: () => true,
+      some: (d) => d
+    });
 
     return <div className="panel panel-default">
       <div className="panel-heading">
@@ -114,7 +122,7 @@ module Esper.Views {
         { Text.FeedbackHeading }
       </div>
       <div className="panel-body">
-        <div className="alert alert-info">
+        <div className="alert alert-info text-center">
           { execTeam ?
             Text.execOnlyFeedbackDescription(email) :
             Text.feedbackDescription(email) }
@@ -140,8 +148,28 @@ module Esper.Views {
               { Text.SendFeedbackSlack }
             </div>
           </div> }
+
+        { showSlackError ? <SlackError teamId={team.teamid} /> : null }
       </div>
     </div>;
+  }
+
+  function SlackError({teamId}: {teamId: string}) {
+    var onClick = () => {
+      Api.getSlackAuthInfo(teamId).then((x) => {
+        if (! x.slack_authorized) {
+          location.href = x.slack_auth_url
+        }
+      });
+    }
+
+    return <div className="alert alert-danger alert-bottom text-center"
+                onClick={onClick}>
+      <i className="fa fa-fw fa-warning" />{" "}
+      <a>{/* Link doesn't do anything because onClick above handles */}
+        { Text.SlackAuthError }
+      </a>
+    </div>
   }
 
 

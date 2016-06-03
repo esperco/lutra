@@ -189,8 +189,15 @@ a {
   }
 }
 
-.alert.compact {
-  margin-bottom: @alert-padding;
+.alert {
+
+  &.compact {
+    margin-bottom: @alert-padding;
+  }
+
+  &.alert-bottom {
+    margin-top: @alert-padding;
+  }
 }
 
 .navbar-brand {
