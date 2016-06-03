@@ -40,8 +40,8 @@ module Esper.Text {
 
   // For post-meeting feedback
   export const FeedbackTitle  = "Meeting Feedback"
-  export const NoAttendPast   = "Didn't Attend";
-  export const NoAttendFuture = "Won't Attend";
+  export const NoAttendPast   = "Ignore";
+  export const NoAttendFuture = "Ignore";
   export const NoEventTitle = `Untitled Event`;
 
   // Selector text
