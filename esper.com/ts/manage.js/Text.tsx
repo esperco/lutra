@@ -59,4 +59,7 @@ module Esper.Text {
       to enable meeting feedback notifications.
     </span>;
   }
+
+  export const SlackAuthError = `We were unable to connect to Slack. ` +
+    `Click here to try reconnecting.`;
 }
