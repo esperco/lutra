@@ -28,32 +28,44 @@ module Esper.Text {
     name: string;
     labels: string[];
   }[] = [{
-    name: "Work-Life Balance",
-    labels: [
-      "Work",
-      "Health and Wellness",
-      "Family Time",
-      "Travel"
-    ]
-  }, {
-    name: "Executive",
+    name: "Senior Leadership",
     labels: [
       "Direct Reports",
       "Investors",
+      "Customers and Partners",
       "Recruiting",
-      "Customers"
+      "Strategy",
+      "Email & Communication",
+      "Health and Wellness",
+      "Impromptu Interactions",
+      "Misc. Obligations"
     ]
   }, {
-    name: "Preset 1",
+    name: "Sales",
     labels: [
-      "Preset 1",
-      "Preset 2"
+      "Lead Generation",
+      "Sales Development",
+      "Customer Success"
     ]
   }, {
-    name: "Preset 2",
+    name: "Management",
     labels: [
-      "Something",
-      "Other"
+      "Direct Reports",
+      "Higher Ups",
+      "External",
+      "Team Development",
+      "Recruiting",
+      "Health and Wellness",
+      "Misc. Obligations"
+    ]
+  }, {
+    name: "Lifestyle",
+    labels: [
+      "Family",
+      "Friends",
+      "Health and Wellness",
+      "Personal Development",
+      "Work"
     ]
   }, {
     name: "Custom",
