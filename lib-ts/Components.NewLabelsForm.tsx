@@ -16,6 +16,7 @@ module Esper.Components {
   interface Props {
     team: ApiT.Team;
     profiles?: LabelProfile[];
+    onProfileSelect?: (p: LabelProfile) => void;
   }
 
   interface State {
@@ -79,16 +80,24 @@ module Esper.Components {
         </div>,
         <ProfileSelector key="selector"
           profiles={this.props.profiles}
-          onSelect={(profile) => this.mutateState((state) => {
-            state.labels = this.addMinLabels(
-              _.map(profile.labels, (l) => ({
-                id: Util.randomString(),
-                display: l
-              }))
-            );
-            state.showProfiles = false;
-          })} />
+          onSelect={(profile) => this.selectProfile(profile)} />
       ];
+    }
+
+    selectProfile(profile: LabelProfile) {
+      this.mutateState((state) => {
+        state.labels = this.addMinLabels(
+          _.map(profile.labels, (l) => ({
+            id: Util.randomString(),
+            display: l
+          }))
+        );
+        state.showProfiles = false;
+      });
+
+      if (this.props.onProfileSelect) {
+        this.props.onProfileSelect(profile);
+      }
     }
 
     renderLabelInterface() {

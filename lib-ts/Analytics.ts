@@ -112,6 +112,7 @@ module Esper.Analytics {
     // Labeling
     ConfirmEventLabels,       // Confirm predicted labels
     EditEventLabels,          // Edit labels for event(s)
+    PickLabelProfile,         // Label profiles
 
     // Post-meeting feedback
     SubmitFeedback,           // Submit feedback from within page
