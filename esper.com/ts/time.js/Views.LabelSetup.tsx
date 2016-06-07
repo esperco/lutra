@@ -55,8 +55,12 @@ module Esper.Views {
     renderTeamForm(team: ApiT.Team) {
       return <Components.NewLabelsForm
         ref={(c) => this._teamForms[team.teamid] = c}
-        team={team}
-        defaults={Text.DefaultLabels} />;
+        team={team} profiles={Text.LabelProfiles}
+        onProfileSelect={(p) =>
+          Analytics.track(Analytics.Trackable.PickLabelProfile, {
+            profile: p.name
+          })
+        } />;
     }
 
     onNext() {

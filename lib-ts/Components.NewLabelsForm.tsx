@@ -8,12 +8,19 @@
 module Esper.Components {
   const DEFAULT_MIN_LABEL_COUNT = 3;
 
+  interface LabelProfile {
+    name: string;
+    labels: string[];
+  }
+
   interface Props {
     team: ApiT.Team;
-    defaults?: string[]; // Default labels to use if none available yet
+    profiles?: LabelProfile[];
+    onProfileSelect?: (p: LabelProfile) => void;
   }
 
   interface State {
+    showProfiles?: boolean;
     labels: {
       id: string;      // Temporary id React can use to identify component
       display: string; // Display version of label
@@ -28,24 +35,26 @@ module Esper.Components {
         id: Util.randomString(),
         display: l
       }));
+      labels = this.addMinLabels(labels);
 
-      if (_.isEmpty(labels) && !_.isEmpty(props.defaults)) {
-        labels = _.map(props.defaults, (d) => ({
-          id: Util.randomString(),
-          display: d
-        }));
-      }
+      this.state = {
+        labels: labels,
+        showProfiles: _.isEmpty(props.team.team_labels) &&
+                      !_.isEmpty(props.profiles)
+      };
+    }
 
+    addMinLabels(labels: { id: string; display: string }[]) {
       var additionalLabels = Math.max(
         DEFAULT_MIN_LABEL_COUNT - labels.length, 1);
-      _.times(additionalLabels, () => labels.push({
+
+      var ret = _.clone(labels);
+      _.times(additionalLabels, () => ret.push({
         id: Util.randomString(),
         display: ""
       }));
 
-      this.state = {
-        labels: labels
-      };
+      return ret;
     }
 
     render() {
@@ -56,29 +65,78 @@ module Esper.Components {
             { Text.LabelRequired }
           </div> : null
         }
+        {
+          this.state.showProfiles ?
+          this.renderProfileSelector() :
+          this.renderLabelInterface()
+        }
+      </div>;
+    }
+
+    renderProfileSelector() {
+      return [
+        <div key="alert" className="alert alert-info">
+          { Text.LabelProfileDescription }
+        </div>,
+        <ProfileSelector key="selector"
+          profiles={this.props.profiles}
+          onSelect={(profile) => this.selectProfile(profile)} />
+      ];
+    }
+
+    selectProfile(profile: LabelProfile) {
+      this.mutateState((state) => {
+        state.labels = this.addMinLabels(
+          _.map(profile.labels, (l) => ({
+            id: Util.randomString(),
+            display: l
+          }))
+        );
+        state.showProfiles = false;
+      });
+
+      if (this.props.onProfileSelect) {
+        this.props.onProfileSelect(profile);
+      }
+    }
+
+    renderLabelInterface() {
+      return <div>
+        { _.isEmpty(this.props.team.team_labels) ?
+            <div className="form-group">
+              <a className="btn btn-default form-control"
+                   onClick={() => this.mutateState((s) => s.showProfiles = true)}>
+                  <i className="fa fa-fw fa-arrow-circle-left" />
+                  {" "}{ Text.LabelProfileBackBtn }
+              </a>
+          </div> : null }
         { _.map(this.state.labels, (l) =>
-          <div key={l.id} className="form-group">
-            <span className="label-icon">
-              <i className="fa fa-fw fa-tag" />
-            </span>
-            <span className="action rm-action" onClick={() => this.onRm(l.id)}>
-              <i className="fa fa-fw fa-close" />
-            </span>
-            <div className="label-input-container">
-              <input name={"label-" + l.id}
-                type="text" className="form-control"
-                value={l.display}
-                onChange={(e) => this.onLabelChange(l.id, e)}
-                placeholder="New Goal" />
+            <div key={"label-" + l.id} className="form-group">
+              <span className="label-icon">
+                <i className="fa fa-fw fa-tag" />
+              </span>
+              <span className="action rm-action"
+                    onClick={() => this.onRm(l.id)}>
+                <i className="fa fa-fw fa-close" />
+              </span>
+              <div className="label-input-container">
+                <input name={"label-" + l.id}
+                  type="text" className="form-control"
+                  value={l.display}
+                  onChange={(e) => this.onLabelChange(l.id, e)}
+                  placeholder={ _.capitalize(Text.NewLabel) } />
+              </div>
             </div>
-          </div>
         )}
-        <div className="add-label-div clearfix">
-          <span className="action pull-right" onClick={() => this.onAdd()}>
+
+        <div key="add-label" className="add-label-div clearfix">
+          <span className="action pull-right"
+                onClick={() => this.onAdd()}>
             <i className="fa fa-fw fa-plus" />{" "}
-            Add Goal
+            { _.capitalize(Text.AddLabel) }
           </span>
         </div>
+
       </div>;
     }
 
@@ -124,5 +182,22 @@ module Esper.Components {
       this.mutateState((s) => s.hasError = true);
       return Option.none<string[]>();
     }
+  }
+
+
+  function ProfileSelector({profiles, onSelect} : {
+    profiles: LabelProfile[];
+    onSelect: (profile: LabelProfile) => void;
+  }) {
+    return <div className="profile-selector">
+      { _.map(profiles, (p) =>
+        <div key={p.name} className="profile-selection">
+          <button className="btn btn-default" onClick={() => onSelect(p)}>
+            <i className="fa fa-fw fa-tags" />{" "}
+            {p.name}
+          </button>
+        </div>
+      ) }
+    </div>;
   }
 }

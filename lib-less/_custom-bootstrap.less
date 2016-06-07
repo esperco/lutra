@@ -81,20 +81,33 @@ a.text-muted {
   (or for stylistic reasons)
 */
 
-// Override .btn-default
-.btn-default:hover, .btn-default:focus {
-  border: 1px solid @link-color;
-  color: @link-color;
-  background: @btn-default-bg;
+.btn, .btn:hover, .btn:focus, .btn:active, .btn.active,
+.btn:active:hover, .btn:active:focus {
   outline: none;
+  box-shadow: none;
+}
 
-  .input-group & {
-    z-index: 10; // So border stands out
+// Override .btn-default
+.btn-default {
+  &:hover, &:focus, &:active, &.active,
+  &:active:hover, &:active:focus {
+    border: 1px solid @link-color;
+    color: @link-color;
+    background: @btn-default-bg;
+
+    .input-group & {
+      z-index: 10; // So border stands out
+    }
+  }
+
+  &:active:hover, &:active:focus {
+    background: fade(@link-color, 10%);
   }
 }
 
 input.form-control, textarea.form-control, select.form-control {
-  &:focus, &:hover {
+  &:focus, &:hover, &:active, &.active,
+  &:active:hover, &:active:focus {
     outline: none;
     border: 1px solid @link-color;
     box-shadow: none;

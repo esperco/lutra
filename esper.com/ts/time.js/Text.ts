@@ -23,14 +23,54 @@ module Esper.Text {
   export const LabelSetupExecDescription = "Pick some goals for each person " +
     "you're supporting. We'll use these to categorize their calendar " +
     "events and calculate how much time they're spending towards each goal.";
-  export const LabelRequired = "Please add at least one goal.";
-  export const DefaultLabels = [
-    "Personal",
-    "Customer Support",
-    "Product",
-    "Recruiting",
-    "Sales"
-  ];
+
+  export const LabelProfiles: {
+    name: string;
+    labels: string[];
+  }[] = [{
+    name: "Senior Leadership",
+    labels: [
+      "Direct Reports",
+      "Investors",
+      "Customers and Partners",
+      "Recruiting",
+      "Strategy",
+      "Email & Communication",
+      "Health and Wellness",
+      "Impromptu Interactions",
+      "Misc. Obligations"
+    ]
+  }, {
+    name: "Sales",
+    labels: [
+      "Lead Generation",
+      "Sales Development",
+      "Customer Success"
+    ]
+  }, {
+    name: "Management",
+    labels: [
+      "Direct Reports",
+      "Higher Ups",
+      "External",
+      "Team Development",
+      "Recruiting",
+      "Health and Wellness",
+      "Misc. Obligations"
+    ]
+  }, {
+    name: "Lifestyle",
+    labels: [
+      "Family",
+      "Friends",
+      "Health and Wellness",
+      "Personal Development",
+      "Work"
+    ]
+  }, {
+    name: "Custom",
+    labels: []
+  }]
 
   export const CalendarSetupHeading = "Hook Up Your Calendar";
   export const CalendarSetupSelfDescription = "Which calendars do you want " +
