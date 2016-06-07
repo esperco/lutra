@@ -19,11 +19,17 @@ module Esper.Text {
   export const GroupMember = "group member";
   export const GroupMembers = "group members";
 
+  export const GroupIndividual = "individual";
+  export const GroupIndividuals = "individuals";
+
   // Add group member
   export const AddGroupMemberLink = `Add ${TeamExec}`;
   export function AddGroupMemberHeading(group?: string) {
     return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
   }
+
+  // Add group inidividual members
+  export const AddGroupIndividualLink = `Add ${GroupIndividual}`;
 
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
