@@ -105,19 +105,22 @@ module Esper.Containers {
 
       // Hold reference to previous modal so we can capture current page
       var listRef: Components.ConfirmListModal;
+      var currentPageStart = 0;
 
       /*
         Set up actions so that hitting "done" goes back to confirmation
         and preserves current page number
       */
-      var backFn = () => {
-        var backPageStart = listRef ? listRef.state.pageIndices[0] : 0;
-        Layout.renderModal(confirmListModal(events, backPageStart));
-      };
+      var backFn = () => Layout.renderModal(
+        confirmListModal(events, currentPageStart)
+      );
       var labelFn = (event: Stores.Events.TeamEvent) => {
 
         // Confirm before opening modal
         Actions.EventLabels.confirm([event]);
+
+        // Record page number
+        currentPageStart = listRef ? listRef.state.pageIndices[0] : 0;
 
         Layout.renderModal(
           eventEditorModal([event], {
