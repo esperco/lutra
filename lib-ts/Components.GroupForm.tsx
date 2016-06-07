@@ -15,9 +15,12 @@ module Esper.Components {
   interface State extends Actions.Groups.GroupData {
     editMember?: string;
     teamFilter?: string;
+    hasIndividualEmail?: boolean;
   }
 
   export class GroupForm extends ReactHelpers.Component<Props, State> {
+    _emailInput: HTMLInputElement;
+
     constructor(props: Props) {
       super(props);
       this.state = {
@@ -82,6 +85,8 @@ module Esper.Components {
             { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
           </div>
         }
+        <hr />
+        { this.renderIndividualInput() }
       </div>;
     }
 
@@ -97,7 +102,7 @@ module Esper.Components {
                    className="form-control"
                    id={this.getId("new-members")}
                    onKeyDown={this.inputKeydown.bind(this)}
-                   onChange={(e) => this.onChange(e)}
+                   onChange={(e) => this.onTeamFilterChange(e)}
                    value={this.state.teamFilter || ""}
                    placeholder="Tony Stark"
             />
@@ -115,6 +120,46 @@ module Esper.Components {
       </div>;
     }
 
+    renderIndividualInput() {
+      return <div className="form-group">
+        <label htmlFor={this.getId("new-individuals")}
+               className="col-md-2 control-label">
+          {Text.AddGroupIndividualLink}
+        </label>
+        <div className="input-group">
+          <div className={this.state.hasIndividualEmail ? "esper-has-right-icon" : ""}>
+            <input type="text"
+                   className="form-control"
+                   id={this.getId("new-individuals")}
+                   ref={(c) => this._emailInput = c}
+                   onKeyDown={this.inputKeydown.bind(this)}
+                   onChange={(e) => this.onIndividualEmailChange(e)}
+                   placeholder="john.doe@esper.com" />
+            { this.state.hasIndividualEmail ?
+              <span className="esper-clear-action esper-right-icon"
+                    onClick={() => {
+                      this._emailInput.value = "";
+                      this.mutateState((s) => s.hasIndividualEmail = false);
+                    }}>
+                <i className="fa fa-fw fa-times" />
+              </span> :
+              <span />
+            }
+          </div>
+          <span className="input-group-btn">
+            <button className="btn btn-default" type="button"
+                    onClick={this.addIndividual.bind(this)}>
+              <i className="fa fa-fw fa-plus" />
+            </button>
+          </span>
+        </div>
+      </div>;
+    }
+
+    addIndividual() {
+
+    }
+
     inputKeydown(e: KeyboardEvent) {
       var val = (e.target as HTMLInputElement).value;
       if (e.keyCode == 27) { // ESC
@@ -123,7 +168,15 @@ module Esper.Components {
       }
     }
 
-    onChange(e: React.FormEvent) {
+    onIndividualEmailChange(e: React.FormEvent) {
+      var val = (e.target as HTMLInputElement).value;
+      if (_.isEmpty(val))
+        this.mutateState((s) => s.hasIndividualEmail = false);
+      else
+        this.mutateState((s) => s.hasIndividualEmail = true);
+    }
+
+    onTeamFilterChange(e: React.FormEvent) {
       var val = (e.target as HTMLInputElement).value;
       this.mutateState((s) => s.teamFilter = val);
     }
