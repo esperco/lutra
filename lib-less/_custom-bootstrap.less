@@ -353,6 +353,23 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
     }
   }
 
+  > div:first-child {
+    .form-control:first-child, .form-control.start-of-group {
+      border-top-left-radius: @input-border-radius;
+      border-bottom-left-radius: @input-border-radius;
+
+      &.input-sm {
+        border-top-left-radius: @input-border-radius-small;
+        border-bottom-left-radius: @input-border-radius-small;
+      }
+
+      &.input-lg {
+        border-top-left-radius: @input-border-radius-large;
+        border-bottom-left-radius: @input-border-radius-large;
+      }
+    }
+  }
+
   > div:last-child {
     .form-control:last-child, .form-control.end-of-group {
       border-top-right-radius: @input-border-radius;

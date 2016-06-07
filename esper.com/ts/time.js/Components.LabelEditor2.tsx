@@ -8,7 +8,8 @@ module Esper.Components {
   //////
 
   interface LabelEditorProps {
-    eventData: Model2.StoreData<Stores.Events.FullEventId, Stores.Events.TeamEvent>[];
+    eventData: Model2.StoreData<Stores.Events.FullEventId,
+                                Stores.Events.TeamEvent>[];
     teams: ApiT.Team[];
     onDone?: () => void;
     doneText?: string;
@@ -60,7 +61,10 @@ module Esper.Components {
     }
 
     componentDidUpdate(prevProps: LabelEditorProps) {
-      if (! _.isEqual(this.props, prevProps)) {
+      // Refocus input if adding/removing events (used in calendar view)
+      var newIds = _.map(this.props.eventData, (d) => d.aliases[0]);
+      var oldIds = _.map(prevProps.eventData, (d) => d.aliases[0]);
+      if (! _.isEqual(oldIds, newIds)) {
         this.focus();
       }
     }
