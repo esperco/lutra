@@ -47,6 +47,11 @@ module Esper.Stores.Preferences {
     label_reminder: {
       recipients_: string[]
     };
+    email_types: {
+      daily_agenda: ApiT.EmailPref;
+      tasks_update: ApiT.EmailPref;
+      feedback_summary: ApiT.EmailPref;
+    };
     timestats_notify: ApiT.TimestatsNotifyPrefs;
   }
 
@@ -60,6 +65,13 @@ module Esper.Stores.Preferences {
     }
     prefs.label_reminder = prefs.label_reminder || {recipients_: []};
     prefs.label_reminder.recipients_ = prefs.label_reminder.recipients_ || [];
+
+    if (! prefs.email_types.feedback_summary) {
+      prefs.email_types.feedback_summary = _.cloneDeep(
+        prefs.email_types.daily_agenda
+      );
+      prefs.email_types.feedback_summary.recipients = [];
+    }
 
     prefs.timestats_notify = prefs.timestats_notify || {
       email_for_meeting_feedback: false,

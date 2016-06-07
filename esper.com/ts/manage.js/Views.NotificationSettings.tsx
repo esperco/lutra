@@ -178,7 +178,10 @@ module Esper.Views {
   /* Handles two variants of recipient list */
   type RecipientList = { recipients: string[] }|{ recipients_: string[] };
 
-  function emailToggled(emailPrefs: RecipientList) {
+  function emailToggled(emailPrefs?: RecipientList) {
+    if (! emailPrefs) {
+      return false;
+    }
     var recipients = hasRecipients(emailPrefs) ?
       emailPrefs.recipients :
       emailPrefs.recipients_;
