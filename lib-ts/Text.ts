@@ -26,10 +26,10 @@ module Esper.Text {
   export const NewLabel = "New " + _.capitalize(Label);
   export const EditLabels = "Edit " + _.capitalize(Labels);
   export const ConfirmLabels = "Confirm " + _.capitalize(Labels);
-  export const LabelRequired = "Please add at least one goal.";
+  export const LabelRequired = `Please add at least one ${Label}.`;
 
-  export const LabelProfileDescription = "Use one of our suggested goals " +
-    "sets or add your own custom goals."
+  export const LabelProfileDescription = `Use one of our suggested ${Label} ` +
+    `sets or add your own custom ${Labels}.`
   export const LabelProfileBackBtn = "Try another preset."
 
   // Calendar List
