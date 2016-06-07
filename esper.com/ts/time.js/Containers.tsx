@@ -6,6 +6,7 @@ module Esper.Containers {
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
     onDone?: () => void;
+    onCancel?: () => void;
   }) {
     opts = opts || { minFeedback: true };
     return ReactHelpers.contain(function() {
@@ -26,6 +27,7 @@ module Esper.Containers {
         focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
         onDone={opts.onDone}
+        onCancel={opts.onCancel}
       />;
     })
   }
@@ -61,7 +63,8 @@ module Esper.Containers {
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: false,
-            onDone: backFn
+            onDone: backFn,
+            onCancel: backFn
           })
         );
 
@@ -74,7 +77,8 @@ module Esper.Containers {
     });
   }
 
-  export function confirmListModal(events: Stores.Events.TeamEvent[]) {
+  export function confirmListModal(events: Stores.Events.TeamEvent[],
+                                   initPageStart=0) {
     return ReactHelpers.contain(function() {
       // Refresh store data before sending to modal, get opts
       var fetching = false;
@@ -99,22 +103,37 @@ module Esper.Containers {
       // Get the team(s) for events
       var teams = Stores.Events.getTeams(events);
 
-      // Set up actions so that hitting "done" goes back to confirmation
-      var backFn = () => Layout.renderModal(confirmListModal(events));
+      // Hold reference to previous modal so we can capture current page
+      var listRef: Components.ConfirmListModal;
+      var currentPageStart = 0;
+
+      /*
+        Set up actions so that hitting "done" goes back to confirmation
+        and preserves current page number
+      */
+      var backFn = () => Layout.renderModal(
+        confirmListModal(events, currentPageStart)
+      );
       var labelFn = (event: Stores.Events.TeamEvent) => {
 
         // Confirm before opening modal
         Actions.EventLabels.confirm([event]);
 
+        // Record page number
+        currentPageStart = listRef ? listRef.state.pageIndices[0] : 0;
+
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
-            onDone: backFn
+            onDone: backFn,
+            onCancel: backFn
           })
         );
       };
 
       return <Components.ConfirmListModal
+        ref={(c) => listRef = c}
+        initPageStart={initPageStart}
         busy={fetching}
         error={hasError}
         events={events}
