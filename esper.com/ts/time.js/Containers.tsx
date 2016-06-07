@@ -74,7 +74,8 @@ module Esper.Containers {
     });
   }
 
-  export function confirmListModal(events: Stores.Events.TeamEvent[]) {
+  export function confirmListModal(events: Stores.Events.TeamEvent[],
+                                   initPageStart=0) {
     return ReactHelpers.contain(function() {
       // Refresh store data before sending to modal, get opts
       var fetching = false;
@@ -99,8 +100,17 @@ module Esper.Containers {
       // Get the team(s) for events
       var teams = Stores.Events.getTeams(events);
 
-      // Set up actions so that hitting "done" goes back to confirmation
-      var backFn = () => Layout.renderModal(confirmListModal(events));
+      // Hold reference to previous modal so we can capture current page
+      var listRef: Components.ConfirmListModal;
+
+      /*
+        Set up actions so that hitting "done" goes back to confirmation
+        and preserves current page number
+      */
+      var backFn = () => {
+        var backPageStart = listRef ? listRef.state.pageIndices[0] : 0;
+        Layout.renderModal(confirmListModal(events, backPageStart));
+      };
       var labelFn = (event: Stores.Events.TeamEvent) => {
 
         // Confirm before opening modal
@@ -115,6 +125,8 @@ module Esper.Containers {
       };
 
       return <Components.ConfirmListModal
+        ref={(c) => listRef = c}
+        initPageStart={initPageStart}
         busy={fetching}
         error={hasError}
         events={events}

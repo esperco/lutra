@@ -12,6 +12,7 @@ module Esper.Components {
     onEventClick?: (event: Stores.Events.TeamEvent) => void;
     onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
     perPage?: number;
+    initPageStart?: number;
   }
 
   interface State {
@@ -22,8 +23,15 @@ module Esper.Components {
   export class ConfirmList extends ReactHelpers.Component<Props, State> {
     constructor(props: Props) {
       super(props);
+
+      var initPageStart = Math.min(
+        this.props.initPageStart || 0,
+        this.props.events.length);
+      var initPageEnd = Math.min(
+        initPageStart + this.perPage(),
+        this.props.events.length);
       this.state = {
-        pageIndices: [0, this.perPage()]
+        pageIndices: [initPageStart, initPageEnd]
       };
     }
 
