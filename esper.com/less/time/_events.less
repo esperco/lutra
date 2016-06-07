@@ -1,3 +1,5 @@
+@event-notes-min-height: 350px;
+
 .event-star-ratings {
   @media (max-width: @screen-xs-max) {
     text-align: center;
@@ -67,6 +69,19 @@
       max-height: none;
       display: block;
     }
+  }
+}
+
+.event-notes .modal-footer {
+  border-top: 0;
+}
+
+.event-notes textarea {
+  transition: min-height 0.6s;
+  min-height: 0;
+
+  &:focus {
+    min-height: @event-notes-min-height;
   }
 }
 
