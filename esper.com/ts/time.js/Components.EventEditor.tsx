@@ -49,7 +49,12 @@ module Esper.Components {
 
   ////
 
-  export class EventEditorModal extends Component<EventEditorProps, {}> {
+  interface EventEditorModalProps extends EventEditorProps {
+    onCancel?: () => void;
+  }
+
+  export class EventEditorModal
+      extends Component<EventEditorModalProps, {}> {
     render() {
       var heading = (this.props.eventData.length === 1 ?
         this.props.eventData[0].data.match({
@@ -59,7 +64,8 @@ module Esper.Components {
         this.props.eventData.length + " Events Selected"
       );
 
-      return <Modal icon="fa-calendar-o" title={heading}>
+      return <Modal icon="fa-calendar-o" title={heading}
+                    onHidden={this.props.onCancel}>
         <EventEditor eventData={this.props.eventData}
                      teams={this.props.teams}
                      onDone={() => (this.props.onDone || Layout.closeModal)()}
