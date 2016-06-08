@@ -234,12 +234,21 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
-  export function putGroupIndividual(groupid: string, uid: string):
-    JQueryPromise<ApiT.GroupIndividual>
+  export function putGroupIndividual(groupid: string, uid: string, opts: {
+    role?: string,
+    resendNotif?: boolean
+  } = {}): JQueryPromise<ApiT.GroupIndividual>
   {
+    var query = opts.role || opts.resendNotif ? "?" : "";
+    var roleParam = opts.role ? "role=" + opts.role : "";
+    var resendParam = opts.resendNotif ? "resend_notif=true" : "";
+    var paramString = query + (opts.role && opts.resendNotif ?
+                               roleParam + "&" + resendParam :
+                               roleParam + resendParam);
     var url = prefix + "/api/group/individual-member/" + string(Login.me())
       + "/" + string(groupid)
-      + "/" + string(uid);
+      + "/" + string(uid)
+      + paramString;
     return JsonHttp.put(url);
   }
 
@@ -250,6 +259,25 @@ module Esper.Api {
       + "/" + string(groupid)
       + "/" + string(uid);
     return JsonHttp.delete_(url);
+  }
+
+  export function putGroupIndividualByEmail(groupid: string, email: string, opts: {
+    role?: string,
+    resendNotif?: boolean
+  } = {}):
+    JQueryPromise<ApiT.GroupIndividual>
+  {
+    var query = opts.role || opts.resendNotif ? "?" : "";
+    var roleParam = opts.role ? "role=" + opts.role : "";
+    var resendParam = opts.resendNotif ? "resend_notif=true" : "";
+    var paramString = query + (opts.role && opts.resendNotif ?
+                               roleParam + "&" + resendParam :
+                               roleParam + resendParam);
+    var url = prefix + "/api/group/individual-member/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/email/" + string(email)
+      + paramString;
+    return JsonHttp.put(url);
   }
 
   export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
