@@ -34,7 +34,7 @@ module Esper.Token {
           //       can add their teams to their groups or leave the group.
           break;
         case "Invite_join_team":
-          // TODO: redirect user to their team settings or to their home
+          renderLogin("Invite accepted. Please login to continue.");
           break;
         case "Login":
           var loginInfo: ApiT.LoginResponse = Variant.value(x);
