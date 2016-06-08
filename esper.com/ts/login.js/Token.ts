@@ -33,9 +33,17 @@ module Esper.Token {
           // TODO: redirect user to group management page where they
           //       can add their teams to their groups or leave the group.
           break;
+
+        /*
+          NB: This case should not happen with new backend code. We should
+          get an ?invite=token link rather than ?token=token link, which means
+          the token would be passed to server via login rather than consumed
+          here. But leave this in for the time being as fallback.
+        */
         case "Invite_join_team":
           renderLogin("Invite accepted. Please login to continue.");
           break;
+
         case "Login":
           var loginInfo: ApiT.LoginResponse = Variant.value(x);
           handleLoginInfo($.Deferred().resolve(loginInfo));
