@@ -127,11 +127,12 @@ module Esper {
   function renderLogin(message?: string, error?: string) {
     var ext = Util.getParamByName(Login.extParam);
     var platform = Util.getParamByName(Login.platformParam);
+    var inviteCode = getInviteCode();
     Layout.render(<div id="esper-login-container" className="container">
       <div className="panel panel-default"><div className="panel-body">
         <Components.LoginPrompt
           landingUrl={getLandingUrl()}
-          inviteCode={getInviteCode()}
+          inviteCode={inviteCode}
           email={getEmail()}
           platform={platform}
           showGoogle={true}
@@ -139,7 +140,9 @@ module Esper {
           showNylas={!ext}>
           <div className={
             "alert text-center alert-" + (error ? "danger" : "info")
-          }>{ error || message || <span>
+          }>{ error || message || (inviteCode && <span>
+              Log in to continue.
+            </span>) || <span>
               Esper uses data from your calendar and other sources to provide
               you insight into how you spend your time. Please log in with your
               calendar provider to continue.

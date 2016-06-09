@@ -10,6 +10,19 @@ module Esper.Views {
     pathFn = Paths.Manage.Team.general;
 
     renderMain(team: ApiT.Team) {
+      var status = Stores.Profiles.status();
+      if (status === Model2.DataStatus.FETCHING) {
+        return <div className="esper-spinner esper-medium esper-centered" />;
+      }
+
+      if (status === Model2.DataStatus.FETCH_ERROR) {
+        return <div className="panel panel-default">
+          <div className="panel-body">
+            <Components.ErrorMsg />
+          </div>
+        </div>;
+      }
+
       var busy = Stores.Teams.status(this.props.teamId).match({
         none: () => false,
         some: (d) => d === Model2.DataStatus.INFLIGHT
@@ -20,6 +33,13 @@ module Esper.Views {
       });
 
       var exec = Stores.Profiles.get(team.team_executive);
+      var assistants = Option.flatten(
+        _.map(team.team_assistants,
+          (uid) => Stores.Profiles.get(uid)
+        )
+      );
+      var profilesLoading =
+        Stores.Profiles.getInitPromise().state() === "pending";
       var prefs = Stores.Preferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
@@ -28,6 +48,8 @@ module Esper.Views {
           exec={exec} prefs={prefs} team={team}
           busy={busy} error={error}
         />
+
+        <SharingSettings team={team} profiles={assistants} />
 
         <RemoveTeam team={team} />
       </div>;
@@ -113,9 +135,148 @@ module Esper.Views {
   }
 
 
+  /* Sharing -> add/remove assistants */
+
+  function SharingSettings({team, profiles}: {
+    team: ApiT.Team;
+    profiles: ApiT.Profile[];
+  }) {
+    profiles = _.filter(profiles, (p) => p.profile_uid !== Login.myUid());
+    return <div className="panel panel-default">
+      <div className="panel-body clearfix">
+        { profiles.length ? <div>
+          <div className="alert alert-info text-center">
+            { team.team_executive === Login.myUid() ?
+              Text.SelfAssistantsDescription :
+              Text.ExecAssistantsDescription
+            }
+          </div>
+          <div className="list-group">{ _.map(profiles, (p) =>
+            <div key={p.profile_uid} className="list-group-item">
+              <i className="fa fa-fw fa-user" />{" "}
+              { p.display_name }
+              { p.display_name === p.email ? "" : ` (${p.email})`}
+              <a className="pull-right action rm-action"
+                 title={Text.RemoveAssistant}
+                 onClick={() => removeAssistant(team.teamid, p)}>
+                <i className="fa fa-fw fa-close list-group-item-text" />
+              </a>
+            </div>
+          )}</div>
+        </div>: null }
+
+        <InviteInput team={team} />
+      </div>
+
+
+    </div>;
+  }
+
+  function removeAssistant(teamId: string, p: ApiT.Profile) {
+    Actions.Assistants.remove(teamId, p.profile_uid)
+  }
+
+
+  /* Interface for adding a team member */
+
+  class InviteInput extends ReactHelpers.Component<{team: ApiT.Team}, {
+    busy?: boolean;
+    error?: boolean;
+    success?: boolean;
+    validationError?: boolean;
+  }> {
+    _input: HTMLInputElement;
+
+    constructor(props: {team: ApiT.Team}) {
+      super(props);
+      this.state = {
+        busy: false,
+        error: false,
+        success: false,
+        validationError: false
+      };
+    }
+
+    render() {
+      return <div>
+        { this.state.success ?
+          <div className="alert alert-success text-center">
+            <i className="fa fa-fw fa-check" />{" "}
+            { Text.InviteAssistantSuccess }
+          </div> : null }
+
+        { this.state.error ? <Components.ErrorMsg /> : null }
+
+        <div className={classNames({"has-error": this.state.validationError})}>
+          <label htmlFor={this.getId("email")}>
+            { this.props.team.team_executive === Login.myUid() ?
+              Text.SelfInviteAssistant :
+              Text.ExecInviteAssistant
+            }
+          </label>
+          <div className="input-group">
+            <input ref={(c) => this._input = c} id={this.getId("email")}
+                   type="text" className="form-control"
+                   onKeyDown={(e) => this.inputKeydown(e)}
+                   disabled={this.state.busy}
+                   placeholder="someone@email.com" />
+            <span className="input-group-btn">
+              <button className="btn btn-default" type="button"
+                      onClick={() => this.send()} disabled={this.state.busy}>
+                <i className="fa fa-fw fa-send" />
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>;
+    }
+
+    // Catch enter / up / down keys
+    inputKeydown(e: __React.KeyboardEvent) {
+      var val = (e.target as HTMLInputElement).value;
+      if (e.keyCode === 13) {         // Enter
+        e.preventDefault();
+        this.send();
+      } else if (e.keyCode === 27) {  // ESC
+        e.preventDefault();
+        $(e.target as HTMLInputElement).val("");
+      }
+    }
+
+    send() {
+      var value: string = $(this._input).val();
+      if (Util.validateEmailAddress(value)) {
+        this.setState({
+          busy: true,
+          error: false,
+          success: false,
+          validationError: false
+        });
+
+        Actions.Assistants.add(this.props.team.teamid, value)
+          .done(() => {
+            $(this._input).val("");
+            this.setState({ busy: false, success: true });
+          })
+          .fail(() => this.setState({ busy: false, error: true }));
+      }
+
+      // Invalid email address
+      else {
+        this.setState({
+          busy: false,
+          error: false,
+          success: false,
+          validationError: true
+        });
+      }
+    }
+  }
+
+
   /* Deactivate Account = really just remove calendars */
 
-  export function RemoveTeam({team} : {team: ApiT.Team}) {
+  function RemoveTeam({team} : {team: ApiT.Team}) {
     return <div className="panel panel-default">
       <div className="panel-body clearfix">
         <span className="control-label esper-input-align">

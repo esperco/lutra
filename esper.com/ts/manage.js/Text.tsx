@@ -14,6 +14,17 @@ module Esper.Text {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Sharing
+  export const ExecAssistantsDescription = `These people have permission to ` +
+    `manage time for this ${TeamExec}`;
+  export const SelfAssistantsDescription = `These people have permission to ` +
+    `manage your time`;
+  export const ExecInviteAssistant = `Invite someone to help manage time ` +
+    `for this ${TeamExec}`;
+  export const SelfInviteAssistant = `Invite someone to help manage your time`;
+  export const InviteAssistantSuccess = `Invitation sent!`;
+  export const RemoveAssistant = `Remove access for this person`;
+
   // Label actions
   export const LabelRenameDescription =
     `Rename a ${Label.toLowerCase()} across all events.`;

@@ -16,8 +16,18 @@ module Esper.Stores.Profiles {
     cap: 100
   });
 
+  // A "status" ID used solely to track status of getAllProfiles call
+  const statusId = "";
+
   export function get(uid: string) {
     return ProfileStore.get(uid).flatMap((p) => p.data);
+  }
+
+  export function status() {
+    return ProfileStore.get(statusId).match({
+      none: () => Model2.DataStatus.FETCH_ERROR,
+      some: (s) => s.dataStatus
+    });
   }
 
   var profilesLoadedDfd: JQueryDeferred<void>;
@@ -37,6 +47,7 @@ module Esper.Stores.Profiles {
   export function init() {
     profilesLoadedDfd = $.Deferred<void>();
     var apiP = Api.getAllProfiles();
+    ProfileStore.fetch(statusId, apiP.then(() => Option.none<any>()));
     ProfileStore.transactP(apiP,
       (apiP2) => apiP2.done(
         (response) => {
