@@ -72,10 +72,6 @@ module Esper.Actions.Preferences {
     var emailTypes = _.cloneDeep(prefs.email_types);
     var active = toggleEmail(emailTypes.daily_agenda.recipients);
 
-    // Reactivating daily agenda => update calendar prefs
-    if (active) {
-      Actions.Calendars.reactivateDailyAgenda(prefs.teamid);
-    }
     Analytics.track(Analytics.Trackable.UpdateNotifications, {
       dailyAgenda: active
     });

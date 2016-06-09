@@ -36,29 +36,6 @@ module Esper.Actions.Calendars {
     queueUpdate(teamId, cals);
   }
 
-  /*
-    Temp function to turn on daily agenda for all calendars. Individual
-    calendar prefs have been removed, but the `add_to_daily_agenda` field
-    is still set for existing users. This function sets that field to true for
-    all calendars. It should be called whenever a user toggles the daily
-    agenda back on.
-  */
-  export function reactivateDailyAgenda(teamId: string) {
-    var cals = cloneCalList(teamId);
-    var promises: JQueryPromise<any>[] = [];
-    _.each(cals, (c) => {
-      if (! c.prefs.add_to_daily_agenda) {
-        c.prefs.add_to_daily_agenda = true;
-        promises.push(Api.postCalendarPrefs(teamId, c.id, c.prefs));
-      }
-    });
-
-    if (promises.length) {
-      var p = $.when.apply($, promises);
-      Stores.Calendars.ListStore.push(teamId, p, Option.wrap(cals));
-    }
-  }
-
   // Queues update to server to match calendars on a given team object
   function queueUpdate(_id: string, calendars: ApiT.GenericCalendar[]) {
     var calIds = _.map(calendars, (c) => c.id);
