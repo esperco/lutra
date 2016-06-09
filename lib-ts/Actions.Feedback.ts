@@ -76,4 +76,45 @@ module Esper.Actions.Feedback {
 
     return initNewData;
   }
+
+  /*
+    Post a string action while simultaneously fetching an event
+  */
+  export function postActionAndFetch({teamId, calId, eventId, action}: {
+    teamId: string;
+    calId: string;
+    eventId: string;
+    action: ApiT.EventFeedbackAction
+  }) {
+    Analytics.track(Analytics.Trackable.SubmitFeedback, {
+      teamId: teamId,
+      action: action
+    });
+
+    var storeId = {
+      teamId: teamId,
+      calId: calId,
+      eventId: eventId
+    };
+    var eventPromise = Stores.Events.EventStore.get(storeId)
+      .match({
+        none: () => Stores.Events.fetchOne(storeId),
+        some: (e) => $.Deferred().resolve(e.data).promise()
+      });
+    var actionPromise = Api.postEventFeedbackAction(
+      teamId, calId, eventId, action);
+
+    eventPromise = eventPromise.then(function(optEvent) {
+      return actionPromise.then((feedback) => {
+        return optEvent.flatMap((e) => {
+          e = _.cloneDeep(e);
+          e.feedback = feedback;
+          return Option.wrap(e);
+        });
+      });
+    });
+    Stores.Events.EventStore.fetch(storeId, eventPromise);
+
+    return eventPromise;
+  }
 }

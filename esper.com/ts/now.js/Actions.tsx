@@ -72,22 +72,28 @@ module Esper.Actions {
     eventId: string;
     action?: ApiT.EventFeedbackAction;
   }) {
-    var storeId = {
-      teamId: teamId,
-      calId: calId,
-      eventId: eventId
-    };
-    Stores.Events.fetchOne(storeId)
-      .then((optEvent: Option.T<Stores.Events.TeamEvent>) => {
-        optEvent.match({
-          none: () => Route.nav.home(),
-          some: (event) => {
-            if (action) {
-              Feedback.postAction(event, action);
-            }
-          }
-        })
+    if (!eventId) { return; }
+
+    var p = action ?
+      Feedback.postActionAndFetch({
+        teamId: teamId,
+        calId: calId,
+        eventId: eventId,
+        action: action
+      }) : Stores.Events.fetchOne({
+        teamId: teamId,
+        calId: calId,
+        eventId: eventId
       });
+
+    // Handle bad event IDs gracefully
+    p.done(function(e) {
+      if (e.isNone()) {
+        Route.nav.home();
+      }
+    }).fail(function() {
+      Route.nav.home();
+    })
 
     render(<Views.EventView
       teamId={teamId}
