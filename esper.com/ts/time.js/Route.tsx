@@ -74,22 +74,6 @@ module Esper.Route {
     })), period);
   });
 
-  // Event feedback landing page
-  route(Paths.Time.event().hash, checkOnboarding, function(ctx) {
-    var q = decodeURIComponent(ctx.querystring);
-    /* ctx.querystring does not really contain the query of the URL.
-       It is just the part of the fragment identifier after '?', i.e.,
-         .../time#!/...?{ctx.querystring}
-       so we need an explicit url-decoding here for the '&' separators.
-     */
-    Actions.renderEvent({
-      teamId  : Util.getParamByName("team",   q),
-      calId   : Util.getParamByName("cal",    q),
-      eventId : Util.getParamByName("event",  q),
-      action  : Util.getParamByName("action", q)
-    });
-  });
-
   route(Paths.Time.list({
     teamId: ":teamId?",
     calIds: ":calIds?",
@@ -149,13 +133,17 @@ module Esper.Route {
   );
 
   // Alias for old references to calendar-settings
-  route("/calendar-settings", redirectPath(Paths.Manage.Team.notifications()));
-  route("/notification-settings", redirectPath(Paths.Manage.Team.notifications()));
+  route("/calendar-settings",
+    redirectPath(Paths.Manage.Team.notifications()));
+  route("/notification-settings",
+    redirectPath(Paths.Manage.Team.notifications()));
 
   // Redirect old settings pages
   route("/labels", redirectPath(Paths.Manage.Team.labels()));
   route("/calendar-manage", redirectPath(Paths.Manage.Team.calendars()));
 
+  // Redirect old post-meeting feedback links
+  route("/event", redirectPath(Paths.Now.event()));
 
   // 404 page
   routeNotFound(function(ctx) {

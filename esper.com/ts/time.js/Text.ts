@@ -78,17 +78,10 @@ module Esper.Text {
   export const CalendarSetupExecDescription = "Pick which calendars Esper " +
     "should use for each person you're supporting.";
 
-  // For post-meeting feedback
-  export const FeedbackTitle  = "Meeting Feedback"
-  export const NoAttendPast   = "Ignore";
-  export const NoAttendFuture = "Ignore";
-  export const NoEventTitle = `Untitled Event`;
-
   // Selector text
   export const AllLabels = `All ` + _.capitalize(Labels);
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const Unconfirmed = `New Events`;
-  export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
   export const SearchEventsPlaceholder = `Search Events`;
 
   // Paginated Predictions

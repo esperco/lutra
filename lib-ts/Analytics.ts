@@ -147,6 +147,9 @@ module Esper.Analytics {
     NotificationSettings,  // /#!/notifications/...
     NewTeam,               // /#!/new-team/...
 
+    // esper.com/now
+    Now,                    // /#!/
+
     // esper.com/settings
     Settings,          // /#!/
     TeamSettings,      // /#!/team-settings/...

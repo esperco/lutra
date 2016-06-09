@@ -2,6 +2,10 @@
   Meeting feedback-related actions
 */
 
+/// <reference path="./Analytics.ts" />
+/// <reference path="./ApiT.ts" />
+/// <reference path="./Stores.Events.ts" />
+
 module Esper.Actions.Feedback {
 
   /*

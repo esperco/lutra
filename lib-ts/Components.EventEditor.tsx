@@ -2,6 +2,8 @@
   Component for editing event details, labels, etc.
 */
 
+/// <reference path="./Components.LabelEditor.tsx" />
+
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
@@ -36,7 +38,7 @@ module Esper.Components {
                          initMin={props.minFeedback} /> :
           null
         }
-        <Components.LabelEditor2
+        <LabelEditor
           eventData={props.eventData}
           teams={props.teams}
           onDone={props.onDone}

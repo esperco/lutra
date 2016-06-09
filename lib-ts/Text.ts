@@ -38,6 +38,13 @@ module Esper.Text {
   export const MustSelectCalendar =
     "Please select at least one calendar";
 
+  // Event Editor
+  export const FeedbackTitle  = "Meeting Feedback"
+  export const NoAttendPast   = "Ignore";
+  export const NoAttendFuture = "Ignore";
+  export const NoEventTitle = `Untitled Event`;
+  export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
+
   export const DefaultErrorTooltip = `There was an error connecting to the ` +
     `server. Try refreshing or contacting us at https://esper.com/contact`;
 }

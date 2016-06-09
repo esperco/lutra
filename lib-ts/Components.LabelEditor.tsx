@@ -16,7 +16,7 @@ module Esper.Components {
     autoFocus?: boolean;
   }
 
-  export class LabelEditor2 extends Component<LabelEditorProps, {
+  export class LabelEditor extends Component<LabelEditorProps, {
     // Did labels change in between props? Set in componentWillReceiveProps
     labelsChanged?: boolean;
 

@@ -30,6 +30,7 @@
 /// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <reference path="../lib/Components.EventEditor.tsx" />
 /// <reference path="../lib/Components.LabelList.tsx" />
 /// <reference path="../lib/Components.LoadingMsg.tsx" />
 /// <reference path="../lib/Components.ListSelector.tsx" />

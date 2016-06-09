@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,
     "jsx": "react",
-    "outFile": "events.js"
+    "outFile": "now.js"
   },
 
   "devOnly": [
