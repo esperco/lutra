@@ -136,7 +136,6 @@ module Esper.ApiT {
     title: string;
     access_role?: string;
       // one of: None, FreeBusyReader, Owner, Reader, Writer
-    prefs?: CalendarPrefs;
   }
 
   export interface GenericCalendars {
@@ -492,12 +491,6 @@ module Esper.ApiT {
     general: GeneralPrefs;
     coworkers: string;
     notes: string;
-  }
-
-  export interface CalendarPrefs {
-    email_for_meeting_feedback?: boolean; //obsolete
-    slack_for_meeting_feedback?: boolean; //obsolete
-    add_to_daily_agenda: boolean;
   }
 
   export interface SlackAddress {
