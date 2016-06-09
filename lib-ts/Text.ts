@@ -10,8 +10,8 @@ module Esper.Text {
   export const Calendar = "calendar";
   export const Calendars = "calendars";
 
-  export const TeamExec = "principal";
-  export const TeamExecs = "principals";
+  export const TeamExec = "account";
+  export const TeamExecs = "accounts";
 
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
