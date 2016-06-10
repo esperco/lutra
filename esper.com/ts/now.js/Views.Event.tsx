@@ -45,7 +45,6 @@ module Esper.Views {
       if (error || eventData.data.isNone()) {
         return <Components.ErrorMsg />;
       }
-      if (eventData.data.isSome()) { console.info(eventData.data.unwrap()); }
 
       return eventData.data.match({
         none: () => {
