@@ -361,6 +361,21 @@
     padding-right: @modal-inner-padding;
   }
 
+  .esper-full-width {
+    margin-left: -@esper-base-padding;
+    margin-right: -@esper-base-padding;
+
+    .panel-body & {
+      margin-left: -@panel-body-padding;
+      margin-right: -@panel-body-padding;
+    }
+
+    .modal-body & {
+      margin-left: -@modal-inner-padding;
+      margin-right: -@modal-inner-padding;
+    }
+  }
+
   .esper-subheader {
     text-transform: capitalize;
     margin: 0 0 @padding-base-vertical;
@@ -491,6 +506,16 @@
     color: @inverse-text-header;
   }
 }
+
+
+/////
+
+// Full-width textarea (as in event editor)
+.esper-full-width textarea {
+  border-width: 1px 0;
+  border-radius: 0;
+}
+
 
 /////
 

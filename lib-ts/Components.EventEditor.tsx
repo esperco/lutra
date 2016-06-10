@@ -202,12 +202,14 @@ module Esper.Components {
           meeting guests.
         </p>
         { this.renderRating(event) }
-        <TextArea id={this.getId("notes")} placeholder="Notes"
-          ref={(ref) => this.inputNotes = ref}
-          className="form-control esper-modal-focus"
-          initValue={this.state.notes}
-          onChange={(v) => this.notesChange(v)}
-        />
+        <div className="esper-full-width">
+          <TextArea id={this.getId("notes")} placeholder="Notes"
+            ref={(ref) => this.inputNotes = ref}
+            className="form-control esper-modal-focus"
+            initValue={this.state.notes}
+            onChange={(v) => this.notesChange(v)}
+          />
+        </div>
       </Components.ModalPanel>;
     }
 
