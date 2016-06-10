@@ -114,7 +114,7 @@ module Esper.Charts {
         }
       })();
 
-      return <div className="esper-menu-section">
+      return <div className="esper-panel-section">
         <div className="esper-subheader">
           <i className="fa fa-fw fa-users" />{" "}
           Domains

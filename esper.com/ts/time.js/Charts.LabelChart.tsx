@@ -114,9 +114,9 @@ module Esper.Charts {
         );
       }
 
-      return <div className="esper-menu-section">
+      return <div className="esper-panel-section">
         { super.renderSelectors() }
-        <div className="esper-menu-section">
+        <div className="esper-panel-section">
           <div className="esper-subheader">
             <i className="fa fa-fw fa-tags" />{" "}
             { Text.Labels }

@@ -333,9 +333,28 @@
   }
 }
 
-.esper-menu-section, .esper-panel-section {
-  margin-top: @padding-large-vertical - @padding-base-vertical;
+/*
+  .esper-panel-sections are used to separate elements. Consecutive panel
+  sections get a dividing border and vertical spacing. Panel sections use
+  negative horizontal margins to ensure that padding doesn't stack up when
+  nested or when used inside Bootstrap modals and panels.
+*/
+.esper-panel-section {
   padding: 0;
+
+  .panel-body & {
+    margin-left: -@modal-inner-padding;
+    margin-right: -@modal-inner-padding;
+    padding-left: @modal-inner-padding;
+    padding-right: @modal-inner-padding;
+  }
+
+  .modal-body & {
+    margin-left: -@panel-body-padding;
+    margin-right: -@panel-body-padding;
+    padding-left: @panel-body-padding;
+    padding-right: @panel-body-padding;
+  }
 
   .esper-subheader {
     text-transform: capitalize;
@@ -353,17 +372,19 @@
   }
 }
 
-.esper-menu-section + .esper-menu-section,
 .esper-panel-section + .esper-panel-section {
   border-top: 1px solid @brand-divider;
 }
 
-.esper-menu-section + .esper-menu-section,
-.esper-menu-section + .modal-footer,
 .esper-panel-section + .modal-footer,
 .esper-panel-section + .esper-panel-section {
-  margin-top: (@line-height-computed / 2);
-  padding-top: (@line-height-computed / 2);
+  margin-top: @panel-body-padding;
+  padding-top: @panel-body-padding;
+
+  .modal-body & {
+    margin-top: @modal-inner-padding;
+    padding-top: @modal-inner-padding;
+  }
 }
 
 .esper-footer-text {

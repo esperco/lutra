@@ -37,7 +37,7 @@ module Esper.Views {
             <i className="fa fa-fw fa-refresh" title="refresh" />
           </a>
           { this.renderChartSelector() }
-          <div className="esper-menu-section">
+          <div className="esper-panel-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
               Calendars
@@ -62,7 +62,7 @@ module Esper.Views {
 
     renderChartSelector() {
       var selected = this.getCurrentChartInfo();
-      return (<div className="esper-menu-section">
+      return (<div className="esper-panel-section">
         <label htmlFor={this.getId("chart-type")}>
           <i className="fa fa-fw fa-bar-chart" />{" "}
           Chart Type{" "}

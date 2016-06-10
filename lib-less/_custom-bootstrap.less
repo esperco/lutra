@@ -299,8 +299,18 @@ a {
 
 ////
 
-.modal-body .modal-footer, .panel-body .modal-footer {
-  padding: @modal-inner-padding 0 0 0;
+.modal-footer {
+  .modal-body & {
+    margin-left: -@modal-inner-padding;
+    margin-right: -@modal-inner-padding;
+    padding: @modal-inner-padding @modal-inner-padding 0;
+  }
+
+  .panel-body & {
+    margin-left: -@panel-body-padding;
+    margin-right: -@panel-body-padding;
+    padding: @panel-body-padding @panel-body-padding 0;
+  }
 }
 
 .modal-body .alert {
