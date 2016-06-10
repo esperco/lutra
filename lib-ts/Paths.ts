@@ -179,6 +179,12 @@ module Esper.Paths {
       return optPath(prefix, "event");
     }
 
+    export function date({date} : { date: Date|string }) {
+      var dateStr = typeof date === "string" ?
+       date : moment(date).format("YYYY-MM-DD");
+      return optPath(prefix, "date", dateStr);
+    }
+
     export function token({token}: {token: string}) {
       return optPath(prefix, "token", token);
     }

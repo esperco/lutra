@@ -13,9 +13,9 @@ module Esper.Route {
     }
   }
 
-  routeHome(
-    redirectPath(Paths.Now.event())
-  );
+  routeHome(function(ctx) {
+    Actions.goToCurrent();
+  });
 
   route(Paths.Now.event().hash, function(ctx) {
     var q = decodeURIComponent(ctx.querystring);
@@ -30,6 +30,11 @@ module Esper.Route {
       eventId : Util.getParamByName("event",  q),
       action  : Util.getParamByName("action", q)
     });
+  });
+
+  route(Paths.Now.date({ date: ":date" }).hash, function(ctx) {
+    var date = moment(ctx.params["date"], "YYYY-MM-DD").toDate();
+    Actions.renderDatePage(date);
   });
 
   // route(Paths.Now.token().hash, function() {

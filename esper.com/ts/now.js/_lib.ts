@@ -28,6 +28,7 @@
 /// <reference path="../lib/Components.EventEditor.tsx" />
 /// <reference path="../lib/Components.LoadingMsg.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.PromiseSpinner.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SignalStrength.tsx" />
 /// <reference path="../lib/Components.StarRating.tsx" />
