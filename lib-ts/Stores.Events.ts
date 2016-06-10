@@ -245,6 +245,7 @@ module Esper.Stores.Events {
     });
   }
 
+  // Fetch predicts for team, return null promise when done
   export function fetchPredictions({teamId, start, end, force=false}: {
     teamId: string,
     start: Date,
@@ -297,7 +298,11 @@ module Esper.Stores.Events {
           }))
         })
       );
+
+      return apiP.then(() => null);
     }
+
+    return $.Deferred().resolve().progress();
   }
 
 

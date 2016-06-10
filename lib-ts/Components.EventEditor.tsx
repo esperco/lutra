@@ -2,6 +2,9 @@
   Component for editing event details, labels, etc.
 */
 
+/// <reference path="./Components.LabelEditor.tsx" />
+/// <reference path="./Components.TextArea.tsx" />
+
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
@@ -36,7 +39,7 @@ module Esper.Components {
                          initMin={props.minFeedback} /> :
           null
         }
-        <Components.LabelEditor2
+        <LabelEditor
           eventData={props.eventData}
           teams={props.teams}
           onDone={props.onDone}
@@ -143,7 +146,7 @@ module Esper.Components {
 
     minimize?: boolean;
   }> {
-    inputNotes: HTMLTextAreaElement;
+    inputNotes: TextArea;
     inputSaveTimeout: number;
 
     constructor(props: OneEventProps) {
@@ -199,11 +202,11 @@ module Esper.Components {
           meeting guests.
         </p>
         { this.renderRating(event) }
-        <textarea id={this.getId("notes")} placeholder="Notes"
+        <TextArea id={this.getId("notes")} placeholder="Notes"
           ref={(ref) => this.inputNotes = ref}
           className="form-control esper-modal-focus"
-          value={this.state.notes}
-          onChange={(e) => this.notesChange(e)}
+          initValue={this.state.notes}
+          onChange={(v) => this.notesChange(v)}
         />
       </Components.ModalPanel>;
     }
@@ -247,11 +250,9 @@ module Esper.Components {
       </div>;
     }
 
-    notesChange(e: React.FormEvent) {
+    notesChange(value: string) {
       clearTimeout(this.inputSaveTimeout);
       this.inputSaveTimeout = setTimeout(() => this.submitNotes(), 2000);
-
-      var value = (e.target as HTMLTextAreaElement).value;
       this.setState({notes: value});
     }
 

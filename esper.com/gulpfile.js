@@ -40,6 +40,7 @@ var config = {
     "ts/groups.js/tsconfig.json",
     "ts/login.js/tsconfig.json",
     "ts/manage.js/tsconfig.json",
+    "ts/now.js/tsconfig.json",
     "ts/settings.js/tsconfig.json",
     "ts/test.js/tsconfig.json",
     "ts/time.js/tsconfig.json"

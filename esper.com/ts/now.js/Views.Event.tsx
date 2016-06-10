@@ -46,23 +46,27 @@ module Esper.Views {
         return <Components.ErrorMsg />;
       }
 
-      var event = eventData.data.unwrap();
       return eventData.data.match({
         none: () => {
           Log.e("No event data found");
           return <Components.ErrorMsg />;
         },
-        some: (event) => <div className="panel panel-default">
-          <div className="panel-heading title">{event.title ||
-            <span className="no-title">{Text.NoEventTitle}</span>
-          }</div>
+        some: (event) => <div>
+          <Components.EventHeader
+            title={event.title || <span className="no-title">
+              {Text.NoEventTitle}
+            </span>}
+            onBack={() => Actions.goToPrev(event)}
+            onNext={() => Actions.goToNext(event)}
+          />
+          <div className="panel panel-default">
             <Components.EventEditor
               className="panel-body"
               eventData={[eventData]}
               teams={Stores.Teams.all()}
               initAction={this.props.initAction}
-              onDone={() => Route.nav.path("/list")}
             />
+          </div>
         </div>
       });
     }

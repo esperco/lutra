@@ -11,6 +11,7 @@
     "highcharts": "github:fongandrew/DefinitelyTyped/highcharts/highcharts.d.ts#333a3e05ae1f762b1ec068f0e508e4967c6119f4",
     "jasmine": "github:esperco/DefinitelyTyped/jasmine/jasmine.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "jquery": "github:esperco/DefinitelyTyped/jquery/jquery.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
+    "jquery.autosize": "registry:dt/jquery.autosize#3.0.7+20160317120654",
     "jqueryui": "github:esperco/DefinitelyTyped/jqueryui/jqueryui.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#c8630523ef2ee3fb42fe65cc17af5b1b56e611bc",
     "moment": "github:esperco/DefinitelyTyped/moment/moment.d.ts#122b5dd8d183028e514d7cc531340847b22d6c26",

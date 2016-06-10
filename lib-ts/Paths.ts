@@ -89,10 +89,6 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function event({}: {} = {}) {
-      return optPath(prefix, "event");
-    }
-
     export function list({teamId, calIds, interval, period}: {
       teamId?: string;
       calIds?: string;
@@ -168,6 +164,29 @@ module Esper.Paths {
 
     export function list() {
       return optPath(prefix, "list");
+    }
+  }
+
+  // Paths for /today
+  export module Now {
+    export const prefix = "/now";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
+
+    export function event() {
+      return optPath(prefix, "event");
+    }
+
+    export function date({date} : { date: Date|string }) {
+      var dateStr = typeof date === "string" ?
+       date : moment(date).format("YYYY-MM-DD");
+      return optPath(prefix, "date", dateStr);
+    }
+
+    export function token({token}: {token: string}) {
+      return optPath(prefix, "token", token);
     }
   }
 }

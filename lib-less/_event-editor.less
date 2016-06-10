@@ -1,5 +1,3 @@
-@event-notes-min-height: 350px;
-
 .event-star-ratings {
   @media (max-width: @screen-xs-max) {
     text-align: center;
@@ -61,25 +59,23 @@
     padding-top: @padding-small-vertical;
     max-height: 5em;
     overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    white-space: pre-line;
+    // display: -webkit-box;
+    // -webkit-line-clamp: 3;
+    // -webkit-box-orient: vertical;
+    transition: 0.6s max-height;
 
     &:focus, &:hover {
-      max-height: none;
+      max-height: 15em;
       display: block;
+      overflow: auto;
     }
   }
 }
 
 .event-notes {
   textarea {
-    transition: min-height 0.6s;
-    min-height: 0;
-
-    &:focus {
-      min-height: @event-notes-min-height;
-    }
+    min-height: 5em;
   }
 
   .modal-footer {
