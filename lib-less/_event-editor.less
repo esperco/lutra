@@ -1,5 +1,3 @@
-@event-notes-min-height: 250px;
-
 .event-star-ratings {
   @media (max-width: @screen-xs-max) {
     text-align: center;
@@ -77,12 +75,7 @@
 
 .event-notes {
   textarea {
-    transition: min-height 0.6s;
-    min-height: 0;
-
-    &:focus {
-      min-height: @event-notes-min-height;
-    }
+    min-height: 5em;
   }
 
   .modal-footer {
