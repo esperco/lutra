@@ -8,6 +8,7 @@
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 25%;
 @sidebar-lg-width: 20%;
+@esper-base-padding: @panel-body-padding;
 
 
 /*
@@ -24,8 +25,7 @@
 ///////
 
 .esper-padded {
-  padding: @padding-base-vertical @padding-base-horizontal
-           @padding-large-vertical;
+  padding: @esper-base-padding;
 }
 
 ///////
@@ -340,20 +340,25 @@
   nested or when used inside Bootstrap modals and panels.
 */
 .esper-panel-section {
-  padding: 0;
+  padding: 0 @esper-base-padding;
 
-  .panel-body & {
-    margin-left: -@modal-inner-padding;
-    margin-right: -@modal-inner-padding;
-    padding-left: @modal-inner-padding;
-    padding-right: @modal-inner-padding;
+  .esper-left-sidebar & {
+    margin-left: -@esper-base-padding;
+    margin-right: -@esper-base-padding;
   }
 
-  .modal-body & {
+  .panel-body & {
     margin-left: -@panel-body-padding;
     margin-right: -@panel-body-padding;
     padding-left: @panel-body-padding;
     padding-right: @panel-body-padding;
+  }
+
+  .modal-body & {
+    margin-left: -@modal-inner-padding;
+    margin-right: -@modal-inner-padding;
+    padding-left: @modal-inner-padding;
+    padding-right: @modal-inner-padding;
   }
 
   .esper-subheader {
@@ -370,6 +375,24 @@
       color: @inverse-text-header;
     }
   }
+
+  .modal-footer {
+    margin-left: -@esper-base-padding;
+    margin-right: -@esper-base-padding;
+    padding: @esper-base-padding @esper-base-padding 0;
+
+    .modal-body & {
+      margin-left: -@modal-inner-padding;
+      margin-right: -@modal-inner-padding;
+      padding: @modal-inner-padding @modal-inner-padding 0;
+    }
+
+    .panel-body & {
+      margin-left: -@panel-body-padding;
+      margin-right: -@panel-body-padding;
+      padding: @panel-body-padding @panel-body-padding 0;
+    }
+  }
 }
 
 .esper-panel-section + .esper-panel-section {
@@ -378,8 +401,13 @@
 
 .esper-panel-section + .modal-footer,
 .esper-panel-section + .esper-panel-section {
-  margin-top: @panel-body-padding;
-  padding-top: @panel-body-padding;
+  margin-top: @esper-base-padding;
+  padding-top: @esper-base-padding;
+
+  .panel-body & {
+    margin-top: @panel-body-padding;
+    padding-top: @panel-body-padding;
+  }
 
   .modal-body & {
     margin-top: @modal-inner-padding;
