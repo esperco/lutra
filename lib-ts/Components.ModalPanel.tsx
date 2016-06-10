@@ -50,6 +50,10 @@ module Esper.Components {
   }
 
   function ModalPanelFooter(props: FooterProps) {
+    if (!props.busy && !props.error && !props.onCancel && !props.onOK ) {
+      return; // Don't show footer if nothing to show
+    }
+
     return <div className="clearfix modal-footer">
       { (() => {
           if (props.busy) {

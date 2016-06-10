@@ -291,27 +291,6 @@ module Esper.Actions {
 
   // Render no-content view for a given date if no event on that date
   export function renderDatePage(date: Date) {
-    var mDate = moment(date).startOf('day');
-    var nextDate = mDate.clone().add(1, 'day').toDate();
-    var prevDate = mDate.clone().subtract(1, 'day').toDate();
-
-    render(<div className="container date-page">
-      <div className="row">
-        <div className="col-md-6 col-md-offset-3">
-          <div className="panel panel-default">
-            <Components.EventHeader
-              title={mDate.format(Text.EventDateHeadingFormat)}
-              onBack={() => goToDate(prevDate)}
-              onNext={() => goToDate(nextDate)}
-            />
-            <div className="panel-body">
-              <div className="esper-no-content">
-                { Text.NoEventsForDate }
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>)
+    render(<Views.Date date={date} />);
   }
 }

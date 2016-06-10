@@ -8,11 +8,19 @@
 @import "./_footer";
 
 #esper-main {
-  padding: @navbar-height 0;
+  padding: @navbar-height 0 0;
   min-height: 50%;
 
   > .container:first-child {
-    margin-top: @navbar-margin-bottom;
+    margin-top: @padding-base-vertical;
+  }
+
+  @media screen and (min-width: @screen-sm-min) {
+    padding: @navbar-height 0;
+
+    > .container:first-child {
+      margin-top: @navbar-margin-bottom;
+    }
   }
 }
 
@@ -21,3 +29,24 @@
   padding-top: 150px;
   padding-bottom: 150px;
 }
+
+.container.event-content, .container.date-page {
+  .title {
+    text-align: center;
+    line-height: @input-height-base;
+    vertical-align: middle;
+    font-weight: bold;
+    color: @brand-text-header;
+  }
+
+  @media screen and (max-width: @screen-xs-max) {
+    .panel {
+      margin-left:  0 - ceil((@grid-gutter-width / 2));
+      margin-right: 0 - floor((@grid-gutter-width / 2));
+      margin-bottom: 0;
+      border-width: 1px 0 0 0;
+      border-radius: 0;
+    }
+  }
+}
+

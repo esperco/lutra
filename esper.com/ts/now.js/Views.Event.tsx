@@ -52,7 +52,7 @@ module Esper.Views {
           Log.e("No event data found");
           return <Components.ErrorMsg />;
         },
-        some: (event) => <div className="panel panel-default">
+        some: (event) => <div>
           <Components.EventHeader
             title={event.title || <span className="no-title">
               {Text.NoEventTitle}
@@ -60,13 +60,14 @@ module Esper.Views {
             onBack={() => Actions.goToPrev(event)}
             onNext={() => Actions.goToNext(event)}
           />
-          <Components.EventEditor
-            className="panel-body"
-            eventData={[eventData]}
-            teams={Stores.Teams.all()}
-            initAction={this.props.initAction}
-            onDone={() => Route.nav.path("/list")}
-          />
+          <div className="panel panel-default">
+            <Components.EventEditor
+              className="panel-body"
+              eventData={[eventData]}
+              teams={Stores.Teams.all()}
+              initAction={this.props.initAction}
+            />
+          </div>
         </div>
       });
     }
