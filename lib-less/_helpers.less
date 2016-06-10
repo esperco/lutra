@@ -493,6 +493,12 @@
 .esper-full-width textarea {
   border-width: 1px 0;
   border-radius: 0;
+
+  &:focus, &:hover, &:active, &:active:focus, &:active:hover,  {
+    padding-left: @padding-base-horizontal - 1;
+    padding-right: @padding-base-horizontal - 1;
+    border-width: 1px;
+  }
 }
 
 
