@@ -53,7 +53,7 @@ module Esper.Views {
           </div>
           { chart ? chart.renderSelectors() : null }
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded">
+        <div className="esper-right-content">
           { this.renderPeriodSelector() }
           { this.renderChartCheck() }
         </div>
@@ -157,7 +157,7 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded padded panel panel-default " +
+      return <div className={"esper-expanded panel panel-default " +
                              "esper-no-content"}>
         <div className="panel-body">
           {elm}

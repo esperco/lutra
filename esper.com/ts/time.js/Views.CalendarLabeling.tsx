@@ -52,7 +52,7 @@ module Esper.Views {
           </div>
           {this.renderLabelEditor()}
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded"
+        <div className="esper-right-content"
              onClick={() => this.clearEventSelection()}>
           {this.renderCalendar()}
         </div>
@@ -99,7 +99,7 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded padded panel panel-default " +
+      return <div className={"esper-expanded panel panel-default " +
                              "esper-no-content"}>
         <div className="panel-body">
           {elm}

@@ -24,16 +24,6 @@
 
 ///////
 
-.esper-padded {
-  padding: @esper-base-padding;
-}
-
-///////
-
-.esper-full-screen.padded {
-  .esper-padded;
-}
-
 // Use for absolutely positioning a center div on screen
 .esper-center {
   position: absolute;
@@ -55,13 +45,12 @@
 }
 
 .esper-full-screen {
+  padding: @esper-base-padding;
+
   @media screen and (max-width: @screen-xs-max) {
+    padding: 0;
     position: relative;
     min-height: @min-fullscreen-height;
-
-    &.minus-nav, {
-      top: 0;
-    }
   }
 }
 
@@ -83,14 +72,11 @@
   }
 
   .esper-left-sidebar, .esper-right-content {
+    padding: @esper-base-padding;
     position: absolute;
     overflow-y: auto;
     top: 0;
     bottom: 0;
-
-    &.padded {
-      .esper-padded;
-    }
   }
 
   .esper-left-sidebar {
@@ -125,10 +111,7 @@
       padding: 0;
       margin: 0;
       border-right: 0;
-
-      &.padded {
-        padding: 0;
-      }
+      padding: 0;
 
       .sidebar-toggle {
         display: block;
@@ -152,8 +135,8 @@
         }
       }
 
-      &.padded .esper-collapse {
-        padding: 0 @padding-base-horizontal;
+      .esper-collapse {
+        padding: 0 @esper-base-padding;
 
         &.open {
           padding-bottom: @padding-large-vertical;
@@ -185,10 +168,6 @@
   .esper-right-content {
     right: 0;
     background: @body-bg;
-
-    &.padded {
-      padding-top: @padding-large-vertical;
-    }
 
     @media (min-width: @screen-sm-min) {
       width: 100% - @sidebar-sm-width;

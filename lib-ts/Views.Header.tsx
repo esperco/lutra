@@ -43,7 +43,7 @@ module Esper.Views {
 
       return <nav
               className="navbar navbar-default navbar-shadow navbar-fixed-top">
-        <div className="container-fluid padded">
+        <div className="container-fluid">
           <div className="navbar-header">
             <button type="button" className={"navbar-toggle collapsed " +
               (this.state.open ? "open " : "")}
