@@ -591,7 +591,7 @@ flexibility with non-UL elements */
   .esper-selectable, li > a {
     display: block;
     cursor: pointer;
-    padding: @padding-xs-vertical @padding-large-horizontal;
+    padding: @padding-xs-vertical @padding-xs-horizontal;
     clear: both;
     font-weight: normal;
     line-height: @line-height-base;
@@ -599,6 +599,10 @@ flexibility with non-UL elements */
     white-space: nowrap; // prevent links from randomly breaking onto new lines
     overflow-x: hidden;
     text-overflow: ellipsis;
+
+    .dropdown-menu & {
+      padding: @padding-xs-vertical @padding-base-horizontal;
+    }
 
     &.active {
       font-weight: bold;
