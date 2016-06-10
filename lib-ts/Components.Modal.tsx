@@ -34,12 +34,15 @@ module Esper.Components {
             {
               this.props.title ?
               <div className="modal-header">
-                { this.props.fixed ? null :
-                  <button type="button" className="close" data-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                }
                 <h4 className="modal-title">
+                  { this.props.fixed ? null :
+                    <span className="action close-action pull-right"
+                          data-dismiss="modal">
+                      <span aria-hidden="true">
+                        <i className="fa fa-fw fa-times" />
+                      </span>
+                    </span>
+                  }
                   { this.props.icon ?
                     <span>
                       <i className={"fa fa-fw " + this.props.icon} />{" "}
