@@ -147,9 +147,13 @@
         border-left: @border-radius-base solid @needs-confirmation-color;
       }
 
-      &.past {
-        background: @past-event-background;
-      }
+      /*
+        Uncomment to shade past-event titles -- current commented out because
+        this doesn't seem to add anything at the moment
+      */
+      // &.past .title {
+      //   color: @text-muted;
+      // }
 
       .event-checkbox + .event-content {
         margin-left: @event-checkbox-width;
