@@ -37,12 +37,7 @@ module Esper.Route {
     Actions.renderDatePage(date);
   });
 
-  // route(Paths.Now.token().hash, function() {
-  //   console.info("TODO");
-  // });
-
   routeNotFound(function(ctx) {
     Actions.render(React.createElement(Views.NotFound, {}));
   });
-
 }

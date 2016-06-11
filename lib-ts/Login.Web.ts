@@ -70,15 +70,53 @@ module Esper.Login {
     This function should be called when the app is initially loaded and we
     want to check if user has stored credentials.
   */
-  export function init() {
+  export function init(checkToken=false) {
     if (alreadyInit) { return; }
     alreadyInit = true;
 
+    if (checkToken) {
+      // Remember to check queryStr after hash too
+      let queryStr = location.search || location.hash.split("?")[1] || "";
+      let token = Util.getParamByName(tokenParam, queryStr);
+      if (token) {
+        postLoginToken(token);
+        return;
+      }
+    }
+
+    // No token, check local store
     if (initCredentials()) {
       Api.getLoginInfo().then(onLoginSuccess, onLoginFailure);
     } else {
       goToLogin();
     }
+  }
+
+  /*
+    Post login token, get response back -- a subset of the Token.consume
+    functionality in login.js
+  */
+  export function postLoginToken(token: string) {
+    Api.postToken(token).then(function(info: ApiT.TokenResponse) {
+      var x = info.token_value;
+      switch (Variant.tag(x)) {
+        case "Login":
+          var loginInfo: ApiT.LoginResponse = Variant.value(x);
+          if (!loginInfo || !loginInfo.uid || !loginInfo.api_secret) {
+            Log.e("Incomplete token login - " + JSON.stringify(loginInfo));
+            onLoginFailure();
+            return;
+          }
+
+          setCredentials(loginInfo.uid, loginInfo.api_secret);
+          onLoginSuccess(loginInfo);
+          break;
+
+        default: // Other token value => ignore
+          goToLogin();
+          break;
+      }
+    }, onLoginFailure);
   }
 
   // Used for testing
@@ -184,19 +222,19 @@ module Esper.Login {
   //////
 
   // Params for redirect
-  export var uidParam = "uid";
-  export var redirectParam = "redirect";
-  export var messageParam = "msg";
-  export var errorParam = "err";
-  export var logoutParam = "logout";
-  export var emailParam = "email";
-  export var inviteParam = "invite";
-  export var tokenParam = "token";
-  export var extParam = "ext";
-  export var platformParam = "platform"; // Google / Exchange / Nylas
+  export const uidParam = "uid";
+  export const redirectParam = "redirect";
+  export const messageParam = "msg";
+  export const errorParam = "err";
+  export const logoutParam = "logout";
+  export const emailParam = "email";
+  export const inviteParam = "invite";
+  export const tokenParam = "token";
+  export const extParam = "ext";
+  export const platformParam = "platform"; // Google / Exchange / Nylas
 
   // Redirects
-  export var loginPath = "/login";
+  export const loginPath = "/login";
 
   export function goToLogin(opts: {
       message?: string,
