@@ -16,7 +16,7 @@ module Esper.Components {
     }
 
     render() {
-      return <div className={"esper-left-sidebar esper-shade padded" +
+      return <div className={"esper-left-sidebar esper-shade" +
                              ( this.state.open ? " open" : "")}>
         { this.state.open ?
           <div className="esper-collapse-backdrop"

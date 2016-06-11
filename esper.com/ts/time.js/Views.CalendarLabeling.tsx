@@ -36,7 +36,7 @@ module Esper.Views {
       return <div id="calendar-page"
                   className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
-          <div className="esper-menu-section">
+          <div className="esper-panel-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
               Calendar
@@ -52,7 +52,7 @@ module Esper.Views {
           </div>
           {this.renderLabelEditor()}
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded"
+        <div className="esper-right-content"
              onClick={() => this.clearEventSelection()}>
           {this.renderCalendar()}
         </div>
@@ -99,7 +99,7 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded padded panel panel-default " +
+      return <div className={"esper-expanded panel panel-default " +
                              "esper-no-content"}>
         <div className="panel-body">
           {elm}
@@ -132,7 +132,7 @@ module Esper.Views {
           hasRecurring = true;
         }
 
-        return <div className="esper-menu-section sidebar-event-editor">
+        return <div className="esper-panel-section sidebar-event-editor">
           <div className="esper-subheader select-labels-heading">
             {heading}
             { hasRecurring ?
@@ -152,7 +152,7 @@ module Esper.Views {
                                   minFeedback={true} />
         </div>;
       } else {
-        return <div className="esper-menu-section">
+        return <div className="esper-panel-section">
           <div className="esper-no-content">
             Select a Calendar Event
           </div>

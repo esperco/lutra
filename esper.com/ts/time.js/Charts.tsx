@@ -253,7 +253,7 @@ module Esper.Charts {
     renderSelectors(): React.ReactElement<any> {
       var period = this.params.period;
       if (this.allowedIncrs().length && !Period.isCustom(period)) {
-        return <div className="esper-menu-section">
+        return <div className="esper-panel-section">
           <div className="esper-subheader">
             <i className="fa fa-fw fa-clock-o" />{" "}
             Compare With

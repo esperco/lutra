@@ -37,7 +37,7 @@ module Esper.Views {
             <i className="fa fa-fw fa-refresh" title="refresh" />
           </a>
           { this.renderChartSelector() }
-          <div className="esper-menu-section">
+          <div className="esper-panel-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
               Calendars
@@ -53,7 +53,7 @@ module Esper.Views {
           </div>
           { chart ? chart.renderSelectors() : null }
         </Components.SidebarWithToggle>
-        <div className="esper-right-content padded">
+        <div className="esper-right-content">
           { this.renderPeriodSelector() }
           { this.renderChartCheck() }
         </div>
@@ -62,7 +62,7 @@ module Esper.Views {
 
     renderChartSelector() {
       var selected = this.getCurrentChartInfo();
-      return (<div className="esper-menu-section">
+      return (<div className="esper-panel-section">
         <label htmlFor={this.getId("chart-type")}>
           <i className="fa fa-fw fa-bar-chart" />{" "}
           Chart Type{" "}
@@ -157,7 +157,7 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded padded panel panel-default " +
+      return <div className={"esper-expanded panel panel-default " +
                              "esper-no-content"}>
         <div className="panel-body">
           {elm}

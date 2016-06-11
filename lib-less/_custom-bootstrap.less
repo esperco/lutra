@@ -122,18 +122,14 @@ input.form-control, textarea.form-control, select.form-control {
 
 ////
 
-.container-fluid.padded {
-  padding-left: @padding-base-horizontal;
-  padding-right: @padding-base-horizontal;
-
-  @media (max-width: @screen-xs-max) {
-    .navbar & {
-      padding-left: @grid-gutter-width / 2;
-      padding-right: @grid-gutter-width / 2;
-    }
-  }
+.navbar .container-fluid {
+  padding-left: @grid-gutter-width / 2;
+  padding-right: @grid-gutter-width / 2;
 
   @media (min-width: @screen-sm-min) {
+    padding-left: @padding-base-horizontal;
+    padding-right: @padding-base-horizontal;
+
     .navbar-right {
       margin-right: 0;
     }
@@ -299,8 +295,27 @@ a {
 
 ////
 
-.modal-body .modal-footer, .panel-body .modal-footer {
-  padding: @modal-inner-padding 0 0 0;
+.modal-header .close-action {
+  line-height: @modal-title-line-height;
+  vertical-align: middle;
+
+  .fa {
+    font-size: @font-size-base;
+  }
+}
+
+.modal-footer {
+  .modal-body & {
+    margin-left: -@modal-inner-padding;
+    margin-right: -@modal-inner-padding;
+    padding: @modal-inner-padding @modal-inner-padding 0;
+  }
+
+  .panel-body & {
+    margin-left: -@panel-body-padding;
+    margin-right: -@panel-body-padding;
+    padding: @panel-body-padding @panel-body-padding 0;
+  }
 }
 
 .modal-body .alert {
@@ -326,6 +341,7 @@ a {
 
 .dropdown {
   .dropdown-menu {
+    padding: (@line-height-computed / 2) 0;
     min-width: 100%;
 
     > li > a {

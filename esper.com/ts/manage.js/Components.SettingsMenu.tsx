@@ -7,7 +7,7 @@ module Esper.Components {
     teamId: string;
     pathFn?: (p: {teamId: string}) => Paths.Path;
   }) {
-    return <div className="esper-content-header settings-menu fixed padded">
+    return <div className="esper-content-header settings-menu fixed">
       <SettingsMenuLink teamId={teamId} text={Text.GeneralSettings}
         pathFn={Paths.Manage.Team.general} activePathFn={pathFn} />
       <SettingsMenuLink teamId={teamId} text={Text.Calendars}

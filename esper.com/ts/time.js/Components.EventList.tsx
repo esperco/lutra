@@ -81,6 +81,7 @@ module Esper.Components {
           </div> : null
         }
         <div className="event-content">
+          <NoAttend event={event} />
           <div className={"title" +
                  (this.props.onEventClick ? " esper-link" : "") +
                  (Stores.Events.isActive(event) ? "": " no-attend")}
@@ -141,7 +142,7 @@ module Esper.Components {
     }
   }
 
-  function EventFeedback({event}: {event: Stores.Events.TeamEvent}) {
+  function NoAttend({event}: {event: Stores.Events.TeamEvent}) {
     // Check if no feedback
     var feedback = event.feedback || {}
 
@@ -150,14 +151,27 @@ module Esper.Components {
     var title = Stores.Events.isFuture(event) ?
       Text.NoAttendFuture : Text.NoAttendPast;
 
+    return <Tooltip className={classNames("action", "no-attend-action", {
+                                active: !isActive
+                              })} title={title}
+        onClick={(e) => toggleAttend(e, event)}>
+      <i className="fa fa-fw fa-close" />
+    </Tooltip>;
+  }
+
+  function toggleAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
+    e.stopPropagation();
+    var newFeedback = _.clone(event.feedback);
+    newFeedback.attended = !Stores.Events.isActive(event);
+    Actions.Feedback.post(event, newFeedback);
+  }
+
+  function EventFeedback({event}: {event: Stores.Events.TeamEvent}) {
+    // Check if no feedback
+    var feedback = event.feedback || {}
+
     // Format feedback
     return <span>
-      <Tooltip className={classNames("action", {
-            active: !isActive
-          })} title={title}
-          onClick={(e) => noAttend(e, event)}>
-        <i className="fa fa-fw fa-close" />
-      </Tooltip>
       { Stores.Events.isActive(event) ?
         _.times(feedback.rating || 0, (i) =>
           <i key={i.toString()} className="fa fa-fw fa-star" />
@@ -166,13 +180,6 @@ module Esper.Components {
       {" "}
       { feedback.notes ? <i className="fa fa-fw fa-comment" /> : null }
     </span>;
-  }
-
-  function noAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
-    e.stopPropagation();
-    var newFeedback = _.clone(event.feedback);
-    newFeedback.attended = !Stores.Events.isActive(event);
-    Actions.Feedback.post(event, newFeedback);
   }
 
 

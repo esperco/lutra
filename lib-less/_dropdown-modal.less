@@ -5,7 +5,12 @@
 @import "./_dropdown";
 
 .dropdown-modal-menu {
-  .dropdown-menu {
+  .modal-body & {
+    margin-left: -@modal-inner-padding;
+    margin-right: -@modal-inner-padding;
+  }
+
+  .dropdown .dropdown-menu, .dropdown-menu {
     display: block;
     border-width: 0;
     border-radius: 0;
