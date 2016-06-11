@@ -82,9 +82,13 @@ a.text-muted {
 */
 
 .btn, .btn:hover, .btn:focus, .btn:active, .btn.active,
-.btn:active:hover, .btn:active:focus {
+.btn:active:hover, .btn:active:focus, .btn.active:focus {
   outline: none;
   box-shadow: none;
+}
+
+.btn:hover {
+  box-shadow: @default-box-shadow;
 }
 
 // Override .btn-default
@@ -297,7 +301,11 @@ a {
 
 .list-group {
   margin-bottom: @padding-large-vertical;
+  border-radius: @border-radius-base;
+  box-shadow: @default-box-shadow;
 }
+
+
 
 
 ////
@@ -335,6 +343,10 @@ a {
 
 .panel-heading {
   text-transform: capitalize;
+}
+
+.panel {
+  box-shadow: @default-box-shadow;
 }
 
 .modal-body, .panel-body {
