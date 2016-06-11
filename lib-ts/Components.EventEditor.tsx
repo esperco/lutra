@@ -224,8 +224,7 @@ module Esper.Components {
 
     renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {
      if (! Stores.Events.isActive(event)) {
-       return Stores.Events.isFuture(event) ?
-         Text.NoAttendFuture : Text.NoAttendPast;
+       return Text.NoAttend;
      }
 
      if (event.feedback.rating) {
@@ -254,8 +253,8 @@ module Esper.Components {
                     (Stores.Events.isActive(event) ? "" : " active")}
                   onClick={() => this.toggleAttended()}>
             <i className="fa fa-fw fa-ban" />{" "}
-            { Stores.Events.isFuture(event) ?
-              Text.NoAttendFuture : Text.NoAttendPast }
+            { Stores.Events.isActive(event) ?
+              Text.YesAttend : Text.NoAttend }
           </button>
         </div>
       </div>;
