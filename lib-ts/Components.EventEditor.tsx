@@ -36,16 +36,19 @@ module Esper.Components {
           <EventFeedback event={firstEvent}
                          status={props.eventData[0].dataStatus}
                          initAction={props.initAction}
-                         initMin={props.minFeedback} /> :
+                         initMin={Stores.Events.isActive(firstEvent) &&
+                                  props.minFeedback} /> :
           null
         }
-        <LabelEditor
-          eventData={props.eventData}
-          teams={props.teams}
-          onDone={props.onDone}
-          autoFocus={props.focusOnLabels}
-          doneText="Done"
-        />
+        { props.eventData.length > 1 ||
+          Stores.Events.isActive(firstEvent) ?
+          <LabelEditor
+            eventData={props.eventData}
+            teams={props.teams}
+            onDone={props.onDone}
+            autoFocus={props.focusOnLabels}
+            doneText="Done"
+          /> : null }
       </div>
     });
   }
@@ -59,10 +62,16 @@ module Esper.Components {
   export class EventEditorModal
       extends Component<EventEditorModalProps, {}> {
     render() {
-      var heading = (this.props.eventData.length === 1 ?
+      var heading: JSX.Element|string = (this.props.eventData.length === 1 ?
         this.props.eventData[0].data.match({
-          none: () => "",
-          some: (e) => e.title || Text.NoEventTitle
+          none: () => null,
+          some: (e) => e.title ? <span className={classNames("title", {
+            "no-attend": !Stores.Events.isActive(e)
+          })}>
+            {e.title}
+          </span> : <span className="no-title">
+            { Text.NoEventTitle }
+          </span>
         }) || "1 Event Selected" :
         this.props.eventData.length + " Events Selected"
       );

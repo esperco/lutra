@@ -9,7 +9,7 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface ModalProps {
-    title?: string;
+    title?: JSX.Element|string;
     busy?: boolean;
     icon?: string;
     small?: boolean;

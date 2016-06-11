@@ -53,7 +53,11 @@ module Esper.Views {
         },
         some: (event) => <div>
           <Components.EventHeader
-            title={event.title || <span className="no-title">
+            title={event.title ? <span className={classNames("title", {
+              "no-attend": !Stores.Events.isActive(event)
+            })}>
+              {event.title}
+            </span> : <span className="no-title">
               {Text.NoEventTitle}
             </span>}
             onBack={() => Actions.goToPrev(event)}
