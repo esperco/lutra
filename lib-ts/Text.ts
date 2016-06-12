@@ -40,8 +40,8 @@ module Esper.Text {
 
   // Event Editor
   export const FeedbackTitle  = "Meeting Feedback"
-  export const NoAttendPast   = "Ignore";
-  export const NoAttendFuture = "Ignore";
+  export const NoAttend     = "Ignored";
+  export const YesAttend    = "Ignore?"
   export const NoEventTitle = `Untitled Event`;
   export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 
