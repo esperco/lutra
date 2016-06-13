@@ -57,6 +57,11 @@ module Esper.Views {
     }
 
     render() {
+      var myself = _.find(this.props.group.group_individuals, function(gim) {
+        return gim.uid === Login.me();
+      });
+      var isOwner = _.isEmpty(myself) ? false : myself.role === Text.GroupRoleOwner;
+
       return <div className="panel panel-default">
         <div className="panel-body">
           <Components.ModalPanel
@@ -67,9 +72,12 @@ module Esper.Views {
               onCancel={() => this.save()} cancelText="Save">
             <Components.GroupForm ref={(c) => this._form = c}
               name={this.props.group.group_name}
+              groupid={this.props.group.groupid}
               uid={Login.me()}
               groupMembers={this.props.group.group_teams || []}
-              onUpdate={() => this.delayedSave()}
+              groupIndividuals={this.props.group.group_individuals || []}
+              isOwner={isOwner}
+              onUpdate={this.delayedSave.bind(this)}
             />
           </Components.ModalPanel>
         </div>
@@ -91,7 +99,8 @@ module Esper.Views {
             Actions.Groups.updateGroup(this.props.group.groupid, {
               name: d.name,
               uid: d.uid,
-              groupMembers: d.groupMembers
+              groupMembers: d.groupMembers,
+              groupIndividuals: d.groupIndividuals
             });
           }
         });
@@ -99,8 +108,6 @@ module Esper.Views {
     }
   }
 
-
-  /* Deactivate Account = really just remove calendars */
 
   export function RemoveGroup({group} : {group: ApiT.Group}) {
     return <div className="panel panel-default">
