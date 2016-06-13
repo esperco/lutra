@@ -31,6 +31,11 @@ module Esper.Text {
   // Add group inidividual members
   export const AddGroupIndividualLink = `Add ${GroupIndividual}`;
 
+  // Group roles
+  export const GroupRoleOwner = "Owner";
+  export const GroupRoleManager = "Manager";
+  export const GroupRoleMember = "Member";
+
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
 
