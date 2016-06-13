@@ -10,7 +10,6 @@
 module Esper.Components {
   interface Props {
     isAdmin?: boolean;
-    groupMembers?: ApiT.Team[];
   }
 
   interface State { }
@@ -21,7 +20,9 @@ module Esper.Components {
     render() {
       return <GroupForm ref={(c) => this._form = c}
         name="" uid={Login.me()} isAdmin={this.props.isAdmin}
-        groupMembers={this.props.groupMembers || []}
+        isOwner={true}
+        groupMembers={[]}
+        groupIndividuals={[]}
       />
     }
 
