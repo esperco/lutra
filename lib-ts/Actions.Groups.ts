@@ -40,10 +40,14 @@ module Esper.Actions.Groups {
 
     // Clone group and set in store
     if (data.name) {
-      var newMembers = _.differenceBy(data.groupMembers, group.group_teams, 'teamid');
-      var removedMembers = _.differenceBy(group.group_teams, data.groupMembers, 'teamid');
-      var newIndividuals = _.differenceBy(data.groupIndividuals, group.group_individuals, 'email');
-      var removedIndividuals = _.differenceBy(group.group_individuals, data.groupIndividuals, 'email');
+      var newMembers = _.differenceBy(data.groupMembers,
+        group.group_teams, (g) => g.teamid);
+      var removedMembers = _.differenceBy(group.group_teams,
+        data.groupMembers, (g) => g.teamid);
+      var newIndividuals = _.differenceBy(data.groupIndividuals,
+        group.group_individuals, (g) => g.email);
+      var removedIndividuals = _.differenceBy(group.group_individuals,
+        data.groupIndividuals, (g) => g.email);
 
       group = _.cloneDeep(group);
       var p1 = group.group_name !== data.name ?
@@ -64,18 +68,24 @@ module Esper.Actions.Groups {
         return Api.removeGroupIndividual(groupId, gim.uid);
       });
 
+      /*
+        (Re-)clone group because we'll be push an initial version of the group
+        to the store and that will be frozen by the time promise resolves
+      */
+      var group2 = _.cloneDeep(group);
       var p5 = _.map(newIndividuals, function(gim: ApiT.GroupIndividual) {
-        return Api.putGroupIndividualByEmail(groupId, gim.email, { role: gim.role });
+        return Api.putGroupIndividualByEmail(groupId, gim.email, {
+          role: gim.role
+        }).then((res) => {
+          var gim = _.find(group2.group_individuals, { email: res.email });
+          gim.uid = res.uid;
+        });
       });
 
-      var p = $.when.apply($, _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5)).then(
-        ([], [], [], [], responses: ApiT.GroupIndividual[]) => {
-          _.each(newIndividuals, function(res) {
-            var gim = _.find(group.group_individuals, { email: res.email });
-            gim.uid = res.uid;
-          });
-      });
-      Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+      var p = $.when.apply($,
+        _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5)
+      ).then(() => Option.wrap(group2));
+      Stores.Groups.GroupStore.pushFetch(groupId, p, Option.wrap(group));
     };
   }
 
