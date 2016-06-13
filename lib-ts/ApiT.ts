@@ -94,7 +94,7 @@ module Esper.ApiT {
   }
 
   export interface GroupIndividual {
-    uid: string;
+    uid?: string;
     role: string;
     email?: string;
     invite_sent?: string;
