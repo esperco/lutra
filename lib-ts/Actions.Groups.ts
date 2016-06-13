@@ -17,6 +17,7 @@ module Esper.Actions.Groups {
     name: string;
     uid: string;
     groupMembers: ApiT.GroupMember[];
+    groupIndividuals: ApiT.GroupIndividual[];
   }
 
   // Base group creation function
@@ -41,11 +42,15 @@ module Esper.Actions.Groups {
     if (data.name) {
       var newMembers = _.differenceBy(data.groupMembers, group.group_teams, 'teamid');
       var removedMembers = _.differenceBy(group.group_teams, data.groupMembers, 'teamid');
+      var newIndividuals = _.differenceBy(data.groupIndividuals, group.group_individuals, 'email');
+      var removedIndividuals = _.differenceBy(group.group_individuals, data.groupIndividuals, 'email');
+
       group = _.cloneDeep(group);
       var p1 = group.group_name !== data.name ?
         [Api.renameGroup(group.groupid, data.name)] : [];
       group.group_name = data.name;
       group.group_teams = data.groupMembers;
+      group.group_individuals = data.groupIndividuals;
 
       var p2 = _.map(newMembers, function(member: ApiT.GroupMember) {
         return Api.putGroupMember(groupId, member.teamid);
@@ -55,7 +60,21 @@ module Esper.Actions.Groups {
         return Api.removeGroupMember(groupId, member.teamid);
       });
 
-      var p = $.when.apply($, p1.concat(p2).concat(p3));
+      var p4 = _.map(removedIndividuals, function(gim: ApiT.GroupIndividual) {
+        return Api.removeGroupIndividual(groupId, gim.uid);
+      });
+
+      var p5 = _.map(newIndividuals, function(gim: ApiT.GroupIndividual) {
+        return Api.putGroupIndividualByEmail(groupId, gim.email, { role: gim.role });
+      });
+
+      var p = $.when.apply($, _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5)).then(
+        ([], [], [], [], responses: ApiT.GroupIndividual[]) => {
+          _.each(newIndividuals, function(res) {
+            var gim = _.find(group.group_individuals, { email: res.email });
+            gim.uid = res.uid;
+          });
+      });
       Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
     };
   }
