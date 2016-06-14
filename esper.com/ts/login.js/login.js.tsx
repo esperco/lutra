@@ -106,9 +106,22 @@ module Esper {
     var ext = Util.getParamByName(Login.extParam);
     if (r) {
       r = Util.hexDecode(r);
+
+      /*
+        We only allow redirects to the same domain as this login page (for
+        safety). If redirect path is already same origin, remove to get path
+        without origin. Else we'll redirect to something like
+        https://esper.com/https://esper.com/path/to/thing
+      */
+      if (_.startsWith(r, location.origin)) {
+        r = r.slice(location.origin.length)
+      }
+
+      // Remove leading slash
       if (r[0] === "/") {
         r = r.slice(1);
       }
+
       return r;
     } else if (ext) {
       return EXT_REDIRECT;
