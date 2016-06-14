@@ -158,11 +158,11 @@ module Esper.Login {
   }
 
   function onLoginSuccess(loginInfo: ApiT.LoginResponse) {
-    // Remove ignored teams
+    // Remove ignored teams (but only if team is not approved)
     var teamIds = getIgnoredTeams();
     loginInfo.teams = _.filter(loginInfo.teams, (t) => {
-      return !_.includes(teamIds, t.teamid);
-    })
+      return t.team_approved || !_.includes(teamIds, t.teamid);
+    });
 
     if (needApproval(loginInfo)) {
       goToLogin({error: "login_again"});
