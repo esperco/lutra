@@ -5,7 +5,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
-/// <reference path="../lib/ApiC.ts" />
+/// <reference path="../lib/Stores.Profiles.ts" />
 /// <reference path="./Login.Oauth.ts" />
 
 module Esper.Views {
@@ -33,27 +33,13 @@ module Esper.Views {
         saving: false,
         error: false
       };
-      ApiC.getAllProfiles();
-    }
-
-    // Get data from external stores
-    getData() {
-      var fn = ApiC.getAllProfiles;
-      var store = fn.store;
-      var key = fn.strFunc([]);
-      var meta = store.metadata(key);
-      var val = store.val(key);
-      return {
-        profiles: val && val.profile_list,
-        dataStatus: meta && meta.dataStatus
-      };
     }
 
     renderWithData() {
-      var data = this.getData();
-      if (data.dataStatus) {
-        var loading = data.dataStatus === Model.DataStatus.FETCHING;
-        var error = (data.dataStatus === Model.DataStatus.FETCH_ERROR ||
+      var status = Stores.Profiles.status();
+      if (status) {
+        var loading = status === Model.DataStatus.FETCHING;
+        var error = (status === Model.DataStatus.FETCH_ERROR ||
                      this.state.error);
       }
 
@@ -104,18 +90,11 @@ module Esper.Views {
     }
 
     getName(uid: string) {
-      var data = this.getData();
-      var profile = _.find(data.profiles,
-        (profile) => profile.profile_uid === uid
-      );
-      if (profile) {
-        if (profile.display_name === profile.email) {
-          return profile.display_name;
-        } else {
-          return profile.display_name + " <" + profile.email + ">";
-        }
-      }
-      return "Unknown User";
+      return Stores.Profiles.get(uid).match({
+        none: () => "Unknown User",
+        some: (profile) => profile.display_name === profile.email ?
+          profile.display_name : `${profile.display_name} <${profile.email}>`
+      })
     }
 
     renderFooter() {
