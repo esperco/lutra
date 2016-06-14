@@ -1,6 +1,7 @@
 /// <reference path="../../../typings/browser.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../lib/Layout.tsx" />
+/// <reference path="../lib/Stores.Profiles.ts" />
 /// <reference path="./Login.Oauth.ts" />
 /// <reference path="./Components.Login.tsx" />
 /// <reference path="./Views.ApproveTeam.tsx" />
@@ -173,6 +174,7 @@ module Esper {
     .then(function(response) {
       var dfd = $.Deferred<ApiT.LoginResponse>();
       if (Login.needApproval(response)) {
+        Stores.Profiles.init();
         Layout.renderModal(<Views.ApproveTeamsModal info={response}
           callback={(info, rejected) => {
             var teamIds = _.map(rejected, (t) => t.teamid);
