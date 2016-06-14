@@ -1,5 +1,5 @@
 {
-  "ambientDependencies": {
+  "globalDependencies": {
     "MediaStream": "github:esperco/DefinitelyTyped/webrtc/MediaStream.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "bootstrap": "github:esperco/DefinitelyTyped/bootstrap/bootstrap.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "chrome": "github:esperco/DefinitelyTyped/chrome/chrome.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
@@ -33,5 +33,9 @@
     "react-global": "github:esperco/DefinitelyTyped/react/react-global.d.ts#e3a7583dc379d3b178216fcd444b0ea64aed66e0",
     "segment-analytics": "github:esperco/DefinitelyTyped/segment-analytics/segment-analytics.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "typeahead": "github:esperco/DefinitelyTyped/typeahead/typeahead.d.ts#48f20e97bfaf70fc1a9537b38aed98e9749be0ae"
+  },
+
+  "resolution": {
+    "browser": "typings/browser"
   }
 }

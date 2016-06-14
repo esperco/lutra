@@ -3,7 +3,7 @@
   Chrome extension
 */
 
-/// <reference path="../../../typings/browser.d.ts" />
+/// <reference path="../../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Login.Web.ts" />
 /// <reference path="../lib/ApiT.ts" />
 
