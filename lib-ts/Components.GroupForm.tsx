@@ -88,7 +88,8 @@ module Esper.Components {
           :
           <div className="list-group">
             <label className="esper-header">
-              { Text.TeamExecs + " in " + (this.state.name || Text.Group) }
+              { "Other " + Text.TeamExecs + " in " +
+                (this.state.name || "this " + Text.Group) }
             </label>
             { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
           </div>
@@ -122,7 +123,7 @@ module Esper.Components {
       return <div className="form-group">
         <label htmlFor={this.getId("new-members")}
                className="col-md-2 control-label">
-          {Text.AddGroupMemberLink}
+          Your {Text.TeamExecs}
         </label>
         <div className="col-md-10">
           <div className=
@@ -133,7 +134,7 @@ module Esper.Components {
                    onKeyDown={this.inputKeydown.bind(this)}
                    onChange={(e) => this.onTeamFilterChange(e)}
                    value={this.state.teamFilter || ""}
-                   placeholder="Tony Stark"
+                   placeholder={"Filter / Search for " + Text.TeamExecs}
             />
             {
               _.isEmpty(this.state.teamFilter) ?
