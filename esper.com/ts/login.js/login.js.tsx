@@ -1,4 +1,4 @@
-/// <reference path="../../../typings/browser.d.ts" />
+/// <reference path="../../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Stores.Profiles.ts" />

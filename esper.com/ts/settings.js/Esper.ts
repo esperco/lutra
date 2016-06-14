@@ -4,7 +4,7 @@
   Esper module.
 */
 
-/// <reference path="../../../typings/browser.d.ts" />
+/// <reference path="../../../typings/browser/index.d.ts" />
 
 declare module Esper {
   export var _: _.LoDashStatic;
