@@ -296,10 +296,12 @@ module Esper.Components {
         <i className="fa fa-fw fa-user" />
         {" "}{member.name}{" "}
         <span>
+        { this.props.isOwner || this.props.isAdmin ?
           <a className="pull-right text-danger" title="Delete"
              onClick={(e) => this.removeMember(member)}>
             <i className="fa fa-fw fa-trash list-group-item-text" />
-          </a>
+          </a> : null
+        }
         </span>
       </div>;
     }
