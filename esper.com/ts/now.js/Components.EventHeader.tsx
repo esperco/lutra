@@ -9,7 +9,7 @@ module Esper.Components {
     onBack: () => void;
     onNext: () => void;
   }) {
-    return <div className="clearfix text-center">
+    return <div className="clearfix text-center title-container">
       <a className="action pull-left"
          onClick={onBack}>
         <i className="fa fa-fw fa-chevron-left" />
