@@ -24,7 +24,6 @@ var config = {
     "bundles/landing-vendor.js",
     "bundles/react-page-vendor.js",
     "bundles/react-simple-vendor.js",
-    "bundles/settings-vendor.js",
     "bundles/test-vendor.js",
     "bundles/timestats-vendor.js"
   ],
@@ -36,12 +35,10 @@ var config = {
     "ts/lib/**/*.{ts,tsx}"
   ],
   tsProjects: [
-    "ts/chrome-ext.js/tsconfig.json",
     "ts/groups.js/tsconfig.json",
     "ts/login.js/tsconfig.json",
     "ts/manage.js/tsconfig.json",
     "ts/now.js/tsconfig.json",
-    "ts/settings.js/tsconfig.json",
     "ts/test.js/tsconfig.json",
     "ts/time.js/tsconfig.json"
   ],

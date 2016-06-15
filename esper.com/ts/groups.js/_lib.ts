@@ -10,7 +10,6 @@
 /// <reference path="../lib/Params.ts" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />

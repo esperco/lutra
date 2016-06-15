@@ -15,7 +15,6 @@
 /// <reference path="../lib/Params.ts" />
 /// <reference path="../lib/Paths.ts" />
 /// <reference path="../lib/Period.ts" />
-/// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />

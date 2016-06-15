@@ -1,7 +1,6 @@
 var _             = require('lodash'),
     gulp          = require('gulp'),
     cached        = require('gulp-cached'),
-    exec          = require('gulp-exec'),
     filter        = require('gulp-filter'),
     fs            = require('fs'),
     glob          = require("glob"),
@@ -19,9 +18,6 @@ var _             = require('lodash'),
 // Cache of TS config projects (used for incremental compilation)
 var projects = {};
 
-// Path to oblivion binary (relative to Lutra root)
-var OBLIVION_BIN = "setup/bin/oblivion";
-
 /*
   Returns functions for building and compiling TypeScript projects.
   Supports using Oblivion.
@@ -33,7 +29,6 @@ var OBLIVION_BIN = "setup/bin/oblivion";
 
     devOnly?: string[] - Files used only in development
     prodOnly?: string[] - Files used only in production
-    oblivion?: boolean - Pre-process with Oblivion?
 
   commonGlobs?: string[] - "Common" glob paths to add to path for each tsConfig
   outDir?: string - Path to output directory (modifies tsConfig.outFile path
@@ -112,28 +107,6 @@ var buildOne = function(tsConfigPath, commonGlobs, outDir) {
   });
 
   var ret = gulp.src(commonGlobs.concat(files), { base: "." });
-
-  /*
-    Oblivion is a custom JS/TS pre-processor that converts HTML-like code to
-    jQuery DOM insertions -- this is deprecated in favor of React in newer
-    code, but a lot of existing TS code uses Oblivion, so keep support for now.
-  */
-  if (config.oblivion) {
-    var oblivionPath = path.resolve(__dirname, "..", OBLIVION_BIN)
-    var filterDefs = filter(['**/*.ts', '!**/*.d.ts'], {restore: true});
-    ret = ret
-      .pipe(cached(tsConfigPath + " oblivion"))
-      .pipe(filterDefs)
-      .pipe(exec(oblivionPath + " -ts <%= file.path %>", {
-        continueOnError: true,
-        pipeStdout: true
-      }))
-      .pipe(exec.reporter({
-        stdout: false   // Don't report stdout, just pipe to output
-      }))
-      .pipe(filterDefs.restore)
-      .pipe(remember(tsConfigPath + " oblivion"));
-  }
 
   // Use file lists to filter out un-needed files
   var tsRefFilter = {referencedFrom: files};
