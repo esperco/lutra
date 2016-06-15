@@ -252,6 +252,10 @@ module Esper.Stores.Events {
     end: Date,
     force?: boolean;
   }) {
+    // We store events by day, so make sure we fetch entire start / end
+    start = moment(start).startOf('day').toDate();
+    end = moment(end).endOf('day').toDate();
+
     var dates = datesFromBounds(start, end);
     var team = Stores.Teams.require(teamId);
     if (! team) return;

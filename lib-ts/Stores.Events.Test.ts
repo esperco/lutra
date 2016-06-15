@@ -121,6 +121,29 @@ module Esper.Stores.Events {
       id: eventId4
     });
 
+    describe("fetchPredictions", function() {
+      var apiSpy: jasmine.Spy;
+      var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
+
+      beforeEach(function() {
+        apiSpy = Test.spySafe(Api, "postForTeamEvents");
+        dfd = $.Deferred();
+        apiSpy.and.returnValue(dfd.promise());
+      });
+
+      it("should round fetches to start / end of day", function() {
+        fetchPredictions({ teamId: teamId,
+          start: new Date(2016, 1, 1, 12),
+          end: new Date(2016, 1, 1, 13)
+        });
+
+        expect(apiSpy).toHaveBeenCalledWith(teamId, {
+          window_start: XDate.toString(new Date(2016, 1, 1)),
+          window_end: XDate.toString(new Date(2016, 1, 1, 23, 59, 59, 999))
+        });
+      });
+    });
+
     describe("fetchPredictionsForPeriod", function() {
       var apiSpy: jasmine.Spy;
       var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
