@@ -14,7 +14,7 @@ module Esper.Route {
   }
 
   routeHome(function(ctx) {
-    Actions.goToCurrent();
+    Actions.renderCurrent();
   });
 
   route(Paths.Now.event().hash, function(ctx) {

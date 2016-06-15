@@ -157,6 +157,13 @@ module Esper.Api {
       + "/email/" + string(email));
   }
 
+  export function getTeam(teamId: string):
+    JQueryPromise<ApiT.Team> {
+    return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
+      + "/" + string(teamId));
+  }
+
+
   export function inviteCreateTeam():
     JQueryPromise<ApiT.UrlResult> {
     var fromUid = Login.me();
