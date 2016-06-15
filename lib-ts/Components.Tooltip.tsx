@@ -11,6 +11,7 @@ module Esper.Components {
     className?: string;
     style?: React.CSSProperties;
     onClick?: React.MouseEventHandler;
+    placement?: string;
     title: string;
     children?: JSX.Element[];
   }, {}> {
@@ -24,6 +25,7 @@ module Esper.Components {
           title={this.props.title}
           onClick={this.props.onClick}
           data-original-title={this.props.title}
+          data-placement={this.props.placement}
           data-toggle="tooltip">
         { this.props.children }
       </span>;
