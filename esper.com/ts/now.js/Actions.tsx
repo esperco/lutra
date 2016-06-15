@@ -239,6 +239,15 @@ module Esper.Actions {
   }) {
     if (!eventId || !teamId || !calId) {
       Log.e(`Missing params - ${eventId} - ${teamId} - ${calId}`);
+      Route.nav.go("/not-found");
+    }
+
+    // Bad team => try using a default team
+    if (Stores.Teams.get(teamId).isNone()) {
+      var team = getTeam();
+      if (team.teamid !== teamId) {
+        teamId = team.teamid;
+      }
     }
 
     var p = action ?
@@ -257,7 +266,14 @@ module Esper.Actions {
 
     // Handle bad event IDs gracefully
     p.done(function(e) {
-      if (e.isNone()) {
+      if (e.isSome()) {
+        render(<Views.EventView
+          teamId={teamId}
+          calId={calId}
+          eventId={eventId}
+          initAction={!!action}
+        />);
+      } else {
         Log.e(e);
         Route.nav.go("/not-found");
       }
@@ -265,13 +281,6 @@ module Esper.Actions {
       Log.e(err);
       Route.nav.go("/not-found");
     })
-
-    render(<Views.EventView
-      teamId={teamId}
-      calId={calId}
-      eventId={eventId}
-      initAction={!!action}
-    />);
 
     Analytics.page(Analytics.Page.EventFeedback, {
       teamId: teamId,
