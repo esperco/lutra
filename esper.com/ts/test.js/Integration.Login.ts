@@ -34,7 +34,7 @@ module Esper.Integration {
 
     it("should log user out", function() {
       Login.initCredentials();
-      expect(Login.myUid()).toBeUndefined();
+      expect(Login.myUid()).toBeFalsy();
     });
   });
 }

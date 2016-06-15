@@ -1,9 +1,10 @@
 {#
   Anti-clickjacking script because S3 doesn't let us set X-Frame-Options.
   Can also be disabled on a case-by-case basis.
+
+  Allow iFrame in dev (for testing) but otherwise disable generally.
 #}
-{% if ALLOW_IFRAME %}
-{% else %}
+{% if PRODUCTION and not ALLOW_IFRAME %}
   <style id="antiClickjack">body{display:none !important;}</style>
   <script type="text/javascript">
     if (self === top) {
