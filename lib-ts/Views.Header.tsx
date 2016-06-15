@@ -6,6 +6,7 @@
 /// <reference path="./Save.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
+/// <reference path="./Components.Tooltip.tsx" />
 /// <reference path="./Text.ts" />
 
 module Esper.Views {
@@ -53,18 +54,18 @@ module Esper.Views {
               <i className={"fa " +
                  (this.state.open ? "fa-times" : "fa-bars")} />
             </button>
-            <span className={hasTeams ? "navbar-square" : ""}>
-              <SaveIndicator>
-                <a className="navbar-brand lg" href="#!/">
-                  <img alt="Esper" src="/img/esper-logo-purple.svg" />
+            <SaveIndicator>
+              <a className={classNames("navbar-brand lg", {
+                "navbar-square": hasTeams
+              })} href="#!/">
+                <img alt="Esper" src="/img/esper-logo-purple.svg" />
+              </a>
+              { hasTeams ? null :
+                <a href="/" className="navbar-brand word-mark hidden-xs">
+                  <img className="logo-name" src="img/word-mark.svg" />
                 </a>
-                { hasTeams ? null :
-                  <a href="/" className="navbar-brand word-mark hidden-xs">
-                    <img className="logo-name" src="img/word-mark.svg" />
-                  </a>
-                }
-              </SaveIndicator>
-            </span>
+              }
+            </SaveIndicator>
           </div>
 
           <div className={"esper-collapse" + (this.state.open ? " open" : "")}
@@ -189,8 +190,6 @@ module Esper.Views {
   class SaveIndicator extends React.Component<{
     children?: JSX.Element[];
   }, Save.Status> {
-    _error: HTMLSpanElement;
-
     constructor(props: { children?: JSX.Element[] }) {
       super(props);
       this.state = { busy: false, error: false };
@@ -198,14 +197,17 @@ module Esper.Views {
 
     render() {
       if (this.state.busy) {
-        return <span className="esper-spinner" />;
+        return <span className="navbar-square">
+          <span className="esper-spinner" />
+        </span>;
       }
       if (this.state.error) {
-        return <span ref={(c) => this._error = c}
-                     className="esper-save-error text-danger"
-                     data-toggle="tooltip" data-placement="right"
-                     title={Text.DefaultErrorTooltip}>
-          <i className="fa fa-fw fa-warning" />
+        return <span className="navbar-square">
+          <Components.Tooltip className="esper-save-error text-danger"
+                              title={Text.DefaultErrorTooltip}
+                              placement="right">
+            <i className="fa fa-fw fa-warning" />
+          </Components.Tooltip>
         </span>;
       }
       return <span>
@@ -215,21 +217,10 @@ module Esper.Views {
 
     componentDidMount() {
       Save.Emitter.addChangeListener(this.onChange);
-      this.mountTooltip();
     }
 
     componentWillUnmount() {
       Save.Emitter.removeChangeListener(this.onChange);
-    }
-
-    componentDidUpdate() {
-      this.mountTooltip();
-    }
-
-    mountTooltip() {
-      if (this._error) {
-        $(this._error).tooltip();
-      }
     }
 
     // Arrow notation to create a single reference for change listener
