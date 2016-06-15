@@ -62,16 +62,10 @@ module Esper.Actions {
         some: (e) => events = events.concat(e.events)
       });
     });
-    var ret = _.sortBy(events, (e) => [
+    return _.sortBy(events, (e) => [
       e.start && e.start.getTime(),
       e.end && e.end.getTime()
     ]);
-
-    console.info(ret,
-      team.teamid,
-      team.team_timestats_calendars,
-      mDate.toDate());
-    return ret;
   }
 
 
