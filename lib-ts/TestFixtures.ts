@@ -16,16 +16,19 @@ module Esper.TestFixtures {
   export var team0Exec = uid;
   export var team0Email = email;
   export var team0Labels = ["Label"];
+  export var team0Calendars = ["lois@esper.com"];
 
   export var teamId1 = "team-id-1";
   export var team1Exec = "O-w_peter____________w";
   export var team1Email = "peter@esper.com";
   export var team1Labels = ["Label 1", "Label 2", "Label 3"];
+  export var team1Calendars = ["peter@esper.com"];
 
   export var teamId2 = "team-id-2";
   export var team2Exec = "O-w_stewie____________w";
   export var team2Email = "stewie@esper.com";
   export var team2Labels = ["Label A", "Label B", "Label C"];
+  export var team2Calendars = ["stewie@esper.com", "rupert@esper.com"];
 
   // Stub normalization function for tests
   function normalizeLabel(label: string) {
@@ -108,7 +111,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["lois@esper.com"]
+          team_timestats_calendars: team0Calendars
         }, {
           teamid: teamId1,
           team_name: "Peter Griffin",
@@ -138,7 +141,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["peter@esper.com"]
+          team_timestats_calendars: team1Calendars
         }, {
           teamid: teamId2,
           team_name: "Stewie Griffin",
@@ -178,7 +181,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["stewie@esper.com", "rupert@esper.com"]
+          team_timestats_calendars: team2Calendars
         }
       ],
       team_members: [
