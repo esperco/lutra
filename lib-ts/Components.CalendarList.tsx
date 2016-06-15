@@ -33,7 +33,7 @@ module Esper.Components {
     render() {
       var calendars = this.props.availableCalendars;
       var teamApproved = this.props.team.team_approved &&
-        !!this.props.team.team_calendars.length;
+        !!this.props.team.team_timestats_calendars.length;
       var isExec = Login.myUid() === this.props.team.team_executive;
 
       var calChoices = _.map(calendars, (c) => ({

@@ -38,8 +38,8 @@ module Esper.Views {
     renderWithData() {
       var status = Stores.Profiles.status();
       if (status) {
-        var loading = status === Model.DataStatus.FETCHING;
-        var error = (status === Model.DataStatus.FETCH_ERROR ||
+        var loading = status === Model2.DataStatus.FETCHING;
+        var error = (status === Model2.DataStatus.FETCH_ERROR ||
                      this.state.error);
       }
 

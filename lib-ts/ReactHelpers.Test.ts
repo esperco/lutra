@@ -4,7 +4,7 @@
 */
 
 /// <reference path="./ReactHelpers.ts" />
-/// <reference path="./Model.StoreOne.ts" />
+/// <reference path="./Model2.ts" />
 /// <reference path="./Test.ts" />
 
 module Esper.ReactHelpers {
@@ -152,12 +152,18 @@ module Esper.ReactHelpers {
 
   /////////////
 
-  var stringStore = new Model.Store<string>();
+  var stringStore = new Model2.Store<string, string>();
 
   // NB: Wrap string in object because React needs an object
   class StoreComponent extends Component<{ prop: string }, { val: string }> {
     getState(props: { prop: string }) {
-      return { val: stringStore.val(props.prop) };
+      return { val: stringStore.get(props.prop).match({
+        none: () => "",
+        some: (s) => s.data.match({
+          none: () => "",
+          some: (v) => v
+        })
+      }) };
     }
 
     render() {
@@ -173,8 +179,8 @@ module Esper.ReactHelpers {
     beforeEach(function() {
       this.sandbox = $("<div>").appendTo("body");
       this.elm = $('<div class="penguin">').appendTo(this.sandbox);
-      stringStore.upsert("A", "first");
-      stringStore.upsert("B", "second");
+      stringStore.set("A", Option.some("first"));
+      stringStore.set("B", Option.some("second"));
       this.elm.renderReact(StoreComponent, { prop: "A" });
       this.component = this.elm.reactComponent();
     });
@@ -190,7 +196,7 @@ module Esper.ReactHelpers {
     });
 
     it("should use updated state on change", function() {
-      stringStore.upsert("A", "plus");
+      stringStore.set("A", Option.some("plus"));
       expect(this.component.jQuery().text()).toBe("plus");
     });
 
@@ -202,7 +208,7 @@ module Esper.ReactHelpers {
     it("should disconnect on removal", function() {
       spyOn(this.component, "setState");
       this.sandbox.remove();
-      stringStore.upsert("A", "plus");
+      stringStore.set("A", Option.some("plus"));
       expect(this.component.setState).not.toHaveBeenCalled();
     });
   });
@@ -212,7 +218,13 @@ module Esper.ReactHelpers {
 
   class StatelessStoreComponent extends Component<{}, {}> {
     render() {
-      return React.createElement("div", {}, stringStore.val("myVal"));
+      return React.createElement("div", {}, stringStore.get("myVal").match({
+        none: () => "",
+        some: (s) => s.data.match({
+          none: () => "",
+          some: (v) => v
+        })
+      }));
     }
 
     componentDidMount(): void {
@@ -224,7 +236,7 @@ module Esper.ReactHelpers {
     function()
   {
     beforeEach(function() {
-      stringStore.upsert("myVal", "first");
+      stringStore.set("myVal", Option.some("first"));
       var elm = React.createElement(StatelessStoreComponent);
       this.component = Test.render(elm);
     });
@@ -236,7 +248,7 @@ module Esper.ReactHelpers {
 
     it("should force update when a source changes", function() {
       spyOn(this.component, "render").and.callThrough();
-      stringStore.upsert("myVal", "second");
+      stringStore.set("myVal", Option.some("second"));
       expect(this.component.render).toHaveBeenCalled();
     });
   });
@@ -244,15 +256,20 @@ module Esper.ReactHelpers {
 
   //////
 
-  var storeOne = new Model.StoreOne<string>();
-  var storeMany = new Model.Store<string>();
+  var storeOneKey: "" = "";
+  var storeOne = new Model2.Store<"", string>();
+  var storeMany = new Model2.Store<string, string>();
 
   class DataComponent extends Component<{}, {}> {
     renderWithData() {
-      if (storeOne.isSet()) {
-        var key = storeOne.val();
-        var value = storeMany.val(key);
-      }
+      var value = storeOne.get(storeOneKey)
+        .flatMap((v1) => v1.data)
+        .flatMap((v2) => storeMany.get(v2))
+        .flatMap((v3) => v3.data)
+        .match({
+          none: () => "",
+          some: (s) => s
+        });
       return React.createElement('span', value);
     }
   }
@@ -272,33 +289,34 @@ module Esper.ReactHelpers {
     });
 
     it("should re-render when first-order store changes", function() {
-      storeOne.set("x");
+      storeOne.set(storeOneKey, Option.some("x"));
       expect(this.component.render.calls.count()).toEqual(1);
 
-      storeMany.set("x", "5");
+      storeMany.set("x", Option.some("5"));
       expect(this.component.render.calls.count()).toEqual(2);
     });
 
     it("should not re-render when second-order store changes if first-order " +
        "store value would prevent second-order from being called", function()
     {
-      storeMany.set("x", "5");
+      storeMany.set("x", Option.some("5"));
       expect(this.component.render).not.toHaveBeenCalled();
     });
 
     it("should only re-render when affected keys are called", function() {
-      storeOne.set("x");
+      storeOne.set(storeOneKey, Option.some("x"));
       expect(this.component.render.calls.count()).toEqual(1);
 
-      storeMany.set("y", "5");
+      storeMany.set("y", Option.some("5"));
       expect(this.component.render.calls.count()).toEqual(1);
     });
 
     it("should update for aliases", function() {
-      storeOne.set("x");
-      storeMany.upsert("x", "5");
-      storeMany.alias("x", "y");
-      storeMany.upsert("y", "6");
+      storeOne.set(storeOneKey, Option.some("x"));
+      storeMany.set("x", Option.some("5"), {
+        aliases: ["y"]
+      });
+      storeMany.set("y", Option.some("6"));
       expect(this.component.render.calls.count()).toEqual(3);
     });
   });

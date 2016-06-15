@@ -14,10 +14,11 @@ vendor:
 
 # Remove derived files
 clean:
-	$(MAKE) -C setup clean
 	$(MAKE) -C esper.com clean
-	$(MAKE) -C stoat clean
 	rm -rf otter
 	rm -rf zorilla
 	rm -rf marten
+	rm -rf grison
+	rm -rf setup
+	rm -rf stoat
 	rm -rf typings
