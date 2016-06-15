@@ -183,7 +183,7 @@ module Esper.ApiT {
   }
 
   export interface GenericCalendarEventsCollection {
-    [teamId: string]: GenericCalendarEvents;
+    [calId: string]: GenericCalendarEvents;
   }
 
   export interface Calendar {
