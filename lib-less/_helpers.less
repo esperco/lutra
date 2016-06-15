@@ -774,13 +774,13 @@ flexibility with non-UL elements */
   color: @input-color-placeholder;
 
   div, input[type=text], input[type=text]:focus {
-    z-index: 20;
+    z-index: @zindex-input;
   }
 
   .esper-left-icon, .esper-right-icon {
     display: block;
     position: absolute;
-    z-index: 21;
+    z-index: @zindex-button;
     top: 0;
     width: @input-height-base;
     height: @input-height-base;
