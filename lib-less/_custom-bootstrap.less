@@ -369,9 +369,11 @@ a {
   margin-bottom: @padding-large-vertical;
   border-radius: @border-radius-base;
   box-shadow: @default-box-shadow;
+
+  .panel-body &, .modal-body & {
+    box-shadow: none;
+  }
 }
-
-
 
 
 ////
