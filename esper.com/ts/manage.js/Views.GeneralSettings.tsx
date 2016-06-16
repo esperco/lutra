@@ -274,7 +274,7 @@ module Esper.Views {
   }
 
 
-  /* Deactivate Account = really just remove calendars */
+  /* Deactivate Account */
 
   function RemoveTeam({team} : {team: ApiT.Team}) {
     return <div className="panel panel-default">
