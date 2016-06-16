@@ -2,7 +2,7 @@
   Stick references to lib here -- makes managing all the refs easier
 */
 
-/// <reference path="../../../typings/browser.d.ts" />
+/// <reference path="../../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.Preferences.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
@@ -10,7 +10,6 @@
 /// <reference path="../lib/Params.ts" />
 /// <reference path="../lib/Layout.tsx" />
 /// <reference path="../lib/Option.ts" />
-/// <reference path="../lib/Queue.ts" />
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />

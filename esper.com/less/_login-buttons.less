@@ -3,7 +3,7 @@
 @esper-sign-in-max-width: 300px;
 @esper-sign-in-icon-width: 50px;
 
-button.sign-in-btn {
+.sign-in-btn {
   width: 100%;
   padding-left: 0;
   padding-right: 0;
@@ -39,6 +39,7 @@ button.sign-in-btn {
     border-color: #DC3921;
     background-image: linear-gradient(to bottom, #DF4A32 0%, #DD3A22 100%);
     box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    color: @brand-contrast;
 
     &:hover, &:active {
       box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
@@ -50,6 +51,7 @@ button.sign-in-btn {
     border-color: #0173BC;
     background-image: linear-gradient(to bottom, #0072BB 0%, #0066AA 100%);
     box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+    color: @brand-contrast;
 
     &:hover, &:active {
       box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.16);
@@ -63,7 +65,7 @@ button.sign-in-btn {
   }
 
   // For "Other Provider" button on landing page
-  &.btn-tertiary {
+  &.btn-default {
     @media (min-width: @screen-sm-min) {
       max-width: @esper-sign-in-max-width * 2 + @padding-xs-horizontal * 3
     }

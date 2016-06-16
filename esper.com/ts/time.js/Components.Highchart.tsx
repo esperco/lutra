@@ -35,12 +35,12 @@ module Esper.Components {
         <button type="button"
                 style={{display: "none"}}
                 onClick={() => this.drillUp()}
-                className={classNames("btn", "btn-secondary", DRILLUP_ID_CLS)}>
+                className={classNames("btn", "btn-default", DRILLUP_ID_CLS)}>
           <i className="fa fa-fw fa-angle-left" />
         </button>
         <button type="button"
                 onClick={() => this.exportChart()}
-                className={classNames("btn", "btn-secondary", EXPORT_ID_CLS)}>
+                className={classNames("btn", "btn-default", EXPORT_ID_CLS)}>
           <i className="fa fa-fw fa-download" />
         </button>
       </div>;

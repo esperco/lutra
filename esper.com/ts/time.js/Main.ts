@@ -25,7 +25,6 @@ module Esper.Main {
 }
 
 /*
-  Init only after everything else done loading (i.e. stuff in Prod.ts and
-  Dev.ts)
+  Init only after everything else done loading
 */
 window.requestAnimationFrame(Esper.Main.init);

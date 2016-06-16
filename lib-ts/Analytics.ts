@@ -9,108 +9,10 @@ module Esper.Analytics {
   // Events to track
   export enum Trackable {
 
-    /////* Old extension or settings page trackables */////
-
-    ArchiveTaskTabTask = 1,
-    CancelTaskTabTask,
-    ChangeSidebarTeam,
-    ChooseTaskTabEvent,
-    ClickCalendarPickerCancel,
-    ClickCalendarPickerSave,
-    ClickCalendarPickerSaveEventsTo,
-    ClickCalendarPickerViewCalendar,
-    ClickCancelEmailSearch,
-    ClickComposeBarAskExecIcon,
-    ClickComposeBarCreateIcon,
-    ClickComposeBarInsertIcon,
-    ClickComposeBarTemplateIcon,
-    ClickFinalizeEventYesDeleteHolds,
-    ClickFinalizeEventNoKeepHolds,
-    ClickInviteButton,
-    ClickInviteCancelButton,
-    ClickLabelsTabSave,
-    ClickLinkEmailSearch,
-    ClickMenuEditSettings,
-    ClickMenuEsperLogo,
-    ClickMenuExtensionOptions,
-    ClickMenuGetAgenda,
-    ClickMenuGetHelp,
-    ClickMenuGetStarted,
-    ClickMenuGetTaskList,
-    ClickMenuGetTimeStats,
-    ClickModalSendAgenda,
-    ClickModalSendTaskList,
-    ClickOnboardingDisable,
-    ClickOnboardingLogin,    // This refers to the explicit button. The
-                             // only reason for the user to click this button
-                             // is if the auto-redirect failed.
-    ClickOnboardingCreateTeams,
-    ClickOnboardingFinish,
-    ClickOnboardingYouTube,
-    ClickPeopleTab,
-    ClickPeopleTabMeetingsDropdown,
-    ClickPeopleTabPreferences,
-    ClickPreferencesTabAddLocation,
-    ClickPreferencesTabAddPhoneNumber,
-    ClickPreferencesTabAddUsername,
-    ClickPreferencesTabAddWorkplace,
-    ClickPreferencesTabInfoModalPrimaryButton,
-    ClickReminderButton,
-    ClickSlidesBackButton,
-    ClickSlidesNextButton,
-    ClickSidebarOptionsSettings,
-    ClickSidebarPrivacyPolicy,
-    ClickSidebarTermsOfUse,
-    ClickTaskTab,
-    ClickTaskTabDeleteEvent,
-    ClickTaskTabEditEvent,
-    ClickTaskTabInviteGuests,
-    ClickTaskTabUnlinkEvent,
-    ClickTemplatesTabTemplate,
-    ClickTemplatesTabCreateTemplate,
-    ClickTemplatesTabSaveTemplate,
-    ClickTimeStatsTweetButton,
-    ClickWorkflowsTabCreateWorkflow,
-    CopySelectionToTaskNotes,
-    CreateTask,
-    CreateTaskTabLinkedEvent,
-    DisablePreferencesTabDailyAgenda,
-    DisablePreferencesTabTasksUpdate,
-    EditCalendarPickerEventTitle,
-    EditCalendarPickerLocation,
-    EditGcalEventLabels,
-    EditGmailEventLabels,
-    EditTaskNotes,
-    EnablePreferencesTabDailyAgenda,
-    EnablePreferencesTabTasksUpdate,
-    LinkTaskTabEvent,
-    LinkTaskTabEmail,
-    LinkTaskTabToExistingTask,
-    MaximizeSidebar,
-    MaximizeSidebarOptions,
-    MinimizeSidebar,
-    MinimizeSidebarOptions,
-    OnboardingModalOpen,         // This happens automatically
-    OnboardingLoginSuccess,      // Called after auto-login
-    OpenTimeStatsAddCalendarsModal,
-    OpenTimeStatsAddLabelsModal,
-    OpenTimeStatsGifModal,
-    RenameTaskTabTask,
-    SaveTaskNotes,
-    SelectCalendarPickerExecutiveTimezone,
-    SelectCalendarPickerGuestTimezone,
-    SelectCalendarPickerMeetingType,
-    SelectTaskTabMeetingType,
-    SelectTaskTabTaskProgress,
-    SelectTaskTabWorkflow,
-    UnarchiveTaskTabTask,
-    UnlinkTaskTabFromExistingTask,
-
-
     ///////////* Time Stats *///////////////
 
     // Labeling
-    ConfirmEventLabels,       // Confirm predicted labels
+    ConfirmEventLabels = 1,   // Confirm predicted labels
     EditEventLabels,          // Edit labels for event(s)
     PickLabelProfile,         // Label profiles
 
@@ -146,6 +48,7 @@ module Esper.Analytics {
     CalendarManage,        // /#!/team/calendars/...
     NotificationSettings,  // /#!/team/notifications/...
     NewTeam,               // /#!/new-team/...
+    PersonalSettings,      // /#!/personal
     GroupManage,           // /#!/group/general/...
     NewGroup,              // /#!/new-group/...
 

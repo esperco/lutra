@@ -123,11 +123,7 @@ module Esper.Stores.Teams {
   /* Init helpers */
 
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    var teams = _.filter(loginResponse.teams,
-      (t) => t.team_timestats_calendars &&
-             t.team_timestats_calendars.length > 0
-    );
-    var data = _.map(teams, (t) => ({
+    var data = _.map(loginResponse.teams, (t) => ({
       itemKey: t.teamid,
       data: Option.wrap(t)
     }));

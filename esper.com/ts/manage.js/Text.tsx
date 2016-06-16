@@ -1,5 +1,19 @@
 module Esper.Text {
 
+  // Personal (non-team) settings
+  export const PersonalSettings = "Personal";
+
+  // Deactivate account?
+  export const DeactivateDescription = `Deactivating your account ` +
+    `will revoke Esper's access to your calendar service. If you are ` +
+    `managing time for another person and that person has not logged ` +
+    `into Esper to claim the account, that person's account will ` +
+    `also be deactivated.`;
+  export function deactivatePrompt(email: string) {
+    return `Deactivate ${email}?`;
+  }
+  export const DeactivateBtn = "Deactivate";
+
   // Team info description
   export const GeneralSettings = "General";
   export const NotificationSettings = "Notifications";

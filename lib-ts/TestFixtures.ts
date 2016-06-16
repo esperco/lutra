@@ -16,16 +16,19 @@ module Esper.TestFixtures {
   export var team0Exec = uid;
   export var team0Email = email;
   export var team0Labels = ["Label"];
+  export var team0Calendars = ["lois@esper.com"];
 
   export var teamId1 = "team-id-1";
   export var team1Exec = "O-w_peter____________w";
   export var team1Email = "peter@esper.com";
   export var team1Labels = ["Label 1", "Label 2", "Label 3"];
+  export var team1Calendars = ["peter@esper.com"];
 
   export var teamId2 = "team-id-2";
   export var team2Exec = "O-w_stewie____________w";
   export var team2Email = "stewie@esper.com";
   export var team2Labels = ["Label A", "Label B", "Label C"];
+  export var team2Calendars = ["stewie@esper.com", "rupert@esper.com"];
 
   // Stub normalization function for tests
   function normalizeLabel(label: string) {
@@ -87,17 +90,6 @@ module Esper.TestFixtures {
           team_cal_user: uid,
           team_assistants: [uid],
           team_calendar_accounts: [],
-          team_calendars: [{
-            calendar_default_agenda: true,
-            calendar_default_dupe: false,
-            calendar_default_view: true,
-            calendar_default_write: true,
-            calendar_timezone: "America/New_York",
-            calendar_title: "Lois's Calendar",
-            google_access_role: "Owner",
-            google_cal_id: "lois@esper.com",
-            is_primary: true
-          }],
           team_email_aliases: [],
           team_executive: team0Exec,
           team_labels: team0Labels,
@@ -108,7 +100,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["lois@esper.com"]
+          team_timestats_calendars: team0Calendars
         }, {
           teamid: teamId1,
           team_name: "Peter Griffin",
@@ -117,17 +109,6 @@ module Esper.TestFixtures {
           team_cal_user: uid,
           team_assistants: [uid],
           team_calendar_accounts: [],
-          team_calendars: [{
-            calendar_default_agenda: true,
-            calendar_default_dupe: false,
-            calendar_default_view: true,
-            calendar_default_write: true,
-            calendar_timezone: "America/New_York",
-            calendar_title: "Peter's Calendar",
-            google_access_role: "Owner",
-            google_cal_id: "peter@esper.com",
-            is_primary: true
-          }],
           team_email_aliases: [],
           team_executive: team1Exec,
           team_labels: team1Labels,
@@ -138,7 +119,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["peter@esper.com"]
+          team_timestats_calendars: team1Calendars
         }, {
           teamid: teamId2,
           team_name: "Stewie Griffin",
@@ -147,27 +128,6 @@ module Esper.TestFixtures {
           team_cal_user: uid,
           team_assistants: [uid],
           team_calendar_accounts: [],
-          team_calendars: [{
-            calendar_default_agenda: true,
-            calendar_default_dupe: false,
-            calendar_default_view: true,
-            calendar_default_write: true,
-            calendar_timezone: "America/New_York",
-            calendar_title: "Stewie's Calendar",
-            google_access_role: "Owner",
-            google_cal_id: "stewie@esper.com",
-            is_primary: true
-          }, {
-            calendar_default_agenda: true,
-            calendar_default_dupe: false,
-            calendar_default_view: true,
-            calendar_default_write: true,
-            calendar_timezone: "America/Los_Angeles",
-            calendar_title: "Rupert's Calendar",
-            google_access_role: "Writer",
-            google_cal_id: "rupert@esper.com",
-            is_primary: false
-          }],
           team_email_aliases: [],
           team_executive: team2Exec,
           team_labels: team2Labels,
@@ -178,7 +138,7 @@ module Esper.TestFixtures {
           team_label_pending: "Pending",
           team_label_done: "Done",
           team_label_canceled: "Canceled",
-          team_timestats_calendars: ["stewie@esper.com", "rupert@esper.com"]
+          team_timestats_calendars: team2Calendars
         }
       ],
       team_members: [

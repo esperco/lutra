@@ -3,6 +3,7 @@
 /*** Imports **/
 
 @import "./lib/_bootstrap-variables";
+@import "./lib/_helpers";
 @import "./_login-buttons";
 @import "./_landing-charts";
 @import "./_header";
@@ -106,6 +107,7 @@ button {
 
   &.index {
     background: @brand-primary-alt;
+    color: @brand-contrast;
     border: 1px solid darken(@brand-primary-alt, 5%);
     &:hover {
       background: @brand-primary-alt-hover;

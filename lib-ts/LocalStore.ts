@@ -77,7 +77,10 @@ module Esper.LocalStore {
     localhost), but it should still be accessible to JS served over HTTPS
   */
   function createCookie(key: string, value: string) {
-    document.cookie = key + "=" + value + "; path=/; secure";
+    document.cookie = key + "=" + value + "; path=/" +
+
+      // Add secure flag unless we're on http (dev)
+      (location.protocol === "http:" ? "" : "; secure");
   }
 
   // Read value as cookie

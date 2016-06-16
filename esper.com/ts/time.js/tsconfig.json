@@ -12,8 +12,7 @@
   "devOnly": [
     "../lib/JasmineStub.ts",
     "EventStats.Test.ts",
-    "Partition.Test.ts",
-    "Route.Test.ts"
+    "Partition.Test.ts"
   ],
 
   "prodOnly": [

@@ -51,13 +51,6 @@ module Esper.ApiT {
     email_list: string[];
   }
 
-  export interface ChromeSupport {
-    requested_version: string;
-    must_upgrade: boolean;
-    minimum_version: string;
-    download_page: string;
-  }
-
   export interface TeamCreationRequest {
     chrome_extension?: boolean;
     executive_email?: string;
@@ -68,13 +61,7 @@ module Esper.ApiT {
     executive_address?: string;
     executive_phone?: string;
     executive_gender?: string;
-    team_calendars?: Calendar[];
     team_email_aliases?: string[];
-  }
-
-  export interface TeamCalendar {
-    access_uid: string;
-    google_calendar_id: string;
   }
 
   export interface Team {
@@ -94,7 +81,6 @@ module Esper.ApiT {
     team_label_pending: string;
     team_label_done: string;
     team_label_canceled: string;
-    team_calendars: Calendar[];
     team_timestats_calendars?: string[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
@@ -183,79 +169,7 @@ module Esper.ApiT {
   }
 
   export interface GenericCalendarEventsCollection {
-    [teamId: string]: GenericCalendarEvents;
-  }
-
-  export interface Calendar {
-    google_cal_id: string;
-    authorized_as?: any;
-    calendar_title: string;
-    calendar_timezone?: string;
-    google_access_role?: string;
-    is_primary?: boolean;
-    calendar_default_view?: boolean;
-    calendar_default_write?: boolean;
-    calendar_default_dupe?: boolean;
-    calendar_default_agenda?: boolean;
-  }
-
-  export interface Calendars {
-    calendars: Calendar[];
-  }
-
-  export interface Phone {
-    title: string;
-    number: string;
-  }
-
-  export interface EmailEntry {
-    title: string;
-    email: string;
-  }
-
-  export interface FirstLastName {
-    first: string;
-    last: string;
-  }
-
-  export enum Role {
-    Assistant,
-    Executive
-  }
-
-  export interface LabelledItem {
-    label: string;
-    item: string;
-  }
-
-  export interface DirProfile {
-    [index: string]: any;
-    uid: string;
-    image_url: string;
-    display_name: string;
-    other_names: LabelledItem[];
-    company: string;
-    company_title: string;
-    company_location : string;
-    other_emails: LabelledItem[];
-    phones: LabelledItem[];
-    addresses: LabelledItem[];
-    custom_entries: LabelledItem[];
-  }
-
-  export interface DirLogin {
-    email: string;
-    password: string;
-  }
-
-  export interface DirProfileSearchResults {
-    search_results: WeightedDirProfile[];
-    search_count: number;
-  }
-
-  export interface WeightedDirProfile {
-    profile_data: DirProfile;
-    profile_score: number;
+    [calId: string]: GenericCalendarEvents;
   }
 
   export interface Profile {
@@ -340,150 +254,10 @@ module Esper.ApiT {
     member_other_emails: string[];
   }
 
-  export interface CalendarTime {
-    local: string; // RFC 3339 timestamp; local time = time read in UTC
-    utc: string; // RFC 3339 timestamp
-  }
-
-  export interface Latlon {
-    lat: number;
-    lon: number;
-  }
-
-  export interface Location {
-    title: string;
-    address: string;
-    public_notes?: string;
-    private_notes?: string;
-    coord?: Latlon; // optional
-    timezone?: string; // required if coordinates are missing
-  }
-
-  export interface CalendarEvent {
-    google_event_id: string;
-    google_cal_id: string;
-    start: CalendarTime;
-    end: CalendarTime;
-
-    /* optional fields */
-    google_cal_url?: string;
-    title?: string;
-    description?: string;
-    description_messageids: string[];
-    labels: string[];
-    location?: Location;
-    all_day?: boolean;
-    guests: Attendee[];
-    transparent?: boolean;
-    recurrence?: Recurrence;
-    recurring_event_id?: string;
-  }
-
-  export interface CalendarEventOpt {
-    event_opt?: CalendarEvent;
-  }
-
-  export interface CalendarEventEdit {
-    google_event_id?: string;
-    google_cal_id?: string;
-    start: CalendarTime;
-    end: CalendarTime;
-    title?: string;
-    description?: string;
-    description_messageids?: string[];
-    labels?: string[];
-    location?: Location;
-    all_day?: boolean;
-    guests: Guest[];
-    send_notifications?: boolean;
-    color_id?: string;
-    recurrence?: Recurrence;
-    recurring_event_id?: string;
-  }
-
-  export interface AgendaEvent {
-    event: CalendarEvent;
-    notes?: string;
-  }
-
-  export interface AgendaEventList {
-    agenda_events: AgendaEvent[];
-  }
-
-  export interface SyncedThread {
-    esper_uid: string;
-    gmail_thrid: string;
-  }
-
-  export interface EmailThread {
-    gmail_thrid: string;
-    subject: string;
-    snippet: string;
-  }
-
-  export interface EmailThreadSearch {
-    gmail_owner: string;
-    gmail_thrid: string;
-    first_subject: string;
-    last_snippet: string;
-    first_from: string;
-    last_date: string;
-  }
-
-  export interface EmailThreadSearchList {
-      items: EmailThreadSearch[];
-  }
-
-  export interface EmailMessage {
-    message_id: string;
-    message_owner: string;
-    message_gmsgid: string;
-    message_date: string;
-    message_sender: string;
-    message_snippet?: string;
-    raw?: string;
-  }
-
-  export interface LinkedCalendarEvents {
-    linked_events: TaskEvent[];
-  }
-
-  export interface LinkedEmailThreads {
-    linked_threads: string[]; /* hexadecimal gthrids */
-  }
-
-  export interface CalendarEventList {
-    events: CalendarEvent[];
-  }
-
-  export interface googleEvent {
-    google_event_id: string;
-  }
-
-  export interface LinkCalendarEvents {
-    google_events: googleEvent[];
-  }
-
-  export interface CreatedCalendarEvent {
-    google_cal_id: string;
-    google_event_id: string;
-    creation_time: string; /* timestamp */
-  }
-
-  export interface CreatedCalendarEvents {
-    created_events: CreatedCalendarEvent[];
-  }
-
-  export interface TeamCalendars {
-    google_cal_ids: string[];
-  }
-
   export interface Preferences {
     uid?: string;
     teamid?: string;
-    workplaces?: Workplace[];
     transportation?: string[];
-    meeting_types: MeetingTypes;
     email_types: EmailTypes;
     label_reminder?: SimpleEmailPref;
     slack_address?: SlackAddress;
@@ -521,81 +295,9 @@ module Esper.ApiT {
     team_prefs: TeamPreferences[];
   }
 
-  export interface UserWorkplaces {
-    workplace_list: Workplace[];
-  }
-
-  export interface UserTransportation {
-    transportation_list: string[];
-  }
-
-  export interface Workplace {
-    location: Location;
-    duration: HourMinute;
-    buffer: HourMinute;
-    distance: number;
-    availability: Availability[];
-  }
-
-  export interface MeetingTypes {
-    phone_call?: PhoneInfo;
-    video_call?: VideoInfo;
-    breakfast?: MealInfo;
-    brunch?: MealInfo;
-    lunch?: MealInfo;
-    coffee?: MealInfo;
-    dinner?: MealInfo;
-    drinks?: MealInfo;
-  }
-
-  export interface PhoneInfo {
-    duration: HourMinute;
-    buffer: HourMinute;
-    available: boolean;
-    availability: Availability[];
-    phones: PhoneNumber[];
-  }
-
-  export interface PhoneNumber {
-    phone_type: string;
-    phone_number: string;
-    share_with_guests?: boolean;
-  }
-
-  export interface VideoInfo {
-    duration: HourMinute;
-    buffer: HourMinute;
-    available: boolean;
-    availability: Availability[];
-    accounts: VideoAccount[];
-  }
-
-  export interface VideoAccount {
-    video_type: string;
-    video_username: string;
-  }
-
-  export interface TimeOnDay {
-    day: string; /* Sun, Mon, Tue... */
-    time: HourMinute;
-  }
-
   export interface HourMinute {
     hour : number; /* 0 to 23 */
     minute: number;
-  }
-
-  export interface Availability {
-    avail_from: TimeOnDay;
-    avail_to: TimeOnDay;
-  }
-
-  export interface MealInfo {
-    duration: HourMinute;
-    buffer: HourMinute;
-    available: boolean;
-    availability: Availability[];
-    favorites: Location[];
   }
 
   export interface EmailTypes {
@@ -745,61 +447,6 @@ module Esper.ApiT {
     chunks_with_guests: number[]; // Seconds list, alternating +/- (+ = busy)
   }
 
-  export interface Task {
-    taskid: string;
-    task_teamid: string;
-    task_title: string;
-    task_notes: string;
-    task_notes_quill: string;
-    task_archived: boolean;
-    task_labels: string[];
-    task_progress: string; // New | In_progress | Pending | Done | Canceled
-    task_urgent: boolean;
-    task_unread_emails?: number;
-    task_threads: EmailThread[];
-    task_messages: EmailMessage[];
-    task_events: TaskEvent[];
-    task_workflow_progress: TaskWorkflowProgress;
-    task_meeting_type?: string;
-  }
-
-  export interface NewTask {
-    task_title: string;
-
-    // optional
-    task_notes?: string;
-    task_notes_quill?: string;
-    task_archived?: boolean;
-    task_labels?: string[];
-    task_progress?: string;
-    task_urgent?: boolean;
-    task_workflow_progress?: TaskWorkflowProgress;
-    task_meeting_type?: string;
-  }
-
-  export interface TaskThread {
-    task_threadid: string; // hex
-  }
-
-  export interface TaskEvent {
-    task_event: CalendarEvent;
-  }
-
-  export interface TaskList {
-    tasks: Task[];
-    next_page?: string; // url
-  }
-
-  export interface TaskSearchResults {
-    search_results: WeightedTask[];
-    search_count: number;
-  }
-
-  export interface WeightedTask {
-    task_data: Task;
-    task_weight: number;
-  }
-
   export interface UrlResult {
     url: string;
   }
@@ -836,15 +483,6 @@ module Esper.ApiT {
 
   export interface EmailAddresses {
     emails: string[];
-  }
-
-  export interface CalendarAcl {
-    shared_emails: CalendarAclEntry[];
-  }
-
-  export interface CalendarAclEntry {
-    acl_id: string;
-    acl_email: string;
   }
 
   export interface EventDescription {
@@ -885,100 +523,13 @@ module Esper.ApiT {
     address_country?: string;
   }
 
-  export interface TaskUsageList {
-    items: TaskUsage[];
-  }
-
-  export interface TaskUsage {
-    teamid: string;
-    start: string; // RFC-3339 timestamp
-    end: string; // RFC-3339 timestamp
-
-    revision: number;
-    approval?: Approval;
-    frozen: boolean;
-    stripe_charge?: string;
-    charge_amount?: number;
-    start_planid: string;
-    end_planid: string;
-    unlimited_usage: boolean;
-    tasks: SingleTaskUsage[];
-  }
-
   export interface Approval {
     approved_by: string; // uid
     approved_on: string; // timestamp
   }
 
-  export interface SingleTaskUsage {
-    taskid: string;
-    title?: string;
-    creation_date: string; // timestamp
-    created_during_period: boolean;
-
-    auto_scheduling_tasks_created: number;
-    scheduling_tasks_created: number;
-
-    auto_scheduling_time: number; // seconds
-    scheduling_time: number; // seconds
-
-    auto_generic_tasks_created: number;
-    generic_tasks_created: number;
-
-    auto_generic_time: number; // seconds
-    generic_time: number; // seconds
-  }
-
-  export interface ExtraCharge {
-    unlimited_usage: boolean;
-    amount_due: number; // cents
-    description: string;
-    statement_descriptor: string;
-  }
-
-  export interface EmailSignature {
-    signature: string;
-  }
-
   export interface CalendarEventPalette {
     palette: CalendarEventColor[];
-  }
-
-  export interface Signup {
-    first_name: string;
-    last_name: string;
-    phone: string;
-    platform: string;
-  }
-
-  export interface TimeTrack {
-    taskid: string;
-    teamid: string;
-    start: number;
-    duration: number;
-    user: string;
-    ip_addr: string;
-  }
-
-  export interface TimeTrackPeriod {
-    start: number;
-    end: number;
-    items: TimeTrack[];
-  }
-
-  // Smarter Scheduling
-
-  export class Status {
-    static yes   = "yes";
-    static no    = "no";
-    static maybe = "maybe";
-
-    static next(current: string) {
-      var availabilities: string[] = ["yes", "no", "maybe"];
-      var nextIndex = availabilities.indexOf(current) + 1;
-
-      return availabilities[nextIndex % availabilities.length];
-    }
   }
 
   /** The status of a guest at some specific event. */
@@ -1003,81 +554,10 @@ module Esper.ApiT {
     timezone?: string;
   }
 
-  export interface TaskPreferences {
-    taskid: string;
-    executive_timezone?: string;
-    guest_timezone?: string;
-    guest_preferences: GuestPreferences[];
-  }
-
-  export interface TaskMessageNotification {
-    taskid: string;
-    emails: string[];
-    snippet: string;
-  }
-
-  export interface ThreadParticipants {
-    messages: MessageParticipants[];
-  }
-
-  export interface MessageParticipants {
-    from: Guest[];
-    to: Guest[];
-    cc: Guest[];
-    bcc: Guest[];
-  }
-
-  export interface Workflow {
-    id : string;
-    title : string;
-    notes : string;
-    steps : WorkflowStep[];
-  }
-
-  export interface UserWorkflows {
-    workflows : Workflow[];
-  }
-
-  export interface Template {
-    id: string;
-    title: string;
-    content: string;
-  }
-
-  export interface UserTemplate {
-    items: Template[];
-  }
-
-  type MeetingType = [string, PhoneInfo|VideoInfo|MealInfo];
-
-  export interface WorkflowStep {
-    id : string;
-    title : string;
-    notes : string;
-    meeting_prefs? : MeetingType;
-    checklist : CheckItem[];
-  }
-
-  export interface CheckItem {
-    text : string;
-    checked : boolean;
-  }
-
-  export interface TaskWorkflowProgress {
-    workflow_id : string;
-    step_id? : string;
-    checklist : CheckItem[];
-  }
-
   export interface Recurrence {
     rrule : Recur[];
     exdate : string[];
     rdate : string[];
-  }
-
-  export interface Error {
-    [index: string]: any;
-    responseText: string;
   }
 
   export type Freq = string; // We only use Daily, Weekly, Monthly, and Yearly
@@ -1107,7 +587,6 @@ module Esper.ApiT {
     bysetpos : number[];
     wkst ?: Weekday;
   }
-
 }
 
 module Esper.ApiT.GoogleDriveApi {

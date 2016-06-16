@@ -8,13 +8,14 @@ module Esper.Components {
     activeGroupId?: string;
     pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
+    activePersonal?: boolean;
     groups: ApiT.Group[];
   }
 
   export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
       return <Components.SidebarWithToggle>
-        <div className="esper-sidebar-section">
+        <div className="esper-panel-section">
           <label className="esper-header">
             { Text.TeamExecs }
           </label>
@@ -23,7 +24,9 @@ module Esper.Components {
             <li className="divider" />
             <li>
               <a className={classNames({
-                active: !this.props.activeTeamId && !this.props.activeGroupId
+                active: !this.props.activeTeamId &&
+                        !this.props.activePersonal &&
+                        !this.props.activeGroupId
               })}
               href={Paths.Manage.newTeam().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
@@ -32,7 +35,7 @@ module Esper.Components {
             </li>
           </ul>
         </div>
-        <div className="esper-sidebar-section">
+        <div className="esper-panel-section">
           <label className="esper-header">
             { Text.Groups }
           </label>
@@ -49,6 +52,16 @@ module Esper.Components {
               </a>
             </li>
           </ul>
+        </div>
+        <div className="esper-panel-section">
+          <ul className="esper-select-menu"><li>
+            <a className={classNames({
+              active: this.props.activePersonal
+            })} href={Paths.Manage.personal().href}>
+              <i className="fa fa-fw fa-cog" />{" "}
+              { Text.PersonalSettings }
+            </a>
+          </li></ul>
         </div>
       </Components.SidebarWithToggle>;
     }

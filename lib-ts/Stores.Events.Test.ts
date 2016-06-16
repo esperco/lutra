@@ -7,6 +7,14 @@ module Esper.Stores.Events {
     beforeEach(function() {
       EventsForDateStore.reset();
       EventStore.reset();
+      TestFixtures.mockLogin();
+      Teams.init();
+      Calendars.init();
+      Login.init();
+    });
+
+    afterEach(function() {
+      TestFixtures.reset();
     });
 
     describe("datesFromBounds", function() {
@@ -75,8 +83,8 @@ module Esper.Stores.Events {
     ///////
 
     // Fixed vars for fetching and setting events
-    const teamId = "teamId";
-    const calId = "calId";
+    const teamId = TestFixtures.teamId0;
+    const calId = TestFixtures.team0Calendars[0];
     const eventId1 = "eventId1";
     const eventId2 = "eventId2";
     const eventId3 = "eventId3";
@@ -113,26 +121,49 @@ module Esper.Stores.Events {
       id: eventId4
     });
 
-    describe("fetchForPeriod", function() {
+    describe("fetchPredictions", function() {
       var apiSpy: jasmine.Spy;
-      var dfd: JQueryDeferred<ApiT.GenericCalendarEvents>;
+      var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
 
       beforeEach(function() {
-        apiSpy = spyOn(Api, "postForGenericCalendarEvents");
+        apiSpy = Test.spySafe(Api, "postForTeamEvents");
+        dfd = $.Deferred();
+        apiSpy.and.returnValue(dfd.promise());
+      });
+
+      it("should round fetches to start / end of day", function() {
+        fetchPredictions({ teamId: teamId,
+          start: new Date(2016, 1, 1, 12),
+          end: new Date(2016, 1, 1, 13)
+        });
+
+        expect(apiSpy).toHaveBeenCalledWith(teamId, {
+          window_start: XDate.toString(new Date(2016, 1, 1)),
+          window_end: XDate.toString(new Date(2016, 1, 1, 23, 59, 59, 999))
+        });
+      });
+    });
+
+    describe("fetchPredictionsForPeriod", function() {
+      var apiSpy: jasmine.Spy;
+      var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
+
+      beforeEach(function() {
+        apiSpy = Test.spySafe(Api, "postForTeamEvents");
         dfd = $.Deferred();
         apiSpy.and.returnValue(dfd.promise());
         testFetch();
       });
 
       function testFetch() {
-        fetchForPeriod({ teamId: teamId, calId: calId, period: {
+        fetchPredictionsForPeriod({ teamId: teamId, period: {
           interval: "month",
           index: 552 // Jan 2016
         }});
       }
 
       it("should fetch data from Api", function() {
-        expect(apiSpy).toHaveBeenCalledWith(teamId, calId, {
+        expect(apiSpy).toHaveBeenCalledWith(teamId, {
           window_start: XDate.toString(new Date(2016, 0, 1)),
           window_end: XDate.toString(new Date(2016, 0, 31, 23, 59, 59, 999))
         });
@@ -150,7 +181,7 @@ module Esper.Stores.Events {
           teamId: teamId, calId: calId, date: new Date(2016, 0, 15)
         });
         testFetch();
-        expect(apiSpy).toHaveBeenCalledWith(teamId, calId, {
+        expect(apiSpy).toHaveBeenCalledWith(teamId, {
           window_start: XDate.toString(new Date(2016, 0, 1)),
           window_end: XDate.toString(new Date(2016, 0, 31, 23, 59, 59, 999))
         });
@@ -158,9 +189,9 @@ module Esper.Stores.Events {
 
       describe("on promise resolution", function() {
         beforeEach(function() {
-          dfd.resolve({
-            events: [e1, e2, e3]
-          });
+          var x: ApiT.GenericCalendarEventsCollection = {};
+          x[calId] = { events: [e1, e2, e3] }
+          dfd.resolve(x);
         });
 
         function getForDate(date: Date) {
@@ -339,17 +370,6 @@ module Esper.Stores.Events {
       }));
 
     describe("getGuests", function() {
-      beforeEach(function() {
-        TestFixtures.mockLogin();
-        Teams.init();
-        Calendars.init();
-        Login.init();
-      });
-
-      afterEach(function() {
-        TestFixtures.reset();
-      });
-
       it("should return all guests who did not decline", function() {
         expect(getGuests(guestEvent)).toEqual([guest1, guest2, guest4]);
       });

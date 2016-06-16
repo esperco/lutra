@@ -87,7 +87,7 @@
 @inverse-text-muted-hover: @gray-40;
 
 @default-box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
-
+@plus-box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.15);
 
 //== Scaffolding
 //
@@ -218,25 +218,24 @@
 @btn-font-weight:                normal;
 
 @btn-default-color:              #333;
-@btn-default-bg:                 @brand-contrast;
+@btn-default-bg:                 rgba(255, 255, 255, 0.1);
 @btn-default-border:             @brand-border;
 
+@btn-primary-color:              darken(@brand-primary, 5%);
+@btn-primary-bg:                 fadeout(@brand-primary, 95%);
+@btn-primary-border:             @brand-primary;
 
-@btn-primary-color:              @brand-contrast;
-@btn-primary-bg:                 @brand-primary;
-@btn-primary-border:             darken(@btn-primary-bg, 5%);
+@btn-success-color:              darken(@brand-success, 5%);
+@btn-success-bg:                 fadeout(@brand-success, 90%);
+@btn-success-border:             @brand-success;
 
-@btn-success-color:              @brand-contrast;
-@btn-success-bg:                 @brand-success;
-@btn-success-border:             darken(@btn-success-bg, 5%);
+@btn-info-color:                 darken(@brand-info, 5%);
+@btn-info-bg:                    fadeout(@brand-info, 90%);
+@btn-info-border:                @brand-info;
 
-@btn-info-color:                 @brand-contrast;
-@btn-info-bg:                    @brand-info;
-@btn-info-border:                darken(@btn-info-bg, 5%);
-
-@btn-warning-color:              @brand-contrast;
-@btn-warning-bg:                 @brand-warning;
-@btn-warning-border:             darken(@btn-warning-bg, 5%);
+@btn-warning-color:              darken(@brand-warning, 5%);
+@btn-warning-bg:                 fadeout(@brand-warning, 90%);
+@btn-warning-border:             @brand-warning;
 
 @btn-danger-color:               @brand-contrast;
 @btn-danger-bg:                  @brand-danger;
@@ -343,6 +342,8 @@
 //
 // Note: These variables are not generated into the Customizer.
 
+@zindex-input:             10; // Form-group inputs
+@zindex-button:            20; // Form-group-buttons
 @zindex-navbar:            1000;
 @zindex-dropdown:          1060;
 @zindex-popover:           1070;
