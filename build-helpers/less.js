@@ -27,7 +27,13 @@ module.exports = function(globs, out) {
     .pipe(less({
       paths: _.map(baseDirs, function(d) { path.resolve(d); })
     }))
-    .pipe(autoprefixer());
+    .on('error', function(err) {
+      console.error(err.toString());
+      this.emit('end');
+    })
+    .pipe(autoprefixer({
+      browsers: ['last 3 versions']
+    }));
 
   if (production.isSet()) {
     // External source maps + minimize
