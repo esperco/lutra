@@ -133,6 +133,10 @@ module Esper.Paths {
       return optPath(prefix, "new-team");
     }
 
+    export function personal() {
+      return optPath(prefix, "personal");
+    }
+
     export module Team {
       export const subprefix = "team/";
 

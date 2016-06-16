@@ -14,6 +14,11 @@ module Esper.Actions {
     Layout.render(main, header, footer);
   }
 
+  export function renderPersonalSettings() {
+    render(<Views.PersonalSettings />);
+    Analytics.page(Analytics.Page.PersonalSettings);
+  }
+
   export function renderGeneralSettings(teamId?: string,
     msgCode?: string, errCode?: string)
   {

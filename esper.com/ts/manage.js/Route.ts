@@ -49,6 +49,10 @@ module Esper.Route {
       Actions.renderNotificationSettings(ctx.params["teamId"], msg, err);
     });
 
+  route(Paths.Manage.personal().hash, function(ctx) {
+    Actions.renderPersonalSettings();
+  });
+
   routeNotFound(function(ctx) {
     Actions.render(React.createElement(Views.NotFound, {}));
   });
