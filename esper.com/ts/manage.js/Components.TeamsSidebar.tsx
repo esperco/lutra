@@ -35,7 +35,6 @@ module Esper.Components {
             </li>
           </ul>
         </div>
-
         <div className="esper-panel-section">
           <label className="esper-header">
             { Text.Groups }
@@ -54,7 +53,6 @@ module Esper.Components {
             </li>
           </ul>
         </div>
-
         <div className="esper-panel-section">
           <ul className="esper-select-menu"><li>
             <a className={classNames({

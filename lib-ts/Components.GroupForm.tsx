@@ -15,11 +15,11 @@ module Esper.Components {
   }
 
   interface State extends Actions.Groups.GroupData {
+    teamFilter: string;
+    selectedRole: string;
     editMember?: string;
-    editIndividual?: ApiT.GroupIndividual;
-    teamFilter?: string;
     hasIndividualEmail?: boolean;
-    hasEmailError?: boolean;
+    hasInvalidEmail?: boolean;
   }
 
   export class GroupForm extends ReactHelpers.Component<Props, State> {
@@ -31,7 +31,9 @@ module Esper.Components {
         name: props.name,
         uid: props.uid,
         groupMembers: props.groupMembers,
-        groupIndividuals: props.groupIndividuals
+        groupIndividuals: props.groupIndividuals,
+        teamFilter: "",
+        selectedRole: Text.GroupRoleMember
       };
     }
 
@@ -43,12 +45,17 @@ module Esper.Components {
           name: props.name,
           uid: props.uid,
           groupMembers: props.groupMembers,
-          groupIndividuals: props.groupIndividuals
+          groupIndividuals: props.groupIndividuals,
+          teamFilter: "",
+          selectedRole: Text.GroupRoleMember
         };
       }
     }
 
     render() {
+      var individuals = _.differenceBy(this.state.groupIndividuals,
+        this.state.groupMembers,
+        (m: ApiT.GroupMember) => m.email);
       return <div className="form-set form-horizontal">
         <div className="form-group">
           <label htmlFor={this.getId("name")}
@@ -79,39 +86,31 @@ module Esper.Components {
         }
         { this.renderMemberInput() }
         <hr />
-        { _.isEmpty(this.state.groupMembers) ?
+        { _.isEmpty(this.state.groupMembers) &&
+          _.isEmpty(individuals) ?
           <div className="esper-no-content">
             No {Text.GroupMembers} Found
           </div>
           :
           <div className="list-group">
             <label className="esper-header">
-              { Text.TeamExecs + " in " + (this.state.name || Text.Group) }
+              { "Other " + Text.TeamExecs + " in " +
+                (this.state.name || "this " + Text.Group) }
             </label>
-            { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
+            { _.map(this.state.groupMembers, (member) =>
+                    this.renderMember(member)) }
+            { _.map(individuals, (gim) =>
+                    this.renderIndividual(gim)) }
           </div>
         }
         <hr />
         { this.renderIndividualInput() }
-        { this.state.hasEmailError ?
+        { this.state.hasInvalidEmail ?
             <div className="alert alert-danger">
               <i className="fa fa-fw fa-warning"></i>
               Invalid email address provided.
             </div> :
             null
-        }
-        <hr />
-        { _.isEmpty(this.state.groupIndividuals) ?
-          <div className="esper-no-content">
-            No {Text.GroupIndividuals} Found
-          </div>
-          :
-          <div className="list-group">
-            <label className="esper-header">
-              {Text.GroupIndividuals + " in " + (this.state.name || Text.Group)}
-            </label>
-            { _.map(this.state.groupIndividuals, this.renderIndividual.bind(this))}
-          </div>
         }
       </div>;
     }
@@ -120,28 +119,29 @@ module Esper.Components {
       return <div className="form-group">
         <label htmlFor={this.getId("new-members")}
                className="col-md-2 control-label">
-          {Text.AddGroupMemberLink}
+          Your {Text.TeamExecs}
         </label>
         <div className="col-md-10">
-          <div className={this.state.teamFilter ? "esper-has-right-icon" : ""}>
+          <div className=
+            {_.isEmpty(this.state.teamFilter) ? "" : "esper-has-right-icon"}>
             <input type="text"
                    className="form-control"
                    id={this.getId("new-members")}
                    onKeyDown={this.inputKeydown.bind(this)}
                    onChange={(e) => this.onTeamFilterChange(e)}
                    value={this.state.teamFilter || ""}
-                   placeholder="Tony Stark"
+                   placeholder={"Filter / Search for " + Text.TeamExecs}
             />
             {
-              this.state.teamFilter ?
+              _.isEmpty(this.state.teamFilter) ?
+              <span /> :
               <span className="esper-clear-action esper-right-icon"
                     onClick={() => this.resetState()}>
                 <i className="fa fa-fw fa-times" />
-              </span> :
-              <span />
+              </span>
             }
           </div>
-          { this.state.teamFilter ? this.renderFilteredTeams() : null }
+          { this.renderTeams() }
         </div>
       </div>;
     }
@@ -167,7 +167,7 @@ module Esper.Components {
                       this._emailInput.value = "";
                       this.mutateState((s) => {
                         s.hasIndividualEmail = false;
-                        s.hasEmailError = false;
+                        s.hasInvalidEmail = false;
                       });
                     }}>
                 <i className="fa fa-fw fa-times" />
@@ -188,7 +188,7 @@ module Esper.Components {
     addIndividual() {
       var email = this._emailInput.value;
       if (!Util.validateEmailAddress(email)) {
-        this.mutateState((s) => s.hasEmailError = true);
+        this.mutateState((s) => s.hasInvalidEmail = true);
         return;
       }
       var individual = {
@@ -197,7 +197,7 @@ module Esper.Components {
       };
       this.mutateState((s) => {
         s.groupIndividuals.push(individual);
-        s.hasEmailError = false;
+        s.hasInvalidEmail = false;
       });
       this.processUpdate();
       this._emailInput.value = "";
@@ -236,45 +236,90 @@ module Esper.Components {
       this.mutateState((s) => s.teamFilter = val);
     }
 
-    renderFilteredTeams() {
-      var self = this;
+    renderTeams() {
+      var teamFilter = this.state.teamFilter;
       var memberIds = _.map(this.state.groupMembers, function(member) {
         return member.teamid;
       });
       var filteredTeams = _.filter(Stores.Teams.all(), function(team) {
         return !_.includes(memberIds, team.teamid)
           && _.includes(team.team_name.toLowerCase(),
-                        self.state.teamFilter.toLowerCase());
+                        teamFilter.toLowerCase());
       });
-      if (_.isEmpty(filteredTeams)) {
+      if (_.isEmpty(filteredTeams) && !_.isEmpty(teamFilter)) {
+        if (_.isEmpty(teamFilter)) {
+          return <div className="esper-no-content">
+            No remaining { Text.TeamExecs } available to add
+          </div>;
+        }
         return <div className="esper-no-content">
-          No { Text.TeamExec } with the name containing '{ this.state.teamFilter }' found
+          No { Text.TeamExec } with the name containing '{ teamFilter }' found
         </div>;
       }
-      var filteredMembers = _.map(filteredTeams, function(team) {
+      var filteredMembers = _.take(_.map(filteredTeams, function(team) {
         return {
           id: team.teamid,
           displayAs: team.team_name
         };
-      });
-      return <ListSelectorSimple choices={filteredMembers}
-        selectedIds={null} updateFn={this.update.bind(this)}/>;
+      }), 5);
+      return <ListSelectorSimple choices={filteredMembers} unselectedIcon={" "}
+        selectedIds={null} updateFn={this.update.bind(this)} />;
     }
 
     update(selected: string[]) {
       var selectedTeam = Stores.Teams.get(selected[0]).unwrap();
+      var profile = Stores.Profiles.get(selectedTeam.team_executive).unwrap();
       var member = {
         teamid: selectedTeam.teamid,
-        name: selectedTeam.team_name
+        name: selectedTeam.team_name,
+        email: profile.email
       };
       this.mutateState((s) => s.groupMembers.push(member));
       this.processUpdate();
     }
 
     renderMember(member: ApiT.GroupMember) {
+      var exec = _.find(this.state.groupIndividuals, {
+        email: member.email
+      });
+      if (!_.isEmpty(exec)) this.state.selectedRole = exec.role;
+      else this.state.selectedRole = Text.GroupRoleMember;
       // State of editing a group member
-      if (member.teamid === this.state.editMember) {
-        return <div className="list-group-item one-line" key={member.teamid}>
+      if (this.state.editMember === member.email) {
+        return <div className="list-group-item" key={member.teamid}>
+          <div className="form-group">
+            <div className="one-line">
+              <i className="fa fa-fw fa-user"></i>
+              {" "}{member.name}{" "}
+              <i className="fa fa-fw fa-calendar"></i>
+            </div>
+            <div>
+              <div className="esper-selectable">
+                <input type="radio" id={this.getId("role-owner")} name="group-role"
+                       onClick={() => this.state.selectedRole = Text.GroupRoleOwner}
+                       defaultChecked={this.state.selectedRole === Text.GroupRoleOwner} />
+                <label htmlFor={this.getId("role-owner")} className="group-role-label">
+                  {Text.GroupRoleOwner}
+                </label>
+              </div>
+              <div className="esper-selectable">
+                <input type="radio" id={this.getId("role-manager")} name="group-role"
+                       onClick={() => this.state.selectedRole = Text.GroupRoleManager}
+                       defaultChecked={this.state.selectedRole === Text.GroupRoleManager} />
+                <label htmlFor={this.getId("role-manager")} className="group-role-label">
+                  {Text.GroupRoleManager}
+                </label>
+              </div>
+              <div className="esper-selectable">
+                <input type="radio" id={this.getId("role-member")} name="group-role"
+                       onClick={() => this.state.selectedRole = Text.GroupRoleMember}
+                       defaultChecked={this.state.selectedRole === Text.GroupRoleMember} />
+                <label htmlFor={this.getId("role-member")} className="group-role-label">
+                  {Text.GroupRoleMember}
+                </label>
+              </div>
+            </div>
+          </div>
           <div className="row">
             <div className="col-xs-6">
               <button className="btn btn-default form-control" type="button"
@@ -284,7 +329,7 @@ module Esper.Components {
             </div>
             <div className="col-xs-6">
               <button className="btn btn-primary form-control" type="button"
-                      onClick={this.submitEditInput.bind(this)}>
+                      onClick={this.submitEditMember.bind(this)}>
                 Save
               </button>
             </div>
@@ -295,48 +340,53 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={member.teamid}>
         <i className="fa fa-fw fa-user" />
         {" "}{member.name}{" "}
-        <span>
+        <i className="fa fa-fw fa-calendar"></i>
         { this.props.isOwner || this.props.isAdmin ?
-          <a className="pull-right text-danger" title="Delete"
-             onClick={(e) => this.removeMember(member)}>
-            <i className="fa fa-fw fa-trash list-group-item-text" />
-          </a> : null
+          <span>
+            <a className="pull-right text-danger" title="Delete"
+               onClick={(e) => this.removeMember(member)}>
+              <i className="fa fa-fw fa-trash list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Edit"
+               onClick={(e) => this.showEditFor(member.email)}>
+              <i className="fa fa-fw fa-pencil list-group-item-text" />
+            </a>
+          </span> : null
         }
-        </span>
       </div>;
     }
 
     renderIndividual(gim: ApiT.GroupIndividual) {
       // State of editing a group member
-      if (!_.isEmpty(this.state.editIndividual) &&
-          this.state.editIndividual.email === gim.email) {
+      if (this.state.editMember === gim.email) {
+        this.state.selectedRole = gim.role;
         return <div className="list-group-item" key={gim.email}>
           <div className="form-group">
             <div className="one-line">
               <i className="fa fa-fw fa-user"></i>
-              {gim.email}
+              {" "}{gim.email}{" "}
             </div>
             <div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-owner")} name="group-role"
-                       value={Text.GroupRoleOwner} defaultChecked={gim.role === Text.GroupRoleOwner}
-                       onClick={this.onRoleChange.bind(this)} />
+                       defaultChecked={gim.role === Text.GroupRoleOwner}
+                       onClick={() => this.state.selectedRole = Text.GroupRoleOwner} />
                 <label htmlFor={this.getId("role-owner")} className="group-role-label">
                   {Text.GroupRoleOwner}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-manager")} name="group-role"
-                       value={Text.GroupRoleManager} defaultChecked={gim.role === Text.GroupRoleManager}
-                       onClick={this.onRoleChange.bind(this)} />
+                       defaultChecked={gim.role === Text.GroupRoleManager}
+                       onClick={() => this.state.selectedRole = Text.GroupRoleManager} />
                 <label htmlFor={this.getId("role-manager")} className="group-role-label">
                   {Text.GroupRoleManager}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-member")} name="group-role"
-                       value={Text.GroupRoleMember} defaultChecked={gim.role === Text.GroupRoleMember}
-                       onClick={this.onRoleChange.bind(this)} />
+                       defaultChecked={gim.role === Text.GroupRoleMember}
+                       onClick={() => this.state.selectedRole = Text.GroupRoleMember} />
                 <label htmlFor={this.getId("role-member")} className="group-role-label">
                   {Text.GroupRoleMember}
                 </label>
@@ -372,7 +422,7 @@ module Esper.Components {
               </a> : null
             }
             <a className="pull-right text-info" title="Edit"
-                onClick={(e) => this.showEditFor(gim)}>
+                onClick={(e) => this.showEditFor(gim.email)}>
                  <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
           </span> :
@@ -383,27 +433,43 @@ module Esper.Components {
 
     resetState() {
       this.mutateState((s) => {
+        s.teamFilter = "";
+        s.selectedRole = Text.GroupRoleMember;
         s.editMember = null;
-        s.editIndividual = null;
-        s.teamFilter = null;
-        s.hasEmailError = false;
+        s.hasInvalidEmail = false;
         s.hasIndividualEmail = false;
       });
     }
 
-    showEditFor(gim: ApiT.GroupIndividual) {
-      this.mutateState((s) => s.editIndividual = gim);
+    showEditFor(email: string) {
+      this.mutateState((s) => s.editMember = email);
     }
 
-    submitEditInput() {
+    submitEditMember() {
+      var member = _.find(this.state.groupMembers, {
+        email: this.state.editMember
+      });
+      if (_.isEmpty(member)) return;
+
+      if (!_.isEmpty(this.props.groupid)) {
+        Api.putGroupIndividualByEmail(this.props.groupid, member.email, {
+          role: this.state.selectedRole
+        });
+      }
       this.resetState();
     }
 
     submitEditIndividual() {
       var gim = _.find(this.state.groupIndividuals, {
-                       email: this.state.editIndividual.email });
-      if (gim !== this.state.editIndividual && !_.isEmpty(this.props.groupid)) {
-        Api.putGroupIndividual(this.props.groupid, gim.uid, { role: gim.role });
+        email: this.state.editMember
+      });
+      if (_.isEmpty(gim)) return;
+
+      if (!_.isEmpty(this.props.groupid)) {
+          gim.role = this.state.selectedRole;
+          Api.putGroupIndividual(this.props.groupid, gim.uid, {
+            role: this.state.selectedRole
+          });
       }
       this.resetState();
     }
@@ -420,20 +486,10 @@ module Esper.Components {
       this.processUpdate();
     }
 
-    onRoleChange(event: React.FormEvent) {
-      var role = (event.target as HTMLInputElement).value;
-
-      if (this.state.editIndividual.role !== role) {
-        this.mutateState((s) => {
-          var gim = _.find(s.groupIndividuals, { email: this.state.editIndividual.email });
-          gim.role = role;
-        });
-      }
-    }
-
     onNameInputChange(event: React.FormEvent) {
       var name = (event.target as HTMLInputElement).value
       this.mutateState((s) => s.name = name);
+      if (_.isEmpty(name)) return;
       this.processUpdate();
     }
 

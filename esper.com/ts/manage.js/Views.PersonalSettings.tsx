@@ -10,6 +10,7 @@ module Esper.Views {
       return <div className="esper-full-screen minus-nav">
         <Components.TeamsSidebar
           teams={Stores.Teams.all()}
+          groups={Stores.Groups.all()}
           activePersonal={true}
         />
 
