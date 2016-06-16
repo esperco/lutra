@@ -8,7 +8,8 @@
   <div class="container-fluid"><div class="row">
 
     <!-- Login + CTA -->
-    <div class="col-md-5 col-lg-4 cta-signup-container"><div class="cta-signup">
+    <div class="col-md-5 col-lg-4 cta-signup-container esper-inverse">
+    <div class="cta-signup">
       <h1 class="splash-text-header">
         Make time count
       </h1>
@@ -22,31 +23,28 @@
       <div class="login-buttons">
         <div class="visible-xs-block visible-sm-inline visible-md-block
                     visible-lg-block">
-          <a href="/login?platform=google">
-            <button class="btn btn-primary sign-in-btn google-btn">
+          <a class="btn btn-primary sign-in-btn google-btn"
+             href="/login?platform=google">
               <div class="sign-in-icon">
                 <i class="fa fa-fw fa-google"></i>
               </div>
               <div class="sign-in-text">Google Account</div>
-            </button>
           </a>
         </div>
         <div class="visible-xs-block visible-sm-inline visible-md-block
                     visible-lg-block">
-          <a href="/login?platform=exchange">
-            <button class="btn btn-primary sign-in-btn exchange-btn">
-              <div class="sign-in-icon">
-                <img src="img/exchange.svg" />
-              </div>
-              <div class="sign-in-text">Microsoft Exchange</div>
-            </button>
+          <a class="btn btn-primary sign-in-btn exchange-btn"
+             href="/login?platform=exchange">
+            <div class="sign-in-icon">
+              <img src="img/exchange.svg" />
+            </div>
+            <div class="sign-in-text">Microsoft Exchange</div>
           </a>
         </div>
         <div>
-          <a href="/login?platform=nylas">
-            <button class="btn btn-tertiary sign-in-btn">
-              Other Provider
-            </button>
+          <a class="btn btn-default sign-in-btn"
+             href="/login?platform=nylas">
+            Other Provider
           </a>
         </div>
       </div>

@@ -5,23 +5,9 @@
 // Override variables
 @import "./_bootstrap-variables";
 
-// Tweak primary class
-.btn-primary {
-  font-weight: bold;
-}
-
-// Addition button classes
-.btn-secondary {
-  color: @link-color;
-  background: transparent;
-  border: 1px solid @link-color;
-  transition: color 0.5s, background 0.5s;
-
-  &:hover, &:active {
-    color: white;
-    background: @link-color;
-  }
-}
+/*
+  Button tweaks
+*/
 
 .btn-tertiary {
   color: rgba(255, 255, 255, 0.8);
@@ -40,15 +26,130 @@
   }
 }
 
-// Animations
 .btn {
-  transition: color 0.5s, border 0.5s, background-color 0.5s;
+  transition: color 0.5s, border 0.5s, background-color 0.5s, transform 0.5s;
 }
 
+.btn, .btn:focus {
+  outline: none;
+  box-shadow: @default-box-shadow;
+}
+
+.btn:active, .btn.active,
+.btn:active:hover, .btn:active:focus, .btn.active:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.btn:hover {
+  outline: none;
+  box-shadow: @plus-box-shadow;
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  font-weight: bold;
+}
+
+.btn-group .btn, .btn-group.btn.active, .btn-group.btn:active,
+.input-group .btn, .input-group.btn.active, .input-group.btn:active {
+  z-index: @zindex-button; // So border changes stand out
+  box-shadow: none;
+
+  &:hover, &:focus {
+    z-index: @zindex-button;
+  }
+}
+
+// .btn-default behaves a little differently in terms of colorgh
+.btn-default {
+  &:hover, &:focus, &:active,
+  &:active:hover, &:active:focus {
+    border-color: @link-color;
+    color: @link-color;
+    background: @btn-default-bg;
+  }
+
+  &:active:hover, &:active:focus {
+    background: fade(@link-color, 10%);
+  }
+
+  // This is a little absurd, but :active and .active do different things
+  &.active, &.active:active, &.active:focus, &.active:hover,
+  &.active:active:hover, &.active:active:focus {
+    color: @brand-contrast;
+    background: @link-color;
+    border-color: @link-color;
+  }
+}
+
+// Modify LESS's default button settings for various classes
+.esper-button-variant(@color; @background; @border) {
+  background-color: transparent; // Fallback;
+  background-color: @background;
+
+  &:focus,
+  &.focus {
+    background-color: lighten(@background, 10%);
+        border-color: lighten(@border, 25%);
+  }
+  &:hover {
+               color: @brand-contrast;
+    background-color: @border;
+        border-color: @border;
+  }
+  &:active,
+  &.active,
+  .open > .dropdown-toggle & {
+               color: @brand-contrast;
+    background-color: @border;
+        border-color: @border;
+
+    &:hover,
+    &:focus,
+    &.focus {
+               color: @brand-contrast;
+    background-color: lighten(@border, 12%);
+        border-color: lighten(@border, 12%);
+    }
+  }
+}
+
+.btn-primary {
+  .esper-button-variant(
+    @btn-primary-color,
+    @btn-primary-bg,
+    @btn-primary-border
+  )
+}
+
+.btn-success {
+  .esper-button-variant(
+    @btn-success-color,
+    @btn-success-bg,
+    @btn-success-border
+  )
+}
+
+.btn-info {
+  .esper-button-variant(
+    @btn-info-color,
+    @btn-info-bg,
+    @btn-info-border
+  )
+}
+
+.btn-warning {
+  .esper-button-variant(
+    @btn-warning-color,
+    @btn-warning-bg,
+    @btn-warning-border
+  )
+}
+
+// Leave .btn-danger along for now
+
 // Aliases
-.button-primary { .btn-primary }
-.button-secondary { .btn-secondary }
-.button-tertiary { .btn-tertiary }
 .left { .pull-left; }
 .right { .pull-right; }
 
@@ -77,44 +178,9 @@ a.text-muted {
 
 
 /*
-  Minor tweaks to Bootstrap classes that don't normally make sense otherwise
+  Misc tweaks to Bootstrap classes that don't normally make sense otherwise
   (or for stylistic reasons)
 */
-
-.btn, .btn:hover, .btn:focus, .btn:active, .btn.active,
-.btn:active:hover, .btn:active:focus, .btn.active:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-.btn:hover {
-  box-shadow: @default-box-shadow;
-}
-
-// Override .btn-default
-.btn-default {
-  &:hover, &:focus, &:active,
-  &:active:hover, &:active:focus {
-    border: 1px solid @link-color;
-    color: @link-color;
-    background: @btn-default-bg;
-
-    .input-group & {
-      z-index: @zindex-button; // So border stands out
-    }
-  }
-
-  &:active:hover, &:active:focus {
-    background: fade(@link-color, 10%);
-  }
-
-  // This is a little absurd, but :active and .active do different things
-  &.active, &.active:active, &.active:focus, &.active:hover,
-  &.active:active:hover, &.active:active:focus {
-    color: @brand-contrast;
-    background: @link-color;
-  }
-}
 
 input.form-control, textarea.form-control, select.form-control {
   &:focus, &:hover, &:active, &.active,

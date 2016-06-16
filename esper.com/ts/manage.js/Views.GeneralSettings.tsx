@@ -96,7 +96,7 @@ module Esper.Views {
                     error={this.props.error}
                     success={this.state.didSave &&
                              !this.props.busy && !this.props.error}
-                    onCancel={() => this.save()} cancelText="Save">
+                    onOK={() => this.save()} okText="Save">
                   <Components.TeamForm ref={(c) => this._form = c}
                     name={this.props.team.team_name}
                     email={exec.email}

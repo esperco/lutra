@@ -920,4 +920,23 @@ a.action {
   input, .form-control, .dropdown-toggle {
     background: @input-bg;
   }
+
+  .btn-default {
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.8);
+
+    &:hover, &:focus {
+      color: @brand-contrast;
+      border-color: @brand-contrast;
+    }
+
+    &:active, &.active {
+      background-color: rgba(255, 255, 255, 0.8);
+      color: rgba(0, 0, 0, 0.8);
+
+      &:hover, &:focus {
+        background: @brand-contrast;
+      }
+    }
+  }
 }

@@ -71,7 +71,7 @@ module Esper.Components {
           <div className="form-group">
           {
             (needsConfirmation || this.hasMore()) ?
-            <button className="btn btn-secondary form-control"
+            <button className="btn btn-primary form-control"
                     onClick={() => this.onNext(events)}>
               { needsConfirmation ?
                 Text.ConfirmAllLabels :
