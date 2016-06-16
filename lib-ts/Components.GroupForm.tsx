@@ -257,7 +257,7 @@ module Esper.Components {
           displayAs: team.team_name
         };
       }), 5);
-      return <ListSelectorSimple choices={filteredMembers}
+      return <ListSelectorSimple choices={filteredMembers} unselectedIcon={" "}
         selectedIds={null} updateFn={this.update.bind(this)} />;
     }
 
