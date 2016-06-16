@@ -64,6 +64,13 @@ module Esper.Api {
       "");
   }
 
+  export function deactivate(uid?: string): JQueryPromise<void> {
+    uid = uid || Login.myUid();
+    return JsonHttp.post(
+      prefix + `/api/deactivate/${Login.myUid()}/${uid}`,
+      "");
+  }
+
   /* Contacts */
   export function getContacts():
   JQueryPromise<ApiT.ContactInfo> {
