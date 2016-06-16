@@ -19,7 +19,7 @@
   }
 }
 
-.team-settings-page {
+.esper-right-content {
   @media screen and (min-width: @screen-sm-min) {
     .panel, .alert.msg {
       max-width: 80%;
@@ -32,11 +32,15 @@
     }
   }
 
+  .esper-expanded {
+    padding-top: @padding-large-vertical * 2;
+  }
+
   .settings-menu {
     text-align: center;
-  }
-}
 
-#new-team-page {
-  padding-top: @padding-large-vertical * 2;
+    & + .esper-expanded {
+      padding-top: 0;
+    }
+  }
 }

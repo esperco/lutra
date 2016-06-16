@@ -7,27 +7,41 @@ module Esper.Components {
     activeTeamId?: string;
     pathFn?: (p: {teamId: string}) => Paths.Path;
     teams: ApiT.Team[];
+    activePersonal?: boolean;
   }
 
   export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
       return <Components.SidebarWithToggle>
-        <label className="esper-header">
-          { Text.TeamExecs }
-        </label>
-        <ul className="esper-select-menu">
-          { _.map(this.props.teams, (t) => this.renderTeam(t))}
-          <li className="divider" />
-          <li>
+        <div className="esper-panel-section">
+          <label className="esper-header">
+            { Text.TeamExecs }
+          </label>
+          <ul className="esper-select-menu">
+            { _.map(this.props.teams, (t) => this.renderTeam(t))}
+            <li className="divider" />
+            <li>
+              <a className={classNames({
+                active: !this.props.activeTeamId && !this.props.activePersonal
+              })}
+              href={Paths.Manage.newTeam().href}>
+                <i className="fa fa-fw fa-user-plus" />{" "}
+                { Text.AddTeamLink }
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div className="esper-panel-section">
+          <ul className="esper-select-menu"><li>
             <a className={classNames({
-              active: !this.props.activeTeamId
-            })}
-            href={Paths.Manage.newTeam().href}>
-              <i className="fa fa-fw fa-user-plus" />{" "}
-              { Text.AddTeamLink }
+              active: this.props.activePersonal
+            })} href={Paths.Manage.personal().href}>
+              <i className="fa fa-fw fa-cog" />{" "}
+              { Text.PersonalSettings }
             </a>
-          </li>
-        </ul>
+          </li></ul>
+        </div>
       </Components.SidebarWithToggle>;
     }
 

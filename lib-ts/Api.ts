@@ -64,6 +64,13 @@ module Esper.Api {
       "");
   }
 
+  export function deactivate(uid?: string): JQueryPromise<void> {
+    uid = uid || Login.myUid();
+    return JsonHttp.post(
+      prefix + `/api/deactivate/${Login.myUid()}/${uid}`,
+      "");
+  }
+
   /* Contacts */
   export function getContacts():
   JQueryPromise<ApiT.ContactInfo> {
@@ -97,12 +104,15 @@ module Esper.Api {
       + "/email/" + string(email));
   }
 
-  export function getTeam(teamId: string):
-    JQueryPromise<ApiT.Team> {
+  export function getTeam(teamId: string): JQueryPromise<ApiT.Team> {
     return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
       + "/" + string(teamId));
   }
 
+  export function deactivateTeam(teamId: string): JQueryPromise<void> {
+    return JsonHttp.post(prefix + "/api/deactivate-team/" +
+      string(Login.myUid()) + "/" + string(teamId));
+  }
 
   export function inviteCreateTeam():
     JQueryPromise<ApiT.UrlResult> {
