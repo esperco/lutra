@@ -111,7 +111,7 @@ module Esper.Actions.Teams {
     });
   }
 
-  // Remove a team (unset its calendars really)
+  // Remove a team
   export function removeTeam(teamId: string) {
     Api.deactivateTeam(teamId);
     Stores.Teams.remove(teamId);
