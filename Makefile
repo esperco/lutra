@@ -6,7 +6,6 @@ export PATH := node_modules/.bin:$(PATH)
 
 # Fetch libraries
 setup: vendor
-	$(MAKE) -C setup setup
 
 vendor:
 	npm install
