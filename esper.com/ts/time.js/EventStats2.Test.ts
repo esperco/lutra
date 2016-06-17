@@ -37,6 +37,31 @@ module Esper.EventStats {
         expect(results["b"].total).toEqual(14);
       });
 
+      it("should let us populate existing groupings", function() {
+        let a1 = makeAnnotation({ value: 5, groups: ["a"]});
+        let b1 = makeAnnotation({ value: 6, groups: ["b"]});
+        let a2 = makeAnnotation({ value: 7, groups: ["a"]});
+        let b2 = makeAnnotation({ value: 8, groups: ["b"]});
+
+        let results1 = groupAnnotations([a1, b1]);
+        expect(_.keys(results1).length).toEqual(2);
+        expect(_.map(results1["a"].annotations, (a) => a.value))
+          .toEqual([5]);
+        expect(_.map(results1["b"].annotations, (b) => b.value))
+          .toEqual([6]);
+        expect(results1["a"].total).toEqual(5);
+        expect(results1["b"].total).toEqual(6);
+
+        let results2 = groupAnnotations([a2, b2], results1);
+        expect(_.keys(results2).length).toEqual(2);
+        expect(_.map(results2["a"].annotations, (a) => a.value))
+          .toEqual([5, 7]);
+        expect(_.map(results2["b"].annotations, (b) => b.value))
+          .toEqual([6, 8]);
+        expect(results2["a"].total).toEqual(12);
+        expect(results2["b"].total).toEqual(14);
+      });
+
       it("should nest groups", function() {
         let a1 = makeAnnotation({ value: 5, groups: ["a"]});
         let b1 = makeAnnotation({ value: 6, groups: ["b"]});
