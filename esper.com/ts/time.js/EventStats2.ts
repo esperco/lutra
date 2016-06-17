@@ -29,7 +29,7 @@ module Esper.EventStats {
     [index: string]: {
       annotations: Annotation[];
       total: number; // Sum of all annotation values
-      subgroups: Option.T<Grouping>;
+      subgroups: Grouping;
     }
   }
 
@@ -38,14 +38,16 @@ module Esper.EventStats {
     var grouping: Grouping = {};
 
     _.each(annotations, (a) => {
+      let currentGroup = grouping;
       _.each(a.groups, (g) => {
-        grouping[g] = grouping[g] || {
+        currentGroup[g] = currentGroup[g] || {
           annotations: [],
           total: 0,
-          subgroups: Option.none<Grouping>()
+          subgroups: {}
         };
-        grouping[g].annotations.push(a);
-        grouping[g].total += a.value
+        currentGroup[g].annotations.push(a);
+        currentGroup[g].total += a.value;
+        currentGroup = currentGroup[g].subgroups;
       });
     });
 

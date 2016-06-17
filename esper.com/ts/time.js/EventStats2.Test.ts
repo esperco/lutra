@@ -38,6 +38,34 @@ module Esper.EventStats {
       });
 
       it("should nest groups", function() {
+        let a1 = makeAnnotation({ value: 5, groups: ["a"]});
+        let b1 = makeAnnotation({ value: 6, groups: ["b"]});
+        let ab1 = makeAnnotation({ value: 7, groups: ["a", "b"]});
+        let ab2 = makeAnnotation({ value: 8, groups: ["a", "b"]});
+        let aa1 = makeAnnotation({ value: 9, groups: ["a", "a"]});
+        let results = groupAnnotations([a1, b1, ab1, ab2, aa1]);
+
+        /* Check parent */
+        expect(_.keys(results).length).toEqual(2);
+        expect(_.map(results["a"].annotations, (a) => a.value))
+          .toEqual([5, 7, 8, 9]);
+        expect(_.map(results["b"].annotations, (b) => b.value))
+          .toEqual([6]);
+        expect(results["a"].total).toEqual(29);
+        expect(results["b"].total).toEqual(6);
+        expect(results["b"].subgroups).toEqual({});
+
+        /* Check nested subgroup A */
+        var subA = results["a"].subgroups;
+        expect(_.keys(subA).length).toEqual(2);
+        expect(_.map(subA["a"].annotations, (a) => a.value))
+          .toEqual([9]);
+        expect(_.map(subA["b"].annotations, (b) => b.value))
+          .toEqual([7, 8]);
+        expect(subA["a"].total).toEqual(9);
+        expect(subA["b"].total).toEqual(15);
+        expect(subA["a"].subgroups).toEqual({});
+        expect(subA["b"].subgroups).toEqual({});
 
       });
     });
