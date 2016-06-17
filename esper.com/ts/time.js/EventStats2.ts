@@ -72,10 +72,10 @@ module Esper.EventStats {
     ready = false;
 
     // Intermediate state for use with progressive calculation
-    protected eventQueue: Stores.Events.TeamEvent[] = [];
-    protected annotationsQueue: Annotation[] = [];
-    protected grouping: Grouping = {};
-    protected MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
+    eventQueue: Stores.Events.TeamEvent[] = [];
+    annotationsQueue: Annotation[] = [];
+    grouping: Grouping = {};
+    MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
 
     // Returns some grouping if done, none if not complete
     getResults(): Option.T<Grouping> {
@@ -87,32 +87,36 @@ module Esper.EventStats {
     // Start calulations based on passed events
     start(events: Stores.Events.TeamEvent[]) {
       this.init(events);
-      window.requestAnimationFrame(() => this.runLoop());
+      window.requestAnimationFrame(this.runLoop);
     }
 
     // Pre-populate vars used in processing loop
     init(events: Stores.Events.TeamEvent[]) {
-      this.eventQueue = events;
+      this.eventQueue = _.clone(events);
       this.ready = false;
       this.annotationsQueue = [];
       this.grouping = {};
     }
 
-    // Recursive "loop" that calls annotateSome and groupSome until we're done
-    runLoop() {
+    /*
+      Recursive "loop" that calls annotateSome and groupSome until we're done.
+      Bind to make testing references easier
+    */
+    runLoop = () => {
       if (! _.isEmpty(this.eventQueue)) {
         this.annotateSome();
-        window.requestAnimationFrame(() => this.runLoop())
+        window.requestAnimationFrame(this.runLoop)
         return;
       }
 
       if (! _.isEmpty(this.annotationsQueue)) {
         this.groupSome();
-        window.requestAnimationFrame(() => this.runLoop())
+        window.requestAnimationFrame(this.runLoop)
         return;
       }
 
       // If we get here, we're done. Emit to signal result.
+      this.ready = true;
       this.emitChange();
     }
 
@@ -149,6 +153,7 @@ module Esper.EventStats {
         this.MAX_PROCESS_EVENTS);
     }
 
+    // Replace with per-chart annotations
     abstract annotate(event: Stores.Events.TeamEvent): Annotation|Annotation[];
   }
 }

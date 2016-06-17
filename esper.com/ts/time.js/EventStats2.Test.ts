@@ -2,25 +2,32 @@
   Client-side time stat calculations
 */
 
+/// <reference path="./EventStats2.ts" />
+
 module Esper.EventStats {
   describe("EventStats2", function() {
+    /*
+      A single generic event for testing. Event itself doesn't matter in below,
+      tests. We're probably just testing annotation value
+    */
+    var testEvent = Stores.Events.asTeamEvent(
+      "team-id",
+      TestFixtures.makeGenericCalendarEvent()
+    );
+
+    // Helper function
+    function makeAnnotation(p: {
+      value: number;
+      groups: string[];
+    }): Annotation {
+      return {
+        event: testEvent,
+        value: p.value,
+        groups: p.groups
+      };
+    }
+
     describe("groupAnnotations", function() {
-
-      function makeAnnotation(p: {
-        value: number;
-        groups: string[];
-      }): Annotation {
-        return {
-          // Event itself doesn't matter, we're just testing annotation value
-          event: Stores.Events.asTeamEvent(
-            "team-id",
-            TestFixtures.makeGenericCalendarEvent()
-          ),
-          value: p.value,
-          groups: p.groups
-        };
-      }
-
       it("should group annotations", function() {
         let a1 = makeAnnotation({ value: 5, groups: ["a"]});
         let b1 = makeAnnotation({ value: 6, groups: ["b"]});
@@ -91,7 +98,136 @@ module Esper.EventStats {
         expect(subA["b"].total).toEqual(15);
         expect(subA["a"].subgroups).toEqual({});
         expect(subA["b"].subgroups).toEqual({});
+      });
+    });
 
+
+    //////
+
+    describe("Calculation", function() {
+
+      /*
+        This test calculation just assigns a value of 1 to a/b and 2 to a/c for
+        each event, and processes two events per loop.
+      */
+      class TestCalc extends Calculation {
+        MAX_PROCESS_EVENTS = 2
+
+        annotate(event: Stores.Events.TeamEvent): Annotation[] {
+          return [
+            makeAnnotation({
+              value: 1,
+              groups: ["a", "b"]
+            }),
+            makeAnnotation({
+              value: 2,
+              groups: ["a", "c"]
+            }),
+          ];
+        }
+      }
+      var events = [testEvent, testEvent, testEvent, testEvent, testEvent];
+
+      /*
+        Spy on requestAnimationFrame to step through events
+      */
+      describe("after start - sync", function() {
+        var calc: TestCalc;
+        var emitSpy: jasmine.Spy;
+
+        beforeEach(function() {
+          spyOn(window, "requestAnimationFrame");
+
+          calc = new TestCalc();
+          emitSpy = jasmine.createSpy("emit");
+          calc.addChangeListener(emitSpy);
+          calc.start(events);
+        });
+
+        it("should make async call to runLoop", function() {
+          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
+          expect(asSpy.calls.count()).toEqual(1);
+        });
+
+        it("should process only only MAX_PROCESS_EVENTS after first loop",
+        function() {
+          calc.runLoop();
+          expect(calc.eventQueue.length).toEqual(3);
+          expect(calc.annotationsQueue.length).toEqual(4); // 2 per event = 4
+
+          // Result should not be done yet
+          expect(calc.getResults().isNone()).toBeTruthy();
+        });
+
+        it("should call runLoop again after first loop",
+        function() {
+          calc.runLoop();
+
+          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
+          expect(asSpy.calls.count()).toEqual(2);
+        });
+
+        it("should start grouping after annotations are done", function() {
+          /*
+            First, clear annotations queue. 5 events / 2 events per run means
+            at least 3 runs. Remainder should not have trigger next step yet.
+          */
+          calc.runLoop();
+          calc.runLoop();
+          calc.runLoop();
+
+          // Result should not be done yet -- but we should have empty events
+          // and full annotations queue
+          expect(calc.getResults().isNone()).toBeTruthy();
+          expect(calc.eventQueue.length).toEqual(0);
+          expect(calc.annotationsQueue.length).toEqual(10); // 2 * 5
+
+          // One RAF call for each loop plus init
+          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
+          expect(asSpy.calls.count()).toEqual(4);
+
+          // This loop should start grouping
+          calc.runLoop();
+          expect(calc.annotationsQueue.length).toEqual(8); // Two grouped
+
+          // Still not done yet
+          expect(calc.getResults().isNone()).toBeTruthy();
+          expect(emitSpy).not.toHaveBeenCalled();
+        });
+      });
+
+      /*
+        Run the entire thing from start to finish
+      */
+      describe("after start - async", function() {
+        var calc: TestCalc;
+
+        beforeEach(function(done) {
+          calc = new TestCalc();
+          calc.addChangeListener(done);
+          calc.start(events);
+        });
+
+        it("should return some result", function() {
+          var result = calc.getResults();
+          expect(result.isSome()).toBeTruthy();
+
+          result.match({
+            none: () => null,
+            some: (g) => {
+              expect(_.keys(g).length).toEqual(1);
+              expect(_.keys(g["a"].subgroups).length).toEqual(2);
+
+              let subB = g["a"].subgroups["b"];
+              expect(subB.annotations.length).toEqual(5);
+              expect(subB.total).toEqual(5);
+
+              let subC = g["a"].subgroups["c"];
+              expect(subC.annotations.length).toEqual(5);
+              expect(subC.total).toEqual(10);
+            }
+          });
+        });
       });
     });
   });
