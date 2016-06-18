@@ -152,10 +152,11 @@ module Esper.EventStats {
       */
       describe("after start - sync", function() {
         var calc: TestCalc;
+        var rAFSpy: jasmine.Spy;
         var emitSpy: jasmine.Spy;
 
         beforeEach(function() {
-          spyOn(window, "requestAnimationFrame");
+          rAFSpy = spyOn(window, "requestAnimationFrame");
 
           calc = new TestCalc();
           emitSpy = jasmine.createSpy("emit");
@@ -164,8 +165,7 @@ module Esper.EventStats {
         });
 
         it("should make async call to runLoop", function() {
-          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
-          expect(asSpy.calls.count()).toEqual(1);
+          expect(rAFSpy.calls.count()).toEqual(1);
         });
 
         it("should process only only MAX_PROCESS_EVENTS after first loop",
@@ -181,18 +181,14 @@ module Esper.EventStats {
         it("should call runLoop again after first loop",
         function() {
           calc.runLoop();
-
-          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
-          expect(asSpy.calls.count()).toEqual(2);
+          expect(rAFSpy.calls.count()).toEqual(2);
         });
 
         it("should not call runLoop again if stopped",
         function() {
-          var count = calc.stop();
-          calc.runLoop(count);
-
-          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
-          expect(asSpy.calls.count()).toEqual(1);
+          calc.stop();
+          calc.runLoop();
+          expect(rAFSpy.calls.count()).toEqual(1);
         });
 
         it("should start grouping after annotations are done", function() {
@@ -211,8 +207,7 @@ module Esper.EventStats {
           expect(calc.annotationsQueue.length).toEqual(10); // 2 * 5
 
           // One RAF call for each loop plus init
-          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
-          expect(asSpy.calls.count()).toEqual(4);
+          expect(rAFSpy.calls.count()).toEqual(4);
 
           // This loop should start grouping
           calc.runLoop();
@@ -260,22 +255,29 @@ module Esper.EventStats {
 
       describe("after double start", function() {
         var calc: TestCalc;
-        var spy: jasmine.Spy;
+        var emitSpy: jasmine.Spy;
+        var loopSpy: jasmine.Spy;
 
         beforeEach(function(done) {
           calc = new TestCalc();
-          spy = jasmine.createSpy("test");
+          emitSpy = jasmine.createSpy("test");
+          loopSpy = spyOn(calc, "runLoop").and.callThrough();
 
-          calc.addChangeListener(spy);
-          calc.addChangeListener(done);
+          calc.addChangeListener(emitSpy);
+
+          // Done should be in next stack to let any listeners finish firing
+          calc.addChangeListener(function() {
+            window.requestAnimationFrame(done);
+          });
+
           calc.start(events);
           calc.start(events);
         });
 
-        it("should only emit once", function() {
+        it("should not result in extra loop runs or emits", function() {
           var result = calc.getResults();
           expect(result.isSome()).toBeTruthy();
-          expect(spy.calls.count()).toEqual(1);
+          expect(emitSpy.calls.count()).toEqual(1);
         });
       });
     });
