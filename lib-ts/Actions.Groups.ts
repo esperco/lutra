@@ -24,6 +24,8 @@ module Esper.Actions.Groups {
   function create(data: GroupData) {
     var p = Api.createGroup(data.uid, data.name).done((g) => {
       Stores.Groups.set(g);
+      // This is to add the creator back to the submitted data
+      data.groupIndividuals = g.group_individuals;
       updateGroup(g.groupid, data);
       return g;
     });
