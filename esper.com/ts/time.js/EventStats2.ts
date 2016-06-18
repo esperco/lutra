@@ -33,24 +33,44 @@ module Esper.EventStats {
     }
   }
 
+  export interface OptGrouping {
+    some: Grouping;
+    none: {
+      annotations: Annotation[];
+      total: number;
+    }
+  }
+
   // Convert annotations to grouping -- optionally takes an existing grouping
   // to add to
   export function groupAnnotations(annotations: Annotation[],
-                                   grouping?: Grouping) {
-    grouping = grouping || {};
+                                   grouping?: OptGrouping) {
+    grouping = grouping || {
+      some: {},
+      none: {
+        annotations: [],
+        total: 0
+      }
+    };
 
     _.each(annotations, (a) => {
-      let currentGroup = grouping;
-      _.each(a.groups, (g) => {
-        currentGroup[g] = currentGroup[g] || {
-          annotations: [],
-          total: 0,
-          subgroups: {}
-        };
-        currentGroup[g].annotations.push(a);
-        currentGroup[g].total += a.value;
-        currentGroup = currentGroup[g].subgroups;
-      });
+      if (a.groups.length) {
+        let currentGroup = grouping.some;
+        _.each(a.groups, (g) => {
+          currentGroup[g] = currentGroup[g] || {
+            annotations: [],
+            total: 0,
+            subgroups: {}
+          };
+          currentGroup[g].annotations.push(a);
+          currentGroup[g].total += a.value;
+          currentGroup = currentGroup[g].subgroups;
+        });
+      }
+      else {
+        grouping.none.annotations.push(a);
+        grouping.none.total += a.value;
+      }
     });
 
     return grouping;
@@ -75,14 +95,20 @@ module Esper.EventStats {
     // Intermediate state for use with progressive calculation
     eventQueue: Stores.Events.TeamEvent[] = [];
     annotationsQueue: Annotation[] = [];
-    grouping: Grouping = {};
+    grouping: OptGrouping = {
+      some: {},
+      none: {
+        annotations: [],
+        total: 0
+      }
+    };
     MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
 
     // Returns some grouping if done, none if not complete
-    getResults(): Option.T<Grouping> {
+    getResults(): Option.T<OptGrouping> {
       return this.ready ?
         Option.wrap(this.grouping) :
-        Option.none<Grouping>();
+        Option.none<OptGrouping>();
     }
 
     // Start calulations based on passed events
@@ -103,7 +129,13 @@ module Esper.EventStats {
       this.ready = false;
       this.runCount += 1;
       this.annotationsQueue = [];
-      this.grouping = {};
+      this.grouping = {
+        some: {},
+        none: {
+          annotations: [],
+          total: 0
+        }
+      }
     }
 
     /*

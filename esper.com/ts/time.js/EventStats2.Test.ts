@@ -35,13 +35,32 @@ module Esper.EventStats {
         let b2 = makeAnnotation({ value: 8, groups: ["b"]});
         let results = groupAnnotations([a1, b1, b2, a2]);
 
-        expect(_.keys(results).length).toEqual(2);
-        expect(_.map(results["a"].annotations, (a) => a.value))
+        expect(_.keys(results.some).length).toEqual(2);
+        expect(_.map(results.some["a"].annotations, (a) => a.value))
           .toEqual([5, 7]);
-        expect(_.map(results["b"].annotations, (b) => b.value))
+        expect(_.map(results.some["b"].annotations, (b) => b.value))
           .toEqual([6, 8]);
-        expect(results["a"].total).toEqual(12);
-        expect(results["b"].total).toEqual(14);
+        expect(results.some["a"].total).toEqual(12);
+        expect(results.some["b"].total).toEqual(14);
+      });
+
+      it("should count empty sets", function() {
+        let a1 = makeAnnotation({ value: 5, groups: ["a"]});
+        let b1 = makeAnnotation({ value: 6, groups: ["b"]});
+        let a2 = makeAnnotation({ value: 7, groups: ["a"]});
+        let b2 = makeAnnotation({ value: 8, groups: []});
+        let results = groupAnnotations([a1, b1, b2, a2]);
+
+        expect(_.keys(results.some).length).toEqual(2);
+        expect(_.map(results.some["a"].annotations, (a) => a.value))
+          .toEqual([5, 7]);
+        expect(_.map(results.some["b"].annotations, (b) => b.value))
+          .toEqual([6]);
+        expect(_.map(results.none.annotations, (b) => b.value))
+          .toEqual([8]);
+        expect(results.some["a"].total).toEqual(12);
+        expect(results.some["b"].total).toEqual(6);
+        expect(results.none.total).toEqual(8);
       });
 
       it("should let us populate existing groupings", function() {
@@ -51,22 +70,22 @@ module Esper.EventStats {
         let b2 = makeAnnotation({ value: 8, groups: ["b"]});
 
         let results1 = groupAnnotations([a1, b1]);
-        expect(_.keys(results1).length).toEqual(2);
-        expect(_.map(results1["a"].annotations, (a) => a.value))
+        expect(_.keys(results1.some).length).toEqual(2);
+        expect(_.map(results1.some["a"].annotations, (a) => a.value))
           .toEqual([5]);
-        expect(_.map(results1["b"].annotations, (b) => b.value))
+        expect(_.map(results1.some["b"].annotations, (b) => b.value))
           .toEqual([6]);
-        expect(results1["a"].total).toEqual(5);
-        expect(results1["b"].total).toEqual(6);
+        expect(results1.some["a"].total).toEqual(5);
+        expect(results1.some["b"].total).toEqual(6);
 
         let results2 = groupAnnotations([a2, b2], results1);
-        expect(_.keys(results2).length).toEqual(2);
-        expect(_.map(results2["a"].annotations, (a) => a.value))
+        expect(_.keys(results2.some).length).toEqual(2);
+        expect(_.map(results2.some["a"].annotations, (a) => a.value))
           .toEqual([5, 7]);
-        expect(_.map(results2["b"].annotations, (b) => b.value))
+        expect(_.map(results2.some["b"].annotations, (b) => b.value))
           .toEqual([6, 8]);
-        expect(results2["a"].total).toEqual(12);
-        expect(results2["b"].total).toEqual(14);
+        expect(results2.some["a"].total).toEqual(12);
+        expect(results2.some["b"].total).toEqual(14);
       });
 
       it("should nest groups", function() {
@@ -78,17 +97,17 @@ module Esper.EventStats {
         let results = groupAnnotations([a1, b1, ab1, ab2, aa1]);
 
         /* Check parent */
-        expect(_.keys(results).length).toEqual(2);
-        expect(_.map(results["a"].annotations, (a) => a.value))
+        expect(_.keys(results.some).length).toEqual(2);
+        expect(_.map(results.some["a"].annotations, (a) => a.value))
           .toEqual([5, 7, 8, 9]);
-        expect(_.map(results["b"].annotations, (b) => b.value))
+        expect(_.map(results.some["b"].annotations, (b) => b.value))
           .toEqual([6]);
-        expect(results["a"].total).toEqual(29);
-        expect(results["b"].total).toEqual(6);
-        expect(results["b"].subgroups).toEqual({});
+        expect(results.some["a"].total).toEqual(29);
+        expect(results.some["b"].total).toEqual(6);
+        expect(results.some["b"].subgroups).toEqual({});
 
         /* Check nested subgroup A */
-        var subA = results["a"].subgroups;
+        var subA = results.some["a"].subgroups;
         expect(_.keys(subA).length).toEqual(2);
         expect(_.map(subA["a"].annotations, (a) => a.value))
           .toEqual([9]);
@@ -224,14 +243,14 @@ module Esper.EventStats {
           result.match({
             none: () => null,
             some: (g) => {
-              expect(_.keys(g).length).toEqual(1);
-              expect(_.keys(g["a"].subgroups).length).toEqual(2);
+              expect(_.keys(g.some).length).toEqual(1);
+              expect(_.keys(g.some["a"].subgroups).length).toEqual(2);
 
-              let subB = g["a"].subgroups["b"];
+              let subB = g.some["a"].subgroups["b"];
               expect(subB.annotations.length).toEqual(5);
               expect(subB.total).toEqual(5);
 
-              let subC = g["a"].subgroups["c"];
+              let subC = g.some["a"].subgroups["c"];
               expect(subC.annotations.length).toEqual(5);
               expect(subC.total).toEqual(10);
             }
