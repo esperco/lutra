@@ -167,6 +167,15 @@ module Esper.EventStats {
           expect(asSpy.calls.count()).toEqual(2);
         });
 
+        it("should not call runLoop again if stopped",
+        function() {
+          var count = calc.stop();
+          calc.runLoop(count);
+
+          let asSpy = <jasmine.Spy> window.requestAnimationFrame;
+          expect(asSpy.calls.count()).toEqual(1);
+        });
+
         it("should start grouping after annotations are done", function() {
           /*
             First, clear annotations queue. 5 events / 2 events per run means
@@ -227,6 +236,27 @@ module Esper.EventStats {
               expect(subC.total).toEqual(10);
             }
           });
+        });
+      });
+
+      describe("after double start", function() {
+        var calc: TestCalc;
+        var spy: jasmine.Spy;
+
+        beforeEach(function(done) {
+          calc = new TestCalc();
+          spy = jasmine.createSpy("test");
+
+          calc.addChangeListener(spy);
+          calc.addChangeListener(done);
+          calc.start(events);
+          calc.start(events);
+        });
+
+        it("should only emit once", function() {
+          var result = calc.getResults();
+          expect(result.isSome()).toBeTruthy();
+          expect(spy.calls.count()).toEqual(1);
         });
       });
     });

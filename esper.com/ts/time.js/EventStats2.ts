@@ -70,6 +70,7 @@ module Esper.EventStats {
   export abstract class Calculation extends Emit.EmitBase {
     // Are we there yet?
     ready = false;
+    runCount = 0;
 
     // Intermediate state for use with progressive calculation
     eventQueue: Stores.Events.TeamEvent[] = [];
@@ -87,37 +88,53 @@ module Esper.EventStats {
     // Start calulations based on passed events
     start(events: Stores.Events.TeamEvent[]) {
       this.init(events);
-      window.requestAnimationFrame(this.runLoop);
+      this.next();
+    }
+
+    stop() {
+      var oldCount = this.runCount;
+      this.runCount += 1;
+      return oldCount;
     }
 
     // Pre-populate vars used in processing loop
     init(events: Stores.Events.TeamEvent[]) {
       this.eventQueue = _.clone(events);
       this.ready = false;
+      this.runCount += 1;
       this.annotationsQueue = [];
       this.grouping = {};
     }
 
     /*
       Recursive "loop" that calls annotateSome and groupSome until we're done.
-      Bind to make testing references easier
     */
-    runLoop = () => {
+    runLoop(count?: number) {
+      count = Util.some(count, this.runCount);
+
+      // This is for an old iteration, stop.
+      if (this.runCount > count) return;
+
       if (! _.isEmpty(this.eventQueue)) {
         this.annotateSome();
-        window.requestAnimationFrame(this.runLoop)
+        this.next();
         return;
       }
 
       if (! _.isEmpty(this.annotationsQueue)) {
         this.groupSome();
-        window.requestAnimationFrame(this.runLoop)
+        this.next();
         return;
       }
 
       // If we get here, we're done. Emit to signal result.
       this.ready = true;
       this.emitChange();
+    }
+
+    next() {
+      var count = this.runCount;
+      window.requestAnimationFrame(() => this.runLoop(count));
     }
 
     // Annotate some events from queue, returns true if it did work, false
