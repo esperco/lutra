@@ -138,9 +138,6 @@ module Esper.Stores.Events {
     events: TeamEvent[];
     isBusy: boolean;
     hasError: boolean;
-
-    // Data for each date in list
-    eventsByDate: Model2.BatchStoreData<DateId, FullEventId, TeamEvent>[];
   }
 
 
@@ -314,7 +311,7 @@ module Esper.Stores.Events {
 
   export function getForPeriod({teamId, calId, period}: {
     teamId: string,
-    calId: string,
+    calId: string|string[],
     period: Period.Single|Period.Custom,
   }): Option.T<EventListData> {
     var bounds = Period.boundsFromPeriod(period);
@@ -328,62 +325,74 @@ module Esper.Stores.Events {
 
   export function get({teamId, calId, start, end}: {
     teamId: string,
-    calId: string,
+    calId: string|string[],
     start: Date,
     end: Date,
   }): Option.T<EventListData> {
     var dates = datesFromBounds(start, end);
-    var eventsByDate = _.map(dates, (d) =>
-      EventsForDateStore.batchGet({
-        teamId: teamId,
-        calId: calId,
-        date: d
-      }));
+    var calIds = _.isArray(calId) ? calId : [calId];
 
-    return _.find(eventsByDate, (e) => e.isNone()) ?
-      Option.none<EventListData>() :
-      Option.some(((): EventListData => {
-        var unwrappedEventsByDate = _.map(eventsByDate, (e) => e.unwrap());
+    var eventsByDate = _.flatten(
+      _.map(calIds, (c) =>
+        _.map(dates, (d) =>
+          EventsForDateStore.batchGet({
+            teamId: teamId,
+            calId: c,
+            date: d
+          })
+        )
+      )
+    );
 
-        var events: TeamEvent[] = [];
-        var isBusy = false;
-        var hasError = false;
-        _.each(unwrappedEventsByDate, (e) => {
-          // If date is busy or error, then entire list is busy or error
-          if (e.dataStatus === Model2.DataStatus.FETCHING) {
+    // If any none, then all none
+    if (_.find(eventsByDate, (e) => e.isNone())) {
+      return Option.none<EventListData>();
+    }
+
+    // Events ready, de-deuplicate
+    var events: TeamEvent[] = [];
+    var eventExists: {[calIdEventId: string]: boolean} = {}; // De-dupe map
+    var isBusy = false;
+    var hasError = false;
+    _.each(Option.flatten(eventsByDate), (e) => {
+      // If date is busy or error, then entire list is busy or error
+      if (e.dataStatus === Model2.DataStatus.FETCHING) {
+        isBusy = true;
+      } else if (e.dataStatus === Model2.DataStatus.FETCH_ERROR) {
+        hasError = true;
+      }
+
+      e.data.match({
+        none: () => null,
+        some: (list) => _.each(list, (eventOpt) => {
+          // If event is busy or error, then entire list is busy or error
+          if (eventOpt.dataStatus === Model2.DataStatus.FETCHING) {
             isBusy = true;
-          } else if (e.dataStatus === Model2.DataStatus.FETCH_ERROR) {
+          }
+          else if (eventOpt.dataStatus === Model2.DataStatus.FETCH_ERROR) {
             hasError = true;
           }
-
-          e.data.match({
+          eventOpt.data.match({
             none: () => null,
-            some: (list) => _.each(list, (eventOpt) => {
-              // If event is busy or error, then entire list is busy or error
-              if (eventOpt.dataStatus === Model2.DataStatus.FETCHING) {
-                isBusy = true;
+            some: (event) => {
+              let key = event.calendarId + event.id;
+              if (! eventExists[key]) {
+                events.push(event);
+                eventExists[key] = true;
               }
-              else if (eventOpt.dataStatus === Model2.DataStatus.FETCH_ERROR) {
-                hasError = true;
-              }
-              eventOpt.data.match({
-                none: () => null,
-                some: (event) => events.push(event)
-              });
-            })
+            }
           });
-        });
-        events = _.uniqBy(events, (e) => e.id);
+        })
+      });
+    });
 
-        return {
-          start: start,
-          end: end,
-          events: events,
-          isBusy: isBusy,
-          hasError: hasError,
-          eventsByDate: unwrappedEventsByDate
-        };
-      })());
+    return Option.some({
+      start: start,
+      end: end,
+      events: events,
+      isBusy: isBusy,
+      hasError: hasError
+    });
   }
 
   export function fetch1(fullEventId: FullEventId, forceRefresh=false) {
