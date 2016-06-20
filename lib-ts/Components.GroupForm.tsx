@@ -41,7 +41,7 @@ module Esper.Components {
     componentWillReceiveProps(props: Props) {
       super.componentWillReceiveProps(props);
       if (! _.isEqual(this.props, props)) {
-         this.state = {
+        this.state = {
           name: props.name,
           uid: props.uid,
           groupMembers: props.groupMembers,
@@ -256,7 +256,7 @@ module Esper.Components {
           displayAs: team.team_name
         };
       }), 5);
-      return <ListSelectorSimple choices={filteredMembers}
+      return <ListSelectorSimple choices={filteredMembers} unselectedIcon=" "
         selectedIds={null} updateFn={this.update.bind(this)} />;
     }
 
