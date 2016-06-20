@@ -74,20 +74,31 @@ module Esper.Login {
     if (alreadyInit) { return; }
     alreadyInit = true;
 
-    if (checkToken) {
-      // Remember to check queryStr after hash too
-      let queryStr = location.search || location.hash.split("?")[1] || "";
-      let token = Util.getParamByName(tokenParam, queryStr);
-      if (token) {
-        postLoginToken(token);
-        return;
-      }
-    }
+    /*
+      Check local store first
 
-    // No token, check local store
+      TODO: If checkToken, should establish some way of verifying that token is
+      for currently logged in user. If different user, we should post token
+      rather than trying to initCredentals first.
+    */
     if (initCredentials()) {
       Api.getLoginInfo().then(onLoginSuccess, onLoginFailure);
-    } else {
+    }
+
+    /*
+      No credentials -- try posting token, else go to login
+    */
+    else {
+      if (checkToken) {
+        // Remember to check queryStr after hash too
+        let queryStr = location.search || location.hash.split("?")[1] || "";
+        let token = Util.getParamByName(tokenParam, queryStr);
+        if (token) {
+          postLoginToken(token);
+          return;
+        }
+      }
+
       goToLogin();
     }
   }
