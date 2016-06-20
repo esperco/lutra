@@ -436,6 +436,7 @@ module Esper.Components {
     onNameInputChange(event: React.FormEvent) {
       var name = (event.target as HTMLInputElement).value
       this.mutateState((s) => s.name = name);
+      if (_.isEmpty(name)) return;
       this.processUpdate();
     }
 
