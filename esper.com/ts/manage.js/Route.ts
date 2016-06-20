@@ -58,7 +58,7 @@ module Esper.Route {
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderNotificationSettings(ctx.params["teamId"], msg, err);
+      Actions.renderTeamNotificationSettings(ctx.params["teamId"], msg, err);
     });
 
   route(Paths.Manage.personal().hash, function(ctx) {
