@@ -16,7 +16,6 @@ module Esper.Components {
 
   interface State extends Actions.Groups.GroupData {
     editMember?: string;
-    editIndividual?: ApiT.GroupIndividual;
     teamFilter: string;
     hasIndividualEmail?: boolean;
     hasEmailError?: boolean;
@@ -81,7 +80,8 @@ module Esper.Components {
         }
         { this.renderMemberInput() }
         <hr />
-        { _.isEmpty(this.state.groupMembers) ?
+        { _.isEmpty(this.state.groupMembers) &&
+          _.isEmpty(this.state.groupIndividuals) ?
           <div className="esper-no-content">
             No {Text.GroupMembers} Found
           </div>
@@ -91,7 +91,10 @@ module Esper.Components {
               { "Other " + Text.TeamExecs + " in " +
                 (this.state.name || "this " + Text.Group) }
             </label>
-            { _.map(this.state.groupMembers, this.renderMember.bind(this)) }
+            { _.map(this.state.groupMembers,
+                    this.renderMember.bind(this)) }
+            { _.map(this.state.groupIndividuals,
+                    this.renderIndividual.bind(this)) }
           </div>
         }
         <hr />
@@ -102,19 +105,6 @@ module Esper.Components {
               Invalid email address provided.
             </div> :
             null
-        }
-        <hr />
-        { _.isEmpty(this.state.groupIndividuals) ?
-          <div className="esper-no-content">
-            No {Text.GroupIndividuals} Found
-          </div>
-          :
-          <div className="list-group">
-            <label className="esper-header">
-              {Text.GroupIndividuals + " in " + (this.state.name || Text.Group)}
-            </label>
-            { _.map(this.state.groupIndividuals, this.renderIndividual.bind(this))}
-          </div>
         }
       </div>;
     }
@@ -276,7 +266,7 @@ module Esper.Components {
 
     renderMember(member: ApiT.GroupMember) {
       // State of editing a group member
-      if (member.teamid === this.state.editMember) {
+      if (this.state.editMember === member.teamid) {
         return <div className="list-group-item one-line" key={member.teamid}>
           <div className="row">
             <div className="col-xs-6">
@@ -311,8 +301,7 @@ module Esper.Components {
 
     renderIndividual(gim: ApiT.GroupIndividual) {
       // State of editing a group member
-      if (!_.isEmpty(this.state.editIndividual) &&
-          this.state.editIndividual.email === gim.email) {
+      if (this.state.editMember === gim.email) {
         return <div className="list-group-item" key={gim.email}>
           <div className="form-group">
             <div className="one-line">
@@ -387,7 +376,6 @@ module Esper.Components {
     resetState() {
       this.mutateState((s) => {
         s.editMember = null;
-        s.editIndividual = null;
         s.teamFilter = "";
         s.hasEmailError = false;
         s.hasIndividualEmail = false;
@@ -395,7 +383,7 @@ module Esper.Components {
     }
 
     showEditFor(gim: ApiT.GroupIndividual) {
-      this.mutateState((s) => s.editIndividual = gim);
+      this.mutateState((s) => s.editMember = gim.email);
     }
 
     submitEditInput() {
@@ -404,8 +392,8 @@ module Esper.Components {
 
     submitEditIndividual() {
       var gim = _.find(this.state.groupIndividuals, {
-                       email: this.state.editIndividual.email });
-      if (gim !== this.state.editIndividual && !_.isEmpty(this.props.groupid)) {
+                       email: this.state.editMember });
+      if (!_.isEmpty(this.props.groupid)) {
         Api.putGroupIndividual(this.props.groupid, gim.uid, { role: gim.role });
       }
       this.resetState();
@@ -425,12 +413,12 @@ module Esper.Components {
 
     onRoleChange(event: React.FormEvent) {
       var role = (event.target as HTMLInputElement).value;
+      var gim = _.find(this.state.groupIndividuals, {
+        email: this.state.editMember });
+      if (_.isEmpty(gim)) return;
 
-      if (this.state.editIndividual.role !== role) {
-        this.mutateState((s) => {
-          var gim = _.find(s.groupIndividuals, { email: this.state.editIndividual.email });
-          gim.role = role;
-        });
+      if (gim.role !== role) {
+        this.mutateState((s) => gim.role = role);
       }
     }
 
