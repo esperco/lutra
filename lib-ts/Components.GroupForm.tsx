@@ -17,7 +17,7 @@ module Esper.Components {
   interface State extends Actions.Groups.GroupData {
     editMember?: string;
     editIndividual?: ApiT.GroupIndividual;
-    teamFilter?: string;
+    teamFilter: string;
     hasIndividualEmail?: boolean;
     hasEmailError?: boolean;
   }
@@ -31,7 +31,8 @@ module Esper.Components {
         name: props.name,
         uid: props.uid,
         groupMembers: props.groupMembers,
-        groupIndividuals: props.groupIndividuals
+        groupIndividuals: props.groupIndividuals,
+        teamFilter: ""
       };
     }
 
@@ -43,7 +44,8 @@ module Esper.Components {
           name: props.name,
           uid: props.uid,
           groupMembers: props.groupMembers,
-          groupIndividuals: props.groupIndividuals
+          groupIndividuals: props.groupIndividuals,
+          teamFilter: ""
         };
       }
     }
@@ -123,7 +125,8 @@ module Esper.Components {
           {Text.AddGroupMemberLink}
         </label>
         <div className="col-md-10">
-          <div className={this.state.teamFilter ? "esper-has-right-icon" : ""}>
+          <div className=
+            {_.isEmpty(this.state.teamFilter) ? "" : "esper-has-right-icon"}>
             <input type="text"
                    className="form-control"
                    id={this.getId("new-members")}
@@ -132,16 +135,15 @@ module Esper.Components {
                    value={this.state.teamFilter || ""}
                    placeholder="Tony Stark"
             />
-            {
-              this.state.teamFilter ?
+            { _.isEmpty(this.state.teamFilter) ?
+              <span /> :
               <span className="esper-clear-action esper-right-icon"
                     onClick={() => this.resetState()}>
                 <i className="fa fa-fw fa-times" />
-              </span> :
-              <span />
+              </span>
             }
           </div>
-          { this.state.teamFilter ? this.renderFilteredTeams() : null }
+          { this.renderTeams() }
         </div>
       </div>;
     }
@@ -236,27 +238,27 @@ module Esper.Components {
       this.mutateState((s) => s.teamFilter = val);
     }
 
-    renderFilteredTeams() {
-      var self = this;
+    renderTeams() {
+      var teamFilter = this.state.teamFilter;
       var memberIds = _.map(this.state.groupMembers, function(member) {
         return member.teamid;
       });
       var filteredTeams = _.filter(Stores.Teams.all(), function(team) {
         return !_.includes(memberIds, team.teamid)
           && _.includes(team.team_name.toLowerCase(),
-                        self.state.teamFilter.toLowerCase());
+                        teamFilter.toLowerCase());
       });
-      if (_.isEmpty(filteredTeams)) {
+      if (_.isEmpty(filteredTeams) && !_.isEmpty(teamFilter)) {
         return <div className="esper-no-content">
-          No { Text.TeamExec } with the name containing '{ this.state.teamFilter }' found
+          No { Text.TeamExec } with the name containing '{ teamFilter }' found
         </div>;
       }
-      var filteredMembers = _.map(filteredTeams, function(team) {
+      var filteredMembers = _.take(_.map(filteredTeams, function(team) {
         return {
           id: team.teamid,
           displayAs: team.team_name
         };
-      });
+      }), 5);
       return <ListSelectorSimple choices={filteredMembers}
         selectedIds={null} updateFn={this.update.bind(this)}/>;
     }
@@ -385,7 +387,7 @@ module Esper.Components {
       this.mutateState((s) => {
         s.editMember = null;
         s.editIndividual = null;
-        s.teamFilter = null;
+        s.teamFilter = "";
         s.hasEmailError = false;
         s.hasIndividualEmail = false;
       });
