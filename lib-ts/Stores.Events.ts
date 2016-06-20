@@ -309,35 +309,30 @@ module Esper.Stores.Events {
 
   /* Get from store */
 
-  export function getForPeriod({teamId, calId, period}: {
-    teamId: string,
-    calId: string|string[],
+  export function getForPeriod({cals, period}: {
+    cals: Calendars.CalSelection[];
     period: Period.Single|Period.Custom,
   }): Option.T<EventListData> {
     var bounds = Period.boundsFromPeriod(period);
     return get({
-      teamId: teamId,
-      calId: calId,
+      cals: cals,
       start: bounds[0],
       end: bounds[1]
     });
   }
 
-  export function get({teamId, calId, start, end}: {
-    teamId: string,
-    calId: string|string[],
+  export function get({cals, start, end}: {
+    cals: Calendars.CalSelection[],
     start: Date,
     end: Date,
   }): Option.T<EventListData> {
     var dates = datesFromBounds(start, end);
-    var calIds = _.isArray(calId) ? calId : [calId];
-
     var eventsByDate = _.flatten(
-      _.map(calIds, (c) =>
+      _.map(cals, (c) =>
         _.map(dates, (d) =>
           EventsForDateStore.batchGet({
-            teamId: teamId,
-            calId: c,
+            teamId: c.teamId,
+            calId: c.calId,
             date: d
           })
         )

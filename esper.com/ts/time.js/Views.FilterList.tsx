@@ -78,23 +78,21 @@ module Esper.Views {
     }
 
     getEventData() {
-      // Merge event lists for multiple calendars
-      var eventData = Option.flatten(
-        _.map(this.props.cals, (c) =>
-          Stores.Events.getForPeriod({
-            teamId: c.teamId,
-            calId: c.calId,
-            period: this.props.period
-          })
-        )
-      );
-
-      var events = _.flatten(_.map(eventData, (e) => e.events));
-      return {
-        events: _.sortBy(events, (e) => moment(e.start)),
-        isBusy: !!_.find(eventData, (e) => e.isBusy),
-        hasError: !!_.find(eventData, (e) => e.hasError)
-      };
+      return Stores.Events.getForPeriod({
+        cals: this.props.cals,
+        period: this.props.period
+      }).match({
+        none: () => ({
+          events: [],
+          isBusy: false,
+          hasError: true
+        }),
+        some: (d) => ({
+          events: d.events,
+          isBusy: d.isBusy,
+          hasError: d.hasError
+        })
+      });
     }
 
     filterEvents(events: Stores.Events.TeamEvent[]) {

@@ -50,18 +50,18 @@ module Esper.Actions {
 
     // Fetch all events on date +/- 1 day
     var mDate = moment(date).startOf('day');
-    var events: Stores.Events.TeamEvent[] = [];
-    _.each(team.team_timestats_calendars, (calId) => {
-      Stores.Events.get({
+    var events = Stores.Events.get({
+      cals: _.map(team.team_timestats_calendars, (c) => ({
         teamId: team.teamid,
-        calId: calId,
-        start: mDate.clone().subtract(1, 'day').toDate(),
-        end: mDate.clone().add(1, 'day').toDate()
-      }).match({
-        none: () => null,
-        some: (e) => events = events.concat(e.events)
-      });
+        calId: c
+      })),
+      start: mDate.clone().subtract(1, 'day').toDate(),
+      end: mDate.clone().add(1, 'day').toDate()
+    }).match<Stores.Events.TeamEvent[]>({
+      none: () => [],
+      some: (e) => e.events
     });
+
     return _.sortBy(events, (e) => [
       e.start && e.start.getTime(),
       e.end && e.end.getTime()

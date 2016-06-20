@@ -302,7 +302,10 @@ module Esper.Stores.Events {
 
       function getVal() {
         return getForPeriod({
-          teamId: teamId, calId: calId,
+          cals: [{
+            teamId: teamId,
+            calId: calId
+          }],
           period: {
             interval: "month",
             index: 552 // Jan 2016
