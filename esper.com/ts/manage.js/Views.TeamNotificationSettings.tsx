@@ -6,7 +6,7 @@
 
 module Esper.Views {
 
-  export class NotificationSettings extends TeamSettings {
+  export class TeamNotificationSettings extends TeamSettings {
     pathFn = Paths.Manage.Team.notifications;
 
     renderMain(team: ApiT.Team) {
