@@ -296,6 +296,20 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(labels));
   }
 
+  export function getGroupPreferences(groupid: string):
+    JQueryPromise<ApiT.GroupPreferences>
+  {
+    var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
+    return JsonHttp.get(url);
+  }
+
+  export function putGroupPreferences(groupid: string, prefs: ApiT.GroupPreferences):
+    JQueryPromise<void>
+  {
+    var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
+    return JsonHttp.put(url, JSON.stringify(prefs));
+  }
+
   /***** Opaque URLs with unique token *****/
 
   export function getToken(token: string): JQueryPromise<ApiT.TokenInfo> {
