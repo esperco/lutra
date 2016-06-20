@@ -6,13 +6,15 @@
 
 module Esper.EventStats {
   describe("EventStats2", function() {
+    const teamId = "teamId";
+    const calId = "calId";
+
     /*
       A single generic event for testing. Event itself doesn't matter in below,
       tests. We're probably just testing annotation value
     */
     var testEvent = Stores.Events.asTeamEvent(
-      "team-id",
-      TestFixtures.makeGenericCalendarEvent()
+      teamId, TestFixtures.makeGenericCalendarEvent()
     );
 
     // Helper function
@@ -117,6 +119,112 @@ module Esper.EventStats {
         expect(subA["b"].total).toEqual(15);
         expect(subA["a"].subgroups).toEqual({});
         expect(subA["b"].subgroups).toEqual({});
+      });
+    });
+
+
+    //////
+
+    describe("durationWrappers", function() {
+
+      // Fixed vars for fetching and setting events
+      const eventId1 = "eventId1";
+      const eventId2 = "eventId2";
+      const eventId3 = "eventId3";
+      const eventId4 = "eventId4";
+      const eventId5 = "eventId5";
+      const eventId6 = "eventId6";
+
+      /*
+        A fairly complicated series of overlapping events for testing, around
+        midnight between January 1 and 2
+            Jan 1 | Jan 2
+        e1:     x |
+        e2:       | xx
+        e3:       | xxxxx
+        e4:       | x
+        e5:       |  xxx
+        e6:       |    xxx
+        ------------------
+                1 | 332321
+      */
+      var e1 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 1, 23)),
+          end:   XDate.toString(new Date(2016, 0, 2)),
+          calendar_id: calId,
+          id: eventId1
+        }));
+      var e2 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2)),
+          end:   XDate.toString(new Date(2016, 0, 2, 2)),
+          calendar_id: calId,
+          id: eventId2
+        }));
+      var e3 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2)),
+          end:   XDate.toString(new Date(2016, 0, 2, 5)),
+          calendar_id: calId,
+          id: eventId3
+        }));
+      var e4 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2)),
+          end:   XDate.toString(new Date(2016, 0, 2, 1)),
+          calendar_id: calId,
+          id: eventId4
+        }));
+      var e5 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 1)),
+          end:   XDate.toString(new Date(2016, 0, 2, 4)),
+          calendar_id: calId,
+          id: eventId5
+        }));
+      var e6 = Stores.Events.asTeamEvent(teamId,
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 3)),
+          end:   XDate.toString(new Date(2016, 0, 2, 6)),
+          calendar_id: calId,
+          id: eventId5
+        }));
+
+      function getVal() {
+        return durationWrappers([e1, e2, e3, e4, e5, e6]);
+      }
+
+      describe("by default", function() {
+        it("should calculate overlap-adjusted duration for each event",
+        function() {
+          expect(_.map(getVal(), (e) => e.duration)).toEqual(
+            _.map([
+              1,
+              1/3 + 1/3,
+              1/3 + 1/3 + 1/2 + 1/3 + 1/2,
+              1/3,
+              1/3 + 1/2 + 1/3,
+              1/3 + 1/2 + 1
+            ], (s) => Math.round(s * 60 * 60))
+          );
+        });
+      });
+
+      describe("with truncate", function() {
+        function getVal() {
+          return durationWrappers([e1, e2, e6], {
+            truncateStart: new Date(2016, 0, 2),
+            truncateEnd: new Date(2016, 0, 2, 5)
+          });
+        };
+
+        it("should truncate durations before and after opts",
+        function() {
+          expect(_.map(getVal(), (e) => e.duration)).toEqual(
+            _.map([0, 2, 2], (s) => Math.round(s * 60 * 60))
+          );
+        });
       });
     });
 
@@ -278,6 +386,98 @@ module Esper.EventStats {
           var result = calc.getResults();
           expect(result.isSome()).toBeTruthy();
           expect(emitSpy.calls.count()).toEqual(1);
+        });
+      });
+    });
+
+
+    //////
+
+    describe("Duration Calculation", function() {
+
+      /*
+        This test calculation just assigns a value of 1 to a/b and 2 to a/c for
+        each event, and processes two events per loop.
+      */
+      class TestCalc extends DurationCalculation {
+        MAX_PROCESS_EVENTS = 2
+
+        annotate(event: Stores.Events.TeamEvent,
+                 duration: number): Annotation[] {
+          return [
+            makeAnnotation({
+              value: duration,
+              groups: ["a"]
+            })
+          ];
+        }
+      }
+
+      var e1 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 1, 23)),
+          end:   XDate.toString(new Date(2016, 0, 2)),
+        }));
+      var e2 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 1)),
+          end:   XDate.toString(new Date(2016, 0, 2, 5)),
+        }));
+
+      // Overlaps 2
+      var e3 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 2)),
+          end:   XDate.toString(new Date(2016, 0, 2, 3)),
+        }));
+
+      // Overlows 2
+      var e4 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 4)),
+          end:   XDate.toString(new Date(2016, 0, 2, 6)),
+        }));
+
+      // Does not overlap 4
+      var e5 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          start: XDate.toString(new Date(2016, 0, 2, 6)),
+          end:   XDate.toString(new Date(2016, 0, 2, 7)),
+        }));
+      var events = [e1, e2, e3, e4, e5];
+
+      /*
+        Spy on requestAnimationFrame to step through events
+      */
+      describe("after start - sync", function() {
+        var calc: TestCalc;
+
+        beforeEach(function() {
+          spyOn(window, "requestAnimationFrame"); // To stop loop
+
+          calc = new TestCalc();
+          calc.start(events);
+        });
+
+        it("should process only only MAX_PROCESS_EVENTS + any overlapping " +
+           "events after first loop",
+        function() {
+          calc.runLoop();
+          expect(calc.eventQueue.length).toEqual(1);
+          expect(calc.annotationsQueue.length).toEqual(4);
+
+          // Result should not be done yet
+          expect(calc.getResults().isNone()).toBeTruthy();
+        });
+
+        it("should pass durations to annotate function", function() {
+          spyOn(calc, "annotate").and.callThrough();
+
+          calc.runLoop();
+          expect(calc.annotate).toHaveBeenCalledWith(e1, 1 * 60 * 60);
+          expect(calc.annotate).toHaveBeenCalledWith(e2, 3 * 60 * 60);
+          expect(calc.annotate).toHaveBeenCalledWith(e3, 0.5 * 60 * 60);
+          expect(calc.annotate).toHaveBeenCalledWith(e4, 1.5 * 60 * 60);
         });
       });
     });
