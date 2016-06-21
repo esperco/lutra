@@ -71,26 +71,6 @@ module Esper.Api {
       "");
   }
 
-  /* Contacts */
-  export function getContacts():
-  JQueryPromise<ApiT.ContactInfo> {
-    var url = prefix + "/api/contacts/" + string(Login.myUid()) + "/0";
-    return JsonHttp.get(url);
-  }
-
-  export function getContactsPage(index: number):
-  JQueryPromise<ApiT.ContactInfo> {
-    var url = prefix + "/api/contacts/" + string(Login.myUid())
-              + "/" + index;
-    return JsonHttp.get(url);
-  }
-
-  export function postContactsInvite(fullname: string, invite_list: ApiT.Invite):
-  JQueryPromise<void> {
-    var url = prefix + "/api/contacts/invite/" + fullname;
-    return JsonHttp.post(url, JSON.stringify(invite_list));
-  }
-
   export function random():
     JQueryPromise<ApiT.Random> {
     return JsonHttp.post(prefix + "/api/random", "");
@@ -547,15 +527,6 @@ module Esper.Api {
       return JsonHttp.put(url, JSON.stringify(general_prefs));
   }
 
-  export function getPreferenceChanges(teamid: string, from: number,
-    until: number): JQueryPromise<ApiT.PreferenceChanges>
-  {
-    var url =
-      prefix + "/api/preferences/changes/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + from.toString() + "/" + until.toString();
-    return JsonHttp.get(url);
-  }
-
   /*** Emails ***/
   export function sendAgenda(teams: string[],
                              timezone: string,
@@ -576,76 +547,6 @@ module Esper.Api {
       recipients: recipients
     }
     return JsonHttp.post(url, JSON.stringify(pref));
-  }
-
-  export function setReminderTime(teamid: string, from_email: string,
-    calid: string, eventid: string, secs: number): JQueryPromise<void>
-  {
-    var url =
-      prefix + "/api/event/set-reminder-time/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + string(from_email)
-      + "/" + encodeURIComponent(string(calid))
-      + "/" + string(eventid)
-      + "/" + secs.toString();
-    return JsonHttp.post(url, "");
-  }
-
-  export function unsetReminderTime(eventid: string):
-  JQueryPromise<void> {
-    var url =
-      prefix + "/api/event/unset-reminder-time/" + string(Login.myUid())
-      + "/" + string(eventid);
-    return JsonHttp.post(url, "");
-  }
-
-  export function getReminders(calid: string, eventid: string):
-  JQueryPromise<ApiT.EventReminders> {
-    var url =
-      prefix + "/api/event/reminders/" + string(Login.myUid())
-      + "/" + encodeURIComponent(string(calid))
-      + "/" + string(eventid);
-    return JsonHttp.get(url);
-  }
-
-  export function enableReminderForGuest(eventid: string, email: string,
-                                         guest_reminder : ApiT.GuestReminder):
-  JQueryPromise<void> {
-    var url =
-      prefix + "/api/event/remind/" + string(Login.myUid())
-      + "/" + string(eventid)
-      + "/" + string(email);
-    return JsonHttp.put(url, JSON.stringify(guest_reminder));
-  }
-
-  export function disableReminderForGuest(eventid: string, email: string):
-  JQueryPromise<void> {
-    var url =
-      prefix + "/api/event/remind/" + string(Login.myUid())
-      + "/" + string(eventid)
-      + "/" + string(email);
-    return JsonHttp.delete_(url);
-  }
-
-  export function getDefaultReminder(teamid: string, calid: string,
-    eventid: string): JQueryPromise<ApiT.DefaultReminder>
-  {
-    var url =
-      prefix + "/api/event/default-reminder/" + string(Login.myUid())
-      + "/" + string(teamid)
-      + "/" + encodeURIComponent(string(calid))
-      + "/" + string(eventid);
-    return JsonHttp.get(url);
-  }
-
-  export function getEventDescriptionWithMessages(description: string,
-                                                  messageids: string[]):
-  JQueryPromise<ApiT.EventDescription> {
-    var url = prefix + "/api/event/description-with-messages/"
-            + string(Login.myUid());
-    var body = { description: description,
-                 description_messageids: messageids };
-    return JsonHttp.post(url, JSON.stringify(body));
   }
 
   // Temporary compatibility fix. Field `label` is now optional.

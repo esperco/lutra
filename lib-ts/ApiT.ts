@@ -34,23 +34,6 @@ module Esper.ApiT {
     error_details: ErrorDetails;
   }
 
-  export interface Contact {
-    id: string;
-    email: string;
-    name: string;
-    picture: string;
-  }
-
-  export interface ContactInfo {
-    contact_list: Contact[];
-    next_index: number;
-    prev_index: number;
-  }
-
-  export interface Invite {
-    email_list: string[];
-  }
-
   export interface TeamCreationRequest {
     chrome_extension?: boolean;
     executive_email?: string;
@@ -257,13 +240,11 @@ module Esper.ApiT {
   export interface Preferences {
     uid?: string;
     teamid?: string;
-    transportation?: string[];
     email_types: EmailTypes;
     label_reminder?: SimpleEmailPref;
     slack_address?: SlackAddress;
     timestats_notify?: TimestatsNotifyPrefs;
     general: GeneralPrefs;
-    coworkers: string;
     notes: string;
   }
 
@@ -320,67 +301,11 @@ module Esper.ApiT {
 
   // This is used for API setting only
   export interface GeneralPrefsOpts {
-    send_exec_confirmation?: boolean;
-    send_exec_reminder?: boolean;
-    send_followup_reminders?: boolean;
-    double_booking_warning?: boolean;
-    no_location_warning?: boolean;
-    link_email_warning?: boolean;
-    use_duplicate_events?: boolean;
-    delete_holds_inquiry?: boolean;
-    bcc_exec_on_reply?: boolean;
     current_timezone?: string;
-    hold_event_color?: CalendarEventColor;
   }
 
   export interface GeneralPrefs extends GeneralPrefsOpts {
-    send_exec_confirmation: boolean;
-    send_exec_reminder: boolean;
-    send_followup_reminders: boolean;
-    double_booking_warning: boolean;
-    no_location_warning: boolean;
-    link_email_warning: boolean;
-    use_duplicate_events: boolean;
-    delete_holds_inquiry: boolean;
-    bcc_exec_on_reply: boolean;
     current_timezone: string;
-    hold_event_color?: CalendarEventColor;
-  }
-
-  export interface CalendarEventColor {
-    key: string;
-    color: string;
-  }
-
-  export interface PreferenceChange {
-    uid?: string;
-    teamid: string;
-    execid: string;
-    changeid: string;
-    timestamp: string;
-    change_type : string[];
-  }
-
-  export interface PreferenceChanges {
-    change_log: PreferenceChange[];
-  }
-
-  export interface GuestReminder {
-    guest_email: string;
-    guest_name?: string;
-    reminder_message?: string;
-  }
-
-  export interface EventReminders {
-    event_start_time: string;
-    reminder_time: string;
-    guest_reminders: GuestReminder[];
-    remind_from_team?: string; // teamid
-    remind_from_email?: string;
-  }
-
-  export interface DefaultReminder {
-    default_message: string;
   }
 
   export interface CalendarRequest {
@@ -526,6 +451,11 @@ module Esper.ApiT {
   export interface Approval {
     approved_by: string; // uid
     approved_on: string; // timestamp
+  }
+
+  export interface CalendarEventColor {
+    key: string;
+    color: string;
   }
 
   export interface CalendarEventPalette {
