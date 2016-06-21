@@ -273,12 +273,16 @@ module Esper.Components {
     }
 
     renderMember(member: ApiT.GroupMember) {
-      // State of editing a group member
       var exec = _.find(this.state.groupIndividuals, {
         email: member.email
       });
       if (!_.isEmpty(exec)) this.state.selectedRole = exec.role;
       else this.state.selectedRole = Text.GroupRoleMember;
+
+      var isOwnTeam = Stores.Teams.get(member.teamid).match({
+        none: () => false,
+        some: () => true
+      });
       // State of editing a group member
       if (this.state.editMember === member.email) {
         return <div className="list-group-item" key={member.teamid}>
@@ -336,7 +340,7 @@ module Esper.Components {
         <i className="fa fa-fw fa-user" />
         {" "}{member.name}{" "}
         <i className="fa fa-fw fa-calendar" />
-        { this.props.isOwner || this.props.isAdmin ?
+        { this.props.isOwner || this.props.isAdmin || isOwnTeam ?
           <span>
             <a className="pull-right text-danger" title="Delete"
                onClick={(e) => this.removeMember(member)}>
