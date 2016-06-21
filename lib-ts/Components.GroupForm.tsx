@@ -359,7 +359,7 @@ module Esper.Components {
           <div className="form-group">
             <div className="one-line">
               <i className="fa fa-fw fa-user"></i>
-              {gim.email}
+              {" "}{gim.email}{" "}
             </div>
             <div>
               <div className="esper-selectable">
