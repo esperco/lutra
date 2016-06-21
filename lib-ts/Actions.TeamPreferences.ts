@@ -3,24 +3,24 @@
 */
 
 /// <reference path="./Actions.Calendars.ts" />
-/// <reference path="./Stores.Preferences.ts" />
+/// <reference path="./Stores.TeamPreferences.ts" />
 
-module Esper.Actions.Preferences {
+module Esper.Actions.TeamPreferences {
   function update(
     teamId: string,
     promise: JQueryPromise<any>,
     fn: (prefs: ApiT.Preferences) => ApiT.Preferences
   ) {
     // Update prefs in store if data present
-    Stores.Preferences.getInitPromise().done(function() {
-      Stores.Preferences.PrefsStore.get(teamId).match({
+    Stores.TeamPreferences.getInitPromise().done(function() {
+      Stores.TeamPreferences.PrefsStore.get(teamId).match({
         none: () => Log.e("Updating prefs for team not stored yet"),
         some: (storeData) => {
           storeData.data.match({
             none: () => Log.e("No prefs found for team - " + teamId),
             some: (prefs) => {
               prefs = fn(_.cloneDeep(prefs))
-              Stores.Preferences.PrefsStore.push(teamId,
+              Stores.TeamPreferences.PrefsStore.push(teamId,
                 promise, Option.some(prefs));
             }
           })
@@ -31,7 +31,7 @@ module Esper.Actions.Preferences {
 
   // Alters general preferences and saves in store
   export function setGeneral(teamId: string, general: ApiT.GeneralPrefsOpts) {
-    var hasChanges = Stores.Preferences.get(teamId).match({
+    var hasChanges = Stores.TeamPreferences.get(teamId).match({
       none: () => true,
       some: (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
     });

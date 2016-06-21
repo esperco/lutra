@@ -16,12 +16,12 @@ module Esper.Views {
         some: (l) => l
       });
 
-      var prefs = Stores.Preferences.get(team.teamid);
-      var slackAuthorized = Stores.Preferences.slackAuthorized(team.teamid);
+      var prefs = Stores.TeamPreferences.get(team.teamid);
+      var slackAuthorized = Stores.TeamPreferences.slackAuthorized(team.teamid);
       return prefs.match({
         none: () => <i className="esper-spinner esper-medium esper-centered" />,
         some: (p) => {
-          let prefsWithDefaults = Stores.Preferences.withDefaults(p);
+          let prefsWithDefaults = Stores.TeamPreferences.withDefaults(p);
 
           return <div>
             <GeneralPrefs prefs={prefsWithDefaults} team={team} />
@@ -35,7 +35,7 @@ module Esper.Views {
   }
 
   function GeneralPrefs({prefs, team}: {
-    prefs: Stores.Preferences.PrefsWithDefaults;
+    prefs: Stores.TeamPreferences.PrefsWithDefaults;
     team: ApiT.Team;
   }) {
     let sendLabelReminder = emailToggled(prefs.label_reminder);
@@ -97,7 +97,7 @@ module Esper.Views {
     to authorize Esper access.
   */
   function FeedbackPrefs({prefs, slackAuthorized, team}: {
-    prefs: Stores.Preferences.PrefsWithDefaults;
+    prefs: Stores.TeamPreferences.PrefsWithDefaults;
     slackAuthorized: Option.T<boolean>;
     team: ApiT.Team;
   }) {
@@ -197,24 +197,24 @@ module Esper.Views {
 
   /////
 
-  function toggleDailyAgenda(p: Stores.Preferences.PrefsWithDefaults) {
-    Actions.Preferences.toggleDailyAgenda(p);
+  function toggleDailyAgenda(p: Stores.TeamPreferences.PrefsWithDefaults) {
+    Actions.TeamPreferences.toggleDailyAgenda(p);
   }
 
-  function toggleFeedbackSummary(p: Stores.Preferences.PrefsWithDefaults) {
-    Actions.Preferences.toggleFeedbackSummary(p);
+  function toggleFeedbackSummary(p: Stores.TeamPreferences.PrefsWithDefaults) {
+    Actions.TeamPreferences.toggleFeedbackSummary(p);
   }
 
-  function toggleLabelReminders(p: Stores.Preferences.PrefsWithDefaults) {
-    Actions.Preferences.toggleLabelReminders(p);
+  function toggleLabelReminders(p: Stores.TeamPreferences.PrefsWithDefaults) {
+    Actions.TeamPreferences.toggleLabelReminders(p);
   }
 
-  function toggleEmailFeedback(p: Stores.Preferences.PrefsWithDefaults) {
-    Actions.Preferences.toggleEmailFeedback(p);
+  function toggleEmailFeedback(p: Stores.TeamPreferences.PrefsWithDefaults) {
+    Actions.TeamPreferences.toggleEmailFeedback(p);
   }
 
-  function toggleSlackFeedback(p: Stores.Preferences.PrefsWithDefaults) {
-    Actions.Preferences.toggleSlackFeedback(p);
+  function toggleSlackFeedback(p: Stores.TeamPreferences.PrefsWithDefaults) {
+    Actions.TeamPreferences.toggleSlackFeedback(p);
   }
 }
 

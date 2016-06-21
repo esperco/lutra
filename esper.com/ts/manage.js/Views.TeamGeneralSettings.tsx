@@ -40,7 +40,7 @@ module Esper.Views {
       );
       var profilesLoading =
         Stores.Profiles.getInitPromise().state() === "pending";
-      var prefs = Stores.Preferences.get(team.teamid)
+      var prefs = Stores.TeamPreferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
       return <div>
