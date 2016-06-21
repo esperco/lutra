@@ -4,7 +4,7 @@
 
 /// <reference path="../../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
-/// <reference path="../lib/Actions.Preferences.ts" />
+/// <reference path="../lib/Actions.TeamPreferences.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Params.ts" />
@@ -13,7 +13,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />
-/// <reference path="../lib/Stores.Preferences.ts" />
+/// <reference path="../lib/Stores.TeamPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/Stores.Groups.ts" />
 /// <reference path="../lib/Text.ts" />

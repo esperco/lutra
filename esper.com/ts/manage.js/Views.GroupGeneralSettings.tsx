@@ -19,7 +19,7 @@ module Esper.Views {
         some: (d) => d === Model2.DataStatus.PUSH_ERROR
       });
 
-      var prefs = Stores.Preferences.get(group.groupid)
+      var prefs = Stores.TeamPreferences.get(group.groupid)
         .flatMap((p) => Option.some(p.general));
 
       return <div>
@@ -128,7 +128,3 @@ module Esper.Views {
     Route.nav.go(Paths.Manage.Group.general());
   }
 }
-
-
-
-

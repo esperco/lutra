@@ -7,7 +7,7 @@
 /// <reference path="./Save.ts" />
 /// <reference path="./Stores.Teams.ts" />
 /// <reference path="./Stores.Profiles.ts" />
-/// <reference path="./Actions.Preferences.ts" />
+/// <reference path="./Actions.TeamPreferences.ts" />
 
 module Esper.Actions.Teams {
 
@@ -30,7 +30,7 @@ module Esper.Actions.Teams {
         Stores.Teams.set(t);
 
         // New team => new prefs and exec
-        Stores.Preferences.reload();
+        Stores.TeamPreferences.reload();
         Stores.Profiles.reload();
 
         /*
@@ -75,7 +75,7 @@ module Esper.Actions.Teams {
 
     // Timezones => update preferences
     if (data.timezone) {
-      Actions.Preferences.setGeneral(teamId, {
+      Actions.TeamPreferences.setGeneral(teamId, {
         current_timezone: data.timezone
       });
     }

@@ -61,7 +61,7 @@ module Esper.Actions {
     var msg = ManageMsg.get(msgCode);
     var err = ManageMsg.get(errCode);
 
-    Stores.Preferences.checkSlack(teamId);
+    Stores.TeamPreferences.checkSlack(teamId);
     render(<Views.TeamNotificationSettings teamId={teamId}
             msg={msg} err={err} />);
     Analytics.page(Analytics.Page.TeamManage);
