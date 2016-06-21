@@ -12,6 +12,7 @@
   "devOnly": [
     "../lib/JasmineStub.ts",
     "EventStats.Test.ts",
+    "EventStats2.Test.ts",
     "Partition.Test.ts"
   ],
 
