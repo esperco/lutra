@@ -120,6 +120,7 @@ module Esper.Login {
           }
 
           setCredentials(loginInfo.uid, loginInfo.api_secret);
+          storeCredentials(loginInfo);
           onLoginSuccess(loginInfo);
           break;
 
