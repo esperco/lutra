@@ -186,4 +186,22 @@ module Esper.Util {
     ret[key] = value;
     return ret;
   }
+
+
+  /* Escape HTML */
+
+  const entityMap: {[index: string]: string} = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
+
+  export function escapeHtml(s: string) {
+    return String(s).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+    });
+  }
 }

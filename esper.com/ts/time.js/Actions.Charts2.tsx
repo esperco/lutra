@@ -60,7 +60,7 @@ module Esper.Actions.Charts2 {
   /*
     Clean up different query params that could be passed
   */
-  export function cleanExtra(e: any): ExtraOpts {
+  function cleanExtra(e: any): ExtraOpts {
     e = e || {};
     var typedQ: ExtraOpts = e;
     typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
@@ -90,7 +90,10 @@ module Esper.Actions.Charts2 {
         };
       });
 
-      var chart = <Components.DurationChart data={calcData} />;
+      var chart = o.extra.type === "percent" ?
+        <Components.DurationPercentChart data={calcData} /> :
+        <Components.DurationHoursChart data={calcData} />;
+
       return <Views.Charts2
         teamId={o.teamId}
         calIds={o.calIds}

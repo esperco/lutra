@@ -7,7 +7,7 @@ module Esper.Components {
 
   type Calc = EventStats.DurationBucketCalc;
 
-  export class DurationChart extends Chart<Calc> {
+  export class DurationHoursChart extends Chart<Calc> {
     renderMain(groups: Charting.PeriodGroup[]) {
       var series = Charting.eventSeries(groups, {
 
@@ -45,6 +45,68 @@ module Esper.Components {
         yAxis: [{
           title: { text: "Duration (Hours)" }
         }],
+
+        series: series
+      }} />;
+    }
+  }
+
+
+  export class DurationPercentChart extends Chart<Calc> {
+    renderMain(groups: Charting.PeriodGroup[]) {
+
+      var series = Charting.eventGroupSeries(groups, {
+        // Ignore actual keys here and just use the default bucket list
+        sortFn: () => _.map(EventStats.DurationBucketCalc.BUCKETS,
+          (b) => b.label
+        ),
+
+        yFn: EventStats.toHours
+      });
+
+      return <Components.Highchart opts={{
+        chart: groups.length > 1 ? {
+          type: 'bar',
+          height: groups.length * 100 + 120
+        } : {
+          type: 'pie'
+        },
+
+        plotOptions: {
+          bar: {
+            stacking: 'percent',
+            borderWidth: 1
+          },
+
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              formatter: function() {
+                if (this.percentage) {
+                  return `${this.point.name} ` +
+                    `(${Util.roundStr(this.percentage, 1)}%)`;
+                }
+              }
+            },
+            size: '80%'
+          }
+        },
+
+        legend: {
+          enabled: false
+        },
+
+        xAxis: {
+          categories: _.map(groups, (g) => Text.fmtPeriod(g.period))
+        },
+
+        yAxis: {
+          title: { text: "Percentage" }
+        },
+
+        tooltip: Charting.countPointTooltip,
 
         series: series
       }} />;
