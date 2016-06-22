@@ -182,11 +182,19 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getGroupDetails(groupid: string):
-    JQueryPromise<ApiT.Group>
+  export function getGroupDetails(groupid: string, opts: {
+      withMembers?: boolean,
+      withLabels?: boolean
+    } = {}): JQueryPromise<ApiT.Group>
   {
-    var url = prefix + "/api/group/details/" + string(Login.me())
-      + "/" + string(groupid);
+    var query = opts.withMembers || opts.withLabels ? "?" : "";
+    var membersParam = opts.withMembers ? "members=true" : "";
+    var labelsParam = opts.withLabels ? "labels=true" : "";
+    var paramString = query + (opts.withMembers && opts.withLabels ?
+                               membersParam + "&" + labelsParam :
+                               membersParam + labelsParam);
+    var url = `${prefix}/api/group/details/${string(Login.me())}/\
+      ${string(groupid) + paramString}`;
     return JsonHttp.get(url);
   }
 

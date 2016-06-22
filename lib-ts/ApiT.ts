@@ -191,6 +191,7 @@ module Esper.ApiT {
     platform?: string; // Google | Nylas
     email: string;
     teams: Team[];
+    groups: string[];
     team_members: TeamMember[];
     landing_url?: string;
   }
