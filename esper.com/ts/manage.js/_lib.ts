@@ -14,6 +14,7 @@
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.TeamPreferences.ts" />
+/// <reference path="../lib/Stores.GroupPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/Stores.Groups.ts" />
 /// <reference path="../lib/Text.ts" />
