@@ -138,24 +138,23 @@ module Esper.Charts {
     */
     getRelative(incr: number) {
       var fetchPeriod = this.relativePeriod(incr);
-      var data = Option.flatten(
-        _.map(this.params.cals, (cal) =>
-          Stores.Events.getForPeriod({
-            teamId: cal.teamId,
-            calId: cal.calId,
-            period: fetchPeriod
-          })
-        )
-      );
-      var events = _.flatten(_.map(data, (d) => d.events));
-      events = this.filterEvents(events, this.params.filterParams);
-
-      return {
-        events: events,
-        busy: !!_.find(data, (d) => d.isBusy),
-        error: !!_.find(data, (d) => d.hasError),
+      return Stores.Events.getForPeriod({
+        cals: this.params.cals,
         period: fetchPeriod
-      };
+      }).match({
+        none: () => ({
+          events: [],
+          busy: false,
+          error: false,
+          period: fetchPeriod
+        }),
+        some: (d) => ({
+          events: this.filterEvents(d.events, this.params.filterParams),
+          busy: d.isBusy,
+          error: d.hasError,
+          period: fetchPeriod
+        })
+      });
     }
 
     /*
