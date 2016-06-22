@@ -30,6 +30,8 @@ module Esper.TestFixtures {
   export var team2Labels = ["Label A", "Label B", "Label C"];
   export var team2Calendars = ["stewie@esper.com", "rupert@esper.com"];
 
+  export var groupId = "group-id";
+
   // Stub normalization function for tests
   function normalizeLabel(label: string) {
     return label.trim().toLowerCase();
@@ -141,6 +143,7 @@ module Esper.TestFixtures {
           team_timestats_calendars: team2Calendars
         }
       ],
+      groups: [groupId],
       team_members: [
         {
           member_email: "peter@esper.com",
