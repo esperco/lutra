@@ -111,4 +111,35 @@ module Esper.Period {
   export function isCustomInterval(x: IntervalOrCustom): x is CustomInterval {
     return x === "custom";
   }
+
+  /*
+    Given a period, returns a list of periods incremented from that period.
+    -- i.e. if showing Febrary 2016. Then incrs of -1,1 will return periods
+    for January and March 2016.
+  */
+  export function withIncrs(p: Single, incrs: number[]): Single[];
+  export function withIncrs(p: Custom, incrs: number[]): Custom[];
+  export function withIncrs(p: Single|Custom, incrs: number[])
+    : Array<Single|Custom>;
+  export function withIncrs(p: Single|Custom, incrs: number[])
+    : Array<Single|Custom>
+  {
+    incrs = _.sortBy(incrs);
+    return _.map(incrs, (i) => incr(p, i));
+  }
+
+  export function incr(p: Single, i: number): Single;
+  export function incr(p: Custom, i: number): Custom;
+  export function incr(p: Single|Custom, i: number): Single|Custom;
+  export function incr(p: Single|Custom, i: number): Single|Custom {
+    var pCopy = _.cloneDeep(p);
+    if (isCustom(pCopy)) {
+      var duration = (pCopy.end - pCopy.start) + 1;
+      pCopy.start += duration * i;
+      pCopy.end += duration * i;
+    } else {
+      pCopy.index += i;
+    }
+    return pCopy;
+  }
 }

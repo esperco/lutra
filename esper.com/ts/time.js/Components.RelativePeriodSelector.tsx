@@ -4,30 +4,20 @@
 
 module Esper.Components {
   interface Props {
-    period: Period.Single;
+    period: Period.Single|Period.Custom;
     selectedIncrs: number[];
     allowedIncrs: number[];
     updateFn: (x: number[]) => void;
   }
 
   export function RelativePeriodSelector(props: Props) {
-    var groups = [{
-      id: "",
-      choices: _.map(props.allowedIncrs, (i) => ({
-        id: i.toString(),
-        displayAs: Text.fmtRelPeriod(props.period.interval, i) + " (" +
-          Text.fmtPeriod({
-            interval: props.period.interval,
-            index: props.period.index + i
-          }, true) + ")"
-      }))
-    }];
-    var selected = _.map(props.selectedIncrs, (i) => ({
-      groupId: "",
-      id: i.toString()
+    var choices = _.map(props.allowedIncrs, (i) => ({
+      id: i.toString(),
+      displayAs: relPeriodText(props.period, i)
     }));
+    var selected = _.map(props.selectedIncrs, (i) => i.toString());
 
-    return <ListSelector groups={groups} selectedIds={selected}
+    return <ListSelectorSimple choices={choices} selectedIds={selected}
       selectOption={ ListSelectOptions.MULTI_SELECT }
       selectedItemClasses="active"
       listClasses="esper-select-menu"
@@ -35,8 +25,17 @@ module Esper.Components {
       headerClasses="esper-select-header"
       dividerClasses="divider"
       updateFn={(x) => props.updateFn(
-        _(x).map((i) => parseInt(i.id)).filter((n) => !isNaN(n)).value()
+        _(x).map((i) => parseInt(i)).filter((n) => !isNaN(n)).value()
       )}
     />;
+  }
+
+  function relPeriodText(period: Period.Single|Period.Custom, i: number) {
+    var periodText = Text.fmtPeriod(Period.incr(period, i), true);
+    if (Period.isCustom(period)) {
+      return periodText;
+    } else {
+      return `${Text.fmtRelPeriod(period.interval, i)} (${periodText})`;
+    }
   }
 }
