@@ -178,4 +178,12 @@ module Esper.Util {
       none: unmatched
     };
   }
+
+  export function keyObj<T>(key: string, value: T): {
+    [index: string]: T
+  } {
+    var ret: {[index: string]: T} = {};
+    ret[key] = value;
+    return ret;
+  }
 }
