@@ -95,5 +95,31 @@ module Esper.Period {
         expect(relativeIndex({ interval: "quarter", index: 182 })).toEqual(-2);
       });
     });
+
+    describe("withIncrs", function() {
+      it("should return incremented single periods", function() {
+        var val = withIncrs({ interval: "month", index: 10 }, [-1, 0, 1]);
+        expect(val).toEqual([{
+          interval: "month", index: 9
+        }, {
+          interval: "month", index: 10
+        }, {
+          interval: "month", index: 11
+        }]);
+      });
+
+      it("should return incremented custom periods", function() {
+        var val = withIncrs({
+          interval: "custom", start: 100, end: 109
+        }, [-1, 0, 1]);
+        expect(val).toEqual([{
+          interval: "custom", start: 90, end: 99
+        }, {
+          interval: "custom", start: 100, end: 109
+        }, {
+          interval: "custom", start: 110, end: 119
+        }]);
+      });
+    });
   });
 }
