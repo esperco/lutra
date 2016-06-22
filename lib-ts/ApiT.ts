@@ -249,6 +249,10 @@ module Esper.ApiT {
     notes: string;
   }
 
+  export interface GroupPreferencesList {
+    prefs_list: GroupPreferences[];
+  }
+
   export interface GroupPreferences {
     groupid: string;
     uid: string;

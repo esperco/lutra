@@ -296,6 +296,13 @@ module Esper.Api {
     return JsonHttp.put(url, JSON.stringify(labels));
   }
 
+  export function getAllGroupPrefs():
+    JQueryPromise<ApiT.GroupPreferencesList>
+  {
+    var url = `${prefix}/api/group/preferences-all/${Login.me()}`;
+    return JsonHttp.get(url);
+  }
+
   export function getGroupPreferences(groupid: string):
     JQueryPromise<ApiT.GroupPreferences>
   {
