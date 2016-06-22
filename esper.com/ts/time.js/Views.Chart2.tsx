@@ -44,7 +44,22 @@ module Esper.Views {
               allowMulti={true}
             />
           </div>
+
+          <div className="esper-panel-section">
+            <div className="esper-subheader">
+              <i className="fa fa-fw fa-clock-o" />{" "}
+              Compare With
+            </div>
+            <Components.RelativePeriodSelector
+              period={this.props.period}
+              allowedIncrs={[-1, 1]}
+              selectedIncrs={this.props.extra.incrs}
+              updateFn={(x) => this.updateIncrs(x)}
+            />
+          </div>
+
           { this.props.selectors }
+
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
           { this.renderPeriodSelector() }
@@ -74,6 +89,25 @@ module Esper.Views {
     updatePeriod(period: Period.Single|Period.Custom) {
       this.updateRoute({
         period: period
+      });
+    }
+
+    updateIncrs(incrs: number[]) {
+      if (! _.includes(incrs, 0)) {
+        incrs.push(0);
+      }
+      this.updateExtra({ incrs: incrs });
+    }
+
+    updateExtra(extra: {
+      type?: "percent"|"absolute";
+      incrs?: number[]
+    }) {
+      this.updateRoute({
+        extra: {
+          type: extra.type || this.props.extra.type,
+          incrs: extra.incrs || this.props.extra.incrs
+        }
       });
     }
 
