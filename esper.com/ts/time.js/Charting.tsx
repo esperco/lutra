@@ -47,7 +47,7 @@ module Esper.Charting {
 
   interface EventSeriesOpts {
     displayName?: (key: string) => string; // Map key to value
-    noneNone?: () => string;               // If null, will not display none
+    noneFn?: () => string;                 // If null, will not display none
     sortFn?: (keys: string[]) => string[]  // Sort keys
     colorFn?: (key: string) => string;     // Color of key
     yFn?: (v: number) => number;           // Display version of values

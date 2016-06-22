@@ -95,7 +95,7 @@ module Esper.Text {
   export const ConfirmationDone = `Thanks! That's all for now.`;
 
   // Chart Types
-  export const ChartPercentage = `Percentage`;
+  export const ChartPercentage = `Percent`;
   export const ChartAbsolute = `Absolute time`;
 
   // Chart messages
@@ -105,6 +105,9 @@ module Esper.Text {
     `Try refreshing in a few minutes.`;
   export const ChartCalculating = `Crunching numbers`;
 
+  // Chart groupings
+  export const ChartDuration = `Duration`;
+
 
   /////
 
@@ -112,7 +115,8 @@ module Esper.Text {
     return n != 1 ? 's' : '';
   }
 
-  export function hours(n: number) {
+  export function hours(n?: number) {
+    if (_.isUndefined(n)) { return 'hours'; }
     return `${Util.roundStr(n, 2)} hour${s(n)}`;
   }
 
