@@ -124,17 +124,30 @@ module Esper.Stores.Groups {
   /* Init helpers */
 
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    Api.getGroupsByUid(loginResponse.uid, { withMembers: true, withLabels: true})
-      .done(function(gl) {
-        if (gl.items) {
-          var data = _.map(gl.items, (g) => ({
-            itemKey: g.groupid,
-            data: Option.wrap(g)
-          }));
+    // Initialize the data store with stub data
+    var data = _.map(loginResponse.groups, (groupid) => {
+      var groupStub = {
+        groupid,
+        group_name: "Loading..."
+      };
+      return {
+        itemKey: groupid,
+        data: Option.some(groupStub)
+      };
+    });
+    GroupListStore.batchSet(batchKey, Option.some(data));
 
-          GroupListStore.batchSet(batchKey, Option.wrap(data));
-        }
-      });
+    // ...then fill it up with actual data when network fetch completes
+    var p = _.map(loginResponse.groups, (groupid) =>
+      Api.getGroupDetails(groupid, { withMembers: true, withLabels: true }));
+    $.when.apply($, p).then((...responses: Array<any>) => {
+      var groups = _.map(responses, (r) => r[0]);
+      var values = _.map(groups, (g) => ({
+        itemKey: g.groupid,
+        data: Option.wrap(g)
+      }));
+      GroupListStore.batchSet(batchKey, Option.some(values));
+    });
   }
 
   export function init() {
