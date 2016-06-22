@@ -47,7 +47,7 @@ module Esper.Charting {
 
   interface EventSeriesOpts {
     displayName?: (key: string) => string; // Map key to value
-    noneFn?: () => string;                 // If null, will not display none
+    noneName?: string;                     // If null, will not display none
     sortFn?: (keys: string[]) => string[]  // Sort keys
     colorFn?: (key: string) => string;     // Color of key
     yFn?: (v: number) => number;           // Display version of values
@@ -64,15 +64,28 @@ module Esper.Charting {
 
     /*
       Get all keys across all groups -- needed to properly chart where key
-      might be present in one group but not another
+      might be present in one group but not another. Also calculate totals.
     */
-    var keys: string[] = [];
-    _.each(groups,
-      (g) => keys = keys.concat(_.keys(g.some))
-    );
-    keys = _.uniq(keys);
+    var currentTotals: {[index: string]: number} = {};
+    var aggregateTotals: {[index: string]: number} = {};
+    _.each(groups, (g) => _.each(g.some, (v, k) => {
+      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
+      if (g.current) {
+        currentTotals[k] = (currentTotals[k] || 0) + v.total;
+      }
+    }));
+    var keys = _.keys(aggregateTotals);
+
+    /*
+      By default, sort by totals descending of current periodGroup, then
+      aggregate total. Or use override if provided.
+    */
     if (opts.sortFn) {
       keys = opts.sortFn(keys);
+    } else {
+      keys = _.sortBy(keys,
+        (k) => [-currentTotals[k] || 0, -aggregateTotals[k] || 0]
+      );
     }
 
     // Hash indices for quick loopup
@@ -102,6 +115,25 @@ module Esper.Charting {
           }))
         });
       })
+
+      // Handle none
+      if (opts.noneName) {
+        series.push({
+          name: opts.noneName,
+          cursor: "pointer",
+          color: Colors.lightGray,
+          stack: Period.asNumber(g.period),
+          index: Period.asNumber(g.period),
+          data: _.map(g.none.annotations, (a) => ({
+            name: Text.eventTitleForChart(a.event),
+            x: keys.length, // None @ end
+            y: opts.yFn ? opts.yFn(a.value) : a.value,
+            events: {
+              click: () => onEventClick(a.event)
+            }
+          }))
+        });
+      }
     });
 
     return series;
@@ -118,22 +150,32 @@ module Esper.Charting {
 
     /*
       Get all keys across all groups -- needed to properly chart where key
-      might be present in one group but not another
+      might be present in one group but not another. Also calculate totals.
     */
-    var keys: string[] = [];
-    _.each(groups,
-      (g) => keys = keys.concat(_.keys(g.some))
-    );
-    keys = _.uniq(keys);
+    var currentTotals: {[index: string]: number} = {};
+    var aggregateTotals: {[index: string]: number} = {};
+    _.each(groups, (g) => _.each(g.some, (v, k) => {
+      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
+      if (g.current) {
+        currentTotals[k] = (currentTotals[k] || 0) + v.total;
+      }
+    }));
+    var keys = _.keys(aggregateTotals);
+
+    /*
+      By default, sort by totals descending of current periodGroup, then
+      aggregate total. Or use override if provided.
+    */
     if (opts.sortFn) {
       keys = opts.sortFn(keys);
+    } else {
+      keys = _.sortBy(keys,
+        (k) => [-currentTotals[k] || 0, -aggregateTotals[k] || 0]
+      );
     }
 
-    var ret = _.map(groups, (g, periodIndex) => ({
-      name: Text.fmtPeriod(g.period),
-      cursor: "pointer",
-      index: Period.asNumber(g.period),
-      data: _.map(keys, (key, index) => ({
+    var ret = _.map(groups, (g, periodIndex) => {
+      let data = _.map(keys, (key, index) => ({
         name: Util.escapeHtml((opts.displayName || _.identity)(key)),
         color: opts.colorFn ? opts.colorFn(key) : Colors.presets[index],
         count: g.some[key] ? g.some[key].annotations.length : 0,
@@ -145,8 +187,31 @@ module Esper.Charting {
             g.some[key] ? _.map(g.some[key].annotations, (a) => a.event) : []
           )
         }
-      }))
-    }));
+      }));
+
+      // Handle none
+      if (opts.noneName) {
+        data.push({
+          name: opts.noneName,
+          color: Colors.lightGray,
+          count: g.none.annotations.length,
+          x: periodIndex,
+          y: (opts.yFn || _.identity)(g.none.total),
+          events: {
+            click: () => onSeriesClick(
+              _.map(g.none.annotations, (a) => a.event)
+            )
+          }
+        });
+      }
+
+      return {
+        name: Text.fmtPeriod(g.period),
+        cursor: "pointer",
+        index: Period.asNumber(g.period),
+        data: data
+      };
+    });
 
     return ret;
   }
