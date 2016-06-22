@@ -94,6 +94,10 @@ module Esper.Text {
   export const ConfirmAllLabels = `Confirm All`;
   export const ConfirmationDone = `Thanks! That's all for now.`;
 
+  // Chart Types
+  export const ChartPercentage = `Percentage`;
+  export const ChartAbsolute = `Absolute time`;
+
   // Chart messages
   export const ChartNoData = `No events found`;
   export const ChartFetching = `Fetching data from your calendar`;
