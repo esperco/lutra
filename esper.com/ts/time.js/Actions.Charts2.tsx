@@ -3,7 +3,6 @@
 */
 
 module Esper.Actions.Charts2 {
-
   // Base options needed to fetch and get events
   export interface BaseOpts<T extends ExtraOpts> {
     teamId: string;
@@ -61,7 +60,7 @@ module Esper.Actions.Charts2 {
   /*
     Clean up different query params that could be passed
   */
-  function cleanExtra(e: any): ExtraOpts {
+  export function cleanExtra(e: any): ExtraOpts {
     e = e || {};
     var typedQ: ExtraOpts = e;
     typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
@@ -74,17 +73,31 @@ module Esper.Actions.Charts2 {
   export function renderDurations(o: DefaultBaseOpts) {
     o.extra = cleanExtra(o.extra);
     fetchEvents(o);
+
     render(ReactHelpers.contain(function() {
       var data = getEventData(o);
-      console.info(data);
+      var calcData = _.map(data, (d, i) => {
+        let calc = new EventStats.DurationBucketCalc();
+        calc.start(d.events);
+
+        return {
+          period: d.period,
+          current: _.isEqual(d.period, o.period),
+          fetching: d.isBusy,
+          error: d.hasError,
+          events: d.events,
+          calculation: calc
+        };
+      });
+
+      var chart = <Components.DurationChart data={calcData} />;
       return <Views.Charts2
         teamId={o.teamId}
         calIds={o.calIds}
         period={o.period}
         extra={o.extra}
         pathFn={Paths.Time.durationChart}
-        chart={<span />}
-        selectors={<span />}
+        chart={chart}
       />
     }));
   }
