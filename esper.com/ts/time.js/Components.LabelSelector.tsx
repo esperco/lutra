@@ -2,12 +2,11 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
+/// <reference path="./Components.CalcUI.tsx" />
+
 module Esper.Components {
-  interface LabelSelectorProps {
-    labels: Array<Labels.LabelCount>;
-    totalCount?: number;
-    unlabeledCount?: number;
-    unconfirmedCount?: number;
+  interface LabelSelectorBaseProps {
+    className?: string;
     selected: string[];
     allSelected?: boolean;
     unlabeledSelected?: boolean;
@@ -19,7 +18,19 @@ module Esper.Components {
       labels: string[];
     }) => void;
     onUnconfirmedClick?: () => void;
-    className?: string;
+  }
+
+  interface LabelCalcSelectorProps extends LabelSelectorBaseProps {
+    teams: ApiT.Team[];
+    events: Stores.Events.TeamEvent[];
+    calculation: EventStats.LabelCountCalc;
+  }
+
+  interface LabelSelectorProps extends LabelSelectorBaseProps {
+    labels: Array<Labels.LabelCount>;
+    totalCount?: number;
+    unlabeledCount?: number;
+    unconfirmedCount?: number;
   }
 
   export function LabelSelector(props: LabelSelectorProps) {
@@ -207,5 +218,58 @@ module Esper.Components {
         }
       </DropdownModal>
     </div>;
+  }
+
+
+  /////
+
+
+  export class LabelCalcSelector
+         extends CalcUI<EventStats.CalcCount, LabelCalcSelectorProps>
+  {
+    render() {
+      return this.state.result.match({
+        none: () => <span />,
+        some: (result) => {
+          // Labels from events
+          var labels: Labels.LabelCount[] = _.map(result.some, (v, k) => ({
+            id: k,
+            displayAs: Labels.getDisplayAs(k),
+            count: v.total
+          }));
+
+          // Get team labels too
+          _.each(this.props.teams, (team) => {
+            _.each(team.team_labels_norm, (norm, i) => {
+              labels.push({
+                id: norm,
+                displayAs: team.team_labels[i],
+                count: 0
+              })
+            })
+          })
+          labels = _.uniqBy(labels, (l) => l.id)
+
+          // Get total event count
+
+          return <LabelSelector
+            className={this.props.className}
+            labels={labels}
+            selected={this.props.selected}
+            allSelected={this.props.allSelected}
+            unlabeledSelected={this.props.unlabeledSelected}
+            unconfirmedSelected={this.props.unconfirmedSelected}
+
+            showUnlabeled={this.props.showUnlabeled}
+            totalCount={result.totalCount}
+            unlabeledCount={result.none.total}
+            unconfirmedCount={result.unconfirmedCount}
+
+            updateFn={this.props.updateFn}
+            onUnconfirmedClick={this.props.onUnconfirmedClick}
+          />;
+        }
+      })
+    }
   }
 }

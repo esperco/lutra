@@ -353,7 +353,82 @@ module Esper.EventStats {
     }
   }
 
-  // Group events by label duration
+
+  // Count unique events by label type
+  export interface CalcCount extends OptGrouping {
+    unconfirmed: Stores.Events.TeamEvent[];
+    unconfirmedCount: number;
+    totalCount: number;
+  }
+
+  // Count unique events by label
+  export class LabelCountCalc extends CalcBase<CalcCount> {
+    // Which events have we looked at so far?
+    _eventMap: { [index: string]: boolean };
+
+    init(events: Stores.Events.TeamEvent[]) {
+      super.init(events);
+      this._eventMap = {};
+    }
+
+    // Filter out already processed events
+    filterEvent(event: Stores.Events.TeamEvent) {
+      return super.filterEvent(event) && (() => {
+        let key = Stores.Events.strId(event);
+        if (this._eventMap[key]) {
+          return false;
+        }
+        this._eventMap[key] = true;
+        return true;
+      })()
+    }
+
+    processBatch(events: Stores.Events.TeamEvent[], results?: CalcCount) {
+      results = results || {
+        some: {},
+        none: {
+          annotations: [],
+          total: 0
+        },
+        unconfirmed: [],
+        unconfirmedCount: 0,
+        totalCount: 0
+      };
+
+      _.each(events, (e) => {
+        var labelIds = _.map(Option.matchList(e.labelScores), (s) => s.id);
+        var annotations = labelIds.length ?
+          // Create annotation for each label
+          _.map(labelIds, (labelId) => ({
+            event: e,
+            value: 1,
+            groups: [labelId]
+          })) :
+
+          // Empty label => no labels
+          [{
+            event: e,
+            value: 1,
+            groups: []
+          }];
+
+        var r2 = groupAnnotations(annotations, results);
+        results.some = r2.some;
+        results.none = r2.none;
+
+        if (Stores.Events.needsConfirmation(e)) {
+          results.unconfirmed.push(e);
+          results.unconfirmedCount += 1;
+        }
+
+        results.totalCount += 1;
+      });
+
+      return results;
+    }
+  }
+
+  // Count event durations by selected labels
   export class LabelDurationCalc extends DurationCalc<OptGrouping> {
     selections: Params.ListSelectJSON;
 
@@ -391,4 +466,6 @@ module Esper.EventStats {
       return groupAnnotations(annotations, results);
     }
   }
+
+
 }

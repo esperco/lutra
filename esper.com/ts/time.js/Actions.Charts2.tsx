@@ -70,6 +70,9 @@ module Esper.Actions.Charts2 {
     return typedQ;
   }
 
+
+  /* Duration Charts */
+
   export function renderDurations(o: DefaultBaseOpts) {
     o.extra = cleanExtra(o.extra);
     fetchEvents(o);
@@ -105,6 +108,9 @@ module Esper.Actions.Charts2 {
     }));
   }
 
+
+  /* Label charts */
+
   export function renderLabels(o: BaseOpts<LabelChartOpts>) {
     o.extra = cleanExtra(o.extra) as LabelChartOpts;
     o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
@@ -130,6 +136,33 @@ module Esper.Actions.Charts2 {
         <Components.LabelPercentChart data={calcData} /> :
         <Components.LabelHoursChart data={calcData} />;
 
+      var selectorCalc = new EventStats.LabelCountCalc();
+      var allEvents = _.flatten( _.map(data, (d) => d.events) );
+      selectorCalc.start(allEvents);
+      var selector = <div className="esper-panel-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-tags" />{" "}
+          { Text.Labels }
+        </div>
+        <Components.LabelCalcSelector
+          events={allEvents}
+          teams={[Stores.Teams.require(o.teamId)]}
+          calculation={selectorCalc}
+          showUnlabeled={o.extra.type === "percent"}
+
+          selected={o.extra.labels.some}
+          allSelected={o.extra.labels.all}
+          unlabeledSelected={o.extra.labels.none}
+
+          updateFn={updateLabels}
+          onUnconfirmedClick={() => selectorCalc.getResults().match({
+            none: () => null,
+            some: (r) => r.unconfirmed.length &&
+                         launchConfirmModal(r.unconfirmed)
+          })}
+        />
+      </div>;
+
       return <Views.Charts2
         teamId={o.teamId}
         calIds={o.calIds}
@@ -137,7 +170,30 @@ module Esper.Actions.Charts2 {
         extra={o.extra}
         pathFn={Paths.Time.labelsChart}
         chart={chart}
+        selectors={selector}
       />
     }));
+
+    function updateLabels({all, unlabeled, labels}: {
+      all: boolean;
+      unlabeled: boolean;
+      labels: string[];
+    }) {
+      Route.nav.query({
+        labels: {
+          all: all,
+          none: unlabeled,
+          some: labels
+        }
+      });
+    }
+
+    var autoLaunchConfirm = true;
+    function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
+      autoLaunchConfirm = false;
+      Layout.renderModal(
+        Containers.confirmListModal(events)
+      );
+    }
   }
 }

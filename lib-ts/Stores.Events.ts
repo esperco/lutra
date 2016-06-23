@@ -450,6 +450,10 @@ module Esper.Stores.Events {
     }
   }
 
+  export function strId(event: TeamEvent): string {
+    return [event.teamId, event.calendarId, event.id].join("|");
+  }
+
   export function matchId(event: TeamEvent, storeId: FullEventId) {
     return event && storeId &&
       event.id === storeId.eventId &&
