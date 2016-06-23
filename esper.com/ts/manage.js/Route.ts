@@ -79,6 +79,13 @@ module Esper.Route {
       Actions.renderGroupLabelSettings(ctx.params["groupId"], msg, err);
   });
 
+  route(Paths.Manage.Group.notifications({groupId: ":groupId?"}).hash, groupCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderGroupNotificationSettings(ctx.params["groupId"], msg, err);
+  });
+
   routeNotFound(function(ctx) {
     Actions.render(React.createElement(Views.NotFound, {}));
   });

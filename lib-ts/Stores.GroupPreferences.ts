@@ -43,11 +43,26 @@ module Esper.Stores.GroupPreferences {
 
   ///////////
 
+  export function makeNewPreferences(groupid: string): ApiT.GroupPreferences {
+    var prefs = {
+      groupid,
+      uid: Login.me(),
+      label_reminder: false,
+      bad_duration: 20,
+      bad_attendees: 4
+    };
+
+    PrefsStore.set(groupid, Option.some(prefs));
+    return prefs;
+  }
+
   /*
     Populate certain null preferences with defaults so we don't have to deal
     with null/undefined values elsewhere
   */
-  export function withDefaults(prefs: ApiT.GroupPreferences): ApiT.GroupPreferences {
+  export function withDefaults(prefs: ApiT.GroupPreferences):
+    ApiT.GroupPreferences
+  {
     if (Object.isFrozen(prefs)) {
       prefs = _.cloneDeep(prefs);
     }
