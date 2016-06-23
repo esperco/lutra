@@ -39,10 +39,14 @@ module Esper.Charting {
     }[]
   }
 
-  export interface PeriodGroup extends EventStats.OptGrouping {
+  // Data tied to a particular point in time
+  export interface PeriodData<T> {
     period: Period.Single|Period.Custom;
     current: boolean; // Is this the "current" or active group?
+    data: T;
   }
+
+  export type PeriodGroup = PeriodData<EventStats.OptGrouping>;
 
 
   interface EventSeriesOpts {
@@ -68,7 +72,7 @@ module Esper.Charting {
     */
     var currentTotals: {[index: string]: number} = {};
     var aggregateTotals: {[index: string]: number} = {};
-    _.each(groups, (g) => _.each(g.some, (v, k) => {
+    _.each(groups, (g) => _.each(g.data.some, (v, k) => {
       aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
       if (g.current) {
         currentTotals[k] = (currentTotals[k] || 0) + v.total;
@@ -84,7 +88,8 @@ module Esper.Charting {
       keys = opts.sortFn(keys);
     } else {
       keys = _.sortBy(keys,
-        (k) => [-currentTotals[k] || 0, -aggregateTotals[k] || 0]
+        (k) => -currentTotals[k] || 0,
+        (k) => -aggregateTotals[k] || 0
       );
     }
 
@@ -95,7 +100,7 @@ module Esper.Charting {
     // Generate actual series
     var series: EventSeries[] = []
     _.each(groups, (g) => {
-      _.each(g.some, (value, key) => {
+      _.each(g.data.some, (value, key) => {
         var index = keyMap[key];
         series.push({
           name: Util.escapeHtml((opts.displayName || _.identity)(key)),
@@ -124,7 +129,7 @@ module Esper.Charting {
           color: Colors.lightGray,
           stack: Period.asNumber(g.period),
           index: Period.asNumber(g.period),
-          data: _.map(g.none.annotations, (a) => ({
+          data: _.map(g.data.none.annotations, (a) => ({
             name: Text.eventTitleForChart(a.event),
             x: keys.length, // None @ end
             y: opts.yFn ? opts.yFn(a.value) : a.value,
@@ -154,7 +159,7 @@ module Esper.Charting {
     */
     var currentTotals: {[index: string]: number} = {};
     var aggregateTotals: {[index: string]: number} = {};
-    _.each(groups, (g) => _.each(g.some, (v, k) => {
+    _.each(groups, (g) => _.each(g.data.some, (v, k) => {
       aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
       if (g.current) {
         currentTotals[k] = (currentTotals[k] || 0) + v.total;
@@ -170,7 +175,8 @@ module Esper.Charting {
       keys = opts.sortFn(keys);
     } else {
       keys = _.sortBy(keys,
-        (k) => [-currentTotals[k] || 0, -aggregateTotals[k] || 0]
+        (k) => -currentTotals[k] || 0,
+        (k) => -aggregateTotals[k] || 0
       );
     }
 
@@ -178,13 +184,15 @@ module Esper.Charting {
       let data = _.map(keys, (key, index) => ({
         name: Util.escapeHtml((opts.displayName || _.identity)(key)),
         color: opts.colorFn ? opts.colorFn(key) : Colors.presets[index],
-        count: g.some[key] ? g.some[key].annotations.length : 0,
+        count: g.data.some[key] ? g.data.some[key].annotations.length : 0,
         x: periodIndex,
         y: (opts.yFn || _.identity)(
-          g.some[key] ? g.some[key].total : 0),
+          g.data.some[key] ? g.data.some[key].total : 0),
         events: {
           click: () => onSeriesClick(
-            g.some[key] ? _.map(g.some[key].annotations, (a) => a.event) : []
+            g.data.some[key] ? _.map(g.data.some[key].annotations,
+              (a) => a.event
+            ) : []
           )
         }
       }));
@@ -194,12 +202,12 @@ module Esper.Charting {
         data.push({
           name: opts.noneName,
           color: Colors.lightGray,
-          count: g.none.annotations.length,
+          count: g.data.none.annotations.length,
           x: periodIndex,
-          y: (opts.yFn || _.identity)(g.none.total),
+          y: (opts.yFn || _.identity)(g.data.none.total),
           events: {
             click: () => onSeriesClick(
-              _.map(g.none.annotations, (a) => a.event)
+              _.map(g.data.none.annotations, (a) => a.event)
             )
           }
         });

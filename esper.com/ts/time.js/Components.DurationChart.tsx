@@ -5,9 +5,7 @@
 /// <reference path="./Components.Chart.tsx" />
 module Esper.Components {
 
-  type Calc = EventStats.DurationBucketCalc;
-
-  export class DurationHoursChart extends Chart<Calc> {
+  export class DurationHoursChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
       var series = Charting.eventSeries(groups, {
 
@@ -27,7 +25,7 @@ module Esper.Components {
   }
 
 
-  export class DurationPercentChart extends Chart<Calc> {
+  export class DurationPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
       var series = Charting.eventGroupSeries(groups, {
         // Ignore actual keys here and just use the default bucket list

@@ -176,29 +176,24 @@ module Esper.EventStats {
     Asynchronous, non-blocking annotation and grouping of a series of events,
     with emission of change event at end of calculation.
   */
-  export abstract class CalculationBase extends Emit.EmitBase {
+  export abstract class CalcBase<T> extends Emit.EmitBase {
     // Are we there yet?
     ready = false;
     running = false;
 
     // Intermediate state for use with progressive calculation
-    eventQueue: Stores.Events.TeamEvent[] = [];
-    annotationsQueue: Annotation[] = [];
-    grouping: OptGrouping = {
-      some: {},
-      none: {
-        annotations: [],
-        total: 0
-      }
-    };
+    _eventQueue: Stores.Events.TeamEvent[] = [];
+    _results: T;
+
     MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
 
     // Returns some grouping if done, none if not complete
-    getResults(): Option.T<OptGrouping> {
+    getResults(): Option.T<T> {
       return this.ready ?
-        Option.wrap(this.grouping) :
-        Option.none<OptGrouping>();
+        Option.wrap(this._results) :
+        Option.none<T>();
     }
+
 
     // Start calulations based on passed events
     start(events: Stores.Events.TeamEvent[]) {
@@ -212,35 +207,31 @@ module Esper.EventStats {
 
     // Pre-populate vars used in processing loop
     init(events: Stores.Events.TeamEvent[]) {
-      this.eventQueue = _.clone(events);
+      this._eventQueue = _.clone(events);
+      this._results = null;
       this.ready = false;
       this.running = true;
-      this.annotationsQueue = [];
-      this.grouping = {
-        some: {},
-        none: {
-          annotations: [],
-          total: 0
-        }
-      }
     }
 
     /*
-      Recursive "loop" that calls annotateSome and groupSome until we're done.
-      Auto-bind so we can easily reference function by name and avoid recursion
-      limits
+      Recursive "loop" that calls processBatch until we're done. Auto-bind so
+      we can easily reference function by name and avoid recursion limits
     */
     runLoop = () => {
       if (! this.running) return;
 
-      if (! _.isEmpty(this.eventQueue)) {
-        this.annotateSome();
-        this.next();
-        return;
-      }
+      if (! _.isEmpty(this._eventQueue)) {
+        var events = this.getBatch();
 
-      if (! _.isEmpty(this.annotationsQueue)) {
-        this.groupSome();
+        // Record init length in case filtering or processing changes this
+        var initLength = events.length;
+
+        events = _.filter(events, (e) => this.filterEvent(e));
+        this._results = this.processBatch(events, this._results);
+
+        // Remove processed items from queue
+        this._eventQueue = this._eventQueue.slice(initLength);
+
         this.next();
         return;
       }
@@ -255,49 +246,22 @@ module Esper.EventStats {
       window.requestAnimationFrame(this.runLoop);
     }
 
-    // Annotate some events from queue
-    abstract annotateSome(): void;
-
-    groupSome() {
-      // Get events to process
-      var annotations = this.annotationsQueue.slice(0,
-        this.MAX_PROCESS_EVENTS);
-
-      // Do some grouping
-      groupAnnotations(annotations, this.grouping);
-
-      // Removed processed items from queue
-      this.annotationsQueue = this.annotationsQueue.slice(
-        this.MAX_PROCESS_EVENTS);
-    }
-  }
-
-
-  /*
-    Standard calculation => just process fixed number of events
-  */
-  export abstract class Calculation extends CalculationBase {
-    // Annotate some events from queue
-    annotateSome() {
-      // Get events to process
-      var events = this.eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
-
-      // Actual annotations
-      _.each(events, (e) => {
-        let annotation = this.annotate(e);
-        if (_.isArray(annotation)) {
-          this.annotationsQueue = this.annotationsQueue.concat(annotation);
-        } else {
-          this.annotationsQueue.push(annotation);
-        }
-      });
-
-      // Remove processed items from queue
-      this.eventQueue = this.eventQueue.slice(events.length);
+    // Returns some events from the head of the queue
+    getBatch() {
+      return this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
     }
 
-    // Replace with per-chart annotations
-    abstract annotate(event: Stores.Events.TeamEvent): Annotation|Annotation[];
+    // Override as appropriate -- return false for events to ignore
+    filterEvent(event: Stores.Events.TeamEvent) {
+      return Stores.Events.isActive(event);
+    }
+
+    /*
+      Handle events from queue -- takes events plus current intermediate
+      result state
+    */
+    abstract processBatch(events: Stores.Events.TeamEvent[],
+                          results?: T): T;
   }
 
 
@@ -310,20 +274,20 @@ module Esper.EventStats {
     MAX_PROCESS_EVENTS in this case is treated as a suggestion, rather than
     a hard rule.
   */
-  export abstract class DurationCalculation extends CalculationBase {
-    getSomeEvents() {
-      var events = this.eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
+  export abstract class DurationCalc<T> extends CalcBase<T> {
+    getBatch() {
+      var events = this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
       let ends = _.map(events, (e) => e.end.getTime());
       let max = _.max(ends);
 
       var i = this.MAX_PROCESS_EVENTS;
-      var next = this.eventQueue[i];
+      var next = this._eventQueue[i];
       while (!!next) {
         if (next.start.getTime() < max) {
           events.push(next);
           max = Math.max(max, next.end.getTime());
           i += 1;
-          next = this.eventQueue[i];
+          next = this._eventQueue[i];
         }
         else {
           break;
@@ -333,39 +297,25 @@ module Esper.EventStats {
       return events;
     }
 
-    // Annotate some events from queue, returns true if it did work, false
-    // if queue was empty
-    annotateSome() {
-      // Get events to process
-      var events = this.getSomeEvents();
-
-      // Get durations
+    processBatch(events: Stores.Events.TeamEvent[], results?: T) {
       var durations = durationWrappers(events);
-
-      // Actual annotations
-      _.each(durations, (d) => {
-        let annotation = this.annotate(d.event, d.duration);
-        if (_.isArray(annotation)) {
-          this.annotationsQueue = this.annotationsQueue.concat(annotation);
-        } else {
-          this.annotationsQueue.push(annotation);
-        }
-      });
-
-      // Remove processed items from queue
-      this.eventQueue = this.eventQueue.slice(events.length);
+      _.each(durations,
+        (d) => results = this.processOne(d.event, d.duration, results)
+      );
+      return results;
     }
 
-    // Replace with per-chart annotations
-    abstract annotate(event: Stores.Events.TeamEvent, duration: number)
-      : Annotation|Annotation[];
+    abstract processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results?: T): T;
   }
 
 
   /* Misc calculation classes we're using for charts */
 
   /* Group events by how long they are */
-  export class DurationBucketCalc extends DurationCalculation {
+  export class DurationBucketCalc extends DurationCalc<OptGrouping> {
     static BUCKETS = [{
       label: "< 30m",
       gte: 0   // Greater than, seconds
@@ -386,16 +336,20 @@ module Esper.EventStats {
       gte: 8 * 60 * 60
     }];
 
-    annotate(event: Stores.Events.TeamEvent, duration: number): Annotation {
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results?: OptGrouping
+    ) {
       var bucket = _.findLast(DurationBucketCalc.BUCKETS,
         (b) => duration >= b.gte
-      )
+      );
 
-      return {
+      return groupAnnotations([{
         event: event,
         value: duration,
         groups: [bucket.label]
-      };
+      }], results);
     }
   }
 }

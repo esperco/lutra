@@ -3,19 +3,19 @@
   done. Renders intermediate states like fetching and calculating.
 */
 module Esper.Components {
-  interface Props<T extends EventStats.CalculationBase> {
+  interface Props<T> {
     // Data is a list because we have calculation for each period
     data: {
       period: Period.Single|Period.Custom;
       current: boolean; // Is this the "active" period or a comparative period?
-      calculation: T;
+      calculation: EventStats.CalcBase<T>;
       events: Stores.Events.TeamEvent[];
       fetching: boolean;
       error: boolean;
     }[];
   }
 
-  export abstract class Chart<T extends EventStats.CalculationBase>
+  export abstract class Chart<T extends EventStats.OptGrouping>
          extends ReactHelpers.Component<Props<T>, {}> {
     componentDidMount() {
       this.setCalcSources();
@@ -51,8 +51,7 @@ module Esper.Components {
         .flatMap((r) => Option.wrap({
           period: d.period,
           current: d.current,
-          none: r.none,
-          some: r.some
+          data: r
         })));
       if (_.find(results, (r) => r.isNone())) {
         return this.renderMsg(<span>
@@ -63,7 +62,7 @@ module Esper.Components {
 
       var data = Option.flatten(results);
       if (_.every(data, (d) =>
-        _.isEmpty(d.none.annotations) && _.isEmpty(d.some)
+        _.isEmpty(d.data.none.annotations) && _.isEmpty(d.data.some)
       )) {
         return this.renderMsg(Text.ChartNoData)
       }
@@ -79,6 +78,11 @@ module Esper.Components {
       </div>;
     }
 
-    abstract renderMain(data: Charting.PeriodGroup[]): JSX.Element;
+    abstract renderMain(data: Charting.PeriodData<T>[]): JSX.Element;
   }
+
+  /*
+    Default chart option for group data and nothing more
+  */
+  export abstract class DefaultChart extends Chart<EventStats.OptGrouping> {}
 }

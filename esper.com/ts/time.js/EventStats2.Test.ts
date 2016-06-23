@@ -17,6 +17,13 @@ module Esper.EventStats {
       teamId, TestFixtures.makeGenericCalendarEvent()
     );
 
+    // Inactive event calculations should ignore
+    var noAttendEvent = Stores.Events.asTeamEvent(
+      teamId, TestFixtures.makeGenericCalendarEvent({
+        feedback: { attended: false }
+      })
+    );
+
     // Helper function
     function makeAnnotation(p: {
       value: number;
@@ -237,23 +244,17 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends Calculation {
+      class TestCalc extends CalcBase<number[]> {
         MAX_PROCESS_EVENTS = 2
 
-        annotate(event: Stores.Events.TeamEvent): Annotation[] {
-          return [
-            makeAnnotation({
-              value: 1,
-              groups: ["a", "b"]
-            }),
-            makeAnnotation({
-              value: 2,
-              groups: ["a", "c"]
-            }),
-          ];
+        processBatch(events: Stores.Events.TeamEvent[], result?: number[])
+        {
+          result = result || [];
+          result.push(this._eventQueue.length);
+          return result;
         }
       }
-      var events = [testEvent, testEvent, testEvent, testEvent, testEvent];
+      var events = [testEvent, testEvent, testEvent, testEvent, noAttendEvent];
 
       /*
         Spy on requestAnimationFrame to step through events
@@ -279,11 +280,12 @@ module Esper.EventStats {
         it("should process only only MAX_PROCESS_EVENTS after first loop",
         function() {
           calc.runLoop();
-          expect(calc.eventQueue.length).toEqual(3);
-          expect(calc.annotationsQueue.length).toEqual(4); // 2 per event = 4
+          expect(calc._eventQueue.length).toEqual(3);
+          expect(calc._results.length).toEqual(2);
 
           // Result should not be done yet
           expect(calc.getResults().isNone()).toBeTruthy();
+          expect(emitSpy).not.toHaveBeenCalled();
         });
 
         it("should call runLoop again after first loop",
@@ -299,31 +301,14 @@ module Esper.EventStats {
           expect(rAFSpy.calls.count()).toEqual(1);
         });
 
-        it("should start grouping after annotations are done", function() {
-          /*
-            First, clear annotations queue. 5 events / 2 events per run means
-            at least 3 runs. Remainder should not have trigger next step yet.
-          */
+        it("should ignore no-attend events by default", function() {
+          var spy = spyOn(calc, "annotate").and.callThrough();
+
           calc.runLoop();
           calc.runLoop();
           calc.runLoop();
 
-          // Result should not be done yet -- but we should have empty events
-          // and full annotations queue
-          expect(calc.getResults().isNone()).toBeTruthy();
-          expect(calc.eventQueue.length).toEqual(0);
-          expect(calc.annotationsQueue.length).toEqual(10); // 2 * 5
-
-          // One RAF call for each loop plus init
-          expect(rAFSpy.calls.count()).toEqual(4);
-
-          // This loop should start grouping
-          calc.runLoop();
-          expect(calc.annotationsQueue.length).toEqual(8); // Two grouped
-
-          // Still not done yet
-          expect(calc.getResults().isNone()).toBeTruthy();
-          expect(emitSpy).not.toHaveBeenCalled();
+          expect(spy.calls.count()).toEqual(4); // Last event is no-attend
         });
       });
 
@@ -346,16 +331,7 @@ module Esper.EventStats {
           result.match({
             none: () => null,
             some: (g) => {
-              expect(_.keys(g.some).length).toEqual(1);
-              expect(_.keys(g.some["a"].subgroups).length).toEqual(2);
-
-              let subB = g.some["a"].subgroups["b"];
-              expect(subB.annotations.length).toEqual(5);
-              expect(subB.total).toEqual(5);
-
-              let subC = g.some["a"].subgroups["c"];
-              expect(subC.annotations.length).toEqual(5);
-              expect(subC.total).toEqual(10);
+              expect(g).toEqual([5, 4, 3, 2]);
             }
           });
         });
@@ -399,17 +375,13 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends DurationCalculation {
+      class TestCalc extends DurationCalc<number[]> {
         MAX_PROCESS_EVENTS = 2
 
-        annotate(event: Stores.Events.TeamEvent,
-                 duration: number): Annotation[] {
-          return [
-            makeAnnotation({
-              value: duration,
-              groups: ["a"]
-            })
-          ];
+        processOne(event: Stores.Events.TeamEvent,
+                   duration: number,
+                   result?: number[]): number[] {
+          return result.concat([duration]);
         }
       }
 
@@ -431,20 +403,28 @@ module Esper.EventStats {
           end:   XDate.toString(new Date(2016, 0, 2, 3)),
         }));
 
-      // Overlows 2
+      // Overlaps 2 but is not active
       var e4 = Stores.Events.asTeamEvent("team-id",
+        TestFixtures.makeGenericCalendarEvent({
+          feedback: { attended: false },
+          start: XDate.toString(new Date(2016, 0, 2, 4)),
+          end:   XDate.toString(new Date(2016, 0, 2, 6)),
+        }));
+
+      // Overlaps 2
+      var e5 = Stores.Events.asTeamEvent("team-id",
         TestFixtures.makeGenericCalendarEvent({
           start: XDate.toString(new Date(2016, 0, 2, 4)),
           end:   XDate.toString(new Date(2016, 0, 2, 6)),
         }));
 
       // Does not overlap 4
-      var e5 = Stores.Events.asTeamEvent("team-id",
+      var e6 = Stores.Events.asTeamEvent("team-id",
         TestFixtures.makeGenericCalendarEvent({
           start: XDate.toString(new Date(2016, 0, 2, 6)),
           end:   XDate.toString(new Date(2016, 0, 2, 7)),
         }));
-      var events = [e1, e2, e3, e4, e5];
+      var events = [e1, e2, e3, e4, e5, e6];
 
       /*
         Spy on requestAnimationFrame to step through events
@@ -463,21 +443,26 @@ module Esper.EventStats {
            "events after first loop",
         function() {
           calc.runLoop();
-          expect(calc.eventQueue.length).toEqual(1);
-          expect(calc.annotationsQueue.length).toEqual(4);
+          expect(calc._eventQueue.length).toEqual(1);
+
+          // NB: Only 4 because we excluded inactive event
+          expect(calc._results.length).toEqual(4);
 
           // Result should not be done yet
           expect(calc.getResults().isNone()).toBeTruthy();
         });
 
         it("should pass durations to annotate function", function() {
-          spyOn(calc, "annotate").and.callThrough();
+          var spy = spyOn(calc, "annotate").and.callThrough();
 
           calc.runLoop();
-          expect(calc.annotate).toHaveBeenCalledWith(e1, 1 * 60 * 60);
-          expect(calc.annotate).toHaveBeenCalledWith(e2, 3 * 60 * 60);
-          expect(calc.annotate).toHaveBeenCalledWith(e3, 0.5 * 60 * 60);
-          expect(calc.annotate).toHaveBeenCalledWith(e4, 1.5 * 60 * 60);
+          expect(spy).toHaveBeenCalledWith(e1, 1 * 60 * 60);
+          expect(spy).toHaveBeenCalledWith(e2, 3 * 60 * 60);
+          expect(spy).toHaveBeenCalledWith(e3, 0.5 * 60 * 60);
+          expect(spy).toHaveBeenCalledWith(e5, 1.5 * 60 * 60);
+
+          // e4 is excluded because of did not attend
+          expect(spy.calls.count()).toEqual(4);
         });
       });
     });
