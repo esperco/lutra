@@ -94,6 +94,17 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.GroupManage);
   }
 
+  export function renderGroupNotificationSettings(groupId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    var groupId = Params.cleanGroupId(groupId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.GroupNotificationSettings groupId={groupId}
+            msg={msg} err={err} />);
+    Analytics.page(Analytics.Page.GroupManage);
+  }
+
   export function renderNewGroup() {
     render(<Views.NewGroup />);
     Analytics.page(Analytics.Page.NewGroup);
