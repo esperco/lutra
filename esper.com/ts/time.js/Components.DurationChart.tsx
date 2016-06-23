@@ -7,18 +7,16 @@ module Esper.Components {
 
   export class DurationHoursChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
+      var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
+        (b) => b.label
+      );
       var series = Charting.eventSeries(groups, {
-
-        // Ignore actual keys here and just use the default bucket list
-        sortFn: () => _.map(EventStats.DurationBucketCalc.BUCKETS,
-          (b) => b.label
-        ),
-
+        sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
       return <AbsoluteChart
-        series={series} orientation="vertical"
+        series={series} categories={keys} orientation="vertical"
         yAxis={`${Text.ChartDuration} (${Text.hours()})`}
       />;
     }
@@ -27,12 +25,11 @@ module Esper.Components {
 
   export class DurationPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
+      var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
+        (b) => b.label
+      );
       var series = Charting.eventGroupSeries(groups, {
-        // Ignore actual keys here and just use the default bucket list
-        sortFn: () => _.map(EventStats.DurationBucketCalc.BUCKETS,
-          (b) => b.label
-        ),
-
+        sortedKeys: keys,
         yFn: EventStats.toHours
       });
 

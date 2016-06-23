@@ -52,7 +52,7 @@ module Esper.Charting {
   interface EventSeriesOpts {
     displayName?: (key: string) => string; // Map key to value
     noneName?: string;                     // If null, will not display none
-    sortFn?: (keys: string[]) => string[]  // Sort keys
+    sortedKeys?: string[];                 // Pre-sorted keys for this chart
     colorFn?: (key: string) => string;     // Color of key
     yFn?: (v: number) => number;           // Display version of values
   }
@@ -65,33 +65,7 @@ module Esper.Charting {
     : EventSeries[]
   {
     var opts = opts || {};
-
-    /*
-      Get all keys across all groups -- needed to properly chart where key
-      might be present in one group but not another. Also calculate totals.
-    */
-    var currentTotals: {[index: string]: number} = {};
-    var aggregateTotals: {[index: string]: number} = {};
-    _.each(groups, (g) => _.each(g.data.some, (v, k) => {
-      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
-      if (g.current) {
-        currentTotals[k] = (currentTotals[k] || 0) + v.total;
-      }
-    }));
-    var keys = _.keys(aggregateTotals);
-
-    /*
-      By default, sort by totals descending of current periodGroup, then
-      aggregate total. Or use override if provided.
-    */
-    if (opts.sortFn) {
-      keys = opts.sortFn(keys);
-    } else {
-      keys = _.sortBy(keys,
-        (k) => -currentTotals[k] || 0,
-        (k) => -aggregateTotals[k] || 0
-      );
-    }
+    var keys = opts.sortedKeys || sortKeys(groups);
 
     // Hash indices for quick loopup
     var keyMap: {[index: string]: number} = {};
@@ -152,33 +126,7 @@ module Esper.Charting {
                                    opts?: EventSeriesOpts): EventGroupSeries[]
   {
     var opts = opts || {};
-
-    /*
-      Get all keys across all groups -- needed to properly chart where key
-      might be present in one group but not another. Also calculate totals.
-    */
-    var currentTotals: {[index: string]: number} = {};
-    var aggregateTotals: {[index: string]: number} = {};
-    _.each(groups, (g) => _.each(g.data.some, (v, k) => {
-      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
-      if (g.current) {
-        currentTotals[k] = (currentTotals[k] || 0) + v.total;
-      }
-    }));
-    var keys = _.keys(aggregateTotals);
-
-    /*
-      By default, sort by totals descending of current periodGroup, then
-      aggregate total. Or use override if provided.
-    */
-    if (opts.sortFn) {
-      keys = opts.sortFn(keys);
-    } else {
-      keys = _.sortBy(keys,
-        (k) => -currentTotals[k] || 0,
-        (k) => -aggregateTotals[k] || 0
-      );
-    }
+    var keys = opts.sortedKeys || sortKeys(groups);
 
     var ret = _.map(groups, (g, periodIndex) => {
       let data = _.map(keys, (key, index) => ({
@@ -222,6 +170,32 @@ module Esper.Charting {
     });
 
     return ret;
+  }
+
+  // Get all keys across multiple groups, then sort
+  export function sortKeys(groups: PeriodGroup[]) {
+    /*
+      Get all keys across all groups -- needed to properly chart where key
+      might be present in one group but not another. Also calculate totals.
+    */
+    var currentTotals: {[index: string]: number} = {};
+    var aggregateTotals: {[index: string]: number} = {};
+    _.each(groups, (g) => _.each(g.data.some, (v, k) => {
+      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
+      if (g.current) {
+        currentTotals[k] = (currentTotals[k] || 0) + v.total;
+      }
+    }));
+    var keys = _.keys(aggregateTotals);
+
+    /*
+      Sort by totals descending of current periodGroup, if any, then
+      aggregate total.
+    */
+    return _.sortBy(keys,
+      (k) => -currentTotals[k] || 0,
+      (k) => -aggregateTotals[k] || 0
+    );
   }
 
 

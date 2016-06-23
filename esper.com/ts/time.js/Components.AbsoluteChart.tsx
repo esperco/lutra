@@ -4,12 +4,12 @@
   on options.
 */
 module Esper.Components {
-  export function AbsoluteChart({series, orientation, yAxis} : {
+  export function AbsoluteChart({series, categories, orientation, yAxis} : {
     series: Charting.EventSeries[],
+    categories: string[];
     orientation?: 'vertical'|'horizontal'
     yAxis?: string;
   }) {
-    series = _.sortBy(series, (s) => s.index);
     orientation = orientation || 'horizontal';
 
     return <Components.Highchart opts={{
@@ -38,7 +38,7 @@ module Esper.Components {
       },
 
       xAxis: {
-        categories: _.map(series, (s) => s.name)
+        categories: categories
       },
 
       yAxis: yAxis ? [{

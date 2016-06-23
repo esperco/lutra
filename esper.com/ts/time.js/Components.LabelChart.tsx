@@ -7,13 +7,18 @@ module Esper.Components {
 
   export class LabelHoursChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
+      var keys = Charting.sortKeys(groups);
       var series = Charting.eventSeries(groups, {
+        colorFn: Colors.getColorForLabel,
         displayName: Labels.getDisplayAs,
+        sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
       return <AbsoluteChart
-        series={series} orientation="horizontal"
+        orientation="horizontal"
+        series={series}
+        categories={keys}
         yAxis={`${Text.ChartLabels} (${Text.hours()})`}
       />;
     }
@@ -21,9 +26,12 @@ module Esper.Components {
 
   export class LabelPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodGroup[]) {
+      var keys = Charting.sortKeys(groups);
       var series = Charting.eventGroupSeries(groups, {
+        colorFn: Colors.getColorForLabel,
         displayName: Labels.getDisplayAs,
         noneName: Text.Unlabeled,
+        sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
