@@ -76,7 +76,7 @@ module Esper.Actions.Charts2 {
 
     render(ReactHelpers.contain(function() {
       var data = getEventData(o);
-      var calcData = _.map(data, (d, i) => {
+      var calcData = _.map(data, (d) => {
         let calc = new EventStats.DurationBucketCalc();
         calc.start(d.events);
 
