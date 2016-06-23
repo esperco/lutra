@@ -93,6 +93,13 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
+    export function labelsChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts) {
+      return optPath(prefix, "charts", "labels",
+                     teamId, calIds, interval, period);
+    }
+
     export function calendarLabeling({teamId, calIds, interval, period}: {
       teamId?: string;
       calIds?: string;

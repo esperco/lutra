@@ -107,6 +107,7 @@ module Esper.Text {
 
   // Chart groupings
   export const ChartDuration = `Duration`;
+  export const ChartLabels = Labels;
 
 
   /////

@@ -104,4 +104,40 @@ module Esper.Actions.Charts2 {
       />
     }));
   }
+
+  export function renderLabels(o: BaseOpts<LabelChartOpts>) {
+    o.extra = cleanExtra(o.extra) as LabelChartOpts;
+    o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
+    fetchEvents(o);
+
+    render(ReactHelpers.contain(function() {
+      var data = getEventData(o);
+      var calcData = _.map(data, (d, i) => {
+        let calc = new EventStats.LabelDurationCalc(o.extra.labels);
+        calc.start(d.events);
+
+        return {
+          period: d.period,
+          current: _.isEqual(d.period, o.period),
+          fetching: d.isBusy,
+          error: d.hasError,
+          events: d.events,
+          calculation: calc
+        };
+      });
+
+      var chart = o.extra.type === "percent" ?
+        <Components.LabelPercentChart data={calcData} /> :
+        <Components.LabelHoursChart data={calcData} />;
+
+      return <Views.Charts2
+        teamId={o.teamId}
+        calIds={o.calIds}
+        period={o.period}
+        extra={o.extra}
+        pathFn={Paths.Time.labelsChart}
+        chart={chart}
+      />
+    }));
+  }
 }

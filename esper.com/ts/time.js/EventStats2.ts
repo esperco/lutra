@@ -352,4 +352,43 @@ module Esper.EventStats {
       }], results);
     }
   }
+
+  // Group events by label duration
+  export class LabelDurationCalc extends DurationCalc<OptGrouping> {
+    selections: Params.ListSelectJSON;
+
+    constructor(p: Params.ListSelectJSON) {
+      super();
+      this.selections = p;
+    }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results?: OptGrouping
+    ) {
+      var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
+      var annotations = Params.applyListSelectJSON(labelIds, this.selections)
+        .match({
+          none: (): Annotation[] => [],
+          some: (matchedLabelIds) => matchedLabelIds.length ?
+
+            // Create annotation for each label
+            _.map(matchedLabelIds, (labelId) => ({
+              event: event,
+              value: duration / matchedLabelIds.length, // Split among matching
+              groups: [labelId]
+            })) :
+
+            // Empty label => no labels
+            [{
+              event: event,
+              value: duration,
+              groups: []
+            }]
+        });
+
+      return groupAnnotations(annotations, results);
+    }
+  }
 }
