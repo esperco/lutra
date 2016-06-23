@@ -68,16 +68,23 @@ module Esper.Params {
       to not match an actual teamId or calendarId to trigger "empty" set
       behavior
     */
-    var teamId = "default";
-    var calIds = "empty";
+    var teamId = defaultTeamId;
+    var calIds = emptyCalIds;
 
     // If cals, then actually format something
     if (cals.length) {
       teamId = cals[0].teamId;
-      calIds = _.map(cals, (c) => c.calId).join(CAL_ID_SEPARATOR);
+      calIds = pathForCalIds(_.map(cals, (c) => c.calId));
     }
     return [teamId, calIds];
   }
+
+  export function pathForCalIds(calIds: string[]) {
+    return calIds.length ? calIds.join(CAL_ID_SEPARATOR) : emptyCalIds;
+  }
+
+  export const defaultTeamId = "default";
+  export const emptyCalIds = "empty";
 
   export function cleanInterval(intervalStr: string,
                                 defaultInterval: Period.Interval = "week")

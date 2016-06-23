@@ -68,6 +68,13 @@ module Esper.Paths {
   export module Time {
     export const prefix = "/time";
 
+    export interface chartPathOpts {
+      teamId?: string;
+      calIds?: string;
+      interval?: string;
+      period?: string;
+    }
+
     export function charts({chartId, teamId, calIds, interval, period} : {
       chartId?: string;
       teamId?: string;
@@ -77,6 +84,13 @@ module Esper.Paths {
     } = {}) {
       return optPath(prefix, "charts",
                      chartId, teamId, calIds, interval, period);
+    }
+
+    export function durationChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts) {
+      return optPath(prefix, "charts", "durations",
+                     teamId, calIds, interval, period);
     }
 
     export function calendarLabeling({teamId, calIds, interval, period}: {

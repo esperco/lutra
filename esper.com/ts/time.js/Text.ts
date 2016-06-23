@@ -94,6 +94,14 @@ module Esper.Text {
   export const ConfirmAllLabels = `Confirm All`;
   export const ConfirmationDone = `Thanks! That's all for now.`;
 
+  // Chart messages
+  export const ChartNoData = `No events found`;
+  export const ChartFetching = `Fetching data from your calendar`;
+  export const ChartFetchError = `Error loading data. ` +
+    `Try refreshing in a few minutes.`;
+  export const ChartCalculating = `Crunching numbers`;
+
+
   /////
 
   function s(n: number) {

@@ -36,6 +36,40 @@ module Esper.Route {
   );
 
   // Charts
+
+  /*
+    Generic cleaning + routing functino for our chart functions
+  */
+  function routeChart<T extends Actions.Charts2.ExtraOpts>(
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
+    cbFn: (o: Actions.Charts2.BaseOpts<T>) => void
+  ) {
+    route(pathFn({
+      teamId: ":teamId?",
+      calIds: ":calIds?",
+      interval: ":interval?",
+      period: ":period?"
+    }).hash, checkOnboarding, function(ctx) {
+      var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+      var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
+      var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
+                                                  "week");
+      var period = Params.cleanSingleOrCustomPeriod(interval,
+                                                    ctx.params["period"]);
+      var incrs = Params.cleanRelativePeriodJSON(getJSONQuery(ctx)).incrs;
+      cbFn({
+        teamId: teamId,
+        calIds: calIds,
+        period: period,
+        extra: getJSONQuery(ctx)
+      });
+    });
+  }
+
+  routeChart(Paths.Time.durationChart, Actions.Charts2.renderDurations);
+
+
+  // Old chart routing
   route(Paths.Time.charts({
     chartId: ":chartId?",
     teamId: ":teamId?",

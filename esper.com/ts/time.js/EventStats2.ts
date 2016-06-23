@@ -360,4 +360,42 @@ module Esper.EventStats {
     abstract annotate(event: Stores.Events.TeamEvent, duration: number)
       : Annotation|Annotation[];
   }
+
+
+  /* Misc calculation classes we're using for charts */
+
+  /* Group events by how long they are */
+  export class DurationBucketCalc extends DurationCalculation {
+    static BUCKETS = [{
+      label: "< 30m",
+      gte: 0   // Greater than, seconds
+    }, {
+      label: "30m +",
+      gte: 30 * 60
+    }, {
+      label: "1h +",
+      gte: 60 * 60
+    }, {
+      label: "2h +",
+      gte: 2 * 60 * 60
+    }, {
+      label: "4h +",
+      gte: 4 * 60 * 60
+    }, {
+      label: "8h +",
+      gte: 8 * 60 * 60
+    }];
+
+    annotate(event: Stores.Events.TeamEvent, duration: number): Annotation {
+      var bucket = _.findLast(DurationBucketCalc.BUCKETS,
+        (b) => duration >= b.gte
+      )
+
+      return {
+        event: event,
+        value: duration,
+        groups: [bucket.label]
+      };
+    }
+  }
 }

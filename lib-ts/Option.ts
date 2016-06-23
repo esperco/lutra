@@ -105,4 +105,15 @@ module Esper.Option {
       .map((s) => s.unwrap())
       .value();
   }
+
+  /*
+    Helper to help Typescript infer types when matching against lists
+    Otherwise, `none: () => []` will return any
+  */
+  export function matchList<E>(opt: T<E[]>): E[] {
+    return opt.match({
+      none: (): E[] => [],
+      some: (s) => s
+    });
+  }
 }
