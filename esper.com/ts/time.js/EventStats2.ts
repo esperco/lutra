@@ -241,7 +241,7 @@ module Esper.EventStats {
     // Returns some grouping if done, none if not complete
     getResults(): Option.T<T> {
       return this.ready ?
-        Option.wrap(this._results) :
+        Option.some(this._results) :
         Option.none<T>();
     }
 
@@ -259,7 +259,7 @@ module Esper.EventStats {
     // Pre-populate vars used in processing loop
     init(events: Stores.Events.TeamEvent[]) {
       this._eventQueue = _.clone(events);
-      this._results = null;
+      this._results = this.initResult();
       this.ready = false;
       this.running = true;
     }
@@ -307,12 +307,15 @@ module Esper.EventStats {
       return Stores.Events.isActive(event);
     }
 
+    // Empty initial result object
+    abstract initResult(): T;
+
     /*
       Handle events from queue -- takes events plus current intermediate
       result state
     */
     abstract processBatch(events: Stores.Events.TeamEvent[],
-                          results?: T): T;
+                          results: T): T;
   }
 
 
@@ -348,7 +351,7 @@ module Esper.EventStats {
       return events;
     }
 
-    processBatch(events: Stores.Events.TeamEvent[], results?: T) {
+    processBatch(events: Stores.Events.TeamEvent[], results: T) {
       var durations = durationWrappers(events);
       _.each(durations,
         (d) => results = this.processOne(d.event, d.duration, results)
@@ -359,7 +362,7 @@ module Esper.EventStats {
     abstract processOne(
       event: Stores.Events.TeamEvent,
       duration: number,
-      results?: T): T;
+      results: T): T;
   }
 
 
@@ -387,10 +390,12 @@ module Esper.EventStats {
       gte: 8 * 60 * 60
     }];
 
+    initResult() { return emptyOptGrouping(); }
+
     processOne(
       event: Stores.Events.TeamEvent,
       duration: number,
-      results?: OptGrouping
+      results: OptGrouping
     ) {
       var bucket = _.findLast(DurationBucketCalc.BUCKETS,
         (b) => duration >= b.gte
@@ -413,7 +418,14 @@ module Esper.EventStats {
 
   // Count unique events by label
   export class LabelCountCalc extends CalcBase<LabelCalcCount> {
-    processBatch(events: Stores.Events.TeamEvent[], results?: LabelCalcCount) {
+    initResult() {
+      return _.extend({
+        unconfirmed: [],
+        unconfirmedCount: 0
+      }, emptyOptGrouping()) as LabelCalcCount;
+    }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: LabelCalcCount) {
       _.each(events, (e) => {
         var eventKey = Stores.Events.strId(e);
         var newEvent = !(results && results.eventMap[eventKey]);
@@ -458,10 +470,12 @@ module Esper.EventStats {
       this.selections = p;
     }
 
+    initResult() { return emptyOptGrouping(); }
+
     processOne(
       event: Stores.Events.TeamEvent,
       duration: number,
-      results?: OptGrouping
+      results: OptGrouping
     ) {
       var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
       var annotations = Params.applyListSelectJSON(labelIds, this.selections)
@@ -492,7 +506,9 @@ module Esper.EventStats {
   /* Guest-related calculations */
 
   export class DomainCountCalc extends CalcBase<OptGrouping> {
-    processBatch(events: Stores.Events.TeamEvent[], results?: OptGrouping) {
+    initResult() { return emptyOptGrouping(); }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
       _.each(events, (e) => {
         var domains = Stores.Events.getGuestDomains(e);
         var annotations = domains.length ?
@@ -532,10 +548,12 @@ module Esper.EventStats {
       this.nestByDomain = nestByDomain;
     }
 
+    initResult() { return emptyOptGrouping(); }
+
     processOne(
       event: Stores.Events.TeamEvent,
       duration: number,
-      results?: OptGrouping
+      results: OptGrouping
     ) {
       var domains = Stores.Events.getGuestDomains(event);
       var annotations = Params.applyListSelectJSON(domains, this.selections)

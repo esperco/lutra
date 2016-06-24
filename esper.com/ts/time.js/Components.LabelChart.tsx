@@ -6,8 +6,8 @@
 module Esper.Components {
 
   export class LabelHoursChart extends DefaultChart {
-    renderMain(groups: Charting.PeriodGroup[]) {
-      var keys = Charting.sortKeys(groups);
+    renderMain(groups: Charting.PeriodOptGroup[]) {
+      var keys = Charting.sortOptGroupKeys(groups);
       var series = Charting.eventSeries(groups, {
         colorFn: Colors.getColorForLabel,
         displayName: Labels.getDisplayAs,
@@ -25,8 +25,8 @@ module Esper.Components {
   }
 
   export class LabelPercentChart extends DefaultChart {
-    renderMain(groups: Charting.PeriodGroup[]) {
-      var keys = Charting.sortKeys(groups);
+    renderMain(groups: Charting.PeriodOptGroup[]) {
+      var keys = Charting.sortOptGroupKeys(groups);
       var series = Charting.eventGroupSeries(groups, {
         colorFn: Colors.getColorForLabel,
         displayName: Labels.getDisplayAs,

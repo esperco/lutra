@@ -253,9 +253,10 @@ module Esper.EventStats {
       class TestCalc extends CalcBase<number[]> {
         MAX_PROCESS_EVENTS = 2
 
-        processBatch(events: Stores.Events.TeamEvent[], result?: number[])
+        initResult(): number[] { return []; }
+
+        processBatch(events: Stores.Events.TeamEvent[], result: number[])
         {
-          result = result || [];
           result = result.concat(
             _.times(events.length, () => this._eventQueue.length)
           );
@@ -383,9 +384,11 @@ module Esper.EventStats {
       class TestCalc extends DurationCalc<number[]> {
         MAX_PROCESS_EVENTS = 2
 
+        initResult(): number[] { return []; }
+
         processOne(event: Stores.Events.TeamEvent,
                    duration: number,
-                   result?: number[]): number[] {
+                   result: number[]): number[] {
           return (result || []).concat([duration]);
         }
       }

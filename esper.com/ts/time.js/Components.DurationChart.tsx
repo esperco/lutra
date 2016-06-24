@@ -6,7 +6,7 @@
 module Esper.Components {
 
   export class DurationHoursChart extends DefaultChart {
-    renderMain(groups: Charting.PeriodGroup[]) {
+    renderMain(groups: Charting.PeriodOptGroup[]) {
       var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
         (b) => b.label
       );
@@ -24,7 +24,7 @@ module Esper.Components {
 
 
   export class DurationPercentChart extends DefaultChart {
-    renderMain(groups: Charting.PeriodGroup[]) {
+    renderMain(groups: Charting.PeriodOptGroup[]) {
       var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
         (b) => b.label
       );
