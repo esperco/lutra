@@ -31,7 +31,8 @@ module Esper.Views {
     prefs: ApiT.GroupPreferences;
     group: ApiT.Group;
   }) {
-    let sendLabelReminder = prefs.label_reminder;
+    let dailyBreakdownReminder = prefs.daily_breakdown;
+    let weeklyBreakdownReminder = prefs.weekly_breakdown;
     let email = Login.myEmail();
 
     return <div className="panel panel-default">
@@ -46,14 +47,24 @@ module Esper.Views {
 
         <div className="esper-select-menu">
 
-          {/* Label reminder e-mail */}
+          {/* Daily breakdown e-mail */}
           <div className="esper-selectable"
-            onClick={() => toggleLabelReminders(prefs) }>
+            onClick={() => toggleDailyBreakdownEmails(prefs) }>
             <i className={classNames("fa fa-fw", {
-              "fa-check-square-o": sendLabelReminder,
-              "fa-square-o": !sendLabelReminder
+              "fa-check-square-o": dailyBreakdownReminder,
+              "fa-square-o": !dailyBreakdownReminder
             }) } />{" "}
-            { Text.SendLabelReminder }
+            { Text.SendDailyBreakdownEmail }
+          </div>
+
+          {/* Weekly breakdown e-mail */}
+          <div className="esper-selectable"
+            onClick={() => toggleWeeklyBreakdownEmails(prefs) }>
+            <i className={classNames("fa fa-fw", {
+              "fa-check-square-o": weeklyBreakdownReminder,
+              "fa-square-o": !weeklyBreakdownReminder
+            }) } />{" "}
+            { Text.SendWeeklyBreakdownEmail }
           </div>
 
         </div>
@@ -64,7 +75,11 @@ module Esper.Views {
 
   /////
 
-  function toggleLabelReminders(p: ApiT.GroupPreferences) {
-    Actions.GroupPreferences.toggleLabelReminders(p);
+  function toggleDailyBreakdownEmails(p: ApiT.GroupPreferences) {
+    Actions.GroupPreferences.toggleDailyBreakdownEmails(p);
+  }
+
+  function toggleWeeklyBreakdownEmails(p: ApiT.GroupPreferences) {
+    Actions.GroupPreferences.toggleWeeklyBreakdownEmails(p);
   }
 }
