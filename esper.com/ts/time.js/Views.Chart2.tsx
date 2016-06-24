@@ -27,50 +27,57 @@ module Esper.Views {
 
       return <div id="charts-page" className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
-          <div className="esper-panel-section">
-            <div className="btn-group btn-group-justified">
-              <div className="btn-group">
-                { this.renderTypeButton("percent") }
-              </div>
-              <div className="btn-group">
-                { this.renderTypeButton("absolute") }
+          <div className="sidebar-top-menu">
+            Hello
+          </div>
+
+          <div className="sidebar-minus-top-menu sidebar-minus-bottom-menu">
+            <div className="esper-panel-section">
+              <div className="btn-group btn-group-justified">
+                <div className="btn-group">
+                  { this.renderTypeButton("percent") }
+                </div>
+                <div className="btn-group">
+                  { this.renderTypeButton("absolute") }
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="esper-panel-section">
-            <label htmlFor={this.getId("cal-select")}>
-              <i className="fa fa-fw fa-calendar-o" />{" "}
-              Calendars
-            </label>
-            <Components.CalSelectorDropdown
-              id={this.getId("cal-select")}
-              teams={[team]}
-              calendarsByTeamId={Util.keyObj(team.teamid, calendars)}
-              selected={_.map(this.props.calIds, (calId) => ({
-                teamId: team.teamid,
-                calId: calId
-              }))}
-              updateFn={(c) => this.updateCalSelection(c)}
-              allowMulti={true}
-            />
-          </div>
-
-          <div className="esper-panel-section">
-            <div className="esper-subheader">
-              <i className="fa fa-fw fa-clock-o" />{" "}
-              Compare With
+            <div className="esper-panel-section">
+              <label htmlFor={this.getId("cal-select")}>
+                <i className="fa fa-fw fa-calendar-o" />{" "}
+                Calendars
+              </label>
+              <Components.CalSelectorDropdown
+                id={this.getId("cal-select")}
+                teams={[team]}
+                calendarsByTeamId={Util.keyObj(team.teamid, calendars)}
+                selected={_.map(this.props.calIds, (calId) => ({
+                  teamId: team.teamid,
+                  calId: calId
+                }))}
+                updateFn={(c) => this.updateCalSelection(c)}
+                allowMulti={true}
+              />
             </div>
-            <Components.RelativePeriodSelector
-              period={this.props.period}
-              allowedIncrs={[-1, 1]}
-              selectedIncrs={this.props.extra.incrs}
-              updateFn={(x) => this.updateIncrs(x)}
-            />
+
+            <div className="esper-panel-section">
+              <div className="esper-subheader">
+                <i className="fa fa-fw fa-clock-o" />{" "}
+                Compare With
+              </div>
+              <Components.RelativePeriodSelector
+                period={this.props.period}
+                allowedIncrs={[-1, 1]}
+                selectedIncrs={this.props.extra.incrs}
+                updateFn={(x) => this.updateIncrs(x)}
+              />
+            </div>
+            { this.props.selectors }
           </div>
-
-          { this.props.selectors }
-
+          <div className="sidebar-bottom-menu">
+            Team
+          </div>
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
           { this.renderPeriodSelector() }
