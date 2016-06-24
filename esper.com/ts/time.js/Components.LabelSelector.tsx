@@ -124,19 +124,17 @@ module Esper.Components {
           Select All
         </a>
       </div>
-      <div className="divider" />
 
       { groups[0].choices.length > 0 ?
         <ListSelector groups={groups} selectedIds={selectedIdsWithGroups}
           selectOption={ ListSelectOptions.MULTI_SELECT }
           selectedItemClasses="active"
+          className="esper-select-menu"
           listClasses="esper-select-menu"
           itemClasses="esper-selectable"
           headerClasses="esper-select-header"
-          dividerClasses="divider"
           updateFn={updateLabels}
         /> : null }
-      { groups[0].choices.length > 0 ? <div className="divider" /> : null }
 
       { props.showUnlabeled ?
         <div className="esper-select-menu">
@@ -152,7 +150,6 @@ module Esper.Components {
           { Text.Unlabeled }
         </a>
       </div> : null }
-      { props.showUnlabeled ? <div className="divider" /> : null }
 
       { props.onUnconfirmedClick ?
         <div className="esper-select-menu">
@@ -170,7 +167,6 @@ module Esper.Components {
           { Text.Unconfirmed }
         </a>
       </div> : null }
-      { props.onUnconfirmedClick ? <div className="divider" /> : null }
 
       <div className="esper-select-menu">
         <a className="esper-selectable"

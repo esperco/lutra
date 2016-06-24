@@ -391,6 +391,14 @@
 
 .esper-panel-section + .esper-panel-section {
   border-top: 1px solid @brand-divider;
+
+  .esper-shade & {
+    border-color: @shade-divider;
+  }
+
+  .esper-inverse & {
+    border-color: @inverse-divider;
+  }
 }
 
 .esper-panel-section + .modal-footer,
@@ -573,6 +581,20 @@ flexibility with non-UL elements */
   font-size: @font-size-base;
   text-align: left; // Ensures proper alignment if parent has it changed
 
+  + .esper-select-menu {
+    border-top: 1px solid @brand-divider;
+    margin-top: @padding-base-vertical;
+    padding-top: @padding-base-vertical;
+
+    .esper-shade & {
+      border-color: @shade-divider;
+    }
+
+    .esper-inverse & {
+      border-color: @inverse-divider;
+    }
+  }
+
   .esper-selectable, li > a {
     display: block;
     cursor: pointer;
@@ -616,13 +638,6 @@ flexibility with non-UL elements */
     }
   }
 
-  .divider {
-    height: 1px;
-    margin: ((@line-height-computed / 2) - 1) 0;
-    overflow: hidden;
-    background-color: @brand-divider;
-  }
-
   + .modal-footer {
     margin-top: @padding-large-vertical;
   }
@@ -638,10 +653,6 @@ flexibility with non-UL elements */
         background-color: @shade-text-highlight-bg;
       }
     }
-
-    .divider {
-      background-color: @shade-divider;
-    }
   }
 
   .esper-inverse & {
@@ -654,10 +665,6 @@ flexibility with non-UL elements */
         color: @inverse-text-highlight;
         background-color: @inverse-text-highlight-bg;
       }
-    }
-
-    .divider {
-      background-color: @inverse-divider;
     }
   }
 

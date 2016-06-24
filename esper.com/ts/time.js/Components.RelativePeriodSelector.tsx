@@ -23,7 +23,6 @@ module Esper.Components {
       listClasses="esper-select-menu"
       itemClasses="esper-selectable"
       headerClasses="esper-select-header"
-      dividerClasses="divider"
       updateFn={(x) => props.updateFn(
         _(x).map((i) => parseInt(i)).filter((n) => !isNaN(n)).value()
       )}

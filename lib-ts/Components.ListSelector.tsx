@@ -14,10 +14,10 @@ module Esper.Components {
     selectedIcon?: string;    // Font-awesome icon
     unselectedIcon?: string;  // Font-awesome icon
 
+    className?: string;
     listClasses?: string;
     itemClasses?: string;
     headerClasses?: string;
-    dividerClasses?: string;
     selectedItemClasses?: string;
   }
 
@@ -59,7 +59,7 @@ module Esper.Components {
   export class ListSelector extends Component<ListSelectorProps, {}>
   {
     render() {
-      return <div>
+      return <div className={this.props.className}>
         { _.map(this.props.groups, this.renderGroup.bind(this)) }
       </div>;
     }
@@ -110,10 +110,6 @@ module Esper.Components {
             </a>
           })
         }</div>
-        {
-          count + 1 < this.props.groups.length ?
-          <div className={this.props.dividerClasses || ""} /> : null
-        }
       </div>;
     }
 
@@ -193,10 +189,10 @@ module Esper.Components {
       selectedIcon={props.selectedIcon}
       unselectedIcon={props.unselectedIcon}
 
+      className={props.className}
       listClasses={props.listClasses}
       itemClasses={props.itemClasses}
       headerClasses={props.headerClasses}
-      dividerClasses={props.dividerClasses}
       selectedItemClasses={props.selectedItemClasses}
     />;
   }

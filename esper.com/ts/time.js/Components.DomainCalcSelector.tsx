@@ -43,6 +43,7 @@ module Esper.Components {
               }
               selectOption={Components.ListSelectOptions.MULTI_SELECT}
               selectedItemClasses="active"
+              className="esper-select-menu"
               listClasses="esper-select-menu"
               itemClasses="esper-selectable"
               updateFn={(x) => this.props.updateFn({
