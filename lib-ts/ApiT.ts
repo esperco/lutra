@@ -256,7 +256,8 @@ module Esper.ApiT {
   export interface GroupPreferences {
     groupid: string;
     uid: string;
-    label_reminder: boolean;
+    daily_breakdown: boolean;
+    weekly_breakdown: boolean;
     bad_duration: number;
     bad_attendees: number;
   }

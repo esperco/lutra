@@ -79,6 +79,10 @@ module Esper.Text {
   export const SendDailyAgenda = "Daily agenda email";
   export const SendFeedbackSummary =
     "Daily meeting feedback summary email";
+  export const SendDailyBreakdownEmail =
+    "Daily Calendar Summary Email";
+  export const SendWeeklyBreakdownEmail =
+    "Weekly Calendar Summary Email";
 
   export const FeedbackHeading = 'Meeting Feedback Notifications';
   export function feedbackDescription(email: string) {
