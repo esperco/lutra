@@ -49,8 +49,8 @@ module Esper.EventStats {
           .toEqual([5, 7]);
         expect(_.map(results.some["b"].annotations, (b) => b.value))
           .toEqual([6, 8]);
-        expect(results.some["a"].total).toEqual(12);
-        expect(results.some["b"].total).toEqual(14);
+        expect(results.some["a"].totalValue).toEqual(12);
+        expect(results.some["b"].totalValue).toEqual(14);
       });
 
       it("should count empty sets", function() {
@@ -67,9 +67,9 @@ module Esper.EventStats {
           .toEqual([6]);
         expect(_.map(results.none.annotations, (b) => b.value))
           .toEqual([8]);
-        expect(results.some["a"].total).toEqual(12);
-        expect(results.some["b"].total).toEqual(6);
-        expect(results.none.total).toEqual(8);
+        expect(results.some["a"].totalValue).toEqual(12);
+        expect(results.some["b"].totalValue).toEqual(6);
+        expect(results.none.totalValue).toEqual(8);
       });
 
       it("should let us populate existing groupings", function() {
@@ -84,8 +84,8 @@ module Esper.EventStats {
           .toEqual([5]);
         expect(_.map(results1.some["b"].annotations, (b) => b.value))
           .toEqual([6]);
-        expect(results1.some["a"].total).toEqual(5);
-        expect(results1.some["b"].total).toEqual(6);
+        expect(results1.some["a"].totalValue).toEqual(5);
+        expect(results1.some["b"].totalValue).toEqual(6);
 
         let results2 = groupAnnotations([a2, b2], results1);
         expect(_.keys(results2.some).length).toEqual(2);
@@ -93,8 +93,8 @@ module Esper.EventStats {
           .toEqual([5, 7]);
         expect(_.map(results2.some["b"].annotations, (b) => b.value))
           .toEqual([6, 8]);
-        expect(results2.some["a"].total).toEqual(12);
-        expect(results2.some["b"].total).toEqual(14);
+        expect(results2.some["a"].totalValue).toEqual(12);
+        expect(results2.some["b"].totalValue).toEqual(14);
       });
 
       it("should nest groups", function() {
@@ -111,8 +111,8 @@ module Esper.EventStats {
           .toEqual([5, 7, 8, 9]);
         expect(_.map(results.some["b"].annotations, (b) => b.value))
           .toEqual([6]);
-        expect(results.some["a"].total).toEqual(29);
-        expect(results.some["b"].total).toEqual(6);
+        expect(results.some["a"].totalValue).toEqual(29);
+        expect(results.some["b"].totalValue).toEqual(6);
         expect(results.some["b"].subgroups).toEqual({});
 
         /* Check nested subgroup A */
@@ -122,10 +122,16 @@ module Esper.EventStats {
           .toEqual([9]);
         expect(_.map(subA["b"].annotations, (b) => b.value))
           .toEqual([7, 8]);
-        expect(subA["a"].total).toEqual(9);
-        expect(subA["b"].total).toEqual(15);
+        expect(subA["a"].totalValue).toEqual(9);
+        expect(subA["b"].totalValue).toEqual(15);
         expect(subA["a"].subgroups).toEqual({});
         expect(subA["b"].subgroups).toEqual({});
+      });
+
+      it("should track unique events", function() {
+        let a1 = makeAnnotation({ value: 5, groups: ["a"]});
+        let b1 = makeAnnotation({ value: 6, groups: ["b"]});
+        expect(groupAnnotations([a1, b1]).totalUnique).toEqual(1);
       });
     });
 
@@ -250,7 +256,9 @@ module Esper.EventStats {
         processBatch(events: Stores.Events.TeamEvent[], result?: number[])
         {
           result = result || [];
-          result.push(this._eventQueue.length);
+          result = result.concat(
+            _.times(events.length, () => this._eventQueue.length)
+          );
           return result;
         }
       }
@@ -277,7 +285,7 @@ module Esper.EventStats {
           expect(rAFSpy.calls.count()).toEqual(1);
         });
 
-        it("should process only only MAX_PROCESS_EVENTS after first loop",
+        it("should process only MAX_PROCESS_EVENTS after first loop",
         function() {
           calc.runLoop();
           expect(calc._eventQueue.length).toEqual(3);
@@ -302,13 +310,10 @@ module Esper.EventStats {
         });
 
         it("should ignore no-attend events by default", function() {
-          var spy = spyOn(calc, "annotate").and.callThrough();
-
           calc.runLoop();
           calc.runLoop();
           calc.runLoop();
-
-          expect(spy.calls.count()).toEqual(4); // Last event is no-attend
+          expect(calc._results.length).toEqual(4); // Last event is no-attend
         });
       });
 
@@ -331,7 +336,7 @@ module Esper.EventStats {
           result.match({
             none: () => null,
             some: (g) => {
-              expect(g).toEqual([5, 4, 3, 2]);
+              expect(g).toEqual([5, 5, 3, 3]);
             }
           });
         });
@@ -381,7 +386,7 @@ module Esper.EventStats {
         processOne(event: Stores.Events.TeamEvent,
                    duration: number,
                    result?: number[]): number[] {
-          return result.concat([duration]);
+          return (result || []).concat([duration]);
         }
       }
 
@@ -439,7 +444,7 @@ module Esper.EventStats {
           calc.start(events);
         });
 
-        it("should process only only MAX_PROCESS_EVENTS + any overlapping " +
+        it("should process only MAX_PROCESS_EVENTS + any overlapping " +
            "events after first loop",
         function() {
           calc.runLoop();
@@ -448,18 +453,18 @@ module Esper.EventStats {
           // NB: Only 4 because we excluded inactive event
           expect(calc._results.length).toEqual(4);
 
-          // Result should not be done yet
+          // Result should not be done ye`t
           expect(calc.getResults().isNone()).toBeTruthy();
         });
 
-        it("should pass durations to annotate function", function() {
-          var spy = spyOn(calc, "annotate").and.callThrough();
+        it("should pass durations to processOne function", function() {
+          var spy = spyOn(calc, "processOne").and.callThrough();
 
           calc.runLoop();
-          expect(spy).toHaveBeenCalledWith(e1, 1 * 60 * 60);
-          expect(spy).toHaveBeenCalledWith(e2, 3 * 60 * 60);
-          expect(spy).toHaveBeenCalledWith(e3, 0.5 * 60 * 60);
-          expect(spy).toHaveBeenCalledWith(e5, 1.5 * 60 * 60);
+          expect(spy.calls.argsFor(0).slice(0,2)).toEqual([e1, 1 * 60 * 60]);
+          expect(spy.calls.argsFor(1).slice(0,2)).toEqual([e2, 3 * 60 * 60]);
+          expect(spy.calls.argsFor(2).slice(0,2)).toEqual([e3, 0.5 * 60 * 60]);
+          expect(spy.calls.argsFor(3).slice(0,2)).toEqual([e5, 1.5 * 60 * 60]);
 
           // e4 is excluded because of did not attend
           expect(spy.calls.count()).toEqual(4);

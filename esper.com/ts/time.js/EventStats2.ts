@@ -22,24 +22,64 @@ module Esper.EventStats {
     groups: string[];
   }
 
+  export interface EventMap {
+    [index: string]: boolean;
+  }
+
   /*
-    Heirarchal map of grouping strings to annotations
+    Heirarchal maps of grouping strings to annotations
   */
+  export interface Group {
+    annotations: Annotation[];
+    totalValue: number;   // Sum of all annotation values
+    totalUnique: number;  // Total unique events
+    eventMap: EventMap;   /* Map used to quickly test whether event exists
+                             in group */
+  }
+
+  export interface Subgroup extends Group {
+    subgroups: Grouping;
+  }
+
   export interface Grouping {
-    [index: string]: {
-      annotations: Annotation[];
-      total: number; // Sum of all annotation values
-      subgroups: Grouping;
+    [index: string]: Subgroup;
+  }
+
+  export interface OptGrouping extends Group {
+    some: Grouping;
+    none: Group;
+  }
+
+  function emptyGroup(): Group {
+    return {
+      annotations: [],
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {}
     }
   }
 
-  export interface OptGrouping {
-    some: Grouping;
-    none: {
-      annotations: Annotation[];
-      total: number;
+  function emptySubgroup(): Subgroup {
+    return {
+      annotations: [],
+      totalValue: 0,
+      totalUnique: 0,
+      subgroups: {},
+      eventMap: {}
     }
   }
+
+  function emptyOptGrouping(): OptGrouping {
+    return {
+      some: {},
+      none: emptyGroup(),
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {},
+      annotations: []
+    }
+  }
+
 
   /*
     Convert annotations to grouping -- optionally takes an existing grouping
@@ -47,31 +87,42 @@ module Esper.EventStats {
   */
   export function groupAnnotations(annotations: Annotation[],
                                    grouping?: OptGrouping) {
-    grouping = grouping || {
-      some: {},
-      none: {
-        annotations: [],
-        total: 0
-      }
-    };
+    grouping = grouping || emptyOptGrouping();
 
     _.each(annotations, (a) => {
+      var eventKey = Stores.Events.strId(a.event);
+
       if (a.groups.length) {
-        let currentGroup = grouping.some;
+        let currentGrouping = grouping.some;
         _.each(a.groups, (g) => {
-          currentGroup[g] = currentGroup[g] || {
-            annotations: [],
-            total: 0,
-            subgroups: {}
-          };
-          currentGroup[g].annotations.push(a);
-          currentGroup[g].total += a.value;
-          currentGroup = currentGroup[g].subgroups;
+          let currentGroup = currentGrouping[g] =
+            currentGrouping[g] || emptySubgroup();
+          currentGroup.annotations.push(a);
+          currentGroup.totalValue += a.value;
+
+          if (! currentGroup.eventMap[eventKey]) {
+            currentGroup.eventMap[eventKey] = true;
+            currentGroup.totalUnique += 1;
+          }
+
+          currentGrouping = currentGroup.subgroups;
         });
       }
       else {
         grouping.none.annotations.push(a);
-        grouping.none.total += a.value;
+        grouping.none.totalValue += a.value;
+
+        if (! grouping.none.eventMap[eventKey]) {
+          grouping.none.eventMap[eventKey] = true;
+          grouping.none.totalUnique += 1;
+        }
+      }
+
+      grouping.totalValue += a.value;
+      grouping.annotations.push(a);
+      if (! grouping.eventMap[eventKey]) {
+        grouping.eventMap[eventKey] = true;
+        grouping.totalUnique += 1;
       }
     });
 
@@ -355,47 +406,22 @@ module Esper.EventStats {
 
 
   // Count unique events by label type
-  export interface CalcCount extends OptGrouping {
+  export interface LabelCalcCount extends OptGrouping {
     unconfirmed: Stores.Events.TeamEvent[];
     unconfirmedCount: number;
-    totalCount: number;
   }
 
   // Count unique events by label
-  export class LabelCountCalc extends CalcBase<CalcCount> {
-    // Which events have we looked at so far?
-    _eventMap: { [index: string]: boolean };
-
+  export class LabelCountCalc extends CalcBase<LabelCalcCount> {
     init(events: Stores.Events.TeamEvent[]) {
       super.init(events);
-      this._eventMap = {};
     }
 
-    // Filter out already processed events
-    filterEvent(event: Stores.Events.TeamEvent) {
-      return super.filterEvent(event) && (() => {
-        let key = Stores.Events.strId(event);
-        if (this._eventMap[key]) {
-          return false;
-        }
-        this._eventMap[key] = true;
-        return true;
-      })()
-    }
-
-    processBatch(events: Stores.Events.TeamEvent[], results?: CalcCount) {
-      results = results || {
-        some: {},
-        none: {
-          annotations: [],
-          total: 0
-        },
-        unconfirmed: [],
-        unconfirmedCount: 0,
-        totalCount: 0
-      };
-
+    processBatch(events: Stores.Events.TeamEvent[], results?: LabelCalcCount) {
       _.each(events, (e) => {
+        var eventKey = Stores.Events.strId(e);
+        var newEvent = !(results && results.eventMap[eventKey]);
+
         var labelIds = _.map(Option.matchList(e.labelScores), (s) => s.id);
         var annotations = labelIds.length ?
           // Create annotation for each label
@@ -412,16 +438,15 @@ module Esper.EventStats {
             groups: []
           }];
 
-        var r2 = groupAnnotations(annotations, results);
-        results.some = r2.some;
-        results.none = r2.none;
+        results = _.extend({
+          unconfirmed: [],
+          unconfirmedCount: 0
+        }, results, groupAnnotations(annotations, results)) as LabelCalcCount;
 
-        if (Stores.Events.needsConfirmation(e)) {
+        if (newEvent && Stores.Events.needsConfirmation(e)) {
           results.unconfirmed.push(e);
           results.unconfirmedCount += 1;
         }
-
-        results.totalCount += 1;
       });
 
       return results;
@@ -466,6 +491,4 @@ module Esper.EventStats {
       return groupAnnotations(annotations, results);
     }
   }
-
-
 }

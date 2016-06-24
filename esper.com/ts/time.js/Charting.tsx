@@ -135,7 +135,7 @@ module Esper.Charting {
         count: g.data.some[key] ? g.data.some[key].annotations.length : 0,
         x: periodIndex,
         y: (opts.yFn || _.identity)(
-          g.data.some[key] ? g.data.some[key].total : 0),
+          g.data.some[key] ? g.data.some[key].totalValue : 0),
         events: {
           click: () => onSeriesClick(
             g.data.some[key] ? _.map(g.data.some[key].annotations,
@@ -152,7 +152,7 @@ module Esper.Charting {
           color: Colors.lightGray,
           count: g.data.none.annotations.length,
           x: periodIndex,
-          y: (opts.yFn || _.identity)(g.data.none.total),
+          y: (opts.yFn || _.identity)(g.data.none.totalValue),
           events: {
             click: () => onSeriesClick(
               _.map(g.data.none.annotations, (a) => a.event)
@@ -181,9 +181,9 @@ module Esper.Charting {
     var currentTotals: {[index: string]: number} = {};
     var aggregateTotals: {[index: string]: number} = {};
     _.each(groups, (g) => _.each(g.data.some, (v, k) => {
-      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.total;
+      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.totalValue;
       if (g.current) {
-        currentTotals[k] = (currentTotals[k] || 0) + v.total;
+        currentTotals[k] = (currentTotals[k] || 0) + v.totalValue;
       }
     }));
     var keys = _.keys(aggregateTotals);

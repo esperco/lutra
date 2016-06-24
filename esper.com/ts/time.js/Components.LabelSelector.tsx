@@ -225,7 +225,7 @@ module Esper.Components {
 
 
   export class LabelCalcSelector
-         extends CalcUI<EventStats.CalcCount, LabelCalcSelectorProps>
+         extends CalcUI<EventStats.LabelCalcCount, LabelCalcSelectorProps>
   {
     render() {
       return this.state.result.match({
@@ -235,7 +235,7 @@ module Esper.Components {
           var labels: Labels.LabelCount[] = _.map(result.some, (v, k) => ({
             id: k,
             displayAs: Labels.getDisplayAs(k),
-            count: v.total
+            count: v.totalUnique
           }));
 
           // Get team labels too
@@ -261,8 +261,8 @@ module Esper.Components {
             unconfirmedSelected={this.props.unconfirmedSelected}
 
             showUnlabeled={this.props.showUnlabeled}
-            totalCount={result.totalCount}
-            unlabeledCount={result.none.total}
+            totalCount={result.totalUnique}
+            unlabeledCount={result.none.totalUnique}
             unconfirmedCount={result.unconfirmedCount}
 
             updateFn={this.props.updateFn}
