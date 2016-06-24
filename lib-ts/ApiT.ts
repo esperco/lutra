@@ -249,6 +249,18 @@ module Esper.ApiT {
     notes: string;
   }
 
+  export interface GroupPreferencesList {
+    prefs_list: GroupPreferences[];
+  }
+
+  export interface GroupPreferences {
+    groupid: string;
+    uid: string;
+    label_reminder: boolean;
+    bad_duration: number;
+    bad_attendees: number;
+  }
+
   export interface SlackAddress {
     slack_teamid: string;
     slack_username: string;

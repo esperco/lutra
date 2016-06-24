@@ -54,15 +54,15 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderNotificationSettings(teamId?: string,
+  export function renderTeamNotificationSettings(teamId?: string,
     msgCode?: string, errCode?: string)
   {
     var teamId = Params.cleanTeamId(teamId);
     var msg = ManageMsg.get(msgCode);
     var err = ManageMsg.get(errCode);
 
-    Stores.Preferences.checkSlack(teamId);
-    render(<Views.NotificationSettings teamId={teamId}
+    Stores.TeamPreferences.checkSlack(teamId);
+    render(<Views.TeamNotificationSettings teamId={teamId}
             msg={msg} err={err} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
@@ -90,6 +90,17 @@ module Esper.Actions {
     var msg = ManageMsg.get(msgCode);
     var err = ManageMsg.get(errCode);
     render(<Views.GroupLabelSettings groupId={groupId}
+            msg={msg} err={err} />);
+    Analytics.page(Analytics.Page.GroupManage);
+  }
+
+  export function renderGroupNotificationSettings(groupId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    var groupId = Params.cleanGroupId(groupId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.GroupNotificationSettings groupId={groupId}
             msg={msg} err={err} />);
     Analytics.page(Analytics.Page.GroupManage);
   }

@@ -7,7 +7,7 @@
 /// <reference path="./Save.ts" />
 /// <reference path="./Stores.Groups.ts" />
 /// <reference path="./Stores.Profiles.ts" />
-/// <reference path="./Actions.Preferences.ts" />
+/// <reference path="./Actions.TeamPreferences.ts" />
 
 module Esper.Actions.Groups {
 

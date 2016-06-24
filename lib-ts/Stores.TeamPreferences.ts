@@ -2,7 +2,7 @@
 /// <reference path="./Model2.ts" />
 /// <reference path="./Stores.Teams.ts" />
 
-module Esper.Stores.Preferences {
+module Esper.Stores.TeamPreferences {
 
   // Key by teamId
   export var PrefsStore = new Model2.Store<string, ApiT.Preferences>();
@@ -92,8 +92,8 @@ module Esper.Stores.Preferences {
     need Slack auth.
   */
   export function checkSlack(teamId: string) {
-    Stores.Preferences.getInitPromise().then(function() {
-      Stores.Preferences.get(teamId).match({
+    Stores.TeamPreferences.getInitPromise().then(function() {
+      Stores.TeamPreferences.get(teamId).match({
         none: () => null,
         some: (prefs) => {
           if (needSlack(prefs)) {

@@ -68,8 +68,8 @@ module Esper.TestFixtures {
     Stores.Events.EventsForDateStore.removeAllChangeListeners();
     Stores.Events.EventStore.reset();
     Stores.Events.EventStore.removeAllChangeListeners();
-    Stores.Preferences.PrefsStore.reset();
-    Stores.Preferences.PrefsStore.removeAllChangeListeners();
+    Stores.TeamPreferences.PrefsStore.reset();
+    Stores.TeamPreferences.PrefsStore.removeAllChangeListeners();
     Stores.Profiles.ProfileStore.reset();
     Stores.Profiles.ProfileStore.removeAllChangeListeners();
   }
