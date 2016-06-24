@@ -413,10 +413,6 @@ module Esper.EventStats {
 
   // Count unique events by label
   export class LabelCountCalc extends CalcBase<LabelCalcCount> {
-    init(events: Stores.Events.TeamEvent[]) {
-      super.init(events);
-    }
-
     processBatch(events: Stores.Events.TeamEvent[], results?: LabelCalcCount) {
       _.each(events, (e) => {
         var eventKey = Stores.Events.strId(e);
@@ -486,6 +482,87 @@ module Esper.EventStats {
               value: duration,
               groups: []
             }]
+        });
+
+      return groupAnnotations(annotations, results);
+    }
+  }
+
+
+  /* Guest-related calculations */
+
+  export class DomainCountCalc extends CalcBase<OptGrouping> {
+    processBatch(events: Stores.Events.TeamEvent[], results?: OptGrouping) {
+      _.each(events, (e) => {
+        var domains = Stores.Events.getGuestDomains(e);
+        var annotations = domains.length ?
+          // Create annotation for each domains
+          _.map(domains, (domain) => ({
+            event: e,
+            value: 1,
+            groups: [domain]
+          })) :
+
+          // Empty label => no labels
+          [{
+            event: e,
+            value: 1,
+            groups: []
+          }];
+
+        results = groupAnnotations(annotations, results);
+      });
+
+      return results;
+    }
+  }
+
+  /*
+    Calc for meeting guests, filtered by e-mail. Pass nestByDomain=true to
+    the constructor to group by domains first, then drilldown to individual
+    e-mails. Else will calc for a flat list.
+  */
+  export class GuestDurationCalc extends DurationCalc<OptGrouping> {
+    selections: Params.ListSelectJSON;
+    nestByDomain: boolean;
+
+    constructor(p: Params.ListSelectJSON, nestByDomain=false) {
+      super();
+      this.selections = p;
+      this.nestByDomain = nestByDomain;
+    }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results?: OptGrouping
+    ) {
+      var domains = Stores.Events.getGuestDomains(event);
+      var annotations = Params.applyListSelectJSON(domains, this.selections)
+        .match({
+          none: (): Annotation[] => [],
+          some: (matchedDomains) => {
+            let emails = Stores.Events.getGuestEmails(event, matchedDomains);
+            return matchedDomains.length ?
+
+              /*
+                Create annotation for each guest. If no emails, this will be
+                empty and nothing will be counted
+              */
+              _.map(emails, (email) => ({
+                event: event,
+                value: duration / emails.length, // Split among matching guests
+                groups: this.nestByDomain ?
+                  [email.split('@')[1], email] : [email]
+              })) :
+
+              // No matched domains => no guests
+              [{
+                event: event,
+                value: duration,
+                groups: []
+              }]
+          }
         });
 
       return groupAnnotations(annotations, results);

@@ -109,7 +109,74 @@ module Esper.Actions.Charts2 {
   }
 
 
-  /* Label charts */
+  /* Guest Charts */
+
+  export function renderGuests(o: BaseOpts<DomainChartOpts>) {
+    o.extra = cleanExtra(o.extra) as DomainChartOpts;
+    o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
+    fetchEvents(o);
+
+    render(ReactHelpers.contain(function() {
+      var data = getEventData(o);
+      var calcData = _.map(data, (d, i) => {
+        let calc = new EventStats.GuestDurationCalc(
+          o.extra.domains,
+          o.extra.type === "percent");  // Nest domains for pie chart
+        calc.start(d.events);
+
+        return {
+          period: d.period,
+          current: _.isEqual(d.period, o.period),
+          fetching: d.isBusy,
+          error: d.hasError,
+          events: d.events,
+          calculation: calc
+        };
+      });
+
+      var chart = o.extra.type === "percent" ?
+        <Components.GuestPercentChart data={calcData} /> :
+        <Components.GuestHoursChart data={calcData} />;
+
+      var selectorCalc = new EventStats.DomainCountCalc();
+      var allEvents = _.flatten( _.map(data, (d) => d.events) );
+      selectorCalc.start(allEvents);
+      var selector = <div className="esper-panel-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-user" />{" "}
+          { Text.GuestDomains }
+        </div>
+        <Components.DomainCalcSelector
+          events={allEvents}
+          calculation={selectorCalc}
+          selected={o.extra.domains}
+          showNone={o.extra.type === "percent"}
+          updateFn={(x) => updateDomains(x, o.extra)}
+        />
+      </div>;
+
+      return <Views.Charts2
+        teamId={o.teamId}
+        calIds={o.calIds}
+        period={o.period}
+        extra={o.extra}
+        pathFn={Paths.Time.guestChart}
+        chart={chart}
+        selectors={selector}
+      />
+    }));
+  }
+
+  function updateDomains(p: {
+    all: boolean;
+    none: boolean;
+    some: string[];
+  }, extra: DomainChartOpts) {
+    Route.nav.query(_.extend({}, extra, { domains: p }));
+  }
+
+
+  /* Label Charts */
 
   export function renderLabels(o: BaseOpts<LabelChartOpts>) {
     o.extra = cleanExtra(o.extra) as LabelChartOpts;
@@ -154,7 +221,7 @@ module Esper.Actions.Charts2 {
           allSelected={o.extra.labels.all}
           unlabeledSelected={o.extra.labels.none}
 
-          updateFn={updateLabels}
+          updateFn={(x) => updateLabels(x, o.extra)}
           onUnconfirmedClick={() => selectorCalc.getResults().match({
             none: () => null,
             some: (r) => r.unconfirmed.length &&
@@ -178,14 +245,14 @@ module Esper.Actions.Charts2 {
       all: boolean;
       unlabeled: boolean;
       labels: string[];
-    }) {
-      Route.nav.query({
+    }, extra: LabelChartOpts) {
+      Route.nav.query(_.extend({}, extra, {
         labels: {
           all: all,
           none: unlabeled,
           some: labels
         }
-      });
+      }));
     }
 
     var autoLaunchConfirm = true;
