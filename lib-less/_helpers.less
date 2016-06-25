@@ -527,10 +527,12 @@
 
   .esper-shade & {
     color: @shade-text-header;
+    &.active { color: @shade-link; }
   }
 
   .esper-inverse & {
     color: @inverse-text-header;
+    &.active { color: @inverse-link; }
   }
 }
 
@@ -901,6 +903,16 @@ flexibility with non-UL elements */
 
     &:hover {
       color: @shade-text-muted-hover;
+    }
+  }
+}
+
+.action-block {
+  cursor: pointer;
+
+  &:hover {
+    .esper-subheader-link {
+      font-weight: bold;
     }
   }
 }
