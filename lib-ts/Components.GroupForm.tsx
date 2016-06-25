@@ -245,7 +245,12 @@ module Esper.Components {
           && _.includes(team.team_name.toLowerCase(),
                         teamFilter.toLowerCase());
       });
-      if (_.isEmpty(filteredTeams) && !_.isEmpty(teamFilter)) {
+      if (_.isEmpty(filteredTeams)) {
+        if (_.isEmpty(teamFilter)) {
+          return <div className="esper-no-content">
+            There are no available { Text.TeamExecs } to add
+          </div>;
+        }
         return <div className="esper-no-content">
           No { Text.TeamExec } with the name containing '{ teamFilter }' found
         </div>;
