@@ -70,26 +70,21 @@ module Esper.Route {
   routeChart(Paths.Time.guestChart, Actions.Charts2.renderGuests);
   routeChart(Paths.Time.labelsChart, Actions.Charts2.renderLabels);
 
-
-  // Old chart routing
+  // Default routing => redirect to labels
   route(Paths.Time.charts({
-    chartId: ":chartId?",
     teamId: ":teamId?",
     calIds: ":calIds?",
     interval: ":interval?",
     period: ":period?"
-  }).hash, checkOnboarding, function(ctx) {
-    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
-    var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
-    var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
-                                                "week");
-    var period = Params.cleanSingleOrCustomPeriod(interval,
-                                                  ctx.params["period"]);
-    Actions.renderChart({
-      chartId: ctx.params["chartId"],
-      cals: _.map(calIds, (c) => ({ calId: c, teamId: teamId })),
-      period: period,
-      filterParams: getJSONQuery(ctx)
+  }).hash, function(ctx) {
+    nav.go(Paths.Time.labelsChart({
+      teamId: ctx.params["teamId"],
+      calIds: ctx.params["calIds"],
+      interval: ctx.params["interval"],
+      period: ctx.params["interval"]
+    }), {
+      queryStr: ctx.querystring,
+      replace: true
     });
   });
 
@@ -180,6 +175,10 @@ module Esper.Route {
 
   // Redirect old post-meeting feedback links
   route("/event", redirectPath(Paths.Now.event()));
+
+  // Redirect old charts to new
+  route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
+    redirectPath(Paths.Time.charts()));
 
   // 404 page
   routeNotFound(function(ctx) {
