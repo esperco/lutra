@@ -80,10 +80,9 @@ module Esper.Views {
     }
 
     renderTypeButton(type: "percent"|"absolute") {
-      var title = type === "percent" ?
-        Text.ChartPercentage : Text.ChartAbsolute;
-      var icon = type === "percent" ?
-        "fa-pie-chart" : "fa-bar-chart";
+      var [title, icon] = type === "percent" ?
+        [Text.ChartPercentage, "fa-pie-chart"] :
+        [Text.ChartAbsolute, "fa-bar-chart"]
 
       return <button className={classNames("btn btn-default", {
         active: type === this.props.extra.type

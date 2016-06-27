@@ -66,10 +66,10 @@ module Esper.Charting {
     Generate event series data from period groups. Each group is one series
     with periods being assigned to different stacks.
   */
-  export function eventSeries(groups: PeriodOptGroup[], opts?: EventSeriesOpts)
-    : EventSeries[]
-  {
-    var opts = opts || {};
+  export function eventSeries(
+    groups: PeriodOptGroup[],
+    opts: EventSeriesOpts = {}
+  ) : EventSeries[] {
     var keys = opts.sortedKeys || sortOptGroupKeys(groups);
 
     // Hash indices for quick loopup
@@ -139,9 +139,9 @@ module Esper.Charting {
     one series and each group is a data point
   */
   export function eventGroupSeries(
-    groups: PeriodOptGroup[], opts?: EventGroupSeriesOpts): EventGroupSeries[]
-  {
-    var opts = opts || {};
+    groups: PeriodOptGroup[],
+    opts: EventGroupSeriesOpts = {}
+  ): EventGroupSeries[] {
     let groupings = _.map(groups, (g) => ({
       period: g.period,
       current: g.current,
