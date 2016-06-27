@@ -102,7 +102,6 @@ module Esper.Components {
           { this.renderLabelInput(events) }
           { this.renderLabelList(events) }
           <div className="esper-select-menu">
-            <div className="divider" />
             <a className="esper-selectable"
                href={Paths.Manage.Team.labels({teamId: selectedTeamId}).href}>
             <i className="fa fa-fw fa-bars"></i>

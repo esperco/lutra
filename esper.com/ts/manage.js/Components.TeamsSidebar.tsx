@@ -17,9 +17,11 @@ module Esper.Components {
           <label className="esper-header">
             { Text.TeamExecs }
           </label>
+          { this.props.teams.length ?
+            <ul className="esper-select-menu">
+              { _.map(this.props.teams, (t) => this.renderTeam(t))}
+            </ul> : null }
           <ul className="esper-select-menu">
-            { _.map(this.props.teams, (t) => this.renderTeam(t))}
-            <li className="divider" />
             <li>
               <a className={classNames({
                 active: !this.props.activeTeamId && !this.props.activePersonal

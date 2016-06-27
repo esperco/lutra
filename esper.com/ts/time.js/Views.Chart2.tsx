@@ -28,6 +28,17 @@ module Esper.Views {
       return <div id="charts-page" className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
           <div className="esper-panel-section">
+            <div className="btn-group btn-group-justified">
+              <div className="btn-group">
+                { this.renderTypeButton("percent") }
+              </div>
+              <div className="btn-group">
+                { this.renderTypeButton("absolute") }
+              </div>
+            </div>
+          </div>
+
+          <div className="esper-panel-section">
             <label htmlFor={this.getId("cal-select")}>
               <i className="fa fa-fw fa-calendar-o" />{" "}
               Calendars
@@ -66,6 +77,20 @@ module Esper.Views {
           { this.props.chart }
         </div>
       </div>;
+    }
+
+    renderTypeButton(type: "percent"|"absolute") {
+      var [title, icon] = type === "percent" ?
+        [Text.ChartPercentage, "fa-pie-chart"] :
+        [Text.ChartAbsolute, "fa-bar-chart"]
+
+      return <button className={classNames("btn btn-default", {
+        active: type === this.props.extra.type
+      })} onClick={() => this.updateExtra({ type: type })}>
+        <Components.Tooltip title={title} placement="bottom">
+          <i style={{width: "100%"}} className={"fa fa-fw " + icon} />
+        </Components.Tooltip>
+      </button>
     }
 
     renderPeriodSelector() {

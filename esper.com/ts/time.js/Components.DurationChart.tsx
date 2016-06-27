@@ -5,49 +5,38 @@
 /// <reference path="./Components.Chart.tsx" />
 module Esper.Components {
 
-  type Calc = EventStats.DurationBucketCalc;
-
-  export class DurationChart extends Chart<Calc> {
-    renderMain(groups: Charting.PeriodGroup[]) {
+  export class DurationHoursChart extends DefaultChart {
+    renderMain(groups: Charting.PeriodOptGroup[]) {
+      var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
+        (b) => b.label
+      );
       var series = Charting.eventSeries(groups, {
-
-        // Ignore actual keys here and just use the default bucket list
-        sortFn: () => _.map(EventStats.DurationBucketCalc.BUCKETS,
-          (b) => b.label
-        ),
-
+        sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
-      return <Components.Highchart opts={{
-        chart: {
-          type: 'column'
-        },
+      return <AbsoluteChart
+        series={series} categories={keys} orientation="vertical"
+        yAxis={`${Text.ChartDuration} (${Text.hours()})`}
+      />;
+    }
+  }
 
-        tooltip: Charting.eventPointTooltip,
 
-        legend: {
-          enabled: false
-        },
+  export class DurationPercentChart extends DefaultChart {
+    renderMain(groups: Charting.PeriodOptGroup[]) {
+      var keys = _.map(EventStats.DurationBucketCalc.BUCKETS,
+        (b) => b.label
+      );
+      var series = Charting.eventGroupSeries(groups, {
+        sortedKeys: keys,
+        yFn: EventStats.toHours
+      });
 
-        plotOptions: {
-          column: {
-            stacking: 'normal'
-          }
-        },
-
-        xAxis: {
-          categories: _.map(EventStats.DurationBucketCalc.BUCKETS,
-            (b) => b.label
-          )
-        },
-
-        yAxis: [{
-          title: { text: "Duration (Hours)" }
-        }],
-
-        series: series
-      }} />;
+      return <PercentageChart
+        series={series}
+        yAxis={`${Text.ChartDuration} (${Text.ChartPercentage})`}
+      />;
     }
   }
 }

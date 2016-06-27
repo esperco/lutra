@@ -60,7 +60,7 @@ module Esper.Actions.Charts2 {
   /*
     Clean up different query params that could be passed
   */
-  export function cleanExtra(e: any): ExtraOpts {
+  function cleanExtra(e: any): ExtraOpts {
     e = e || {};
     var typedQ: ExtraOpts = e;
     typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
@@ -69,6 +69,9 @@ module Esper.Actions.Charts2 {
     }
     return typedQ;
   }
+
+
+  /* Duration Charts */
 
   export function renderDurations(o: DefaultBaseOpts) {
     o.extra = cleanExtra(o.extra);
@@ -90,7 +93,10 @@ module Esper.Actions.Charts2 {
         };
       });
 
-      var chart = <Components.DurationChart data={calcData} />;
+      var chart = o.extra.type === "percent" ?
+        <Components.DurationPercentChart data={calcData} /> :
+        <Components.DurationHoursChart data={calcData} />;
+
       return <Views.Charts2
         teamId={o.teamId}
         calIds={o.calIds}
@@ -100,5 +106,161 @@ module Esper.Actions.Charts2 {
         chart={chart}
       />
     }));
+  }
+
+
+  /* Guest Charts */
+
+  export function renderGuests(o: BaseOpts<DomainChartOpts>) {
+    o.extra = cleanExtra(o.extra) as DomainChartOpts;
+    o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
+    fetchEvents(o);
+
+    render(ReactHelpers.contain(function() {
+      var data = getEventData(o);
+      var calcData = _.map(data, (d, i) => {
+        let calc = new EventStats.GuestDurationCalc(
+          o.extra.domains,
+          o.extra.type === "percent");  // Nest domains for pie chart
+        calc.start(d.events);
+
+        return {
+          period: d.period,
+          current: _.isEqual(d.period, o.period),
+          fetching: d.isBusy,
+          error: d.hasError,
+          events: d.events,
+          calculation: calc
+        };
+      });
+
+      var chart = o.extra.type === "percent" ?
+        <Components.GuestPercentChart data={calcData} /> :
+        <Components.GuestHoursChart data={calcData} />;
+
+      var selectorCalc = new EventStats.DomainCountCalc();
+      var allEvents = _.flatten( _.map(data, (d) => d.events) );
+      selectorCalc.start(allEvents);
+      var selector = <div className="esper-panel-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-user" />{" "}
+          { Text.GuestDomains }
+        </div>
+        <Components.DomainCalcSelector
+          events={allEvents}
+          calculation={selectorCalc}
+          selected={o.extra.domains}
+          showNone={o.extra.type === "percent"}
+          updateFn={(x) => updateDomains(x, o.extra)}
+        />
+      </div>;
+
+      return <Views.Charts2
+        teamId={o.teamId}
+        calIds={o.calIds}
+        period={o.period}
+        extra={o.extra}
+        pathFn={Paths.Time.guestChart}
+        chart={chart}
+        selectors={selector}
+      />
+    }));
+  }
+
+  function updateDomains(p: {
+    all: boolean;
+    none: boolean;
+    some: string[];
+  }, extra: DomainChartOpts) {
+    Route.nav.query(_.extend({}, extra, { domains: p }));
+  }
+
+
+  /* Label Charts */
+
+  export function renderLabels(o: BaseOpts<LabelChartOpts>) {
+    o.extra = cleanExtra(o.extra) as LabelChartOpts;
+    o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
+    fetchEvents(o);
+
+    render(ReactHelpers.contain(function() {
+      var data = getEventData(o);
+      var calcData = _.map(data, (d, i) => {
+        let calc = new EventStats.LabelDurationCalc(o.extra.labels);
+        calc.start(d.events);
+
+        return {
+          period: d.period,
+          current: _.isEqual(d.period, o.period),
+          fetching: d.isBusy,
+          error: d.hasError,
+          events: d.events,
+          calculation: calc
+        };
+      });
+
+      var chart = o.extra.type === "percent" ?
+        <Components.LabelPercentChart data={calcData} /> :
+        <Components.LabelHoursChart data={calcData} />;
+
+      var selectorCalc = new EventStats.LabelCountCalc();
+      var allEvents = _.flatten( _.map(data, (d) => d.events) );
+      selectorCalc.start(allEvents);
+      var selector = <div className="esper-panel-section">
+        <div className="esper-subheader">
+          <i className="fa fa-fw fa-tags" />{" "}
+          { Text.Labels }
+        </div>
+        <Components.LabelCalcSelector
+          events={allEvents}
+          teams={[Stores.Teams.require(o.teamId)]}
+          calculation={selectorCalc}
+          showUnlabeled={o.extra.type === "percent"}
+
+          selected={o.extra.labels.some}
+          allSelected={o.extra.labels.all}
+          unlabeledSelected={o.extra.labels.none}
+
+          updateFn={(x) => updateLabels(x, o.extra)}
+          onUnconfirmedClick={() => selectorCalc.getResults().match({
+            none: () => null,
+            some: (r) => r.unconfirmed.length &&
+                         launchConfirmModal(r.unconfirmed)
+          })}
+        />
+      </div>;
+
+      return <Views.Charts2
+        teamId={o.teamId}
+        calIds={o.calIds}
+        period={o.period}
+        extra={o.extra}
+        pathFn={Paths.Time.labelsChart}
+        chart={chart}
+        selectors={selector}
+      />
+    }));
+
+    function updateLabels({all, unlabeled, labels}: {
+      all: boolean;
+      unlabeled: boolean;
+      labels: string[];
+    }, extra: LabelChartOpts) {
+      Route.nav.query(_.extend({}, extra, {
+        labels: {
+          all: all,
+          none: unlabeled,
+          some: labels
+        }
+      }));
+    }
+
+    var autoLaunchConfirm = true;
+    function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
+      autoLaunchConfirm = false;
+      Layout.renderModal(
+        Containers.confirmListModal(events)
+      );
+    }
   }
 }

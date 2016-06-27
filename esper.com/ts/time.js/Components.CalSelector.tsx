@@ -34,13 +34,13 @@ module Esper.Components {
             selectedItemClasses="active"
             selectedIcon="fa-calendar-check-o"
             unselectedIcon="fa-calendar-o"
+            className="esper-select-menu"
             listClasses="esper-select-menu"
             itemClasses="esper-selectable"
             headerClasses="esper-select-header"
             updateFn={this.updateCal.bind(this)}
           /> : null
         }
-        { groups.length ? <div className="divider" /> : null }
         <div className="esper-select-menu">
           <a className="esper-selectable"
              onClick={this.editCalendars.bind(this)}>

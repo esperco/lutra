@@ -22,24 +22,64 @@ module Esper.EventStats {
     groups: string[];
   }
 
+  export interface EventMap {
+    [index: string]: boolean;
+  }
+
   /*
-    Heirarchal map of grouping strings to annotations
+    Heirarchal maps of grouping strings to annotations
   */
+  export interface Group {
+    annotations: Annotation[];
+    totalValue: number;   // Sum of all annotation values
+    totalUnique: number;  // Total unique events
+    eventMap: EventMap;   /* Map used to quickly test whether event exists
+                             in group */
+  }
+
+  export interface Subgroup extends Group {
+    subgroups: Grouping;
+  }
+
   export interface Grouping {
-    [index: string]: {
-      annotations: Annotation[];
-      total: number; // Sum of all annotation values
-      subgroups: Grouping;
+    [index: string]: Subgroup;
+  }
+
+  export interface OptGrouping extends Group {
+    some: Grouping;
+    none: Group;
+  }
+
+  function emptyGroup(): Group {
+    return {
+      annotations: [],
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {}
     }
   }
 
-  export interface OptGrouping {
-    some: Grouping;
-    none: {
-      annotations: Annotation[];
-      total: number;
+  function emptySubgroup(): Subgroup {
+    return {
+      annotations: [],
+      totalValue: 0,
+      totalUnique: 0,
+      subgroups: {},
+      eventMap: {}
     }
   }
+
+  function emptyOptGrouping(): OptGrouping {
+    return {
+      some: {},
+      none: emptyGroup(),
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {},
+      annotations: []
+    }
+  }
+
 
   /*
     Convert annotations to grouping -- optionally takes an existing grouping
@@ -47,31 +87,42 @@ module Esper.EventStats {
   */
   export function groupAnnotations(annotations: Annotation[],
                                    grouping?: OptGrouping) {
-    grouping = grouping || {
-      some: {},
-      none: {
-        annotations: [],
-        total: 0
-      }
-    };
+    grouping = grouping || emptyOptGrouping();
 
     _.each(annotations, (a) => {
+      var eventKey = Stores.Events.strId(a.event);
+
       if (a.groups.length) {
-        let currentGroup = grouping.some;
+        let currentGrouping = grouping.some;
         _.each(a.groups, (g) => {
-          currentGroup[g] = currentGroup[g] || {
-            annotations: [],
-            total: 0,
-            subgroups: {}
-          };
-          currentGroup[g].annotations.push(a);
-          currentGroup[g].total += a.value;
-          currentGroup = currentGroup[g].subgroups;
+          let currentGroup = currentGrouping[g] =
+            currentGrouping[g] || emptySubgroup();
+          currentGroup.annotations.push(a);
+          currentGroup.totalValue += a.value;
+
+          if (! currentGroup.eventMap[eventKey]) {
+            currentGroup.eventMap[eventKey] = true;
+            currentGroup.totalUnique += 1;
+          }
+
+          currentGrouping = currentGroup.subgroups;
         });
       }
       else {
         grouping.none.annotations.push(a);
-        grouping.none.total += a.value;
+        grouping.none.totalValue += a.value;
+
+        if (! grouping.none.eventMap[eventKey]) {
+          grouping.none.eventMap[eventKey] = true;
+          grouping.none.totalUnique += 1;
+        }
+      }
+
+      grouping.totalValue += a.value;
+      grouping.annotations.push(a);
+      if (! grouping.eventMap[eventKey]) {
+        grouping.eventMap[eventKey] = true;
+        grouping.totalUnique += 1;
       }
     });
 
@@ -176,29 +227,24 @@ module Esper.EventStats {
     Asynchronous, non-blocking annotation and grouping of a series of events,
     with emission of change event at end of calculation.
   */
-  export abstract class CalculationBase extends Emit.EmitBase {
+  export abstract class CalcBase<T> extends Emit.EmitBase {
     // Are we there yet?
     ready = false;
     running = false;
 
     // Intermediate state for use with progressive calculation
-    eventQueue: Stores.Events.TeamEvent[] = [];
-    annotationsQueue: Annotation[] = [];
-    grouping: OptGrouping = {
-      some: {},
-      none: {
-        annotations: [],
-        total: 0
-      }
-    };
+    _eventQueue: Stores.Events.TeamEvent[] = [];
+    _results: T;
+
     MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
 
     // Returns some grouping if done, none if not complete
-    getResults(): Option.T<OptGrouping> {
+    getResults(): Option.T<T> {
       return this.ready ?
-        Option.wrap(this.grouping) :
-        Option.none<OptGrouping>();
+        Option.some(this._results) :
+        Option.none<T>();
     }
+
 
     // Start calulations based on passed events
     start(events: Stores.Events.TeamEvent[]) {
@@ -212,35 +258,31 @@ module Esper.EventStats {
 
     // Pre-populate vars used in processing loop
     init(events: Stores.Events.TeamEvent[]) {
-      this.eventQueue = _.clone(events);
+      this._eventQueue = _.clone(events);
+      this._results = this.initResult();
       this.ready = false;
       this.running = true;
-      this.annotationsQueue = [];
-      this.grouping = {
-        some: {},
-        none: {
-          annotations: [],
-          total: 0
-        }
-      }
     }
 
     /*
-      Recursive "loop" that calls annotateSome and groupSome until we're done.
-      Auto-bind so we can easily reference function by name and avoid recursion
-      limits
+      Recursive "loop" that calls processBatch until we're done. Auto-bind so
+      we can easily reference function by name and avoid recursion limits
     */
     runLoop = () => {
       if (! this.running) return;
 
-      if (! _.isEmpty(this.eventQueue)) {
-        this.annotateSome();
-        this.next();
-        return;
-      }
+      if (! _.isEmpty(this._eventQueue)) {
+        var events = this.getBatch();
 
-      if (! _.isEmpty(this.annotationsQueue)) {
-        this.groupSome();
+        // Record init length in case filtering or processing changes this
+        var initLength = events.length;
+
+        events = _.filter(events, (e) => this.filterEvent(e));
+        this._results = this.processBatch(events, this._results);
+
+        // Remove processed items from queue
+        this._eventQueue = this._eventQueue.slice(initLength);
+
         this.next();
         return;
       }
@@ -255,49 +297,25 @@ module Esper.EventStats {
       window.requestAnimationFrame(this.runLoop);
     }
 
-    // Annotate some events from queue
-    abstract annotateSome(): void;
-
-    groupSome() {
-      // Get events to process
-      var annotations = this.annotationsQueue.slice(0,
-        this.MAX_PROCESS_EVENTS);
-
-      // Do some grouping
-      groupAnnotations(annotations, this.grouping);
-
-      // Removed processed items from queue
-      this.annotationsQueue = this.annotationsQueue.slice(
-        this.MAX_PROCESS_EVENTS);
-    }
-  }
-
-
-  /*
-    Standard calculation => just process fixed number of events
-  */
-  export abstract class Calculation extends CalculationBase {
-    // Annotate some events from queue
-    annotateSome() {
-      // Get events to process
-      var events = this.eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
-
-      // Actual annotations
-      _.each(events, (e) => {
-        let annotation = this.annotate(e);
-        if (_.isArray(annotation)) {
-          this.annotationsQueue = this.annotationsQueue.concat(annotation);
-        } else {
-          this.annotationsQueue.push(annotation);
-        }
-      });
-
-      // Remove processed items from queue
-      this.eventQueue = this.eventQueue.slice(events.length);
+    // Returns some events from the head of the queue
+    getBatch() {
+      return this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
     }
 
-    // Replace with per-chart annotations
-    abstract annotate(event: Stores.Events.TeamEvent): Annotation|Annotation[];
+    // Override as appropriate -- return false for events to ignore
+    filterEvent(event: Stores.Events.TeamEvent) {
+      return Stores.Events.isActive(event);
+    }
+
+    // Empty initial result object
+    abstract initResult(): T;
+
+    /*
+      Handle events from queue -- takes events plus current intermediate
+      result state
+    */
+    abstract processBatch(events: Stores.Events.TeamEvent[],
+                          results: T): T;
   }
 
 
@@ -310,20 +328,20 @@ module Esper.EventStats {
     MAX_PROCESS_EVENTS in this case is treated as a suggestion, rather than
     a hard rule.
   */
-  export abstract class DurationCalculation extends CalculationBase {
-    getSomeEvents() {
-      var events = this.eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
+  export abstract class DurationCalc<T> extends CalcBase<T> {
+    getBatch() {
+      var events = this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
       let ends = _.map(events, (e) => e.end.getTime());
       let max = _.max(ends);
 
       var i = this.MAX_PROCESS_EVENTS;
-      var next = this.eventQueue[i];
+      var next = this._eventQueue[i];
       while (!!next) {
         if (next.start.getTime() < max) {
           events.push(next);
           max = Math.max(max, next.end.getTime());
           i += 1;
-          next = this.eventQueue[i];
+          next = this._eventQueue[i];
         }
         else {
           break;
@@ -333,39 +351,25 @@ module Esper.EventStats {
       return events;
     }
 
-    // Annotate some events from queue, returns true if it did work, false
-    // if queue was empty
-    annotateSome() {
-      // Get events to process
-      var events = this.getSomeEvents();
-
-      // Get durations
+    processBatch(events: Stores.Events.TeamEvent[], results: T) {
       var durations = durationWrappers(events);
-
-      // Actual annotations
-      _.each(durations, (d) => {
-        let annotation = this.annotate(d.event, d.duration);
-        if (_.isArray(annotation)) {
-          this.annotationsQueue = this.annotationsQueue.concat(annotation);
-        } else {
-          this.annotationsQueue.push(annotation);
-        }
-      });
-
-      // Remove processed items from queue
-      this.eventQueue = this.eventQueue.slice(events.length);
+      _.each(durations,
+        (d) => results = this.processOne(d.event, d.duration, results)
+      );
+      return results;
     }
 
-    // Replace with per-chart annotations
-    abstract annotate(event: Stores.Events.TeamEvent, duration: number)
-      : Annotation|Annotation[];
+    abstract processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: T): T;
   }
 
 
   /* Misc calculation classes we're using for charts */
 
   /* Group events by how long they are */
-  export class DurationBucketCalc extends DurationCalculation {
+  export class DurationBucketCalc extends DurationCalc<OptGrouping> {
     static BUCKETS = [{
       label: "< 30m",
       gte: 0   // Greater than, seconds
@@ -386,16 +390,200 @@ module Esper.EventStats {
       gte: 8 * 60 * 60
     }];
 
-    annotate(event: Stores.Events.TeamEvent, duration: number): Annotation {
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
       var bucket = _.findLast(DurationBucketCalc.BUCKETS,
         (b) => duration >= b.gte
-      )
+      );
 
-      return {
+      return groupAnnotations([{
         event: event,
         value: duration,
         groups: [bucket.label]
-      };
+      }], results);
+    }
+  }
+
+
+  // Count unique events by label type
+  export interface LabelCalcCount extends OptGrouping {
+    unconfirmed: Stores.Events.TeamEvent[];
+    unconfirmedCount: number;
+  }
+
+  // Count unique events by label
+  export class LabelCountCalc extends CalcBase<LabelCalcCount> {
+    initResult() {
+      return _.extend({
+        unconfirmed: [],
+        unconfirmedCount: 0
+      }, emptyOptGrouping()) as LabelCalcCount;
+    }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: LabelCalcCount) {
+      _.each(events, (e) => {
+        var eventKey = Stores.Events.strId(e);
+        var newEvent = !(results && results.eventMap[eventKey]);
+
+        var labelIds = _.map(Option.matchList(e.labelScores), (s) => s.id);
+        var annotations = labelIds.length ?
+          // Create annotation for each label
+          _.map(labelIds, (labelId) => ({
+            event: e,
+            value: 1,
+            groups: [labelId]
+          })) :
+
+          // Empty label => no labels
+          [{
+            event: e,
+            value: 1,
+            groups: []
+          }];
+
+        results = _.extend({
+          unconfirmed: [],
+          unconfirmedCount: 0
+        }, results, groupAnnotations(annotations, results)) as LabelCalcCount;
+
+        if (newEvent && Stores.Events.needsConfirmation(e)) {
+          results.unconfirmed.push(e);
+          results.unconfirmedCount += 1;
+        }
+      });
+
+      return results;
+    }
+  }
+
+  // Count event durations by selected labels
+  export class LabelDurationCalc extends DurationCalc<OptGrouping> {
+    selections: Params.ListSelectJSON;
+
+    constructor(p: Params.ListSelectJSON) {
+      super();
+      this.selections = p;
+    }
+
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
+      var annotations = Params.applyListSelectJSON(labelIds, this.selections)
+        .match({
+          none: (): Annotation[] => [],
+          some: (matchedLabelIds) => matchedLabelIds.length ?
+
+            // Create annotation for each label
+            _.map(matchedLabelIds, (labelId) => ({
+              event: event,
+              value: duration / matchedLabelIds.length, // Split among matching
+              groups: [labelId]
+            })) :
+
+            // Empty label => no labels
+            [{
+              event: event,
+              value: duration,
+              groups: []
+            }]
+        });
+
+      return groupAnnotations(annotations, results);
+    }
+  }
+
+
+  /* Guest-related calculations */
+
+  export class DomainCountCalc extends CalcBase<OptGrouping> {
+    initResult() { return emptyOptGrouping(); }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
+      _.each(events, (e) => {
+        var domains = Stores.Events.getGuestDomains(e);
+        var annotations = domains.length ?
+          // Create annotation for each domains
+          _.map(domains, (domain) => ({
+            event: e,
+            value: 1,
+            groups: [domain]
+          })) :
+
+          // Empty label => no labels
+          [{
+            event: e,
+            value: 1,
+            groups: []
+          }];
+
+        results = groupAnnotations(annotations, results);
+      });
+
+      return results;
+    }
+  }
+
+  /*
+    Calc for meeting guests, filtered by e-mail. Pass nestByDomain=true to
+    the constructor to group by domains first, then drilldown to individual
+    e-mails. Else will calc for a flat list.
+  */
+  export class GuestDurationCalc extends DurationCalc<OptGrouping> {
+    selections: Params.ListSelectJSON;
+    nestByDomain: boolean;
+
+    constructor(p: Params.ListSelectJSON, nestByDomain=false) {
+      super();
+      this.selections = p;
+      this.nestByDomain = nestByDomain;
+    }
+
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      var domains = Stores.Events.getGuestDomains(event);
+      var annotations = Params.applyListSelectJSON(domains, this.selections)
+        .match({
+          none: (): Annotation[] => [],
+          some: (matchedDomains) => {
+            let emails = Stores.Events.getGuestEmails(event, matchedDomains);
+            return matchedDomains.length ?
+
+              /*
+                Create annotation for each guest. If no emails, this will be
+                empty and nothing will be counted
+              */
+              _.map(emails, (email) => ({
+                event: event,
+                value: duration / emails.length, // Split among matching guests
+                groups: this.nestByDomain ?
+                  [email.split('@')[1], email] : [email]
+              })) :
+
+              // No matched domains => no guests
+              [{
+                event: event,
+                value: duration,
+                groups: []
+              }]
+          }
+        });
+
+      return groupAnnotations(annotations, results);
     }
   }
 }

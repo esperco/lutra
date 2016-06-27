@@ -4,17 +4,20 @@
   on options.
 */
 module Esper.Components {
-  export function AbsoluteChart({series, orientation, yAxis} : {
+  export function AbsoluteChart({series, categories, orientation, yAxis} : {
     series: Charting.EventSeries[],
+    categories: string[];
     orientation?: 'vertical'|'horizontal'
     yAxis?: string;
   }) {
-    series = _.sortBy(series, (s) => s.index);
     orientation = orientation || 'horizontal';
 
     return <Components.Highchart opts={{
-      chart: {
-        type: orientation === 'vertical' ? 'column' : 'bar'
+      chart: orientation === 'vertical' ? {
+        type: 'column'
+      } : {
+        type: 'bar',
+        height: series.length * 50 + 120
       },
 
       tooltip: Charting.eventPointTooltip,
@@ -26,13 +29,16 @@ module Esper.Components {
       plotOptions: {
         column: {
           stacking: 'normal'
+        },
+
+        bar: {
+          borderWidth: 1,
+          stacking: 'normal'
         }
       },
 
       xAxis: {
-        categories: _.map(EventStats.DurationBucketCalc.BUCKETS,
-          (b) => b.label
-        )
+        categories: categories
       },
 
       yAxis: yAxis ? [{

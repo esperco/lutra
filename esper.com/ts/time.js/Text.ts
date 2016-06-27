@@ -79,10 +79,14 @@ module Esper.Text {
     "should use for each person you're supporting.";
 
   // Selector text
+  export const SelectAll = `Select All`;
   export const AllLabels = `All ` + _.capitalize(Labels);
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const Unconfirmed = `New Events`;
   export const SearchEventsPlaceholder = `Search Events`;
+
+  export const GuestDomains = `Organization`;
+  export const NoGuests = `No Guests`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
@@ -94,12 +98,21 @@ module Esper.Text {
   export const ConfirmAllLabels = `Confirm All`;
   export const ConfirmationDone = `Thanks! That's all for now.`;
 
+  // Chart Types
+  export const ChartPercentage = `Percent`;
+  export const ChartAbsolute = `Absolute time`;
+
   // Chart messages
   export const ChartNoData = `No events found`;
   export const ChartFetching = `Fetching data from your calendar`;
   export const ChartFetchError = `Error loading data. ` +
     `Try refreshing in a few minutes.`;
   export const ChartCalculating = `Crunching numbers`;
+
+  // Chart groupings
+  export const ChartDuration = `Duration`;
+  export const ChartLabels = Labels;
+  export const ChartGuests = `Guests`;
 
 
   /////
@@ -108,7 +121,8 @@ module Esper.Text {
     return n != 1 ? 's' : '';
   }
 
-  export function hours(n: number) {
+  export function hours(n?: number) {
+    if (_.isUndefined(n)) { return 'hours'; }
     return `${Util.roundStr(n, 2)} hour${s(n)}`;
   }
 

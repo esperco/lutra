@@ -67,6 +67,8 @@ module Esper.Route {
   }
 
   routeChart(Paths.Time.durationChart, Actions.Charts2.renderDurations);
+  routeChart(Paths.Time.guestChart, Actions.Charts2.renderGuests);
+  routeChart(Paths.Time.labelsChart, Actions.Charts2.renderLabels);
 
 
   // Old chart routing

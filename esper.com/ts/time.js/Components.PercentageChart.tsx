@@ -9,7 +9,6 @@ module Esper.Components {
     yAxis?: string;
   }) {
     series = _.sortBy(series, (s) => s.index);
-
     return <Components.Highchart opts={{
       chart: series.length > 1 ? {
         type: 'bar',
@@ -44,9 +43,9 @@ module Esper.Components {
         enabled: false
       },
 
-      xAxis: {
+      xAxis: series.length > 1 ? {
         categories: _.map(series, (s) => s.name)
-      },
+      } : {},
 
       yAxis: {
         title: { text: yAxis || Text.ChartPercentage }

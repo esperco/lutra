@@ -2,12 +2,11 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
+/// <reference path="./Components.CalcUI.tsx" />
+
 module Esper.Components {
-  interface LabelSelectorProps {
-    labels: Array<Labels.LabelCount>;
-    totalCount?: number;
-    unlabeledCount?: number;
-    unconfirmedCount?: number;
+  interface LabelSelectorBaseProps {
+    className?: string;
     selected: string[];
     allSelected?: boolean;
     unlabeledSelected?: boolean;
@@ -19,7 +18,19 @@ module Esper.Components {
       labels: string[];
     }) => void;
     onUnconfirmedClick?: () => void;
-    className?: string;
+  }
+
+  interface LabelCalcSelectorProps extends LabelSelectorBaseProps {
+    teams: ApiT.Team[];
+    events: Stores.Events.TeamEvent[];
+    calculation: EventStats.LabelCountCalc;
+  }
+
+  interface LabelSelectorProps extends LabelSelectorBaseProps {
+    labels: Array<Labels.LabelCount>;
+    totalCount?: number;
+    unlabeledCount?: number;
+    unconfirmedCount?: number;
   }
 
   export function LabelSelector(props: LabelSelectorProps) {
@@ -113,19 +124,17 @@ module Esper.Components {
           Select All
         </a>
       </div>
-      <div className="divider" />
 
       { groups[0].choices.length > 0 ?
         <ListSelector groups={groups} selectedIds={selectedIdsWithGroups}
           selectOption={ ListSelectOptions.MULTI_SELECT }
           selectedItemClasses="active"
+          className="esper-select-menu"
           listClasses="esper-select-menu"
           itemClasses="esper-selectable"
           headerClasses="esper-select-header"
-          dividerClasses="divider"
           updateFn={updateLabels}
         /> : null }
-      { groups[0].choices.length > 0 ? <div className="divider" /> : null }
 
       { props.showUnlabeled ?
         <div className="esper-select-menu">
@@ -141,7 +150,6 @@ module Esper.Components {
           { Text.Unlabeled }
         </a>
       </div> : null }
-      { props.showUnlabeled ? <div className="divider" /> : null }
 
       { props.onUnconfirmedClick ?
         <div className="esper-select-menu">
@@ -159,7 +167,6 @@ module Esper.Components {
           { Text.Unconfirmed }
         </a>
       </div> : null }
-      { props.onUnconfirmedClick ? <div className="divider" /> : null }
 
       <div className="esper-select-menu">
         <a className="esper-selectable"
@@ -207,5 +214,58 @@ module Esper.Components {
         }
       </DropdownModal>
     </div>;
+  }
+
+
+  /////
+
+
+  export class LabelCalcSelector
+         extends CalcUI<EventStats.LabelCalcCount, LabelCalcSelectorProps>
+  {
+    render() {
+      return this.state.result.match({
+        none: () => <span />,
+        some: (result) => {
+          // Labels from events
+          var labels: Labels.LabelCount[] = _.map(result.some, (v, k) => ({
+            id: k,
+            displayAs: Labels.getDisplayAs(k),
+            count: v.totalUnique
+          }));
+
+          // Get team labels too
+          _.each(this.props.teams, (team) => {
+            _.each(team.team_labels_norm, (norm, i) => {
+              labels.push({
+                id: norm,
+                displayAs: team.team_labels[i],
+                count: 0
+              })
+            })
+          })
+          labels = _.uniqBy(labels, (l) => l.id)
+
+          // Get total event count
+
+          return <LabelSelector
+            className={this.props.className}
+            labels={labels}
+            selected={this.props.selected}
+            allSelected={this.props.allSelected}
+            unlabeledSelected={this.props.unlabeledSelected}
+            unconfirmedSelected={this.props.unconfirmedSelected}
+
+            showUnlabeled={this.props.showUnlabeled}
+            totalCount={result.totalUnique}
+            unlabeledCount={result.none.totalUnique}
+            unconfirmedCount={result.unconfirmedCount}
+
+            updateFn={this.props.updateFn}
+            onUnconfirmedClick={this.props.onUnconfirmedClick}
+          />;
+        }
+      })
+    }
   }
 }
