@@ -222,13 +222,25 @@ module Esper.Actions.Charts2 {
           unlabeledSelected={o.extra.labels.none}
 
           updateFn={(x) => updateLabels(x, o.extra)}
-          onUnconfirmedClick={() => selectorCalc.getResults().match({
-            none: () => null,
-            some: (r) => r.unconfirmed.length &&
-                         launchConfirmModal(r.unconfirmed)
-          })}
         />
       </div>;
+
+      var confirmationMenu = {
+        id: "confirm",
+        tab: <Components.ConfirmBadge
+          events={allEvents}
+          calculation={selectorCalc}
+        />,
+        onClick: () => {
+          selectorCalc.getResults().match({
+            none: () => null,
+            some: (r) => Layout.renderModal(
+              Containers.confirmListModal(r.unconfirmed)
+            )
+          });
+          return false;
+        }
+      };
 
       return <Views.Charts2
         teamId={o.teamId}
@@ -238,6 +250,7 @@ module Esper.Actions.Charts2 {
         pathFn={Paths.Time.labelsChart}
         chart={chart}
         selectors={selector}
+        menus={[confirmationMenu]}
       />
     }));
 

@@ -16,19 +16,28 @@ module Esper.Views {
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
     chart: JSX.Element;
     selectors?: JSX.Element|JSX.Element[];
+
+    // Other sidebar menus
+    menus?: {
+      id: string;
+      tab: JSX.Element;
+      content?: JSX.Element|JSX.Element[];
+      onClick?: () => boolean; // Return false to avoid switching state
+    }[];
   }
 
-  type SidebarVals = "main"|"filter"|"events";
+  const SidebarMain = "main";
+  const SidebarFilter = "filter";
 
   interface State {
-    sidebar: SidebarVals
+    sidebar: string;
   }
 
   export class Charts2 extends Component<Props, State> {
     constructor(props: Props) {
       super(props);
       this.state = {
-        sidebar: "main"
+        sidebar: SidebarMain
       };
     }
 
@@ -43,10 +52,8 @@ module Esper.Views {
               { this.renderSidebarTab("filter",
                   <i className="fa fa-fw fa-sliders" />
               ) }
-              { this.renderSidebarTab("events",
-                  <span className="badge">
-                    123
-                  </span>
+              { _.map(this.props.menus,
+                (m) => this.renderSidebarTab(m.id, m.tab, m.onClick)
               ) }
             </div>
           </div>
@@ -67,19 +74,28 @@ module Esper.Views {
       </div>;
     }
 
-    renderSidebarTab(val: SidebarVals, elm: JSX.Element) {
-      return <a className={classNames("esper-tab", {
-        active: this.state.sidebar === val
-      })} onClick={() => this.setState({ sidebar: val })}>
+    renderSidebarTab(val: string, elm: JSX.Element, onClick?: () => boolean) {
+      return <a
+        className={classNames("esper-tab", {
+          active: this.state.sidebar === val
+        })}
+        onClick={() => (onClick ? onClick() : true) &&
+                 this.setState({ sidebar: val })}>
         { elm }
       </a>
     }
 
     renderSidebarContent() {
-      if (this.state.sidebar === "main") {
-        return this.renderSidebarMain();
+      if (this.state.sidebar === SidebarFilter) {
+        return this.renderSidebarFilters();
       }
-      return this.renderSidebarFilters();
+
+      var menu = _.find(this.props.menus, (m) => m.id === this.state.sidebar);
+      if (menu) {
+        return menu.content;
+      }
+
+      return this.renderSidebarMain();
     }
 
     renderSidebarMain() {
