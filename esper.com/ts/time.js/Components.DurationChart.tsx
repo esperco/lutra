@@ -15,10 +15,13 @@ module Esper.Components {
         yFn: EventStats.toHours
       });
 
-      return <AbsoluteChart
-        series={series} categories={keys} orientation="vertical"
-        yAxis={`${Text.ChartDuration} (${Text.hours()})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <AbsoluteChart
+          series={series} categories={keys} orientation="vertical"
+          yAxis={`${Text.ChartDuration} (${Text.hours()})`}
+        />
+      </div>;
     }
   }
 
@@ -33,10 +36,13 @@ module Esper.Components {
         yFn: EventStats.toHours
       });
 
-      return <PercentageChart
-        series={series}
-        yAxis={`${Text.ChartDuration} (${Text.ChartPercentage})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <PercentageChart
+          series={series}
+          yAxis={`${Text.ChartDuration} (${Text.ChartPercentage})`}
+        />
+      </div>;
     }
   }
 }

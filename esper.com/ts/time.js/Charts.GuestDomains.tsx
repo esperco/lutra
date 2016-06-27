@@ -79,14 +79,6 @@ module Esper.Charts {
       });
     }
 
-    getTotals(): Components.Types.PeriodTotal[] {
-      return [{
-        period: this.params.period,
-        duration: this.totalDuration,
-        count: this.totalCount
-      }];
-    }
-
     renderChart() {
       var data = _.map(this.durationsByDomain.some, (d) => ({
         name: d.key,

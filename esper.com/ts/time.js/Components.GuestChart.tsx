@@ -14,18 +14,24 @@ module Esper.Components {
         yFn: EventStats.toHours
       });
 
-      return <AbsoluteChart
-        orientation="horizontal"
-        series={series}
-        categories={keys}
-        yAxis={`${Text.ChartGuests} (${Text.hours()})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <AbsoluteChart
+          orientation="horizontal"
+          series={series}
+          categories={keys}
+          yAxis={`${Text.ChartGuests} (${Text.hours()})`}
+        />
+      </div>;
     }
   }
 
   export class GuestPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodOptGroup[]) {
-      return <GuestPercentDrilldownChart groups={groups} />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <GuestPercentDrilldownChart groups={groups} />
+      </div>;
     }
   }
 

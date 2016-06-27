@@ -2,19 +2,9 @@
   Used with charts to show the total number of events / hours shown in chart
 */
 
-/// <reference path="../lib/ReactHelpers.ts" />
-
 module Esper.Components {
-  export module Types {
-    export interface PeriodTotal {
-      period: Period.Single|Period.Custom;
-      duration: number; // seconds
-      count: number;
-    }
-  }
-
   interface Props {
-    periodTotals: Types.PeriodTotal[];
+    periodTotals: Charting.PeriodData<EventStats.Group>[];
   }
 
   export class TotalsBar extends ReactHelpers.Component<Props, {}> {
@@ -35,12 +25,12 @@ module Esper.Components {
             <span className="total-hours">
               <i className="fa fa-fw fa-clock-o" />{" "}
               <TotalHours short={totals.length > 1}
-                          duration={total.duration} />
+                          duration={total.data.totalValue} />
             </span>
             <span className="total-count">
               <i className="fa fa-fw fa-calendar-o" />{" "}
               <TotalEvents short={totals.length > 1}
-                           count={total.count} />
+                           count={total.data.totalUnique} />
             </span>
           </div>
         )}
