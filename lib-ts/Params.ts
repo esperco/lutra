@@ -36,12 +36,13 @@ module Esper.Params {
   // if this proves to be untrue.
   export const CAL_ID_SEPARATOR = ",";
   export const MAX_DEFAULT_CALS = 10;
+  export const defaultCalIds = "default";
 
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Stores.Teams.require(teamId);
     lastCalIds = calIdsStr || lastCalIds;
-    if (lastCalIds) {
+    if (lastCalIds && lastCalIds !== defaultCalIds) {
       var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
       return _.intersection(team.team_timestats_calendars, calIds);
     }

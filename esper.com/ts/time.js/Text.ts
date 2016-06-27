@@ -87,6 +87,8 @@ module Esper.Text {
 
   export const GuestDomains = `Organization`;
   export const NoGuests = `No Guests`;
+  export const NoTeam = `Select ${TeamExec}`;
+  export const ManageTeams = `Manage ${TeamExecs}`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;

@@ -54,10 +54,10 @@ module Esper.Views {
           { this.renderSidebarContent() }
 
           <div className="sidebar-bottom-menu">
-            <div className="team-selector">
-              <i className="fa fa-fw fa-caret-up" />{" "}
-              Team
-            </div>
+            <Components.TeamSelector
+              teams={Stores.Teams.all()}
+              selectedId={this.props.teamId}
+              onUpdate={(teamId) => this.updateRoute({teamId: teamId})} />
           </div>
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
@@ -276,13 +276,14 @@ module Esper.Views {
         opts.jsonQuery = extra;
       }
 
-      // Preserve params only if same team change
-      else if (teamId === this.props.teamId) {
-        opts.jsonQuery = _.extend({}, this.props.extra, extra)
+      // Preserve params only if same team change. Also switch cals.
+      else if (teamId !== this.props.teamId) {
+        calIds = [Params.defaultCalIds];
+        opts.jsonQuery = {};
       }
 
       else {
-        opts.jsonQuery = {};
+        opts.jsonQuery = _.extend({}, this.props.extra, extra)
       }
 
       var periodStr = Period.isCustom(period) ?
