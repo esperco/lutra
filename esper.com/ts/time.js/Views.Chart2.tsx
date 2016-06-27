@@ -75,7 +75,7 @@ module Esper.Views {
     }
 
     renderSidebarTab(val: string, elm: JSX.Element, onClick?: () => boolean) {
-      return <a
+      return <a key={val}
         className={classNames("esper-tab", {
           active: this.state.sidebar === val
         })}
