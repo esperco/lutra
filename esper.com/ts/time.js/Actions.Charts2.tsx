@@ -178,6 +178,8 @@ module Esper.Actions.Charts2 {
 
   /* Label Charts */
 
+  var autoLaunchConfirm = true; // This gets set to false after first launch.
+
   export function renderLabels(o: BaseOpts<LabelChartOpts>) {
     o.extra = cleanExtra(o.extra) as LabelChartOpts;
     o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
@@ -225,6 +227,16 @@ module Esper.Actions.Charts2 {
         />
       </div>;
 
+      // Automatically open the confirmation modal the first time
+      selectorCalc.onceChange(function(r) {
+        if (autoLaunchConfirm && r.unconfirmedCount) {
+          autoLaunchConfirm = false;
+          Layout.renderModal(
+            Containers.confirmListModal(r.unconfirmed)
+          )
+        }
+      });
+
       var confirmationMenu = {
         id: "confirm",
         tab: <Components.ConfirmBadge
@@ -268,7 +280,6 @@ module Esper.Actions.Charts2 {
       }));
     }
 
-    var autoLaunchConfirm = true;
     function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
       autoLaunchConfirm = false;
       Layout.renderModal(
