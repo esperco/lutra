@@ -33,6 +33,7 @@ module Esper.Components {
     children?: JSX.Element[];
     className?: string;
     align?: "left"|"right";
+    dropup?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
   }
@@ -114,16 +115,26 @@ module Esper.Components {
       }
 
       var offset = toggle.offset() || { left: 0, top: 0 };
-      var top = offset.top + toggle.outerHeight();
+      var height = toggle.outerHeight();
       var width = toggle.outerWidth();
+      var top = offset.top + toggle.outerHeight();
+      var bottom = $(window).height() - offset.top;
+      var left = offset.left;
+      var right = $(window).width() - (offset.left + width);
 
-      var align: Align = this.props.align === "right" ? {
-        top: top,
-        right: $(window).width() - (offset.left + width)
-      } : {
-        top: top,
-        left: offset.left
-      }
+      var align: Align = this.props.dropup ?
+
+        // Dropup
+        ( this.props.align === "right" ?
+          { bottom: bottom, right: right } :
+          { bottom: bottom, left: left } ) :
+
+        // Dropdown
+        ( this.props.align === "right" ?
+          { top: top, right: right } :
+          { top: top, left: left } );
+
+      console.info(align);
 
       var menu = this.getMenu();
       if (! menu) { return; }
@@ -145,7 +156,11 @@ module Esper.Components {
     Above component is just the trigger -- this is the acutal menu that gets
     rendered
   */
-  type Align = { top: number; left: number; }|{ top: number; right: number; };
+  type Align =
+    { top: number; left: number; }|
+    { top: number; right: number; }|
+    { bottom: number; left: number; }|
+    { bottom: number; right: number; }
   interface MenuProps {
     children?: JSX.Element[];
     className?: string;
