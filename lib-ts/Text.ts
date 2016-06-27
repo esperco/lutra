@@ -10,6 +10,9 @@ module Esper.Text {
   export const Calendar = "calendar";
   export const Calendars = "calendars";
 
+  export const Guest = "person";
+  export const Guests = "people";
+
   export const TeamExec = "account";
   export const TeamExecs = "accounts";
 

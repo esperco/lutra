@@ -107,6 +107,7 @@ module Esper.Views {
             incrs: this.props.extra.incrs
           },
           header: Text.ChartLabels,
+          content: Text.ChartLabelsDescription,
           icon: "fa-tags"
         }) }
 
@@ -117,6 +118,7 @@ module Esper.Views {
             incrs: this.props.extra.incrs
           },
           header: Text.ChartGuests,
+          content: Text.ChartGuestsDescription,
           icon: "fa-users"
         }) }
 
@@ -127,17 +129,18 @@ module Esper.Views {
             incrs: this.props.extra.incrs
           },
           header: Text.ChartDuration,
+          content: Text.ChartDurationDescription,
           icon: "fa-clock-o"
         }) }
       </div>;
     }
 
-    renderSidebarMenuOpt({pathFn, extra, header, icon, elm}: {
+    renderSidebarMenuOpt({pathFn, extra, header, icon, content}: {
       pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
       extra?: Actions.Charts2.ExtraOpts;
       header: string;
       icon?: string;
-      elm?: JSX.Element|string;
+      content?: JSX.Element|string;
     }) {
       var active = pathFn === this.props.pathFn;
       return <div className="esper-panel-section action-block"
@@ -148,14 +151,10 @@ module Esper.Views {
         <div className={classNames("esper-subheader-link", {
           active: active
         })}>
-          <i className={"fa fa-fw " + icon} />{" "}
+          { icon ? <i className={"fa fa-fw " + icon} /> : null }{" "}
           { header }
         </div>
-        <div className="">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur a
-          iaculis odio. Nulla blandit euismod imperdiet. Phasellus facilisis
-          purus odio, vitae porta ante ullamcorper at.
-        </div>
+        { content }
       </div>;
     }
 
