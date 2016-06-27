@@ -45,7 +45,9 @@ module Esper.Components {
             <li className="divider" />
             <li>
               <a className={classNames({
-                active: !this.props.activeGroupId && !this.props.activeTeamId
+                active: !this.props.activeGroupId &&
+                        !this.props.activeTeamId &&
+                        !this.props.activePersonal
               })}
               href={Paths.Manage.newGroup().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
