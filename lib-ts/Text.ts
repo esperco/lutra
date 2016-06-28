@@ -43,6 +43,7 @@ module Esper.Text {
 
   // Label interface
   export const AddLabel = "add " + Label;
+  export const FindLabels = "find " + Labels;
   export const FindAddLabels = "find / add " + Labels;
   export function predictionTooltip(score: number) { // Score is 0-1
     return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +
