@@ -11,11 +11,19 @@ module Esper.Views {
     pathFn = Paths.Manage.Group.labels;
 
     renderMain(group: ApiT.Group) {
+      var myself = _.find(group.group_individuals, {
+        uid: Login.me()
+      });
+
+      var addPermission = false;
+      if (!_.isEmpty(myself) && myself.role !== Text.GroupRoleMember)
+        addPermission = true;
       return <div className="panel panel-default">
         <div className="panel-body">
           <Components.LabelManager getLabels={this.getLabels(group)}
             addLabel={this.addLabel(group)} archiveFn={this.archive(group)}
-            removeLabel={this.removeLabel(group)} renameLabel={this.renameLabel(group)} />
+            removeLabel={this.removeLabel(group)} renameLabel={this.renameLabel(group)}
+            addPermission={addPermission} />
         </div>
       </div>;
     }
