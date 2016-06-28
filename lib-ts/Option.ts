@@ -107,6 +107,17 @@ module Esper.Option {
   }
 
   /*
+    Like flatten, but wraps response in option. Returns none if any of
+    the options in array is none.
+  */
+  export function flatOpt<E>(opts: T<E>[]): T<E[]> {
+    if (_.find(opts, (o) => o.isNone())) {
+      return Option.none<E[]>();
+    }
+    return Option.some(_.map(opts, (o) => o.unwrap()));
+  }
+
+  /*
     Helper to help Typescript infer types when matching against lists
     Otherwise, `none: () => []` will return any
   */

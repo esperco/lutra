@@ -130,12 +130,28 @@ module Esper.Stores.Events {
     Model2.StoreData<FullEventId, TeamEvent>;
 
   /*
-    Convenience interface for grouping together merged event list with
+    Convenience interface for grouping together merged event list for multiple
+    days
   */
   export interface EventListData {
     start: Date;
     end: Date;
     events: TeamEvent[];
+    isBusy: boolean;
+    hasError: boolean;
+  }
+
+  /*
+    Convenience interface for grouping together events still separated by
+    date
+  */
+  export interface EventsForDate {
+    date: Date;
+    events: TeamEvent[];
+  };
+
+  export interface EventDateData {
+    dates: EventsForDate[];
     isBusy: boolean;
     hasError: boolean;
   }
@@ -389,6 +405,89 @@ module Esper.Stores.Events {
       hasError: hasError
     });
   }
+
+
+  /////
+
+  export function getByDateForPeriod({cals, period}: {
+    cals: Calendars.CalSelection[];
+    period: Period.Single|Period.Custom,
+  }): Option.T<EventDateData> {
+    var bounds = Period.boundsFromPeriod(period);
+    return getByDate({
+      cals: cals,
+      start: bounds[0],
+      end: bounds[1]
+    });
+  }
+
+  export function getByDate({cals, start, end}: {
+    cals: Calendars.CalSelection[],
+    start: Date,
+    end: Date,
+  }): Option.T<EventDateData> {
+    var dates = datesFromBounds(start, end);
+    var isBusy = false;
+    var hasError = false;
+    var eventDates: {
+      date: Date;
+      events: TeamEvent[]
+    }[] = [];
+
+    for (let i in dates) {
+      let date = dates[i];
+      let events = Option.flatOpt(
+        _.map(cals, (c) => EventsForDateStore.batchGet({
+          teamId: c.teamId,
+          calId: c.calId,
+          date: date
+        }))
+      );
+
+      if (events.isNone()) {
+        return Option.none<EventDateData>();
+      } else {
+        let eventsForThisDay: TeamEvent[] = [];
+        _.each(Option.matchList(events), (e) => {
+          // If date is busy or error, then entire list is busy or error
+          if (e.dataStatus === Model2.DataStatus.FETCHING) {
+            isBusy = true;
+          } else if (e.dataStatus === Model2.DataStatus.FETCH_ERROR) {
+            hasError = true;
+          }
+
+          _.each(Option.matchList(e.data), (eventOpt) => {
+            // If event is busy or error, then entire list is busy or error
+            if (eventOpt.dataStatus === Model2.DataStatus.FETCHING) {
+              isBusy = true;
+            }
+            else if (eventOpt.dataStatus ===
+                     Model2.DataStatus.FETCH_ERROR) {
+              hasError = true;
+            }
+            eventOpt.data.match({
+              none: () => null,
+              some: (event) => eventsForThisDay.push(event)
+            })
+          });
+        });
+
+        eventDates.push({
+          date: date,
+          events: eventsForThisDay
+        });
+      }
+    }
+
+    return Option.some({
+      hasError: hasError,
+      isBusy: isBusy,
+      dates: eventDates
+    });
+  }
+
+
+  //////
 
   export function fetch1(fullEventId: FullEventId, forceRefresh=false) {
     if (forceRefresh || EventStore.get(fullEventId).isNone()) {
