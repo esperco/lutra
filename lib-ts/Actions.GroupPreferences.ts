@@ -28,14 +28,26 @@ module Esper.Actions.GroupPreferences {
     });
   }
 
-  // Enable or disable label reminder email
-  export function toggleLabelReminders(oldPrefs: ApiT.GroupPreferences) {
+  // Enable or disable daily breakdown email
+  export function toggleDailyBreakdownEmails(oldPrefs: ApiT.GroupPreferences) {
     var groupId = oldPrefs.groupid;
     var newPrefs = _.cloneDeep(oldPrefs);
-    newPrefs.label_reminder = !oldPrefs.label_reminder;
+    newPrefs.daily_breakdown = !oldPrefs.daily_breakdown;
     var promise = Api.putGroupPreferences(groupId, newPrefs);
     update(groupId, promise, (prefs) => {
-      prefs.label_reminder = newPrefs.label_reminder;
+      prefs.daily_breakdown = newPrefs.daily_breakdown;
+      return prefs;
+    });
+  }
+
+  // Enable or disable weekly breakdown email
+  export function toggleWeeklyBreakdownEmails(oldPrefs: ApiT.GroupPreferences) {
+    var groupId = oldPrefs.groupid;
+    var newPrefs = _.cloneDeep(oldPrefs);
+    newPrefs.weekly_breakdown = !oldPrefs.weekly_breakdown;
+    var promise = Api.putGroupPreferences(groupId, newPrefs);
+    update(groupId, promise, (prefs) => {
+      prefs.weekly_breakdown = newPrefs.weekly_breakdown;
       return prefs;
     });
   }

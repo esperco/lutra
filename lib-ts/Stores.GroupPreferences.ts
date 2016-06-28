@@ -47,7 +47,8 @@ module Esper.Stores.GroupPreferences {
     var prefs = {
       groupid,
       uid: Login.me(),
-      label_reminder: false,
+      daily_breakdown: false,
+      weekly_breakdown: false,
       bad_duration: 20,
       bad_attendees: 4
     };
@@ -66,7 +67,8 @@ module Esper.Stores.GroupPreferences {
     if (Object.isFrozen(prefs)) {
       prefs = _.cloneDeep(prefs);
     }
-    prefs.label_reminder = false;
+    prefs.daily_breakdown = false;
+    prefs.weekly_breakdown = false;
     prefs.bad_duration = 20;
     prefs.bad_attendees = 4;
 
