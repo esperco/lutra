@@ -87,6 +87,8 @@ module Esper.Text {
 
   export const GuestDomains = `Organization`;
   export const NoGuests = `No Guests`;
+  export const NoTeam = `Select ${TeamExec}`;
+  export const ManageTeams = `Manage ${TeamExecs}`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
@@ -112,7 +114,15 @@ module Esper.Text {
   // Chart groupings
   export const ChartDuration = `Duration`;
   export const ChartLabels = Labels;
-  export const ChartGuests = `Guests`;
+  export const ChartGuests = Guests;
+
+  // Chart descriptions
+  export const ChartDurationDescription =
+    `Am I spending my time in many short meetings or a few long meetings?`;
+  export const ChartLabelsDescription =
+    `Which ${Labels} am I spending the most time on?`;
+  export const ChartGuestsDescription =
+    `Which ${Guests} am I meeting the most with?`;
 
 
   /////

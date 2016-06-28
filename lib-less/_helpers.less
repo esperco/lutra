@@ -71,6 +71,10 @@
     }
   }
 
+  .sidebar-top-menu, .sidebar-bottom-menu {
+    height: @input-height-base;
+  }
+
   .esper-left-sidebar, .esper-right-content {
     padding: @esper-base-padding;
     position: absolute;
@@ -89,6 +93,42 @@
 
     @media (min-width: @screen-sm-min) {
       width: @sidebar-sm-width;
+
+      .sidebar-top-menu, .sidebar-bottom-menu {
+        position: absolute;
+        left: 0; right: 0;
+      }
+
+      .sidebar-top-menu {
+        top: 0;
+      }
+
+      .sidebar-bottom-menu {
+        bottom: 0;
+      }
+
+      .sidebar-minus-top-menu, .sidebar-minus-bottom-menu {
+        position: absolute;
+        padding: @esper-base-padding;
+        left: 0; right: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+
+      .sidebar-minus-top-menu {
+        top: @input-height-base;
+        bottom: 0;
+      }
+
+      .sidebar-minus-bottom-menu {
+        top: 0;
+        bottom: @input-height-base;
+      }
+
+      .sidebar-minus-top-menu.sidebar-minus-bottom-menu {
+        top: @input-height-base;
+        bottom: @input-height-base;
+      }
     }
 
     @media (min-width: @screen-md-min) {
@@ -141,6 +181,15 @@
         &.open {
           padding-bottom: @padding-large-vertical;
         }
+      }
+
+      .sidebar-top-menu, .sidebar-bottom-menu {
+        margin: 0 -@esper-base-padding;
+      }
+
+      .sidebar-bottom-menu {
+        margin-top: @esper-base-padding;
+        margin-bottom: -@esper-base-padding;
       }
     }
 
@@ -487,10 +536,12 @@
 
   .esper-shade & {
     color: @shade-text-header;
+    &.active { color: @shade-link; }
   }
 
   .esper-inverse & {
     color: @inverse-text-header;
+    &.active { color: @inverse-link; }
   }
 }
 
@@ -861,6 +912,16 @@ flexibility with non-UL elements */
 
     &:hover {
       color: @shade-text-muted-hover;
+    }
+  }
+}
+
+.action-block {
+  cursor: pointer;
+
+  &:hover {
+    .esper-subheader-link {
+      font-weight: bold;
     }
   }
 }

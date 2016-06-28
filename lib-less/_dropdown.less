@@ -10,4 +10,10 @@
   background: rgba(0, 0, 0, 0.2);
   animation: fadein 0.3s ease-in-out;
   overflow: auto;
+
+  // Get rid of position absolute because wrapper in Components.Dropdown
+  // should apply position
+  .dropdown-menu {
+    position: static;
+  }
 }

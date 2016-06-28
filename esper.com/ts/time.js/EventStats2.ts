@@ -297,6 +297,10 @@ module Esper.EventStats {
       window.requestAnimationFrame(this.runLoop);
     }
 
+    onceChange(fn: (result: T) => void) {
+      super.once(this.CHANGE_EVENT, () => fn(this._results));
+    }
+
     // Returns some events from the head of the queue
     getBatch() {
       return this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);

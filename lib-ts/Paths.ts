@@ -75,34 +75,31 @@ module Esper.Paths {
       period?: string;
     }
 
-    export function charts({chartId, teamId, calIds, interval, period} : {
-      chartId?: string;
-      teamId?: string;
-      calIds?: string;
-      interval?: string;
-      period?: string;
-    } = {}) {
+    // Default chart path
+    export function charts({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
       return optPath(prefix, "charts",
-                     chartId, teamId, calIds, interval, period);
+                     teamId, calIds, interval, period);
     }
 
     export function durationChart({
       teamId, calIds, interval, period
-    } : chartPathOpts) {
+    } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "durations",
                      teamId, calIds, interval, period);
     }
 
     export function guestChart({
       teamId, calIds, interval, period
-    } : chartPathOpts) {
+    } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "guests",
                      teamId, calIds, interval, period);
     }
 
     export function labelsChart({
       teamId, calIds, interval, period
-    } : chartPathOpts) {
+    } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "labels",
                      teamId, calIds, interval, period);
     }

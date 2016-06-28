@@ -178,6 +178,8 @@ module Esper.Actions.Charts2 {
 
   /* Label Charts */
 
+  var autoLaunchConfirm = true; // This gets set to false after first launch.
+
   export function renderLabels(o: BaseOpts<LabelChartOpts>) {
     o.extra = cleanExtra(o.extra) as LabelChartOpts;
     o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
@@ -222,13 +224,35 @@ module Esper.Actions.Charts2 {
           unlabeledSelected={o.extra.labels.none}
 
           updateFn={(x) => updateLabels(x, o.extra)}
-          onUnconfirmedClick={() => selectorCalc.getResults().match({
-            none: () => null,
-            some: (r) => r.unconfirmed.length &&
-                         launchConfirmModal(r.unconfirmed)
-          })}
         />
       </div>;
+
+      // Automatically open the confirmation modal the first time
+      selectorCalc.onceChange(function(r) {
+        if (autoLaunchConfirm && r.unconfirmedCount) {
+          autoLaunchConfirm = false;
+          Layout.renderModal(
+            Containers.confirmListModal(r.unconfirmed)
+          )
+        }
+      });
+
+      var confirmationMenu = {
+        id: "confirm",
+        tab: <Components.ConfirmBadge
+          events={allEvents}
+          calculation={selectorCalc}
+        />,
+        onClick: () => {
+          selectorCalc.getResults().match({
+            none: () => null,
+            some: (r) => Layout.renderModal(
+              Containers.confirmListModal(r.unconfirmed)
+            )
+          });
+          return false;
+        }
+      };
 
       return <Views.Charts2
         teamId={o.teamId}
@@ -238,6 +262,7 @@ module Esper.Actions.Charts2 {
         pathFn={Paths.Time.labelsChart}
         chart={chart}
         selectors={selector}
+        menus={[confirmationMenu]}
       />
     }));
 
@@ -255,7 +280,6 @@ module Esper.Actions.Charts2 {
       }));
     }
 
-    var autoLaunchConfirm = true;
     function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
       autoLaunchConfirm = false;
       Layout.renderModal(
