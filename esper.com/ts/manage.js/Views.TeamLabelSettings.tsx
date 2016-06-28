@@ -15,7 +15,8 @@ module Esper.Views {
         <div className="panel-body">
           <Components.LabelManager getLabels={this.getLabels(team)}
             addLabel={this.addLabel(team)} archiveFn={this.archive(team)}
-            removeLabel={this.removeLabel(team)} renameLabel={this.renameLabel(team)} />
+            removeLabel={this.removeLabel(team)} renameLabel={this.renameLabel(team)}
+            addPermission={true} />
         </div>
       </div>;
     }

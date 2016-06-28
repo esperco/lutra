@@ -11,6 +11,7 @@ module Esper.Components {
     archiveFn: (label: string) => any;
     removeLabel: (label: string) => any;
     renameLabel: (orig: string, val: string) => any;
+    addPermission: boolean;
   }
 
   interface State {
@@ -33,7 +34,7 @@ module Esper.Components {
       return <div>
         { this.renderLabelInput() }
         {
-          !labels.length ? null :
+          labels.length && this.props.addPermission ?
           <div className="alert alert-info">
               <i className="fa fa-fw fa-pencil" />{" "}
                 { Text.LabelRenameDescription }<br />
@@ -41,7 +42,8 @@ module Esper.Components {
                 { Text.LabelArchiveDescription }<br />
               <i className="fa fa-fw fa-trash" />{" "}
                 { Text.LabelDeleteDescription }
-          </div>
+          </div> :
+          null
         }
         {
           labels.length ?
@@ -60,9 +62,9 @@ module Esper.Components {
     renderLabelInput() {
       return <div className="form-group">
         <label htmlFor={this.getId("new-labels")}>
-          {Text.FindAddLabels}
+          {this.props.addPermission ? Text.FindAddLabels : Text.FindLabels}
         </label>
-        <div className="input-group">
+        <div className={this.props.addPermission ? "input-group" : ""}>
           <div className={this.state.labelFilter ? "esper-has-right-icon" : ""}>
             <input type="text"
                    className="form-control"
@@ -81,12 +83,15 @@ module Esper.Components {
               <span />
             }
           </div>
-          <span className="input-group-btn">
-            <button className="btn btn-default" type="button"
-                    onClick={this.addLabel.bind(this)}>
-              <i className="fa fa-fw fa-plus" />
-            </button>
-          </span>
+          { this.props.addPermission ?
+            <span className="input-group-btn">
+              <button className="btn btn-default" type="button"
+                      onClick={this.addLabel.bind(this)}>
+                <i className="fa fa-fw fa-plus" />
+              </button>
+            </span> :
+            <span />
+          }
         </div>
       </div>;
     }
@@ -94,7 +99,7 @@ module Esper.Components {
     // Catch enter / up / down keys
     inputKeydown(e: KeyboardEvent) {
       var val = (e.target as HTMLInputElement).value;
-      if (e.keyCode === 13) {         // Enter
+      if (e.keyCode === 13 && this.props.addPermission) { // Enter
         e.preventDefault();
         this.addLabel();
       } else if (e.keyCode === 27) {  // ESC
@@ -178,20 +183,22 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
-        <span>
-          <a className="pull-right text-danger" title="Delete"
-             onClick={(e) => this.promptRmFor(label)}>
-            <i className="fa fa-fw fa-trash list-group-item-text" />
-          </a>
-          <a className="pull-right text-info" title="Archive"
-             onClick={(e) => this.archive(label)}>
-            <i className="fa fa-fw fa-archive list-group-item-text" />
-          </a>
-          <a className="pull-right text-info" title="Edit"
-             onClick={(e) => this.showEditFor(label)}>
-            <i className="fa fa-fw fa-pencil list-group-item-text" />
-          </a>
-        </span>
+        { this.props.addPermission ?
+          <span>
+            <a className="pull-right text-danger" title="Delete"
+               onClick={(e) => this.promptRmFor(label)}>
+              <i className="fa fa-fw fa-trash list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Archive"
+               onClick={(e) => this.archive(label)}>
+              <i className="fa fa-fw fa-archive list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Edit"
+               onClick={(e) => this.showEditFor(label)}>
+              <i className="fa fa-fw fa-pencil list-group-item-text" />
+            </a>
+          </span> : null
+        }
       </div>;
     }
 

@@ -345,6 +345,10 @@ module Esper.Components {
         <i className="fa fa-fw fa-user" />
         {" "}{member.name}{" "}
         <i className="fa fa-fw fa-calendar" />
+        {" "}
+        <span className="group-role-box">
+          {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
+        </span>
         { this.props.isOwner || this.props.isAdmin || isOwnTeam ?
           <span>
             <a className="pull-right text-danger" title="Delete"
@@ -417,6 +421,9 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={gim.email}>
         <i className="fa fa-fw fa-user" />
         {" "}{gim.email}{" "}
+        <span className="group-role-box">
+          {gim.role}
+        </span>
         { this.props.isOwner || this.props.isAdmin ?
           <span>
             { gim.uid !== Login.me() ?
