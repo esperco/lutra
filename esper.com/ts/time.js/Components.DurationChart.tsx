@@ -57,7 +57,7 @@ module Esper.Components {
   }
 
 
-  export class DurationEventGrid extends EventGrid {
+  export class DurationEventGrid extends EventGrid<{}> {
     colorFn(groups: Option.T<string[]>) {
       return this.toBucket(groups).match({
         none: () => Colors.lightGray,

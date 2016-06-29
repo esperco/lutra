@@ -550,6 +550,31 @@ module Esper.EventStats {
   }
 
 
+  /* Calc for sorting events by calendar */
+
+  export class CalendarDurationCalc extends DurationCalc<OptGrouping> {
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      return groupAnnotations([{
+        event: event,
+        value: duration,
+        groups: [event.calendarId]
+      }], results);
+    }
+  }
+
+  export class CalendarDateDurationCalc extends DateDurationCalc {
+    getGroups(event: Stores.Events.TeamEvent) {
+      return Option.some([event.calendarId]);
+    }
+  }
+
+
   // Count unique events by label type
   export interface LabelCalcCount extends OptGrouping {
     unconfirmed: Stores.Events.TeamEvent[];

@@ -48,7 +48,7 @@ module Esper.Components {
     }
   }
 
-  export class LabelEventGrid extends EventGrid {
+  export class LabelEventGrid extends EventGrid<{}> {
     colorFn(groups: Option.T<string[]>) {
       return groups.match({
         none: () => Colors.lightGray,

@@ -66,8 +66,9 @@ module Esper.Route {
     });
   }
 
-  routeChart(Paths.Time.durationChart, Actions.Charts2.renderDurations);
-  routeChart(Paths.Time.guestChart, Actions.Charts2.renderGuests);
+  routeChart(Paths.Time.calendarsChart, Actions.Charts2.renderCalendars);
+  routeChart(Paths.Time.durationsChart, Actions.Charts2.renderDurations);
+  routeChart(Paths.Time.guestsChart, Actions.Charts2.renderGuests);
   routeChart(Paths.Time.labelsChart, Actions.Charts2.renderLabels);
 
   // Default routing => redirect to labels

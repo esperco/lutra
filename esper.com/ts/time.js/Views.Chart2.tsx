@@ -110,8 +110,19 @@ module Esper.Views {
           icon: "fa-tags"
         }) }
 
+        { this.props.calIds.length > 1 ? this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.calendarsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartCalendars,
+          content: Text.ChartCalendarsDescription,
+          icon: "fa-calendar-o"
+        }) : null }
+
         { this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.guestChart,
+          pathFn: Paths.Time.guestsChart,
           extra: {
             type: "absolute",
             incrs: this.props.extra.incrs
@@ -122,7 +133,7 @@ module Esper.Views {
         }) }
 
         { this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.durationChart,
+          pathFn: Paths.Time.durationsChart,
           extra: {
             type: "percent",
             incrs: this.props.extra.incrs
@@ -177,7 +188,7 @@ module Esper.Views {
             </div>
             <div className="btn-group">
               { this.renderTypeButton("calendar",
-                                      Text.ChartCalendar,
+                                      Text.ChartGrid,
                                       "fa-calendar") }
             </div>
           </div>

@@ -166,7 +166,68 @@ module Esper.Actions.Charts2 {
       calIds={o.calIds}
       period={o.period}
       extra={o.extra}
-      pathFn={Paths.Time.durationChart}
+      pathFn={Paths.Time.durationsChart}
+      chart={chart}
+    />;
+  }
+
+
+  /* Calendars Charts */
+
+  export function renderCalendars(o: DefaultBaseOpts) {
+    fetchAndClean(o);
+    render(ReactHelpers.contain(function() {
+      var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.CalendarDateDurationCalc(data.dates);
+        calc.start();
+        let chart = <Components.CalendarEventGrid
+          calendars={calendars}
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getCalendarsChartView(o, chart);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d) => {
+          let calc = new EventStats.CalendarDurationCalc(d.events);
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.CalendarPercentChart
+            data={calcData}
+            calendars={calendars} /> :
+          <Components.CalendarHoursChart
+            data={calcData}
+            calendars={calendars} />;
+
+        return getCalendarsChartView(o, chart);
+      }
+    }));
+  }
+
+  function getCalendarsChartView(o: DefaultBaseOpts,
+                                 chart: JSX.Element) {
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.calendarsChart}
       chart={chart}
     />;
   }
@@ -247,7 +308,7 @@ module Esper.Actions.Charts2 {
       calIds={o.calIds}
       period={o.period}
       extra={o.extra}
-      pathFn={Paths.Time.guestChart}
+      pathFn={Paths.Time.guestsChart}
       chart={chart}
       selectors={selector}
     />

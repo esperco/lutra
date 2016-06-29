@@ -105,7 +105,7 @@ module Esper.Components {
   }
 
 
-  export class DomainEventGrid extends EventGrid {
+  export class DomainEventGrid extends EventGrid<{}> {
     colorFn(groups: Option.T<string[]>) {
       return groups.match({
         none: () => Colors.lightGray,

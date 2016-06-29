@@ -103,7 +103,7 @@ module Esper.Text {
   // Chart Types
   export const ChartPercentage = `Percent`;
   export const ChartAbsolute = `Absolute Time`;
-  export const ChartCalendar = `Calendar Grid`;
+  export const ChartGrid = `Calendar Grid`;
 
   // Chart messages
   export const ChartNoData = `No events found`;
@@ -116,8 +116,12 @@ module Esper.Text {
   export const ChartDuration = `Duration`;
   export const ChartLabels = Labels;
   export const ChartGuests = Guests;
+  export const ChartCalendars = `Calendars`;
 
   // Chart descriptions
+  export const ChartCalendarsDescription =
+    `Which of my calendars has more events scheduled? You can use this to ` +
+    `compare your work and personal calendars.`;
   export const ChartDurationDescription =
     `Am I spending my time in many short meetings or a few long meetings?`;
   export const ChartLabelsDescription =
