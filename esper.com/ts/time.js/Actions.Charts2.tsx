@@ -160,55 +160,78 @@ module Esper.Actions.Charts2 {
     o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
 
     render(ReactHelpers.contain(function() {
-      var data = getEventData(o);
-      var calcData = _.map(data, (d, i) => {
-        let calc = new EventStats.GuestDurationCalc(
-          d.events,
-          o.extra.domains,
-          o.extra.type === "percent");  // Nest domains for pie chart
+
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.DomainDurationByDateCalc(data.dates,
+                                                           o.extra.domains);
         calc.start();
+        let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
+        let chart = <Components.DomainEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getGuestChartView(o, chart, allEvents);
+      }
 
-        return {
-          period: d.period,
-          current: _.isEqual(d.period, o.period),
-          fetching: d.isBusy,
-          error: d.hasError,
-          events: d.events,
-          calculation: calc
-        };
-      });
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d, i) => {
+          let calc = new EventStats.GuestDurationCalc(
+            d.events,
+            o.extra.domains,
+            o.extra.type === "percent");  // Nest domains for pie chart
+          calc.start();
 
-      var chart = o.extra.type === "percent" ?
-        <Components.GuestPercentChart data={calcData} /> :
-        <Components.GuestHoursChart data={calcData} />;
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
 
-      var allEvents = _.flatten( _.map(data, (d) => d.events) );
-      var selectorCalc = new EventStats.DomainCountCalc(allEvents);
-      selectorCalc.start();
-      var selector = <div className="esper-panel-section">
-        <div className="esper-subheader">
-          <i className="fa fa-fw fa-user" />{" "}
-          { Text.GuestDomains }
-        </div>
-        <Components.DomainCalcSelector
-          events={allEvents}
-          calculation={selectorCalc}
-          selected={o.extra.domains}
-          showNone={o.extra.type === "percent"}
-          updateFn={(x) => updateDomains(x, o.extra)}
-        />
-      </div>;
+        let chart = o.extra.type === "percent" ?
+          <Components.GuestPercentChart data={calcData} /> :
+          <Components.GuestHoursChart data={calcData} />;
 
-      return <Views.Charts2
-        teamId={o.teamId}
-        calIds={o.calIds}
-        period={o.period}
-        extra={o.extra}
-        pathFn={Paths.Time.guestChart}
-        chart={chart}
-        selectors={selector}
-      />
+        let allEvents = _.flatten( _.map(data, (d) => d.events) );
+        return getGuestChartView(o, chart, allEvents);
+      }
     }));
+  }
+
+  function getGuestChartView(o: BaseOpts<DomainChartOpts>,
+                             chart: JSX.Element,
+                             events: Stores.Events.TeamEvent[]) {
+    var selectorCalc = new EventStats.DomainCountCalc(events);
+    selectorCalc.start();
+    var selector = <div className="esper-panel-section">
+      <div className="esper-subheader">
+        <i className="fa fa-fw fa-user" />{" "}
+        { Text.GuestDomains }
+      </div>
+      <Components.DomainCalcSelector
+        events={events}
+        calculation={selectorCalc}
+        selected={o.extra.domains}
+        showNone={o.extra.type === "percent"}
+        updateFn={(x) => updateDomains(x, o.extra)}
+      />
+    </div>;
+
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.guestChart}
+      chart={chart}
+      selectors={selector}
+    />
   }
 
   function updateDomains(p: {
