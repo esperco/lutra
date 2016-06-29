@@ -250,7 +250,7 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends CalcBase<number[]> {
+      class TestCalc extends EventListCalc<number[]> {
         MAX_PROCESS_EVENTS = 2
 
         initResult(): number[] { return []; }
@@ -276,10 +276,10 @@ module Esper.EventStats {
         beforeEach(function() {
           rAFSpy = spyOn(window, "requestAnimationFrame");
 
-          calc = new TestCalc();
+          calc = new TestCalc(events);
           emitSpy = jasmine.createSpy("emit");
           calc.addChangeListener(emitSpy);
-          calc.start(events);
+          calc.start();
         });
 
         it("should make async call to runLoop", function() {
@@ -325,9 +325,9 @@ module Esper.EventStats {
         var calc: TestCalc;
 
         beforeEach(function(done) {
-          calc = new TestCalc();
+          calc = new TestCalc(events);
           calc.addChangeListener(done);
-          calc.start(events);
+          calc.start();
         });
 
         it("should return some result", function() {
@@ -337,7 +337,7 @@ module Esper.EventStats {
           result.match({
             none: () => null,
             some: (g) => {
-              expect(g).toEqual([5, 5, 3, 3]);
+              expect(g).toEqual([3, 3, 1, 1]);
             }
           });
         });
@@ -349,7 +349,7 @@ module Esper.EventStats {
         var loopSpy: jasmine.Spy;
 
         beforeEach(function(done) {
-          calc = new TestCalc();
+          calc = new TestCalc(events);
           emitSpy = jasmine.createSpy("test");
           loopSpy = spyOn(calc, "runLoop").and.callThrough();
 
@@ -360,8 +360,8 @@ module Esper.EventStats {
             window.requestAnimationFrame(done);
           });
 
-          calc.start(events);
-          calc.start(events);
+          calc.start();
+          calc.start();
         });
 
         it("should not result in extra loop runs or emits", function() {
@@ -443,8 +443,8 @@ module Esper.EventStats {
         beforeEach(function() {
           spyOn(window, "requestAnimationFrame"); // To stop loop
 
-          calc = new TestCalc();
-          calc.start(events);
+          calc = new TestCalc(events);
+          calc.start();
         });
 
         it("should process only MAX_PROCESS_EVENTS + any overlapping " +

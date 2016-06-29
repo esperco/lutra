@@ -3,7 +3,15 @@
 */
 
 /// <reference path="./Components.Chart.tsx" />
+/// <reference path="./Components.EventGrid.tsx" />
+
 module Esper.Components {
+
+  function getBucket(label: string) {
+    return _.find(EventStats.DurationBucketCalc.BUCKETS,
+      (b) => b.label === label
+    );
+  }
 
   export class DurationHoursChart extends DefaultChart {
     renderMain(groups: Charting.PeriodOptGroup[]) {
@@ -11,14 +19,18 @@ module Esper.Components {
         (b) => b.label
       );
       var series = Charting.eventSeries(groups, {
+        colorFn: (key) => getBucket(key) ? getBucket(key).color : "",
         sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
-      return <AbsoluteChart
-        series={series} categories={keys} orientation="vertical"
-        yAxis={`${Text.ChartDuration} (${Text.hours()})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <AbsoluteChart
+          series={series} categories={keys} orientation="vertical"
+          yAxis={`${Text.ChartDuration} (${Text.hours()})`}
+        />
+      </div>;
     }
   }
 
@@ -29,14 +41,40 @@ module Esper.Components {
         (b) => b.label
       );
       var series = Charting.eventGroupSeries(groups, {
+        colorFn: (key) => getBucket(key) ? getBucket(key).color : "",
         sortedKeys: keys,
         yFn: EventStats.toHours
       });
 
-      return <PercentageChart
-        series={series}
-        yAxis={`${Text.ChartDuration} (${Text.ChartPercentage})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <PercentageChart
+          series={series}
+          yAxis={`${Text.ChartDuration} (${Text.ChartPercentage})`}
+        />
+      </div>;
+    }
+  }
+
+
+  export class DurationEventGrid extends EventGrid {
+    colorFn(groups: Option.T<string[]>) {
+      return this.toBucket(groups).match({
+        none: () => Colors.lightGray,
+        some: (bucket) => {
+          return bucket.color
+        }
+      });
+    }
+
+    categoryFn(groups: Option.T<string[]>) {
+      return ""; // No need for label since duration always shown
+    }
+
+    toBucket(groups: Option.T<string[]>) {
+      return groups.flatMap((g) => {
+        return Option.wrap(getBucket(g[0]));
+      });
     }
   }
 }

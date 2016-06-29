@@ -57,8 +57,17 @@
   box-shadow: none;
 
   &:hover, &:focus {
-    z-index: @zindex-button;
+    z-index: @zindex-button + 1;
     transform: none;
+  }
+}
+
+// Fix double-border using flexbox
+.btn-group-justified {
+  display: flex;
+
+  > .btn-group, > .btn {
+    flex-grow: 1;
   }
 }
 

@@ -14,21 +14,27 @@ module Esper.Components {
         yFn: EventStats.toHours
       });
 
-      return <AbsoluteChart
-        orientation="horizontal"
-        series={series}
-        categories={keys}
-        yAxis={`${Text.ChartGuests} (${Text.hours()})`}
-      />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <AbsoluteChart
+          orientation="horizontal"
+          series={series}
+          categories={keys}
+          yAxis={`${Text.ChartGuests} (${Text.hours()})`}
+        />
+      </div>;
     }
   }
+
 
   export class GuestPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodOptGroup[]) {
-      return <GuestPercentDrilldownChart groups={groups} />;
+      return <div className="chart-content">
+        <TotalsBar periodTotals={groups} />
+        <GuestPercentDrilldownChart groups={groups} />
+      </div>;
     }
   }
-
 
   /*
     Guest colors in pie chart are lightened versions of a base color. This
@@ -95,6 +101,23 @@ module Esper.Components {
           subgroup: up
         })
       }
+    }
+  }
+
+
+  export class DomainEventGrid extends EventGrid {
+    colorFn(groups: Option.T<string[]>) {
+      return groups.match({
+        none: () => Colors.lightGray,
+        some: (g) => g[0] ? Colors.getColorForDomain(g[0]) : Colors.gray,
+      });
+    }
+
+    categoryFn(groups: Option.T<string[]>) {
+      return groups.match({
+        none: () => "",
+        some: (g) => g[0] || Text.NoGuests
+      });
     }
   }
 }

@@ -188,13 +188,6 @@ module Esper.Charts {
     }
 
     /*
-      Used to populate values for totals bar
-    */
-    getTotals(): Components.Types.PeriodTotal[] {
-      return [];
-    }
-
-    /*
       Helper function to get a complete list of keys across *all* periods
       but sorted by attribute of *current* period
     */
