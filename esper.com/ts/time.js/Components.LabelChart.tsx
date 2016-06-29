@@ -47,4 +47,20 @@ module Esper.Components {
       </div>;
     }
   }
+
+  export class LabelEventGrid extends EventGrid {
+    colorFn(groups: Option.T<string[]>) {
+      return groups.match({
+        none: () => Colors.lightGray,
+        some: (g) => g[0] ? Colors.getColorForLabel(g[0]) : Colors.gray,
+      });
+    }
+
+    categoryFn(groups: Option.T<string[]>) {
+      return groups.match({
+        none: () => "",
+        some: (g) => g[0] ? Labels.getDisplayAs(g[0]) : Text.Unlabeled
+      });
+    }
+  }
 }

@@ -166,13 +166,15 @@ table.calendar-grid {
   }
 
   .time-blocks-container {
-    margin: @padding-xs-vertical @padding-xs-horizontal @padding-base-vertical;
-    line-height: 1;
+    margin: @padding-base-vertical @padding-xs-horizontal;
+    height: ceil(@font-size-base * 3);
+    overflow: hidden;
   }
 
   .time-block {
     transition: opacity 0.6s;
     opacity: 1.0;
+    line-height: floor(@font-size-base * 1.5);
 
     &:hover {
       opacity: 0.5;
@@ -182,9 +184,8 @@ table.calendar-grid {
   .time-segment {
     box-sizing: border-box;
     display: inline-block;
-    height: floor((@font-size-base * 0.75));
+    height: floor((@font-size-base * 1.1));
     width: 1em; // Should get overriden in code -- but a default
-    padding-right: 1px;
 
     > span {
       display: block;
@@ -193,25 +194,13 @@ table.calendar-grid {
       background: white;
       border: 1px solid @table-border-color;
       box-sizing: border-box;;
+      margin-right: 1px;
     }
 
     &.active > span {
       background: @active-span;
       border: 0;
       cursor: pointer;
-
-      // Early => darken slightly
-      // &.row-0 {
-      //   background: lighten(@brand-primary, 15%);
-      // }
-
-      // &.row-1 {
-      //   background: @brand-primary;
-      // }
-
-      // &.row-2 {
-      //   background: darken(@brand-primary, 15%);
-      // }
     }
   }
 }

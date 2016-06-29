@@ -423,8 +423,6 @@ module Esper.EventStats {
           var eventKey = Stores.Events.strId(d.event);
           if (! dateGroup.eventMap[eventKey]) {
             dateGroup.eventMap[eventKey] = true;
-            dateGroup.totalUnique += 1;
-
             this.getGroups(d.event).match({
               none: () => null,
               some: (groups) => {
@@ -433,6 +431,7 @@ module Esper.EventStats {
                   value: d.duration,
                   groups: groups
                 });
+                dateGroup.totalUnique += 1;
                 dateGroup.totalValue += d.duration;
               }
             });
@@ -727,6 +726,21 @@ module Esper.EventStats {
         });
 
       return groupAnnotations(annotations, results);
+    }
+  }
+
+  export class DomainDurationByDateCalc extends DateDurationCalc {
+    selections: Params.ListSelectJSON;
+
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                p: Params.ListSelectJSON) {
+      super(eventDates);
+      this.selections = p;
+    }
+
+    getGroups(event: Stores.Events.TeamEvent) {
+      var domains = Stores.Events.getGuestDomains(event);
+      return Params.applyListSelectJSON(domains, this.selections);
     }
   }
 }

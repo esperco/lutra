@@ -102,7 +102,8 @@ module Esper.Text {
 
   // Chart Types
   export const ChartPercentage = `Percent`;
-  export const ChartAbsolute = `Absolute time`;
+  export const ChartAbsolute = `Absolute Time`;
+  export const ChartCalendar = `Calendar Grid`;
 
   // Chart messages
   export const ChartNoData = `No events found`;

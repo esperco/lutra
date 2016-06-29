@@ -10,7 +10,6 @@ module Esper.Views {
     teamId: string;
     calIds: string[];
     period: Period.Single|Period.Custom;
-    intervalsAllowed?: Period.IntervalOrCustom[];
     extra: Actions.Charts2.ExtraOpts;
 
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
@@ -167,10 +166,19 @@ module Esper.Views {
         <div className="esper-panel-section">
           <div className="btn-group btn-group-justified">
             <div className="btn-group">
-              { this.renderTypeButton("percent") }
+              { this.renderTypeButton("percent",
+                                      Text.ChartPercentage,
+                                      "fa-pie-chart") }
             </div>
             <div className="btn-group">
-              { this.renderTypeButton("absolute") }
+              { this.renderTypeButton("absolute",
+                                      Text.ChartAbsolute,
+                                      "fa-bar-chart") }
+            </div>
+            <div className="btn-group">
+              { this.renderTypeButton("calendar",
+                                      Text.ChartCalendar,
+                                      "fa-calendar") }
             </div>
           </div>
         </div>
@@ -193,26 +201,27 @@ module Esper.Views {
           />
         </div>
 
-        <div className="esper-panel-section">
-          <div className="esper-subheader">
-            <i className="fa fa-fw fa-clock-o" />{" "}
-            Compare With
+        { this.props.extra.type === "calendar" ? null :
+          <div className="esper-panel-section">
+            <div className="esper-subheader">
+              <i className="fa fa-fw fa-clock-o" />{" "}
+              Compare With
+            </div>
+            <Components.RelativePeriodSelector
+              period={this.props.period}
+              allowedIncrs={[-1, 1]}
+              selectedIncrs={this.props.extra.incrs}
+              updateFn={(x) => this.updateIncrs(x)}
+            />
           </div>
-          <Components.RelativePeriodSelector
-            period={this.props.period}
-            allowedIncrs={[-1, 1]}
-            selectedIncrs={this.props.extra.incrs}
-            updateFn={(x) => this.updateIncrs(x)}
-          />
-        </div>
+        }
         { this.props.selectors }
       </div>;
     }
 
-    renderTypeButton(type: "percent"|"absolute") {
-      var [title, icon] = type === "percent" ?
-        [Text.ChartPercentage, "fa-pie-chart"] :
-        [Text.ChartAbsolute, "fa-bar-chart"]
+    renderTypeButton(
+        type: Charting.ChartType,
+        title: string, icon: string) {
 
       return <button className={classNames("btn btn-default", {
         active: type === this.props.extra.type
@@ -229,7 +238,7 @@ module Esper.Views {
         <Components.IntervalOrCustomSelector
           className="col-sm-6"
           period={this.props.period}
-          show={this.props.intervalsAllowed}
+          show={this.props.extra.type === "calendar" ? ["month"] : undefined}
           updateFn={(p) => this.updatePeriod(p)}
         />
         <div className="col-sm-6">
@@ -255,7 +264,7 @@ module Esper.Views {
     }
 
     updateExtra(extra: {
-      type?: "percent"|"absolute";
+      type?: Charting.ChartType;
       incrs?: number[]
     }) {
       this.updateRoute({

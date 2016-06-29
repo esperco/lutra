@@ -5,6 +5,7 @@
 module Esper.Charting {
 
   /* Types */
+  export type ChartType = "percent"|"absolute"|"calendar";
 
   /*
     For use with charts where a series is a list of events, and each data
