@@ -37,6 +37,13 @@ module Esper.EventStats {
                              in group */
   }
 
+  /*
+    Collection of annotated events for a given date
+  */
+  export interface DateGroup extends Group {
+    date: Date;
+  }
+
   export interface Subgroup extends Group {
     subgroups: Grouping;
   }
@@ -57,6 +64,17 @@ module Esper.EventStats {
       totalUnique: 0,
       eventMap: {}
     }
+  }
+
+  function emptyDateGroup(date: Date): DateGroup {
+    var group = emptyGroup();
+    return {
+      date: date,
+      annotations: group.annotations,
+      totalValue: group.totalValue,
+      totalUnique: group.totalUnique,
+      eventMap: group.eventMap
+    };
   }
 
   function emptySubgroup(): Subgroup {
@@ -230,13 +248,19 @@ module Esper.EventStats {
   export abstract class CalcBase<T> extends Emit.EmitBase {
     // Are we there yet?
     ready = false;
-    running = false;
+    running = true;
 
     // Intermediate state for use with progressive calculation
-    _eventQueue: Stores.Events.TeamEvent[] = [];
     _results: T;
 
     MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
+
+    constructor() {
+      super();
+      this._results = this.initResult();
+      this.ready = false;
+      this.running = false;
+    }
 
     // Returns some grouping if done, none if not complete
     getResults(): Option.T<T> {
@@ -247,21 +271,13 @@ module Esper.EventStats {
 
 
     // Start calulations based on passed events
-    start(events: Stores.Events.TeamEvent[]) {
-      this.init(events);
+    start() {
+      this.running = true;
       this.next();
     }
 
     stop() {
       this.running = false;
-    }
-
-    // Pre-populate vars used in processing loop
-    init(events: Stores.Events.TeamEvent[]) {
-      this._eventQueue = _.clone(events);
-      this._results = this.initResult();
-      this.ready = false;
-      this.running = true;
     }
 
     /*
@@ -271,26 +287,20 @@ module Esper.EventStats {
     runLoop = () => {
       if (! this.running) return;
 
-      if (! _.isEmpty(this._eventQueue)) {
-        var events = this.getBatch();
+      this.getBatch().match({
+        some: (events) => {
+          events = _.filter(events, (e) => this.filterEvent(e));
+          this._results = this.processBatch(events, this._results);
+          this.next();
+        },
 
-        // Record init length in case filtering or processing changes this
-        var initLength = events.length;
-
-        events = _.filter(events, (e) => this.filterEvent(e));
-        this._results = this.processBatch(events, this._results);
-
-        // Remove processed items from queue
-        this._eventQueue = this._eventQueue.slice(initLength);
-
-        this.next();
-        return;
-      }
-
-      // If we get here, we're done. Emit to signal result.
-      this.ready = true;
-      this.running = false;
-      this.emitChange();
+        none: () => {
+          // No more events, we're done. Emit to signal result.
+          this.ready = true;
+          this.running = false;
+          this.emitChange();
+        }
+      });
     }
 
     next() {
@@ -301,11 +311,6 @@ module Esper.EventStats {
       super.once(this.CHANGE_EVENT, () => fn(this._results));
     }
 
-    // Returns some events from the head of the queue
-    getBatch() {
-      return this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
-    }
-
     // Override as appropriate -- return false for events to ignore
     filterEvent(event: Stores.Events.TeamEvent) {
       return Stores.Events.isActive(event);
@@ -314,12 +319,131 @@ module Esper.EventStats {
     // Empty initial result object
     abstract initResult(): T;
 
+    // Get next set of events to process
+    abstract getBatch(): Option.T<Stores.Events.TeamEvent[]>;
+
     /*
       Handle events from queue -- takes events plus current intermediate
       result state
     */
     abstract processBatch(events: Stores.Events.TeamEvent[],
                           results: T): T;
+  }
+
+
+  /*
+    Calc which processes a list of events
+  */
+  export abstract class EventListCalc<T> extends CalcBase<T> {
+    _eventQueue: Stores.Events.TeamEvent[] = [];
+
+    constructor(events: Stores.Events.TeamEvent[]) {
+      super();
+      this._eventQueue = _.clone(events);
+    }
+
+    // Returns some events from the head of the queue
+    getBatch() {
+      if (_.isEmpty(this._eventQueue)) {
+        return Option.none<Stores.Events.TeamEvent[]>();
+      }
+
+      var events = this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
+      this._eventQueue = this._eventQueue.slice(events.length);
+      return Option.some(events);
+    }
+  }
+
+
+  /*
+    Calc which processes durations for a list of events, truncated by day
+  */
+  export abstract class DateDurationCalc extends CalcBase<DateGroup[]>
+  {
+    _eventDates: Stores.Events.EventsForDate[];
+    _date: Date;
+
+    constructor(eventDates: Stores.Events.EventsForDate[]) {
+      super();
+      this._eventDates = _.cloneDeep(eventDates);
+    }
+
+    initResult(): DateGroup[] {
+      return [];
+    }
+
+    getBatch(): Option.T<Stores.Events.TeamEvent[]> {
+      if (_.isEmpty(this._eventDates)) {
+        return Option.none<Stores.Events.TeamEvent[]>();
+      }
+
+      else {
+        // Slice off dates until we land on a non-empty date
+        var eventDate = this._eventDates[0];
+        if (_.isEmpty(eventDate.events)) {
+          this._eventDates = this._eventDates.slice(1);
+          return this.getBatch();
+        }
+
+        this._date = eventDate.date;
+        var events = eventDate.events.slice(0, this.MAX_PROCESS_EVENTS);
+        eventDate.events = eventDate.events.slice(events.length);
+
+        // Include overlapping
+        let ends = _.map(events, (e) => e.end.getTime());
+        let max = _.max(ends);
+        while (!_.isEmpty(eventDate.events)) {
+          let next = eventDate.events[0];
+          if (next.start.getTime() < max) {
+            max = Math.max(max, next.end.getTime());
+            events.push(next);
+            eventDate.events = eventDate.events.slice(1);
+          } else {
+            break;
+          }
+        }
+
+        return Option.some(events);
+      }
+    }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: DateGroup[]) {
+      var durations = durationWrappers(events, {
+        truncateStart: moment(this._date).clone().startOf('day').toDate(),
+        truncateEnd: moment(this._date).clone().endOf('day').toDate()
+      });
+      var dateGroup = _.last(results);
+      if (!(dateGroup && dateGroup.date === this._date)) {
+        dateGroup = emptyDateGroup(this._date);
+        results.push(dateGroup);
+      }
+
+      _.each(durations,
+        (d) => {
+          var eventKey = Stores.Events.strId(d.event);
+          if (! dateGroup.eventMap[eventKey]) {
+            dateGroup.eventMap[eventKey] = true;
+            dateGroup.totalUnique += 1;
+
+            this.getGroups(d.event).match({
+              none: () => null,
+              some: (groups) => {
+                dateGroup.annotations.push({
+                  event: d.event,
+                  value: d.duration,
+                  groups: groups
+                });
+                dateGroup.totalValue += d.duration;
+              }
+            });
+          }
+        }
+      );
+
+      return results;
+    }
+
+    abstract getGroups(event: Stores.Events.TeamEvent): Option.T<string[]>;
   }
 
 
@@ -332,27 +456,24 @@ module Esper.EventStats {
     MAX_PROCESS_EVENTS in this case is treated as a suggestion, rather than
     a hard rule.
   */
-  export abstract class DurationCalc<T> extends CalcBase<T> {
+  export abstract class DurationCalc<T> extends EventListCalc<T> {
     getBatch() {
-      var events = this._eventQueue.slice(0, this.MAX_PROCESS_EVENTS);
-      let ends = _.map(events, (e) => e.end.getTime());
-      let max = _.max(ends);
+      return super.getBatch().flatMap((events) => {
+        let ends = _.map(events, (e) => e.end.getTime());
+        let max = _.max(ends);
 
-      var i = this.MAX_PROCESS_EVENTS;
-      var next = this._eventQueue[i];
-      while (!!next) {
-        if (next.start.getTime() < max) {
-          events.push(next);
-          max = Math.max(max, next.end.getTime());
-          i += 1;
-          next = this._eventQueue[i];
+        while (!_.isEmpty(this._eventQueue)) {
+          let next = this._eventQueue[0];
+          if (next.start.getTime() < max) {
+            max = Math.max(max, next.end.getTime());
+            events.push(next);
+            this._eventQueue = this._eventQueue.slice(1);
+          } else {
+            break;
+          }
         }
-        else {
-          break;
-        }
-      }
-
-      return events;
+        return Option.some(events);
+      });
     }
 
     processBatch(events: Stores.Events.TeamEvent[], results: T) {
@@ -421,7 +542,7 @@ module Esper.EventStats {
   }
 
   // Count unique events by label
-  export class LabelCountCalc extends CalcBase<LabelCalcCount> {
+  export class LabelCountCalc extends EventListCalc<LabelCalcCount> {
     initResult() {
       return _.extend({
         unconfirmed: [],
@@ -469,8 +590,9 @@ module Esper.EventStats {
   export class LabelDurationCalc extends DurationCalc<OptGrouping> {
     selections: Params.ListSelectJSON;
 
-    constructor(p: Params.ListSelectJSON) {
-      super();
+    constructor(events: Stores.Events.TeamEvent[],
+                p: Params.ListSelectJSON) {
+      super(events);
       this.selections = p;
     }
 
@@ -506,10 +628,25 @@ module Esper.EventStats {
     }
   }
 
+  export class LabelDurationByDateCalc extends DateDurationCalc {
+    selections: Params.ListSelectJSON;
+
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                p: Params.ListSelectJSON) {
+      super(eventDates);
+      this.selections = p;
+    }
+
+    getGroups(event: Stores.Events.TeamEvent) {
+      var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
+      return Params.applyListSelectJSON(labelIds, this.selections);
+    }
+  }
+
 
   /* Guest-related calculations */
 
-  export class DomainCountCalc extends CalcBase<OptGrouping> {
+  export class DomainCountCalc extends EventListCalc<OptGrouping> {
     initResult() { return emptyOptGrouping(); }
 
     processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
@@ -546,8 +683,10 @@ module Esper.EventStats {
     selections: Params.ListSelectJSON;
     nestByDomain: boolean;
 
-    constructor(p: Params.ListSelectJSON, nestByDomain=false) {
-      super();
+    constructor(events: Stores.Events.TeamEvent[],
+                p: Params.ListSelectJSON,
+                nestByDomain=false) {
+      super(events);
       this.selections = p;
       this.nestByDomain = nestByDomain;
     }
