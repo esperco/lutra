@@ -423,7 +423,7 @@ module Esper.EventStats {
           var eventKey = Stores.Events.strId(d.event);
           if (! dateGroup.eventMap[eventKey]) {
             dateGroup.eventMap[eventKey] = true;
-            this.getGroups(d.event).match({
+            this.getGroups(d.event, d.duration).match({
               none: () => null,
               some: (groups) => {
                 dateGroup.annotations.push({
@@ -442,7 +442,8 @@ module Esper.EventStats {
       return results;
     }
 
-    abstract getGroups(event: Stores.Events.TeamEvent): Option.T<string[]>;
+    abstract getGroups(event: Stores.Events.TeamEvent,
+                       duration: number): Option.T<string[]>;
   }
 
 
@@ -496,22 +497,28 @@ module Esper.EventStats {
   export class DurationBucketCalc extends DurationCalc<OptGrouping> {
     static BUCKETS = [{
       label: "< 30m",
-      gte: 0   // Greater than, seconds
+      gte: 0,   // Greater than, seconds
+      color: Colors.level0
     }, {
       label: "30m +",
-      gte: 30 * 60
+      gte: 30 * 60,
+      color: Colors.level1
     }, {
       label: "1h +",
-      gte: 60 * 60
+      gte: 60 * 60,
+      color: Colors.level2
     }, {
       label: "2h +",
-      gte: 2 * 60 * 60
+      gte: 2 * 60 * 60,
+      color: Colors.level3
     }, {
       label: "4h +",
-      gte: 4 * 60 * 60
+      gte: 4 * 60 * 60,
+      color: Colors.level4
     }, {
       label: "8h +",
-      gte: 8 * 60 * 60
+      gte: 8 * 60 * 60,
+      color: Colors.level5
     }];
 
     initResult() { return emptyOptGrouping(); }
@@ -530,6 +537,15 @@ module Esper.EventStats {
         value: duration,
         groups: [bucket.label]
       }], results);
+    }
+  }
+
+  export class DateDurationBucketCalc extends DateDurationCalc {
+    getGroups(event: Stores.Events.TeamEvent, duration: number) {
+      var bucket = _.findLast(DurationBucketCalc.BUCKETS,
+        (b) => duration >= b.gte
+      );
+      return Option.some([bucket.label]);
     }
   }
 

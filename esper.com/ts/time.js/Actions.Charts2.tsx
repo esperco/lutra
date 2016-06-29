@@ -122,34 +122,53 @@ module Esper.Actions.Charts2 {
   export function renderDurations(o: DefaultBaseOpts) {
     fetchAndClean(o);
     render(ReactHelpers.contain(function() {
-      var data = getEventData(o);
-      var calcData = _.map(data, (d) => {
-        let calc = new EventStats.DurationBucketCalc(d.events);
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.DateDurationBucketCalc(data.dates);
         calc.start();
+        let chart = <Components.DurationEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getDurationChartView(o, chart);
+      }
 
-        return {
-          period: d.period,
-          current: _.isEqual(d.period, o.period),
-          fetching: d.isBusy,
-          error: d.hasError,
-          events: d.events,
-          calculation: calc
-        };
-      });
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d) => {
+          let calc = new EventStats.DurationBucketCalc(d.events);
+          calc.start();
 
-      var chart = o.extra.type === "percent" ?
-        <Components.DurationPercentChart data={calcData} /> :
-        <Components.DurationHoursChart data={calcData} />;
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
 
-      return <Views.Charts2
-        teamId={o.teamId}
-        calIds={o.calIds}
-        period={o.period}
-        extra={o.extra}
-        pathFn={Paths.Time.durationChart}
-        chart={chart}
-      />
+        let chart = o.extra.type === "percent" ?
+          <Components.DurationPercentChart data={calcData} /> :
+          <Components.DurationHoursChart data={calcData} />;
+
+        return getDurationChartView(o, chart);
+      }
     }));
+  }
+
+  function getDurationChartView(o: DefaultBaseOpts,
+                                chart: JSX.Element) {
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.durationChart}
+      chart={chart}
+    />;
   }
 
 

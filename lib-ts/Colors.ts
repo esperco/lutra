@@ -121,10 +121,19 @@ module Esper.Colors {
   export var gray = "#999";
   export var offWhite = "#FCFCFC";
   export var green = "#5CB85C";
-  export var yellow = "#FADD00";
+  export var yellow = "#FFF59D";
   export var orange = "#F0AD4E";
   export var red = "#D9534F";
   export var brand = "#a25cc6"; // Purple
+
+  // Rating colors
+  export var level0 = "#64B5F6"; // Blue
+  export var level1 = "#5CB85C"; // Green
+  export var level2 = "#AED581"; // Yellow-Green
+  export var level3 = "#FDD835"; // Yellow
+  export var level4 = "#F0AD4E"; // Orange
+  export var level5 = "#D9534F"; // Red
+
 
   // Already assigned colors
   export type ColorMap = { [index: string]: string };
