@@ -301,7 +301,7 @@ module Esper.Actions.Charts2 {
         events={events}
         calculation={selectorCalc}
         selected={o.extra.domains}
-        showNone={o.extra.type === "percent"}
+        showNone={o.extra.type !== "absolute"}
         updateFn={(x) => updateDomains(x, o.extra)}
       />
     </div>;
@@ -323,6 +323,87 @@ module Esper.Actions.Charts2 {
     some: string[];
   }, extra: DomainChartOpts) {
     Route.nav.query(_.extend({}, extra, { domains: p }));
+  }
+
+
+  /* Guest Count Charts */
+
+  export function renderGuestsCount(o: BaseOpts<DomainChartOpts>) {
+    fetchAndClean(o);
+    o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
+
+    render(ReactHelpers.contain(function() {
+
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.GuestCountDurationByDateCalc(
+          data.dates, o.extra.domains);
+        calc.start();
+        let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
+        let chart = <Components.GuestCountEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getGuestCountChartView(o, chart, allEvents);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d, i) => {
+          let calc = new EventStats.GuestCountDurationCalc(
+            d.events,
+            o.extra.domains);  // Nest domains for pie chart
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.GuestCountPercentChart data={calcData} /> :
+          <Components.GuestCountHoursChart data={calcData} />;
+
+        let allEvents = _.flatten( _.map(data, (d) => d.events) );
+        return getGuestCountChartView(o, chart, allEvents);
+      }
+    }));
+  }
+
+  function getGuestCountChartView(o: BaseOpts<DomainChartOpts>,
+                                  chart: JSX.Element,
+                                  events: Stores.Events.TeamEvent[]) {
+    var selectorCalc = new EventStats.DomainCountCalc(events);
+    selectorCalc.start();
+    var selector = <div className="esper-panel-section">
+      <div className="esper-subheader">
+        <i className="fa fa-fw fa-user" />{" "}
+        { Text.GuestDomains }
+      </div>
+      <Components.DomainCalcSelector
+        events={events}
+        calculation={selectorCalc}
+        selected={o.extra.domains}
+        showNone={true}
+        updateFn={(x) => updateDomains(x, o.extra)}
+      />
+    </div>;
+
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.guestsCountChart}
+      chart={chart}
+      selectors={selector}
+    />
   }
 
 

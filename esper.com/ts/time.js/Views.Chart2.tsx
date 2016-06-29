@@ -129,7 +129,18 @@ module Esper.Views {
           },
           header: Text.ChartGuests,
           content: Text.ChartGuestsDescription,
-          icon: "fa-users"
+          icon: "fa-user"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.ratingsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartRatings,
+          content: Text.ChartRatingsDescription,
+          icon: "fa-star"
         }) }
 
         { this.renderSidebarMenuOpt({
@@ -144,14 +155,14 @@ module Esper.Views {
         }) }
 
         { this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.ratingsChart,
+          pathFn: Paths.Time.guestsCountChart,
           extra: {
             type: "percent",
             incrs: this.props.extra.incrs
           },
-          header: Text.ChartRatings,
-          content: Text.ChartRatingsDescription,
-          icon: "fa-star"
+          header: Text.ChartGuestsCount,
+          content: Text.ChartGuestsCountDescription,
+          icon: "fa-users"
         }) }
       </div>;
     }

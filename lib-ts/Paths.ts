@@ -104,6 +104,13 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
+    export function guestsCountChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
+      return optPath(prefix, "charts", "guests-count",
+                     teamId, calIds, interval, period);
+    }
+
     export function labelsChart({
       teamId, calIds, interval, period
     } : chartPathOpts = {}) {

@@ -119,6 +119,7 @@ module Esper.Text {
   export const ChartDuration = `Duration`;
   export const ChartLabels = Labels;
   export const ChartGuests = Guests;
+  export const ChartGuestsCount = `Number of Attendees`;
   export const ChartCalendars = `Calendars`;
   export const ChartRatings = `Ratings`
 
@@ -132,6 +133,8 @@ module Esper.Text {
     `Which ${Labels} am I spending the most time on?`;
   export const ChartGuestsDescription =
     `Which ${Guests} am I meeting the most with?`;
+  export const ChartGuestsCountDescription =
+    `Are there too many people invited to the meetings I attend?`
   export const ChartRatingsDescription =
     `How much time do I spend in good meetings vs. bad meetings?`;
 
