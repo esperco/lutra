@@ -49,6 +49,7 @@ module Esper.Stores.GroupPreferences {
       uid: Login.me(),
       daily_breakdown: false,
       weekly_breakdown: false,
+      bad_meeting_warning: false,
       bad_duration: 20,
       bad_attendees: 4
     };
