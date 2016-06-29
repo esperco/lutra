@@ -22,6 +22,9 @@ module Esper.Actions.Charts2 {
   export interface DomainChartOpts extends ExtraOpts {
     domains: Params.ListSelectJSON;
   }
+  export interface RatingChartOpts extends ExtraOpts {
+    hideNone: boolean;
+  }
 
   // Fetch events from server
   function fetchEvents<T extends ExtraOpts>(o: BaseOpts<T>) {
@@ -455,13 +458,15 @@ module Esper.Actions.Charts2 {
 
   /* Rating Charts */
 
-  export function renderRatings(o: DefaultBaseOpts) {
+  export function renderRatings(o: BaseOpts<RatingChartOpts>) {
     fetchAndClean(o);
+    o.extra.hideNone = Params.cleanBoolean(o.extra.hideNone);
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
-        let calc = new EventStats.RatingDateDurationCalc(data.dates);
+        let calc = new EventStats.RatingDateDurationCalc(
+          data.dates, o.extra.hideNone);
         calc.start();
         let chart = <Components.RatingEventGrid
           calculation={calc}
@@ -474,7 +479,8 @@ module Esper.Actions.Charts2 {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
-          let calc = new EventStats.RatingDurationCalc(d.events);
+          let calc = new EventStats.RatingDurationCalc(
+            d.events, o.extra.hideNone);
           calc.start();
 
           return {
@@ -496,15 +502,28 @@ module Esper.Actions.Charts2 {
     }));
   }
 
-  function getRatingsChartView(o: DefaultBaseOpts,
+  function getRatingsChartView(o: BaseOpts<RatingChartOpts>,
                                chart: JSX.Element) {
+    var selector = <div className="esper-panel-section">
+      <Components.SimpleToggle
+        active={o.extra.hideNone}
+        title={Text.ShowNoRating}
+        onChange={(x) => toggleHideNone(x, o.extra)}
+      />
+    </div>;
+
     return <Views.Charts2
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
       extra={o.extra}
       pathFn={Paths.Time.ratingsChart}
+      selectors={selector}
       chart={chart}
     />;
+  }
+
+  function toggleHideNone(active: boolean, extra: RatingChartOpts) {
+    Route.nav.query(_.extend({}, extra, { hideNone: active }));
   }
 }

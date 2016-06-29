@@ -36,6 +36,7 @@ module Esper.Components {
       var series = Charting.eventSeries(groups, {
         colorFn: colorForRating,
         displayName: displayNameForRating,
+        noneName: Text.NoRating,
         sortedKeys: RATINGS,
         yFn: EventStats.toHours
       });
@@ -56,6 +57,7 @@ module Esper.Components {
       var series = Charting.eventGroupSeries(groups, {
         colorFn: colorForRating,
         displayName: displayNameForRating,
+        noneName: Text.NoRating,
         sortedKeys: RATINGS,
         yFn: EventStats.toHours
       });
