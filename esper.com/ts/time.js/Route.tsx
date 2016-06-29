@@ -40,9 +40,9 @@ module Esper.Route {
   /*
     Generic cleaning + routing functino for our chart functions
   */
-  function routeChart<T extends Actions.Charts2.ExtraOpts>(
+  function routeChart<T extends Actions.Charts.ExtraOpts>(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
-    cbFn: (o: Actions.Charts2.BaseOpts<T>) => void
+    cbFn: (o: Actions.Charts.BaseOpts<T>) => void
   ) {
     route(pathFn({
       teamId: ":teamId?",
@@ -66,12 +66,12 @@ module Esper.Route {
     });
   }
 
-  routeChart(Paths.Time.calendarsChart, Actions.Charts2.renderCalendars);
-  routeChart(Paths.Time.durationsChart, Actions.Charts2.renderDurations);
-  routeChart(Paths.Time.guestsChart, Actions.Charts2.renderGuests);
-  routeChart(Paths.Time.guestsCountChart, Actions.Charts2.renderGuestsCount);
-  routeChart(Paths.Time.labelsChart, Actions.Charts2.renderLabels);
-  routeChart(Paths.Time.ratingsChart, Actions.Charts2.renderRatings);
+  routeChart(Paths.Time.calendarsChart, Actions.Charts.renderCalendars);
+  routeChart(Paths.Time.durationsChart, Actions.Charts.renderDurations);
+  routeChart(Paths.Time.guestsChart, Actions.Charts.renderGuests);
+  routeChart(Paths.Time.guestsCountChart, Actions.Charts.renderGuestsCount);
+  routeChart(Paths.Time.labelsChart, Actions.Charts.renderLabels);
+  routeChart(Paths.Time.ratingsChart, Actions.Charts.renderRatings);
 
   // Default routing => redirect to labels
   route(Paths.Time.charts({

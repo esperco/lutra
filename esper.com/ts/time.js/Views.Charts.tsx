@@ -10,7 +10,7 @@ module Esper.Views {
     teamId: string;
     calIds: string[];
     period: Period.Single|Period.Custom;
-    extra: Actions.Charts2.ExtraOpts;
+    extra: Actions.Charts.ExtraOpts;
 
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
     chart: JSX.Element;
@@ -32,7 +32,7 @@ module Esper.Views {
     sidebar: string;
   }
 
-  export class Charts2 extends Component<Props, State> {
+  export class Charts extends Component<Props, State> {
     constructor(props: Props) {
       super(props);
       this.state = {
@@ -169,7 +169,7 @@ module Esper.Views {
 
     renderSidebarMenuOpt({pathFn, extra, header, icon, content}: {
       pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
-      extra?: Actions.Charts2.ExtraOpts;
+      extra?: Actions.Charts.ExtraOpts;
       header: string;
       icon?: string;
       content?: JSX.Element|string;
@@ -320,7 +320,7 @@ module Esper.Views {
       teamId?: string;
       calIds?: string[];
       period?: Period.Single|Period.Custom;
-      extra?: Actions.Charts2.ExtraOpts;
+      extra?: Actions.Charts.ExtraOpts;
       opts?: Route.nav.Opts;
     }) {
       pathFn = pathFn || this.props.pathFn;

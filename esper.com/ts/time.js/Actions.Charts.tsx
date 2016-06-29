@@ -2,7 +2,7 @@
   Actions for charts page
 */
 
-module Esper.Actions.Charts2 {
+module Esper.Actions.Charts {
   // Base options needed to fetch and get events
   export interface BaseOpts<T extends ExtraOpts> {
     teamId: string;
@@ -164,7 +164,7 @@ module Esper.Actions.Charts2 {
 
   function getDurationChartView(o: DefaultBaseOpts,
                                 chart: JSX.Element) {
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
@@ -225,7 +225,7 @@ module Esper.Actions.Charts2 {
 
   function getCalendarsChartView(o: DefaultBaseOpts,
                                  chart: JSX.Element) {
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
@@ -306,7 +306,7 @@ module Esper.Actions.Charts2 {
       />
     </div>;
 
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
@@ -395,7 +395,7 @@ module Esper.Actions.Charts2 {
       />
     </div>;
 
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
@@ -503,7 +503,7 @@ module Esper.Actions.Charts2 {
       }
     };
 
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
@@ -593,7 +593,7 @@ module Esper.Actions.Charts2 {
       />
     </div>;
 
-    return <Views.Charts2
+    return <Views.Charts
       teamId={o.teamId}
       calIds={o.calIds}
       period={o.period}
