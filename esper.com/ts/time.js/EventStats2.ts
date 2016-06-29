@@ -784,4 +784,54 @@ module Esper.EventStats {
       return Params.applyListSelectJSON(domains, this.selections);
     }
   }
+
+
+  /* Calcs for post-meeting feedback rating */
+
+  export class RatingDurationCalc extends DurationCalc<OptGrouping> {
+    showNone: boolean;
+
+    constructor(events: Stores.Events.TeamEvent[], showNone=false) {
+      super(events);
+      this.showNone = showNone;
+    }
+
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      if (!event.feedback.rating && !this.showNone) {
+        return results;
+      }
+
+      return groupAnnotations([{
+        event: event,
+        value: duration,
+        groups: event.feedback.rating ? [event.feedback.rating.toString()] : []
+      }], results);
+    }
+  }
+
+  export class RatingDateDurationCalc extends DateDurationCalc {
+    showNone: boolean;
+
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                showNone=false) {
+      super(eventDates);
+      this.showNone = showNone;
+    }
+
+    getGroups(event: Stores.Events.TeamEvent) {
+      if (!event.feedback.rating && !this.showNone) {
+        return Option.none<string[]>();
+      }
+      return Option.some(
+        event.feedback.rating ? [event.feedback.rating.toString()] : []
+      );
+    }
+  }
+
 }

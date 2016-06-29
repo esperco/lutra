@@ -70,6 +70,7 @@ module Esper.Route {
   routeChart(Paths.Time.durationsChart, Actions.Charts2.renderDurations);
   routeChart(Paths.Time.guestsChart, Actions.Charts2.renderGuests);
   routeChart(Paths.Time.labelsChart, Actions.Charts2.renderLabels);
+  routeChart(Paths.Time.ratingsChart, Actions.Charts2.renderRatings);
 
   // Default routing => redirect to labels
   route(Paths.Time.charts({

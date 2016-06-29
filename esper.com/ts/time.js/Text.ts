@@ -90,6 +90,8 @@ module Esper.Text {
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
+  export const NoRating = `No Rating`;
+
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
   export const ConfirmationDescription = `Hi there! We've made some guesses ` +
@@ -117,6 +119,7 @@ module Esper.Text {
   export const ChartLabels = Labels;
   export const ChartGuests = Guests;
   export const ChartCalendars = `Calendars`;
+  export const ChartRatings = `Ratings`
 
   // Chart descriptions
   export const ChartCalendarsDescription =
@@ -128,6 +131,8 @@ module Esper.Text {
     `Which ${Labels} am I spending the most time on?`;
   export const ChartGuestsDescription =
     `Which ${Guests} am I meeting the most with?`;
+  export const ChartRatingsDescription =
+    `How much time do I spend in good meetings vs. bad meetings?`;
 
 
   /////
@@ -159,6 +164,10 @@ module Esper.Text {
 
   export function eventTitleForChart(event: Stores.Events.TeamEvent) {
     return `${event.title || NoEventTitle} (${date(event.start)})`;
+  }
+
+  export function stars(n: number) {
+    return `${n} star${s(n)}`;
   }
 
   export function date(d: Date|moment.Moment|string) {

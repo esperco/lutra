@@ -142,6 +142,17 @@ module Esper.Views {
           content: Text.ChartDurationDescription,
           icon: "fa-clock-o"
         }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.ratingsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartRatings,
+          content: Text.ChartRatingsDescription,
+          icon: "fa-star"
+        }) }
       </div>;
     }
 

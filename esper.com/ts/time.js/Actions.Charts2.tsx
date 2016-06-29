@@ -451,4 +451,60 @@ module Esper.Actions.Charts2 {
       Containers.confirmListModal(events)
     );
   }
+
+
+  /* Rating Charts */
+
+  export function renderRatings(o: DefaultBaseOpts) {
+    fetchAndClean(o);
+    render(ReactHelpers.contain(function() {
+      var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.RatingDateDurationCalc(data.dates);
+        calc.start();
+        let chart = <Components.RatingEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getRatingsChartView(o, chart);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d) => {
+          let calc = new EventStats.RatingDurationCalc(d.events);
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.RatingPercentChart data={calcData} /> :
+          <Components.RatingHoursChart data={calcData} />;
+
+        return getRatingsChartView(o, chart);
+      }
+    }));
+  }
+
+  function getRatingsChartView(o: DefaultBaseOpts,
+                               chart: JSX.Element) {
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.ratingsChart}
+      chart={chart}
+    />;
+  }
 }

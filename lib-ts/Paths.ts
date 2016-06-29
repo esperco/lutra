@@ -111,6 +111,13 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
+    export function ratingsChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
+      return optPath(prefix, "charts", "ratings",
+                     teamId, calIds, interval, period);
+    }
+
     export function calendarLabeling({teamId, calIds, interval, period}: {
       teamId?: string;
       calIds?: string;
