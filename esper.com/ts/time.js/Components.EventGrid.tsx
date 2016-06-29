@@ -234,7 +234,7 @@ module Esper.Components {
           ret += (event.title || Text.NoEventTitle) + " @ ";
           ret += Text.time(event.start) + " / ";
           ret += Text.hours(EventStats.toHours(this.props.seconds));
-          ret += this.props.category ? "" : ` (${this.props.category})`;
+          ret += this.props.category ? ` (${this.props.category})` : "";
           return ret;
         }
       })
