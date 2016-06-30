@@ -85,20 +85,48 @@ module Esper.Views {
     }
 
     renderSidebarContent() {
-      if (this.state.sidebar === SidebarFilter) {
-        return this.renderSidebarFilters();
+      var defaultMenus: Array<JSX.Element|JSX.Element[]> = [
+        this.renderSidebarMain(),
+        this.renderSidebarFilters(),
+      ];
+      var allMenus = defaultMenus.concat(
+        _.map(this.props.menus, (m) => m.content)
+      );
+
+      // Get index of active menu
+      var current = _.findIndex(this.props.menus,
+        (m) => m.id === this.state.sidebar
+      );
+      if (current >= 0) {
+        current += defaultMenus.length
+      } else if (this.state.sidebar === SidebarFilter) {
+        current = 1;
+      } else {
+        current = 0;
       }
 
-      var menu = _.find(this.props.menus, (m) => m.id === this.state.sidebar);
-      if (menu) {
-        return menu.content;
-      }
+      return _.map(allMenus, (menu, i) => {
+        let left = i - current;
+        let right = current - i;
+        let style = {
+          left: (left * 100) + "%",
+          right: (right * 100) + "%"
+        };
+        let classes = classNames(
+          "sidebar-minus-top-menu",
+          "sidebar-minus-bottom-menu",
+          "sidebar-slider", {
+            active: i === current
+          });
 
-      return this.renderSidebarMain();
+        return <div key={i} style={style} className={classes}>
+          { menu }
+        </div>;
+      });
     }
 
     renderSidebarMain() {
-      return <div className="sidebar-minus-top-menu sidebar-minus-bottom-menu">
+      return <div>
         { this.renderSidebarMenuOpt({
           pathFn: Paths.Time.labelsChart,
           extra: {
@@ -195,7 +223,7 @@ module Esper.Views {
       var calendars = Option.matchList(
         Stores.Calendars.list(this.props.teamId)
       );
-      return <div className="sidebar-minus-top-menu sidebar-minus-bottom-menu">
+      return <div>
         <div className="esper-panel-section">
           <div className="btn-group btn-group-justified">
             <div className="btn-group">
