@@ -204,10 +204,13 @@ module Esper.Views {
     }) {
       var active = pathFn === this.props.pathFn;
       return <div className="esper-panel-section action-block"
-        onClick={() => this.updateRoute({
-          pathFn: pathFn,
-          extra: extra
-        })}>
+        onClick={() => {
+          this.updateRoute({
+            pathFn: pathFn,
+            extra: extra
+          });
+          this.setState({ sidebar: SidebarFilter })
+        }}>
         <div className={classNames("esper-subheader-link", {
           active: active
         })}>
