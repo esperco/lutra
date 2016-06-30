@@ -48,11 +48,15 @@ module Esper.Stores.Events {
   {
     var labelScores = (() => {
       if (e.labels_norm) {
-        return Option.some(_.map(e.labels_norm, (n, i) => ({
-          id: n,
-          displayAs: e.labels[i],
-          score: 1
-        })));
+        return Option.some(_.map(e.labels_norm, (n, i) => {
+          let [norm, display] = [n, e.labels[i]];
+          Labels.storeMapping({ norm: norm, display: display });
+          return {
+            id: norm,
+            displayAs: display,
+            score: 1
+          };
+        }));
       } else if (Util.notEmpty(e.predicted_labels)) {
         var team = Teams.require(teamId);
         if (team) {

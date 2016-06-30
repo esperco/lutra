@@ -23,7 +23,7 @@ module Esper.Containers {
 
       return <Components.EventEditorModal
         eventData={eventData}
-        teams={Stores.Teams.all()}
+        teams={Stores.Events.getTeams(events)}
         focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
         onDone={opts.onDone}

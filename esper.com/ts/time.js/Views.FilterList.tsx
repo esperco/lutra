@@ -193,7 +193,8 @@ module Esper.Views {
     }
 
     renderLabelSelector(events: Stores.Events.TeamEvent[]) {
-      var labels = Labels.fromEvents(events, Stores.Teams.all());
+      var teams = Stores.Teams.getFromCalSelection(this.props.cals);
+      var labels = Labels.fromEvents(events, teams);
       labels = Labels.sortLabels(labels);
 
       var unconfirmedCount = _.filter(events,
@@ -448,8 +449,9 @@ module Esper.Views {
         .map((e) => e.unwrap())
         .value();
 
+      var teams = Stores.Teams.getFromCalSelection(this.props.cals);
       return <Components.EventEditorModal eventData={eventData}
-                                          teams={Stores.Teams.all()}
+                                          teams={teams}
                                           focusOnLabels={minFeedback}
                                           minFeedback={minFeedback} />;
     }

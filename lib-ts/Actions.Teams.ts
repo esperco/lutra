@@ -171,7 +171,7 @@ module Esper.Actions.Teams {
     newLabels = newLabels.concat(addLabels);
 
     // Remove duplicates based on normalization
-    newLabels = _.uniqBy(newLabels, Stores.Teams.getNormLabel);
+    newLabels = _.uniqBy(newLabels, Labels.getNorm);
 
     return setTeamLabels(_id, team, newLabels);
   }
@@ -198,7 +198,7 @@ module Esper.Actions.Teams {
     labels = _.sortBy(labels, Labels.normalizeForSort);
 
     teamCopy.team_labels = labels;
-    teamCopy.team_labels_norm = _.map(labels, Stores.Teams.getNormLabel);
+    teamCopy.team_labels_norm = _.map(labels, Labels.getNorm);
 
     var p = LabelUpdateQueue.enqueue(_id, {
       teamId: _id,
