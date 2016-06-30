@@ -3,11 +3,12 @@
   done. Renders intermediate states like fetching and calculating.
 */
 module Esper.Components {
+
   interface Props<T> {
     // Data is a list because we have calculation for each period
     data: {
       period: Period.Single|Period.Custom;
-      current: boolean; // Is this the "active" period or a comparative period?
+      current: boolean; // Is this "active" period or a comparative period?
       calculation: EventStats.CalcBase<T>;
       events: Stores.Events.TeamEvent[];
       fetching: boolean;
@@ -15,8 +16,8 @@ module Esper.Components {
     }[];
   }
 
-  export abstract class Chart<T extends EventStats.OptGrouping>
-         extends ReactHelpers.Component<Props<T>, {}> {
+  export abstract class Chart<T extends EventStats.OptGrouping, U>
+         extends ReactHelpers.Component<Props<T> & U, {}> {
     componentDidMount() {
       this.setCalcSources();
     }
@@ -84,5 +85,8 @@ module Esper.Components {
   /*
     Default chart option for group data and nothing more
   */
-  export abstract class DefaultChart extends Chart<EventStats.OptGrouping> {}
+  export abstract class DefaultGroupingChart<T>
+    extends Chart<EventStats.OptGrouping, T> {}
+
+  export abstract class DefaultChart extends DefaultGroupingChart<{}> {}
 }

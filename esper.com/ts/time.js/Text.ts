@@ -90,6 +90,9 @@ module Esper.Text {
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
+  export const ShowNoRating = `Show Events Without Ratings`;
+  export const NoRating = `No Rating`;
+
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
   export const ConfirmationDescription = `Hi there! We've made some guesses ` +
@@ -103,7 +106,7 @@ module Esper.Text {
   // Chart Types
   export const ChartPercentage = `Percent`;
   export const ChartAbsolute = `Absolute Time`;
-  export const ChartCalendar = `Calendar Grid`;
+  export const ChartGrid = `Calendar Grid`;
 
   // Chart messages
   export const ChartNoData = `No events found`;
@@ -116,14 +119,24 @@ module Esper.Text {
   export const ChartDuration = `Duration`;
   export const ChartLabels = Labels;
   export const ChartGuests = Guests;
+  export const ChartGuestsCount = `Number of Attendees`;
+  export const ChartCalendars = `Calendars`;
+  export const ChartRatings = `Ratings`
 
   // Chart descriptions
+  export const ChartCalendarsDescription =
+    `Which of my calendars has more events scheduled? You can use this to ` +
+    `compare your work and personal calendars.`;
   export const ChartDurationDescription =
     `Am I spending my time in many short meetings or a few long meetings?`;
   export const ChartLabelsDescription =
     `Which ${Labels} am I spending the most time on?`;
   export const ChartGuestsDescription =
     `Which ${Guests} am I meeting the most with?`;
+  export const ChartGuestsCountDescription =
+    `Are there too many people invited to the meetings I attend?`
+  export const ChartRatingsDescription =
+    `How much time do I spend in good meetings vs. bad meetings?`;
 
 
   /////
@@ -155,6 +168,10 @@ module Esper.Text {
 
   export function eventTitleForChart(event: Stores.Events.TeamEvent) {
     return `${event.title || NoEventTitle} (${date(event.start)})`;
+  }
+
+  export function stars(n: number) {
+    return `${n} star${s(n)}`;
   }
 
   export function date(d: Date|moment.Moment|string) {

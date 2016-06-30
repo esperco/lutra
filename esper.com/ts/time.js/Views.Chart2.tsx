@@ -110,19 +110,41 @@ module Esper.Views {
           icon: "fa-tags"
         }) }
 
+        { this.props.calIds.length > 1 ? this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.calendarsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartCalendars,
+          content: Text.ChartCalendarsDescription,
+          icon: "fa-calendar-o"
+        }) : null }
+
         { this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.guestChart,
+          pathFn: Paths.Time.guestsChart,
           extra: {
             type: "absolute",
             incrs: this.props.extra.incrs
           },
           header: Text.ChartGuests,
           content: Text.ChartGuestsDescription,
-          icon: "fa-users"
+          icon: "fa-user"
         }) }
 
         { this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.durationChart,
+          pathFn: Paths.Time.ratingsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartRatings,
+          content: Text.ChartRatingsDescription,
+          icon: "fa-star"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.durationsChart,
           extra: {
             type: "percent",
             incrs: this.props.extra.incrs
@@ -130,6 +152,17 @@ module Esper.Views {
           header: Text.ChartDuration,
           content: Text.ChartDurationDescription,
           icon: "fa-clock-o"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.guestsCountChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartGuestsCount,
+          content: Text.ChartGuestsCountDescription,
+          icon: "fa-users"
         }) }
       </div>;
     }
@@ -177,7 +210,7 @@ module Esper.Views {
             </div>
             <div className="btn-group">
               { this.renderTypeButton("calendar",
-                                      Text.ChartCalendar,
+                                      Text.ChartGrid,
                                       "fa-calendar") }
             </div>
           </div>

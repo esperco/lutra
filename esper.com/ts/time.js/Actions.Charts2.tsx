@@ -22,6 +22,9 @@ module Esper.Actions.Charts2 {
   export interface DomainChartOpts extends ExtraOpts {
     domains: Params.ListSelectJSON;
   }
+  export interface RatingChartOpts extends ExtraOpts {
+    hideNone: boolean;
+  }
 
   // Fetch events from server
   function fetchEvents<T extends ExtraOpts>(o: BaseOpts<T>) {
@@ -166,7 +169,68 @@ module Esper.Actions.Charts2 {
       calIds={o.calIds}
       period={o.period}
       extra={o.extra}
-      pathFn={Paths.Time.durationChart}
+      pathFn={Paths.Time.durationsChart}
+      chart={chart}
+    />;
+  }
+
+
+  /* Calendars Charts */
+
+  export function renderCalendars(o: DefaultBaseOpts) {
+    fetchAndClean(o);
+    render(ReactHelpers.contain(function() {
+      var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.CalendarDateDurationCalc(data.dates);
+        calc.start();
+        let chart = <Components.CalendarEventGrid
+          calendars={calendars}
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getCalendarsChartView(o, chart);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d) => {
+          let calc = new EventStats.CalendarDurationCalc(d.events);
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.CalendarPercentChart
+            data={calcData}
+            calendars={calendars} /> :
+          <Components.CalendarHoursChart
+            data={calcData}
+            calendars={calendars} />;
+
+        return getCalendarsChartView(o, chart);
+      }
+    }));
+  }
+
+  function getCalendarsChartView(o: DefaultBaseOpts,
+                                 chart: JSX.Element) {
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.calendarsChart}
       chart={chart}
     />;
   }
@@ -237,7 +301,7 @@ module Esper.Actions.Charts2 {
         events={events}
         calculation={selectorCalc}
         selected={o.extra.domains}
-        showNone={o.extra.type === "percent"}
+        showNone={o.extra.type !== "absolute"}
         updateFn={(x) => updateDomains(x, o.extra)}
       />
     </div>;
@@ -247,7 +311,7 @@ module Esper.Actions.Charts2 {
       calIds={o.calIds}
       period={o.period}
       extra={o.extra}
-      pathFn={Paths.Time.guestChart}
+      pathFn={Paths.Time.guestsChart}
       chart={chart}
       selectors={selector}
     />
@@ -259,6 +323,87 @@ module Esper.Actions.Charts2 {
     some: string[];
   }, extra: DomainChartOpts) {
     Route.nav.query(_.extend({}, extra, { domains: p }));
+  }
+
+
+  /* Guest Count Charts */
+
+  export function renderGuestsCount(o: BaseOpts<DomainChartOpts>) {
+    fetchAndClean(o);
+    o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
+
+    render(ReactHelpers.contain(function() {
+
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.GuestCountDurationByDateCalc(
+          data.dates, o.extra.domains);
+        calc.start();
+        let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
+        let chart = <Components.GuestCountEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getGuestCountChartView(o, chart, allEvents);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d, i) => {
+          let calc = new EventStats.GuestCountDurationCalc(
+            d.events,
+            o.extra.domains);  // Nest domains for pie chart
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.GuestCountPercentChart data={calcData} /> :
+          <Components.GuestCountHoursChart data={calcData} />;
+
+        let allEvents = _.flatten( _.map(data, (d) => d.events) );
+        return getGuestCountChartView(o, chart, allEvents);
+      }
+    }));
+  }
+
+  function getGuestCountChartView(o: BaseOpts<DomainChartOpts>,
+                                  chart: JSX.Element,
+                                  events: Stores.Events.TeamEvent[]) {
+    var selectorCalc = new EventStats.DomainCountCalc(events);
+    selectorCalc.start();
+    var selector = <div className="esper-panel-section">
+      <div className="esper-subheader">
+        <i className="fa fa-fw fa-user" />{" "}
+        { Text.GuestDomains }
+      </div>
+      <Components.DomainCalcSelector
+        events={events}
+        calculation={selectorCalc}
+        selected={o.extra.domains}
+        showNone={true}
+        updateFn={(x) => updateDomains(x, o.extra)}
+      />
+    </div>;
+
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.guestsCountChart}
+      chart={chart}
+      selectors={selector}
+    />
   }
 
 
@@ -389,5 +534,77 @@ module Esper.Actions.Charts2 {
     Layout.renderModal(
       Containers.confirmListModal(events)
     );
+  }
+
+
+  /* Rating Charts */
+
+  export function renderRatings(o: BaseOpts<RatingChartOpts>) {
+    fetchAndClean(o);
+    o.extra.hideNone = Params.cleanBoolean(o.extra.hideNone);
+    render(ReactHelpers.contain(function() {
+      var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
+      if (o.extra.type === "calendar") {
+        let data = getForMonth(o);
+        let calc = new EventStats.RatingDateDurationCalc(
+          data.dates, o.extra.hideNone);
+        calc.start();
+        let chart = <Components.RatingEventGrid
+          calculation={calc}
+          fetching={data.isBusy}
+          error={data.hasError}
+        />;
+        return getRatingsChartView(o, chart);
+      }
+
+      else {
+        let data = getEventData(o);
+        let calcData = _.map(data, (d) => {
+          let calc = new EventStats.RatingDurationCalc(
+            d.events, o.extra.hideNone);
+          calc.start();
+
+          return {
+            period: d.period,
+            current: _.isEqual(d.period, o.period),
+            fetching: d.isBusy,
+            error: d.hasError,
+            events: d.events,
+            calculation: calc
+          };
+        });
+
+        let chart = o.extra.type === "percent" ?
+          <Components.RatingPercentChart data={calcData} /> :
+          <Components.RatingHoursChart data={calcData} />;
+
+        return getRatingsChartView(o, chart);
+      }
+    }));
+  }
+
+  function getRatingsChartView(o: BaseOpts<RatingChartOpts>,
+                               chart: JSX.Element) {
+    var selector = <div className="esper-panel-section">
+      <Components.SimpleToggle
+        active={o.extra.hideNone}
+        title={Text.ShowNoRating}
+        onChange={(x) => toggleHideNone(x, o.extra)}
+      />
+    </div>;
+
+    return <Views.Charts2
+      teamId={o.teamId}
+      calIds={o.calIds}
+      period={o.period}
+      extra={o.extra}
+      pathFn={Paths.Time.ratingsChart}
+      selectors={selector}
+      chart={chart}
+    />;
+  }
+
+  function toggleHideNone(active: boolean, extra: RatingChartOpts) {
+    Route.nav.query(_.extend({}, extra, { hideNone: active }));
   }
 }

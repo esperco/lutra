@@ -550,6 +550,31 @@ module Esper.EventStats {
   }
 
 
+  /* Calc for sorting events by calendar */
+
+  export class CalendarDurationCalc extends DurationCalc<OptGrouping> {
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      return groupAnnotations([{
+        event: event,
+        value: duration,
+        groups: [event.calendarId]
+      }], results);
+    }
+  }
+
+  export class CalendarDateDurationCalc extends DateDurationCalc {
+    getGroups(event: Stores.Events.TeamEvent) {
+      return Option.some([event.calendarId]);
+    }
+  }
+
+
   // Count unique events by label type
   export interface LabelCalcCount extends OptGrouping {
     unconfirmed: Stores.Events.TeamEvent[];
@@ -759,4 +784,168 @@ module Esper.EventStats {
       return Params.applyListSelectJSON(domains, this.selections);
     }
   }
+
+
+  /* Group meetings by how many guests there are */
+
+  export class GuestCountDurationCalc extends DurationCalc<OptGrouping> {
+    static BUCKETS = [{
+      label: "2 " + Text.Guests,
+      gte: 2,   // Greater than, guests
+      color: Colors.level1
+    }, {
+      label: "3 - 4 " + Text.Guests,
+      gte: 3,
+      color: Colors.level2
+    }, {
+      label: "5 - 8 " + Text.Guests,
+      gte: 5,
+      color: Colors.level3
+    }, {
+      label: "9 - 18" + Text.Guests,
+      gte: 9,
+      color: Colors.level4
+    }, {
+      label: "19+" + Text.Guests,
+      gte: 19,
+      color: Colors.level5
+    }];
+
+    selections: Params.ListSelectJSON;
+
+    constructor(events: Stores.Events.TeamEvent[],
+                p: Params.ListSelectJSON) {
+      super(events);
+      this.selections = p;
+    }
+
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      var domains = Stores.Events.getGuestDomains(event);
+      var annotations = Params.applyListSelectJSON(domains, this.selections)
+        .match({
+          none: (): Annotation[] => [],
+          some: (matchedDomains) => {
+            let emails = Stores.Events.getGuestEmails(event, matchedDomains);
+
+            // No matched domains => no guests
+            if (! matchedDomains.length) {
+              return [{
+                event: event,
+                value: duration,
+                groups: []
+              }];
+            }
+
+            // No emails -> don't count, we've filtered these folks out
+            if (! emails.length) {
+              return [];
+            }
+
+            // Else - count is number of matching guests
+            var count = emails.length + 1; // +1 for exec
+            var bucket = _.findLast(GuestCountDurationCalc.BUCKETS,
+              (b) => count >= b.gte
+            );
+            return [{
+              event: event,
+              value: duration,
+              groups: [bucket.label]
+            }];
+          }
+        });
+
+      return groupAnnotations(annotations, results);
+    }
+  }
+
+  export class GuestCountDurationByDateCalc extends DateDurationCalc {
+    selections: Params.ListSelectJSON;
+
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                p: Params.ListSelectJSON) {
+      super(eventDates);
+      this.selections = p;
+    }
+
+    getGroups(event: Stores.Events.TeamEvent, duration: number) {
+      var domains = Stores.Events.getGuestDomains(event);
+      return Params.applyListSelectJSON(domains, this.selections)
+        .flatMap((matchedDomains): Option.T<string[]> => {
+          let emails = Stores.Events.getGuestEmails(event, matchedDomains);
+
+          // No matched domains => no guests
+          if (! matchedDomains.length) {
+            return Option.some([]);
+          }
+
+          // No emails -> don't count, we've filtered these folks out
+          if (! emails.length) {
+            return Option.none<string[]>();
+          }
+
+          // Else - count is number of matching guests
+          var count = emails.length + 1; // +1 for exec
+          var bucket = _.findLast(GuestCountDurationCalc.BUCKETS,
+            (b) => count >= b.gte
+          );
+          return Option.some([bucket.label]);
+        });
+    }
+  }
+
+
+  /* Calcs for post-meeting feedback rating */
+
+  export class RatingDurationCalc extends DurationCalc<OptGrouping> {
+    showNone: boolean;
+
+    constructor(events: Stores.Events.TeamEvent[], showNone=false) {
+      super(events);
+      this.showNone = showNone;
+    }
+
+    initResult() { return emptyOptGrouping(); }
+
+    processOne(
+      event: Stores.Events.TeamEvent,
+      duration: number,
+      results: OptGrouping
+    ) {
+      if (!event.feedback.rating && !this.showNone) {
+        return results;
+      }
+
+      return groupAnnotations([{
+        event: event,
+        value: duration,
+        groups: event.feedback.rating ? [event.feedback.rating.toString()] : []
+      }], results);
+    }
+  }
+
+  export class RatingDateDurationCalc extends DateDurationCalc {
+    showNone: boolean;
+
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                showNone=false) {
+      super(eventDates);
+      this.showNone = showNone;
+    }
+
+    getGroups(event: Stores.Events.TeamEvent) {
+      if (!event.feedback.rating && !this.showNone) {
+        return Option.none<string[]>();
+      }
+      return Option.some(
+        event.feedback.rating ? [event.feedback.rating.toString()] : []
+      );
+    }
+  }
+
 }

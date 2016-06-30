@@ -24,7 +24,8 @@ module Esper.Components {
     error: boolean;
   }
 
-  export abstract class EventGrid extends ReactHelpers.Component<Props, {}> {
+  export abstract class EventGrid<T>
+         extends ReactHelpers.Component<Props & T, {}> {
     componentDidMount() {
       this.setCalcSources();
     }

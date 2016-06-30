@@ -83,17 +83,31 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function durationChart({
+    export function calendarsChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
+      return optPath(prefix, "charts", "calendars",
+                     teamId, calIds, interval, period);
+    }
+
+    export function durationsChart({
       teamId, calIds, interval, period
     } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "durations",
                      teamId, calIds, interval, period);
     }
 
-    export function guestChart({
+    export function guestsChart({
       teamId, calIds, interval, period
     } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "guests",
+                     teamId, calIds, interval, period);
+    }
+
+    export function guestsCountChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
+      return optPath(prefix, "charts", "guests-count",
                      teamId, calIds, interval, period);
     }
 
@@ -101,6 +115,13 @@ module Esper.Paths {
       teamId, calIds, interval, period
     } : chartPathOpts = {}) {
       return optPath(prefix, "charts", "labels",
+                     teamId, calIds, interval, period);
+    }
+
+    export function ratingsChart({
+      teamId, calIds, interval, period
+    } : chartPathOpts = {}) {
+      return optPath(prefix, "charts", "ratings",
                      teamId, calIds, interval, period);
     }
 

@@ -54,6 +54,7 @@ module Esper.Charting {
   interface EventSeriesOpts {
     displayName?: (key: string) => string; // Map key to value
     noneName?: string;                     // If null, will not display none
+    noneStart?: boolean;                   // Displays none at start if true
     sortedKeys?: string[];                 // Pre-sorted keys for this chart
     colorFn?: (key: string, pos: {         // Color of key
       // In case color is based on position in sort order
@@ -97,7 +98,7 @@ module Esper.Charting {
           index: Period.asNumber(g.period),
           data: _.map(value.annotations, (a) => ({
             name: Text.eventTitleForChart(a.event),
-            x: index,
+            x: index + (opts.noneStart ? 1 : 0),
             y: opts.yFn ? opts.yFn(a.value) : a.value,
             events: {
               click: () => onEventClick(a.event)
@@ -116,7 +117,7 @@ module Esper.Charting {
           index: Period.asNumber(g.period),
           data: _.map(g.data.none.annotations, (a) => ({
             name: Text.eventTitleForChart(a.event),
-            x: keys.length, // None @ end
+            x: opts.noneStart ? 0 : keys.length, // None @ end
             y: opts.yFn ? opts.yFn(a.value) : a.value,
             events: {
               click: () => onEventClick(a.event)
@@ -172,7 +173,7 @@ module Esper.Charting {
       // Handle none
       if (opts.noneName && _.isEmpty(opts.subgroup)) {
         let none = groups[periodIndex].data.none;
-        data.push({
+        let s = {
           name: opts.noneName,
           color: Colors.lightGray,
           count: none.annotations.length,
@@ -183,7 +184,13 @@ module Esper.Charting {
               _.map(none.annotations, (a) => a.event)
             )
           }
-        });
+        };
+
+        if (opts.noneStart) {
+          data.unshift(s);
+        } else {
+          data.push(s);
+        }
       }
 
       return {
