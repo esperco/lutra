@@ -80,15 +80,17 @@ module Esper.Components {
                  onClick={() => this.handleDayClick(day) }
                  onMouseOver={() => this.handleDayOver(day)}
                  onMouseOut={() => this.handleDayOut(day)}>
-        {
-          this.props.dayNumberFn ?
-          this.props.dayNumberFn(day.toDate()) :
-          <div className="day-number">
-            { day.format("D") }
-          </div>
-        }
-        { (inMonth && this.props.dayFn) ?
-          this.props.dayFn(day.toDate()) : null }
+        <div className="cal-day-content">
+          {
+            this.props.dayNumberFn ?
+            this.props.dayNumberFn(day.toDate()) :
+            <div className="day-number">
+              { day.format("D") }
+            </div>
+          }
+          { (inMonth && this.props.dayFn) ?
+            this.props.dayFn(day.toDate()) : null }
+        </div>
       </td>;
     }
 
