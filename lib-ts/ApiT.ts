@@ -258,6 +258,7 @@ module Esper.ApiT {
     uid: string;
     daily_breakdown: boolean;
     weekly_breakdown: boolean;
+    bad_meeting_warning: boolean;
     bad_duration: number;
     bad_attendees: number;
   }

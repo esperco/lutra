@@ -67,6 +67,7 @@ module Esper.Text {
 
   // Notification Settings
   export const GeneralPrefsHeading = "Subscriptions";
+  export const BadMeetingPrefsHeading = "Costly Meetings";
   export function generalPrefsDescription(email: string) {
     return <span>
       These notifications will go to {" "}<strong>{email}</strong>.
@@ -83,6 +84,12 @@ module Esper.Text {
     "Daily Calendar Summary Email";
   export const SendWeeklyBreakdownEmail =
     "Weekly Calendar Summary Email";
+  export const ShowBadMeetingNotifications =
+    "Show Costly Meeting Warnings in Summary Emails";
+  export const BadMeetingDuration =
+    "Minimum meeting duration to trigger warning (mins)";
+  export const BadMeetingPeople =
+    "Minimum number of attendees to trigger warning";
 
   export const FeedbackHeading = 'Meeting Feedback Notifications';
   export function feedbackDescription(email: string) {
