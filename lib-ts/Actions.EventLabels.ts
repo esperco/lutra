@@ -143,7 +143,7 @@ module Esper.Actions.EventLabels {
   }) {
     var labels = _.cloneDeep(Stores.Events.getLabels(event));
     _.each(opts.addLabels, (l) => {
-      let normalized = Stores.Teams.getNormLabel(l);
+      let normalized = Labels.getNorm(l);
       if (! _.find(labels, (l) => l.id === normalized)) {
         labels.push({
           id: normalized,
@@ -154,7 +154,7 @@ module Esper.Actions.EventLabels {
     });
 
     _.each(opts.removeLabels, (l) => {
-      let normalized = Stores.Teams.getNormLabel(l);
+      let normalized = Labels.getNorm(l);
       _.remove(labels, (l) => l.id === normalized);
     });
 

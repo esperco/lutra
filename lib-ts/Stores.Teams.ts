@@ -30,6 +30,13 @@ module Esper.Stores.Teams {
     return TeamStore.get(teamId).flatMap((t) => t.data);
   }
 
+  export function getFromCalSelection(cals: {teamId: string}[]): ApiT.Team[]
+  {
+    var teamIds = _.uniq(_.map(cals, (c) => c.teamId));
+    var teams = _.map(teamIds, (_id) => get(_id));
+    return Option.flatten(teams);
+  }
+
   // Like get, but logs error if team doe not exist
   export function require(teamId: string): ApiT.Team {
     return get(teamId).match({
@@ -97,26 +104,6 @@ module Esper.Stores.Teams {
     var currentTeamIds = _.clone(allIds());
     _.pull(currentTeamIds, teamId);
     TeamListStore.setSafe(batchKey, Option.some(currentTeamIds));
-  }
-
-
-  //////////
-
-  // Find the normalized form of a team label
-  export function getNormLabel(label: string) {
-    var teams = all();
-    for (let i in teams) {
-      var team = teams[i];
-
-      for (let j in team.team_labels) {
-        if (team.team_labels[j] === label) {
-          return team.team_labels_norm[j];
-        }
-      }
-    }
-
-    // No match, default to lowercase and trimming
-    return label.toLowerCase().trim();
   }
 
 

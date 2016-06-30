@@ -31,7 +31,6 @@ inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap/js/transition");
 
   highcharts = require("highcharts");
-  require("highcharts/modules/drilldown")(highcharts);
   require("highcharts/modules/exporting")(highcharts);
   require("highcharts/modules/offline-exporting")(highcharts);
 });

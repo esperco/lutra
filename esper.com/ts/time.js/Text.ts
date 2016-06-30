@@ -108,6 +108,10 @@ module Esper.Text {
   export const ChartAbsolute = `Absolute Time`;
   export const ChartGrid = `Calendar Grid`;
 
+  // Chart Units
+  export const ChartPercentUnit = `Percent`;
+  export const ChartHoursUnit = `Hours`;
+
   // Chart messages
   export const ChartNoData = `No events found`;
   export const ChartFetching = `Fetching data from your calendar`;
@@ -117,8 +121,8 @@ module Esper.Text {
 
   // Chart groupings
   export const ChartDuration = `Duration`;
-  export const ChartLabels = Labels;
-  export const ChartGuests = Guests;
+  export const ChartLabels = _.capitalize(Labels);
+  export const ChartGuests = _.capitalize(Guests);
   export const ChartGuestsCount = `Number of Attendees`;
   export const ChartCalendars = `Calendars`;
   export const ChartRatings = `Ratings`

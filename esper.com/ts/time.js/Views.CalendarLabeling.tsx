@@ -150,10 +150,12 @@ module Esper.Views {
               </div>: ""
             }
           </div>
-          <Components.EventEditor eventData={eventData}
-                                  teams={Stores.Teams.all()}
-                                  focusOnLabels={true}
-                                  minFeedback={true} />
+          <Components.EventEditor
+            eventData={eventData}
+            teams={Stores.Teams.getFromCalSelection(this.props.cals)}
+            focusOnLabels={true}
+            minFeedback={true}
+          />
         </div>;
       } else {
         return <div className="esper-panel-section">

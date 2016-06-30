@@ -46,6 +46,8 @@ module Esper.Views {
         return <Components.ErrorMsg />;
       }
 
+      var team = Stores.Teams.require(this.props.teamId);
+
       return eventData.data.match({
         none: () => {
           Log.e("No event data found");
@@ -67,7 +69,7 @@ module Esper.Views {
             <Components.EventEditor
               className="panel-body"
               eventData={[eventData]}
-              teams={Stores.Teams.all()}
+              teams={team ? [team] : []}
               initAction={this.props.initAction}
             />
           </div>

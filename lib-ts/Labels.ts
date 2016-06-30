@@ -27,11 +27,27 @@ module Esper.Labels {
     Currently the two are identical, but this is not guaranteed.
   */
   export function normalizeForSort(l: string) {
-    return l.toLowerCase().trim();
+    return l ? l.toLowerCase().trim() : "";
   }
 
   // Global map of normalized labels to display forms
   var displayAsMap: {[index: string]: string} = {};
+
+  // Global map of known display labels to normalized form
+  var normMap: {[index: string]: string} = {};
+
+  export function storeMapping({norm, display, force}: {
+    norm: string;
+    display: string;
+    force?: boolean;
+  }) {
+    if (force || !displayAsMap[norm]) {
+      displayAsMap[norm] = display;
+    }
+    if (force || !normMap[display]) {
+      normMap[display] = norm;
+    }
+  }
 
   export function getDisplayAs(norm: string) {
     if (! norm.trim()) {
@@ -39,6 +55,14 @@ module Esper.Labels {
     }
     return displayAsMap[norm] || norm;
   }
+
+  export function getNorm(display: string) {
+    if (! display.trim()) {
+      return "";
+    }
+    return normMap[display] || display.toLowerCase().trim();
+  }
+
 
   // Takes a list of events and returns a list of unique normalized / display
   // label combos. Optionally includes team labels too (if team matches
@@ -50,21 +74,14 @@ module Esper.Labels {
     var counts: {[index: string]: number} = {};
 
     // Order of labels as we encounter them (team labels come first)
-    var labels: string[] = [];
-
-    var teamIds = _(events)
-      .map((e) => e.teamId)
-      .uniq()
-      .value();
+    var labels: LabelCount[] = [];
 
     _.each(teams, (t) => {
-      if (_.includes(teamIds, t.teamid)) {
-        _.each(t.team_labels_norm, (id, i) => {
-          var teamLabel = t.team_labels[i];
-          displayAsMap[id] = displayAsMap[id] || teamLabel;
-          labels.push(id);
-        });
-      }
+      _.each(t.team_labels_norm, (id, i) => labels.push({
+        id: id,
+        displayAs: t.team_labels[i],
+        count: 0
+      }));
     });
 
     _.each(events, (e) => e.labelScores.match({
@@ -73,16 +90,17 @@ module Esper.Labels {
         displayAsMap[s.id] = displayAsMap[s.id] || s.displayAs;
         counts[s.id] = counts[s.id] || 0;
         counts[s.id] += 1;
-        labels.push(s.id);
+        labels.push({
+          id: s.id,
+          displayAs: s.displayAs,
+          count: 0
+        });
       })
     }));
 
-    labels = _.uniq(labels);
-    return _.map(labels, (id): LabelCount => ({
-      id: id,
-      displayAs: displayAsMap[id],
-      count: counts[id] || 0
-    }));
+    labels = _.uniqBy(labels, (l) => l.id);
+    _.each(labels, (l) => l.count = counts[l.id] || 0);
+    return labels;
   }
 
   export function fromTeam(team: ApiT.Team) {
@@ -112,5 +130,19 @@ module Esper.Labels {
   */
   export function sortLabelStrs(labels: string[]) {
     return _.sortBy(labels, normalizeForSort);
+  }
+
+  export function init() {
+    // Set initial norm/display label mappings based on teams
+    Login.promise.done(() => {
+      _.each(Stores.Teams.all(), (team) => {
+        _.each(team.team_labels_norm, (norm, index) => {
+          storeMapping({
+            norm: norm,
+            display: team.team_labels[index]
+          });
+        });
+      });
+    });
   }
 }

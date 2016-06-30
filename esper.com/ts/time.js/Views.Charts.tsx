@@ -1,240 +1,389 @@
 /*
-  View for all of the charts
+  View for all of the chart pages
 */
 
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface ChartTypeInfo {
-    // Used in URL to identify which chart we're looking at
-    id: string;
-
-    // Display Name
-    displayAs: string;
-    icon: string;
-  }
-
   interface Props {
-    currentChart: Esper.Charts.DefaultEventChart;
-    chartTypes: Actions.ChartTypeInfo[];
+    teamId: string;
+    calIds: string[];
+    period: Period.Single|Period.Custom;
+    extra: Actions.Charts.ExtraOpts;
+
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
+    chart: JSX.Element;
+    selectors?: JSX.Element|JSX.Element[];
+
+    // Other sidebar menus
+    menus?: {
+      id: string;
+      tab: JSX.Element;
+      content?: JSX.Element|JSX.Element[];
+      onClick?: () => boolean; // Return false to avoid switching state
+    }[];
   }
 
-  /* React Views */
+  const SidebarMain = "main";
+  const SidebarFilter = "filter";
 
-  export class Charts extends Component<Props, {}> {
+  interface State {
+    sidebar: string;
+  }
+
+  export class Charts extends Component<Props, State> {
+    constructor(props: Props) {
+      super(props);
+      this.state = {
+        sidebar: SidebarMain
+      };
+    }
+
     renderWithData() {
-      var chart = this.props.currentChart;
-      chart.sync(); // Call once per renderWithData to update chart data
-
-      var teams = Stores.Teams.all();
-      var calendarsByTeamId = Stores.Calendars.byTeamId();
-
-      // Render view
       return <div id="charts-page" className="esper-full-screen minus-nav">
         <Components.SidebarWithToggle>
-          <a className="pull-right" onClick={() => this.refresh()}>
-            <i className="fa fa-fw fa-refresh" title="refresh" />
-          </a>
-          { this.renderChartSelector() }
-          <div className="esper-panel-section">
-            <label htmlFor={this.getId("cal-select")}>
-              <i className="fa fa-fw fa-calendar-o" />{" "}
-              Calendars
-            </label>
-            <Components.CalSelectorDropdown
-              id={this.getId("cal-select")}
-              teams={teams}
-              calendarsByTeamId={calendarsByTeamId}
-              selected={chart.params.cals}
-              updateFn={(c) => this.updateCalSelection(c)}
-              allowMulti={true}
-            />
+          <div className="sidebar-top-menu">
+            <div className="esper-tab-menu">
+              { this.renderSidebarTab("main",
+                  <i className="fa fa-fw fa-home" />
+              ) }
+              { this.renderSidebarTab("filter",
+                  <i className="fa fa-fw fa-sliders" />
+              ) }
+              { _.map(this.props.menus,
+                (m) => this.renderSidebarTab(m.id, m.tab, m.onClick)
+              ) }
+            </div>
           </div>
-          { chart ? chart.renderSelectors() : null }
+
+          { this.renderSidebarContent() }
+
+          <div className="sidebar-bottom-menu">
+            <Components.TeamSelector
+              teams={Stores.Teams.all()}
+              selectedId={this.props.teamId}
+              onUpdate={(teamId) => this.updateRoute({teamId: teamId})} />
+          </div>
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
           { this.renderPeriodSelector() }
-          { this.renderChartCheck() }
+          { this.props.chart }
         </div>
       </div>;
     }
 
-    renderChartSelector() {
-      var selected = this.getCurrentChartInfo();
-      return (<div className="esper-panel-section">
-        <label htmlFor={this.getId("chart-type")}>
-          <i className="fa fa-fw fa-bar-chart" />{" "}
-          Chart Type{" "}
-          <a className="text-muted" href="/help-charts"
-             target="_blank">
-            <i className="fa fa-fw fa-question-circle" />
-          </a>
-        </label>
-        <Components.DropdownModal>
-          <Components.Selector id={this.getId("chart-type")}
-                               className="dropdown-toggle end-of-group">
-            <i className={"fa fa-fw " + selected.icon} />{" "}
-            { selected.displayAs }
-          </Components.Selector>
-          <ul className="dropdown-menu">
-            {
-              _.map(this.props.chartTypes, (c) =>
-                <li key={c.id} onClick={() => this.updateChartType(c.id)}>
-                  <a>
-                    { c.icon ? <span>
-                        <span className={"fa fa-fw " + c.icon} />{" "}
-                      </span> : null
-                    }
-                    { c.displayAs }
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-        </Components.DropdownModal>
-      </div>);
+    renderSidebarTab(val: string, elm: JSX.Element, onClick?: () => boolean) {
+      return <a key={val}
+        className={classNames("esper-tab", {
+          active: this.state.sidebar === val
+        })}
+        onClick={() => (onClick ? onClick() : true) &&
+                 this.setState({ sidebar: val })}>
+        { elm }
+      </a>
+    }
+
+    renderSidebarContent() {
+      var defaultMenus: Array<JSX.Element|JSX.Element[]> = [
+        this.renderSidebarMain(),
+        this.renderSidebarFilters(),
+      ];
+      var allMenus = defaultMenus.concat(
+        _.map(this.props.menus, (m) => m.content)
+      );
+
+      // Get index of active menu
+      var current = _.findIndex(this.props.menus,
+        (m) => m.id === this.state.sidebar
+      );
+      if (current >= 0) {
+        current += defaultMenus.length
+      } else if (this.state.sidebar === SidebarFilter) {
+        current = 1;
+      } else {
+        current = 0;
+      }
+
+      return _.map(allMenus, (menu, i) => {
+        let left = i - current;
+        let right = current - i;
+        let style = {
+          left: (left * 100) + "%",
+          right: (right * 100) + "%"
+        };
+        let classes = classNames(
+          "sidebar-minus-top-menu",
+          "sidebar-minus-bottom-menu",
+          "sidebar-slider", {
+            active: i === current
+          });
+
+        return <div key={i} style={style} className={classes}>
+          { menu }
+        </div>;
+      });
+    }
+
+    renderSidebarMain() {
+      return <div>
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.labelsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartLabels,
+          content: Text.ChartLabelsDescription,
+          icon: "fa-tags"
+        }) }
+
+        { this.props.calIds.length > 1 ? this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.calendarsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartCalendars,
+          content: Text.ChartCalendarsDescription,
+          icon: "fa-calendar-o"
+        }) : null }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.guestsChart,
+          extra: {
+            type: "absolute",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartGuests,
+          content: Text.ChartGuestsDescription,
+          icon: "fa-user"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.ratingsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartRatings,
+          content: Text.ChartRatingsDescription,
+          icon: "fa-star"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.durationsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartDuration,
+          content: Text.ChartDurationDescription,
+          icon: "fa-clock-o"
+        }) }
+
+        { this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.guestsCountChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartGuestsCount,
+          content: Text.ChartGuestsCountDescription,
+          icon: "fa-users"
+        }) }
+      </div>;
+    }
+
+    renderSidebarMenuOpt({pathFn, extra, header, icon, content}: {
+      pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
+      extra?: Actions.Charts.ExtraOpts;
+      header: string;
+      icon?: string;
+      content?: JSX.Element|string;
+    }) {
+      var active = pathFn === this.props.pathFn;
+      return <div className="esper-panel-section action-block"
+        onClick={() => {
+          this.updateRoute({
+            pathFn: pathFn,
+            extra: extra
+          });
+          this.setState({ sidebar: SidebarFilter })
+        }}>
+        <div className={classNames("esper-subheader-link", {
+          active: active
+        })}>
+          { icon ? <i className={"fa fa-fw " + icon} /> : null }{" "}
+          { header }
+        </div>
+        { content }
+      </div>;
+    }
+
+    renderSidebarFilters() {
+      var team = Stores.Teams.require(this.props.teamId);
+      var calendars = Option.matchList(
+        Stores.Calendars.list(this.props.teamId)
+      );
+      return <div>
+        <div className="esper-panel-section">
+          <div className="btn-group btn-group-justified">
+            <div className="btn-group">
+              { this.renderTypeButton("percent",
+                                      Text.ChartPercentage,
+                                      "fa-pie-chart") }
+            </div>
+            <div className="btn-group">
+              { this.renderTypeButton("absolute",
+                                      Text.ChartAbsolute,
+                                      "fa-bar-chart") }
+            </div>
+            <div className="btn-group">
+              { this.renderTypeButton("calendar",
+                                      Text.ChartGrid,
+                                      "fa-calendar") }
+            </div>
+          </div>
+        </div>
+
+        <div className="esper-panel-section">
+          <label htmlFor={this.getId("cal-select")}>
+            <i className="fa fa-fw fa-calendar-o" />{" "}
+            Calendars
+          </label>
+          <Components.CalSelectorDropdown
+            id={this.getId("cal-select")}
+            teams={[team]}
+            calendarsByTeamId={Util.keyObj(team.teamid, calendars)}
+            selected={_.map(this.props.calIds, (calId) => ({
+              teamId: team.teamid,
+              calId: calId
+            }))}
+            updateFn={(c) => this.updateCalSelection(c)}
+            allowMulti={true}
+          />
+        </div>
+
+        { this.props.extra.type === "calendar" ? null :
+          <div className="esper-panel-section">
+            <div className="esper-subheader">
+              <i className="fa fa-fw fa-clock-o" />{" "}
+              Compare With
+            </div>
+            <Components.RelativePeriodSelector
+              period={this.props.period}
+              allowedIncrs={[-1, 1]}
+              selectedIncrs={this.props.extra.incrs}
+              updateFn={(x) => this.updateIncrs(x)}
+            />
+          </div>
+        }
+        { this.props.selectors }
+      </div>;
+    }
+
+    renderTypeButton(
+        type: Charting.ChartType,
+        title: string, icon: string) {
+
+      return <button className={classNames("btn btn-default", {
+        active: type === this.props.extra.type
+      })} onClick={() => this.updateExtra({ type: type })}>
+        <Components.Tooltip title={title} placement="bottom">
+          <i style={{width: "100%"}} className={"fa fa-fw " + icon} />
+        </Components.Tooltip>
+      </button>
     }
 
     renderPeriodSelector() {
-      var period = this.props.currentChart.params.period;
       return <div className={"esper-content-header period-selector " +
                              "row fixed clearfix"}>
         <Components.IntervalOrCustomSelector
           className="col-sm-6"
-          period={period}
-          show={this.props.currentChart.intervalsAllowed()}
+          period={this.props.period}
+          show={this.props.extra.type === "calendar" ? ["month"] : undefined}
           updateFn={(p) => this.updatePeriod(p)}
         />
         <div className="col-sm-6">
           <Components.SingleOrCustomPeriodSelector
-            period={period}
+            period={this.props.period}
             updateFn={(p) => this.updatePeriod(p)}
           />
         </div>
       </div>;
     }
 
-    /*
-      Render any messages as appropriate in lieu of displaying chart, else
-      display chart
-    */
-    renderChartCheck() {
-      var chart = this.props.currentChart;
-      if (!chart || !chart.params.cals.length) {
-        return this.renderMessage(<span>
-          <i className="fa fa-fw fa-calendar"></i>{" "}
-          Please select a calendar.
-        </span>);
-      }
-
-      else if (chart.hasError()) {
-        return this.renderMessage(<span>
-          <i className="fa fa-fw fa-warning"></i>{" "}
-          Error loading data
-        </span>);
-      }
-
-      else if (chart.isBusy()) {
-        return <div className="esper-center">
-          <span className="esper-spinner esper-large" />
-        </div>;
-      }
-
-      else if (chart.noData()) {
-        return this.renderMessage(chart.noDataMsg());
-      }
-
-      return <div className="chart-content">
-        { chart.renderChart() }
-      </div>;
-    }
-
-    renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded panel panel-default " +
-                             "esper-no-content"}>
-        <div className="panel-body">
-          {elm}
-        </div>
-      </div>;
-    }
-
-
-    /* Helpers */
-
-    getCurrentChartInfo() {
-      return Option.wrap(
-        _.find(this.props.chartTypes,
-          (ct) => this.props.currentChart.params.chartId === ct.id
-        )
-      ).match({
-        none: () => this.props.chartTypes[0],
-        some: (info) => info
+    updatePeriod(period: Period.Single|Period.Custom) {
+      this.updateRoute({
+        period: period
       });
     }
 
-
-    /* Actions */
-
-    refresh() {
-      Stores.Events.invalidate();
-      Route.nav.refresh();
+    updateIncrs(incrs: number[]) {
+      if (! _.includes(incrs, 0)) {
+        incrs.push(0);
+      }
+      this.updateExtra({ incrs: incrs });
     }
 
-    updateRoute({chartId, cals, period, opts}: {
-      chartId?: string;
-      cals?: Stores.Calendars.CalSelection[];
+    updateExtra(extra: {
+      type?: Charting.ChartType;
+      incrs?: number[]
+    }) {
+      this.updateRoute({
+        extra: {
+          type: extra.type || this.props.extra.type,
+          incrs: extra.incrs || this.props.extra.incrs
+        }
+      });
+    }
+
+    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
+      this.updateRoute({
+        teamId: selections[0] && selections[0].teamId,
+        calIds: _.map(selections, (s) => s.calId)
+      });
+    }
+
+    updateRoute({pathFn, teamId, calIds, period, extra, opts={}}: {
+      pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
+      teamId?: string;
+      calIds?: string[];
       period?: Period.Single|Period.Custom;
+      extra?: Actions.Charts.ExtraOpts;
       opts?: Route.nav.Opts;
     }) {
-      var chart = this.props.currentChart;
-      chartId = chartId || chart.params.chartId;
-      cals    = cals    || chart.params.cals;
-      period  = period  || chart.params.period;
+      pathFn = pathFn || this.props.pathFn;
+      teamId = teamId || this.props.teamId;
+      calIds = calIds || this.props.calIds;
+      period = period || this.props.period;
 
-      // Assume at most one team, maybe multiple calendars
-      var pathForCals = Params.pathForCals(cals);
+      // Chart change => blank out filter params unless provided
+      if (pathFn !== this.props.pathFn && extra) {
+        opts.jsonQuery = extra;
+      }
 
-      opts = opts || {};
+      // Preserve params only if same team change. Also switch cals.
+      else if (teamId !== this.props.teamId) {
+        calIds = [Params.defaultCalIds];
+        opts.jsonQuery = {};
+      }
 
-      // Team change => blank out filter params, else preserve
-      var newTeamId = pathForCals[0];
-      var oldCals = this.props.currentChart.params.cals || [];
-      var oldTeamId = oldCals && oldCals[0] && oldCals[0].teamId;
-      if (oldTeamId === newTeamId) {
-        opts.jsonQuery = chart.params.filterParams;
+      else {
+        opts.jsonQuery = _.extend({}, this.props.extra, extra)
       }
 
       var periodStr = Period.isCustom(period) ?
         [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
         period.index.toString();
 
-      Route.nav.path([
-        "charts",
-        chartId,
-        pathForCals[0],
-        pathForCals[1],
-        period.interval[0],
-        periodStr
-      ], opts);
-    }
-
-    updateChartType(val: string) {
-      this.updateRoute({
-        chartId: val
-      });
-    }
-
-    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
-      this.updateRoute({
-        cals: selections
-      });
-    }
-
-    updatePeriod(period: Period.Single|Period.Custom) {
-      this.updateRoute({
-        period: period
-      });
+      Route.nav.path(pathFn({
+        teamId: teamId,
+        calIds: Params.pathForCalIds(calIds),
+        interval: period.interval[0],
+        period: periodStr
+      }), opts);
     }
   }
 }

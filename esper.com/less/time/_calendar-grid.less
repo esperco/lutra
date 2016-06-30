@@ -23,6 +23,10 @@ table.calendar-grid {
     border: 1px solid @table-border-color;
     width: calc(100% / 7);
     overflow: hidden;
+
+    .cal-day-content {
+      height: 100%;
+    }
   }
 
   .out-month {
@@ -118,6 +122,10 @@ table.calendar-grid {
       .day-number {
         background: @navbar-inverse-bg;
         color: @navbar-inverse-color;
+      }
+
+      .cal-day-content {
+        border: 1px solid @navbar-inverse-bg;
       }
     }
   }
