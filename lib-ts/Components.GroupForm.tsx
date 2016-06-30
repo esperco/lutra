@@ -346,7 +346,7 @@ module Esper.Components {
         {" "}{member.name}{" "}
         <i className="fa fa-fw fa-calendar" />
         {" "}
-        <span className="group-role-box">
+        <span className="badge group-role-box">
           {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
         </span>
         { this.props.isOwner || this.props.isAdmin || isOwnTeam ?
@@ -421,7 +421,7 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={gim.email}>
         <i className="fa fa-fw fa-user" />
         {" "}{gim.email}{" "}
-        <span className="group-role-box">
+        <span className="badge group-role-box">
           {gim.role}
         </span>
         { this.props.isOwner || this.props.isAdmin ?
@@ -463,9 +463,9 @@ module Esper.Components {
       if (_.isEmpty(member)) return;
 
       if (!_.isEmpty(this.props.groupid)) {
-        Api.putGroupIndividualByEmail(this.props.groupid, member.email, {
-          role: this.state.selectedRole
-        });
+        Actions.Groups.setGroupMemberRole(this.props.groupid,
+                                          this.state.selectedRole,
+                                          { email: member.email });
       }
       this.resetState();
     }
@@ -477,10 +477,9 @@ module Esper.Components {
       if (_.isEmpty(gim)) return;
 
       if (!_.isEmpty(this.props.groupid)) {
-        gim.role = this.state.selectedRole;
-        Api.putGroupIndividual(this.props.groupid, gim.uid, {
-          role: this.state.selectedRole
-        });
+        Actions.Groups.setGroupMemberRole(this.props.groupid,
+                                          this.state.selectedRole,
+                                          { uid: gim.uid });
       }
       this.resetState();
     }

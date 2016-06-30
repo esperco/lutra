@@ -101,6 +101,35 @@ module Esper.Actions.Groups {
     Stores.Groups.remove(groupId);
   }
 
+  export function setGroupMemberRole(groupId: string, role: string, opts: {
+    email?: string;
+    uid?: string;
+  }) {
+    var group = Stores.Groups.require(groupId);
+    if (!group) return;
+
+    var group2 = _.cloneDeep(group);
+    if (_.isEmpty(opts.email)) {
+      var promise = Api.putGroupIndividual(groupId,
+                                           opts.uid,
+                                           {role}).then(() => {
+        var gim = _.find(group2.group_individuals, { uid: opts.uid });
+        gim.role = role;
+        return Option.wrap(group2);
+      });
+    } else {
+      var promise = Api.putGroupIndividualByEmail(groupId,
+                                                  opts.email,
+                                                  {role}).then(() => {
+        var gim = _.find(group2.group_individuals, { email: opts.email });
+        gim.role = role;
+        return Option.wrap(group2);
+      });
+    }
+
+    Stores.Groups.GroupStore.pushFetch(groupId, promise, Option.wrap(group));
+  }
+
 
   /* Group label management */
 
