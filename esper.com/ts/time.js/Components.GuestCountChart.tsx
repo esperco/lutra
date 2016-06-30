@@ -29,7 +29,7 @@ module Esper.Components {
           series={series}
           categories={[Text.NoGuests].concat(keys)}
           orientation="vertical"
-          yAxis={`${Text.ChartGuestsCount} (${Text.hours()})`}
+          yAxis={`${Text.ChartGuestsCount} (${Text.ChartHoursUnit})`}
         />
       </div>;
     }
@@ -53,7 +53,7 @@ module Esper.Components {
         <TotalsBar periodTotals={groups} />
         <PercentageChart
           series={series}
-          yAxis={`${Text.ChartGuestsCount} (${Text.ChartPercentage})`}
+          yAxis={`${Text.ChartGuestsCount} (${Text.ChartPercentUnit})`}
         />
       </div>;
     }

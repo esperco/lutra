@@ -20,7 +20,7 @@ module Esper.Components {
           orientation="horizontal"
           series={series}
           categories={keys}
-          yAxis={`${Text.ChartGuests} (${Text.hours()})`}
+          yAxis={`${Text.ChartGuests} (${Text.ChartHoursUnit})`}
         />
       </div>;
     }
@@ -69,7 +69,7 @@ module Esper.Components {
       return <div className="chart-holder-parent">
         <PercentageChart
           series={series}
-          yAxis={`${Text.ChartGuests} (${Text.ChartPercentage})`}
+          yAxis={`${Text.ChartGuests} (${Text.ChartPercentUnit})`}
         />
         {
           _.isEmpty(this.state.subgroup) ? null :

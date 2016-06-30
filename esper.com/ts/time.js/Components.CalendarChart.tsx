@@ -34,7 +34,7 @@ module Esper.Components {
           orientation="horizontal"
           series={series}
           categories={keys}
-          yAxis={`${Text.ChartCalendars} (${Text.hours()})`}
+          yAxis={`${Text.ChartCalendars} (${Text.ChartHoursUnit})`}
         />
       </div>;
     }
@@ -55,7 +55,7 @@ module Esper.Components {
         <TotalsBar periodTotals={groups} />
         <PercentageChart
           series={series}
-          yAxis={`${Text.ChartCalendars} (${Text.ChartPercentage})`}
+          yAxis={`${Text.ChartCalendars} (${Text.ChartPercentUnit})`}
         />
       </div>;
     }
