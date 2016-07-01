@@ -678,4 +678,78 @@ module Esper.Stores.Events {
       return _.includes(filterText, query);
     });
   }
+
+
+  interface EqOpts {
+    deepCompare?: boolean;
+    ignoreLabelScores?: boolean;
+  }
+
+  /*
+    Quick-ish equality check of two event lists -- relies on most event
+    objects being identical (frozen) to avoid doing too many deep equality
+    checks.
+
+    Opts:
+      * deepCompare = true - Enable deep comparison between events that fail
+        identity check.
+      * ignoreLabelScores = false - Ignore different scores between labels.
+        This can be used to avoid reacting to an event confirmation.
+  */
+  export function eqList(list1: Stores.Events.TeamEvent[],
+                         list2: Stores.Events.TeamEvent[],
+                         opts?: EqOpts)
+  {
+    // Extend defaults
+    opts = _.extend({
+      deepCompare: true,
+      ignoreLabelScores: false
+    }, opts || {})
+
+    if (list1.length !== list2.length) return false;
+    for (let i in list1) {
+      let e1 = list1[i];
+      let e2 = list2[i];
+      if (e1 !== e2) {
+        if (! opts.deepCompare) return false;
+        if (opts.ignoreLabelScores) {
+          e1 = _.clone(e1);
+          reviseScores(e1);
+
+          e2 = _.clone(e2);
+          reviseScores(e2);
+        }
+        if (! _.isEqual(e1, e2)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // Bumps all predictions up to 1
+  function reviseScores(event: TeamEvent) {
+    event.labelScores = event.labelScores.flatMap(
+      (scores) => Option.some(_.map(scores, (s) => ({
+        id: s.id,
+        displayAs: s.displayAs,
+        score: 1
+      })))
+    );
+  }
+
+  export function eqEventsForDate(list1: EventsForDate[],
+                                  list2: EventsForDate[],
+                                  opts?: EqOpts) {
+    if (list1.length !== list2.length) return false;
+    for (var i in list1) {
+      let d1 = list1[i];
+      let d2 = list2[i];
+      if (d1.date.getTime() !== d2.date.getTime() ||
+          !eqList(d1.events, d2.events, opts)) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

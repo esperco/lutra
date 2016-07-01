@@ -250,7 +250,7 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends EventListCalc<number[]> {
+      class TestCalc extends EventListCalc<number[], void> {
         MAX_PROCESS_EVENTS = 2
 
         initResult(): number[] { return []; }
@@ -258,7 +258,7 @@ module Esper.EventStats {
         processBatch(events: Stores.Events.TeamEvent[], result: number[])
         {
           result = result.concat(
-            _.times(events.length, () => this._eventQueue.length)
+            _.times(events.length, () => this._index)
           );
           return result;
         }
@@ -289,7 +289,7 @@ module Esper.EventStats {
         it("should process only MAX_PROCESS_EVENTS after first loop",
         function() {
           calc.runLoop();
-          expect(calc._eventQueue.length).toEqual(3);
+          expect(calc._index).toEqual(2);
           expect(calc._results.length).toEqual(2);
 
           // Result should not be done yet
@@ -337,7 +337,7 @@ module Esper.EventStats {
           result.match({
             none: () => null,
             some: (g) => {
-              expect(g).toEqual([3, 3, 1, 1]);
+              expect(g).toEqual([2, 2, 4, 4]);
             }
           });
         });
@@ -381,7 +381,7 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends DurationCalc<number[]> {
+      class TestCalc extends DurationCalc<number[], void> {
         MAX_PROCESS_EVENTS = 2
 
         initResult(): number[] { return []; }
@@ -451,7 +451,7 @@ module Esper.EventStats {
            "events after first loop",
         function() {
           calc.runLoop();
-          expect(calc._eventQueue.length).toEqual(1);
+          expect(calc._index).toEqual(5);
 
           // NB: Only 4 because we excluded inactive event
           expect(calc._results.length).toEqual(4);

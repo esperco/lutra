@@ -148,7 +148,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });
@@ -205,7 +204,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });
@@ -272,7 +270,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });
@@ -361,7 +358,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });
@@ -440,7 +436,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });
@@ -569,7 +564,6 @@ module Esper.Actions.Charts {
             current: _.isEqual(d.period, o.period),
             fetching: d.isBusy,
             error: d.hasError,
-            events: d.events,
             calculation: calc
           };
         });

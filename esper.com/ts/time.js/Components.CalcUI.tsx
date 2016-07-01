@@ -6,7 +6,7 @@
 */
 module Esper.Components {
   interface Props<T> {
-    calculation: EventStats.CalcBase<T>;
+    calculation: EventStats.CalcBase<T, any>;
     events: Stores.Events.TeamEvent[];
   }
 
@@ -17,7 +17,7 @@ module Esper.Components {
   export abstract class CalcUI<T, P extends Props<T>>
     extends ReactHelpers.Component<P, State<T>>
   {
-    _calculation: EventStats.CalcBase<T>;
+    _calculation: EventStats.CalcBase<T, any>;
 
     constructor(props: P) {
       super(props);
