@@ -20,7 +20,6 @@ module Esper.Components {
     }
 
     componentWillReceiveProps(props: Props) {
-      super.componentWillReceiveProps(props);
       if (this.props.promise !== props.promise) {
         this.setState({ error: false })
         this.hookUpPromise(props.promise);

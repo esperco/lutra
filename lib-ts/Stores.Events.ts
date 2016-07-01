@@ -184,66 +184,70 @@ module Esper.Stores.Events {
   }
 
 
-  /* Old calendar-based API */
-
-  export function fetchForPeriod({teamId, calId, period, force=false}: {
-    teamId: string,
-    calId: string,
-    period: Period.Single|Period.Custom,
-    force?: boolean;
-  }) {
-    var bounds = Period.boundsFromPeriod(period);
-    return fetch({
-      teamId: teamId,
-      calId: calId,
-      start: bounds[0],
-      end: bounds[1],
-      force: force
-    });
+  /*
+    Makes API call to fetch events. Sorting for insertion into store can be a
+    little CPU-intensive, so does this in batches for resolving promise.
+  */
+  interface TeamEventsByDate {
+    /*
+      Event map by calendarId to date as stringified integer time
+    */
+    [index: string]: { [index: string]: TeamEvent[] }
   }
 
-  export function fetch({teamId, calId, start, end, force=false}: {
-    teamId: string,
-    calId: string,
-    start: Date,
-    end: Date,
-    force?: boolean;
-  }) {
-    var dates = datesFromBounds(start, end);
-    var eventsForDates = _.map(dates, (d) => EventsForDateStore.get({
-      calId: calId, teamId: teamId, date: d
-    }));
-    if (force || _.find(eventsForDates, (e) => e.isNone())) {
-      var apiP = Api.postForGenericCalendarEvents(teamId, calId, {
-        window_start: XDate.toString(start),
-        window_end: XDate.toString(end)
+  const FETCH_BATCH_SIZE = 10; // How many to process per loop
+
+  function fetchTeamEvents(teamId: string, q: ApiT.CalendarRequest) {
+    var dfd = $.Deferred<TeamEventsByDate>();
+
+    /*
+      Event map by calendarId to date as stringified integer time
+    */
+    var eventMap: TeamEventsByDate = {};
+
+    // Scoped vars to populate after API initially returns.
+    var index = 0;
+    var calendarEvents: ApiT.GenericCalendarEvent[] = [];
+
+    /*
+      Named function for recusive calling (must be named in order to avoid
+      blowing recursion stack for absurdly large number of events).
+    */
+    function processEvents() {
+      var events = calendarEvents.slice(index, index + FETCH_BATCH_SIZE);
+      index += events.length;
+      _.each(events, (e) => {
+        let teamEvent = asTeamEvent(teamId, e);
+        let calMap = eventMap[teamEvent.calendarId];
+        if (! calMap) return;
+
+        let dates = datesFromBounds(teamEvent.start, teamEvent.end);
+        _.each(dates, (d) => {
+          let key = d.getTime().toString();
+          calMap[key] = calMap[key] || [];
+          calMap[key].push(teamEvent);
+        });
       });
 
-      EventsForDateStore.transactP(apiP, (apiP2) =>
-        EventStore.transactP(apiP2, (apiP3) => {
-          _.each(dates, (d) => {
-            var dateP = apiP3.then((eventList) => {
-              var events = _.filter(eventList.events,
-                (e) => overlapsDate(e, d)
-              );
-              return Option.wrap(_.map(events,
-                (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
-                  itemKey: {
-                    teamId: teamId,
-                    calId: calId,
-                    eventId: e.id
-                  },
-                  data: Option.some(asTeamEvent(teamId, e))
-                })));
-            });
-            EventsForDateStore.batchFetch({
-              teamId: teamId, calId: calId, date: d
-            }, dateP);
-          });
-        })
-      );
+      if (events.length) {
+        window.requestAnimationFrame(processEvents);
+      } else {
+        dfd.resolve(eventMap);
+      }
     }
+
+    // Make API call, then trigger batch function
+    Api.postForTeamEvents(teamId, q).then((eventCollection) => {
+      _.each(eventCollection, (events, calId) => {
+        eventMap[calId] = {};
+        calendarEvents = calendarEvents.concat(events.events);
+      });
+      processEvents();
+    }, (err) => dfd.reject(err));
+
+    return dfd.promise();
   }
+
 
 
   /* Predictions-based API */
@@ -287,7 +291,7 @@ module Esper.Stores.Events {
     );
 
     if (doFetch) {
-      var apiP = Api.postForTeamEvents(teamId, {
+      var apiP = fetchTeamEvents(teamId, {
         window_start: XDate.toString(start),
         window_end: XDate.toString(end)
       });
@@ -295,21 +299,17 @@ module Esper.Stores.Events {
       EventsForDateStore.transactP(apiP, (apiP2) =>
         EventStore.transactP(apiP2, (apiP3) => {
           _.each(calIds, (calId) => _.each(dates, (d) => {
-
-            var dateP = apiP3.then((eventCollection) => {
-              var eventList = eventCollection[calId] ?
-                eventCollection[calId].events : [];
-              var events = _.filter(eventList,
-                (e) => overlapsDate(e, d)
-              );
+            var dateP = apiP3.then((eventMap) => {
+              let calMap = eventMap[calId] || {};
+              let events = calMap[d.getTime().toString()] || [];
               return Option.wrap(_.map(events,
                 (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
                   itemKey: {
                     teamId: teamId,
-                    calId: e.calendar_id,
+                    calId: e.calendarId,
                     eventId: e.id
                   },
-                  data: Option.some(asTeamEvent(teamId, e))
+                  data: Option.some(e)
                 })));
             });
 
@@ -677,5 +677,79 @@ module Esper.Stores.Events {
       filterText = filterText.toLowerCase();
       return _.includes(filterText, query);
     });
+  }
+
+
+  interface EqOpts {
+    deepCompare?: boolean;
+    ignoreLabelScores?: boolean;
+  }
+
+  /*
+    Quick-ish equality check of two event lists -- relies on most event
+    objects being identical (frozen) to avoid doing too many deep equality
+    checks.
+
+    Opts:
+      * deepCompare = true - Enable deep comparison between events that fail
+        identity check.
+      * ignoreLabelScores = false - Ignore different scores between labels.
+        This can be used to avoid reacting to an event confirmation.
+  */
+  export function eqList(list1: Stores.Events.TeamEvent[],
+                         list2: Stores.Events.TeamEvent[],
+                         opts?: EqOpts)
+  {
+    // Extend defaults
+    opts = _.extend({
+      deepCompare: true,
+      ignoreLabelScores: false
+    }, opts || {})
+
+    if (list1.length !== list2.length) return false;
+    for (let i in list1) {
+      let e1 = list1[i];
+      let e2 = list2[i];
+      if (e1 !== e2) {
+        if (! opts.deepCompare) return false;
+        if (opts.ignoreLabelScores) {
+          e1 = _.clone(e1);
+          reviseScores(e1);
+
+          e2 = _.clone(e2);
+          reviseScores(e2);
+        }
+        if (! _.isEqual(e1, e2)) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  // Bumps all predictions up to 1
+  function reviseScores(event: TeamEvent) {
+    event.labelScores = event.labelScores && event.labelScores.flatMap(
+      (scores) => Option.some(_.map(scores, (s) => ({
+        id: s.id,
+        displayAs: s.displayAs,
+        score: 1
+      })))
+    );
+  }
+
+  export function eqEventsForDate(list1: EventsForDate[],
+                                  list2: EventsForDate[],
+                                  opts?: EqOpts) {
+    if (list1.length !== list2.length) return false;
+    for (var i in list1) {
+      let d1 = list1[i];
+      let d2 = list2[i];
+      if (d1.date.getTime() !== d2.date.getTime() ||
+          !eqList(d1.events, d2.events, opts)) {
+        return false;
+      }
+    }
+    return true;
   }
 }

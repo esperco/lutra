@@ -9,8 +9,7 @@ module Esper.Components {
     data: {
       period: Period.Single|Period.Custom;
       current: boolean; // Is this "active" period or a comparative period?
-      calculation: EventStats.CalcBase<T>;
-      events: Stores.Events.TeamEvent[];
+      calculation: EventStats.CalcBase<T, any>;
       fetching: boolean;
       error: boolean;
     }[];
@@ -18,6 +17,35 @@ module Esper.Components {
 
   export abstract class Chart<T extends EventStats.OptGrouping, U>
          extends ReactHelpers.Component<Props<T> & U, {}> {
+
+    /*
+      Only update if props or underlying events changed. This is a relatively
+      expensive check to do but is less annoying than rendering the chart
+      multiple times.
+    */
+    shouldComponentUpdate(newProps: Props<T> & U) {
+      // Different periods => update
+      if (newProps.data.length !== this.props.data.length) {
+        return true;
+      }
+
+      // Else compare each period, and make sure calculations don't
+      for (let i in newProps.data) {
+        let newData = newProps.data[i];
+        let oldData = this.props.data[i];
+        let isEqual = _.isEqual(newData.period, oldData.period) &&
+          newData.current === oldData.current &&
+          newData.fetching === oldData.fetching &&
+          newData.error === oldData.error &&
+          newData.calculation.eq(oldData.calculation);
+        if (! isEqual) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
     componentDidMount() {
       this.setCalcSources();
     }
@@ -28,7 +56,11 @@ module Esper.Components {
 
     setCalcSources() {
       var calculations = _.map(this.props.data, (d) => d.calculation);
-      this.setSources(calculations);
+      if (_.every(calculations, (c) => c.ready)) {
+        this.setSources([]);
+      } else {
+        this.setSources(calculations);
+      }
     }
 
     render() {

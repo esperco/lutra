@@ -19,13 +19,29 @@ module Esper.Components {
   const VERY_HIGH_EVENTS   = 9;
 
   interface Props {
-    calculation: EventStats.CalcBase<EventStats.DateGroup[]>;
+    calculation: EventStats.CalcBase<EventStats.DateGroup[], any>;
     fetching: boolean;
     error: boolean;
   }
 
   export abstract class EventGrid<T>
          extends ReactHelpers.Component<Props & T, {}> {
+
+    /*
+      Only update if props or underlying events changed. This is a relatively
+      expensive check to do but is less annoying than rendering the chart
+      multiple times.
+    */
+    shouldComponentUpdate(newProps: Props & T) {
+      if (newProps.fetching !== this.props.fetching ||
+          newProps.error !== this.props.error) {
+        return true;
+      }
+
+      // Else compare calculation
+      return !newProps.calculation.eq(this.props.calculation);
+    }
+
     componentDidMount() {
       this.setCalcSources();
     }
@@ -35,7 +51,11 @@ module Esper.Components {
     }
 
     setCalcSources() {
-      this.setSources([this.props.calculation]);
+      if (this.props.calculation.ready) {
+        this.setSources([]);
+      } else {
+        this.setSources([this.props.calculation]);
+      }
     }
 
     render() {
@@ -52,6 +72,7 @@ module Esper.Components {
           { Text.ChartFetching }
         </span>);
       }
+
       return this.props.calculation.getResults().match({
         none: () => this.renderMsg(<span>
           <span className="esper-spinner esper-inline" />{" "}

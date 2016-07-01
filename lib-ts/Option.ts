@@ -127,4 +127,18 @@ module Esper.Option {
       some: (s) => s
     });
   }
+
+  /*
+    Shallow unwrap + equality check for options. Can always do _.isEqual
+    for a deep check, which should play nice with options.
+  */
+  export function eq<E>(a:T<E>, b:T<E>): boolean {
+    return a.match({
+      none: () => b.isNone(),
+      some: (v1) => b.match({
+        none: () => false,
+        some: (v2) => v1 === v2
+      })
+    });
+  }
 }
