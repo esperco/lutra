@@ -184,68 +184,6 @@ module Esper.Stores.Events {
   }
 
 
-  /* Old calendar-based API */
-
-  export function fetchForPeriod({teamId, calId, period, force=false}: {
-    teamId: string,
-    calId: string,
-    period: Period.Single|Period.Custom,
-    force?: boolean;
-  }) {
-    var bounds = Period.boundsFromPeriod(period);
-    return fetch({
-      teamId: teamId,
-      calId: calId,
-      start: bounds[0],
-      end: bounds[1],
-      force: force
-    });
-  }
-
-  export function fetch({teamId, calId, start, end, force=false}: {
-    teamId: string,
-    calId: string,
-    start: Date,
-    end: Date,
-    force?: boolean;
-  }) {
-    var dates = datesFromBounds(start, end);
-    var eventsForDates = _.map(dates, (d) => EventsForDateStore.get({
-      calId: calId, teamId: teamId, date: d
-    }));
-    if (force || _.find(eventsForDates, (e) => e.isNone())) {
-      var apiP = Api.postForGenericCalendarEvents(teamId, calId, {
-        window_start: XDate.toString(start),
-        window_end: XDate.toString(end)
-      });
-
-      EventsForDateStore.transactP(apiP, (apiP2) =>
-        EventStore.transactP(apiP2, (apiP3) => {
-          _.each(dates, (d) => {
-            var dateP = apiP3.then((eventList) => {
-              var events = _.filter(eventList.events,
-                (e) => overlapsDate(e, d)
-              );
-              return Option.wrap(_.map(events,
-                (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
-                  itemKey: {
-                    teamId: teamId,
-                    calId: calId,
-                    eventId: e.id
-                  },
-                  data: Option.some(asTeamEvent(teamId, e))
-                })));
-            });
-            EventsForDateStore.batchFetch({
-              teamId: teamId, calId: calId, date: d
-            }, dateP);
-          });
-        })
-      );
-    }
-  }
-
-
   /* Predictions-based API */
 
   export function fetchPredictionsForPeriod({teamId, period, force=false}: {
