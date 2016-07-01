@@ -184,6 +184,72 @@ module Esper.Stores.Events {
   }
 
 
+  /*
+    Makes API call to fetch events. Sorting for insertion into store can be a
+    little CPU-intensive, so does this in batches for resolving promise.
+  */
+  interface TeamEventsByDate {
+    /*
+      Event map by calendarId to date as stringified integer time
+    */
+    [index: string]: { [index: string]: TeamEvent[] }
+  }
+
+  const FETCH_BATCH_SIZE = 10; // How many to process per loop
+
+  function fetchTeamEvents(teamId: string, q: ApiT.CalendarRequest) {
+    var dfd = $.Deferred<TeamEventsByDate>();
+
+    /*
+      Event map by calendarId to date as stringified integer time
+    */
+    var eventMap: TeamEventsByDate = {};
+
+    // Scoped vars to populate after API initially returns.
+    var index = 0;
+    var calendarEvents: ApiT.GenericCalendarEvent[] = [];
+
+    /*
+      Named function for recusive calling (must be named in order to avoid
+      blowing recursion stack for absurdly large number of events).
+    */
+    function processEvents() {
+      var events = calendarEvents.slice(index, index + FETCH_BATCH_SIZE);
+      index += events.length;
+      _.each(events, (e) => {
+        let teamEvent = asTeamEvent(teamId, e);
+        let calMap = eventMap[teamEvent.calendarId];
+        if (! calMap) return;
+
+        let dates = datesFromBounds(teamEvent.start, teamEvent.end);
+        _.each(dates, (d) => {
+          let key = d.getTime().toString();
+          calMap[key] = calMap[key] || [];
+          calMap[key].push(teamEvent);
+        });
+      });
+
+      if (events.length) {
+        window.requestAnimationFrame(processEvents);
+      } else {
+        dfd.resolve(eventMap);
+      }
+    }
+
+    // Make API call, then trigger batch function
+    Api.postForTeamEvents(teamId, q).then((eventCollection) => {
+      _.each(eventCollection, (events, calId) => {
+        eventMap[calId] = {};
+        calendarEvents = calendarEvents.concat(events.events);
+      });
+      processEvents();
+    }, (err) => dfd.reject(err));
+
+    return dfd.promise();
+  }
+
+
+
   /* Predictions-based API */
 
   export function fetchPredictionsForPeriod({teamId, period, force=false}: {
@@ -225,7 +291,7 @@ module Esper.Stores.Events {
     );
 
     if (doFetch) {
-      var apiP = Api.postForTeamEvents(teamId, {
+      var apiP = fetchTeamEvents(teamId, {
         window_start: XDate.toString(start),
         window_end: XDate.toString(end)
       });
@@ -233,21 +299,17 @@ module Esper.Stores.Events {
       EventsForDateStore.transactP(apiP, (apiP2) =>
         EventStore.transactP(apiP2, (apiP3) => {
           _.each(calIds, (calId) => _.each(dates, (d) => {
-
-            var dateP = apiP3.then((eventCollection) => {
-              var eventList = eventCollection[calId] ?
-                eventCollection[calId].events : [];
-              var events = _.filter(eventList,
-                (e) => overlapsDate(e, d)
-              );
+            var dateP = apiP3.then((eventMap) => {
+              let calMap = eventMap[calId] || {};
+              let events = calMap[d.getTime().toString()] || [];
               return Option.wrap(_.map(events,
                 (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
                   itemKey: {
                     teamId: teamId,
-                    calId: e.calendar_id,
+                    calId: e.calendarId,
                     eventId: e.id
                   },
-                  data: Option.some(asTeamEvent(teamId, e))
+                  data: Option.some(e)
                 })));
             });
 
