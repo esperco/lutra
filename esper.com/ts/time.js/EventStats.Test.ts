@@ -278,8 +278,7 @@ module Esper.EventStats {
 
           calc = new TestCalc(events);
           emitSpy = jasmine.createSpy("emit");
-          calc.addChangeListener(emitSpy);
-          calc.start();
+          calc.addChangeListener(emitSpy); // Triggers start
         });
 
         it("should make async call to runLoop", function() {
@@ -327,7 +326,6 @@ module Esper.EventStats {
         beforeEach(function(done) {
           calc = new TestCalc(events);
           calc.addChangeListener(done);
-          calc.start();
         });
 
         it("should return some result", function() {
@@ -343,7 +341,7 @@ module Esper.EventStats {
         });
       });
 
-      describe("after double start", function() {
+      describe("after extra starts", function() {
         var calc: TestCalc;
         var emitSpy: jasmine.Spy;
         var loopSpy: jasmine.Spy;

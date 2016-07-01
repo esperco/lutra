@@ -729,7 +729,7 @@ module Esper.Stores.Events {
 
   // Bumps all predictions up to 1
   function reviseScores(event: TeamEvent) {
-    event.labelScores = event.labelScores.flatMap(
+    event.labelScores = event.labelScores && event.labelScores.flatMap(
       (scores) => Option.some(_.map(scores, (s) => ({
         id: s.id,
         displayAs: s.displayAs,

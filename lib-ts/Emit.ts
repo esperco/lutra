@@ -42,6 +42,10 @@ module Esper.Emit {
       this.removeAllListeners(this.CHANGE_EVENT);
     }
 
+    changeListeners() {
+      return this.listeners(this.CHANGE_EVENT);
+    }
+
     /*
       Use to track whether emitChange has been called during an emitChange
       cycle. The purpose of this is maintain unidirectional data flow. State

@@ -128,7 +128,6 @@ module Esper.Actions.Charts {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
         let calc = new EventStats.DateDurationBucketCalc(data.dates);
-        calc.start();
         let chart = <Components.DurationEventGrid
           calculation={calc}
           fetching={data.isBusy}
@@ -141,8 +140,6 @@ module Esper.Actions.Charts {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
           let calc = new EventStats.DurationBucketCalc(d.events);
-          calc.start();
-
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -183,7 +180,6 @@ module Esper.Actions.Charts {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
         let calc = new EventStats.CalendarDateDurationCalc(data.dates);
-        calc.start();
         let chart = <Components.CalendarEventGrid
           calendars={calendars}
           calculation={calc}
@@ -197,7 +193,6 @@ module Esper.Actions.Charts {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
           let calc = new EventStats.CalendarDurationCalc(d.events);
-          calc.start();
 
           return {
             period: d.period,
@@ -246,7 +241,6 @@ module Esper.Actions.Charts {
         let data = getForMonth(o);
         let calc = new EventStats.DomainDurationByDateCalc(data.dates,
                                                            o.extra.domains);
-        calc.start();
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.DomainEventGrid
           calculation={calc}
@@ -263,8 +257,6 @@ module Esper.Actions.Charts {
             d.events,
             o.extra.domains,
             o.extra.type === "percent");  // Nest domains for pie chart
-          calc.start();
-
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -288,7 +280,6 @@ module Esper.Actions.Charts {
                              chart: JSX.Element,
                              events: Stores.Events.TeamEvent[]) {
     var selectorCalc = new EventStats.DomainCountCalc(events);
-    selectorCalc.start();
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-user" />{" "}
@@ -335,7 +326,6 @@ module Esper.Actions.Charts {
         let data = getForMonth(o);
         let calc = new EventStats.GuestCountDurationByDateCalc(
           data.dates, o.extra.domains);
-        calc.start();
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.GuestCountEventGrid
           calculation={calc}
@@ -351,8 +341,6 @@ module Esper.Actions.Charts {
           let calc = new EventStats.GuestCountDurationCalc(
             d.events,
             o.extra.domains);  // Nest domains for pie chart
-          calc.start();
-
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -376,7 +364,6 @@ module Esper.Actions.Charts {
                                   chart: JSX.Element,
                                   events: Stores.Events.TeamEvent[]) {
     var selectorCalc = new EventStats.DomainCountCalc(events);
-    selectorCalc.start();
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-user" />{" "}
@@ -414,7 +401,6 @@ module Esper.Actions.Charts {
         let data = getForMonth(o);
         let calc = new EventStats.LabelDurationByDateCalc(data.dates,
                                                           o.extra.labels);
-        calc.start();
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.LabelEventGrid
           calculation={calc}
@@ -429,8 +415,6 @@ module Esper.Actions.Charts {
         let calcData = _.map(data, (d, i) => {
           let calc = new EventStats.LabelDurationCalc(d.events,
                                                       o.extra.labels);
-          calc.start();
-
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -456,7 +440,6 @@ module Esper.Actions.Charts {
                              chart: JSX.Element,
                              events: Stores.Events.TeamEvent[]) {
     var selectorCalc = new EventStats.LabelCountCalc(events);
-    selectorCalc.start();
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-tags" />{" "}
@@ -543,7 +526,6 @@ module Esper.Actions.Charts {
         let data = getForMonth(o);
         let calc = new EventStats.RatingDateDurationCalc(
           data.dates, o.extra.hideNone);
-        calc.start();
         let chart = <Components.RatingEventGrid
           calculation={calc}
           fetching={data.isBusy}
@@ -557,8 +539,6 @@ module Esper.Actions.Charts {
         let calcData = _.map(data, (d) => {
           let calc = new EventStats.RatingDurationCalc(
             d.events, o.extra.hideNone);
-          calc.start();
-
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),

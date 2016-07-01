@@ -345,6 +345,28 @@ module Esper.EventStats {
       this.running = false;
     }
 
+    /* Start-stop based on presence of listeners */
+
+    // Register a callback to handle changes
+    addChangeListener(callback: (...args: any[]) => void): void {
+      super.addChangeListener(callback);
+      if (! this.running) this.start();
+    }
+
+    // De-register a callback to handle changes
+    removeChangeListener(callback: (...args: any[]) => void): void {
+      super.removeChangeListener(callback);
+      if (! this.changeListeners().length) {
+        this.stop();
+      }
+    }
+
+    // Remove all callbacks
+    removeAllChangeListeners(): void {
+      super.removeAllChangeListeners();
+      this.stop();
+    }
+
     /*
       Recursive "loop" that calls processBatch until we're done. Auto-bind so
       we can easily reference function by name and avoid recursion limits
