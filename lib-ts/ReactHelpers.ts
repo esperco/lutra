@@ -119,7 +119,6 @@ module Esper.ReactHelpers {
     constructor(props: P) {
       super(props);
       this.sources = [];
-      this.state = (<S> this.getState(props));
     }
 
     // Reference to JQuery-wrapped parent node
@@ -146,10 +145,6 @@ module Esper.ReactHelpers {
     // call super if overridden
     componentWillUnmount(): void {
       this.setSources([]);
-    }
-
-    componentWillReceiveProps(nextProps: P) {
-      this.updateState(nextProps);
     }
 
     /*
@@ -206,13 +201,24 @@ module Esper.ReactHelpers {
         keys: keys,
         onChange: (_ids?: any[]) => {
 
-          // No _ids => force update
+          /*
+            No _ids or _ids match keys for this source => force update.
+
+            React docs advise against doing a forceUpdate for simplicity and
+            efficiency reasons but if you're using our `setSources` helper,
+            it's actually simpler to provide a mechanism by which the component
+            will always re-render in the event a source changes without needing
+            to define a getState function. It's a little less efficient since
+            we can't do a `shouldComponentUpdate` check, but simpler than
+            artificially introducing state management.
+          */
+
           if (_.isUndefined(_ids) || _.isNull(_ids) || !src.keys) {
-            this.updateState();
+            this.forceUpdate();
           }
 
           else if (_.intersectionWith(_ids, src.keys, _.isEqual).length > 0) {
-            this.updateState();
+            this.forceUpdate();
           }
         }
       };
@@ -225,37 +231,6 @@ module Esper.ReactHelpers {
       fn(newState);
       this.setState(newState);
     }
-
-    // Update state using getState function
-    protected updateState(newProps?: P) {
-      var newState = <S> this.getState(newProps || this.props);
-
-      // React doesn't like null / non-object states, so do a quick check
-      if (newState !== undefined && newState !== null) {
-        this.setState(newState)
-      } else {
-
-        /*
-          NB: React docs advise against doing a forceUpdate for simplicity
-          and efficiency reasons but if you're using our `setSources` helper,
-          it's actually simpler to provide a mechanism by which the component
-          will always re-render in the event a source changes without needing
-          to define a getState function. It's a little less efficient since we
-          can't do a `shouldComponentUpdate` check, but simpler than
-          artificially introducing state management.
-
-          If efficiency is important, define `getState` to return the existing
-          `this.state` rather than null or undefined, and then define a
-          `shoudComponentUpdate` function that returns false if states are
-          identical (===).
-        */
-        this.forceUpdate();
-      }
-    }
-
-    // Interface for getting State -- passed a boolean = true if this is
-    // called during the initial constructor
-    protected getState(props: P): S { return; }
   }
 
   // Use when handling children
