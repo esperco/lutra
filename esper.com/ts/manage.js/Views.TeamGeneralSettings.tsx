@@ -6,7 +6,7 @@
 
 module Esper.Views {
 
-  export class GeneralSettings extends TeamSettings {
+  export class TeamGeneralSettings extends TeamSettings {
     pathFn = Paths.Manage.Team.general;
 
     renderMain(team: ApiT.Team) {
@@ -40,7 +40,7 @@ module Esper.Views {
       );
       var profilesLoading =
         Stores.Profiles.getInitPromise().state() === "pending";
-      var prefs = Stores.Preferences.get(team.teamid)
+      var prefs = Stores.TeamPreferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
       return <div>

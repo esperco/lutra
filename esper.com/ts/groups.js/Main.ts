@@ -15,9 +15,10 @@ module Esper.Main {
   export function initAll() {
     Stores.Teams.init();
     Stores.Calendars.init();
+    Stores.Groups.init();
     Login.init();
     Login.promise.done(function() {
-      Stores.Preferences.init();
+      Stores.TeamPreferences.init();
       Stores.Profiles.init();
     });
   }

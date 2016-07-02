@@ -9,7 +9,15 @@ module Esper.Route {
     if (Stores.Teams.all().length) {
       next();
     } else {
-      Route.nav.go(Paths.Manage.newTeam())
+      Route.nav.go(Paths.Manage.newTeam());
+    }
+  }
+
+  var groupCheck: PageJS.Callback = function(ctx, next) {
+    if (Stores.Groups.all().length) {
+      next();
+    } else {
+      Route.nav.go(Paths.Manage.newGroup());
     }
   }
 
@@ -21,11 +29,15 @@ module Esper.Route {
     Actions.renderNewTeam();
   });
 
+  route(Paths.Manage.newGroup().hash, function() {
+    Actions.renderNewGroup();
+  });
+
   route(Paths.Manage.Team.general({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderGeneralSettings(ctx.params["teamId"], msg, err);
+      Actions.renderTeamGeneralSettings(ctx.params["teamId"], msg, err);
     });
 
   route(Paths.Manage.Team.calendars({teamId: ":teamId?"}).hash, onboardingCheck,
@@ -39,18 +51,39 @@ module Esper.Route {
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderLabelSettings(ctx.params["teamId"], msg, err);
+      Actions.renderTeamLabelSettings(ctx.params["teamId"], msg, err);
     });
 
   route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash, onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderNotificationSettings(ctx.params["teamId"], msg, err);
+      Actions.renderTeamNotificationSettings(ctx.params["teamId"], msg, err);
     });
 
   route(Paths.Manage.personal().hash, function(ctx) {
     Actions.renderPersonalSettings();
+  });
+
+  route(Paths.Manage.Group.general({groupId: ":groupId?"}).hash, groupCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderGroupGeneralSettings(ctx.params["groupId"], msg, err);
+  });
+
+  route(Paths.Manage.Group.labels({groupId: ":groupId?"}).hash, groupCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderGroupLabelSettings(ctx.params["groupId"], msg, err);
+  });
+
+  route(Paths.Manage.Group.notifications({groupId: ":groupId?"}).hash, groupCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderGroupNotificationSettings(ctx.params["groupId"], msg, err);
   });
 
   routeNotFound(function(ctx) {

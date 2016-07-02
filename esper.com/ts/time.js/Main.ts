@@ -20,7 +20,7 @@ module Esper.Main {
     Login.init();
     Login.promise.done(function() {
       Stores.Profiles.init();
-      Stores.Preferences.init();
+      Stores.TeamPreferences.init();
     });
   }
 }

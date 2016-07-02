@@ -22,10 +22,20 @@ module Esper.Text {
   export const AddTeamLink = `New ${TeamExec}`;
   export const AddTeamHeading = "Who are you managing time for?";
 
+  // Add group
+  export const AddGroupLink = `New ${Group}`;
+  export const AddGroupHeading = "Create a new group";
+
   // Remove team
   export const RemoveTeamBtn = "Deactivate";
   export function removeTeamDescription(person?: string) {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
+  }
+
+  // Remove group
+  export const RemoveGroupBtn = "Remove";
+  export function removeGroupDescription(group?: string) {
+    return `Remove ${group || "this" + Group}?`;
   }
 
   // Sharing
@@ -57,6 +67,7 @@ module Esper.Text {
 
   // Notification Settings
   export const GeneralPrefsHeading = "Subscriptions";
+  export const BadMeetingPrefsHeading = "Costly Meetings";
   export function generalPrefsDescription(email: string) {
     return <span>
       These notifications will go to {" "}<strong>{email}</strong>.
@@ -69,6 +80,16 @@ module Esper.Text {
   export const SendDailyAgenda = "Daily agenda email";
   export const SendFeedbackSummary =
     "Daily meeting feedback summary email";
+  export const SendDailyBreakdownEmail =
+    "Daily Calendar Summary Email";
+  export const SendWeeklyBreakdownEmail =
+    "Weekly Calendar Summary Email";
+  export const ShowBadMeetingNotifications =
+    "Show Costly Meeting Warnings in Summary Emails";
+  export const BadMeetingDuration =
+    "Minimum meeting duration to trigger warning (mins)";
+  export const BadMeetingPeople =
+    "Minimum number of attendees to trigger warning";
 
   export const FeedbackHeading = 'Meeting Feedback Notifications';
   export function feedbackDescription(email: string) {

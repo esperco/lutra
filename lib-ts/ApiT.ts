@@ -94,7 +94,7 @@ module Esper.ApiT {
   }
 
   export interface GroupIndividual {
-    uid: string;
+    uid?: string;
     role: string;
     email?: string;
     invite_sent?: string;
@@ -191,6 +191,7 @@ module Esper.ApiT {
     platform?: string; // Google | Nylas
     email: string;
     teams: Team[];
+    groups: string[];
     team_members: TeamMember[];
     landing_url?: string;
   }
@@ -246,6 +247,20 @@ module Esper.ApiT {
     timestats_notify?: TimestatsNotifyPrefs;
     general: GeneralPrefs;
     notes: string;
+  }
+
+  export interface GroupPreferencesList {
+    prefs_list: GroupPreferences[];
+  }
+
+  export interface GroupPreferences {
+    groupid: string;
+    uid: string;
+    daily_breakdown: boolean;
+    weekly_breakdown: boolean;
+    bad_meeting_warning: boolean;
+    bad_duration: number;
+    bad_attendees: number;
   }
 
   export interface SlackAddress {

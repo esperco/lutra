@@ -5,9 +5,11 @@ module Esper.Components {
 
   interface Props {
     activeTeamId?: string;
-    pathFn?: (p: {teamId: string}) => Paths.Path;
+    activeGroupId?: string;
+    pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
     activePersonal?: boolean;
+    groups: ApiT.Group[];
   }
 
   export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
@@ -24,7 +26,9 @@ module Esper.Components {
           <ul className="esper-select-menu">
             <li>
               <a className={classNames({
-                active: !this.props.activeTeamId && !this.props.activePersonal
+                active: !this.props.activeTeamId &&
+                        !this.props.activePersonal &&
+                        !this.props.activeGroupId
               })}
               href={Paths.Manage.newTeam().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
@@ -33,6 +37,29 @@ module Esper.Components {
             </li>
           </ul>
         </div>
+
+        { Esper.PRODUCTION ? null :
+          <div className="esper-panel-section">
+            <label className="esper-header">
+              { Text.Groups }
+            </label>
+            <ul className="esper-select-menu">
+              { _.map(this.props.groups, (g) => this.renderGroup(g))}
+              <li className="divider" />
+              <li>
+                <a className={classNames({
+                  active: !this.props.activeGroupId &&
+                          !this.props.activeTeamId &&
+                          !this.props.activePersonal
+                })}
+                href={Paths.Manage.newGroup().href}>
+                  <i className="fa fa-fw fa-user-plus" />{" "}
+                  { Text.AddGroupLink }
+                </a>
+              </li>
+            </ul>
+          </div>
+        }
 
         <div className="esper-panel-section">
           <ul className="esper-select-menu"><li>
@@ -49,7 +76,8 @@ module Esper.Components {
 
     renderTeam(team: ApiT.Team) {
       // Use pathFn to preserve current settings "tab" when switching teams
-      var pathFn = this.props.pathFn || Paths.Manage.Team.general;
+      var pathFn = this.props.activeTeamId ? this.props.pathFn
+                                           : Paths.Manage.Team.general;
 
       return <li key={team.teamid}>
         <a className={classNames({
@@ -58,6 +86,21 @@ module Esper.Components {
         href={pathFn({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-user" />{" "}
           { team.team_name }
+        </a>
+      </li>;
+    }
+
+    renderGroup(group: ApiT.Group) {
+      var pathFn = this.props.activeGroupId ? this.props.pathFn
+                                            : Paths.Manage.Group.general;
+
+      return <li key={group.groupid}>
+        <a className={classNames({
+          active: group.groupid === this.props.activeGroupId
+        })}
+        href={pathFn({groupId: group.groupid}).href}>
+          <i className="fa fa-fw fa-users" />{" "}
+          { group.group_name }
         </a>
       </li>;
     }

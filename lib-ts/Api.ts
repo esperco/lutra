@@ -165,19 +165,36 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getGroupsByUid(uid: string):
-    JQueryPromise<ApiT.GroupList>
+  export function getGroupsByUid(uid: string, opts: {
+      withMembers?: boolean,
+      withLabels?: boolean
+    }): JQueryPromise<ApiT.GroupList>
   {
+    var query = opts.withMembers || opts.withLabels ? "?" : "";
+    var membersParam = opts.withMembers ? "members=true" : "";
+    var labelsParam = opts.withLabels ? "labels=true" : "";
+    var paramString = query + (opts.withMembers && opts.withLabels ?
+                               membersParam + "&" + labelsParam :
+                               membersParam + labelsParam);
     var url = prefix + "/api/group/user/" + string(Login.me())
-      + "/" + string(uid);
+      + "/" + string(uid)
+      + paramString;
     return JsonHttp.get(url);
   }
 
-  export function getGroupDetails(groupid: string):
-    JQueryPromise<ApiT.Group>
+  export function getGroupDetails(groupid: string, opts: {
+      withMembers?: boolean,
+      withLabels?: boolean
+    } = {}): JQueryPromise<ApiT.Group>
   {
-    var url = prefix + "/api/group/details/" + string(Login.me())
-      + "/" + string(groupid);
+    var query = opts.withMembers || opts.withLabels ? "?" : "";
+    var membersParam = opts.withMembers ? "members=true" : "";
+    var labelsParam = opts.withLabels ? "labels=true" : "";
+    var paramString = query + (opts.withMembers && opts.withLabels ?
+                               membersParam + "&" + labelsParam :
+                               membersParam + labelsParam);
+    var url = `${prefix}/api/group/details/${string(Login.me())}/\
+      ${string(groupid) + paramString}`;
     return JsonHttp.get(url);
   }
 
@@ -188,6 +205,15 @@ module Esper.Api {
       + "/" + string(uid)
       + "/" + string(groupName);
     return JsonHttp.post(url);
+  }
+
+  export function renameGroup(groupid: string, groupName: string):
+    JQueryPromise<void>
+  {
+    var url = prefix + "/api/group/group-name/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/" + string(groupName);
+    return JsonHttp.put(url);
   }
 
   export function deleteGroup(groupid: string):
@@ -210,18 +236,27 @@ module Esper.Api {
   export function removeGroupMember(groupid: string, teamid: string):
     JQueryPromise<void>
   {
-    var url = prefix + "/api/group/member" + string(Login.me())
+    var url = prefix + "/api/group/member/" + string(Login.me())
       + "/" + string(groupid)
       + "/" + string(teamid);
     return JsonHttp.delete_(url);
   }
 
-  export function putGroupIndividual(groupid: string, uid: string):
-    JQueryPromise<ApiT.GroupIndividual>
+  export function putGroupIndividual(groupid: string, uid: string, opts: {
+    role?: string,
+    resendNotif?: boolean
+  } = {}): JQueryPromise<ApiT.GroupIndividual>
   {
+    var query = opts.role || opts.resendNotif ? "?" : "";
+    var roleParam = opts.role ? "role=" + opts.role : "";
+    var resendParam = opts.resendNotif ? "resend_notif=true" : "";
+    var paramString = query + (opts.role && opts.resendNotif ?
+                               roleParam + "&" + resendParam :
+                               roleParam + resendParam);
     var url = prefix + "/api/group/individual-member/" + string(Login.me())
       + "/" + string(groupid)
-      + "/" + string(uid);
+      + "/" + string(uid)
+      + paramString;
     return JsonHttp.put(url);
   }
 
@@ -234,12 +269,52 @@ module Esper.Api {
     return JsonHttp.delete_(url);
   }
 
+  export function putGroupIndividualByEmail(groupid: string, email: string, opts: {
+    role?: string,
+    resendNotif?: boolean
+  } = {}):
+    JQueryPromise<ApiT.GroupIndividual>
+  {
+    var query = opts.role || opts.resendNotif ? "?" : "";
+    var roleParam = opts.role ? "role=" + opts.role : "";
+    var resendParam = opts.resendNotif ? "resend_notif=true" : "";
+    var paramString = query + (opts.role && opts.resendNotif ?
+                               roleParam + "&" + resendParam :
+                               roleParam + resendParam);
+    var url = prefix + "/api/group/individual-member/" + string(Login.me())
+      + "/" + string(groupid)
+      + "/email/" + string(email)
+      + paramString;
+    return JsonHttp.put(url);
+  }
+
   export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
     JQueryPromise<void>
   {
     var url = prefix + "/api/group/event-labels/" + string(Login.me())
       + "/" + string(groupid);
     return JsonHttp.put(url, JSON.stringify(labels));
+  }
+
+  export function getAllGroupPrefs():
+    JQueryPromise<ApiT.GroupPreferencesList>
+  {
+    var url = `${prefix}/api/group/preferences-all/${Login.me()}`;
+    return JsonHttp.get(url);
+  }
+
+  export function getGroupPreferences(groupid: string):
+    JQueryPromise<ApiT.GroupPreferences>
+  {
+    var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
+    return JsonHttp.get(url);
+  }
+
+  export function putGroupPreferences(groupid: string, prefs: ApiT.GroupPreferences):
+    JQueryPromise<void>
+  {
+    var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
+    return JsonHttp.put(url, JSON.stringify(prefs));
   }
 
   /***** Opaque URLs with unique token *****/

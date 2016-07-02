@@ -16,11 +16,34 @@ module Esper.Text {
   export const TeamExec = "account";
   export const TeamExecs = "accounts";
 
+  export const Group = "group";
+  export const Groups = "groups";
+
+  export const GroupMember = "group member";
+  export const GroupMembers = "group members";
+
+  export const GroupIndividual = "individual";
+  export const GroupIndividuals = "individuals";
+
+  // Add group member
+  export function AddGroupMemberHeading(group?: string) {
+    return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
+  }
+
+  // Add group inidividual members
+  export const AddGroupIndividualLink = "Invite Someone Else";
+
+  // Group roles
+  export const GroupRoleOwner = "Owner";
+  export const GroupRoleManager = "Manager";
+  export const GroupRoleMember = "Member";
+
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
 
   // Label interface
   export const AddLabel = "add " + Label;
+  export const FindLabels = "find " + Labels;
   export const FindAddLabels = "find / add " + Labels;
   export function predictionTooltip(score: number) { // Score is 0-1
     return `We are ${Util.roundStr(score * 100, 0)}% confident that this ` +

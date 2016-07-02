@@ -1,28 +1,17 @@
 /*
-  Label settings for a given team
+  Abstract class to handle labelling
 */
 
-/// <reference path="./Views.TeamSettings.tsx" />
-
-module Esper.Views {
-
-  export class LabelSettings extends TeamSettings {
-    pathFn = Paths.Manage.Team.labels;
-
-    renderMain(team: ApiT.Team) {
-      return <div className="panel panel-default">
-        <div className="panel-body">
-          <LabelManager team={team} />
-        </div>
-      </div>;
-    }
-  }
-
-
+module Esper.Components {
   /* Label manager component used in above view */
 
   interface Props {
-    team: ApiT.Team;
+    getLabels: () => string[];
+    addLabel: (label: string) => any;
+    archiveFn: (label: string) => any;
+    removeLabel: (label: string) => any;
+    renameLabel: (orig: string, val: string) => any;
+    addPermission: boolean;
   }
 
   interface State {
@@ -32,7 +21,7 @@ module Esper.Views {
     labelFilter?: string;
   }
 
-  class LabelManager extends ReactHelpers.Component<Props, State> {
+  export class LabelManager extends ReactHelpers.Component<Props, State> {
     _editInput: HTMLInputElement;
 
     constructor(props: Props) {
@@ -41,11 +30,11 @@ module Esper.Views {
     }
 
     render() {
-      var labels = this.getLabels();
+      var labels = this.props.getLabels();
       return <div>
         { this.renderLabelInput() }
         {
-          !labels.length ? null :
+          labels.length && this.props.addPermission ?
           <div className="alert alert-info">
               <i className="fa fa-fw fa-pencil" />{" "}
                 { Text.LabelRenameDescription }<br />
@@ -53,7 +42,8 @@ module Esper.Views {
                 { Text.LabelArchiveDescription }<br />
               <i className="fa fa-fw fa-trash" />{" "}
                 { Text.LabelDeleteDescription }
-          </div>
+          </div> :
+          null
         }
         {
           labels.length ?
@@ -69,16 +59,12 @@ module Esper.Views {
       </div>;
     }
 
-    getLabels() {
-      return Labels.sortLabelStrs(this.props.team.team_labels);
-    }
-
     renderLabelInput() {
       return <div className="form-group">
         <label htmlFor={this.getId("new-labels")}>
-          {Text.FindAddLabels}
+          {this.props.addPermission ? Text.FindAddLabels : Text.FindLabels}
         </label>
-        <div className="input-group">
+        <div className={this.props.addPermission ? "input-group" : ""}>
           <div className={this.state.labelFilter ? "esper-has-right-icon" : ""}>
             <input type="text"
                    className="form-control"
@@ -97,12 +83,15 @@ module Esper.Views {
               <span />
             }
           </div>
-          <span className="input-group-btn">
-            <button className="btn btn-default" type="button"
-                    onClick={this.addLabel.bind(this)}>
-              <i className="fa fa-fw fa-plus" />
-            </button>
-          </span>
+          { this.props.addPermission ?
+            <span className="input-group-btn">
+              <button className="btn btn-default" type="button"
+                      onClick={this.addLabel.bind(this)}>
+                <i className="fa fa-fw fa-plus" />
+              </button>
+            </span> :
+            <span />
+          }
         </div>
       </div>;
     }
@@ -110,7 +99,7 @@ module Esper.Views {
     // Catch enter / up / down keys
     inputKeydown(e: KeyboardEvent) {
       var val = (e.target as HTMLInputElement).value;
-      if (e.keyCode === 13) {         // Enter
+      if (e.keyCode === 13 && this.props.addPermission) { // Enter
         e.preventDefault();
         this.addLabel();
       } else if (e.keyCode === 27) {  // ESC
@@ -127,7 +116,7 @@ module Esper.Views {
     addLabel() {
       var val = this.state.labelFilter;
       if (val) {
-        Actions.Teams.addLabel(this.props.team.teamid, val);
+        this.props.addLabel(val);
         this.resetState();
       }
     }
@@ -194,20 +183,22 @@ module Esper.Views {
       return <div className="list-group-item one-line" key={label}>
         <i className="fa fa-fw fa-tag" />
         {" "}{label}{" "}
-        <span>
-          <a className="pull-right text-danger" title="Delete"
-             onClick={(e) => this.promptRmFor(label)}>
-            <i className="fa fa-fw fa-trash list-group-item-text" />
-          </a>
-          <a className="pull-right text-info" title="Archive"
-             onClick={(e) => this.archive(label)}>
-            <i className="fa fa-fw fa-archive list-group-item-text" />
-          </a>
-          <a className="pull-right text-info" title="Edit"
-             onClick={(e) => this.showEditFor(label)}>
-            <i className="fa fa-fw fa-pencil list-group-item-text" />
-          </a>
-        </span>
+        { this.props.addPermission ?
+          <span>
+            <a className="pull-right text-danger" title="Delete"
+               onClick={(e) => this.promptRmFor(label)}>
+              <i className="fa fa-fw fa-trash list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Archive"
+               onClick={(e) => this.archive(label)}>
+              <i className="fa fa-fw fa-archive list-group-item-text" />
+            </a>
+            <a className="pull-right text-info" title="Edit"
+               onClick={(e) => this.showEditFor(label)}>
+              <i className="fa fa-fw fa-pencil list-group-item-text" />
+            </a>
+          </span> : null
+        }
       </div>;
     }
 
@@ -221,7 +212,7 @@ module Esper.Views {
 
     archive(label: string) {
       this.resetState();
-      Actions.Teams.rmLabel(this.props.team.teamid, label);
+      this.props.archiveFn(label);
     }
 
     promptRmFor(label: string) {
@@ -232,8 +223,7 @@ module Esper.Views {
     }
 
     rmLabel(label: string) {
-      this.archive(label);
-      Actions.BatchLabels.remove(this.props.team.teamid, label);
+      this.props.removeLabel(label);
     }
 
     showEditFor(label: string) {
@@ -256,8 +246,7 @@ module Esper.Views {
       var val = input.val().trim();
       var orig = this.state.editLabel.trim();
       if (val && val !== orig) {
-        Actions.Teams.renameLabel(this.props.team.teamid, orig, val);
-        Actions.BatchLabels.rename(this.props.team.teamid, orig, val);
+        this.props.renameLabel(orig, val);
       }
       this.resetState();
     }
@@ -271,8 +260,3 @@ module Esper.Views {
     }
   }
 }
-
-
-
-
-
