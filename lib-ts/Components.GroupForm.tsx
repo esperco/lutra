@@ -39,7 +39,6 @@ module Esper.Components {
 
     // Reset state on prop change
     componentWillReceiveProps(props: Props) {
-      super.componentWillReceiveProps(props);
       if (! _.isEqual(this.props, props)) {
         this.state = {
           name: props.name,
