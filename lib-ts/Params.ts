@@ -34,7 +34,8 @@ module Esper.Params {
 
     else {
       var storedTeamId = LocalStore.get(lastTeamIdKey);
-      if (Stores.Teams.get(storedTeamId).isSome()) {
+      if (typeof storedTeamId === "string" &&
+          Stores.Teams.get(storedTeamId).isSome()) {
         return storedTeamId;
       }
     }
@@ -62,7 +63,8 @@ module Esper.Params {
 
     else {
       var storedGroupId = LocalStore.get(lastGroupIdKey);
-      if (Stores.Groups.get(storedGroupId).isSome()) {
+      if (typeof storedGroupId === "string" &&
+          Stores.Groups.get(storedGroupId).isSome()) {
         return storedGroupId;
       }
     }
@@ -89,7 +91,8 @@ module Esper.Params {
     }
 
     lastCalIds = calIdsStr || lastCalIds || LocalStore.get(lastCalIdsKey);
-    if (lastCalIds && lastCalIds !== defaultCalIds) {
+    if (typeof lastCalIds === "string" &&
+        lastCalIds !== defaultCalIds) {
       var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
       return _.intersection(team.team_timestats_calendars, calIds);
     }
