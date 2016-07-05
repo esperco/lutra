@@ -134,8 +134,6 @@ module Esper.Components {
           { top: top, right: right } :
           { top: top, left: left } );
 
-      console.info(align);
-
       var menu = this.getMenu();
       if (! menu) { return; }
 
