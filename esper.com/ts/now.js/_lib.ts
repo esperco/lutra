@@ -3,8 +3,6 @@
 */
 
 /// <reference path="../../../typings/browser/index.d.ts" />
-
-/// <reference path="./Esper.ts" />
 /// <reference path="../lib/Actions.EventLabels.ts" />
 /// <reference path="../lib/Actions.Feedback.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />

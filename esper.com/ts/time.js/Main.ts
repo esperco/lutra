@@ -1,5 +1,10 @@
 /// <reference path="./_lib.ts" />
-/// <reference path="./Esper.ts" />
+
+declare module Esper {
+  export var PRODUCTION: boolean;
+  export var TESTING: boolean;
+  export var pageJs: PageJS.Static;
+}
 
 module Esper.Main {
   export function init() {
