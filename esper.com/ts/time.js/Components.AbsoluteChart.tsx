@@ -41,9 +41,18 @@ module Esper.Components {
         categories: categories
       },
 
-      yAxis: yAxis ? [{
-        title: { text: yAxis }
-      }] : null,
+      yAxis: [{
+        title: yAxis ? { text: yAxis } : null,
+        stackLabels: {
+          enabled: true,
+          formatter: Charting.stackPointFormatter,
+          style: {
+            fontSize: "10px",
+            fontWeight: "normal",
+            textShadow: "none"
+          }
+        }
+      }],
 
       series: series
     }} />;

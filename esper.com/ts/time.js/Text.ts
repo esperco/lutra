@@ -142,6 +142,10 @@ module Esper.Text {
   export const ChartRatingsDescription =
     `How much time do I spend in good meetings vs. bad meetings?`;
 
+  /* Chart Misc */
+
+  // Name for 0-value pseudo-event used for spacing
+  export const ChartEmptyEvent = "No Events";
 
   /////
 

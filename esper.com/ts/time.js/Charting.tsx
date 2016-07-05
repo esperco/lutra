@@ -83,8 +83,8 @@ module Esper.Charting {
     _.each(groups, (g) => {
       var total = _.keys(g.data.some).length;
 
-      _.each(g.data.some, (value, key) => {
-        var index = keyMap[key];
+      _.each(keys, (key, index) => {
+        let value = g.data.some[key];
         series.push({
           name: Util.escapeHtml((opts.displayName || _.identity)(key)),
           cursor: "pointer",
@@ -96,16 +96,28 @@ module Esper.Charting {
             Colors.lightGray,
           stack: Period.asNumber(g.period),
           index: Period.asNumber(g.period),
-          data: _.map(value.annotations, (a) => ({
-            name: Text.eventTitleForChart(a.event),
-            x: index + (opts.noneStart ? 1 : 0),
-            y: opts.yFn ? opts.yFn(a.value) : a.value,
-            events: {
-              click: () => onEventClick(a.event)
-            }
-          }))
+          data: value && value.annotations.length ?
+            _.map(value.annotations, (a) => ({
+              name: Text.eventTitleForChart(a.event),
+              x: index + (opts.noneStart ? 1 : 0),
+              y: opts.yFn ? opts.yFn(a.value) : a.value,
+              events: {
+                click: () => onEventClick(a.event)
+              }
+            })) :
+
+            /*
+              We need to create an explicit zero-value data point to explicitly
+              single to user that there is no data
+            */
+            [{
+              name: Text.ChartEmptyEvent,
+              x: index + (opts.noneStart ? 1 : 0),
+              y: opts.yFn ? opts.yFn(0) : 0,
+              events: { click: () => false }
+            }]
         });
-      })
+      });
 
       // Handle none
       if (opts.noneName) {
@@ -287,6 +299,8 @@ module Esper.Charting {
 
   export function eventPointFormatter(): string {
     var point: HighchartsPointObject = this;
+    if (point.y === 0) return "";
+
     var ret = "";
     ret += point.y.toString();
     ret += " / ";
@@ -304,7 +318,7 @@ module Esper.Charting {
   export function countPointFormatter(): string {
     var point: HighchartsPointObject = this;
     var ret = "";
-    ret += Text.hours(this.hours || this.y);
+    ret += Text.hours(point.y);
     if (this.count) {
       ret += " / " + Text.events(this.count);
     }
@@ -317,5 +331,14 @@ module Esper.Charting {
   export var countPointTooltip: HighchartsTooltipOptions = {
     formatter: null,
     pointFormatter: countPointFormatter
+  }
+
+  export function stackPointFormatter(): string {
+    /*
+      Not sure what type is supposed to be here -- we just care about total
+      for now
+    */
+    var stack: { total: number } = this;
+    return Text.hoursShort(stack.total);
   }
 }
