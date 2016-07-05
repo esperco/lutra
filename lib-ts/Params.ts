@@ -2,6 +2,7 @@
   Namespace for helpers that clean up querystring params and the like
 */
 
+/// <reference path="./LocalStore.ts" />
 /// <reference path="./Stores.Calendars.ts" />
 /// <reference path="./Stores.Groups.ts"/>
 /// <reference path="./Stores.Teams.ts"/>
@@ -14,15 +15,28 @@ module Esper.Params {
   var lastGroupId: string;
   var lastCalIds: string;
 
+  // Remember last teamID, groupId, cals in memory too
+  const lastTeamIdKey = "lastTeamId";
+  const lastGroupIdKey = "lastGroupId";
+  const lastCalIdsKey = "lastCalIds";
+
   // Clean team ID
   export function cleanTeamId(teamId: string) {
     if (teamId && Stores.Teams.get(teamId).isSome()) {
       lastTeamId = teamId;
+      LocalStore.set(lastTeamIdKey, teamId);
       return teamId;
     }
 
     else if (lastTeamId && Stores.Teams.get(lastTeamId).isSome()) {
       return lastTeamId;
+    }
+
+    else {
+      var storedTeamId = LocalStore.get(lastTeamIdKey);
+      if (Stores.Teams.get(storedTeamId).isSome()) {
+        return storedTeamId;
+      }
     }
 
     var teams = Stores.Teams.all();
@@ -38,11 +52,19 @@ module Esper.Params {
   export function cleanGroupId(groupId: string) {
     if (groupId && Stores.Groups.get(groupId).isSome()) {
       lastGroupId = groupId;
+      LocalStore.set(lastGroupIdKey, groupId);
       return groupId;
     }
 
     else if (lastGroupId && Stores.Groups.get(lastGroupId).isSome()) {
       return lastGroupId;
+    }
+
+    else {
+      var storedGroupId = LocalStore.get(lastGroupIdKey);
+      if (Stores.Groups.get(storedGroupId).isSome()) {
+        return storedGroupId;
+      }
     }
 
     var groups = Stores.Groups.all();
@@ -62,7 +84,11 @@ module Esper.Params {
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Stores.Teams.require(teamId);
-    lastCalIds = calIdsStr || lastCalIds;
+    if (calIdsStr) {
+      LocalStore.set(lastCalIdsKey, calIdsStr);
+    }
+
+    lastCalIds = calIdsStr || lastCalIds || LocalStore.get(lastCalIdsKey);
     if (lastCalIds && lastCalIds !== defaultCalIds) {
       var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
       return _.intersection(team.team_timestats_calendars, calIds);
