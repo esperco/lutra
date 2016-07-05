@@ -120,10 +120,29 @@ module Esper.Actions.Charts {
   }
 
 
+  /* Analytics */
+
+  var analyticsId = "chart-analytics-id";
+
+  function trackChart(o: DefaultBaseOpts, group: string) {
+
+    // Delay tracking by 2 seconds to ensure user is actually looking at chart
+    Util.delayOne(analyticsId, function() {
+      Analytics.page(Analytics.Page.TimeStatsCharts, {
+        group: group,
+        type: o.extra.type,
+        params: o.extra,
+        interval: o.period.interval
+      });
+    }, 2000);
+  }
+
+
   /* Duration Charts */
 
   export function renderDurations(o: DefaultBaseOpts) {
     fetchAndClean(o);
+    trackChart(o, "durations");
     render(ReactHelpers.contain(function() {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
@@ -175,6 +194,7 @@ module Esper.Actions.Charts {
 
   export function renderCalendars(o: DefaultBaseOpts) {
     fetchAndClean(o);
+    trackChart(o, "calendars");
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
       if (o.extra.type === "calendar") {
@@ -233,6 +253,7 @@ module Esper.Actions.Charts {
 
   export function renderGuests(o: BaseOpts<DomainChartOpts>) {
     fetchAndClean(o);
+    trackChart(o, "guests");
     o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
 
     render(ReactHelpers.contain(function() {
@@ -318,6 +339,7 @@ module Esper.Actions.Charts {
 
   export function renderGuestsCount(o: BaseOpts<DomainChartOpts>) {
     fetchAndClean(o);
+    trackChart(o, "guest-counts");
     o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
 
     render(ReactHelpers.contain(function() {
@@ -394,6 +416,7 @@ module Esper.Actions.Charts {
 
   export function renderLabels(o: BaseOpts<LabelChartOpts>) {
     fetchAndClean(o);
+    trackChart(o, "labels");
     o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
 
     render(ReactHelpers.contain(function() {
@@ -519,6 +542,7 @@ module Esper.Actions.Charts {
 
   export function renderRatings(o: BaseOpts<RatingChartOpts>) {
     fetchAndClean(o);
+    trackChart(o, "ratings");
     o.extra.hideNone = Params.cleanBoolean(o.extra.hideNone);
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
