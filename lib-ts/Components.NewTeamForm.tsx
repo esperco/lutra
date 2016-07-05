@@ -9,6 +9,8 @@
 
 module Esper.Components {
   interface Props {
+    email?: string;
+    name?: string;
     supportsExec?: boolean;
   }
 
@@ -19,7 +21,8 @@ module Esper.Components {
 
     render() {
       return <TeamForm ref={(c) => this._form = c}
-        name="" email="" timezone={moment.tz.guess()}
+        name={this.props.name || ""} email={this.props.email || ""}
+        timezone={moment.tz.guess()}
         showEmail={this.props.supportsExec}
         editableEmail={this.props.supportsExec}
       />
