@@ -115,6 +115,13 @@ module Esper.Components {
             </div> :
             null
           }
+          {
+            event.feedback && event.feedback.notes ?
+            <div className="action-block event-feedback-notes"
+                 onClick={() => this.handleFeedbackClick(event)}>
+              <EventFeedbackNotes notes={event.feedback.notes} />
+            </div> : null
+          }
         </div>
       </div>;
     }
@@ -177,7 +184,20 @@ module Esper.Components {
         ) : null
       }
       {" "}
-      { feedback.notes ? <i className="fa fa-fw fa-comment" /> : null }
+    </span>;
+  }
+
+  function EventFeedbackNotes({notes}: {notes: string}) {
+    /*
+      Use text-overflow: ellipsis in CSS to truncate exactly at end of line but
+      use JS to do a sanity-check too, and to keep DOM a little less cluttered.
+    */
+    notes = notes.slice(0, 250);
+
+    // Format feedback notes
+    return <span>
+      <i className="fa fa-fw fa-comment-o" />{" "}
+      { notes }
     </span>;
   }
 
