@@ -711,7 +711,7 @@ module Esper.Stores.Events {
       let e1 = list1[i];
       let e2 = list2[i];
       if (e1 !== e2) {
-        if (! opts.deepCompare) return false;
+        if (!opts.deepCompare || !e1 || !e2) return false;
         if (opts.ignoreLabelScores) {
           e1 = _.clone(e1);
           reviseScores(e1);
