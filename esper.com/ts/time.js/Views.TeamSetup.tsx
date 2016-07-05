@@ -50,10 +50,18 @@ module Esper.Views {
           header={<div className="esper-subheader">Just Myself</div>}
         >
           <div className="onboarding-expando-content">
-            <p>{ Text.TeamSelfDescription }</p>
-            <Components.NewTeamForm
-             ref={(c) => this._selfForm = c}
-             supportsExec={false} />
+            { Stores.Profiles.get(Login.myUid()).match({
+              none: () =>
+                <span className="esper-spinner esper-medium esper-centered" />,
+              some: (p) => <div>
+                <p>{ Text.TeamSelfDescription }</p>
+                <Components.NewTeamForm
+                  ref={(c) => this._selfForm = c}
+                  name={p.display_name || ""}
+                  email={Login.myEmail()}
+                  supportsExec={false} />
+              </div>
+            })}
           </div>
         </Components.Expando>
 
