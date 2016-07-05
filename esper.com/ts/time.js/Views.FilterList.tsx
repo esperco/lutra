@@ -281,7 +281,7 @@ module Esper.Views {
               <i className={"fa fa-fw " + icon} />
             </span>
             <span className="hidden-xs">
-              {" "}Select All
+              {" "}{ Text.SelectAll }
             </span>
           </div>
           {
@@ -450,10 +450,17 @@ module Esper.Views {
         .value();
 
       var teams = Stores.Teams.getFromCalSelection(this.props.cals);
-      return <Components.EventEditorModal eventData={eventData}
-                                          teams={teams}
-                                          focusOnLabels={minFeedback}
-                                          minFeedback={minFeedback} />;
+      return <Components.EventEditorModal
+        eventData={eventData}
+        teams={teams}
+        focusOnLabels={minFeedback}
+        minFeedback={minFeedback}
+        onCancel={() => this.clearSelection()}
+        onDone={() => this.clearSelection()} />;
+    }
+
+    clearSelection() {
+      this.setState({ selected: [] });
     }
 
     toggleEvent(event: Stores.Events.TeamEvent) {
