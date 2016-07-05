@@ -3,7 +3,6 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Esper.ts" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;

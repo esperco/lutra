@@ -5,7 +5,6 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
-/// <reference path="./Esper.ts" />
 /// <reference path="./Components.CalendarDaySelector.tsx" />
 
 module Esper.Components {

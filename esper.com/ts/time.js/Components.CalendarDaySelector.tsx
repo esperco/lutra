@@ -3,7 +3,6 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="./Esper.ts" />
 /// <reference path="./Components.CalendarGrid.tsx" />
 
 module Esper.Components {
