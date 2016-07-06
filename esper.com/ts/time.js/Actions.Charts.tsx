@@ -3,31 +3,12 @@
 */
 
 module Esper.Actions.Charts {
-  // Base options needed to fetch and get events
-  export interface BaseOpts<T extends ExtraOpts> {
-    teamId: string;
-    calIds: string[];
-    period: Period.Single|Period.Custom;
-    extra: T;
-  }
-
-  export interface DefaultBaseOpts extends BaseOpts<ExtraOpts> {};
-  export interface ExtraOpts {
-    type: Charting.ChartType;
-    incrs: number[];
-  }
-  export interface LabelChartOpts extends ExtraOpts {
-    labels: Params.ListSelectJSON;
-  }
-  export interface DomainChartOpts extends ExtraOpts {
-    domains: Params.ListSelectJSON;
-  }
-  export interface RatingChartOpts extends ExtraOpts {
-    hideNone: boolean;
-  }
+  // Rename types defined in Charting module
+  type BaseOpts<T> = Charting.BaseOpts<T>;
+  type ExtraOpts = Charting.ExtraOpts;
 
   // Fetch events from server
-  function fetchEvents<T extends ExtraOpts>(o: BaseOpts<T>) {
+  function fetchEvents<T>(o: BaseOpts<T>) {
     var periods = Period.withIncrs(o.period, o.extra.incrs);
     _.each(periods, (p) => Stores.Events.fetchPredictionsForPeriod({
       teamId: o.teamId,
@@ -36,7 +17,7 @@ module Esper.Actions.Charts {
   }
 
   // Fetch events + metadata for one or more periods
-  function getEventData<T extends ExtraOpts>(o: BaseOpts<T>) {
+  function getEventData<T>(o: BaseOpts<T>) {
     var periods = _.sortBy(
       Period.withIncrs(o.period, o.extra.incrs),
       Period.asNumber
@@ -68,7 +49,7 @@ module Esper.Actions.Charts {
   }
 
   // Different get function for calendar grid view (sorted by day)
-  function getForMonth<T extends ExtraOpts>(o: BaseOpts<T>) {
+  function getForMonth<T>(o: BaseOpts<T>) {
     return Stores.Events.getByDateForPeriod({
       cals: _.map(o.calIds, (calId) => ({
         teamId: o.teamId,
@@ -97,6 +78,7 @@ module Esper.Actions.Charts {
     if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
       typedQ.type = "percent";
     }
+    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
     return typedQ;
   }
 
@@ -111,8 +93,8 @@ module Esper.Actions.Charts {
     Some cleaning should happen in routing, but this makes additional changes
     based on extra vars
   */
-  function fetchAndClean<T extends ExtraOpts>(o: BaseOpts<T>) {
-    o.extra = cleanExtra(o.extra) as T;
+  function fetchAndClean<T>(o: BaseOpts<T>) {
+    o.extra = cleanExtra(o.extra) as T & ExtraOpts;
     if (o.extra.type === "calendar") {
       o.period = toMonth(o.period);
     }
@@ -124,7 +106,7 @@ module Esper.Actions.Charts {
 
   var analyticsId = "chart-analytics-id";
 
-  function trackChart(o: DefaultBaseOpts, group: string) {
+  function trackChart(o: BaseOpts<{}>, group: string) {
 
     // Delay tracking by 2 seconds to ensure user is actually looking at chart
     Util.delayOne(analyticsId, function() {
@@ -140,13 +122,13 @@ module Esper.Actions.Charts {
 
   /* Duration Charts */
 
-  export function renderDurations(o: DefaultBaseOpts) {
+  export function renderDurations(o: BaseOpts<{}>) {
     fetchAndClean(o);
     trackChart(o, "durations");
     render(ReactHelpers.contain(function() {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
-        let calc = new EventStats.DateDurationBucketCalc(data.dates);
+        let calc = new EventStats.DateDurationBucketCalc(data.dates, o.extra);
         let chart = <Components.DurationEventGrid
           calculation={calc}
           fetching={data.isBusy}
@@ -158,7 +140,7 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
-          let calc = new EventStats.DurationBucketCalc(d.events);
+          let calc = new EventStats.DurationBucketCalc(d.events, o.extra);
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -177,7 +159,7 @@ module Esper.Actions.Charts {
     }));
   }
 
-  function getDurationChartView(o: DefaultBaseOpts,
+  function getDurationChartView(o: BaseOpts<{}>,
                                 chart: JSX.Element) {
     return <Views.Charts
       teamId={o.teamId}
@@ -192,7 +174,7 @@ module Esper.Actions.Charts {
 
   /* Calendars Charts */
 
-  export function renderCalendars(o: DefaultBaseOpts) {
+  export function renderCalendars(o: BaseOpts<{}>) {
     fetchAndClean(o);
     trackChart(o, "calendars");
     render(ReactHelpers.contain(function() {
@@ -212,7 +194,7 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
-          let calc = new EventStats.CalendarDurationCalc(d.events);
+          let calc = new EventStats.CalendarDurationCalc(d.events, o.extra);
 
           return {
             period: d.period,
@@ -236,7 +218,7 @@ module Esper.Actions.Charts {
     }));
   }
 
-  function getCalendarsChartView(o: DefaultBaseOpts,
+  function getCalendarsChartView(o: BaseOpts<{}>,
                                  chart: JSX.Element) {
     return <Views.Charts
       teamId={o.teamId}
@@ -251,7 +233,7 @@ module Esper.Actions.Charts {
 
   /* Guest Charts */
 
-  export function renderGuests(o: BaseOpts<DomainChartOpts>) {
+  export function renderGuests(o: BaseOpts<EventStats.DomainOpts>) {
     fetchAndClean(o);
     trackChart(o, "guests");
     o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
@@ -260,8 +242,7 @@ module Esper.Actions.Charts {
 
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
-        let calc = new EventStats.DomainDurationByDateCalc(data.dates,
-                                                           o.extra.domains);
+        let calc = new EventStats.DomainDurationByDateCalc(data.dates, o.extra);
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.DomainEventGrid
           calculation={calc}
@@ -274,10 +255,13 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d, i) => {
-          let calc = new EventStats.GuestDurationCalc(
-            d.events,
-            o.extra.domains,
-            o.extra.type === "percent");  // Nest domains for pie chart
+          let calc = new EventStats.GuestDurationCalc(d.events, {
+            filterStr: o.extra.filterStr,
+            domains: o.extra.domains,
+
+            // Nest domains for pie chart
+            nestByDomain: o.extra.type === "percent"
+          });
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -297,10 +281,10 @@ module Esper.Actions.Charts {
     }));
   }
 
-  function getGuestChartView(o: BaseOpts<DomainChartOpts>,
+  function getGuestChartView(o: BaseOpts<EventStats.DomainOpts>,
                              chart: JSX.Element,
                              events: Stores.Events.TeamEvent[]) {
-    var selectorCalc = new EventStats.DomainCountCalc(events);
+    var selectorCalc = new EventStats.DomainCountCalc(events, o.extra);
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-user" />{" "}
@@ -330,14 +314,14 @@ module Esper.Actions.Charts {
     all: boolean;
     none: boolean;
     some: string[];
-  }, extra: DomainChartOpts) {
+  }, extra: EventStats.DomainOpts) {
     Route.nav.query(_.extend({}, extra, { domains: p }));
   }
 
 
   /* Guest Count Charts */
 
-  export function renderGuestsCount(o: BaseOpts<DomainChartOpts>) {
+  export function renderGuestsCount(o: BaseOpts<EventStats.DomainOpts>) {
     fetchAndClean(o);
     trackChart(o, "guest-counts");
     o.extra.domains = Params.cleanListSelectJSON(o.extra.domains);
@@ -347,7 +331,7 @@ module Esper.Actions.Charts {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
         let calc = new EventStats.GuestCountDurationByDateCalc(
-          data.dates, o.extra.domains);
+          data.dates, o.extra);
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.GuestCountEventGrid
           calculation={calc}
@@ -360,9 +344,7 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d, i) => {
-          let calc = new EventStats.GuestCountDurationCalc(
-            d.events,
-            o.extra.domains);  // Nest domains for pie chart
+          let calc = new EventStats.GuestCountDurationCalc(d.events, o.extra);
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -382,10 +364,10 @@ module Esper.Actions.Charts {
     }));
   }
 
-  function getGuestCountChartView(o: BaseOpts<DomainChartOpts>,
+  function getGuestCountChartView(o: BaseOpts<EventStats.DomainOpts>,
                                   chart: JSX.Element,
                                   events: Stores.Events.TeamEvent[]) {
-    var selectorCalc = new EventStats.DomainCountCalc(events);
+    var selectorCalc = new EventStats.DomainCountCalc(events, o.extra);
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-user" />{" "}
@@ -414,7 +396,7 @@ module Esper.Actions.Charts {
 
   /* Label Charts */
 
-  export function renderLabels(o: BaseOpts<LabelChartOpts>) {
+  export function renderLabels(o: BaseOpts<EventStats.LabelOpts>) {
     fetchAndClean(o);
     trackChart(o, "labels");
     o.extra.labels = Params.cleanListSelectJSON(o.extra.labels);
@@ -422,8 +404,7 @@ module Esper.Actions.Charts {
     render(ReactHelpers.contain(function() {
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
-        let calc = new EventStats.LabelDurationByDateCalc(data.dates,
-                                                          o.extra.labels);
+        let calc = new EventStats.LabelDurationByDateCalc(data.dates, o.extra);
         let allEvents = _.flatten( _.map(data.dates, (d) => d.events ));
         let chart = <Components.LabelEventGrid
           calculation={calc}
@@ -436,8 +417,7 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d, i) => {
-          let calc = new EventStats.LabelDurationCalc(d.events,
-                                                      o.extra.labels);
+          let calc = new EventStats.LabelDurationCalc(d.events, o.extra);
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -459,10 +439,10 @@ module Esper.Actions.Charts {
 
   var autoLaunchConfirm = true; // This gets set to false after first launch.
 
-  function getLabelChartView(o: BaseOpts<LabelChartOpts>,
+  function getLabelChartView(o: BaseOpts<EventStats.LabelOpts>,
                              chart: JSX.Element,
                              events: Stores.Events.TeamEvent[]) {
-    var selectorCalc = new EventStats.LabelCountCalc(events);
+    var selectorCalc = new EventStats.LabelCountCalc(events, o.extra);
     var selector = <div className="esper-panel-section">
       <div className="esper-subheader">
         <i className="fa fa-fw fa-tags" />{" "}
@@ -520,7 +500,7 @@ module Esper.Actions.Charts {
     all: boolean;
     unlabeled: boolean;
     labels: string[];
-  }, extra: LabelChartOpts) {
+  }, extra: EventStats.LabelOpts) {
     Route.nav.query(_.extend({}, extra, {
       labels: {
         all: all,
@@ -540,16 +520,15 @@ module Esper.Actions.Charts {
 
   /* Rating Charts */
 
-  export function renderRatings(o: BaseOpts<RatingChartOpts>) {
+  export function renderRatings(o: BaseOpts<EventStats.RatingOpts>) {
     fetchAndClean(o);
     trackChart(o, "ratings");
-    o.extra.hideNone = Params.cleanBoolean(o.extra.hideNone);
+    o.extra.showNone = Params.cleanBoolean(o.extra.showNone);
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
       if (o.extra.type === "calendar") {
         let data = getForMonth(o);
-        let calc = new EventStats.RatingDateDurationCalc(
-          data.dates, o.extra.hideNone);
+        let calc = new EventStats.RatingDateDurationCalc(data.dates, o.extra);
         let chart = <Components.RatingEventGrid
           calculation={calc}
           fetching={data.isBusy}
@@ -561,8 +540,7 @@ module Esper.Actions.Charts {
       else {
         let data = getEventData(o);
         let calcData = _.map(data, (d) => {
-          let calc = new EventStats.RatingDurationCalc(
-            d.events, o.extra.hideNone);
+          let calc = new EventStats.RatingDurationCalc(d.events, o.extra);
           return {
             period: d.period,
             current: _.isEqual(d.period, o.period),
@@ -581,11 +559,11 @@ module Esper.Actions.Charts {
     }));
   }
 
-  function getRatingsChartView(o: BaseOpts<RatingChartOpts>,
+  function getRatingsChartView(o: BaseOpts<EventStats.RatingOpts>,
                                chart: JSX.Element) {
     var selector = <div className="esper-panel-section">
       <Components.SimpleToggle
-        active={o.extra.hideNone}
+        active={o.extra.showNone}
         title={Text.ShowNoRating}
         onChange={(x) => toggleHideNone(x, o.extra)}
       />
@@ -602,7 +580,7 @@ module Esper.Actions.Charts {
     />;
   }
 
-  function toggleHideNone(active: boolean, extra: RatingChartOpts) {
-    Route.nav.query(_.extend({}, extra, { hideNone: active }));
+  function toggleHideNone(active: boolean, extra: EventStats.RatingOpts) {
+    Route.nav.query(_.extend({}, extra, { showNone: active }));
   }
 }

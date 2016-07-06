@@ -282,6 +282,22 @@ module Esper.EventStats {
 
   /* Settings for Calculation */
 
+  export interface CalcOpts { // Standard calc opts for all charts
+    filterStr: string;
+  }
+  export interface LabelOpts extends CalcOpts {
+    labels: Params.ListSelectJSON;
+  }
+  export interface DomainOpts extends CalcOpts {
+    domains: Params.ListSelectJSON;
+  }
+  export interface DomainNestOpts extends DomainOpts {
+    nestByDomain: boolean; // Used to nest domain => email in duration calc
+  }
+  export interface RatingOpts extends CalcOpts {
+    showNone: boolean;
+  }
+
   // How many events to annotate or group at any given time
   const DEFAULT_MAX_PROCESS_EVENTS = 10;
 
@@ -297,11 +313,11 @@ module Esper.EventStats {
     // Intermediate state for use with progressive calculation
     _results: T;
     _events: Stores.Events.TeamEvent[] = [];
-    _opts: U;
+    _opts: U & CalcOpts;
 
     MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
 
-    constructor(events: Stores.Events.TeamEvent[], opts?: U) {
+    constructor(events: Stores.Events.TeamEvent[], opts: U & CalcOpts) {
       super();
       this._results = this.initResult();
       this.ready = false;
@@ -400,7 +416,10 @@ module Esper.EventStats {
 
     // Override as appropriate -- return false for events to ignore
     filterEvent(event: Stores.Events.TeamEvent) {
-      return Stores.Events.isActive(event);
+      return Stores.Events.isActive(event) && (
+        this._opts.filterStr ?
+          Stores.Events.filterOne(event, this._opts.filterStr) : true
+      );
     }
 
     // Empty initial result object
@@ -421,7 +440,7 @@ module Esper.EventStats {
   /*
     Calc which processes a list of events
   */
-  export abstract class EventListCalc<T, U> extends CalcBase<T, U> {
+  export abstract class EventListCalc<T, U > extends CalcBase<T, U> {
     _index = 0;
 
     // Returns some events from the head of the queue
@@ -449,7 +468,8 @@ module Esper.EventStats {
     _eventIndex = 0;
     _date: Date;
 
-    constructor(eventDates: Stores.Events.EventsForDate[], opts?: U) {
+    constructor(eventDates: Stores.Events.EventsForDate[],
+                opts?: U & CalcOpts) {
       super(
         _.flatten( _.map(eventDates, (d) => d.events) ),
         opts
@@ -614,7 +634,7 @@ module Esper.EventStats {
   /* Misc calculation classes we're using for charts */
 
   /* Group events by how long they are */
-  export class DurationBucketCalc extends DurationCalc<OptGrouping, void> {
+  export class DurationBucketCalc extends DurationCalc<OptGrouping, {}> {
     static BUCKETS = [{
       label: "< 30m",
       gte: 0,   // Greater than, seconds
@@ -660,7 +680,7 @@ module Esper.EventStats {
     }
   }
 
-  export class DateDurationBucketCalc extends DateDurationCalc<void> {
+  export class DateDurationBucketCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent, duration: number) {
       var bucket = _.findLast(DurationBucketCalc.BUCKETS,
         (b) => duration >= b.gte
@@ -672,7 +692,7 @@ module Esper.EventStats {
 
   /* Calc for sorting events by calendar */
 
-  export class CalendarDurationCalc extends DurationCalc<OptGrouping, void> {
+  export class CalendarDurationCalc extends DurationCalc<OptGrouping, {}> {
     initResult() { return emptyOptGrouping(); }
 
     processOne(
@@ -688,7 +708,7 @@ module Esper.EventStats {
     }
   }
 
-  export class CalendarDateDurationCalc extends DateDurationCalc<void> {
+  export class CalendarDateDurationCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent) {
       return Option.some([event.calendarId]);
     }
@@ -702,7 +722,7 @@ module Esper.EventStats {
   }
 
   // Count unique events by label
-  export class LabelCountCalc extends EventListCalc<LabelCalcCount, void> {
+  export class LabelCountCalc extends EventListCalc<LabelCalcCount, {}> {
     initResult() {
       return _.extend({
         unconfirmed: [],
@@ -748,12 +768,7 @@ module Esper.EventStats {
 
   // Count event durations by selected labels
   export class LabelDurationCalc
-      extends DurationCalc<OptGrouping, Params.ListSelectJSON> {
-    constructor(events: Stores.Events.TeamEvent[],
-                p: Params.ListSelectJSON) {
-      super(events, p);
-    }
-
+      extends DurationCalc<OptGrouping, LabelOpts> {
     initResult() { return emptyOptGrouping(); }
 
     processOne(
@@ -762,7 +777,7 @@ module Esper.EventStats {
       results: OptGrouping
     ) {
       var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
-      var annotations = Params.applyListSelectJSON(labelIds, this._opts)
+      var annotations = Params.applyListSelectJSON(labelIds, this._opts.labels)
         .match({
           none: (): Annotation[] => [],
           some: (matchedLabelIds) => matchedLabelIds.length ?
@@ -786,24 +801,17 @@ module Esper.EventStats {
     }
   }
 
-  export class LabelDurationByDateCalc
-      extends DateDurationCalc<Params.ListSelectJSON> {
-
-    constructor(eventDates: Stores.Events.EventsForDate[],
-                p: Params.ListSelectJSON) {
-      super(eventDates, p);
-    }
-
+  export class LabelDurationByDateCalc extends DateDurationCalc<LabelOpts> {
     getGroups(event: Stores.Events.TeamEvent) {
       var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
-      return Params.applyListSelectJSON(labelIds, this._opts);
+      return Params.applyListSelectJSON(labelIds, this._opts.labels);
     }
   }
 
 
   /* Guest-related calculations */
 
-  export class DomainCountCalc extends EventListCalc<OptGrouping, void> {
+  export class DomainCountCalc extends EventListCalc<OptGrouping, {}> {
     initResult() { return emptyOptGrouping(); }
 
     processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
@@ -836,18 +844,8 @@ module Esper.EventStats {
     the constructor to group by domains first, then drilldown to individual
     e-mails. Else will calc for a flat list.
   */
-  export class GuestDurationCalc extends DurationCalc<OptGrouping, {
-    selections: Params.ListSelectJSON;
-    nestByDomain: boolean;
-  }> {
-    constructor(events: Stores.Events.TeamEvent[],
-                p: Params.ListSelectJSON,
-                nestByDomain=false) {
-      super(events, {
-        selections: p,
-        nestByDomain: nestByDomain
-      });
-    }
+  export class GuestDurationCalc
+      extends DurationCalc<OptGrouping, DomainNestOpts> {
 
     initResult() { return emptyOptGrouping(); }
 
@@ -858,7 +856,7 @@ module Esper.EventStats {
     ) {
       var domains = Stores.Events.getGuestDomains(event);
       var annotations = Params.applyListSelectJSON(domains,
-                                                   this._opts.selections)
+                                                   this._opts.domains)
         .match({
           none: (): Annotation[] => [],
           some: (matchedDomains) => {
@@ -890,15 +888,11 @@ module Esper.EventStats {
   }
 
   export class DomainDurationByDateCalc
-      extends DateDurationCalc<Params.ListSelectJSON> {
-    constructor(eventDates: Stores.Events.EventsForDate[],
-                p: Params.ListSelectJSON) {
-      super(eventDates, p);
-    }
+      extends DateDurationCalc<DomainOpts> {
 
     getGroups(event: Stores.Events.TeamEvent) {
       var domains = Stores.Events.getGuestDomains(event);
-      return Params.applyListSelectJSON(domains, this._opts);
+      return Params.applyListSelectJSON(domains, this._opts.domains);
     }
   }
 
@@ -906,7 +900,7 @@ module Esper.EventStats {
   /* Group meetings by how many guests there are */
 
   export class GuestCountDurationCalc
-      extends DurationCalc<OptGrouping, Params.ListSelectJSON> {
+      extends DurationCalc<OptGrouping, DomainOpts> {
     static BUCKETS = [{
       label: "2 " + Text.Guests,
       gte: 2,   // Greater than, guests
@@ -929,11 +923,6 @@ module Esper.EventStats {
       color: Colors.level5
     }];
 
-    constructor(events: Stores.Events.TeamEvent[],
-                p: Params.ListSelectJSON) {
-      super(events, p);
-    }
-
     initResult() { return emptyOptGrouping(); }
 
     processOne(
@@ -942,7 +931,7 @@ module Esper.EventStats {
       results: OptGrouping
     ) {
       var domains = Stores.Events.getGuestDomains(event);
-      var annotations = Params.applyListSelectJSON(domains, this._opts)
+      var annotations = Params.applyListSelectJSON(domains, this._opts.domains)
         .match({
           none: (): Annotation[] => [],
           some: (matchedDomains) => {
@@ -980,16 +969,11 @@ module Esper.EventStats {
   }
 
   export class GuestCountDurationByDateCalc
-      extends DateDurationCalc<Params.ListSelectJSON> {
-
-    constructor(eventDates: Stores.Events.EventsForDate[],
-                p: Params.ListSelectJSON) {
-      super(eventDates, p);
-    }
+      extends DateDurationCalc<DomainOpts> {
 
     getGroups(event: Stores.Events.TeamEvent, duration: number) {
       var domains = Stores.Events.getGuestDomains(event);
-      return Params.applyListSelectJSON(domains, this._opts)
+      return Params.applyListSelectJSON(domains, this._opts.domains)
         .flatMap((matchedDomains): Option.T<string[]> => {
           let emails = Stores.Events.getGuestEmails(event, matchedDomains);
 
@@ -1016,15 +1000,8 @@ module Esper.EventStats {
 
   /* Calcs for post-meeting feedback rating */
 
-  export class RatingDurationCalc extends DurationCalc<OptGrouping, {
-    showNone: boolean;
-  }> {
-
-    constructor(events: Stores.Events.TeamEvent[], showNone=false) {
-      super(events, {
-        showNone: showNone
-      });
-    }
+  export class RatingDurationCalc
+      extends DurationCalc<OptGrouping, RatingOpts> {
 
     initResult() { return emptyOptGrouping(); }
 
@@ -1045,14 +1022,7 @@ module Esper.EventStats {
     }
   }
 
-  export class RatingDateDurationCalc extends DateDurationCalc<{
-    showNone: boolean;
-  }> {
-
-    constructor(eventDates: Stores.Events.EventsForDate[],
-                showNone=false) {
-      super(eventDates, { showNone: showNone });
-    }
+  export class RatingDateDurationCalc extends DateDurationCalc<RatingOpts> {
 
     getGroups(event: Stores.Events.TeamEvent) {
       if (!event.feedback.rating && !this._opts.showNone) {

@@ -250,8 +250,12 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends EventListCalc<number[], void> {
+      class TestCalc extends EventListCalc<number[], {}> {
         MAX_PROCESS_EVENTS = 2
+
+        constructor(events: Stores.Events.TeamEvent[]) {
+          super(events, { filterStr: "" });
+        }
 
         initResult(): number[] { return []; }
 
@@ -379,8 +383,12 @@ module Esper.EventStats {
         This test calculation just assigns a value of 1 to a/b and 2 to a/c for
         each event, and processes two events per loop.
       */
-      class TestCalc extends DurationCalc<number[], void> {
+      class TestCalc extends DurationCalc<number[], {}> {
         MAX_PROCESS_EVENTS = 2
+
+        constructor(events: Stores.Events.TeamEvent[]) {
+          super(events, { filterStr: "" });
+        }
 
         initResult(): number[] { return []; }
 

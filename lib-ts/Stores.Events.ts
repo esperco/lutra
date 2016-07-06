@@ -658,25 +658,27 @@ module Esper.Stores.Events {
     too CPU intensive.
    */
   export function filter(events: TeamEvent[], query: string): TeamEvent[] {
-    query = query.toLowerCase();
-    return _.filter(events, (e) => {
-      var title = e.title || "";
-      var description = e.description || "";
-      var guests = _.map(e.guests,
-        (g) => g.display_name + " " + g.email
-      );
-      var labels = e.labelScores.match({
-        none: (): string[] => [],
-        some: (scores) => _.map(scores, (l) => l.displayAs)
-      });
+    return _.filter(events, (e) => filterOne(e, query));
+  }
 
-      var filterText = [title, description]
-                        .concat(guests)
-                        .concat(labels)
-                        .join(" ");
-      filterText = filterText.toLowerCase();
-      return _.includes(filterText, query);
+  export function filterOne(e: TeamEvent, query: string): boolean {
+    query = query.toLowerCase();
+    var title = e.title || "";
+    var description = e.description || "";
+    var guests = _.map(e.guests,
+      (g) => g.display_name + " " + g.email
+    );
+    var labels = e.labelScores.match({
+      none: (): string[] => [],
+      some: (scores) => _.map(scores, (l) => l.displayAs)
     });
+
+    var filterText = [title, description]
+                      .concat(guests)
+                      .concat(labels)
+                      .join(" ");
+    filterText = filterText.toLowerCase();
+    return _.includes(filterText, query);
   }
 
 

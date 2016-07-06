@@ -10,7 +10,7 @@ module Esper.Views {
     teamId: string;
     calIds: string[];
     period: Period.Single|Period.Custom;
-    extra: Actions.Charts.ExtraOpts;
+    extra: Charting.ExtraOpts;
 
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
     chart: JSX.Element;
@@ -197,7 +197,7 @@ module Esper.Views {
 
     renderSidebarMenuOpt({pathFn, extra, header, icon, content}: {
       pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
-      extra?: Actions.Charts.ExtraOpts;
+      extra?: Charting.ExtraOptsMaybe;
       header: string;
       icon?: string;
       content?: JSX.Element|string;
@@ -245,6 +245,16 @@ module Esper.Views {
                                       "fa-calendar") }
             </div>
           </div>
+        </div>
+
+        <div className="esper-panel-section">
+          <Components.SearchBox
+            icon="fa-search"
+            className="form-control"
+            placeholder={Text.SearchEventsPlaceholder}
+            value={this.props.extra.filterStr}
+            onUpdate={(val) => this.updateExtra({ filterStr: val })}
+          />
         </div>
 
         <div className="esper-panel-section">
@@ -327,16 +337,18 @@ module Esper.Views {
       this.updateExtra({ incrs: incrs });
     }
 
-    updateExtra(extra: {
-      type?: Charting.ChartType;
-      incrs?: number[]
-    }) {
+    updateExtra(extra: Charting.ExtraOptsMaybe) {
       this.updateRoute({
-        extra: {
-          type: extra.type || this.props.extra.type,
-          incrs: extra.incrs || this.props.extra.incrs
-        }
+        extra: extra
       });
+    }
+
+    getExtra(ext: Charting.ExtraOptsMaybe): Charting.ExtraOpts {
+      return {
+        type: ext.type || this.props.extra.type,
+        incrs: ext.incrs || this.props.extra.incrs,
+        filterStr: Util.some(ext.filterStr, this.props.extra.filterStr || "")
+      };
     }
 
     updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
@@ -351,7 +363,7 @@ module Esper.Views {
       teamId?: string;
       calIds?: string[];
       period?: Period.Single|Period.Custom;
-      extra?: Actions.Charts.ExtraOpts;
+      extra?: Charting.ExtraOptsMaybe;
       opts?: Route.nav.Opts;
     }) {
       pathFn = pathFn || this.props.pathFn;
@@ -371,7 +383,7 @@ module Esper.Views {
       }
 
       else {
-        opts.jsonQuery = _.extend({}, this.props.extra, extra)
+        opts.jsonQuery = this.getExtra(extra || {});
       }
 
       var periodStr = Period.isCustom(period) ?
