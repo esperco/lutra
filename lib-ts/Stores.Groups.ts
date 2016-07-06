@@ -128,7 +128,8 @@ module Esper.Stores.Groups {
     var data = _.map(loginResponse.groups, (groupid) => {
       var groupStub = {
         groupid,
-        group_name: "Loading..."
+        group_name: "Loading...",
+        group_timezone: moment.tz.guess()
       };
       return {
         itemKey: groupid,
