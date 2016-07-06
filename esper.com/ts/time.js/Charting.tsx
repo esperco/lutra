@@ -7,6 +7,26 @@ module Esper.Charting {
   /* Types */
   export type ChartType = "percent"|"absolute"|"calendar";
 
+  // Base options needed to fetch and get events
+  export interface BaseOpts<T> {
+    teamId: string;
+    calIds: string[];
+    period: Period.Single|Period.Custom;
+    extra: ExtraOpts & T;
+  }
+
+  export interface ExtraOptsMaybe {
+    type?: ChartType;
+    incrs?: number[];
+    filterStr?: string;
+  }
+
+  export interface ExtraOpts extends ExtraOptsMaybe, EventStats.CalcOpts {
+    type: ChartType;
+    incrs: number[];
+    filterStr: string;
+  }
+
   /*
     For use with charts where a series is a list of events, and each data
     point is a single event

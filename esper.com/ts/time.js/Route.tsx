@@ -40,9 +40,9 @@ module Esper.Route {
   /*
     Generic cleaning + routing functino for our chart functions
   */
-  function routeChart<T extends Actions.Charts.ExtraOpts>(
+  function routeChart<T>(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
-    cbFn: (o: Actions.Charts.BaseOpts<T>) => void
+    cbFn: (o: Charting.BaseOpts<T>) => void
   ) {
     route(pathFn({
       teamId: ":teamId?",
