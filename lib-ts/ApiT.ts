@@ -271,6 +271,11 @@ module Esper.ApiT {
   export interface TimestatsNotifyPrefs {
     email_for_meeting_feedback: boolean;
     slack_for_meeting_feedback: boolean;
+    time_to_notify_since_meeting_start?: number;
+      // sliding scale
+      // 0.  -> at the start of meeting
+      // 0.5 -> in the middle of meeting
+      // 1.  -> at the end of meeting
   }
 
   export interface SlackAuthInfo {
