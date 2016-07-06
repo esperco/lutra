@@ -74,7 +74,13 @@ module Esper.Components {
     }
 
     getSelected() {
-      return _.map(this.props.selected, (s) => {
+      // Selected => only if stored on team
+      let selected = _.filter(this.props.selected, (s) =>
+        !!_.find(this.props.calendarsByTeamId[s.teamId] || [],
+                 (c) => c.id === s.calId)
+      )
+
+      return _.map(selected, (s) => {
         return {
           id: s.calId,
           groupId: s.teamId
