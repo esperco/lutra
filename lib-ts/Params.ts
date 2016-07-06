@@ -292,6 +292,10 @@ module Esper.Params {
     return typedQ;
   }
 
+  export function cleanString(x: any) {
+    return _.isString(x) ? x : "";
+  }
+
   export function cleanBoolean(x: boolean) {
     return !!x;
   }

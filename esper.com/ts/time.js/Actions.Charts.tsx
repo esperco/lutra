@@ -78,6 +78,7 @@ module Esper.Actions.Charts {
     if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
       typedQ.type = "percent";
     }
+    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
     return typedQ;
   }
 

@@ -416,7 +416,10 @@ module Esper.EventStats {
 
     // Override as appropriate -- return false for events to ignore
     filterEvent(event: Stores.Events.TeamEvent) {
-      return Stores.Events.isActive(event);
+      return Stores.Events.isActive(event) && (
+        this._opts.filterStr ?
+          Stores.Events.filterOne(event, this._opts.filterStr) : true
+      );
     }
 
     // Empty initial result object

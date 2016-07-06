@@ -248,6 +248,16 @@ module Esper.Views {
         </div>
 
         <div className="esper-panel-section">
+          <Components.SearchBox
+            icon="fa-search"
+            className="form-control"
+            placeholder={Text.SearchEventsPlaceholder}
+            value={this.props.extra.filterStr}
+            onUpdate={(val) => this.updateExtra({ filterStr: val })}
+          />
+        </div>
+
+        <div className="esper-panel-section">
           <label htmlFor={this.getId("cal-select")}>
             <i className="fa fa-fw fa-calendar-o" />{" "}
             Calendars
