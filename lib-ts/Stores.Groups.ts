@@ -141,7 +141,14 @@ module Esper.Stores.Groups {
     var p = _.map(loginResponse.groups, (groupid) =>
       Api.getGroupDetails(groupid, { withMembers: true, withLabels: true }));
     $.when.apply($, p).then((...responses: Array<any>) => {
-      var groups = _.map(responses, (r) => r[0]);
+      var groups: ApiT.Group[];
+      if (loginResponse.groups.length == 1)
+        // There's only 1 response and the array returned has the type
+        // [ApiT.Group, string, JQueryXHR]
+        groups = [responses[0]];
+      else
+        groups = _.map(responses, (r) => r[0]);
+
       var values = _.map(groups, (g) => ({
         itemKey: g.groupid,
         data: Option.wrap(g)
