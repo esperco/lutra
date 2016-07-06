@@ -155,11 +155,13 @@ module Esper.Views {
               <i className="fa fa-fw fa-user" />{" "}
               { p.display_name }
               { p.display_name === p.email ? "" : ` (${p.email})`}
-              <a className="pull-right action rm-action"
-                 title={Text.RemoveAssistant}
-                 onClick={() => removeAssistant(team.teamid, p)}>
-                <i className="fa fa-fw fa-close list-group-item-text" />
-              </a>
+              { p.profile_uid === Login.me() ? null :
+                <a className="pull-right action rm-action"
+                   title={Text.RemoveAssistant}
+                   onClick={() => removeAssistant(team.teamid, p)}>
+                  <i className="fa fa-fw fa-close list-group-item-text" />
+                </a>
+              }
             </div>
           )}</div>
         </div>: null }
