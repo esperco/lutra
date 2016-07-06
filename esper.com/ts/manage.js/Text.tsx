@@ -48,6 +48,8 @@ module Esper.Text {
   export const SelfInviteAssistant = `Invite someone to help manage your time`;
   export const InviteAssistantSuccess = `Invitation sent!`;
   export const RemoveAssistant = `Remove access for this person`;
+  export const RoleSelf = `Myself`;
+  export const RoleExec = `Primary`;
 
   // Label actions
   export const LabelRenameDescription =

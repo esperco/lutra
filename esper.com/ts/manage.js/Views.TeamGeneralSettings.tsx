@@ -34,12 +34,20 @@ module Esper.Views {
         some: (d) => d === Model2.DataStatus.PUSH_ERROR
       });
 
-      var exec = Stores.Profiles.get(team.team_executive);
-      var members = _.concat([exec.unwrap()], Option.flatten(
+      var members = Option.flatten(
         _.map(team.team_assistants,
           (uid) => Stores.Profiles.get(uid)
         )
-      ));
+      );
+      var exec = Stores.Profiles.get(team.team_executive);
+      exec.match({
+        none: () => null,
+        some: (e) => members.unshift(e)
+      });
+
+      // Fix possible duplication between exec and assistants
+      members = _.uniqBy(members, (m) => m.profile_uid);
+
       var prefs = Stores.TeamPreferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
@@ -155,26 +163,38 @@ module Esper.Views {
               <i className="fa fa-fw fa-user" />{" "}
               { p.display_name }
               { p.display_name === p.email ? "" : ` (${p.email})`}
-              { p.profile_uid === Login.me() ? null :
-                <a className="pull-right action rm-action"
-                   title={Text.RemoveAssistant}
-                   onClick={() => removeAssistant(team.teamid, p)}>
-                  <i className="fa fa-fw fa-close list-group-item-text" />
-                </a>
-              }
+              <span className="pull-right">
+                { p.profile_uid === team.team_executive ?
+                  <span className="badge role-box">
+                    { Text.RoleExec }
+                  </span> :
+
+                  ( p.profile_uid === Login.myUid() ?
+                    <span className="badge role-box">
+                      { Text.RoleSelf }
+                    </span>  :
+
+                    <a className="action rm-action"
+                       title={Text.RemoveAssistant}
+                       onClick={() => removeAssistant(team.teamid, p)}>
+                      <i className="fa fa-fw fa-close list-group-item-text" />
+                    </a> )
+                }
+              </span>
             </div>
           )}</div>
         </div>: null }
 
         <InviteInput team={team} />
       </div>
-
-
     </div>;
   }
 
   function removeAssistant(teamId: string, p: ApiT.Profile) {
-    Actions.Assistants.remove(teamId, p.profile_uid)
+    if (p.profile_uid === Login.myUid()) {
+      Route.nav.path(Paths.Manage.newTeam());
+    }
+    Actions.Assistants.remove(teamId, p.profile_uid);
   }
 
 
