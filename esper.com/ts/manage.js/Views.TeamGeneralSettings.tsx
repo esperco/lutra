@@ -11,7 +11,9 @@ module Esper.Views {
 
     renderMain(team: ApiT.Team) {
       var status = Stores.Profiles.status();
-      if (status === Model2.DataStatus.FETCHING) {
+      var profilesLoading =
+        Stores.Profiles.getInitPromise().state() === "pending";
+      if (status === Model2.DataStatus.FETCHING || profilesLoading) {
         return <div className="esper-spinner esper-medium esper-centered" />;
       }
 
@@ -33,13 +35,11 @@ module Esper.Views {
       });
 
       var exec = Stores.Profiles.get(team.team_executive);
-      var assistants = Option.flatten(
+      var members = _.concat([exec.unwrap()], Option.flatten(
         _.map(team.team_assistants,
           (uid) => Stores.Profiles.get(uid)
         )
-      );
-      var profilesLoading =
-        Stores.Profiles.getInitPromise().state() === "pending";
+      ));
       var prefs = Stores.TeamPreferences.get(team.teamid)
         .flatMap((p) => Option.some(p.general));
 
@@ -49,7 +49,7 @@ module Esper.Views {
           busy={busy} error={error}
         />
 
-        <SharingSettings team={team} profiles={assistants} />
+        <SharingSettings team={team} profiles={members} />
 
         <RemoveTeam team={team} />
       </div>;
@@ -135,13 +135,12 @@ module Esper.Views {
   }
 
 
-  /* Sharing -> add/remove assistants */
+  /* Sharing -> add/remove team members */
 
   function SharingSettings({team, profiles}: {
     team: ApiT.Team;
     profiles: ApiT.Profile[];
   }) {
-    profiles = _.filter(profiles, (p) => p.profile_uid !== Login.myUid());
     return <div className="panel panel-default">
       <div className="panel-body clearfix">
         { profiles.length ? <div>
