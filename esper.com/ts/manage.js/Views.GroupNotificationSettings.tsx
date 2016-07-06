@@ -102,29 +102,29 @@ module Esper.Views {
 
           </div>
 
-          { badMeetingWarning ?
-            <div className="alert alert-info">
-              <div className="form-group">
-                <label className="col-md-5"
-                       htmlFor={this.getId("bad-meeting-duration")}>
-                  { Text.BadMeetingDuration }
-                </label>{" "}
-                <input id={this.getId("bad-meeting-duration")} type="number"
-                       defaultValue={`${this.props.prefs.bad_duration}`}
-                       onChange={this.onBadMeetingDurationChange.bind(this)} />
-              </div>
+          <div className="alert alert-info">
+            <div className="form-group">
+              <label className="col-md-5"
+                     htmlFor={this.getId("bad-meeting-duration")}>
+                { Text.BadMeetingDuration }
+              </label>{" "}
+              <input id={this.getId("bad-meeting-duration")} type="number"
+                     defaultValue={`${this.props.prefs.bad_duration}`}
+                     onChange={this.onBadMeetingDurationChange.bind(this)}
+                     disabled={!badMeetingWarning} />
+            </div>
 
-              <div className="form-group">
-                <label className="col-md-5"
-                       htmlFor={this.getId("bad-meeting-people")}>
-                  { Text.BadMeetingPeople }
-                </label>{" "}
-                <input id={this.getId("bad-meeting-people")} type="number"
-                       defaultValue={`${this.props.prefs.bad_attendees}`}
-                       onChange={this.onBadMeetingAttendeesChange.bind(this)} />
-              </div>
-            </div> : null
-          }
+            <div className="form-group">
+              <label className="col-md-5"
+                     htmlFor={this.getId("bad-meeting-people")}>
+                { Text.BadMeetingPeople }
+              </label>{" "}
+              <input id={this.getId("bad-meeting-people")} type="number"
+                     defaultValue={`${this.props.prefs.bad_attendees}`}
+                     onChange={this.onBadMeetingAttendeesChange.bind(this)}
+                     disabled={!badMeetingWarning} />
+            </div>
+          </div>
         </div>
       </div>;
     }
