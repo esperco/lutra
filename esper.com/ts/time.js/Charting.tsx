@@ -106,7 +106,7 @@ module Esper.Charting {
       _.each(keys, (key, index) => {
         let value = g.data.some[key];
         series.push({
-          name: Util.escapeHtml((opts.displayName || _.identity)(key)),
+          name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
           cursor: "pointer",
           color: g.current ?
             (opts.colorFn ? opts.colorFn(key, {
@@ -252,7 +252,7 @@ module Esper.Charting {
         );
 
       return {
-        name: Util.escapeHtml((opts.displayName || _.identity)(key)),
+        name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
         color: opts.colorFn ? opts.colorFn(key, {
           index: index,
           total: keys.length
