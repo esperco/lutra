@@ -41,7 +41,7 @@
   box-shadow: none;
 }
 
-.btn:hover {
+.btn:hover:enabled {
   outline: none;
   box-shadow: @plus-box-shadow;
   transform: translateY(-1px);
@@ -103,7 +103,7 @@
     background-color: lighten(@background, 10%);
         border-color: lighten(@border, 25%);
   }
-  &:hover {
+  &:hover:enabled {
                color: @brand-contrast;
     background-color: @border;
         border-color: @border;
