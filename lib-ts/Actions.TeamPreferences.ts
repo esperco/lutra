@@ -169,4 +169,24 @@ module Esper.Actions.TeamPreferences {
       feedbackSlack: prefs.timestats_notify.slack_for_meeting_feedback
     });
   }
+
+  /*
+    Toggles post-meeting feedback e-mails
+  */
+  export function updateNotifTiming(prefs: ApiT.Preferences, val: number) {
+    prefs.timestats_notify.time_to_notify_since_meeting_start = val;
+
+    var promise = Api.setTimestatsNotifyPrefs(
+      prefs.teamid,
+      prefs.timestats_notify
+    );
+    update(prefs.teamid, promise, (newPrefs) => {
+      newPrefs.timestats_notify = prefs.timestats_notify;
+      return newPrefs;
+    });
+
+    Analytics.track(Analytics.Trackable.UpdateNotifications, {
+      timeToNotify: val
+    });
+  }
 }

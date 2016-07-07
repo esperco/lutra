@@ -42,7 +42,7 @@ module Esper.Components {
   }
 
   // Single item in list
-  interface ListChoice {
+  export interface ListChoice {
     id: string;
     displayAs: string|JSX.Element;
     badgeText?: string;

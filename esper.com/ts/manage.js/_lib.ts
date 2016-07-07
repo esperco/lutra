@@ -30,6 +30,7 @@
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.NewGroupForm.tsx" />
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
+/// <reference path="../lib/Components.RadioList.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.TeamForm.tsx" />
