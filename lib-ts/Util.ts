@@ -195,12 +195,17 @@ module Esper.Util {
     "<": "&lt;",
     ">": "&gt;",
     '"': '&quot;',
-    "'": '&#39;',
-    "/": '&#x2F;'
+    "'": '&#39;'
   };
 
   export function escapeHtml(s: string) {
-    return String(s).replace(/[&<>"'\/]/g, function (s) {
+    return String(s).replace(/[&<>"']/g, function (s) {
+      return entityMap[s];
+    });
+  }
+
+  export function escapeBrackets(s: string) {
+    return String(s).replace(/[<>]/g, function (s) {
       return entityMap[s];
     });
   }
