@@ -16,6 +16,7 @@
   }
 
   .chart-content {
+    position: relative;
     flex-grow: 1;
     min-height: 400px;
 
@@ -34,8 +35,8 @@
 }
 
 .chart-holder-parent {
-  position: relative;
   display: flex;
+  position: relative;
 
   .highchart-drillup, .highchart-export {
     position: absolute;
@@ -70,9 +71,16 @@
   .period-desc {
     font-weight: bold;
   }
+}
 
-  @media (min-width: @screen-md-min) {
+@media (min-width: @screen-sm-min) {
+  .chart-content .chart-holder-parent {
+    position: static; // Remove relative because chart-content is handling
+  }
+
+  .totals-bar {
     display: flex;
+    padding: 0 (@input-height-base * 1.5);
 
     .period-total {
       display: inline-block;
