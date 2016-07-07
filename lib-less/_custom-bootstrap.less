@@ -52,7 +52,11 @@
 }
 
 .btn-group .btn, .btn-group.btn.active, .btn-group.btn:active,
-.input-group .btn, .input-group.btn.active, .input-group.btn:active {
+.input-group .btn, .input-group.btn.active, .input-group.btn:active,
+.input-group-btn > .btn:hover,
+.input-group-btn > .btn:focus,
+.input-group-btn > .btn:active,
+.input-group-btn:last-child > .btn {
   z-index: @zindex-button; // So border changes stand out
   box-shadow: none;
 

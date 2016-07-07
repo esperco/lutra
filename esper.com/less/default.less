@@ -96,13 +96,17 @@ ul{
 
 /** Landing page button tweaks **/
 
-button {
+button, .btn {
   &.index, &.large {
     font-size: @font-size-large;
     font-weight: bold;
     padding: @padding-large-vertical @padding-large-horizontal;
     text-transform: uppercase;
-    min-width: 300px;
+    min-width: 200px;
+
+    @media screen and (min-width: @screen-sm-min) {
+      min-width: 300px;
+    }
   }
 
   &.index {
@@ -115,6 +119,11 @@ button {
     }
 
     .feature-text & {
+      width: 100%;
+      min-width: auto;
+    }
+
+    @media screen and (max-width: @screen-xs-max) {
       width: 100%;
       min-width: auto;
     }

@@ -5,59 +5,47 @@
 {% block main %}
   <!-- Overview -->
   <div class="section-container white left-align">
-    <div class="section-content verynarrow">
-      Thanks for signing up. We'll reach out to you shortly!
-      <br>You can also <a href="/contact">contact us directly</a>.
-    </div>
-
-    <!-- Signup Form -->
-    <div id="mc_embed_signup" class="signup-form section-content">
-      <!-- event.keyCode == 13 refers to the Enter key - for typers who don't feel like clicking the button-->
-      <form onkeydown="if (event.keyCode == 13) document.getElementById('signup-btn').click()"
-        action="http://esper.us9.list-manage.com/subscribe/post?u=8158de07fd0008052ebb78ee6&amp;id=31f4c34dec"
-        method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank">
-        <div class="row">
-          <div class="col-sm-6 form-group">
-            <input type="text" placeholder="First Name" name="FNAME"
-                   class="required form-control" id="first-name" autofocus />
-          </div>
-          <div class="col-sm-6 form-group">
-            <input type="text" placeholder="Last Name" name="LNAME"
-                   class="required form-control" id="last-name">
-          </div>
-        </div>
-        <div class="form-group">
-          <input type="tel" placeholder="Phone Number" name="PHONE" id="phone"
-                 class="form-control">
-        </div>
-        <div class="form-group">
-          <input type="email" placeholder="Email Address" name="EMAIL"
-                 class="required form-control" id="email">
-        </div>
-        <div class="form-group clearfix">
-          <select name="MMERGE3" class="required form-control" id="platform">
-            <option selected disabled value="none">Email / Calendar Client</option>
-            <option value="Google Apps">Google Apps</option>
-            <option value="Microsoft Exchange">Microsoft Exchange</option>
-            <option value="Microsoft Office 365">Microsoft Office 365</option>
-            <option value="IBM (Lotus) Notes">IBM (Lotus) Notes</option>
-            <option value="Other/I Don't Know">Other / I don't know</option>
-          </select>
-        </div>
-        <div class="submit-button-row" align="right">
-          <button id="signup-btn" class="btn btn-primary" type="submit">Request Demo</button>
-        </div>
-        <div id="mce-responses" class="clear">
-          <div class="response" id="mce-error-response" style="display:none"></div>
-          <div class="response" id="mce-success-response" style="display:none"></div>
-        </div>    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-        <div style="position: absolute; left: -5000px;">
-          <input type="text" name="b_8158de07fd0008052ebb78ee6_31f4c34dec" tabindex="-1" value="">
-        </div>
-        <div>
-          <input type="hidden" value="New" name="USTATUS" id="ustatus">
-        </div>
-      </form>
+    <div class="section-content verynarrow"
+         style="text-align:center">
+      <h3>Request a Demo</h3>
+      <p>
+        Let us show you how Esper can work for you and your organization.
+        Enter your email address below and we'll get back to you shortly.
+      </p>
     </div>
   </div>
+
+  <!-- Form -->
+  <form id="mc_embed_signup" class="signup-form section-content">
+    <div id="signup-success" class="alert alert-success text-center hidden">
+      Request Sent
+    </div>
+    <div id="signup-fail" class="alert alert-danger text-center hidden">
+      That was an error sending your request. Please try
+      <a href="/contact">emailing us</a> directly instead.
+    </div>
+
+    <div class="form-group">
+      <label class="control-label" for="signup-email">Email Address</label>
+      <div class="input-group">
+        <input id="signup-email" type="text" class="form-control" />
+        <div class="input-group-btn">
+          <button id="signup-email-btn" class="btn btn-primary">
+            <i class="fa fa-fw fa-send"></i>
+            <span class="hidden-xs">
+              Request
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Honeypot to trip up spam bots -->
+    <input id="terms-check" type="checkbox" class="hidden" />
+  </form>
+{% endblock %}
+
+{% block postscripts %}
+  {{ super() }}
+  <script type="text/javascript" src="/js/request-demo.js"></script>
 {% endblock %}
