@@ -345,7 +345,7 @@ module Esper.Components {
         {" "}{member.name}{" "}
         <i className="fa fa-fw fa-calendar" />
         {" "}
-        <span className="badge group-role-box">
+        <span className="badge role-box">
           {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
         </span>
         { this.props.isOwner || this.props.isAdmin || isOwnTeam ?
@@ -420,7 +420,7 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={gim.email}>
         <i className="fa fa-fw fa-user" />
         {" "}{gim.email}{" "}
-        <span className="badge group-role-box">
+        <span className="badge role-box">
           {gim.role}
         </span>
         { this.props.isOwner || this.props.isAdmin ?

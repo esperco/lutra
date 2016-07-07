@@ -204,4 +204,15 @@ module Esper.Util {
       return entityMap[s];
     });
   }
+
+  // Typed version of $.when.apply($, array)
+  export function when<T>(deferreds: (T | JQueryPromise<T>)[])
+    : JQueryPromise<T[]>
+  {
+    return $.when.apply($, deferreds).then(
+
+      // Convert ..args to args (typing ...args is annoying)
+      function(...args: T[]) { return args; }
+    )
+  }
 }
