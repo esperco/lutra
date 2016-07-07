@@ -93,6 +93,12 @@ module Esper.Text {
   export const BadMeetingPeople =
     "Minimum number of attendees to trigger warning";
 
+  export const FeedbackTiming =
+    `When should we send meeting feedback requests?`;
+  export const FeedbackTimingStart = `Start of Event`;
+  export const FeedbackTimingMiddle = `Middle of Event`;
+  export const FeedbackTimingEnd = `End of Event`;
+
   export const FeedbackHeading = 'Meeting Feedback Notifications';
   export function feedbackDescription(email: string) {
     return <span>

@@ -1,0 +1,11 @@
+@import "./_bootstrap-variables";
+
+// Use flexbox style to make list horizontal on wide dispalys
+.esper-select-menu.esper-flex-list {
+  display: flex;
+  flex-wrap: wrap;
+
+  .esper-selectable, li > a {
+    flex-grow: 1;
+  }
+}
