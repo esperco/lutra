@@ -38,7 +38,7 @@ module Esper.Views {
     renderWithData() {
       return <Components.OnboardingPanel heading={Text.TeamSetupHeading}
               progress={1/3} busy={this.state.busy}
-              disableNext={!(this.state.selfSelected ||
+              disableNext={!((this._selfForm && this.state.selfSelected) ||
                              this.state.execSelected)}
               onNext={() => this.onNext()}>
         <div className="alert alert-info">
@@ -129,7 +129,7 @@ module Esper.Views {
     onNext() {
       var promises: JQueryPromise<any>[] = []
       if (this.state.selfSelected) {
-        this._selfForm.validate().match({
+        this._selfForm && this._selfForm.validate().match({
           none: () => null,
           some: (d) => promises.push(Actions.Teams.createSelfTeam(d))
         });
