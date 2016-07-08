@@ -9,6 +9,8 @@ module Esper.Components {
   interface Props {
     initOpen?: boolean;
     header: JSX.Element|JSX.Element[]|string;
+    className?: string;
+    headerClasses?: string;
     onOpen?: () => void;
     onClose?: () => void;
     onToggle?: () => void;
@@ -36,9 +38,22 @@ module Esper.Components {
       }
     }
 
+    componentWillReceiveProps(props: Props) {
+      // initOpen change => update state
+      if (props.initOpen && !this.props.initOpen) {
+        this.mutateState((s) => s.open = true);
+      }
+
+      else if (!props.initOpen && this.props.initOpen) {
+        this.mutateState((s) => s.open = false);
+      }
+    }
+
     render() {
-      return <div className="esper-expando">
-        <div className="esper-expando-header" onClick={() => this.toggle()}>
+      return <div className={classNames("esper-expando", this.props.className)}>
+        <div className={classNames("esper-expando-header",
+          this.props.headerClasses, { open: this.state.open }
+        )} onClick={() => this.toggle()}>
           <span className="esper-expando-caret">
             <i className={classNames("fa", "fa-fw", {
               "fa-caret-right": !this.state.open,
