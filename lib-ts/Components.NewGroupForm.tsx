@@ -9,6 +9,7 @@
 
 module Esper.Components {
   interface Props {
+    userCalendars: Option.T<ApiT.GenericCalendar[]>;
     isAdmin?: boolean;
   }
 
@@ -23,6 +24,7 @@ module Esper.Components {
         isAdmin={this.props.isAdmin} isOwner={true}
         groupMembers={[]}
         groupIndividuals={[]}
+        userCalendars={this.props.userCalendars}
       />
     }
 

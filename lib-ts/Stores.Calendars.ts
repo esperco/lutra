@@ -20,6 +20,12 @@ module Esper.Stores.Calendars {
   export var AvailableStore =
     new Model2.Store<string, ApiT.GenericCalendar[]>();
 
+  // Store list of calendars avaiable for currently logged in user -- usedd in
+  // suggesting individuals to add to groups
+  export var UserStore =
+    new Model2.Store<string, ApiT.GenericCalendar[]>();
+
+  const userId = "";
 
   ////////
 
@@ -46,6 +52,10 @@ module Esper.Stores.Calendars {
   {
     return AvailableStore.get(teamId)
       .flatMap((storeData) => storeData.data);
+  }
+
+  export function listAllForUser() : Option.T<ApiT.GenericCalendar[]> {
+    return UserStore.get(userId).flatMap((storeData) => storeData.data);
   }
 
   export function fetchAvailable(teamId: string, force=false) {
@@ -110,6 +120,11 @@ module Esper.Stores.Calendars {
         Option.wrap(calendars));
       return p;
     });
+
+    var p = Api.getGenericCalendarListOfUser().then(
+      (r) => Option.wrap(r.calendars));
+    UserStore.pushFetch(userId, p);
+    promises = _.concat(promises, [p]);
 
     calendarLoadPromise = $.when.apply($, promises)
       .done(() => calendarLoadDfd.resolve());
