@@ -74,6 +74,7 @@ module Esper.Views {
               name={this.props.group.group_name}
               groupid={this.props.group.groupid}
               uid={Login.me()}
+              timezone={this.props.group.group_timezone}
               groupMembers={this.props.group.group_teams || []}
               groupIndividuals={this.props.group.group_individuals || []}
               isOwner={isOwner}
@@ -99,6 +100,7 @@ module Esper.Views {
             Actions.Groups.updateGroup(this.props.group.groupid, {
               name: d.name,
               uid: d.uid,
+              timezone: d.timezone,
               groupMembers: d.groupMembers,
               groupIndividuals: d.groupIndividuals
             });

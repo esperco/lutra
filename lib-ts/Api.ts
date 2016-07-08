@@ -193,8 +193,8 @@ module Esper.Api {
     var paramString = query + (opts.withMembers && opts.withLabels ?
                                membersParam + "&" + labelsParam :
                                membersParam + labelsParam);
-    var url = `${prefix}/api/group/details/${string(Login.me())}/\
-      ${string(groupid) + paramString}`;
+    var url = `${prefix}/api/group/details/${string(Login.me())}/`
+      + `${string(groupid) + paramString}`;
     return JsonHttp.get(url);
   }
 
@@ -222,6 +222,14 @@ module Esper.Api {
     var url = prefix + "/api/group/delete/" + string(Login.me())
       + "/" + string(groupid);
     return JsonHttp.delete_(url);
+  }
+
+  export function putGroupTimezone(groupid: string, timezone: string):
+    JQueryPromise<ApiT.Group>
+  {
+    var url = `${prefix}/api/group/timezone/${string(Login.me())}/`
+      + `${string(groupid)}/${encodeURIComponent(string(timezone))}`;
+    return JsonHttp.put(url);
   }
 
   export function putGroupMember(groupid: string, teamid: string):

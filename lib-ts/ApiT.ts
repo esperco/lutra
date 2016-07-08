@@ -80,6 +80,7 @@ module Esper.ApiT {
   export interface Group {
     groupid: string;
     group_name: string;
+    group_timezone: string;
     group_labels?: string[];
     group_labels_norm?: string[];
     group_member_role?: string;

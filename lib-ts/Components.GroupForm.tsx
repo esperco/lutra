@@ -30,6 +30,7 @@ module Esper.Components {
       this.state = {
         name: props.name,
         uid: props.uid,
+        timezone: props.timezone,
         groupMembers: props.groupMembers,
         groupIndividuals: props.groupIndividuals,
         teamFilter: "",
@@ -43,6 +44,7 @@ module Esper.Components {
         this.state = {
           name: props.name,
           uid: props.uid,
+          timezone: props.timezone,
           groupMembers: props.groupMembers,
           groupIndividuals: props.groupIndividuals,
           teamFilter: "",
@@ -69,6 +71,20 @@ module Esper.Components {
              placeholder="The Avengers Council" />
           </div>
         </div>
+
+        <div className="form-group">
+          <label htmlFor={this.getId("timezone")}
+                 className="col-md-2 control-label">
+            Timezone
+          </label>
+          <div className="col-md-10">
+            <TimezoneSelector id={this.getId("timezone")}
+              onSelect={(tz) => this.updateTimezone(tz)}
+              selected={this.state.timezone}
+            />
+          </div>
+        </div>
+
         { this.props.isAdmin ?
           <div className="form-group">
             <label htmlFor={this.getId("user")}
@@ -112,6 +128,11 @@ module Esper.Components {
             null
         }
       </div>;
+    }
+
+    updateTimezone(tz: string) {
+      this.mutateState((s) => s.timezone = tz);
+      this.processUpdate();
     }
 
     renderMemberInput() {

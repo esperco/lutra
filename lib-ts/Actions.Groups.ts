@@ -16,6 +16,7 @@ module Esper.Actions.Groups {
   export interface GroupData {
     name: string;
     uid: string;
+    timezone: string;
     groupMembers: ApiT.GroupMember[];
     groupIndividuals: ApiT.GroupIndividual[];
   }
@@ -54,19 +55,22 @@ module Esper.Actions.Groups {
       group = _.cloneDeep(group);
       var p1 = group.group_name !== data.name ?
         [Api.renameGroup(group.groupid, data.name)] : [];
+      var p2 = group.group_timezone !== data.timezone ?
+        [Api.putGroupTimezone(group.groupid, data.timezone)] : [];
       group.group_name = data.name;
+      group.group_timezone = data.timezone;
       group.group_teams = data.groupMembers;
       group.group_individuals = data.groupIndividuals;
 
-      var p2 = _.map(newMembers, function(member: ApiT.GroupMember) {
+      var p3 = _.map(newMembers, function(member: ApiT.GroupMember) {
         return Api.putGroupMember(groupId, member.teamid);
       });
 
-      var p3 = _.map(removedMembers, function(member: ApiT.GroupMember) {
+      var p4 = _.map(removedMembers, function(member: ApiT.GroupMember) {
         return Api.removeGroupMember(groupId, member.teamid);
       });
 
-      var p4 = _.map(removedIndividuals, function(gim: ApiT.GroupIndividual) {
+      var p5 = _.map(removedIndividuals, function(gim: ApiT.GroupIndividual) {
         return Api.removeGroupIndividual(groupId, gim.uid);
       });
 
@@ -75,7 +79,7 @@ module Esper.Actions.Groups {
         to the store and that will be frozen by the time promise resolves
       */
       var group2 = _.cloneDeep(group);
-      var p5 = _.map(newIndividuals, function(gim: ApiT.GroupIndividual) {
+      var p6 = _.map(newIndividuals, function(gim: ApiT.GroupIndividual) {
         return Api.putGroupIndividualByEmail(groupId, gim.email, {
           role: gim.role
         }).then((res) => {
@@ -85,7 +89,7 @@ module Esper.Actions.Groups {
       });
 
       var p = $.when.apply($,
-        _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5)
+        _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5, p6)
       ).then(() => Option.wrap(group2));
       Stores.Groups.GroupStore.pushFetch(groupId, p, Option.wrap(group));
     };
