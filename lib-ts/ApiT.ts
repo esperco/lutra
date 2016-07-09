@@ -139,6 +139,7 @@ module Esper.ApiT {
     labels?: string[];
     labels_norm?: string[];
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
+    hashtags?: string[];
     feedback: EventFeedback;
     location?: string;
     all_day: boolean;
