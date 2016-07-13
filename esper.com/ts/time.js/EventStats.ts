@@ -284,18 +284,14 @@ module Esper.EventStats {
 
   export interface CalcOpts { // Standard calc opts for all charts
     filterStr: string;
-  }
-  export interface LabelOpts extends CalcOpts {
     labels: Params.ListSelectJSON;
-  }
-  export interface DomainOpts extends CalcOpts {
     domains: Params.ListSelectJSON;
+    durations: Params.ListSelectJSON;
+    guestCounts: Params.ListSelectJSON;
+    ratings: Params.ListSelectJSON;
   }
-  export interface DomainNestOpts extends DomainOpts {
+  export interface DomainNestOpts extends CalcOpts {
     nestByDomain: boolean; // Used to nest domain => email in duration calc
-  }
-  export interface RatingOpts extends CalcOpts {
-    showNone: boolean;
   }
 
   // How many events to annotate or group at any given time
@@ -416,10 +412,67 @@ module Esper.EventStats {
 
     // Override as appropriate -- return false for events to ignore
     filterEvent(event: Stores.Events.TeamEvent) {
-      return Stores.Events.isActive(event) && (
-        this._opts.filterStr ?
-          Stores.Events.filterOne(event, this._opts.filterStr) : true
-      );
+      // Remove specifically ignored events
+      if (! Stores.Events.isActive(event)) return false;
+
+      // Filter by string
+      if (this._opts.filterStr &&
+          ! Stores.Events.filterOne(event, this._opts.filterStr)) {
+        return false;
+      }
+
+      // Filter by domain
+      var domains = Stores.Events.getGuestDomains(event);
+      if (this._opts.domains && Params.applyListSelectJSON(domains,
+          this._opts.domains).isNone())
+      {
+        return false;
+      }
+
+      // Filter by labels
+      var labels = Stores.Events.getLabelIds(event);
+      if (this._opts.labels && Params.applyListSelectJSON(labels,
+          this._opts.labels).isNone())
+      {
+        return false;
+      }
+
+      // Filter by duration
+      var durationBucket = getDurationBucket(event);
+      var durationBucketId = durationBucket ?
+        [durationBucket.label] : [];
+      if (this._opts.durations &&
+        Params.applyListSelectJSON(
+          durationBucketId,
+          this._opts.durations
+        ).isNone())
+      {
+        return false;
+      }
+
+      // Filter by number of guests
+      var guestCountBucket = getGuestCountBucket(event);
+      var guestCountBucketId = guestCountBucket ?
+        [guestCountBucket.label] : [];
+      if (this._opts.guestCounts &&
+        Params.applyListSelectJSON(
+          guestCountBucketId,
+          this._opts.guestCounts
+        ).isNone())
+      {
+        return false;
+      }
+
+      // Filter by rating
+      var strRating = event.feedback && event.feedback.rating ?
+        [event.feedback.rating.toString()] : [];
+      if (this._opts.ratings && Params.applyListSelectJSON(strRating,
+          this._opts.ratings).isNone())
+      {
+        return false;
+      }
+
+      return true;
     }
 
     // Empty initial result object
@@ -633,33 +686,46 @@ module Esper.EventStats {
 
   /* Misc calculation classes we're using for charts */
 
+  export const DURATION_BUCKETS = [{
+    label: "< 30m",
+    gte: 0,   // Greater than, seconds
+    color: Colors.level0
+  }, {
+    label: "30m +",
+    gte: 30 * 60,
+    color: Colors.level1
+  }, {
+    label: "1h +",
+    gte: 60 * 60,
+    color: Colors.level2
+  }, {
+    label: "2h +",
+    gte: 2 * 60 * 60,
+    color: Colors.level3
+  }, {
+    label: "4h +",
+    gte: 4 * 60 * 60,
+    color: Colors.level4
+  }, {
+    label: "8h +",
+    gte: 8 * 60 * 60,
+    color: Colors.level5
+  }];
+
+  /*
+    For duration calc, use nominal duration (ignore overlapping events
+    because this can be un-intutive, also more annoying to abstract)
+  */
+  export function getDurationBucket(event: Stores.Events.TeamEvent) {
+    let duration = (event.end.getTime() - event.start.getTime()) / 1000;
+    return _.findLast(DurationBucketCalc.BUCKETS,
+      (b) => duration >= b.gte
+    );
+  }
+
   /* Group events by how long they are */
   export class DurationBucketCalc extends DurationCalc<OptGrouping, {}> {
-    static BUCKETS = [{
-      label: "< 30m",
-      gte: 0,   // Greater than, seconds
-      color: Colors.level0
-    }, {
-      label: "30m +",
-      gte: 30 * 60,
-      color: Colors.level1
-    }, {
-      label: "1h +",
-      gte: 60 * 60,
-      color: Colors.level2
-    }, {
-      label: "2h +",
-      gte: 2 * 60 * 60,
-      color: Colors.level3
-    }, {
-      label: "4h +",
-      gte: 4 * 60 * 60,
-      color: Colors.level4
-    }, {
-      label: "8h +",
-      gte: 8 * 60 * 60,
-      color: Colors.level5
-    }];
+    static BUCKETS = DURATION_BUCKETS;
 
     initResult() { return emptyOptGrouping(); }
 
@@ -668,10 +734,7 @@ module Esper.EventStats {
       duration: number,
       results: OptGrouping
     ) {
-      var bucket = _.findLast(DurationBucketCalc.BUCKETS,
-        (b) => duration >= b.gte
-      );
-
+      var bucket = getDurationBucket(event);
       return groupAnnotations([{
         event: event,
         value: duration,
@@ -680,11 +743,16 @@ module Esper.EventStats {
     }
   }
 
+  export class DurationBucketCountCalc extends DefaultCountCalc {
+    processOne(e: Stores.Events.TeamEvent) {
+      let bucket = getDurationBucket(e);
+      return [ bucket ? [bucket.label] : [] ];
+    }
+  }
+
   export class DateDurationBucketCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent, duration: number) {
-      var bucket = _.findLast(DurationBucketCalc.BUCKETS,
-        (b) => duration >= b.gte
-      );
+      var bucket = getDurationBucket(event);
       return Option.some([bucket.label]);
     }
   }
@@ -768,7 +836,7 @@ module Esper.EventStats {
 
   // Count event durations by selected labels
   export class LabelDurationCalc
-      extends DurationCalc<OptGrouping, LabelOpts> {
+      extends DurationCalc<OptGrouping, CalcOpts> {
     initResult() { return emptyOptGrouping(); }
 
     processOne(
@@ -801,7 +869,7 @@ module Esper.EventStats {
     }
   }
 
-  export class LabelDurationByDateCalc extends DateDurationCalc<LabelOpts> {
+  export class LabelDurationByDateCalc extends DateDurationCalc<CalcOpts> {
     getGroups(event: Stores.Events.TeamEvent) {
       var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
       return Params.applyListSelectJSON(labelIds, this._opts.labels);
@@ -887,9 +955,7 @@ module Esper.EventStats {
     }
   }
 
-  export class DomainDurationByDateCalc
-      extends DateDurationCalc<DomainOpts> {
-
+  export class DomainDurationByDateCalc extends DateDurationCalc<CalcOpts> {
     getGroups(event: Stores.Events.TeamEvent) {
       var domains = Stores.Events.getGuestDomains(event);
       return Params.applyListSelectJSON(domains, this._opts.domains);
@@ -899,29 +965,39 @@ module Esper.EventStats {
 
   /* Group meetings by how many guests there are */
 
+  export const GUEST_COUNT_BUCKETS = [{
+    label: "2 " + Text.Guests,
+    gte: 2,   // Greater than, guests
+    color: Colors.level1
+  }, {
+    label: "3 - 4 " + Text.Guests,
+    gte: 3,
+    color: Colors.level2
+  }, {
+    label: "5 - 8 " + Text.Guests,
+    gte: 5,
+    color: Colors.level3
+  }, {
+    label: "9 - 18 " + Text.Guests,
+    gte: 9,
+    color: Colors.level4
+  }, {
+    label: "19+ " + Text.Guests,
+    gte: 19,
+    color: Colors.level5
+  }];
+
+  export function getGuestCountBucket(event: Stores.Events.TeamEvent,
+                                      domains?: string[])
+  {
+    let emails = Stores.Events.getGuestEmails(event, domains);
+    let count = emails.length + 1; // +1 for exec
+    return _.findLast(GUEST_COUNT_BUCKETS, (b) => count >= b.gte);
+  }
+
   export class GuestCountDurationCalc
-      extends DurationCalc<OptGrouping, DomainOpts> {
-    static BUCKETS = [{
-      label: "2 " + Text.Guests,
-      gte: 2,   // Greater than, guests
-      color: Colors.level1
-    }, {
-      label: "3 - 4 " + Text.Guests,
-      gte: 3,
-      color: Colors.level2
-    }, {
-      label: "5 - 8 " + Text.Guests,
-      gte: 5,
-      color: Colors.level3
-    }, {
-      label: "9 - 18" + Text.Guests,
-      gte: 9,
-      color: Colors.level4
-    }, {
-      label: "19+ " + Text.Guests,
-      gte: 19,
-      color: Colors.level5
-    }];
+      extends DurationCalc<OptGrouping, CalcOpts> {
+    static BUCKETS = GUEST_COUNT_BUCKETS;
 
     initResult() { return emptyOptGrouping(); }
 
@@ -935,8 +1011,6 @@ module Esper.EventStats {
         .match({
           none: (): Annotation[] => [],
           some: (matchedDomains) => {
-            let emails = Stores.Events.getGuestEmails(event, matchedDomains);
-
             // No matched domains => no guests
             if (! matchedDomains.length) {
               return [{
@@ -946,16 +1020,13 @@ module Esper.EventStats {
               }];
             }
 
-            // No emails -> don't count, we've filtered these folks out
-            if (! emails.length) {
+            var bucket = getGuestCountBucket(event, matchedDomains);
+
+            // No guests -> don't count, we've filtered these folks out
+            if (! bucket) {
               return [];
             }
 
-            // Else - count is number of matching guests
-            var count = emails.length + 1; // +1 for exec
-            var bucket = _.findLast(GuestCountDurationCalc.BUCKETS,
-              (b) => count >= b.gte
-            );
             return [{
               event: event,
               value: duration,
@@ -1001,7 +1072,7 @@ module Esper.EventStats {
   /* Calcs for post-meeting feedback rating */
 
   export class RatingDurationCalc
-      extends DurationCalc<OptGrouping, RatingOpts> {
+      extends DurationCalc<OptGrouping, {}> {
 
     initResult() { return emptyOptGrouping(); }
 
@@ -1010,27 +1081,28 @@ module Esper.EventStats {
       duration: number,
       results: OptGrouping
     ) {
-      if (!event.feedback.rating && !this._opts.showNone) {
-        return results;
-      }
-
-      return groupAnnotations([{
-        event: event,
-        value: duration,
-        groups: event.feedback.rating ? [event.feedback.rating.toString()] : []
-      }], results);
+      let ratings  = event.feedback && event.feedback.rating ?
+        [event.feedback.rating.toString()] : [];
+      let annotations = Params.applyListSelectJSON(ratings, this._opts.ratings)
+        .match({
+          none: (): Annotation[] => [],
+          some: (groups) => [{
+            event: event,
+            value: duration,
+            groups: groups
+          }]
+        });
+      return groupAnnotations(annotations, results);
     }
   }
 
   export class RatingDateDurationCalc extends DateDurationCalc<RatingOpts> {
 
+  export class RatingDateDurationCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent) {
-      if (!event.feedback.rating && !this._opts.showNone) {
-        return Option.none<string[]>();
-      }
-      return Option.some(
-        event.feedback.rating ? [event.feedback.rating.toString()] : []
-      );
+      let ratings  = event.feedback && event.feedback.rating ?
+        [event.feedback.rating.toString()] : [];
+      return Params.applyListSelectJSON(ratings, this._opts.ratings);
     }
   }
 

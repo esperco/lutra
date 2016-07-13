@@ -244,6 +244,16 @@ module Esper.EventStats {
 
     //////
 
+    // Default options for calc
+    const defaultOpts: EventStats.CalcOpts = {
+      filterStr: "",
+      labels: { all: true, none: true, some: [] },
+      domains: { all: true, none: true, some: [] },
+      durations: { all: true, none: true, some: [] },
+      guestCounts: { all: true, none: true, some: [] },
+      ratings: { all: true, none: true, some: [] }
+    }
+
     describe("Calculation", function() {
 
       /*
@@ -254,7 +264,7 @@ module Esper.EventStats {
         MAX_PROCESS_EVENTS = 2
 
         constructor(events: Stores.Events.TeamEvent[]) {
-          super(events, { filterStr: "" });
+          super(events, defaultOpts);
         }
 
         initResult(): number[] { return []; }
@@ -387,7 +397,7 @@ module Esper.EventStats {
         MAX_PROCESS_EVENTS = 2
 
         constructor(events: Stores.Events.TeamEvent[]) {
-          super(events, { filterStr: "" });
+          super(events, defaultOpts);
         }
 
         initResult(): number[] { return []; }

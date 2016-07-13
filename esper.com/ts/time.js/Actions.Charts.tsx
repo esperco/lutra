@@ -60,6 +60,15 @@ module Esper.Actions.Charts {
       typedQ.type = "percent";
     }
     typedQ.filterStr = Params.cleanString(typedQ.filterStr);
+    typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
+    typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts);
+    typedQ.labels = Params.cleanListSelectJSON(typedQ.labels);
+    typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings);
+
+    // Domain selector none and guest count none should match.
+    typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
+    typedQ.domains.none = typedQ.guestCounts.none;
+
     return typedQ;
   }
 
