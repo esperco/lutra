@@ -493,7 +493,7 @@ module Esper.EventStats {
   /*
     Calc which processes a list of events
   */
-  export abstract class EventListCalc<T, U > extends CalcBase<T, U> {
+  export abstract class EventListCalc<T, U> extends CalcBase<T, U> {
     _index = 0;
 
     // Returns some events from the head of the queue
@@ -508,6 +508,37 @@ module Esper.EventStats {
       this._index += events.length;
       return Option.some(events);
     }
+  }
+
+  /*
+    Base calc for counting objects for selectors. This does very minimal
+    filtering so toggling things doesn't change the calc numbers.
+  */
+  export abstract class EventCountCalc<T, U> extends EventListCalc<T, U> {
+    filterEvent(event: Stores.Events.TeamEvent) {
+      return Stores.Events.isActive(event);
+    }
+  }
+
+  export abstract class DefaultCountCalc
+         extends EventCountCalc<OptGrouping, {}> {
+    initResult() { return emptyOptGrouping(); }
+
+    processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
+      _.each(events, (e) => {
+        var groupSets = this.processOne(e);
+        var annotations = _.map(groupSets, (groups) => ({
+          event: e,
+          value: 1,
+          groups: groups
+        }));
+        results = groupAnnotations(annotations, results);
+      });
+      return results;
+    }
+
+    // Return list of nested groups
+    abstract processOne(event: Stores.Events.TeamEvent): string[][];
   }
 
 
@@ -776,6 +807,12 @@ module Esper.EventStats {
     }
   }
 
+  export class CalendarCountCalc extends DefaultCountCalc {
+    processOne(e: Stores.Events.TeamEvent) {
+      return [[e.calendarId]];
+    }
+  }
+
   export class CalendarDateDurationCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent) {
       return Option.some([event.calendarId]);
@@ -790,7 +827,7 @@ module Esper.EventStats {
   }
 
   // Count unique events by label
-  export class LabelCountCalc extends EventListCalc<LabelCalcCount, {}> {
+  export class LabelCountCalc extends EventCountCalc<LabelCalcCount, {}> {
     initResult() {
       return _.extend({
         unconfirmed: [],
@@ -803,7 +840,7 @@ module Esper.EventStats {
         var eventKey = Stores.Events.strId(e);
         var newEvent = !(results && results.eventMap[eventKey]);
 
-        var labelIds = _.map(Option.matchList(e.labelScores), (s) => s.id);
+        var labelIds = Stores.Events.getLabelIds(e);
         var annotations = labelIds.length ?
           // Create annotation for each label
           _.map(labelIds, (labelId) => ({
@@ -844,7 +881,7 @@ module Esper.EventStats {
       duration: number,
       results: OptGrouping
     ) {
-      var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
+      var labelIds = Stores.Events.getLabelIds(event);
       var annotations = Params.applyListSelectJSON(labelIds, this._opts.labels)
         .match({
           none: (): Annotation[] => [],
@@ -871,7 +908,7 @@ module Esper.EventStats {
 
   export class LabelDurationByDateCalc extends DateDurationCalc<CalcOpts> {
     getGroups(event: Stores.Events.TeamEvent) {
-      var labelIds = _.map(Option.matchList(event.labelScores), (s) => s.id);
+      var labelIds = Stores.Events.getLabelIds(event);
       return Params.applyListSelectJSON(labelIds, this._opts.labels);
     }
   }
@@ -879,31 +916,15 @@ module Esper.EventStats {
 
   /* Guest-related calculations */
 
-  export class DomainCountCalc extends EventListCalc<OptGrouping, {}> {
-    initResult() { return emptyOptGrouping(); }
+  export class DomainCountCalc extends DefaultCountCalc {
+    processOne(e: Stores.Events.TeamEvent) {
+      var domains = Stores.Events.getGuestDomains(e);
+      if (domains.length) {
+        return _.map(domains, (d) => [d]);
+      }
 
-    processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
-      _.each(events, (e) => {
-        var domains = Stores.Events.getGuestDomains(e);
-        var annotations = domains.length ?
-          // Create annotation for each domains
-          _.map(domains, (domain) => ({
-            event: e,
-            value: 1,
-            groups: [domain]
-          })) :
-
-          // Empty label => no labels
-          [{
-            event: e,
-            value: 1,
-            groups: []
-          }];
-
-        results = groupAnnotations(annotations, results);
-      });
-
-      return results;
+      // Double brackets to indicate empty set
+      return [[]];
     }
   }
 
@@ -1039,8 +1060,21 @@ module Esper.EventStats {
     }
   }
 
-  export class GuestCountDurationByDateCalc
-      extends DateDurationCalc<DomainOpts> {
+  export class GuestCountBucketCalc extends DefaultCountCalc {
+    processOne(e: Stores.Events.TeamEvent) {
+      var domains = Stores.Events.getGuestDomains(e);
+      return Params.applyListSelectJSON(domains, this._opts.domains)
+        .match({
+          none: () => [],
+          some: (domains) => {
+            let bucket = getGuestCountBucket(e, domains);
+            return [bucket ? [bucket.label] : []];
+          }
+        })
+    }
+  }
+
+  export class GuestCountDurationByDateCalc extends DateDurationCalc<CalcOpts> {
 
     getGroups(event: Stores.Events.TeamEvent, duration: number) {
       var domains = Stores.Events.getGuestDomains(event);
@@ -1096,7 +1130,14 @@ module Esper.EventStats {
     }
   }
 
-  export class RatingDateDurationCalc extends DateDurationCalc<RatingOpts> {
+  export class RatingCountCalc extends DefaultCountCalc {
+    processOne(e: Stores.Events.TeamEvent) {
+      return [
+        e.feedback && e.feedback.rating ?
+        [e.feedback.rating.toString()] : []
+      ];
+    }
+  }
 
   export class RatingDateDurationCalc extends DateDurationCalc<{}> {
     getGroups(event: Stores.Events.TeamEvent) {

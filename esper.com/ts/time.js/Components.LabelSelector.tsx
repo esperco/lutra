@@ -1,12 +1,92 @@
 /*
-  Component for selecting a bunch of labels. Extract labels from
+  Component for selecting a bunch of labels.
 */
 
-/// <reference path="./Components.CalcUI.tsx" />
+/// <reference path="./Components.SidebarSelector.tsx" />
 
 module Esper.Components {
-  interface LabelSelectorBaseProps {
+
+  export class LabelCalcSelector extends DefaultSidebarSelector<{
+    calculation: EventStats.LabelCountCalc;
+    team: ApiT.Team;
+    selected: Params.ListSelectJSON;
+    updateFn: (x: Params.ListSelectJSON) => void;
+  }> {
+    renderHeader() {
+      return <span>
+        <i className="fa fa-fw fa-tags" />{" "}
+        { Text.ChartLabels }
+      </span>;
+    }
+
+    renderContent() {
+      return this.state.result.match({
+        none: () => <span />,
+        some: (result) => {
+          // Labels from events
+          var choices = _.map(result.some, (v, k) => ({
+            id: k,
+            displayAs: Labels.getDisplayAs(k),
+            badgeText: v.totalUnique.toString(),
+            badgeHoverText: Text.events(v.totalUnique),
+            badgeColor: this.props.primary ?
+              Colors.getColorForLabel(k) : undefined
+          }));
+
+          // Get team labels too
+          _.each(this.props.team.team_labels_norm, (norm, i) => {
+            choices.push({
+              id: norm,
+              displayAs: this.props.team.team_labels[i],
+              badgeText: undefined,
+              badgeHoverText: undefined,
+              badgeColor: this.props.primary ?
+                Colors.getColorForLabel(norm) : undefined
+            })
+          });
+          choices = _(choices)
+            .uniqBy((c) => c.id)
+            .sortBy((c) => Labels.normalizeForSort(c.displayAs))
+            .value();
+
+          return <Components.ListSelectorASN
+            choices={choices}
+            selected={this.props.selected}
+            updateFn={this.props.updateFn}
+            allChoice={{
+              displayAs: Text.AllLabels,
+              badgeText: result.totalUnique.toString(),
+              badgeHoverText: Text.events(result.totalUnique),
+            }}
+            noneChoice={{
+              displayAs: Text.Unlabeled,
+              badgeText: result.none ?
+                result.none.totalUnique.toString() : undefined,
+              badgeHoverText: result.none ?
+                Text.events(result.none.totalUnique) : undefined,
+            }}
+            selectedItemClasses="active"
+            className="esper-select-menu"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+          />;
+        }
+      });
+    }
+  }
+
+  /*
+    NB: LabelSelector is deprecated. Plan is switch over to LabelCalcSelector
+    above eventually. The one thing it doesn't do yet is have an option for
+    unconfirmed labels, but we might create a separate selector for that
+    later.
+  */
+  interface LabelSelectorProps {
     className?: string;
+    labels: Array<Labels.LabelCount>;
+    totalCount?: number;
+    unlabeledCount?: number;
+    unconfirmedCount?: number;
     selected: string[];
     allSelected?: boolean;
     unlabeledSelected?: boolean;
@@ -18,19 +98,6 @@ module Esper.Components {
       labels: string[];
     }) => void;
     onUnconfirmedClick?: () => void;
-  }
-
-  interface LabelCalcSelectorProps extends LabelSelectorBaseProps {
-    teams: ApiT.Team[];
-    events: Stores.Events.TeamEvent[];
-    calculation: EventStats.LabelCountCalc;
-  }
-
-  interface LabelSelectorProps extends LabelSelectorBaseProps {
-    labels: Array<Labels.LabelCount>;
-    totalCount?: number;
-    unlabeledCount?: number;
-    unconfirmedCount?: number;
   }
 
   export function LabelSelector(props: LabelSelectorProps) {
@@ -179,7 +246,19 @@ module Esper.Components {
   }
 
 
-  //////
+  /*
+    LabelCalcSelector takes a calculation and updates label counts based on
+    events present in a non-blocking (ish) fashion.
+  */
+
+  interface LabelCalcSelectorProps {
+    teams: ApiT.Team[];
+    events: Stores.Events.TeamEvent[];
+    calculation: EventStats.LabelCountCalc;
+    selected: Params.ListSelectJSON;
+    updateFn: (x: Params.ListSelectJSON) => void;
+    showColor?: boolean;
+  }
 
   export function LabelSelectorDropdown(props: LabelSelectorProps) {
     // Dropdown input text
@@ -214,58 +293,5 @@ module Esper.Components {
         }
       </DropdownModal>
     </div>;
-  }
-
-
-  /////
-
-
-  export class LabelCalcSelector
-         extends CalcUI<EventStats.LabelCalcCount, LabelCalcSelectorProps>
-  {
-    render() {
-      return this.state.result.match({
-        none: () => <span />,
-        some: (result) => {
-          // Labels from events
-          var labels: Labels.LabelCount[] = _.map(result.some, (v, k) => ({
-            id: k,
-            displayAs: Labels.getDisplayAs(k),
-            count: v.totalUnique
-          }));
-
-          // Get team labels too
-          _.each(this.props.teams, (team) => {
-            _.each(team.team_labels_norm, (norm, i) => {
-              labels.push({
-                id: norm,
-                displayAs: team.team_labels[i],
-                count: 0
-              })
-            })
-          })
-          labels = _.uniqBy(labels, (l) => l.id)
-
-          // Get total event count
-
-          return <LabelSelector
-            className={this.props.className}
-            labels={labels}
-            selected={this.props.selected}
-            allSelected={this.props.allSelected}
-            unlabeledSelected={this.props.unlabeledSelected}
-            unconfirmedSelected={this.props.unconfirmedSelected}
-
-            showUnlabeled={this.props.showUnlabeled}
-            totalCount={result.totalUnique}
-            unlabeledCount={result.none.totalUnique}
-            unconfirmedCount={result.unconfirmedCount}
-
-            updateFn={this.props.updateFn}
-            onUnconfirmedClick={this.props.onUnconfirmedClick}
-          />;
-        }
-      })
-    }
   }
 }
