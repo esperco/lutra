@@ -63,7 +63,9 @@ module Esper.Views {
             <Components.TeamSelector
               teams={Stores.Teams.all()}
               selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.updateRoute({teamId: teamId})} />
+              onUpdate={(teamId) => Charting.updateChart(this.props, {
+                teamId: teamId
+              })} />
           </div>
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
@@ -325,77 +327,15 @@ module Esper.Views {
     }
 
     updatePeriod(period: Period.Single|Period.Custom) {
-      this.updateRoute({
+      Charting.updateChart(this.props, {
         period: period
       });
     }
 
-    updateIncrs(incrs: number[]) {
-      if (! _.includes(incrs, 0)) {
-        incrs.push(0);
-      }
-      this.updateExtra({ incrs: incrs });
-    }
-
     updateExtra(extra: Charting.ExtraOptsMaybe) {
-      this.updateRoute({
+      Charting.updateChart(this.props, {
         extra: extra
       });
-    }
-
-    getExtra(ext: Charting.ExtraOptsMaybe): Charting.ExtraOpts {
-      return {
-        type: ext.type || this.props.extra.type,
-        incrs: ext.incrs || this.props.extra.incrs,
-        filterStr: Util.some(ext.filterStr, this.props.extra.filterStr || "")
-      };
-    }
-
-    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
-      this.updateRoute({
-        teamId: selections[0] && selections[0].teamId,
-        calIds: _.map(selections, (s) => s.calId)
-      });
-    }
-
-    updateRoute({pathFn, teamId, calIds, period, extra, opts={}}: {
-      pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
-      teamId?: string;
-      calIds?: string[];
-      period?: Period.Single|Period.Custom;
-      extra?: Charting.ExtraOptsMaybe;
-      opts?: Route.nav.Opts;
-    }) {
-      pathFn = pathFn || this.props.pathFn;
-      teamId = teamId || this.props.teamId;
-      calIds = calIds || this.props.calIds;
-      period = period || this.props.period;
-
-      // Chart change => blank out filter params unless provided
-      if (pathFn !== this.props.pathFn && extra) {
-        opts.jsonQuery = extra;
-      }
-
-      // Preserve params only if same team change. Also switch cals.
-      else if (teamId !== this.props.teamId) {
-        calIds = [Params.defaultCalIds];
-        opts.jsonQuery = {};
-      }
-
-      else {
-        opts.jsonQuery = this.getExtra(extra || {});
-      }
-
-      var periodStr = Period.isCustom(period) ?
-        [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
-        period.index.toString();
-
-      Route.nav.path(pathFn({
-        teamId: teamId,
-        calIds: Params.pathForCalIds(calIds),
-        interval: period.interval[0],
-        period: periodStr
-      }), opts);
     }
   }
 }

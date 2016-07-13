@@ -4,8 +4,15 @@
 
 module Esper.Charting {
 
-  /* Types */
+  /* Routing helpers */
+
   export type ChartType = "percent"|"absolute"|"calendar";
+  export type ChartGroup = "calendars"
+                          |"durations"
+                          |"domains"
+                          |"guest-counts"
+                          |"labels"
+                          |"ratings";
 
   // Base options needed to fetch and get events
   export interface BaseOpts<T> {
@@ -19,13 +26,71 @@ module Esper.Charting {
     type?: ChartType;
     incrs?: number[];
     filterStr?: string;
+    domains?: Params.ListSelectJSON;
+    durations?: Params.ListSelectJSON;
+    labels?: Params.ListSelectJSON;
+    ratings?: Params.ListSelectJSON;
+    guestCounts?: Params.ListSelectJSON;
   }
 
   export interface ExtraOpts extends ExtraOptsMaybe, EventStats.CalcOpts {
     type: ChartType;
     incrs: number[];
     filterStr: string;
+    domains: Params.ListSelectJSON;
+    durations: Params.ListSelectJSON;
+    labels: Params.ListSelectJSON;
+    ratings: Params.ListSelectJSON;
+    guestCounts: Params.ListSelectJSON;
   }
+
+  // Current pathFn for charts (set by Route.routeChart)
+  export var currentPathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
+
+  export function updateChart<T>(o: BaseOpts<T>, p: {
+    pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
+    teamId?: string;
+    calIds?: string[];
+    period?: Period.Single|Period.Custom;
+    extra?: ExtraOptsMaybe & T;
+    opts?: Route.nav.Opts;
+  }) {
+    var opts = p.opts || {};
+    var pathFn = p.pathFn || currentPathFn;
+    var teamId = p.teamId || o.teamId;
+    var calIds = p.calIds || o.calIds;
+    var period = p.period || o.period;
+
+    // Chart change => blank out filter params unless provided
+    if (pathFn !== Charting.currentPathFn && p.extra) {
+      opts.jsonQuery = p.extra;
+    }
+
+    // Preserve params only if same team change. Also switch cals.
+    else if (teamId !== o.teamId) {
+      calIds = [Params.defaultCalIds];
+      opts.jsonQuery = {};
+    }
+
+    // Else merge old extra with new params
+    else {
+      opts.jsonQuery = _.extend({}, o.extra, p.extra)
+    }
+
+    var periodStr = Period.isCustom(period) ?
+      [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
+      period.index.toString();
+
+    Route.nav.path(pathFn({
+      teamId: teamId,
+      calIds: Params.pathForCalIds(calIds),
+      interval: period.interval[0],
+      period: periodStr
+    }), opts);
+  }
+
+
+  /* Highcharts Helpers */
 
   /*
     For use with charts where a series is a list of events, and each data
