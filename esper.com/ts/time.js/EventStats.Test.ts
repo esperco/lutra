@@ -269,6 +269,20 @@ module Esper.EventStats {
 
         initResult(): number[] { return []; }
 
+        /*
+          Stub out calls that require team for purpose of test. We'd do this
+          with a spy, but making this work asynchronously is a bother.
+        */
+        filterEvent(event: Stores.Events.TeamEvent) {
+          var oldRequire = Stores.Teams.require;
+          Stores.Teams.require = function(teamId: string) {
+            return TestFixtures.makeTeam({ teamid: teamId });
+          }
+          let ret = super.filterEvent(event);
+          Stores.Teams.require = oldRequire;
+          return ret;
+        }
+
         processBatch(events: Stores.Events.TeamEvent[], result: number[])
         {
           result = result.concat(
@@ -401,6 +415,20 @@ module Esper.EventStats {
         }
 
         initResult(): number[] { return []; }
+
+        /*
+          Stub out calls that require team for purpose of test. We'd do this
+          with a spy, but making this work asynchronously is a bother.
+        */
+        filterEvent(event: Stores.Events.TeamEvent) {
+          var oldRequire = Stores.Teams.require;
+          Stores.Teams.require = function(teamId: string) {
+            return TestFixtures.makeTeam({ teamid: teamId });
+          }
+          let ret = super.filterEvent(event);
+          Stores.Teams.require = oldRequire;
+          return ret;
+        }
 
         processOne(event: Stores.Events.TeamEvent,
                    duration: number,

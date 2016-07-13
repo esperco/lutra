@@ -230,7 +230,7 @@ module Esper.Stores.Events {
         });
       });
 
-      if (events.length) {
+      if (index < calendarEvents.length) {
         window.requestAnimationFrame(processEvents);
       } else {
         dfd.resolve(eventMap);
@@ -266,11 +266,12 @@ module Esper.Stores.Events {
     if (q.hasOwnProperty('period')) {
       var typedQ = <T & PeriodQ> q;
       var bounds = Period.boundsFromPeriod(typedQ.period);
-      var p = <T & StartEndQ>
+      let p = <T & StartEndQ>
         _.extend({}, q, { start: bounds[0], end: bounds[1] })
       return fn(p);
     } else {
-      return fn(p)
+      let p = <T & StartEndQ> q;
+      return fn(p);
     }
   }
 
@@ -294,7 +295,7 @@ module Esper.Stores.Events {
       var team = Stores.Teams.require(teamId);
       if (! team) return;
 
-      var calIds = team.team_timestats_calendars
+      var calIds = team.team_timestats_calendars;
       var doFetch = force || !!_.find(calIds, (calId) =>
         _.find(dates, (date) =>
           EventsForDateStore.get({

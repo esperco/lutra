@@ -149,6 +149,12 @@ module Esper.Stores.Events {
       var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
 
       beforeEach(function() {
+        /*
+          NB: API fetch is followed by another, asynchronous processing of
+          events before storing. If number of events returned >
+          Stores.Events.FETCH_BASE_SIZE, this may result in weird test results
+          (since test runs synchronously).
+        */
         apiSpy = Test.spySafe(Api, "postForTeamEvents");
         dfd = $.Deferred();
         apiSpy.and.returnValue(dfd.promise());
@@ -307,7 +313,7 @@ module Esper.Stores.Events {
             teamId: teamId,
             calId: calId
           }],
-          period: {
+          period: <Period.Single> {
             interval: "month",
             index: 552 // Jan 2016
           }
