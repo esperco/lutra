@@ -6,66 +6,47 @@ module Esper.Actions.Charts {
   // Rename types defined in Charting module
   type BaseOpts<T> = Charting.BaseOpts<T>;
   type ExtraOpts = Charting.ExtraOpts;
+  type PeriodList = Charting.PeriodData<Stores.Events.EventListData>;
 
   // Fetch events from server
   function fetchEvents<T>(o: BaseOpts<T>) {
     var periods = Period.withIncrs(o.period, o.extra.incrs);
-    _.each(periods, (p) => Stores.Events.fetchPredictionsForPeriod({
+    _.each(periods, (p) => Stores.Events.fetchPredictions({
       teamId: o.teamId,
       period: p
     }));
   }
 
   // Fetch events + metadata for one or more periods
-  function getEventData<T>(o: BaseOpts<T>) {
+  function getEventData<T>(o: BaseOpts<T>): PeriodList[] {
     var periods = _.sortBy(
       Period.withIncrs(o.period, o.extra.incrs),
       Period.asNumber
     );
-    return _.map(periods, (p) =>
-      Stores.Events.getForPeriod({
-        cals: _.map(o.calIds, (calId) => ({
-          teamId: o.teamId,
-          calId: calId
-        })),
-        period: p
-      }).match({
-        some: (d) => ({
-          events: d.events,
-          hasError: d.hasError,
-          isBusy: d.isBusy,
-          period: p
-        }),
+    var cals = _.map(o.calIds, (calId) => ({
+      teamId: o.teamId,
+      calId: calId
+    }));
 
-        // None => forgot to call fetch. Error.
-        none: () => ({
-          events: [] as Stores.Events.TeamEvent[],
-          hasError: true,
-          isBusy: false,
-          period: p
-        })
+    return _.map(periods, (p) => ({
+      period: p,
+      current: _.isEqual(p, o.period),
+      data: Stores.Events.require({
+        cals: cals,
+        period: p
       })
-    );
+    }));
   }
 
   // Different get function for calendar grid view (sorted by day)
   function getForMonth<T>(o: BaseOpts<T>) {
-    return Stores.Events.getByDateForPeriod({
+    return Stores.Events.requireByDate({
       cals: _.map(o.calIds, (calId) => ({
         teamId: o.teamId,
         calId: calId
       })),
       period: o.period
-    }).match({
-      some: (d) => d,
-
-      // None => forgot to call fetch. Error.
-      none: (): Stores.Events.EventDateData => ({
-        isBusy: false,
-        hasError: true,
-        dates: []
-      })
-    })
+    });
   }
 
   /*

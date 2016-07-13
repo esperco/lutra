@@ -78,20 +78,9 @@ module Esper.Views {
     }
 
     getEventData() {
-      return Stores.Events.getForPeriod({
+      return Stores.Events.require({
         cals: this.props.cals,
         period: this.props.period
-      }).match({
-        none: () => ({
-          events: [],
-          isBusy: false,
-          hasError: true
-        }),
-        some: (d) => ({
-          events: d.events,
-          isBusy: d.isBusy,
-          hasError: d.hasError
-        })
       });
     }
 
@@ -374,7 +363,7 @@ module Esper.Views {
     refreshEvents() {
       this._eventIdMap = {}; // Reset remembered event list
       if (Util.notEmpty(this.props.cals)) {
-        Stores.Events.fetchPredictionsForPeriod({
+        Stores.Events.fetchPredictions({
           teamId: this.props.cals[0].teamId,
           period: this.props.period,
           force: true
