@@ -8,6 +8,7 @@
 
 module Esper.Components {
   interface Props extends Actions.Groups.GroupData {
+    userCalendars: Option.T<ApiT.GenericCalendar[]>;
     isAdmin?: boolean;
     isOwner?: boolean;
     groupid?: string;
@@ -16,14 +17,13 @@ module Esper.Components {
 
   interface State extends Actions.Groups.GroupData {
     teamFilter: string;
+    emailFilter: string;
     selectedRole: string;
     editMember?: string;
-    hasIndividualEmail?: boolean;
     hasInvalidEmail?: boolean;
   }
 
   export class GroupForm extends ReactHelpers.Component<Props, State> {
-    _emailInput: HTMLInputElement;
 
     constructor(props: Props) {
       super(props);
@@ -34,6 +34,7 @@ module Esper.Components {
         groupMembers: props.groupMembers,
         groupIndividuals: props.groupIndividuals,
         teamFilter: "",
+        emailFilter: "",
         selectedRole: Text.GroupRoleMember
       };
     }
@@ -48,6 +49,7 @@ module Esper.Components {
           groupMembers: props.groupMembers,
           groupIndividuals: props.groupIndividuals,
           teamFilter: "",
+          emailFilter: "",
           selectedRole: Text.GroupRoleMember
         };
       }
@@ -171,47 +173,84 @@ module Esper.Components {
                className="col-md-2 control-label">
           {Text.AddGroupIndividualLink}
         </label>
-        <div className="input-group">
-          <div className={this.state.hasIndividualEmail ? "esper-has-right-icon" : ""}>
-            <input type="text"
-                   className="form-control"
-                   id={this.getId("new-individuals")}
-                   ref={(c) => this._emailInput = c}
-                   onKeyDown={this.inputEmailKeydown.bind(this)}
-                   onChange={(e) => this.onIndividualEmailChange(e)}
-                   placeholder="john.doe@esper.com" />
-            { this.state.hasIndividualEmail ?
-              <span className="esper-clear-action esper-right-icon"
-                    onClick={() => {
-                      this._emailInput.value = "";
-                      this.mutateState((s) => {
-                        s.hasIndividualEmail = false;
-                        s.hasInvalidEmail = false;
-                      });
-                    }}>
-                <i className="fa fa-fw fa-times" />
-              </span> :
-              <span />
-            }
+        <div className="col-md-10">
+          <div className="input-group">
+            <div className={_.isEmpty(this.state.emailFilter) ?
+                              "" : "esper-has-right-icon"}>
+              <input type="text"
+                     className="form-control"
+                     id={this.getId("new-individuals")}
+                     onKeyDown={this.inputEmailKeydown.bind(this)}
+                     onChange={(e) => this.onIndividualEmailChange(e)}
+                     placeholder="john.doe@esper.com" />
+              { _.isEmpty(this.state.emailFilter) ?
+                <span /> :
+                <span className="esper-clear-action esper-right-icon"
+                      onClick={() => {
+                        this.mutateState((s) => {
+                          s.hasInvalidEmail = false;
+                          s.emailFilter = "";
+                        });
+                      }}>
+                  <i className="fa fa-fw fa-times" />
+                </span>
+              }
+            </div>
+            <span className="input-group-btn">
+              <button className="btn btn-default" type="button"
+                      onClick={this.addIndividual.bind(this)}>
+                <i className="fa fa-fw fa-plus" />
+              </button>
+            </span>
           </div>
-          <span className="input-group-btn">
-            <button className="btn btn-default" type="button"
-                    onClick={this.addIndividual.bind(this)}>
-              <i className="fa fa-fw fa-plus" />
-            </button>
-          </span>
+          { this.renderIndividuals() }
         </div>
       </div>;
     }
 
-    addIndividual() {
-      var email = this._emailInput.value;
+    renderIndividuals() {
+      var emailFilter = this.state.emailFilter;
+      return this.props.userCalendars.match({
+        none: () => null,
+        some: (allCalendars) => {
+          var gimEmails = _.map(this.state.groupIndividuals, (gim) => gim.email);
+          var filteredCalendars = _.filter(allCalendars, (cal) => {
+            return !_.includes(gimEmails, cal.id)
+              && Util.validateEmailAddress(cal.id)
+              && !_.includes(cal.id, "calendar.google.com")
+              && _.includes(cal.id.toLowerCase(), emailFilter.toLowerCase());
+          });
+          if (_.isEmpty(filteredCalendars) && !_.isEmpty(emailFilter)) {
+            return <div className="esper-no-content">
+              Add '{emailFilter}' to {this.state.name || "this " + Text.Group}
+            </div>;
+          }
+          var emails = _.map(_.take(filteredCalendars, 5), (cal) => {
+            return {
+              id: cal.id,
+              displayAs: cal.id
+            };
+          });
+          return <ListSelectorSimple choices={emails} selectedIds={null}
+            updateFn={(ids) => this.addIndividual.call(this, ids[0])}
+            unselectedIcon=" " />;
+        }
+      });
+    }
+
+    addIndividual(selectedEmail?: string) {
+      var email: string;
+      if (_.isEmpty(selectedEmail))
+        email = this.state.emailFilter;
+      else
+        email = selectedEmail;
       if (!Util.validateEmailAddress(email)) {
         this.mutateState((s) => s.hasInvalidEmail = true);
         return;
       }
+
       var individual = {
-        email: email,
+        email,
         role: Text.GroupRoleMember
       };
       this.mutateState((s) => {
@@ -219,7 +258,9 @@ module Esper.Components {
         s.hasInvalidEmail = false;
       });
       this.processUpdate();
-      this._emailInput.value = "";
+
+      if (_.isEmpty(selectedEmail))
+        this.state.emailFilter = "";
     }
 
     inputKeydown(e: KeyboardEvent) {
@@ -237,17 +278,14 @@ module Esper.Components {
         this.addIndividual();
       } else if (e.keyCode == 27) { // ESC
         e.preventDefault();
-        this._emailInput.value = "";
+        this.state.emailFilter = "";
         this.resetState();
       }
     }
 
     onIndividualEmailChange(e: React.FormEvent) {
       var val = (e.target as HTMLInputElement).value;
-      if (_.isEmpty(val))
-        this.mutateState((s) => s.hasIndividualEmail = false);
-      else
-        this.mutateState((s) => s.hasIndividualEmail = true);
+      this.mutateState((s) => s.emailFilter = val);
     }
 
     onTeamFilterChange(e: React.FormEvent) {
@@ -257,10 +295,10 @@ module Esper.Components {
 
     renderTeams() {
       var teamFilter = this.state.teamFilter;
-      var memberIds = _.map(this.state.groupMembers, function(member) {
+      var memberIds = _.map(this.state.groupMembers, (member) => {
         return member.teamid;
       });
-      var filteredTeams = _.filter(Stores.Teams.all(), function(team) {
+      var filteredTeams = _.filter(Stores.Teams.all(), (team) => {
         return !_.includes(memberIds, team.teamid)
           && _.includes(team.team_name.toLowerCase(),
                         teamFilter.toLowerCase());
@@ -275,17 +313,17 @@ module Esper.Components {
           No { Text.TeamExec } with the name containing '{ teamFilter }' found
         </div>;
       }
-      var filteredMembers = _.take(_.map(filteredTeams, function(team) {
+      var filteredMembers = _.map(_.take(filteredTeams, 5), (team) => {
         return {
           id: team.teamid,
           displayAs: team.team_name
         };
-      }), 5);
+      });
       return <ListSelectorSimple choices={filteredMembers} unselectedIcon=" "
-        selectedIds={null} updateFn={this.update.bind(this)} />;
+        selectedIds={null} updateFn={this.addTeam.bind(this)} />;
     }
 
-    update(selected: string[]) {
+    addTeam(selected: string[]) {
       var selectedTeam = Stores.Teams.get(selected[0]).unwrap();
       var profile = Stores.Profiles.get(selectedTeam.team_executive).unwrap();
       var member = {
@@ -465,10 +503,10 @@ module Esper.Components {
     resetState() {
       this.mutateState((s) => {
         s.teamFilter = "";
+        s.emailFilter = "";
         s.selectedRole = Text.GroupRoleMember;
         s.editMember = null;
         s.hasInvalidEmail = false;
-        s.hasIndividualEmail = false;
       });
     }
 

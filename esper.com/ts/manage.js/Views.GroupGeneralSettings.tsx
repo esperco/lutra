@@ -77,6 +77,7 @@ module Esper.Views {
               timezone={this.props.group.group_timezone}
               groupMembers={this.props.group.group_teams || []}
               groupIndividuals={this.props.group.group_individuals || []}
+              userCalendars={Stores.Calendars.listAllForUser()}
               isOwner={isOwner}
               onUpdate={this.delayedSave.bind(this)}
             />

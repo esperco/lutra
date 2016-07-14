@@ -34,6 +34,7 @@ module Esper.Views {
                  okText="Save" onOK={() => this.save()}>
                   <Components.NewGroupForm isAdmin={this.props.isAdmin}
                     ref={(c) => this._groupForm = c}
+                    userCalendars={Stores.Calendars.listAllForUser()}
                   />
                 </Components.ModalPanel>
               </div>
