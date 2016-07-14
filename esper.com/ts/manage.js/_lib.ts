@@ -20,6 +20,7 @@
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/Stores.Groups.ts" />
 /// <reference path="../lib/Text.ts" />
+/// <reference path="../lib/Types.ts" />
 /// <reference path="../lib/Util.ts" />
 
 /// <reference path="../lib/Components.CalendarList.tsx" />
