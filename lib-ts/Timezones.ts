@@ -145,6 +145,7 @@ module Esper.Timezones {
     { id: "Europe/Vienna", name: "Vienna" },
     { id: "Europe/Warsaw", name: "Warsaw" },
     { id: "Europe/Zurich", name: "Zurich" },
+    { id: "Etc/UTC", name: "Coordinated Universal Time" },
     { id: "Africa/Khartoum", name: "Khartoum" },
     { id: "Africa/Nairobi", name: "Nairobi" },
     { id: "Antarctica/Syowa", name: "Syowa" },
