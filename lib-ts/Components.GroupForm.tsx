@@ -70,7 +70,8 @@ module Esper.Components {
              type="text" className="form-control"
              onChange={(e) => this.onNameInputChange(e)}
              value={this.state.name}
-             placeholder="The Avengers Council" />
+             placeholder="The Avengers Council"
+             disabled={!this.props.isAdmin && !this.props.isOwner} />
           </div>
         </div>
 
@@ -83,6 +84,7 @@ module Esper.Components {
             <TimezoneSelector id={this.getId("timezone")}
               onSelect={(tz) => this.updateTimezone(tz)}
               selected={this.state.timezone}
+              disabled={!this.props.isAdmin && !this.props.isOwner}
             />
           </div>
         </div>
@@ -153,6 +155,7 @@ module Esper.Components {
                    onChange={(e) => this.onTeamFilterChange(e)}
                    value={this.state.teamFilter || ""}
                    placeholder={"Filter / Search for " + Text.TeamExecs}
+                   disabled={!this.props.isAdmin && !this.props.isOwner}
             />
             { _.isEmpty(this.state.teamFilter) ?
               <span /> :
@@ -162,7 +165,8 @@ module Esper.Components {
               </span>
             }
           </div>
-          { this.renderTeams() }
+          { this.props.isAdmin || this.props.isOwner ?
+              this.renderTeams() : null }
         </div>
       </div>;
     }
@@ -182,7 +186,8 @@ module Esper.Components {
                      id={this.getId("new-individuals")}
                      onKeyDown={this.inputEmailKeydown.bind(this)}
                      onChange={(e) => this.onIndividualEmailChange(e)}
-                     placeholder="john.doe@esper.com" />
+                     placeholder="john.doe@esper.com"
+                     disabled={!this.props.isAdmin && !this.props.isOwner} />
               { _.isEmpty(this.state.emailFilter) ?
                 <span /> :
                 <span className="esper-clear-action esper-right-icon"
@@ -198,12 +203,14 @@ module Esper.Components {
             </div>
             <span className="input-group-btn">
               <button className="btn btn-default" type="button"
-                      onClick={this.addIndividual.bind(this)}>
+                      onClick={this.addIndividual.bind(this)}
+                      disabled={!this.props.isAdmin && !this.props.isOwner}>
                 <i className="fa fa-fw fa-plus" />
               </button>
             </span>
           </div>
-          { this.renderIndividuals() }
+          { this.props.isAdmin || this.props.isOwner ?
+              this.renderIndividuals() : null }
         </div>
       </div>;
     }

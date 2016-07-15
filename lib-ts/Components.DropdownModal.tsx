@@ -36,6 +36,7 @@ module Esper.Components {
     className?: string;
     align?: "left"|"right";
     dropup?: boolean;
+    disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
   }, {}> {
@@ -83,6 +84,7 @@ module Esper.Components {
           onOpen={this.props.onOpen}
           align={this.props.align}
           dropup={this.props.dropup}
+          disabled={this.props.disabled}
         >
           { this.props.children }
         </Dropdown>

@@ -10,12 +10,14 @@ module Esper.Components {
     id?: string;
     className?: string;
     children?: JSX.Element[];
+    disabled?: boolean;
     onClick?: (e: React.MouseEvent) => void;
   }, {}> {
     render() {
       var classes = this.props.className +
         " form-control esper-selector clearfix";
-      return <div className={classes} onClick={this.props.onClick}>
+      return <div className={classes} onClick={this.props.onClick}
+                  disabled={this.props.disabled}>
 
         {/* Tiny input box so label with 'for' property can trigger onClick */}
         <input type="text" id={this.props.id}

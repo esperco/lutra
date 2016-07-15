@@ -780,6 +780,10 @@ flexibility with non-UL elements */
   float: none;
   position: relative;
 
+  &[disabled] {
+    cursor: not-allowed;
+  }
+
   &:focus, &:hover {
     border: 1px solid @link-color;
     z-index: @zindex-button + 1;
