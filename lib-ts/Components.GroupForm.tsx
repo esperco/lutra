@@ -109,7 +109,7 @@ module Esper.Components {
             No {Text.GroupMembers} Found
           </div>
           :
-          <div className="list-group">
+          <div className="list-group esper-group-member-list">
             <label className="esper-header">
               { "Other " + Text.TeamExecs + " in " +
                 (this.state.name || "this " + Text.Group) }
