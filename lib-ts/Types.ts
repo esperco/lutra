@@ -74,4 +74,31 @@ module Esper.Types {
     isBusy: boolean;
     hasError: boolean;
   }
+
+  /*
+    Interface for representing business hours -- considered using a 7-item
+    array but this introduces the possibility of errors based on what the
+    "start" of the week is.
+
+    Use Option.none to represent that there should be no hours on a given day.
+  */
+  export interface WeekHours {
+    sun: Option.T<DayHours>;
+    mon: Option.T<DayHours>;
+    tue: Option.T<DayHours>;
+    wed: Option.T<DayHours>;
+    thu: Option.T<DayHours>;
+    fri: Option.T<DayHours>;
+    sat: Option.T<DayHours>;
+  }
+
+  /*
+    i.e. 11:00 to 17:00 -- end should be > start. Hour is in HourMinute is
+    usually 0-23, but use 24:00 instead of 23:59 if you actually want to
+    capture going to end of day.
+  */
+  export interface DayHours {
+    start: ApiT.HourMinute;
+    end: ApiT.HourMinute;
+  }
 }

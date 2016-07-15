@@ -10,6 +10,9 @@ module Esper.EventStats {
 
     // Truncate duration if end is after this date/time
     truncateEnd?: Date;
+
+    // Segemnt based on overlap with working hours
+    weekHours?: Types.WeekHours;
   }
 
   // Simple aggregate duration of events, avoids double-counting overlaps
@@ -200,6 +203,11 @@ module Esper.EventStats {
     duration: number;
   }
 
+  interface DurationSegment {
+    start: number; // Javascript time (milliseconds)
+    end: number;   // Javascript time (milliseconds)
+  }
+
   export function durationWrappers(events: Stores.Events.TeamEvent[],
     opts: DurationOpts = {}): DurationWrapper[]
   {
@@ -223,33 +231,17 @@ module Esper.EventStats {
 
     _.each(ret, (e) => {
 
-      // Truncate start
-      var event = e.event;
-      var startM = moment(event.start);
-      if (opts.truncateStart && moment(opts.truncateStart).diff(startM) > 0) {
-        startM = moment(opts.truncateStart);
-      }
-      var start = startM.valueOf();
-
-      // Truncate end
-      var endM = moment(event.end);
-      if (opts.truncateEnd && moment(opts.truncateEnd).diff(endM) < 0) {
-        endM = moment(opts.truncateEnd);
-      }
-      var end = endM.valueOf();
-
-      // Ignore invalid start/end dates (possible after truncation)
-      if (end <= start) { return; }
-
-      // Map critical points to check for overlaps
-      var startStr = start.toString();
-      var endStr = end.toString();
-      startMap[startStr] = startMap[startStr] || [];
-      startMap[startStr].push(e);
-      endMap[endStr] = endMap[endStr] || [];
-      endMap[endStr].push(e);
-      criticalPoints.push(start);
-      criticalPoints.push(end);
+      // Map critical points of event to check for overlaps
+      _.each(getSegments(e.event, opts), (s) => {
+        var startStr = s.start.toString();
+        var endStr = s.end.toString();
+        startMap[startStr] = startMap[startStr] || [];
+        startMap[startStr].push(e);
+        endMap[endStr] = endMap[endStr] || [];
+        endMap[endStr].push(e);
+        criticalPoints.push(s.start);
+        criticalPoints.push(s.end);
+      });
     });
 
     criticalPoints.sort();
@@ -275,6 +267,111 @@ module Esper.EventStats {
     });
 
     return ret;
+  }
+
+  /*
+    Returns start/end times of an events given truncation options. Basically
+    chops our event up into time segments that overlap the time(s) we care
+    about.
+  */
+  export function getSegments(event: Types.TeamEvent, opts: DurationOpts)
+    : DurationSegment[]
+  {
+    // Truncate start
+    var startM = moment(event.start);
+    if (opts.truncateStart && moment(opts.truncateStart).diff(startM) > 0) {
+      startM = moment(opts.truncateStart);
+    }
+    var start = startM.valueOf();
+
+    // Truncate end
+    var endM = moment(event.end);
+    if (opts.truncateEnd && moment(opts.truncateEnd).diff(endM) < 0) {
+      endM = moment(opts.truncateEnd);
+    }
+    var end = endM.valueOf();
+
+    // Ignore invalid start/end dates (possible after truncation)
+    if (end <= start) { return []; }
+
+    if (opts.weekHours) {
+      let ret: DurationSegment[] = [];
+      let lastSegment: DurationSegment = null;
+      while (startM.diff(endM) < 0) {
+        getDayHours(startM, opts.weekHours).flatMap((dayHours) => {
+          // Intersect portion of event for this day with dayHours
+          let dayStart = startM.clone().startOf('day');
+          return intersectSegments(
+            { // Hours for this day
+              start: dayStart.clone().add(dayHours.start).valueOf(),
+              end: dayStart.clone().add(dayHours.end).valueOf()
+            },
+
+            { // Portion of event that overlaps this day
+              start: startM.valueOf(),
+              end: Math.min(endM.valueOf(),
+                            startM.clone().endOf('day').valueOf())
+            });
+        }).match({
+          none: () => null,
+          some: (segment) => {
+            /*
+              If overlap or adjacent with last segment, extend. Add one
+              millisecond to include segments that are adjacent.
+            */
+            if (lastSegment && (lastSegment.end + 1) >= segment.start) {
+              lastSegment.end = segment.end;
+            } else {
+              lastSegment = segment;
+              ret.push(segment);
+            }
+          }
+        });
+
+        // Go to next day
+        startM = startM.startOf('day').add(1, 'day');
+      }
+      return ret;
+    }
+
+    // No weekHours, return entire period as segment
+    return [{
+      start: start,
+      end: end
+    }];
+  }
+
+  /*
+    Given a moment and a WeekHours object, figure out the day of the week and
+    return the relevant DayHours from the WeekHours
+  */
+  function getDayHours(m: moment.Moment, weekHours: Types.WeekHours) {
+    switch (m.format('ddd')) {
+      case "Sun": return weekHours.sun;
+      case "Mon": return weekHours.mon;
+      case "Tue": return weekHours.tue;
+      case "Wed": return weekHours.wed;
+      case "Thu": return weekHours.thu;
+      case "Fri": return weekHours.fri;
+      case "Sat": return weekHours.sat;
+      default: return Option.none<Types.DayHours>();
+    }
+  }
+
+  /*
+    Given two time segments, returns a new segment with their intersection
+  */
+  function intersectSegments(s1: DurationSegment, s2: DurationSegment)
+    : Option.T<DurationSegment>
+  {
+    let start = Math.max(s1.start, s2.start);
+    let end = Math.min(s1.end, s2.end);
+    if (end > start) {
+      return Option.some({ start, end })
+    } else {
+      // No intersection
+      return Option.none<DurationSegment>();
+    }
   }
 
 
