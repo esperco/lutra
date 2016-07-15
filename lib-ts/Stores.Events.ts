@@ -8,6 +8,7 @@
 /// <reference path="./Model2.ts" />
 /// <reference path="./Stores.Profiles.ts" />
 /// <reference path="./Stores.Teams.ts" />
+/// <reference path="./Types.ts" />
 /// <reference path="./XDate.ts" />
 /// <reference path="./Period.ts" />
 
@@ -18,30 +19,7 @@ module Esper.Stores.Events {
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
   const PREDICTED_LABEL_MODIFIER = 0.95;
 
-  /*
-    Similar to ApiT.GenericCalendarEvent but with some teamId and different
-    representation of labels, camelCase, and removal of fields we don't care
-    about at the moment
-  */
-  export interface TeamEvent {
-    id: string;
-    calendarId: string;
-    teamId: string;
-    start: Date;
-    end: Date;
-    timezone: string;
-    title: string;
-    description: string;
-
-    labelScores: Option.T<Labels.Label[]>;
-
-    feedback: ApiT.EventFeedback;
-    location: string;
-    allDay: boolean;
-    guests: ApiT.Attendee[];
-    transparent: boolean;
-    recurringEventId?: string;
-  }
+  export type TeamEvent = Types.TeamEvent;
 
   export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent)
     : TeamEvent
@@ -116,49 +94,11 @@ module Esper.Stores.Events {
 
   /* Store Interfaces */
 
-  export interface FullEventId {
-    teamId: string;
-    calId: string;
-    eventId: string;
-  }
-
-  export interface DateId {
-    teamId: string;
-    calId: string;
-
-    // Start of date
-    date: Date;
-  }
-
-  export type EventData =
-    Model2.StoreData<FullEventId, TeamEvent>;
-
-  /*
-    Convenience interface for grouping together merged event list for multiple
-    days
-  */
-  export interface EventListData {
-    start: Date;
-    end: Date;
-    events: TeamEvent[];
-    isBusy: boolean;
-    hasError: boolean;
-  }
-
-  /*
-    Convenience interface for grouping together events still separated by
-    date
-  */
-  export interface EventsForDate {
-    date: Date;
-    events: TeamEvent[];
-  };
-
-  export interface EventDateData {
-    dates: EventsForDate[];
-    isBusy: boolean;
-    hasError: boolean;
-  }
+  export type FullEventId = Types.FullEventId;
+  export type EventData = Model2.StoreData<FullEventId, TeamEvent>;
+  export type EventListData = Types.EventListData;
+  export type EventsForDate = Types.EventsForDate;
+  export type EventDateData = Types.EventDateData;
 
 
   /* Stores */
@@ -173,7 +113,7 @@ module Esper.Stores.Events {
 
   // Store a list of events for each day
   export var EventsForDateStore = new Model2.BatchStore
-    <DateId, FullEventId, TeamEvent>(EventStore, {
+    <Types.FullCalDateId, FullEventId, TeamEvent>(EventStore, {
       cap: 2000
     });
 

@@ -9,8 +9,7 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface EventEditorProps {
-    eventData: Model2.StoreData<Stores.Events.FullEventId,
-                                Stores.Events.TeamEvent>[];
+    eventData: Model2.StoreData<Types.FullEventId, Types.TeamEvent>[];
     teams: ApiT.Team[];
 
     minFeedback?: boolean;

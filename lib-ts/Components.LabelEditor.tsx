@@ -8,8 +8,7 @@ module Esper.Components {
   //////
 
   interface LabelEditorProps {
-    eventData: Model2.StoreData<Stores.Events.FullEventId,
-                                Stores.Events.TeamEvent>[];
+    eventData: Model2.StoreData<Types.FullEventId, Types.TeamEvent>[];
     teams: ApiT.Team[];
     onDone?: () => void;
     doneText?: string;
