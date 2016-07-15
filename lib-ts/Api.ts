@@ -160,8 +160,8 @@ module Esper.Api {
   export function getGroups(teamid: string):
     JQueryPromise<ApiT.GroupList>
   {
-    var url = prefix + "/api/group/team/" + string(Login.me())
-      + "/" + string(teamid);
+    var url = `${prefix}/api/group/team/${string(Login.me())}`
+      + `/${string(teamid)}`;
     return JsonHttp.get(url);
   }
 
@@ -198,13 +198,12 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function createGroup(uid: string, groupName: string):
+  export function createGroup(uid: string, groupUpdate: ApiT.GroupUpdate):
     JQueryPromise<ApiT.Group>
   {
     var url = prefix + "/api/group/create/" + string(Login.me())
-      + "/" + string(uid)
-      + "/" + string(groupName);
-    return JsonHttp.post(url);
+      + "/" + string(uid);
+    return JsonHttp.post(url, JSON.stringify(groupUpdate));
   }
 
   export function renameGroup(groupid: string, groupName: string):

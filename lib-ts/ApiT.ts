@@ -77,15 +77,18 @@ module Esper.ApiT {
 
   export type GroupLabels = ListResponse<string>;
 
-  export interface Group {
+  export interface Group extends GroupUpdate {
     groupid: string;
-    group_name: string;
-    group_timezone: string;
     group_labels?: string[];
     group_labels_norm?: string[];
     group_member_role?: string;
     group_teams?: GroupMember[];
     group_individuals?: GroupIndividual[];
+  }
+
+  export interface GroupUpdate {
+    group_name: string;
+    group_timezone: string;
   }
 
   export interface GroupMember {
