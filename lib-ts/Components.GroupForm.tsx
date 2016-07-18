@@ -360,7 +360,9 @@ module Esper.Components {
             <div className="one-line">
               <i className="fa fa-fw fa-user"></i>
               {" "}{member.name}{" "}
-              <i className="fa fa-fw fa-calendar"></i>
+              <Tooltip title={Text.GroupCalendarSharing}>
+                <i className="fa fa-fw fa-calendar"></i>
+              </Tooltip>
             </div>
             <div>
               <div className="esper-selectable">
@@ -406,10 +408,12 @@ module Esper.Components {
         </div>;
       }
 
-      return <div className="list-group-item one-line" key={member.teamid}>
+      return <div className="list-group-item" key={member.teamid}>
         <i className="fa fa-fw fa-user" />
         {" "}{member.name}{" "}
-        <i className="fa fa-fw fa-calendar" />
+        <Tooltip title={Text.GroupCalendarSharing}>
+          <i className="fa fa-fw fa-calendar" />
+        </Tooltip>
         {" "}
         <span className="badge role-box">
           {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
