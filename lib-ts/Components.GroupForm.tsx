@@ -108,7 +108,7 @@ module Esper.Components {
         { _.isEmpty(this.state.groupMembers) &&
           _.isEmpty(individuals) ?
           <div className="esper-no-content">
-            No {Text.GroupMembers} Found
+            No {Text.GroupMembers} found
           </div>
           :
           <div className="list-group esper-group-member-list">
