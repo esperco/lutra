@@ -2,6 +2,8 @@
   Client-side time stat calculations
 */
 
+/// <reference path="./Params.ts" />
+
 module Esper.EventStats {
 
   export interface DurationOpts {
@@ -278,7 +280,7 @@ module Esper.EventStats {
     : DurationSegment[]
   {
     // Truncate start
-    var startM = moment(event.start);
+    var startM = moment(event.start).clone();
     if (opts.truncateStart && moment(opts.truncateStart).diff(startM) > 0) {
       startM = moment(opts.truncateStart);
     }
@@ -374,22 +376,46 @@ module Esper.EventStats {
     }
   }
 
+  // Simpler version of above to see if event has anything within weekhour
+  export function weekHoursOverlap(event: Types.TeamEvent,
+                                   weekHours: Types.WeekHours)
+  {
+    let startM = moment(event.start).clone();
+    let endM = moment(event.end);
+    while (startM.diff(endM) < 0) {
+      let overlaps = getDayHours(startM, weekHours)
+        .match({
+          none: () => false,
+          some: (dh) => {
+            let dayStart = startM.clone().startOf('day');
+            return intersectSegments(
+              { // Hours for this day
+                start: dayStart.clone().add(dh.start).valueOf(),
+                end: dayStart.clone().add(dh.end).valueOf()
+              },
+
+              { // Portion of event that overlaps this day
+                start: startM.valueOf(),
+                end: Math.min(endM.valueOf(),
+                              startM.clone().endOf('day').valueOf())
+              }).isSome();
+          }
+        });
+      if (overlaps) return true;
+
+      // Go to next day
+      startM = startM.startOf('day').add(1, 'day');
+    }
+    return false;
+  }
+
 
   /////
 
   /* Settings for Calculation */
 
-  export interface CalcOpts { // Standard calc opts for all charts
-    filterStr: string;
-    labels: Params.ListSelectJSON;
-    domains: Params.ListSelectJSON;
-    durations: Params.ListSelectJSON;
-    guestCounts: Params.ListSelectJSON;
-    ratings: Params.ListSelectJSON;
-  }
-  export interface DomainNestOpts extends CalcOpts {
-    nestByDomain: boolean; // Used to nest domain => email in duration calc
-  }
+  export type CalcOpts = Types.EventCalcOpts;
+  export type DomainNestOpts = Types.DomainNestOpts;
 
   // How many events to annotate or group at any given time
   const DEFAULT_MAX_PROCESS_EVENTS = 10;
@@ -569,6 +595,12 @@ module Esper.EventStats {
         return false;
       }
 
+      // Filter by weekHour
+      if (this._opts.weekHours &&
+          !weekHoursOverlap(event, this._opts.weekHours)) {
+        return false;
+      }
+
       return true;
     }
 
@@ -722,7 +754,8 @@ module Esper.EventStats {
     processBatch(events: Stores.Events.TeamEvent[], results: DateGroup[]) {
       var durations = durationWrappers(events, {
         truncateStart: moment(this._date).clone().startOf('day').toDate(),
-        truncateEnd: moment(this._date).clone().endOf('day').toDate()
+        truncateEnd: moment(this._date).clone().endOf('day').toDate(),
+        weekHours: this._opts.weekHours
       });
       var dateGroup = _.last(results);
       if (!(dateGroup && dateGroup.date === this._date)) {
@@ -798,7 +831,9 @@ module Esper.EventStats {
     }
 
     processBatch(events: Stores.Events.TeamEvent[], results: T) {
-      var durations = durationWrappers(events);
+      var durations = durationWrappers(events, {
+        weekHours: this._opts.weekHours
+      });
       _.each(durations,
         (d) => results = this.processOne(d.event, d.duration, results)
       );

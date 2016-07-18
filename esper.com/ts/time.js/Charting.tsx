@@ -3,46 +3,14 @@
 */
 
 module Esper.Charting {
+  export type ChartType = Types.ChartType;
+  export type ChartGroup = Types.ChartGroup;
+  export type BaseOpts<T> = Types.ChartBaseOpts<T>;
+  export type ExtraOptsMaybe = Types.ChartExtraOptsMaybe;
+  export type ExtraOpts = Types.ChartExtraOpts;
+
 
   /* Routing helpers */
-
-  export type ChartType = "percent"|"absolute"|"calendar";
-  export type ChartGroup = "calendars"
-                          |"durations"
-                          |"domains"
-                          |"guest-counts"
-                          |"labels"
-                          |"ratings";
-
-  // Base options needed to fetch and get events
-  export interface BaseOpts<T> {
-    teamId: string;
-    calIds: string[];
-    period: Period.Single|Period.Custom;
-    extra: ExtraOpts & T;
-  }
-
-  export interface ExtraOptsMaybe {
-    type?: ChartType;
-    incrs?: number[];
-    filterStr?: string;
-    domains?: Params.ListSelectJSON;
-    durations?: Params.ListSelectJSON;
-    labels?: Params.ListSelectJSON;
-    ratings?: Params.ListSelectJSON;
-    guestCounts?: Params.ListSelectJSON;
-  }
-
-  export interface ExtraOpts extends ExtraOptsMaybe, EventStats.CalcOpts {
-    type: ChartType;
-    incrs: number[];
-    filterStr: string;
-    domains: Params.ListSelectJSON;
-    durations: Params.ListSelectJSON;
-    labels: Params.ListSelectJSON;
-    ratings: Params.ListSelectJSON;
-    guestCounts: Params.ListSelectJSON;
-  }
 
   // Current pathFn for charts (set by Route.routeChart)
   export var currentPathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;

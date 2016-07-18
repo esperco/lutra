@@ -7,7 +7,7 @@
 
 module Esper.Types {
 
-  /* Event Types */
+  /* Event Types */ //////////////////////////
 
   /*
     Similar to ApiT.GenericCalendarEvent but with some teamId and different
@@ -75,6 +75,21 @@ module Esper.Types {
     hasError: boolean;
   }
 
+
+  /* Filtering, selection */ //////////////////////////
+
+  // Filter events by some attribute in a list
+  export interface ListSelectJSON {
+    // Show all items
+    all: boolean;
+
+    // Show items with no label, domain, etc.
+    none: boolean;
+
+    // Show items with at least one of the items in this list
+    some: string[];
+  }
+
   /*
     Interface for representing business hours -- considered using a 7-item
     array but this introduces the possibility of errors based on what the
@@ -100,5 +115,61 @@ module Esper.Types {
   export interface DayHours {
     start: ApiT.HourMinute;
     end: ApiT.HourMinute;
+  }
+
+
+  /* Charting */ //////////////////////////
+
+  export type ChartType = "percent"|"absolute"|"calendar";
+  export type ChartGroup = "calendars"
+                          |"durations"
+                          |"domains"
+                          |"guest-counts"
+                          |"labels"
+                          |"ratings";
+
+  // Base options needed to fetch and get events
+  export interface ChartBaseOpts<T> {
+    teamId: string;
+    calIds: string[];
+    period: Period.Single|Period.Custom;
+    extra: ChartExtraOpts & T;
+  }
+
+  export interface ChartExtraOptsMaybe {
+    type?: ChartType;
+    incrs?: number[];
+    filterStr?: string;
+    domains?: Params.ListSelectJSON;
+    durations?: Params.ListSelectJSON;
+    labels?: Params.ListSelectJSON;
+    ratings?: Params.ListSelectJSON;
+    guestCounts?: Params.ListSelectJSON;
+    weekHours?: Types.WeekHours;
+  }
+
+  export interface EventCalcOpts { // Standard calc opts for all charts
+    filterStr: string;
+    labels: Types.ListSelectJSON;
+    domains: Types.ListSelectJSON;
+    durations: Types.ListSelectJSON;
+    guestCounts: Types.ListSelectJSON;
+    ratings: Types.ListSelectJSON;
+    weekHours: Types.WeekHours;
+  }
+  export interface DomainNestOpts extends EventCalcOpts {
+    nestByDomain: boolean; // Used to nest domain => email in duration calc
+  }
+
+  export interface ChartExtraOpts extends ChartExtraOptsMaybe, EventCalcOpts {
+    type: ChartType;
+    incrs: number[];
+    filterStr: string;
+    domains: Params.ListSelectJSON;
+    durations: Params.ListSelectJSON;
+    labels: Params.ListSelectJSON;
+    ratings: Params.ListSelectJSON;
+    guestCounts: Params.ListSelectJSON;
+    weekHours: Types.WeekHours;
   }
 }

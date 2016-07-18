@@ -69,6 +69,7 @@ module Esper.Actions.Charts {
     typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
     typedQ.domains.none = typedQ.guestCounts.none;
 
+    typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
     return typedQ;
   }
 
