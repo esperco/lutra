@@ -156,18 +156,15 @@ module Esper.ReactHelpers {
 
   // NB: Wrap string in object because React needs an object
   class StoreComponent extends Component<{ prop: string }, { val: string }> {
-    getState(props: { prop: string }) {
-      return { val: stringStore.get(props.prop).match({
-        none: () => "",
-        some: (s) => s.data.match({
-          none: () => "",
-          some: (v) => v
-        })
-      }) };
-    }
-
     render() {
-      return React.createElement("div", {}, this.state && this.state.val);
+      return React.createElement("div", {},
+        stringStore.get(this.props.prop).match({
+          none: () => "",
+          some: (s) => s.data.match({
+            none: () => "",
+            some: (v) => v
+          })
+        }));
     }
 
     componentDidMount(): void {

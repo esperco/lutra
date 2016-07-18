@@ -5,6 +5,7 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Components.Badge.tsx" />
+/// <reference path="./Params.ts" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -41,13 +42,17 @@ module Esper.Components {
     choices: ListChoice[];
   }
 
-  // Single item in list
-  export interface ListChoice {
-    id: string;
+  // For special, meta chocies like "Select All"
+  interface SpecialChoice {
     displayAs: string|JSX.Element;
     badgeText?: string;
     badgeHoverText?: string;
     badgeColor?: string;
+  }
+
+  // Single item in list
+  export interface ListChoice extends SpecialChoice {
+    id: string;
   }
 
   // Selection -- if using groups, groupIds are included
@@ -195,5 +200,112 @@ module Esper.Components {
       headerClasses={props.headerClasses}
       selectedItemClasses={props.selectedItemClasses}
     />;
+  }
+
+
+  /* Variant of the above, but using Params.ListSelectJSON */
+
+  // ASN = All-Some-None
+  interface ListSelectorASNProps extends ListSelectorBaseProps {
+    choices: ListChoice[];
+    selected: Params.ListSelectJSON; // Subset of chocies
+    updateFn: (x: Params.ListSelectJSON) => void;
+    allChoice?: SpecialChoice; // Select All
+    noneChoice?: SpecialChoice; // None of the above
+  }
+
+  export function ListSelectorASN(props: ListSelectorASNProps) {
+    var allIds = _.map(props.choices, (c) => c.id);
+    var selectedIds = props.selected.all ? allIds :
+      _.intersection(props.selected.some, allIds);
+
+    var noneSelected = props.noneChoice && props.selected.none;
+    var allSelected: boolean|"some" =
+      (noneSelected || !props.noneChoice) &&
+      (props.selected.all || selectedIds.length === allIds.length);
+    if (!allSelected && (selectedIds.length || noneSelected)) {
+      allSelected = "some";
+    }
+
+    return <div className={props.className}>
+      { props.allChoice ? <SpecialSelector
+        selected={allSelected}
+        choice={props.allChoice}
+        onClick={(x) => props.updateFn({
+          all: x,
+          none: x ? !!props.noneChoice : false,
+          some: []
+        })}
+      /> : null }
+
+      <ListSelectorSimple
+        choices={props.choices}
+        selectedIds={selectedIds}
+        updateFn={(ids) => {
+          let allSelected = allIds.length === ids.length;
+          props.updateFn({
+            all: allSelected,
+            none: props.selected.none,
+            some: allSelected ? [] : ids
+          })
+        }}
+
+        selectOption={Components.ListSelectOptions.MULTI_SELECT}
+        selectedIcon={props.selectedIcon}
+        unselectedIcon={props.unselectedIcon}
+
+        className={props.listClasses}
+        listClasses={props.listClasses}
+        itemClasses={props.itemClasses}
+        headerClasses={props.headerClasses}
+        selectedItemClasses={props.selectedItemClasses}
+      />
+
+      { props.noneChoice ? <SpecialSelector
+        selected={noneSelected}
+        choice={props.noneChoice}
+        onClick={(x) => props.updateFn({
+          all: props.selected.all,
+          none: x,
+          some: props.selected.some
+        })}
+      /> : null }
+    </div>;
+  }
+
+  function SpecialSelector({
+    selected, onClick, className, itemClasses, choice
+  }: {
+    selected: boolean|"some";
+    onClick: (selected: boolean) => void;
+    className?: string;
+    itemClasses?: string;
+    choice: SpecialChoice;
+  }) {
+    var icon = (() => {
+      if (selected === true) {
+        return "fa-check-square-o";
+      } else if (selected === "some") {
+        return "fa-minus-square-o";
+      } else {
+        return "fa-square-o"
+      }
+    })();
+
+    var badge = choice.badgeText ? <Components.Badge
+      text={choice.badgeText}
+      hoverText={choice.badgeHoverText}
+      color={selected && choice.badgeColor}
+    /> : null;
+
+    return <div className={classNames(className, "esper-select-menu")}>
+      <a className={classNames(itemClasses || "esper-selectable", {
+        active: selected === true
+      })} onClick={() => onClick(!selected)}>
+        { badge }
+        <i className={"fa fa-fw " + icon} />{" "}
+        { choice.displayAs }
+      </a>
+    </div>;
   }
 }

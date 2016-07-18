@@ -1,13 +1,19 @@
 @import "./_helpers";
 
-@expando-max-height: 1000px;
-
 .esper-expando {
   .esper-expando-header {
     cursor: pointer;
     font-weight: bold;
     color: @brand-text-header;
     transition: color 0.6s;
+
+    .esper-shade & {
+      color: @shade-text-header
+    }
+
+    .esper-inverse & {
+      color: @inverse-text-header
+    }
 
     &:hover {
       color: @link-hover-color;
@@ -27,5 +33,10 @@
       border-top: 1px solid @brand-border;
       animation: slidedown 1.0s ease-in-out 0s;
     }
+  }
+
+  &.esper-panel-section .esper-expando-body.open {
+    border: 0;
+    padding-top: @padding-base-vertical;
   }
 }

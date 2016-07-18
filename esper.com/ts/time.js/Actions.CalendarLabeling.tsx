@@ -11,7 +11,7 @@ module Esper.Actions {
 
     // Fetch
     var teamIds = _.uniq(_.map(cals, (c) => c.teamId));
-    _.each(teamIds, (teamId) => Stores.Events.fetchPredictionsForPeriod({
+    _.each(teamIds, (teamId) => Stores.Events.fetchPredictions({
       teamId: teamId,
       period: period
     }));

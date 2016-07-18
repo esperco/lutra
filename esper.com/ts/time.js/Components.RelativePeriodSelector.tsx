@@ -2,6 +2,8 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
+/// <reference path="./Components.SidebarSelector.tsx" />
+
 module Esper.Components {
   interface Props {
     period: Period.Single|Period.Custom;
@@ -23,9 +25,7 @@ module Esper.Components {
       listClasses="esper-select-menu"
       itemClasses="esper-selectable"
       headerClasses="esper-select-header"
-      updateFn={(x) => props.updateFn(
-        _(x).map((i) => parseInt(i)).filter((n) => !isNaN(n)).value()
-      )}
+      updateFn={(x) => props.updateFn(parseIncrs(x))}
     />;
   }
 
@@ -35,6 +35,39 @@ module Esper.Components {
       return periodText;
     } else {
       return `${Text.fmtRelPeriod(period.interval, i)} (${periodText})`;
+    }
+  }
+
+  function parseIncrs(x: string[], zero=true): number[] {
+    let ret = _(x)
+      .map((i) => parseInt(i))
+      .filter((n) => !isNaN(n))
+      .value();
+    if (! _.includes(ret, 0)) {
+      ret.push(0);
+    }
+    ret.sort();
+    return ret;
+  }
+
+
+  //////
+
+  export class RelativePeriodSidebarSelector extends SidebarSelector<Props> {
+    renderHeader() {
+      return <span>
+        <i className="fa fa-fw fa-flip-horizontal fa-tasks" />{" "}
+        Compare With
+      </span>;
+    }
+
+    renderContent() {
+      return <RelativePeriodSelector
+        period={this.props.period}
+        allowedIncrs={[-1, 1]}
+        selectedIncrs={this.props.selectedIncrs}
+        updateFn={this.props.updateFn}
+      />;
     }
   }
 }

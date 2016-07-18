@@ -2,27 +2,25 @@
   View for all of the chart pages
 */
 
+module Esper.Types {
+  export interface ChartViewMenu {
+    id: string;
+    tab: JSX.Element;
+    content?: JSX.Element|JSX.Element[];
+    onClick?: () => boolean; // Return false to avoid switching state
+  }
+}
+
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface Props {
-    teamId: string;
-    calIds: string[];
-    period: Period.Single|Period.Custom;
-    extra: Charting.ExtraOpts;
-
-    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
+  interface Props extends Charting.BaseOpts<{}> {
     chart: JSX.Element;
     selectors?: JSX.Element|JSX.Element[];
 
     // Other sidebar menus
-    menus?: {
-      id: string;
-      tab: JSX.Element;
-      content?: JSX.Element|JSX.Element[];
-      onClick?: () => boolean; // Return false to avoid switching state
-    }[];
+    menus?: Types.ChartViewMenu[];
   }
 
   const SidebarMain = "main";
@@ -63,7 +61,9 @@ module Esper.Views {
             <Components.TeamSelector
               teams={Stores.Teams.all()}
               selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.updateRoute({teamId: teamId})} />
+              onUpdate={(teamId) => Charting.updateChart(this.props, {
+                teamId: teamId
+              })} />
           </div>
         </Components.SidebarWithToggle>
         <div className="esper-right-content">
@@ -126,7 +126,22 @@ module Esper.Views {
     }
 
     renderSidebarMain() {
+      var numCals = Stores.Calendars.list(this.props.teamId).match({
+        none: () => 0,
+        some: (c) => c.length
+      });
       return <div>
+        { numCals > 1 ? this.renderSidebarMenuOpt({
+          pathFn: Paths.Time.calendarsChart,
+          extra: {
+            type: "percent",
+            incrs: this.props.extra.incrs
+          },
+          header: Text.ChartCalendars,
+          content: Text.ChartCalendarsDescription,
+          icon: "fa-calendar-o"
+        }) : null }
+
         { this.renderSidebarMenuOpt({
           pathFn: Paths.Time.labelsChart,
           extra: {
@@ -137,17 +152,6 @@ module Esper.Views {
           content: Text.ChartLabelsDescription,
           icon: "fa-tags"
         }) }
-
-        { this.props.calIds.length > 1 ? this.renderSidebarMenuOpt({
-          pathFn: Paths.Time.calendarsChart,
-          extra: {
-            type: "percent",
-            incrs: this.props.extra.incrs
-          },
-          header: Text.ChartCalendars,
-          content: Text.ChartCalendarsDescription,
-          icon: "fa-calendar-o"
-        }) : null }
 
         { this.renderSidebarMenuOpt({
           pathFn: Paths.Time.guestsChart,
@@ -179,7 +183,7 @@ module Esper.Views {
           },
           header: Text.ChartDuration,
           content: Text.ChartDurationDescription,
-          icon: "fa-clock-o"
+          icon: "fa-hourglass"
         }) }
 
         { this.renderSidebarMenuOpt({
@@ -202,14 +206,19 @@ module Esper.Views {
       icon?: string;
       content?: JSX.Element|string;
     }) {
-      var active = pathFn === this.props.pathFn;
+      var active = pathFn === Charting.currentPathFn;
       return <div className="esper-panel-section action-block"
         onClick={() => {
-          this.updateRoute({
+          Charting.updateChart(this.props, {
             pathFn: pathFn,
             extra: extra
           });
-          this.setState({ sidebar: SidebarFilter })
+
+          /*
+            Uncomment to go to filter after changing chart type.
+            Disabling for now because this seems confusing for new users.
+          */
+          // this.setState({ sidebar: SidebarFilter })
         }}>
         <div className={classNames("esper-subheader-link", {
           active: active
@@ -222,10 +231,6 @@ module Esper.Views {
     }
 
     renderSidebarFilters() {
-      var team = Stores.Teams.require(this.props.teamId);
-      var calendars = Option.matchList(
-        Stores.Calendars.list(this.props.teamId)
-      );
       return <div>
         <div className="esper-panel-section">
           <div className="btn-group btn-group-justified">
@@ -257,38 +262,6 @@ module Esper.Views {
           />
         </div>
 
-        <div className="esper-panel-section">
-          <label htmlFor={this.getId("cal-select")}>
-            <i className="fa fa-fw fa-calendar-o" />{" "}
-            Calendars
-          </label>
-          <Components.CalSelectorDropdown
-            id={this.getId("cal-select")}
-            teams={[team]}
-            calendarsByTeamId={Util.keyObj(team.teamid, calendars)}
-            selected={_.map(this.props.calIds, (calId) => ({
-              teamId: team.teamid,
-              calId: calId
-            }))}
-            updateFn={(c) => this.updateCalSelection(c)}
-            allowMulti={true}
-          />
-        </div>
-
-        { this.props.extra.type === "calendar" ? null :
-          <div className="esper-panel-section">
-            <div className="esper-subheader">
-              <i className="fa fa-fw fa-clock-o" />{" "}
-              Compare With
-            </div>
-            <Components.RelativePeriodSelector
-              period={this.props.period}
-              allowedIncrs={[-1, 1]}
-              selectedIncrs={this.props.extra.incrs}
-              updateFn={(x) => this.updateIncrs(x)}
-            />
-          </div>
-        }
         { this.props.selectors }
       </div>;
     }
@@ -325,77 +298,15 @@ module Esper.Views {
     }
 
     updatePeriod(period: Period.Single|Period.Custom) {
-      this.updateRoute({
+      Charting.updateChart(this.props, {
         period: period
       });
     }
 
-    updateIncrs(incrs: number[]) {
-      if (! _.includes(incrs, 0)) {
-        incrs.push(0);
-      }
-      this.updateExtra({ incrs: incrs });
-    }
-
     updateExtra(extra: Charting.ExtraOptsMaybe) {
-      this.updateRoute({
+      Charting.updateChart(this.props, {
         extra: extra
       });
-    }
-
-    getExtra(ext: Charting.ExtraOptsMaybe): Charting.ExtraOpts {
-      return {
-        type: ext.type || this.props.extra.type,
-        incrs: ext.incrs || this.props.extra.incrs,
-        filterStr: Util.some(ext.filterStr, this.props.extra.filterStr || "")
-      };
-    }
-
-    updateCalSelection(selections: Stores.Calendars.CalSelection[]) {
-      this.updateRoute({
-        teamId: selections[0] && selections[0].teamId,
-        calIds: _.map(selections, (s) => s.calId)
-      });
-    }
-
-    updateRoute({pathFn, teamId, calIds, period, extra, opts={}}: {
-      pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
-      teamId?: string;
-      calIds?: string[];
-      period?: Period.Single|Period.Custom;
-      extra?: Charting.ExtraOptsMaybe;
-      opts?: Route.nav.Opts;
-    }) {
-      pathFn = pathFn || this.props.pathFn;
-      teamId = teamId || this.props.teamId;
-      calIds = calIds || this.props.calIds;
-      period = period || this.props.period;
-
-      // Chart change => blank out filter params unless provided
-      if (pathFn !== this.props.pathFn && extra) {
-        opts.jsonQuery = extra;
-      }
-
-      // Preserve params only if same team change. Also switch cals.
-      else if (teamId !== this.props.teamId) {
-        calIds = [Params.defaultCalIds];
-        opts.jsonQuery = {};
-      }
-
-      else {
-        opts.jsonQuery = this.getExtra(extra || {});
-      }
-
-      var periodStr = Period.isCustom(period) ?
-        [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
-        period.index.toString();
-
-      Route.nav.path(pathFn({
-        teamId: teamId,
-        calIds: Params.pathForCalIds(calIds),
-        interval: period.interval[0],
-        period: periodStr
-      }), opts);
     }
   }
 }

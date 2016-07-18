@@ -144,11 +144,17 @@ module Esper.Stores.Events {
       });
     });
 
-    describe("fetchPredictionsForPeriod", function() {
+    describe("fetchPredictions (period)", function() {
       var apiSpy: jasmine.Spy;
       var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
 
       beforeEach(function() {
+        /*
+          NB: API fetch is followed by another, asynchronous processing of
+          events before storing. If number of events returned >
+          Stores.Events.FETCH_BASE_SIZE, this may result in weird test results
+          (since test runs synchronously).
+        */
         apiSpy = Test.spySafe(Api, "postForTeamEvents");
         dfd = $.Deferred();
         apiSpy.and.returnValue(dfd.promise());
@@ -156,10 +162,11 @@ module Esper.Stores.Events {
       });
 
       function testFetch() {
-        fetchPredictionsForPeriod({ teamId: teamId, period: {
+        var period: Period.Single = {
           interval: "month",
           index: 552 // Jan 2016
-        }});
+        };
+        fetchPredictions({ teamId: teamId, period: period });
       }
 
       it("should fetch data from Api", function() {
@@ -236,7 +243,7 @@ module Esper.Stores.Events {
       });
     });
 
-    describe("getForPeriod", function() {
+    describe("get (period)", function() {
       beforeEach(function() {
         var dates = datesFromBounds(new Date(2016, 0, 1),
                                     new Date(2016, 1, 1));
@@ -301,12 +308,12 @@ module Esper.Stores.Events {
       });
 
       function getVal() {
-        return getForPeriod({
+        return get({
           cals: [{
             teamId: teamId,
             calId: calId
           }],
-          period: {
+          period: <Period.Single> {
             interval: "month",
             index: 552 // Jan 2016
           }

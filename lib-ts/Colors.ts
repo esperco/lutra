@@ -133,7 +133,17 @@ module Esper.Colors {
   export var level3 = "#FDD835"; // Yellow
   export var level4 = "#F0AD4E"; // Orange
   export var level5 = "#D9534F"; // Red
-
+  export function level(i: number) {
+    switch (i) {
+      case 0: return level0;
+      case 1: return level1;
+      case 2: return level2;
+      case 3: return level3;
+      case 4: return level4;
+      case 5: return level5;
+      default: return gray;
+    }
+  }
 
   // Already assigned colors
   export type ColorMap = { [index: string]: string };

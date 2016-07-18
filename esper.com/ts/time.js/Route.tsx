@@ -57,6 +57,7 @@ module Esper.Route {
       var period = Params.cleanSingleOrCustomPeriod(interval,
                                                     ctx.params["period"]);
       var incrs = Params.cleanRelativePeriodJSON(getJSONQuery(ctx)).incrs;
+      Charting.currentPathFn = pathFn;
       cbFn({
         teamId: teamId,
         calIds: calIds,

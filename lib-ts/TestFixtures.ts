@@ -84,64 +84,31 @@ module Esper.TestFixtures {
       platform: "Google",
       email: email,
       teams: [
-        {
+        makeTeam({
           teamid: teamId0,
           team_name: email,
-          team_approved: true,
-          team_owner: uid,
-          team_cal_user: uid,
-          team_assistants: [uid],
-          team_calendar_accounts: [],
-          team_email_aliases: [],
           team_executive: team0Exec,
           team_labels: team0Labels,
-          team_labels_norm: _.map(team0Labels, normalizeLabel),
-          team_label_urgent: "Urgent",
-          team_label_new: "New",
-          team_label_in_progress: "In Progress",
-          team_label_pending: "Pending",
-          team_label_done: "Done",
-          team_label_canceled: "Canceled",
           team_timestats_calendars: team0Calendars
-        }, {
+        }),
+
+        makeTeam({
           teamid: teamId1,
           team_name: "Peter Griffin",
           team_approved: true,
-          team_owner: uid,
-          team_cal_user: uid,
-          team_assistants: [uid],
-          team_calendar_accounts: [],
-          team_email_aliases: [],
           team_executive: team1Exec,
           team_labels: team1Labels,
-          team_labels_norm: _.map(team1Labels, normalizeLabel),
-          team_label_urgent: "Urgent",
-          team_label_new: "New",
-          team_label_in_progress: "In Progress",
-          team_label_pending: "Pending",
-          team_label_done: "Done",
-          team_label_canceled: "Canceled",
           team_timestats_calendars: team1Calendars
-        }, {
+        }),
+
+        makeTeam({
           teamid: teamId2,
           team_name: "Stewie Griffin",
           team_approved: true,
-          team_owner: uid,
-          team_cal_user: uid,
-          team_assistants: [uid],
-          team_calendar_accounts: [],
-          team_email_aliases: [],
           team_executive: team2Exec,
           team_labels: team2Labels,
-          team_labels_norm: _.map(team2Labels, normalizeLabel),
-          team_label_urgent: "Urgent",
-          team_label_new: "New",
-          team_label_in_progress: "In Progress",
-          team_label_pending: "Pending",
-          team_label_done: "Done",
-          team_label_canceled: "Canceled",
           team_timestats_calendars: team2Calendars
-        }
+        })
       ],
       groups: [groupId],
       team_members: [
@@ -169,6 +136,42 @@ module Esper.TestFixtures {
       ],
       landing_url: "moon/base"
     };
+  }
+
+  export function makeTeam(props: {
+    teamid?: string;
+    team_name?: string;
+    team_approved?: boolean;
+    team_owner?: string;
+    team_cal_user?: string;
+    team_assistants?: string[];
+    team_calendar_accounts?: string[];
+    team_email_aliases?: string[];
+    team_executive?: string;
+    team_labels?: string[];
+    team_timestats_calendars?: string[];
+  } = {}): ApiT.Team {
+    return {
+      teamid: props.teamid || "team-id",
+      team_name: props.team_name || "Team Name",
+      team_approved: _.isUndefined(props.team_approved) ?
+        true : props.team_approved,
+      team_owner: props.team_owner || uid,
+      team_cal_user: props.team_cal_user || uid,
+      team_assistants: props.team_assistants || [uid],
+      team_calendar_accounts: props.team_calendar_accounts || [],
+      team_email_aliases: props.team_email_aliases || [],
+      team_executive: props.team_executive || uid,
+      team_labels: props.team_labels || [],
+      team_labels_norm: _.map(props.team_labels, normalizeLabel),
+      team_label_urgent: "Urgent",
+      team_label_new: "New",
+      team_label_in_progress: "In Progress",
+      team_label_pending: "Pending",
+      team_label_done: "Done",
+      team_label_canceled: "Canceled",
+      team_timestats_calendars: props.team_timestats_calendars || ["calId"]
+    }
   }
 
   export function makeGenericCalendarEvent(props: {

@@ -14,7 +14,7 @@ module Esper.Actions {
 
     // Async load of events
     var teamIds = _.uniq(_.map(params.cals, (c) => c.teamId));
-    _.each(teamIds, (teamId) => Stores.Events.fetchPredictionsForPeriod({
+    _.each(teamIds, (teamId) => Stores.Events.fetchPredictions({
       teamId: teamId,
       period: params.period
     }));

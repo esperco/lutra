@@ -67,22 +67,10 @@ module Esper.Views {
         </span>);
       }
 
-      var eventsData = Stores.Events.getForPeriod({
+      var { isBusy, hasError, events} = Stores.Events.require({
         cals: this.props.cals,
         period: this.props.period
       });
-      var isBusy = eventsData.match({
-        none: () => false,
-        some: (d) => d.isBusy
-      });
-      var hasError = eventsData.match({
-        none: () => true,
-        some: (d) => d.hasError
-      });
-      var events = eventsData.match<Stores.Events.TeamEvent[]>({
-        none: () => [],
-        some: (d) => d.events
-      })
       var selectedEvents = _.filter(events, (e) =>
         !!_.find(this.state.selected, (s) =>
           s.teamId === e.teamId &&

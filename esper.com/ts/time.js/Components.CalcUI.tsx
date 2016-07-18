@@ -5,21 +5,21 @@
   result so that event changes don't cause checkboxes to disappear, etc.
 */
 module Esper.Components {
-  interface Props<T> {
-    calculation: EventStats.CalcBase<T, any>;
-    events: Stores.Events.TeamEvent[];
+  interface Props<R> {
+    calculation: EventStats.CalcBase<R, {}>;
   }
 
-  interface State<T> {
-    result: Option.T<T>;
+  interface State<R> {
+    result: Option.T<R>;
   }
 
-  export abstract class CalcUI<T, P extends Props<T>>
-    extends ReactHelpers.Component<P, State<T>>
+  // Generic Types: R - Calculation result type, P - extra props
+  export abstract class CalcUI<R, P>
+    extends ReactHelpers.Component<Props<R> & P, State<R>>
   {
-    _calculation: EventStats.CalcBase<T, any>;
+    _calculation: EventStats.CalcBase<R, {}>;
 
-    constructor(props: P) {
+    constructor(props: Props<R> & P) {
       super(props);
       this.state = {
         result: this.getResults()
@@ -30,7 +30,7 @@ module Esper.Components {
       this.props.calculation.addChangeListener(this.setResults);
     }
 
-    componentDidUpdate(oldProps: P) {
+    componentDidUpdate(oldProps: Props<R> & P) {
       if (oldProps.calculation !== this.props.calculation) {
         oldProps.calculation.removeChangeListener(this.setResults);
         this.props.calculation.addChangeListener(this.setResults);
@@ -42,13 +42,17 @@ module Esper.Components {
       this.props.calculation.removeChangeListener(this.setResults);
     }
 
-    getResults(props?: P) {
+    /*
+      getResult is a private helper function. Subclasses should use
+      this.state.result (which pulls last known result option)
+    */
+    private getResults(props?: Props<R> & P) {
       props = props || this.props;
       return props.calculation.getResults();
     }
 
     // Use arrow syntax so we can reference for listener
-    setResults = () => {
+    private setResults = () => {
       this.getResults().match({
         none: () => null,
         some: (result) => this.setState({ result: Option.some(result) })
