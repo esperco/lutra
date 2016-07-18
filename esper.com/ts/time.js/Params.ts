@@ -1,19 +1,40 @@
 module Esper.Params{
 
+  let allDay = {
+    start: { hour: 0, minute: 0 },
+    end: { hour: 24, minute: 0 }
+  };
+
   export function weekHoursAll() {
-    let all = Option.some({
-      start: { hour: 0, minute: 0 },
-      end: { hour: 24, minute: 0 }
-    });
+    let optAll = Option.some(allDay);
     return {
-      sun: all,
-      mon: all,
-      tue: all,
-      wed: all,
-      thu: all,
-      fri: all,
-      sat: all
+      sun: optAll,
+      mon: optAll,
+      tue: optAll,
+      wed: optAll,
+      thu: optAll,
+      fri: optAll,
+      sat: optAll
     };
+  }
+
+  export function weekHoursJSON(weekHours: Types.WeekHours) {
+    return _.omitBy({
+      sun: dayHourJSON(weekHours.sun),
+      mon: dayHourJSON(weekHours.mon),
+      tue: dayHourJSON(weekHours.tue),
+      wed: dayHourJSON(weekHours.wed),
+      thu: dayHourJSON(weekHours.thu),
+      fri: dayHourJSON(weekHours.fri),
+      sat: dayHourJSON(weekHours.sat)
+    }, (v) => !v)
+  }
+
+  function dayHourJSON(o: Option.T<Types.DayHours>) {
+    return o.match({
+      none: () => null,
+      some: (dh) => _.isEqual(dh, allDay) ? dh : null
+    });
   }
 
   export function cleanWeekHours(weekHours: Types.WeekHours) {

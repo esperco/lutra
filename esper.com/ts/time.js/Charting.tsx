@@ -42,7 +42,11 @@ module Esper.Charting {
 
     // Else merge old extra with new params
     else {
-      opts.jsonQuery = _.extend({}, o.extra, p.extra)
+      opts.jsonQuery = _.extend({}, o.extra, p.extra);
+      if (opts.jsonQuery.weekHours) {
+        opts.jsonQuery.weekHours =
+          Params.weekHoursJSON(opts.jsonQuery.weekHours)
+      }
     }
 
     var periodStr = Period.isCustom(period) ?
