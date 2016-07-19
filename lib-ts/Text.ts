@@ -32,6 +32,9 @@ module Esper.Text {
   export function AddGroupMemberHeading(group?: string) {
     return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
   }
+  export function ClickToEdit(entity: string) {
+    return `Click to edit ${entity}`;
+  }
 
   // Group roles
   export const GroupRoleOwner = "Owner";

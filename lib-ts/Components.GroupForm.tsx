@@ -415,20 +415,24 @@ module Esper.Components {
           <i className="fa fa-fw fa-calendar" />
         </Tooltip>
         {" "}
-        <span className="badge role-box">
-          {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
-        </span>
         { this.props.isOwner || this.props.isAdmin || isOwnTeam ?
           <span>
             <a className="pull-right text-danger" title="Delete"
                onClick={(e) => this.removeMember(member)}>
               <i className="fa fa-fw fa-trash list-group-item-text" />
             </a>
-            <a className="pull-right text-info" title="Edit"
-               onClick={(e) => this.showEditFor(member.email)}>
-              <i className="fa fa-fw fa-pencil list-group-item-text" />
-            </a>
-          </span> : null
+            <Tooltip className="pull-right"
+                     title={Text.ClickToEdit("role")}
+                     onClick={() => this.showEditFor(member.email)}>
+              <span className="badge role-box pull-right editable">
+                {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
+              </span>
+            </Tooltip>
+          </span>
+          :
+          <span className="badge role-box pull-right">
+            {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
+          </span>
         }
       </div>;
     }
