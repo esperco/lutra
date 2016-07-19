@@ -108,7 +108,9 @@ module Esper.Actions.Groups {
     Stores.Groups.remove(groupId);
   }
 
-  export function setGroupMemberRole(groupId: string, role: string, opts: {
+  export function setGroupMemberRole(groupId: string,
+                                     role: ApiT.GroupRole,
+                                     opts: {
     email?: string;
     uid?: string;
   }) {

@@ -18,7 +18,7 @@ module Esper.Components {
   interface State extends Actions.Groups.GroupData {
     teamFilter: string;
     emailFilter: string;
-    selectedRole: string;
+    selectedRole: ApiT.GroupRole;
     editMember?: string;
     hasInvalidEmail?: boolean;
   }
@@ -35,7 +35,7 @@ module Esper.Components {
         groupIndividuals: props.groupIndividuals,
         teamFilter: "",
         emailFilter: "",
-        selectedRole: Text.GroupRoleMember
+        selectedRole: "Member"
       };
     }
 
@@ -50,7 +50,7 @@ module Esper.Components {
           groupIndividuals: props.groupIndividuals,
           teamFilter: "",
           emailFilter: "",
-          selectedRole: Text.GroupRoleMember
+          selectedRole: "Member"
         };
       }
     }
@@ -258,7 +258,7 @@ module Esper.Components {
 
       var individual = {
         email,
-        role: Text.GroupRoleMember
+        role: "Member" as ApiT.GroupRole
       };
       this.mutateState((s) => {
         s.groupIndividuals.push(individual);
@@ -342,12 +342,21 @@ module Esper.Components {
       this.processUpdate();
     }
 
+    displayGroupRole(role: ApiT.GroupRole) {
+      if (role === "Member")
+        return Text.GroupRoleMember;
+      else if (role === "Manager")
+        return Text.GroupRoleManager;
+      else
+        return Text.GroupRoleOwner;
+    }
+
     renderMember(member: ApiT.GroupMember) {
       var exec = _.find(this.state.groupIndividuals, {
         email: member.email
       });
       if (!_.isEmpty(exec)) this.state.selectedRole = exec.role;
-      else this.state.selectedRole = Text.GroupRoleMember;
+      else this.state.selectedRole = "Member";
 
       var isOwnTeam = Stores.Teams.get(member.teamid).match({
         none: () => false,
@@ -367,24 +376,24 @@ module Esper.Components {
             <div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-owner")} name="group-role"
-                       onClick={() => this.state.selectedRole = Text.GroupRoleOwner}
-                       defaultChecked={this.state.selectedRole === Text.GroupRoleOwner} />
+                       onClick={() => this.state.selectedRole = "Owner"}
+                       defaultChecked={this.state.selectedRole === "Owner"} />
                 <label htmlFor={this.getId("role-owner")} className="group-role-label">
                   {Text.GroupRoleOwner}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-manager")} name="group-role"
-                       onClick={() => this.state.selectedRole = Text.GroupRoleManager}
-                       defaultChecked={this.state.selectedRole === Text.GroupRoleManager} />
+                       onClick={() => this.state.selectedRole = "Manager"}
+                       defaultChecked={this.state.selectedRole === "Manager"} />
                 <label htmlFor={this.getId("role-manager")} className="group-role-label">
                   {Text.GroupRoleManager}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-member")} name="group-role"
-                       onClick={() => this.state.selectedRole = Text.GroupRoleMember}
-                       defaultChecked={this.state.selectedRole === Text.GroupRoleMember} />
+                       onClick={() => this.state.selectedRole = "Member"}
+                       defaultChecked={this.state.selectedRole === "Member"} />
                 <label htmlFor={this.getId("role-member")} className="group-role-label">
                   {Text.GroupRoleMember}
                 </label>
@@ -421,17 +430,26 @@ module Esper.Components {
                onClick={(e) => this.removeMember(member)}>
               <i className="fa fa-fw fa-trash list-group-item-text" />
             </a>
-            <Tooltip className="pull-right"
-                     title={Text.ClickToEdit("role")}
-                     onClick={() => this.showEditFor(member.email)}>
-              <span className="badge role-box pull-right editable">
-                {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
+            { this.props.isOwner || this.props.isAdmin ?
+              <Tooltip className="pull-right"
+                       title={Text.ClickToEdit("role")}
+                       onClick={() => this.showEditFor(member.email)}>
+                <span className="badge role-box pull-right editable">
+                  {_.isEmpty(exec) ? Text.GroupRoleMember
+                    : this.displayGroupRole(exec.role)}
+                </span>
+              </Tooltip>
+              :
+              <span className="badge role-box pull-right">
+                {_.isEmpty(exec) ? Text.GroupRoleMember
+                  : this.displayGroupRole(exec.role)}
               </span>
-            </Tooltip>
+            }
           </span>
           :
           <span className="badge role-box pull-right">
-            {_.isEmpty(exec) ? Text.GroupRoleMember : exec.role}
+            {_.isEmpty(exec) ? Text.GroupRoleMember
+              : this.displayGroupRole(exec.role)}
           </span>
         }
       </div>;
@@ -450,24 +468,24 @@ module Esper.Components {
             <div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-owner")} name="group-role"
-                       defaultChecked={gim.role === Text.GroupRoleOwner}
-                       onClick={() => this.state.selectedRole = Text.GroupRoleOwner} />
+                       defaultChecked={gim.role === "Owner"}
+                       onClick={() => this.state.selectedRole = "Owner"} />
                 <label htmlFor={this.getId("role-owner")} className="group-role-label">
                   {Text.GroupRoleOwner}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-manager")} name="group-role"
-                       defaultChecked={gim.role === Text.GroupRoleManager}
-                       onClick={() => this.state.selectedRole = Text.GroupRoleManager} />
+                       defaultChecked={gim.role === "Manager"}
+                       onClick={() => this.state.selectedRole = "Manager"} />
                 <label htmlFor={this.getId("role-manager")} className="group-role-label">
                   {Text.GroupRoleManager}
                 </label>
               </div>
               <div className="esper-selectable">
                 <input type="radio" id={this.getId("role-member")} name="group-role"
-                       defaultChecked={gim.role === Text.GroupRoleMember}
-                       onClick={() => this.state.selectedRole = Text.GroupRoleMember} />
+                       defaultChecked={gim.role === "Member"}
+                       onClick={() => this.state.selectedRole = "Member"} />
                 <label htmlFor={this.getId("role-member")} className="group-role-label">
                   {Text.GroupRoleMember}
                 </label>
@@ -494,9 +512,6 @@ module Esper.Components {
       return <div className="list-group-item one-line" key={gim.email}>
         <i className="fa fa-fw fa-user" />
         {" "}{gim.email}{" "}
-        <span className="badge role-box">
-          {gim.role}
-        </span>
         { this.props.isOwner || this.props.isAdmin ?
           <span>
             { gim.uid !== Login.me() ?
@@ -509,8 +524,11 @@ module Esper.Components {
                 onClick={(e) => this.showEditFor(gim.email)}>
                  <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
-          </span> :
-          null
+          </span>
+          :
+          <span className="badge role-box pull-right">
+            {this.displayGroupRole(gim.role)}
+          </span>
         }
       </div>;
     }
@@ -519,7 +537,7 @@ module Esper.Components {
       this.mutateState((s) => {
         s.teamFilter = "";
         s.emailFilter = "";
-        s.selectedRole = Text.GroupRoleMember;
+        s.selectedRole = "Member";
         s.editMember = null;
         s.hasInvalidEmail = false;
       });

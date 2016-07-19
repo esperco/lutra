@@ -37,9 +37,9 @@ module Esper.Text {
   }
 
   // Group roles
-  export const GroupRoleOwner = "Owner";
+  export const GroupRoleOwner = "Administrator";
   export const GroupRoleManager = "Manager";
-  export const GroupRoleMember = "Member";
+  export const GroupRoleMember = "Contributor";
 
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";

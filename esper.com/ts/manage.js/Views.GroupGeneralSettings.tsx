@@ -60,7 +60,7 @@ module Esper.Views {
       var myself = _.find(this.props.group.group_individuals, function(gim) {
         return gim.uid === Login.me();
       });
-      var isOwner = _.isEmpty(myself) ? false : myself.role === Text.GroupRoleOwner;
+      var isOwner = _.isEmpty(myself) ? false : myself.role === "Owner";
 
       return <div className="panel panel-default">
         <div className="panel-body">
