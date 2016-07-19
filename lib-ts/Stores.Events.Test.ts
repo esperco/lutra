@@ -360,7 +360,7 @@ module Esper.Stores.Events {
 
     const guest1: ApiT.Attendee = {
       email: "a@example.com",
-      response: "NeedsAction"
+      response: "Needs_action"
     };
     const guest2: ApiT.Attendee = {
       email: "b@example.com",
