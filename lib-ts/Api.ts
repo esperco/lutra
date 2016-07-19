@@ -471,7 +471,7 @@ module Esper.Api {
   // Alias used in Otter
   export var getAllProfiles = getAllTeamProfiles;
 
-  export function getMyProfile() {
+  export function getMyProfile(): JQueryPromise<ApiT.Profile> {
     var url = prefix + "/api/profile/" + string(Login.myUid()) + "/me";
     return JsonHttp.get(url);
   }
