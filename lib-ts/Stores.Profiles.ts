@@ -46,7 +46,12 @@ module Esper.Stores.Profiles {
 
   export function init() {
     profilesLoadedDfd = $.Deferred<void>();
-    var apiP = Api.getAllProfiles();
+    var apiP = Login.data.teams.length ?
+      Api.getAllProfiles() :
+      Api.getMyProfile().then((profile) => ({
+        profile_list: [profile]
+      }));
+
     ProfileStore.fetch(statusId, apiP.then(() => Option.none<any>()));
     ProfileStore.transactP(apiP,
       (apiP2) => apiP2.done(
