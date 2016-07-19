@@ -90,8 +90,8 @@ module Esper.Text {
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
-  export const ShowNoRating = `Show Events Without Ratings`;
   export const NoRating = `No Rating`;
+  export const WeekHours = `Time of Day`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;

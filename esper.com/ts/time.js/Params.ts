@@ -19,7 +19,7 @@ module Esper.Params{
   }
 
   export function weekHoursJSON(weekHours: Types.WeekHours) {
-    return _.omitBy({
+    let ret = _.omitBy({
       sun: dayHourJSON(weekHours.sun),
       mon: dayHourJSON(weekHours.mon),
       tue: dayHourJSON(weekHours.tue),
@@ -28,25 +28,35 @@ module Esper.Params{
       fri: dayHourJSON(weekHours.fri),
       sat: dayHourJSON(weekHours.sat)
     }, (v) => !v)
+    return ret;
   }
 
   function dayHourJSON(o: Option.T<Types.DayHours>) {
     return o.match({
       none: () => null,
-      some: (dh) => _.isEqual(dh, allDay) ? dh : null
+      some: (dh) => _.isEqual(dh, allDay) ? {} : dh
     });
   }
 
+  export function mapWeekHours(
+    weekHours: Types.WeekHours,
+    fn: (v: Option.T<Types.DayHours>,
+         k: Types.DayAbbr) => Option.T<Types.DayHours>
+  ) {
+    return {
+      sun: fn(weekHours.sun, "sun"),
+      mon: fn(weekHours.mon, "mon"),
+      tue: fn(weekHours.tue, "tue"),
+      wed: fn(weekHours.wed, "wed"),
+      thu: fn(weekHours.thu, "thu"),
+      fri: fn(weekHours.fri, "fri"),
+      sat: fn(weekHours.sat, "sat")
+    };
+  }
+
   export function cleanWeekHours(weekHours: Types.WeekHours) {
-    weekHours = weekHours || weekHoursAll();
-    weekHours.sun = cleanDayHoursOpt(weekHours.sun);
-    weekHours.mon = cleanDayHoursOpt(weekHours.mon);
-    weekHours.tue = cleanDayHoursOpt(weekHours.tue);
-    weekHours.wed = cleanDayHoursOpt(weekHours.wed);
-    weekHours.thu = cleanDayHoursOpt(weekHours.thu);
-    weekHours.fri = cleanDayHoursOpt(weekHours.fri);
-    weekHours.sat = cleanDayHoursOpt(weekHours.sat);
-    return weekHours;
+    return mapWeekHours(weekHours || weekHoursAll(),
+      (v,k) => cleanDayHoursOpt(v));
   }
 
   export function cleanDayHoursOpt(o: Option.T<Types.DayHours>) {
@@ -55,10 +65,7 @@ module Esper.Params{
   }
 
   export function cleanDayHours(dayHours?: Types.DayHours) {
-    dayHours = dayHours || {
-      start: { hour: 0, minute: 0 },
-      end: { hour: 24, minute: 0}
-    };
+    dayHours = (dayHours && dayHours.start && dayHours.end) ? dayHours : allDay;
     dayHours.start = cleanHourMinute(dayHours.start);
     dayHours.end = cleanHourMinute(dayHours.end);
     return dayHours;

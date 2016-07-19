@@ -213,6 +213,11 @@ module Esper.Actions.Charts {
         updateFn={(x) => Charting.updateChart(o, { extra: { guestCounts: x }})}
       />,
 
+      <Components.WeekHourSelector key="weekHours"
+        selected={o.extra.weekHours}
+        updateFn={(x) => Charting.updateChart(o, { extra: { weekHours: x }})}
+      />,
+
       o.extra.type === "calendar" ? null :
       <Components.RelativePeriodSidebarSelector key="incrs"
         period={o.period}

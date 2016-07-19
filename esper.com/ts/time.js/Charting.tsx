@@ -45,7 +45,7 @@ module Esper.Charting {
       opts.jsonQuery = _.extend({}, o.extra, p.extra);
       if (opts.jsonQuery.weekHours) {
         opts.jsonQuery.weekHours =
-          Params.weekHoursJSON(opts.jsonQuery.weekHours)
+          Params.weekHoursJSON(opts.jsonQuery.weekHours);
       }
     }
 

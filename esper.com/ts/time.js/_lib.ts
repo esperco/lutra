@@ -39,6 +39,7 @@
 /// <reference path="../lib/Components.ProgressBar.tsx" />
 /// <reference path="../lib/Components.SearchBox.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
+/// <reference path="../lib/Components.SelectMenu.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.SignalStrength.tsx" />
 /// <reference path="../lib/Components.SimpleToggle.tsx" />

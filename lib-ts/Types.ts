@@ -107,6 +107,8 @@ module Esper.Types {
     sat: Option.T<DayHours>;
   }
 
+  export type DayAbbr = "sun"|"mon"|"tue"|"wed"|"thu"|"fri"|"sat";
+
   /*
     i.e. 11:00 to 17:00 -- end should be > start. Hour is in HourMinute is
     usually 0-23, but use 24:00 instead of 23:59 if you actually want to
@@ -140,22 +142,22 @@ module Esper.Types {
     type?: ChartType;
     incrs?: number[];
     filterStr?: string;
-    domains?: Params.ListSelectJSON;
-    durations?: Params.ListSelectJSON;
-    labels?: Params.ListSelectJSON;
-    ratings?: Params.ListSelectJSON;
-    guestCounts?: Params.ListSelectJSON;
-    weekHours?: Types.WeekHours;
+    domains?: ListSelectJSON;
+    durations?: ListSelectJSON;
+    labels?: ListSelectJSON;
+    ratings?: ListSelectJSON;
+    guestCounts?: ListSelectJSON;
+    weekHours?: WeekHours;
   }
 
   export interface EventCalcOpts { // Standard calc opts for all charts
     filterStr: string;
-    labels: Types.ListSelectJSON;
-    domains: Types.ListSelectJSON;
-    durations: Types.ListSelectJSON;
-    guestCounts: Types.ListSelectJSON;
-    ratings: Types.ListSelectJSON;
-    weekHours: Types.WeekHours;
+    labels: ListSelectJSON;
+    domains: ListSelectJSON;
+    durations: ListSelectJSON;
+    guestCounts: ListSelectJSON;
+    ratings: ListSelectJSON;
+    weekHours: WeekHours;
   }
   export interface DomainNestOpts extends EventCalcOpts {
     nestByDomain: boolean; // Used to nest domain => email in duration calc
@@ -165,11 +167,11 @@ module Esper.Types {
     type: ChartType;
     incrs: number[];
     filterStr: string;
-    domains: Params.ListSelectJSON;
-    durations: Params.ListSelectJSON;
-    labels: Params.ListSelectJSON;
-    ratings: Params.ListSelectJSON;
-    guestCounts: Params.ListSelectJSON;
-    weekHours: Types.WeekHours;
+    domains: ListSelectJSON;
+    durations: ListSelectJSON;
+    labels: ListSelectJSON;
+    ratings: ListSelectJSON;
+    guestCounts: ListSelectJSON;
+    weekHours: WeekHours;
   }
 }
