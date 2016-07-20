@@ -1,7 +1,7 @@
 module Esper.Text {
 
   // Personal (non-team) settings
-  export const PersonalSettings = "Personal";
+  export const PersonalSettings = "Other Settings";
 
   // Deactivate account?
   export const DeactivateDescription = `Deactivating your account ` +
