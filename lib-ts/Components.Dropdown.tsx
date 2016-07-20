@@ -34,6 +34,7 @@ module Esper.Components {
     className?: string;
     align?: "left"|"right";
     dropup?: boolean;
+    disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
   }
@@ -71,9 +72,11 @@ module Esper.Components {
     }
 
     open() {
-      renderDropdown(this.getMenuWrapper())
-      if (this.props.onOpen) {
-        this.props.onOpen();
+      if (!this.props.disabled) {
+        renderDropdown(this.getMenuWrapper())
+        if (this.props.onOpen) {
+          this.props.onOpen();
+        }
       }
     }
 

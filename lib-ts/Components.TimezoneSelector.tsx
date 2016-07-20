@@ -18,6 +18,7 @@ module Esper.Components {
   interface Props {
     id?: string;
     selected?: string;
+    disabled?: boolean;
     onSelect: (timezone: string) => void;
   }
 
@@ -53,9 +54,11 @@ module Esper.Components {
       var zoneInfo = Timezones.get(this.props.selected);
       return <Components.DropdownModal ref={(c) => this._dropdown = c}
               keepOpen={true} className="esper-timezone-select"
-              onOpen={() => this.onOpen()}>
+              onOpen={() => this.onOpen()}
+              disabled={this.props.disabled}>
         <Components.Selector id={this.props.id || this.getId("tz")}
-                             className="dropdown-toggle">
+                             className="dropdown-toggle"
+                             disabled={this.props.disabled}>
           { zoneInfo.display }
         </Components.Selector>
         <div className="dropdown-menu">

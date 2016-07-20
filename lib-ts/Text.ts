@@ -25,18 +25,21 @@ module Esper.Text {
   export const GroupIndividual = "individual";
   export const GroupIndividuals = "individuals";
 
-  // Add group member
+  // Group form
+  export const GroupCalendarSharing =
+    `This ${GroupMember} is sharing their calendars with the group`;
+  export const AddGroupIndividualLink = "Invite Someone Else";
   export function AddGroupMemberHeading(group?: string) {
     return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
   }
-
-  // Add group inidividual members
-  export const AddGroupIndividualLink = "Invite Someone Else";
+  export function ClickToEdit(entity: string) {
+    return `Click to edit ${entity}`;
+  }
 
   // Group roles
-  export const GroupRoleOwner = "Owner";
+  export const GroupRoleOwner = "Administrator";
   export const GroupRoleManager = "Manager";
-  export const GroupRoleMember = "Member";
+  export const GroupRoleMember = "Contributor";
 
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";

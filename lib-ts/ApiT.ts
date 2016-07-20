@@ -77,11 +77,13 @@ module Esper.ApiT {
 
   export type GroupLabels = ListResponse<string>;
 
+  export type GroupRole = "Member"|"Manager"|"Owner";
+
   export interface Group extends GroupUpdate {
     groupid: string;
     group_labels?: string[];
     group_labels_norm?: string[];
-    group_member_role?: string;
+    group_member_role?: GroupRole;
     group_teams?: GroupMember[];
     group_individuals?: GroupIndividual[];
   }
@@ -99,7 +101,7 @@ module Esper.ApiT {
 
   export interface GroupIndividual {
     uid?: string;
-    role: string;
+    role: GroupRole;
     email?: string;
     invite_sent?: string;
   }
