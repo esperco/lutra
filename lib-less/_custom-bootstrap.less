@@ -61,7 +61,7 @@
   box-shadow: none;
 
   &:hover, &:focus {
-    z-index: @zindex-button + 1;
+    z-index: @zindex-hover;
     transform: none;
   }
 }
@@ -206,7 +206,8 @@ input.form-control, textarea.form-control, select.form-control {
   }
 
   .input-group & {
-    z-index: 10; // So border stands out
+    z-index: @zindex-input;
+    &:hover, &:focus { z-index: @zindex-hover; }
   }
 }
 
