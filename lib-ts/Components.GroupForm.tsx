@@ -111,15 +111,18 @@ module Esper.Components {
             No {Text.GroupMembers} found
           </div>
           :
-          <div className="list-group esper-group-member-list">
+          <div>
             <label className="esper-header">
               { "Other " + Text.TeamExecs + " in " +
                 (this.state.name || "this " + Text.Group) }
             </label>
-            { _.map(this.state.groupMembers, (member) =>
-                    this.renderMember(member)) }
-            { _.map(individuals, (gim) =>
-                    this.renderIndividual(gim)) }
+            <div className="list-group">
+
+              { _.map(this.state.groupMembers, (member) =>
+                      this.renderMember(member)) }
+              { _.map(individuals, (gim) =>
+                      this.renderIndividual(gim)) }
+            </div>
           </div>
         }
         <hr />
