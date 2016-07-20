@@ -128,7 +128,7 @@ module Esper.Components {
         this.props.selected.sat.isSome() ? "sat" : null
       ]);
       this.props.updateFn(
-        Params.mapWeekHours(this.props.selected, (v, k) => this.updateHours(
+        WeekHours.map(this.props.hours, (v, k) => this.updateHours(
           v, _.includes(selectedIds, k), dayHours
         )));
     }

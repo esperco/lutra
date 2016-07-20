@@ -38,24 +38,8 @@ module Esper.Params{
     });
   }
 
-  export function mapWeekHours(
-    weekHours: Types.WeekHours,
-    fn: (v: Option.T<Types.DayHours>,
-         k: Types.DayAbbr) => Option.T<Types.DayHours>
-  ) {
-    return {
-      sun: fn(weekHours.sun, "sun"),
-      mon: fn(weekHours.mon, "mon"),
-      tue: fn(weekHours.tue, "tue"),
-      wed: fn(weekHours.wed, "wed"),
-      thu: fn(weekHours.thu, "thu"),
-      fri: fn(weekHours.fri, "fri"),
-      sat: fn(weekHours.sat, "sat")
-    };
-  }
-
   export function cleanWeekHours(weekHours: Types.WeekHours) {
-    return mapWeekHours(weekHours || weekHoursAll(),
+    return WeekHours.map(weekHours || weekHoursAll(),
       (v,k) => cleanDayHoursOpt(v));
   }
 

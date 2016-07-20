@@ -300,7 +300,7 @@ module Esper.EventStats {
       let ret: DurationSegment[] = [];
       let lastSegment: DurationSegment = null;
       while (startM.diff(endM) < 0) {
-        getDayHours(startM, opts.weekHours).flatMap((dayHours) => {
+        WeekHours.getDayHours(startM, opts.weekHours).flatMap((dayHours) => {
           // Intersect portion of event for this day with dayHours
           let dayStart = startM.clone().startOf('day');
           return intersectSegments(
@@ -344,23 +344,6 @@ module Esper.EventStats {
   }
 
   /*
-    Given a moment and a WeekHours object, figure out the day of the week and
-    return the relevant DayHours from the WeekHours
-  */
-  function getDayHours(m: moment.Moment, weekHours: Types.WeekHours) {
-    switch (m.format('ddd')) {
-      case "Sun": return weekHours.sun;
-      case "Mon": return weekHours.mon;
-      case "Tue": return weekHours.tue;
-      case "Wed": return weekHours.wed;
-      case "Thu": return weekHours.thu;
-      case "Fri": return weekHours.fri;
-      case "Sat": return weekHours.sat;
-      default: return Option.none<Types.DayHours>();
-    }
-  }
-
-  /*
     Given two time segments, returns a new segment with their intersection
   */
   function intersectSegments(s1: DurationSegment, s2: DurationSegment)
@@ -374,39 +357,6 @@ module Esper.EventStats {
       // No intersection
       return Option.none<DurationSegment>();
     }
-  }
-
-  // Simpler version of above to see if event has anything within weekhour
-  export function weekHoursOverlap(event: Types.TeamEvent,
-                                   weekHours: Types.WeekHours)
-  {
-    let startM = moment(event.start).clone();
-    let endM = moment(event.end);
-    while (startM.diff(endM) < 0) {
-      let overlaps = getDayHours(startM, weekHours)
-        .match({
-          none: () => false,
-          some: (dh) => {
-            let dayStart = startM.clone().startOf('day');
-            return intersectSegments(
-              { // Hours for this day
-                start: dayStart.clone().add(dh.start).valueOf(),
-                end: dayStart.clone().add(dh.end).valueOf()
-              },
-
-              { // Portion of event that overlaps this day
-                start: startM.valueOf(),
-                end: Math.min(endM.valueOf(),
-                              startM.clone().endOf('day').valueOf())
-              }).isSome();
-          }
-        });
-      if (overlaps) return true;
-
-      // Go to next day
-      startM = startM.startOf('day').add(1, 'day');
-    }
-    return false;
   }
 
 
@@ -597,7 +547,7 @@ module Esper.EventStats {
 
       // Filter by weekHour
       if (this._opts.weekHours &&
-          !weekHoursOverlap(event, this._opts.weekHours)) {
+          !WeekHours.overlap(event, this._opts.weekHours)) {
         return false;
       }
 
