@@ -12,8 +12,11 @@ module Esper.Components {
       calculation: EventStats.CalcBase<T, any>;
       fetching: boolean;
       error: boolean;
+      total: number; // How big should our pie chart be?
     }[];
   }
+
+  interface HasTotal { total: number; }
 
   export abstract class Chart<T extends EventStats.OptGrouping, U>
          extends ReactHelpers.Component<Props<T> & U, {}> {
@@ -84,6 +87,7 @@ module Esper.Components {
         .flatMap((r) => Option.wrap({
           period: d.period,
           current: d.current,
+          total: d.total,
           data: r
         })));
       if (_.find(results, (r) => r.isNone())) {
@@ -111,7 +115,8 @@ module Esper.Components {
       </div>;
     }
 
-    abstract renderMain(data: Charting.PeriodData<T>[]): JSX.Element;
+    abstract renderMain(data: Charting.PeriodData<T>[] & HasTotal[])
+      : JSX.Element;
   }
 
   /*

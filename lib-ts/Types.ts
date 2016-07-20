@@ -140,6 +140,7 @@ module Esper.Types {
 
   export interface ChartExtraOptsMaybe {
     type?: ChartType;
+    incUnscheduled?: boolean;
     incrs?: number[];
     filterStr?: string;
     domains?: ListSelectJSON;
@@ -165,6 +166,7 @@ module Esper.Types {
 
   export interface ChartExtraOpts extends ChartExtraOptsMaybe, EventCalcOpts {
     type: ChartType;
+    incUnscheduled: boolean;
     incrs: number[];
     filterStr: string;
     domains: ListSelectJSON;

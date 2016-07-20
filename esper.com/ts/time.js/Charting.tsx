@@ -104,7 +104,10 @@ module Esper.Charting {
     data: T;
   }
 
-  export type PeriodOptGroup = PeriodData<EventStats.OptGrouping>;
+  // PeriodOptGroup includes
+  export type PeriodOptGroup = PeriodData<EventStats.OptGrouping> & {
+    total: number;
+  };
   export type PeriodGrouping = PeriodData<EventStats.Grouping>;
 
 
@@ -216,14 +219,23 @@ module Esper.Charting {
     let groupings = _.map(groups, (g) => ({
       period: g.period,
       current: g.current,
-      data: g.data.some
+      data: g.data.some,
+      totalData: g.data.totalValue,
+      totalAll: g.total
     }));
 
     // Filter down to subgroups as appropriate
     if (! _.isEmpty(opts.subgroup)) {
       _.each(groupings, (g) => {
         _.each(opts.subgroup, (key) => {
-          g.data = g.data[key] ? g.data[key].subgroups : {}
+          let sub = g.data[key];
+          if (g.data[key]) {
+            g.data = sub.subgroups;
+            g.totalData = sub.totalValue;
+          } else {
+            g.data = {};
+            g.totalData = 0;
+          }
         });
       });
     }
@@ -253,6 +265,25 @@ module Esper.Charting {
               _.map(none.annotations, (a) => a.event)
             )
           }
+        };
+
+        if (opts.noneStart) {
+          data.unshift(s);
+        } else {
+          data.push(s);
+        }
+      }
+
+      // Handle remainder
+      let remainder = g.totalAll - g.totalData;
+      if (remainder > 0) {
+        let s = {
+          name: Text.ChartRemainder,
+          color: Colors.lighterGray,
+          count: 0,
+          x: periodIndex,
+          y: (opts.yFn || _.identity)(remainder),
+          events: { click: () => false }
         };
 
         if (opts.noneStart) {

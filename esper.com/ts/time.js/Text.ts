@@ -92,6 +92,7 @@ module Esper.Text {
 
   export const NoRating = `No Rating`;
   export const WeekHours = `Time of Day`;
+  export const IncUnscheduled = `Show Unscheduled Time`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
@@ -146,6 +147,9 @@ module Esper.Text {
 
   // Name for 0-value pseudo-event used for spacing
   export const ChartEmptyEvent = "No Events";
+
+  // For showing unscheduled time if we've selected less than total
+  export const ChartRemainder = "Unscheduled Time";
 
   /////
 

@@ -70,6 +70,7 @@ module Esper.Actions.Charts {
     typedQ.domains.none = typedQ.guestCounts.none;
 
     typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
+    typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
     return typedQ;
   }
 
@@ -214,8 +215,14 @@ module Esper.Actions.Charts {
       />,
 
       <Components.WeekHourSelector key="weekHours"
-        selected={o.extra.weekHours}
-        updateFn={(x) => Charting.updateChart(o, { extra: { weekHours: x }})}
+        hours={o.extra.weekHours}
+        updateHours={
+          (x) => Charting.updateChart(o, { extra: { weekHours: x }})
+        }
+        unscheduled={o.extra.incUnscheduled}
+        updateUnscheduled={
+          (x) => Charting.updateChart(o, { extra: { incUnscheduled: x }})
+        }
       />,
 
       o.extra.type === "calendar" ? null :
@@ -274,17 +281,20 @@ module Esper.Actions.Charts {
   }
 
   // Convert period data to calc data format used in Components.Charts.
-  function getPeriodCalcData<U, T>(
+  function getPeriodCalcData<R, P>(
+    o: BaseOpts<P>,
     data: PeriodList[],
     getCalc: (events: Stores.Events.TeamEvent[])
-      => EventStats.CalcBase<U, T>)
+      => EventStats.CalcBase<R /* results */, P /* props */>)
   {
     return _.map(data, (d) => ({
       period: d.period,
       current: d.current,
       fetching: d.data.isBusy,
       error: d.data.hasError,
-      calculation: getCalc(d.data.events)
+      calculation: getCalc(d.data.events),
+      total: o.extra.incUnscheduled ?
+        WeekHours.totalForPeriod(d.period, o.extra.weekHours) : 0
     }));
   }
 
@@ -296,7 +306,7 @@ module Esper.Actions.Charts {
     trackChart(o, "durations");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.DurationBucketCalc(events, o.extra)
+      o, data, (events) => new EventStats.DurationBucketCalc(events, o.extra)
     );
     render(ReactHelpers.contain(function() {
       let {chart, events} = getChart(o, {
@@ -329,7 +339,7 @@ module Esper.Actions.Charts {
     trackChart(o, "calendars");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.CalendarDurationCalc(events, o.extra)
+      o, data, (events) => new EventStats.CalendarDurationCalc(events, o.extra)
     );
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
@@ -366,7 +376,7 @@ module Esper.Actions.Charts {
     trackChart(o, "guests");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.GuestDurationCalc(events,
+      o, data, (events) => new EventStats.GuestDurationCalc(events,
         _.extend({}, o.extra, {
           // Nest domains for pie chart
           nestByDomain: o.extra.type === "percent"
@@ -398,7 +408,7 @@ module Esper.Actions.Charts {
     trackChart(o, "guest-counts");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.GuestCountDurationCalc(events, o.extra)
+      o, data, (events) => new EventStats.GuestCountDurationCalc(events, o.extra)
     );
     render(ReactHelpers.contain(function() {
       let {chart, events} = getChart(o, {
@@ -428,7 +438,7 @@ module Esper.Actions.Charts {
     trackChart(o, "labels");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.LabelDurationCalc(events, o.extra)
+      o, data, (events) => new EventStats.LabelDurationCalc(events, o.extra)
     );
     render(ReactHelpers.contain(function() {
       let {chart, events} = getChart(o, {
@@ -455,7 +465,7 @@ module Esper.Actions.Charts {
     trackChart(o, "ratings");
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
-      data, (events) => new EventStats.RatingDurationCalc(events, o.extra)
+      o, data, (events) => new EventStats.RatingDurationCalc(events, o.extra)
     );
     render(ReactHelpers.contain(function() {
       var calendars = Option.matchList(Stores.Calendars.list(o.teamId));
