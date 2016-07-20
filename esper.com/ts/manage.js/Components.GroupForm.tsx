@@ -2,10 +2,6 @@
   Form used in editing group name, timezone, etc.
 */
 
-/// <reference path="./Actions.Groups.ts" />
-/// <reference path="./Option.ts" />
-/// <reference path="./ReactHelpers.ts" />
-
 module Esper.Components {
   interface Props extends Actions.Groups.GroupData {
     userCalendars: Option.T<ApiT.GenericCalendar[]>;
@@ -70,7 +66,7 @@ module Esper.Components {
              type="text" className="form-control"
              onChange={(e) => this.onNameInputChange(e)}
              value={this.state.name}
-             placeholder="The Avengers Council"
+             placeholder="The Avengers"
              disabled={!this.props.isAdmin && !this.props.isOwner} />
           </div>
         </div>
@@ -378,26 +374,32 @@ module Esper.Components {
             </div>
             <div>
               <div className="esper-selectable">
-                <input type="radio" id={this.getId("role-owner")} name="group-role"
+                <input type="radio" id={this.getId("role-owner")}
+                       name="group-role"
                        onClick={() => this.state.selectedRole = "Owner"}
                        defaultChecked={this.state.selectedRole === "Owner"} />
-                <label htmlFor={this.getId("role-owner")} className="group-role-label">
+                <label htmlFor={this.getId("role-owner")}
+                       className="group-role-label">
                   {Text.GroupRoleOwner}
                 </label>
               </div>
               <div className="esper-selectable">
-                <input type="radio" id={this.getId("role-manager")} name="group-role"
+                <input type="radio" id={this.getId("role-manager")}
+                       name="group-role"
                        onClick={() => this.state.selectedRole = "Manager"}
                        defaultChecked={this.state.selectedRole === "Manager"} />
-                <label htmlFor={this.getId("role-manager")} className="group-role-label">
+                <label htmlFor={this.getId("role-manager")}
+                       className="group-role-label">
                   {Text.GroupRoleManager}
                 </label>
               </div>
               <div className="esper-selectable">
-                <input type="radio" id={this.getId("role-member")} name="group-role"
+                <input type="radio" id={this.getId("role-member")}
+                       name="group-role"
                        onClick={() => this.state.selectedRole = "Member"}
                        defaultChecked={this.state.selectedRole === "Member"} />
-                <label htmlFor={this.getId("role-member")} className="group-role-label">
+                <label htmlFor={this.getId("role-member")}
+                       className="group-role-label">
                   {Text.GroupRoleMember}
                 </label>
               </div>

@@ -29,7 +29,6 @@
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
-/// <reference path="../lib/Components.NewGroupForm.tsx" />
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
 /// <reference path="../lib/Components.RadioList.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />

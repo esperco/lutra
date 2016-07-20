@@ -2,11 +2,6 @@
   A form for creating a new Group
 */
 
-/// <reference path="./Actions.Groups.ts" />
-/// <reference path="./Components.GroupForm.tsx" />
-/// <reference path="./Login.ts" />
-/// <reference path="./ReactHelpers.ts" />
-
 module Esper.Components {
   interface Props {
     userCalendars: Option.T<ApiT.GenericCalendar[]>;

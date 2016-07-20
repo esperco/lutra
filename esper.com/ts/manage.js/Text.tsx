@@ -22,15 +22,42 @@ module Esper.Text {
   export const AddTeamLink = `New ${TeamExec}`;
   export const AddTeamHeading = "Who are you managing time for?";
 
-  // Add group
-  export const AddGroupLink = `New ${Group}`;
-  export const AddGroupHeading = "Create a new group";
-
   // Remove team
   export const RemoveTeamBtn = "Deactivate";
   export function removeTeamDescription(person?: string) {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
+
+  // Groups
+  export const Group = "group";
+  export const Groups = "groups";
+
+  export const GroupMember = "group member";
+  export const GroupMembers = "group members";
+
+  export const GroupIndividual = "individual";
+  export const GroupIndividuals = "individuals";
+
+  // Add group
+  export const AddGroupLink = `New ${Group}`;
+  export const AddGroupHeading = "Create a new group";
+
+  // Group form
+  export const GroupCalendarSharing =
+    `This ${GroupMember} is sharing their calendars with the group`;
+  export const AddGroupIndividualLink = "Invite Someone Else";
+  export function AddGroupMemberHeading(group?: string) {
+    return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
+  }
+  export function ClickToEdit(entity: string) {
+    return `Click to edit ${entity}`;
+  }
+
+  // Group roles
+  export const GroupRoleOwner = "Administrator";
+  export const GroupRoleManager = "Manager";
+  export const GroupRoleMember = "Contributor";
+
 
   // Remove group
   export const RemoveGroupBtn = "Remove";
