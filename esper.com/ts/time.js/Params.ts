@@ -19,7 +19,7 @@ module Esper.Params{
   }
 
   export function weekHoursJSON(weekHours: Types.WeekHours) {
-    let ret = _.omitBy({
+    return _.omitBy({
       sun: dayHourJSON(weekHours.sun),
       mon: dayHourJSON(weekHours.mon),
       tue: dayHourJSON(weekHours.tue),
@@ -27,8 +27,7 @@ module Esper.Params{
       thu: dayHourJSON(weekHours.thu),
       fri: dayHourJSON(weekHours.fri),
       sat: dayHourJSON(weekHours.sat)
-    }, (v) => !v)
-    return ret;
+    }, (v) => !v);
   }
 
   function dayHourJSON(o: Option.T<Types.DayHours>) {
