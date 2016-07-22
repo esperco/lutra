@@ -1,0 +1,71 @@
+@import "./lib/_bootstrap-variables";
+@import "./_login-buttons";
+
+@splash-height: 400px;
+
+.splash {
+  padding: 0;
+  max-height: 85%;
+  overflow-y: hidden;
+  background: @brand-gradient;
+}
+
+.feature-grid {
+  &:after {
+    content:"";
+    display:block;
+    clear:both;
+  }
+
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 70px 15px;
+
+  .feature-image, .feature-text {
+    padding: 10px 25px;
+  }
+
+  .feature-image {
+    img {
+      width: 100%;
+    }
+  }
+
+  .feature-text {
+    text-align: center;
+  }
+
+  @media (min-width:@screen-sm-min) {
+    max-width: 90%;
+
+    .feature-image {
+      width: 400px;
+    }
+  }
+
+  @media (min-width: @screen-md-min) {
+    max-width: 1000px;
+
+    .row > .left-col {
+      display: inline-block;
+      float: left;
+    }
+
+    .row > .right-col {
+      display: inline-block;
+      float: right;
+    }
+
+    .feature-image {
+      img {
+        max-height: 250px;
+        width: auto;
+      }
+    }
+  }
+
+  @media (min-width: @screen-lg-min) {
+    max-width: 1200px;
+  }
+}
