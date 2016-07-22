@@ -69,6 +69,7 @@ module Esper.Actions.Charts {
     typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
     typedQ.domains.none = typedQ.guestCounts.none;
 
+    typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
     return typedQ;
   }
 
@@ -210,6 +211,11 @@ module Esper.Actions.Charts {
         selected={o.extra.guestCounts}
         calculation={new EventStats.GuestCountBucketCalc(p.events, o.extra)}
         updateFn={(x) => Charting.updateChart(o, { extra: { guestCounts: x }})}
+      />,
+
+      <Components.WeekHourSelector key="weekHours"
+        selected={o.extra.weekHours}
+        updateFn={(x) => Charting.updateChart(o, { extra: { weekHours: x }})}
       />,
 
       o.extra.type === "calendar" ? null :

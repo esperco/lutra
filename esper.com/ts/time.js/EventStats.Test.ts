@@ -239,6 +239,176 @@ module Esper.EventStats {
           );
         });
       });
+
+      describe("with weekHours", function() {
+        let nineToFive = {
+          start: { hour: 9, minute: 0 },
+          end: { hour: 17, minute: 0}
+        };
+        let weekHours = {
+          mon: Option.some(nineToFive),
+          tue: Option.some(nineToFive),
+          wed: Option.some(nineToFive),
+          thu: Option.some(nineToFive),
+          fri: Option.some(nineToFive),
+          sat: Option.none<Types.DayHours>(),
+          sun: Option.none<Types.DayHours>()
+        };
+
+        it("should only count durations overlapping specified hours",
+        function() {
+          let e1 = Stores.Events.asTeamEvent(teamId,
+            TestFixtures.makeGenericCalendarEvent({
+              start: XDate.toString(new Date(2016, 0, 1, 5)),  // Friday
+              end:   XDate.toString(new Date(2016, 0, 4, 18)), // Monday
+            }));
+          let e2 = Stores.Events.asTeamEvent(teamId,
+            TestFixtures.makeGenericCalendarEvent({
+              start: XDate.toString(new Date(2016, 0, 4, 9)),  // Friday
+              end:   XDate.toString(new Date(2016, 0, 4, 18)), // Monday
+            }));
+          let val = durationWrappers([e1, e2], { weekHours: weekHours })
+
+          // Expect weekend to be skipped, time to split for overlap
+          expect(_.map(val, (e) => e.duration)).toEqual(
+            _.map([8 + 4, 4], (s) => Math.round(s * 60 * 60))
+          );
+        })
+      });
+    });
+
+
+    //////
+
+    describe("getSegments", function() {
+
+      it("should truncate events that run past bounds", function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({
+            start: XDate.toString(new Date(2016, 0, 1, 12)),
+            end:   XDate.toString(new Date(2016, 0, 3, 12)),
+          }));
+        let start = new Date(2016, 0, 2, 0);
+        let end = new Date(2016, 0, 2, 12);
+
+        var segments = getSegments(e, {
+          truncateStart: start,
+          truncateEnd: end
+        });
+        expect(segments).toEqual([{
+          start: start.getTime(),
+          end: end.getTime()
+        }]);
+      });
+
+      let weekHours = { // M @ 9am - F @ 5:30pm, continuous
+        mon: Option.some({
+          start: {hour: 9, minute: 0},
+          end: {hour: 24, minute: 0}
+        }),
+        tue: Option.some({
+          start: {hour: 0, minute: 0},
+          end: {hour: 24, minute: 0}
+        }),
+        wed: Option.some({
+          start: {hour: 0, minute: 0},
+          end: {hour: 24, minute: 0}
+        }),
+        thu: Option.some({
+          start: {hour: 0, minute: 0},
+          end: {hour: 24, minute: 0}
+        }),
+        fri: Option.some({
+          start: {hour: 0, minute: 0},
+          end: {hour: 17, minute: 30}
+        }),
+        sat: Option.none<Types.DayHours>(),
+        sun: Option.none<Types.DayHours>()
+      }
+
+      it("should truncate events based on working hours", function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({ // Friday
+            start: XDate.toString(new Date(2016, 0, 1, 5)),
+            end:   XDate.toString(new Date(2016, 0, 1, 18)),
+          }));
+        let segments = getSegments(e, { weekHours: weekHours });
+        expect(segments).toEqual([{
+          start: (new Date(2016, 0, 1, 5)).getTime(),
+          end: (new Date(2016, 0, 1, 17, 30)).getTime(),
+        }]);
+      });
+
+      it("should truncate multi-day events based on working hours",
+      function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({
+            start: XDate.toString(new Date(2016, 0, 1, 5)),  // Friday
+            end:   XDate.toString(new Date(2016, 0, 4, 18)), // Monday
+          }));
+        let segments = getSegments(e, { weekHours: weekHours });
+
+        // Expect weekend to be skipped
+        expect(segments).toEqual([{
+          start: (new Date(2016, 0, 1, 5)).getTime(),
+          end: (new Date(2016, 0, 1, 17, 30)).getTime()
+        }, {
+          start: (new Date(2016, 0, 4, 9)).getTime(),
+          end: (new Date(2016, 0, 4, 18)).getTime(),
+        }]);
+      });
+
+      it("should preserve segments across days", function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({
+            start: XDate.toString(new Date(2016, 0, 4, 20)),  // Monday
+            end:   XDate.toString(new Date(2016, 0, 5, 4)),   // Tuesday
+          }));
+        let segments = getSegments(e, { weekHours: weekHours });
+
+        /*
+          Since Monday goes to midnight and Tuesday starts at midnight,
+          expect to see a single segment covering both
+        */
+        expect(segments).toEqual([{
+          start: (new Date(2016, 0, 4, 20)).getTime(),
+          end: (new Date(2016, 0, 5, 4)).getTime()
+        }]);
+      });
+    });
+
+    describe("weekHoursOverlap", function() {
+      let nineToFive = {
+        start: { hour: 9, minute: 0 },
+        end: { hour: 17, minute: 0}
+      };
+      let weekHours = {
+        mon: Option.some(nineToFive),
+        tue: Option.some(nineToFive),
+        wed: Option.some(nineToFive),
+        thu: Option.some(nineToFive),
+        fri: Option.some(nineToFive),
+        sat: Option.none<Types.DayHours>(),
+        sun: Option.none<Types.DayHours>()
+      };
+
+      it("should return true if events overlap at all", function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({ // Friday
+            start: XDate.toString(new Date(2016, 0, 1, 5)),
+            end:   XDate.toString(new Date(2016, 0, 1, 18)),
+          }));
+        expect(weekHoursOverlap(e, weekHours)).toBe(true);
+      });
+
+      it("should return false if events don't overlap at all", function() {
+        let e = Stores.Events.asTeamEvent(teamId,
+          TestFixtures.makeGenericCalendarEvent({ // Friday
+            start: XDate.toString(new Date(2016, 0, 1, 5)),
+            end:   XDate.toString(new Date(2016, 0, 1, 8)),
+          }));
+        expect(weekHoursOverlap(e, weekHours)).toBe(false);
+      });
     });
 
 
@@ -251,7 +421,8 @@ module Esper.EventStats {
       domains: { all: true, none: true, some: [] },
       durations: { all: true, none: true, some: [] },
       guestCounts: { all: true, none: true, some: [] },
-      ratings: { all: true, none: true, some: [] }
+      ratings: { all: true, none: true, some: [] },
+      weekHours: Params.weekHoursAll()
     }
 
     describe("Calculation", function() {
@@ -439,8 +610,8 @@ module Esper.EventStats {
 
       var e1 = Stores.Events.asTeamEvent("team-id",
         TestFixtures.makeGenericCalendarEvent({
-          start: XDate.toString(new Date(2016, 0, 1, 23)),
-          end:   XDate.toString(new Date(2016, 0, 2)),
+          start: XDate.toString(new Date(2016, 0, 1, 22)),
+          end:   XDate.toString(new Date(2016, 0, 1, 23)),
         }));
       var e2 = Stores.Events.asTeamEvent("team-id",
         TestFixtures.makeGenericCalendarEvent({

@@ -7,7 +7,7 @@
 
 module Esper.Types {
 
-  /* Event Types */
+  /* Event Types */ //////////////////////////
 
   /*
     Similar to ApiT.GenericCalendarEvent but with some teamId and different
@@ -73,5 +73,105 @@ module Esper.Types {
     dates: EventsForDate[];
     isBusy: boolean;
     hasError: boolean;
+  }
+
+
+  /* Filtering, selection */ //////////////////////////
+
+  // Filter events by some attribute in a list
+  export interface ListSelectJSON {
+    // Show all items
+    all: boolean;
+
+    // Show items with no label, domain, etc.
+    none: boolean;
+
+    // Show items with at least one of the items in this list
+    some: string[];
+  }
+
+  /*
+    Interface for representing business hours -- considered using a 7-item
+    array but this introduces the possibility of errors based on what the
+    "start" of the week is.
+
+    Use Option.none to represent that there should be no hours on a given day.
+  */
+  export interface WeekHours {
+    sun: Option.T<DayHours>;
+    mon: Option.T<DayHours>;
+    tue: Option.T<DayHours>;
+    wed: Option.T<DayHours>;
+    thu: Option.T<DayHours>;
+    fri: Option.T<DayHours>;
+    sat: Option.T<DayHours>;
+  }
+
+  export type DayAbbr = "sun"|"mon"|"tue"|"wed"|"thu"|"fri"|"sat";
+
+  /*
+    i.e. 11:00 to 17:00 -- end should be > start. Hour is in HourMinute is
+    usually 0-23, but use 24:00 instead of 23:59 if you actually want to
+    capture going to end of day.
+  */
+  export interface DayHours {
+    start: ApiT.HourMinute;
+    end: ApiT.HourMinute;
+  }
+
+
+  /* Charting */ //////////////////////////
+
+  export type ChartType = "percent"|"absolute"|"calendar";
+  export type ChartGroup = "calendars"
+                          |"durations"
+                          |"domains"
+                          |"guest-counts"
+                          |"labels"
+                          |"ratings";
+
+  // Base options needed to fetch and get events
+  export interface ChartBaseOpts<T> {
+    teamId: string;
+    calIds: string[];
+    period: Period.Single|Period.Custom;
+    extra: ChartExtraOpts & T;
+  }
+
+  export interface ChartExtraOptsMaybe {
+    type?: ChartType;
+    incrs?: number[];
+    filterStr?: string;
+    domains?: ListSelectJSON;
+    durations?: ListSelectJSON;
+    labels?: ListSelectJSON;
+    ratings?: ListSelectJSON;
+    guestCounts?: ListSelectJSON;
+    weekHours?: WeekHours;
+  }
+
+  export interface EventCalcOpts { // Standard calc opts for all charts
+    filterStr: string;
+    labels: ListSelectJSON;
+    domains: ListSelectJSON;
+    durations: ListSelectJSON;
+    guestCounts: ListSelectJSON;
+    ratings: ListSelectJSON;
+    weekHours: WeekHours;
+  }
+  export interface DomainNestOpts extends EventCalcOpts {
+    nestByDomain: boolean; // Used to nest domain => email in duration calc
+  }
+
+  export interface ChartExtraOpts extends ChartExtraOptsMaybe, EventCalcOpts {
+    type: ChartType;
+    incrs: number[];
+    filterStr: string;
+    domains: ListSelectJSON;
+    durations: ListSelectJSON;
+    labels: ListSelectJSON;
+    ratings: ListSelectJSON;
+    guestCounts: ListSelectJSON;
+    weekHours: WeekHours;
   }
 }

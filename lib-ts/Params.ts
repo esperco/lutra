@@ -253,16 +253,7 @@ module Esper.Params {
 
 
   // Filter events by some attribute in a list
-  export interface ListSelectJSON {
-    // Show all items
-    all: boolean;
-
-    // Show items with no label, domain, etc.
-    none: boolean;
-
-    // Show items with at least one of the items in this list
-    some: string[];
-  }
+  export type ListSelectJSON = Types.ListSelectJSON;
 
   export function cleanListSelectJSON(q: any = {}): ListSelectJSON {
     q = q || {

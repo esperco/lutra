@@ -1,0 +1,36 @@
+@import "../lib/_bootstrap-variables.less";
+
+.day-selector .esper-select-menu {
+  display: flex;
+
+  .esper-selectable, li > a {
+    flex-grow: 1;
+    text-align: center;
+    display: inline-block;
+
+    &.active { font-weight: bold; }
+
+    i.fa { display: none; }
+  }
+
+
+}
+
+.esper-left-sidebar .esper-expando .day-selector .esper-select-menu {
+  .esper-selectable, li > a {
+    &.active { font-weight: bold; }
+  }
+}
+
+.day-selector .times {
+  display: flex;
+
+  .hour-minute {
+    flex-grow: 1
+  }
+
+  .dash {
+    padding: 0 @padding-xs-horizontal;
+    line-height: @input-height-base;
+  }
+}
