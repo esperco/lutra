@@ -10,13 +10,10 @@ function slackSignIn() {
   xhr.onloadend = function() {
     if (xhr.status == 200) {
       var body = JSON.parse(xhr.responseText);
-      var redirect_uri = Esper.PRODUCTION ?
-        "https://app.esper.com/api/slack/authorized" :
-        "https://beta.esper.com:8012/api/slack/authorized"
       var url = "https://slack.com/oauth/authorize?client_id=" +
         body.client_id + "&scope=" +
         body.id_scope + "&redirect_uri=" +
-        encodeURIComponent(redirect_uri);
+        encodeURIComponent(body.redirect_uri);
       window.location = url;
     }
   }
