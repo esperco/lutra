@@ -1,3 +1,27 @@
+function slackSignIn() {
+  var xhr = new XMLHttpRequest();
+  var api_url = Esper.PRODUCTION ?
+    "https://app.esper.com/api/slack/app-info" :
+    "http://127.0.0.1/api/slack/app-info";
+
+  xhr.open("GET", api_url);
+  xhr.send();
+
+  xhr.onloadend = function() {
+    if (xhr.status == 200) {
+      var body = JSON.parse(xhr.responseText);
+      var redirect_uri = Esper.PRODUCTION ?
+        "https://app.esper.com/api/slack/authorized" :
+        "https://beta.esper.com:8012/api/slack/authorized"
+      var url = "https://slack.com/oauth/authorize?client_id=" +
+        body.client_id + "&scope=" +
+        body.id_scope + "&redirect_uri=" +
+        encodeURIComponent(redirect_uri);
+      window.location = url;
+    }
+  }
+}
+
 function toggleNavMenu() {
   if ($(".nav-menu").css("display") === "none") {
     $(".nav-menu").fadeIn("fast");
