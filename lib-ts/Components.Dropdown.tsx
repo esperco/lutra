@@ -32,8 +32,6 @@ module Esper.Components {
   interface Props {
     children?: JSX.Element[];
     className?: string;
-    align?: "left"|"right";
-    dropup?: boolean;
     disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
@@ -120,20 +118,26 @@ module Esper.Components {
       var offset = toggle.offset() || { left: 0, top: 0 };
       var height = toggle.outerHeight();
       var width = toggle.outerWidth();
-      var top = offset.top + toggle.outerHeight();
+      var top = offset.top - $(window).scrollTop() + toggle.outerHeight();
       var bottom = $(window).height() - offset.top;
-      var left = offset.left;
+      var left = offset.left - $(window).scrollLeft();
       var right = $(window).width() - (offset.left + width);
 
-      var align: Align = this.props.dropup ?
+      // Align right if if right edge is pretty far over
+      var alignRight = (right / $(window).width()) <= 0.3;
+
+      // Drop-up if top is too low
+      var alignTop = (top / $(window).height()) > 0.7;
+
+      var align: Align = alignTop ?
 
         // Dropup
-        ( this.props.align === "right" ?
+        ( alignRight ?
           { bottom: bottom, right: right } :
           { bottom: bottom, left: left } ) :
 
         // Dropdown
-        ( this.props.align === "right" ?
+        ( alignRight ?
           { top: top, right: right } :
           { top: top, left: left } );
 
@@ -170,6 +174,10 @@ module Esper.Components {
     align: Align;
   }
 
+  function hasTop(x: {top: number}|{bottom: number}): x is {top: number} {
+    return x.hasOwnProperty('top');
+  }
+
   class DropdownMenu extends ReactHelpers.Component<MenuProps, {}> {
     constructor(props: MenuProps) {
       super(props);
@@ -180,6 +188,7 @@ module Esper.Components {
         minWidth: this.props.width,
         position: "absolute"
       }, this.props.align);
+
       return <div className="dropdown-backdrop" onClick={() => this.close()}>
         <div className={classNames(this.props.className, {
                dropdown: _.isUndefined(this.props.className),
@@ -199,6 +208,36 @@ module Esper.Components {
     */
     close() {
       clearDropdown();
+    }
+
+    // Apply maxHeight after rendering if actual height breaks window edge
+    componentDidMount() {
+      this.applyMax();
+    }
+
+    componentDidUpdate() {
+      super.componentDidUpdate();
+      this.applyMax();
+    }
+
+    applyMax() {
+      let align = this.props.align;
+      let menu = this.find('.dropdown-menu');
+      let maxHeight = hasTop(align) ?
+
+        // Dropdown
+        $(window).height() - align.top :
+
+        // Dropup
+        $(window).height() - align.bottom;
+
+      // Buffer slightly
+      maxHeight = maxHeight * 0.9;
+
+      this.find('.dropdown-menu').css({
+        "max-height": maxHeight,
+        "overflow": "auto"
+      });
     }
   }
 

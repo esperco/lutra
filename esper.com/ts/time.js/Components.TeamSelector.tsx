@@ -12,7 +12,7 @@ module Esper.Components {
     var selectedTeam = _.find(teams, (t) => t.teamid === selectedId);
     var displayName = selectedTeam ? selectedTeam.team_name : Text.NoTeam;
 
-    return <DropdownModal className="team-selector" dropup={true}>
+    return <DropdownModal className="team-selector">
       <div className="dropdown-toggle clearfix">
         { displayName }
         <span className="pull-right">

@@ -128,7 +128,7 @@ module Esper.Components {
 
       { canRemove || canChangeRole || canRemoveCals || canAddCals ?
 
-        <div className="pull-right"><DropdownModal align="right">
+        <div className="pull-right"><DropdownModal>
           <GroupRole role={role} className="dropdown-toggle" editable={true} />
           <div className="dropdown-menu">
             { canChangeRole ? <RadioList

@@ -34,8 +34,6 @@ module Esper.Components {
   export class DropdownModal extends ReactHelpers.Component<{
     children?: JSX.Element[];
     className?: string;
-    align?: "left"|"right";
-    dropup?: boolean;
     disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
@@ -82,8 +80,6 @@ module Esper.Components {
           className={classNames("hidden-xs", "dropdown", this.props.className)}
           keepOpen={this.props.keepOpen}
           onOpen={this.props.onOpen}
-          align={this.props.align}
-          dropup={this.props.dropup}
           disabled={this.props.disabled}
         >
           { this.props.children }
