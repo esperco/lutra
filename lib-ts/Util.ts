@@ -158,27 +158,6 @@ module Esper.Util {
     delayTimeouts[id] = setTimeout(fn, delay);
   }
 
-  /*
-    Iterates over a list with a filter function, returns both matching
-    and unmatching values
-  */
-  export function matches<T>(list: T[], fn: (t: T) => boolean) {
-    var matched: T[] = [];
-    var unmatched: T[] = [];
-    _.each(list, (i) => {
-      if (fn(i)) {
-        matched.push(i)
-      } else {
-        unmatched.push(i)
-      }
-    });
-
-    return {
-      some: matched,
-      none: unmatched
-    };
-  }
-
   export function keyObj<T>(key: string, value: T): {
     [index: string]: T
   } {
@@ -219,5 +198,40 @@ module Esper.Util {
       // Convert ..args to args (typing ...args is annoying)
       function(...args: T[]) { return args; }
     )
+  }
+
+  /*
+    Typed, functional switching, useful for React since if/else-if is clunky
+    when using with React expressions
+
+      declare var x: number;
+      Util.match(x,
+        [
+          [1, "One"],
+          [2, "Two"]
+        ],
+        "Not one or two"
+      );
+
+    Can also use custom matching:
+
+      Util.match(x,
+        [
+          [1, "One"],
+          [2, "Two"]
+        ],
+        "Not one or two",
+        (x,y) => parseInt(x) === parseInt(y)
+      );
+
+  */
+  export function match<I,O>(x: I,
+    choices: Array<[I, O]>,
+    defaultChoice: O,
+    testFn?: (x: I, y: I) => boolean
+  ): O {
+    testFn = testFn || ((x: I, y:I) => x === y);
+    let found = _.find(choices, (c) => testFn(c[0], x));
+    return found ? found[1] : defaultChoice;
   }
 }
