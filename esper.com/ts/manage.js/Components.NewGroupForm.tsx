@@ -7,6 +7,7 @@ module Esper.Components {
     teams: ApiT.Team[];
     userCalendars: Option.T<ApiT.GenericCalendar[]>;
     isAdmin?: boolean;
+    onSubmit?: () => void;
   }
 
   interface State { }
@@ -16,8 +17,10 @@ module Esper.Components {
 
     render() {
       return <GroupForm ref={(c) => this._form = c}
-        name="" uid={Login.me()} timezone={moment.tz.guess()}
+        name="" uid={Login.me()}
+        timezone={moment.tz.guess()}
         editable={true}
+        onSubmit={this.props.onSubmit}
       />
     }
 

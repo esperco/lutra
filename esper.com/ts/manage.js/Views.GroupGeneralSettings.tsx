@@ -77,7 +77,8 @@ module Esper.Views {
               uid={Login.me()}
               editable={this.props.editable}
               timezone={this.props.group.group_timezone}
-              onUpdate={this.save.bind(this)}
+              onUpdate={this.delayedSave.bind(this)}
+              onSubmit={this.save.bind(this)}
             />
           </Components.ModalPanel>
         </div>

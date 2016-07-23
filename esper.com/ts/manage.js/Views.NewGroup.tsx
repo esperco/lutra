@@ -36,6 +36,7 @@ module Esper.Views {
                     ref={(c) => this._groupForm = c}
                     teams={Stores.Teams.all()}
                     userCalendars={Stores.Calendars.listAllForUser()}
+                    onSubmit={() => this.save()}
                   />
                 </Components.ModalPanel>
               </div>

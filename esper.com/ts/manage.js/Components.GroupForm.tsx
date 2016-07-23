@@ -6,6 +6,7 @@ module Esper.Components {
   interface Props extends Actions.Groups.GroupData {
     groupid?: string;
     onUpdate?: () => void;
+    onSubmit?: () => void; // Enter
     editable?: boolean;
   }
 
@@ -25,7 +26,8 @@ module Esper.Components {
 
     // Reset state on prop change
     componentWillReceiveProps(props: Props) {
-      if (! _.isEqual(this.props, props)) {
+      if (this.props.groupid !== props.groupid ||
+          this.props.name !== props.name) {
         this.setState({
           name: props.name,
           uid: props.uid,
@@ -48,6 +50,7 @@ module Esper.Components {
             { this.props.editable ?
               <input id={this.getId("name")} name="name"
                 type="text" className="form-control"
+                onKeyDown={(e) => this.onKeyDown(e)}
                 onChange={(e) => this.onNameInputChange(e)}
                 value={this.state.name}
                 placeholder="The Avengers" /> :
@@ -76,6 +79,14 @@ module Esper.Components {
     updateTimezone(tz: string) {
       this.mutateState((s) => s.timezone = tz);
       this.processUpdate();
+    }
+
+    // Enter to submit
+    onKeyDown(e: React.KeyboardEvent) {
+      if (e.keyCode === 13 && this.props.onSubmit) {
+        e.preventDefault();
+        this.props.onSubmit();
+      }
     }
 
     onNameInputChange(event: React.FormEvent) {
