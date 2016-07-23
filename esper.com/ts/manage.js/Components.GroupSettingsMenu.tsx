@@ -3,17 +3,25 @@
 */
 
 module Esper.Components {
-  export function GroupSettingsMenu({groupId, pathFn}: {
-    groupId: string;
+  export function GroupSettingsMenu({group, pathFn}: {
+    group: ApiT.Group;
     pathFn?: (p: {groupId: string}) => Paths.Path;
   }) {
+    var groupId = group.groupid;
+    var me = _.find(group.group_individuals,
+      (gim) => gim.uid === Login.myUid()
+    );
+
     return <div className="esper-content-header settings-menu fixed padded">
       <SettingsMenuLink groupId={groupId} text={Text.GeneralSettings}
         pathFn={Paths.Manage.Group.general} activePathFn={pathFn} />
       <SettingsMenuLink groupId={groupId} text={Text.Labels}
         pathFn={Paths.Manage.Group.labels} activePathFn={pathFn} />
-      <SettingsMenuLink groupId={groupId} text={Text.NotificationSettings}
-        pathFn={Paths.Manage.Group.notifications} activePathFn={pathFn} />
+      { me && me.role !== "Member" ?
+        <SettingsMenuLink groupId={groupId} text={Text.NotificationSettings}
+          pathFn={Paths.Manage.Group.notifications} activePathFn={pathFn} /> :
+        null
+      }
     </div>;
   }
 

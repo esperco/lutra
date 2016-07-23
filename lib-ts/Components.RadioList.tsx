@@ -10,6 +10,9 @@ module Esper.Components {
     choices: ListChoice[];
     selectedId: string;
     updateFn: (ids: string) => void;
+    className?: string;
+    listClasses?: string;
+    itemClasses?: string;
   }
 
   export function RadioList(props: Props) {
@@ -22,9 +25,9 @@ module Esper.Components {
       selectedIcon="fa-check-circle-o"
       unselectedIcon="fa-circle-thin"
 
-      className="esper-radio-list"
-      listClasses="esper-flex-list esper-select-menu"
-      itemClasses="esper-selectable"
+      className={classNames("esper-radio-list", props.className)}
+      listClasses={props.listClasses || "esper-flex-list esper-select-menu"}
+      itemClasses={props.itemClasses || "esper-selectable"}
       selectedItemClasses="active"
     />;
   }

@@ -19,6 +19,12 @@ module Esper.Stores.Profiles {
   // A "status" ID used solely to track status of getAllProfiles call
   const statusId = "";
 
+  export function all() {
+    return Option.flatten(
+      _.map(ProfileStore.all(), (p) => p.data)
+    );
+  }
+
   export function get(uid: string) {
     return ProfileStore.get(uid).flatMap((p) => p.data);
   }

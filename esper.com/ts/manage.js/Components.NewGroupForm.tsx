@@ -4,6 +4,7 @@
 
 module Esper.Components {
   interface Props {
+    teams: ApiT.Team[];
     userCalendars: Option.T<ApiT.GenericCalendar[]>;
     isAdmin?: boolean;
   }
@@ -16,10 +17,7 @@ module Esper.Components {
     render() {
       return <GroupForm ref={(c) => this._form = c}
         name="" uid={Login.me()} timezone={moment.tz.guess()}
-        isAdmin={this.props.isAdmin} isOwner={true}
-        groupMembers={[]}
-        groupIndividuals={[]}
-        userCalendars={this.props.userCalendars}
+        editable={true}
       />
     }
 

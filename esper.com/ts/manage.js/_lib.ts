@@ -27,6 +27,7 @@
 /// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
+/// <reference path="../lib/Components.FilterInput.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
