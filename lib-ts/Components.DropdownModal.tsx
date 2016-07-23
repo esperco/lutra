@@ -9,13 +9,13 @@
       <button className="btn btn-default dropdown-toggle" type="button"
               id="dropdownMenu1">
         Dropdown
-        <span class="caret"></span>
+        <span className="caret"></span>
       </button>
       <ul className="dropdown-menu">
         <li><a>Action</a></li>
         <li><a>Another action</a></li>
         <li><a>Something else here</a></li>
-        <li role="separator" class="divider"></li>
+        <li role="separator" className="divider"></li>
         <li><a>Separated link</a></li>
       </ul>
     </Components.DropdownModal>
