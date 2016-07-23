@@ -47,9 +47,11 @@ module Esper.Views {
 
         <Components.Expando onOpen={() => this.onOpenSelf()}
           group={this._expandos}
-          header={<div className="esper-subheader">Just Myself</div>}
+          header="Just Myself"
+          headerClasses="esper-panel-section"
+          bodyClasses="esper-panel-section"
         >
-          <div className="onboarding-expando-content">
+          <div>
             { Stores.Profiles.get(Login.myUid()).match({
               none: () =>
                 <span className="esper-spinner esper-medium esper-centered" />,
@@ -67,9 +69,11 @@ module Esper.Views {
 
         <Components.Expando onOpen={() => this.onOpenExec()}
           group={this._expandos}
-          header={<div className="esper-subheader">Someone Else</div>}
+          header="Someone Else"
+          headerClasses="esper-panel-section"
+          bodyClasses="esper-panel-section"
         >
-          <div className="onboarding-expando-content">
+          <div>
             <p>{ Text.TeamExecDescription }</p>
             { _.map(this.state.newTeamIds, (id) =>
               <div key={id} className="new-team">

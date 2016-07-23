@@ -40,7 +40,7 @@ module Esper.Components {
     }
 
     render() {
-      return <div className="form-set form-horizontal">
+      return <div className="form-set form-horizontal esper-panel-section">
         <div className="form-group">
           <label htmlFor={this.getId("name")}
                  className="col-md-2 control-label">

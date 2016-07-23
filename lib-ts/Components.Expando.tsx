@@ -11,6 +11,7 @@ module Esper.Components {
     header: JSX.Element|JSX.Element[]|string;
     className?: string;
     headerClasses?: string;
+    bodyClasses?: string;
     onOpen?: () => void;
     onClose?: () => void;
     onToggle?: () => void;
@@ -62,9 +63,10 @@ module Esper.Components {
           </span>
           {this.props.header}
         </div>
-        <div className={classNames("esper-expando-body", {
-          open: this.state.open
-        })}>
+        <div className={classNames("esper-expando-body",
+          this.props.bodyClasses, {
+            open: this.state.open
+          })}>
           {this.props.children}
         </div>
       </div>
