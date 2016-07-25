@@ -64,23 +64,29 @@ module Esper.Views {
     render() {
       return <div className="panel panel-default">
         <div className="panel-body">
-          <Components.ModalPanel
-              busy={this.props.editable && this.props.busy}
-              error={this.props.editable && this.props.error}
-              success={this.props.editable && this.state.didSave &&
+          { this.props.editable ?
+
+            <Components.ModalPanel
+              busy={this.props.busy}
+              error={this.props.error}
+              success={this.state.didSave &&
                        !this.props.busy && !this.props.error}
-              onCancel={this.props.editable ? () => this.save() : null}
-              cancelText={this.props.editable ? "Save" : null}>
-            <Components.GroupForm ref={(c) => this._form = c}
-              name={this.props.group.group_name}
-              groupid={this.props.group.groupid}
-              uid={Login.me()}
-              editable={this.props.editable}
-              timezone={this.props.group.group_timezone}
-              onUpdate={this.delayedSave.bind(this)}
-              onSubmit={this.save.bind(this)}
-            />
-          </Components.ModalPanel>
+              onCancel={() => this.save()}
+              cancelText="Save">
+              <Components.GroupForm ref={(c) => this._form = c}
+                name={this.props.group.group_name}
+                groupid={this.props.group.groupid}
+                uid={Login.me()}
+                timezone={this.props.group.group_timezone}
+                onUpdate={this.delayedSave.bind(this)}
+                onSubmit={this.save.bind(this)}
+              />
+            </Components.ModalPanel> :
+
+            <span className="esper-input-align">
+              { this.props.group.group_name }
+            </span>
+          }
         </div>
       </div>;
     }

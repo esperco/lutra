@@ -19,7 +19,6 @@ module Esper.Components {
       return <GroupForm ref={(c) => this._form = c}
         name="" uid={Login.me()}
         timezone={moment.tz.guess()}
-        editable={true}
         onSubmit={this.props.onSubmit}
       />
     }

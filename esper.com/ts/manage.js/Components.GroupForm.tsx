@@ -7,7 +7,6 @@ module Esper.Components {
     groupid?: string;
     onUpdate?: () => void;
     onSubmit?: () => void; // Enter
-    editable?: boolean;
   }
 
   interface State extends Actions.Groups.GroupData {
@@ -38,8 +37,7 @@ module Esper.Components {
 
     render() {
       return <div className="form-horizontal esper-panel-section">
-        <div className={classNames({
-          "form-group": this.props.editable,
+        <div className={classNames("form-group", {
           "has-error": this.state.hasInvalidName
         })}>
           <label htmlFor={this.getId("name")}
@@ -47,21 +45,16 @@ module Esper.Components {
             Group Name
           </label>
           <div className="col-md-10">
-            { this.props.editable ?
-              <input id={this.getId("name")} name="name"
-                type="text" className="form-control"
-                onKeyDown={(e) => this.onKeyDown(e)}
-                onChange={(e) => this.onNameInputChange(e)}
-                value={this.state.name}
-                placeholder="The Avengers" /> :
-              <span className="esper-input-align">
-                { this.state.name }
-              </span>
-            }
+            <input id={this.getId("name")} name="name"
+              type="text" className="form-control"
+              onKeyDown={(e) => this.onKeyDown(e)}
+              onChange={(e) => this.onNameInputChange(e)}
+              value={this.state.name}
+              placeholder="The Avengers" />
           </div>
         </div>
 
-        { this.props.editable ? <div className="form-group">
+        <div className="form-group">
           <label htmlFor={this.getId("timezone")}
                  className="col-md-2 control-label">
             Timezone
@@ -72,7 +65,7 @@ module Esper.Components {
               selected={this.state.timezone}
             />
           </div>
-        </div> : null }
+        </div>
       </div>;
     }
 
