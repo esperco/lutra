@@ -44,7 +44,8 @@ module Esper.Components {
           </label>
           <ul className="esper-select-menu">
             { _.map(this.props.groups, (g) => this.renderGroup(g))}
-            <li className="divider" />
+          </ul>
+          <ul className="esper-select-menu">
             <li>
               <a className={classNames({
                 active: this.props.newGroup
