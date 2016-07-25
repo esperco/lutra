@@ -30,7 +30,7 @@ module Esper.Components {
           Login / Signup
         </button>,
 
-        some: (info) => <Dropdown className="dropdown" align="right">
+        some: (info) => <Dropdown className="dropdown">
           <a className="dropdown-toggle navbar-link">
             {info.email}{" "}
             <span className="caret"></span>

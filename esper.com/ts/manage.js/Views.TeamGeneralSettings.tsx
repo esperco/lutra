@@ -151,26 +151,26 @@ module Esper.Views {
   }) {
     return <div className="panel panel-default">
       <div className="panel-body clearfix">
-        { profiles.length ? <div>
-          <div className="alert alert-info text-center">
+        { profiles.length ? [
+          <div key="info" className="alert alert-info text-center">
             { team.team_executive === Login.myUid() ?
               Text.SelfAssistantsDescription :
               Text.ExecAssistantsDescription
             }
-          </div>
-          <div className="list-group">{ _.map(profiles, (p) =>
-            <div key={p.profile_uid} className="list-group-item">
+          </div>,
+          <div key="list" className="list-group">{ _.map(profiles, (p) =>
+            <div key={p.profile_uid} className="list-group-item clearfix">
               <i className="fa fa-fw fa-user" />{" "}
               { p.display_name }
               { p.display_name === p.email ? "" : ` (${p.email})`}
               <span className="pull-right">
                 { p.profile_uid === team.team_executive ?
-                  <span className="badge role-box">
+                  <span className="role-box">
                     { Text.RoleExec }
                   </span> :
 
                   ( p.profile_uid === Login.myUid() ?
-                    <span className="badge role-box">
+                    <span className="role-box">
                       { Text.RoleSelf }
                     </span>  :
 
@@ -183,7 +183,7 @@ module Esper.Views {
               </span>
             </div>
           )}</div>
-        </div>: null }
+        ] : null }
 
         <InviteInput team={team} />
       </div>

@@ -102,14 +102,15 @@ module Esper.Views {
 
           </div>
 
-          <div className="bad-meeting-prefs">
+          <div className="bad-meeting-prefs esper-select-menu form-horizontal">
             <div className="form-group">
-              <label className="col-md-5"
+              <label className="col-md-9 control-label long"
                      htmlFor={this.getId("bad-meeting-duration")}>
                 { Text.BadMeetingDuration }
               </label>{" "}
               <div className="col-md-3">
                 <input id={this.getId("bad-meeting-duration")} type="number"
+                       className="form-control"
                        defaultValue={`${this.props.prefs.bad_duration}`}
                        onChange={this.onBadMeetingDurationChange.bind(this)}
                        disabled={!badMeetingWarning} />
@@ -117,12 +118,13 @@ module Esper.Views {
             </div>
 
             <div className="form-group">
-              <label className="col-md-5"
+              <label className="col-md-9 control-label long"
                      htmlFor={this.getId("bad-meeting-people")}>
                 { Text.BadMeetingPeople }
               </label>{" "}
               <div className="col-md-3">
                 <input id={this.getId("bad-meeting-people")} type="number"
+                       className="form-control"
                        defaultValue={`${this.props.prefs.bad_attendees}`}
                        onChange={this.onBadMeetingAttendeesChange.bind(this)}
                        disabled={!badMeetingWarning} />

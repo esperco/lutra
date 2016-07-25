@@ -11,14 +11,12 @@
 
 module Esper.Actions.Groups {
 
-  /* Grouop Creation */
+  /* Group Creation */
 
   export interface GroupData {
     name: string;
     uid: string;
     timezone: string;
-    groupMembers: ApiT.GroupMember[];
-    groupIndividuals: ApiT.GroupIndividual[];
   }
 
   // Base group creation function
@@ -28,9 +26,6 @@ module Esper.Actions.Groups {
       group_timezone: data.timezone
     }).done((g) => {
       Stores.Groups.set(g);
-      // This is to add the creator back to the submitted data
-      data.groupIndividuals = g.group_individuals;
-      updateGroup(g.groupid, data);
       return g;
     });
     Save.monitor(Stores.Groups.GroupStore, "new-group", p);
@@ -46,55 +41,19 @@ module Esper.Actions.Groups {
 
     // Clone group and set in store
     if (data.name) {
-      var newMembers = _.differenceBy(data.groupMembers,
-        group.group_teams, (g) => g.teamid);
-      var removedMembers = _.differenceBy(group.group_teams,
-        data.groupMembers, (g) => g.teamid);
-      var newIndividuals = _.differenceBy(data.groupIndividuals,
-        group.group_individuals, (g) => g.email);
-      var removedIndividuals = _.differenceBy(group.group_individuals,
-        data.groupIndividuals, (g) => g.email);
-
       group = _.cloneDeep(group);
-      var p1 = group.group_name !== data.name ?
-        [Api.renameGroup(group.groupid, data.name)] : [];
-      var p2 = group.group_timezone !== data.timezone ?
-        [Api.putGroupTimezone(group.groupid, data.timezone)] : [];
+      let promises: JQueryPromise<any>[] = []
+      if (group.group_name !== data.name) {
+        promises.push(Api.renameGroup(group.groupid, data.name));
+      }
+      if (group.group_timezone !== data.timezone) {
+        promises.push(Api.putGroupTimezone(group.groupid, data.timezone));
+      }
       group.group_name = data.name;
       group.group_timezone = data.timezone;
-      group.group_teams = data.groupMembers;
-      group.group_individuals = data.groupIndividuals;
 
-      var p3 = _.map(newMembers, function(member: ApiT.GroupMember) {
-        return Api.putGroupMember(groupId, member.teamid);
-      });
-
-      var p4 = _.map(removedMembers, function(member: ApiT.GroupMember) {
-        return Api.removeGroupMember(groupId, member.teamid);
-      });
-
-      var p5 = _.map(removedIndividuals, function(gim: ApiT.GroupIndividual) {
-        return Api.removeGroupIndividual(groupId, gim.uid);
-      });
-
-      /*
-        (Re-)clone group because we'll be push an initial version of the group
-        to the store and that will be frozen by the time promise resolves
-      */
-      var group2 = _.cloneDeep(group);
-      var p6 = _.map(newIndividuals, function(gim: ApiT.GroupIndividual) {
-        return Api.putGroupIndividualByEmail(groupId, gim.email, {
-          role: gim.role
-        }).then((res) => {
-          var gim = _.find(group2.group_individuals, { email: res.email });
-          gim.uid = res.uid;
-        });
-      });
-
-      var p = $.when.apply($,
-        _.concat<JQueryPromise<any>>(p1, p2, p3, p4, p5, p6)
-      ).then(() => Option.wrap(group2));
-      Stores.Groups.GroupStore.pushFetch(groupId, p, Option.wrap(group));
+      var p = Util.when(promises);
+      Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
     };
   }
 
@@ -108,35 +67,239 @@ module Esper.Actions.Groups {
     Stores.Groups.remove(groupId);
   }
 
-  export function setGroupMemberRole(groupId: string,
-                                     role: ApiT.GroupRole,
-                                     opts: {
-    email?: string;
-    uid?: string;
-  }) {
-    var group = Stores.Groups.require(groupId);
-    if (!group) return;
 
-    var group2 = _.cloneDeep(group);
-    if (_.isEmpty(opts.email)) {
-      var promise = Api.putGroupIndividual(groupId,
-                                           opts.uid,
-                                           {role}).then(() => {
-        var gim = _.find(group2.group_individuals, { uid: opts.uid });
-        gim.role = role;
-        return Option.wrap(group2);
+  /* Group member management */
+
+  interface MemberUpdate {
+    groupId: string;
+    putMembers: ApiT.GroupMember[];
+    delMembers: ApiT.GroupMember[];
+    putGIMs: ApiT.GroupIndividual[];
+    delGIMs: ApiT.GroupIndividual[];
+  }
+
+  var MemberUpdateQueue = new Queue2.Processor(
+    function(update: MemberUpdate) {
+      var p1 = _.map(update.putMembers, function(member) {
+        return Api.putGroupMember(update.groupId, member.teamid);
       });
-    } else {
-      var promise = Api.putGroupIndividualByEmail(groupId,
-                                                  opts.email,
-                                                  {role}).then(() => {
-        var gim = _.find(group2.group_individuals, { email: opts.email });
-        gim.role = role;
-        return Option.wrap(group2);
+      var p2 = _.map(update.delMembers, function(member) {
+        return Api.removeGroupMember(update.groupId, member.teamid);
       });
+      var p3 = _.map(update.putGIMs, function(gim) {
+        return Api.putGroupIndividualByEmail(update.groupId, gim.email)
+          .then((res) => {
+            // Assign UID to temporarily created GIM
+            let group = _.cloneDeep(Stores.Groups.require(update.groupId));
+            let oldGIM = _.find(group.group_individuals,
+              (old) => old.email === gim.email
+            );
+            if (oldGIM) {
+              oldGIM.uid = res.uid;
+            } else {
+              group.group_individuals.push(res);
+            }
+            Stores.Groups.GroupStore.set(update.groupId, Option.some(group));
+          });
+      });
+      var p4 = _.map(update.delGIMs, function(gim) {
+        if (! gim.uid) { // No UID => try checking store
+          let group = Stores.Groups.require(update.groupId);
+          gim = _.find(group.group_individuals, (g) =>
+            g.uid &&
+            g.email === gim.email
+          );
+          if (! gim) {
+            Log.e("No UID when trying to delete");
+            return $.Deferred<any>().reject().promise();
+          }
+        }
+        return Api.removeGroupIndividual(update.groupId, gim.uid);
+      });
+
+      return Util.when(_.concat(p1, p2, p3, p4));
+    },
+
+    // Merge requests by groupId
+    function(requests) {
+      var next = requests.shift();
+
+      // Merge requests. Should be keyed be groupId so okay to merge
+      _.each(requests, (r) => {
+
+        /*
+          Not the most efficicent algorithm - O(n^2), but we expect the number
+          of queued put and dels to be low. Revisit if we add some way to
+          add 200 members at once or something.
+        */
+        _.each(r.putMembers, (m) => {
+          _.remove(next.putMembers, (n) => n.email === m.email);
+          _.remove(next.delMembers, (n) => n.email === m.email);
+          next.putMembers.push(m);
+        });
+
+        _.each(r.delMembers, (m) => {
+          _.remove(next.putMembers, (n) => n.email === m.email);
+          _.remove(next.delMembers, (n) => n.email === m.email);
+          next.delMembers.push(m);
+        });
+
+        _.each(r.putGIMs, (gim) => {
+          _.remove(next.putGIMs, (i) => i.email === gim.email);
+          _.remove(next.delGIMs, (i) => i.email === gim.email);
+          next.putGIMs.push(gim);
+        });
+
+        _.each(r.delGIMs, (gim) => {
+          _.remove(next.putGIMs, (i) => i.email === gim.email);
+          _.remove(next.delGIMs, (i) => i.email === gim.email);
+          next.delGIMs.push(gim);
+        });
+      });
+
+      return [next];
+    });
+
+
+  export function addEmail(groupId: string, email: string) {
+    let group = _.cloneDeep(Stores.Groups.require(groupId));
+    let update: MemberUpdate = {
+      groupId: groupId,
+      putMembers: [],
+      delMembers: [],
+      putGIMs: [],
+      delGIMs: []
+    };
+
+    if (! _.find(group.group_teams, (t) => t.email === email)) {
+      let team = _.find(Stores.Teams.all(), (t) => {
+        return Stores.Profiles.get(t.team_executive).match({
+          none: () => false,
+          some: (exec) => exec.email === email
+        });
+      });
+
+      if (team) {
+        let newMember = {
+          email,
+          teamid: team.teamid,
+          name: team.team_name
+        };
+        group.group_teams.push(newMember);
+        update.putMembers.push(newMember);
+      }
+
+      else if (! _.find(group.group_individuals, (i) => i.email === email)) {
+        let newGIM = { email, role: "Member" as ApiT.GroupRole };
+        group.group_individuals.push(newGIM);
+        update.putGIMs.push(newGIM);
+      }
+
+      let p = MemberUpdateQueue.enqueue(groupId, update);
+      Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+    }
+  }
+
+  export function removeEmail(groupId: string, email: string) {
+    let group = _.cloneDeep(Stores.Groups.require(groupId));
+    let update: MemberUpdate = {
+      groupId: groupId,
+      putMembers: [],
+      delMembers: [],
+      putGIMs: [],
+      delGIMs: []
+    };
+
+    let rmGim = _.remove(group.group_individuals,
+      (gim) => gim.email === email)[0];
+    let rmMember = _.remove(group.group_teams,
+      (member) => member.email === email)[0];
+
+    if (rmGim) {
+      update.delGIMs.push(rmGim);
+    }
+    if (rmMember) {
+      update.delMembers.push(rmMember);
     }
 
-    Stores.Groups.GroupStore.pushFetch(groupId, promise, Option.wrap(group));
+    let p = MemberUpdateQueue.enqueue(groupId, update);
+    Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+  }
+
+  export function changeRole(
+    groupId: string, email: string, role: ApiT.GroupRole
+  ) {
+    let group = _.cloneDeep(Stores.Groups.require(groupId));
+    let gim = _.find(group.group_individuals,
+      (g) => g.email === email);
+    if (gim) {
+      gim.role  = role;
+    } else {
+      gim = { email, role };
+      group.group_individuals.push(gim);
+    }
+
+    let p = MemberUpdateQueue.enqueue(groupId, {
+      groupId: groupId,
+      putMembers: [],
+      delMembers: [],
+      putGIMs: [gim],
+      delGIMs: []
+    });
+    Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+  }
+
+  export function toggleCalendar(groupId: string, email: string) {
+    let group = _.cloneDeep(Stores.Groups.require(groupId));
+    let update: MemberUpdate = {
+      groupId: groupId,
+      putMembers: [],
+      delMembers: [],
+      putGIMs: [],
+      delGIMs: []
+    };
+
+    // Existing team => remove
+    let existingTeam = _.find(group.group_teams, (t) => t.email === email);
+    if (existingTeam) {
+      _.remove(group.group_teams, (t) => t.email === email);
+      update.delMembers.push(existingTeam);
+
+      // Add GIM if necessary (and possible)
+      if (! _.find(group.group_individuals, (t) => t.email === email)) {
+        let selfGim = _.find(group.group_individuals,
+          (i) => i.uid === Login.me());
+        if (selfGim) {
+          let gim: ApiT.GroupIndividual = { email, role: "Member" };
+          group.group_individuals.push(gim);
+          update.putGIMs.push(gim);
+        }
+      }
+    }
+
+    // Create new group team
+    else {
+      let team = _.find(Stores.Teams.all(), (t) =>
+        Stores.Profiles.get(t.team_executive).match({
+          none: () => false,
+          some: (e) => e.email === email
+        })
+      );
+      if (team) {
+        let newMember = {
+          email,
+          teamid: team.teamid,
+          name: team.team_name
+        };
+        group.group_teams.push(newMember);
+        update.putMembers.push(newMember);
+      } else {
+        Log.e("Tried to toggle calendar for non-existent team - " + email);
+      }
+    }
+
+    let p = MemberUpdateQueue.enqueue(groupId, update);
+    Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
   }
 
 

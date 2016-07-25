@@ -61,7 +61,7 @@
   box-shadow: none;
 
   &:hover, &:focus {
-    z-index: @zindex-button + 1;
+    z-index: @zindex-hover;
     transform: none;
   }
 }
@@ -206,7 +206,8 @@ input.form-control, textarea.form-control, select.form-control {
   }
 
   .input-group & {
-    z-index: 10; // So border stands out
+    z-index: @zindex-input;
+    &:hover, &:focus { z-index: @zindex-hover; }
   }
 }
 
@@ -387,6 +388,10 @@ a {
   .panel-body &, .modal-body & {
     box-shadow: none;
   }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 
@@ -443,7 +448,8 @@ a {
 .dropdown {
   .dropdown-menu {
     padding: (@line-height-computed / 2) 0;
-    min-width: 100%;
+    width: 100%;
+    max-width: 400px;
 
     > li > a {
       &:hover, &:focus {
@@ -560,3 +566,12 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
 }
 
 
+/* Form tweaks */
+
+.form-horizontal .control-label.long {
+  text-align: left;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}

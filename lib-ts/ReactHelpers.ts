@@ -98,6 +98,10 @@ module Esper.ReactHelpers {
 
   // Subclass of Component with some helper functions
   export class Component<P,S> extends React.Component<P,S> {
+    // Temporary React state - used if mutateState gets called twice in the
+    // same React loop
+    _tempState: S;
+
     // List of stores this component is listening to. Set via setSources.
     sources: Source[];
 
@@ -145,6 +149,10 @@ module Esper.ReactHelpers {
     // call super if overridden
     componentWillUnmount(): void {
       this.setSources([]);
+    }
+
+    componentDidUpdate(prevProps?: P, prevState?: S) {
+      this._tempState = null;
     }
 
     /*
@@ -227,9 +235,9 @@ module Esper.ReactHelpers {
 
     // Helper for updating the state object via mutation
     protected mutateState(fn: (state: S) => void) {
-      var newState = _.cloneDeep(this.state);
-      fn(newState);
-      this.setState(newState);
+      if (! this._tempState) { this._tempState = _.cloneDeep(this.state); }
+      fn(this._tempState);
+      this.setState(this._tempState);
     }
   }
 

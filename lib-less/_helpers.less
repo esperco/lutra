@@ -687,6 +687,32 @@ flexibility with non-UL elements */
 
     &.active {
       font-weight: bold;
+
+      .description { font-weight: normal; }
+    }
+
+    &.danger, &.text-danger {
+      color: @brand-danger;
+
+      &:hover, &:focus, &:active { color: @brand-danger; }
+    }
+
+    > .fa + div {
+      display: inline-block;
+      vertical-align: top;
+
+      /*
+        TODO: Using fixed px is a little hacky. Revisit with flexbox later.
+      */
+      .dropdown .dropdown-menu & {
+        max-width: 360px;
+      }
+    }
+
+    .description {
+      color: @brand-text-muted;
+      font-size: @font-size-small;
+      white-space: normal;
     }
 
     &.partial-active {
@@ -868,12 +894,13 @@ flexibility with non-UL elements */
 
   div, input[type=text], input[type=text]:focus {
     z-index: @zindex-input;
+    &:hover, &:focus, &:active { z-index: @zindex-hover; }
   }
 
   .esper-left-icon, .esper-right-icon {
     display: block;
     position: absolute;
-    z-index: @zindex-button;
+    z-index: @zindex-hover + 1;
     top: 0;
     width: @input-height-base;
     height: @input-height-base;

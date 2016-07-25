@@ -9,13 +9,13 @@
       <button className="btn btn-default dropdown-toggle" type="button"
               id="dropdownMenu1">
         Dropdown
-        <span class="caret"></span>
+        <span className="caret"></span>
       </button>
       <ul className="dropdown-menu">
         <li><a>Action</a></li>
         <li><a>Another action</a></li>
         <li><a>Something else here</a></li>
-        <li role="separator" class="divider"></li>
+        <li role="separator" className="divider"></li>
         <li><a>Separated link</a></li>
       </ul>
     </Components.DropdownModal>
@@ -34,8 +34,6 @@ module Esper.Components {
   export class DropdownModal extends ReactHelpers.Component<{
     children?: JSX.Element[];
     className?: string;
-    align?: "left"|"right";
-    dropup?: boolean;
     disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
@@ -82,8 +80,6 @@ module Esper.Components {
           className={classNames("hidden-xs", "dropdown", this.props.className)}
           keepOpen={this.props.keepOpen}
           onOpen={this.props.onOpen}
-          align={this.props.align}
-          dropup={this.props.dropup}
           disabled={this.props.disabled}
         >
           { this.props.children }

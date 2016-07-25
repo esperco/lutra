@@ -16,31 +16,6 @@ module Esper.Text {
   export const TeamExec = "account";
   export const TeamExecs = "accounts";
 
-  export const Group = "group";
-  export const Groups = "groups";
-
-  export const GroupMember = "group member";
-  export const GroupMembers = "group members";
-
-  export const GroupIndividual = "individual";
-  export const GroupIndividuals = "individuals";
-
-  // Group form
-  export const GroupCalendarSharing =
-    `This ${GroupMember} is sharing their calendars with the group`;
-  export const AddGroupIndividualLink = "Invite Someone Else";
-  export function AddGroupMemberHeading(group?: string) {
-    return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
-  }
-  export function ClickToEdit(entity: string) {
-    return `Click to edit ${entity}`;
-  }
-
-  // Group roles
-  export const GroupRoleOwner = "Administrator";
-  export const GroupRoleManager = "Manager";
-  export const GroupRoleMember = "Contributor";
-
   // Default Loading Message
   export const DefaultLoadingMsg = "Loading";
 

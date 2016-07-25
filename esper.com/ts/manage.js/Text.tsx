@@ -1,7 +1,7 @@
 module Esper.Text {
 
   // Personal (non-team) settings
-  export const PersonalSettings = "Personal";
+  export const PersonalSettings = "Other Settings";
 
   // Deactivate account?
   export const DeactivateDescription = `Deactivating your account ` +
@@ -22,20 +22,67 @@ module Esper.Text {
   export const AddTeamLink = `New ${TeamExec}`;
   export const AddTeamHeading = "Who are you managing time for?";
 
-  // Add group
-  export const AddGroupLink = `New ${Group}`;
-  export const AddGroupHeading = "Create a new group";
-
   // Remove team
   export const RemoveTeamBtn = "Deactivate";
   export function removeTeamDescription(person?: string) {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Groups
+  export const Group = "group";
+  export const Groups = "groups";
+
+  export const GroupMember = "group member";
+  export const GroupMembers = "group members";
+
+  export const GroupIndividual = "individual";
+  export const GroupIndividuals = "individuals";
+
+  // Add group
+  export const AddGroupLink = `New ${Group}`;
+  export const AddGroupHeading = "Create a new group";
+
+  // Group roles
+  export const GroupRoleOwner = "Administrator";
+  export const GroupRoleOwnerDescription =
+    `Can edit group settings and delete group`;
+  export const GroupRoleManager = "Manager";
+  export const GroupRoleManagerDescription =
+    `Can view calendar data for other group members`;
+  export const GroupRoleMember = "Contributor";
+  export const GroupRoleMemberDescription =
+    `Can contribute calendar data to this group`;
+
+   // Group form
+  export const GroupCalendarSharing =
+    `This ${GroupMember} is sharing their calendars with the group`;
+  export const AddGroupIndividualLink = "Invite Someone Else";
+  export const RemoveGroupMember = "Remove";
+  export const AddGroupTeam = "Share Calendars";
+  export const AddGroupTeamDescription =
+    `Share this ${TeamExec}'s calendar data with people who have ` +
+    `${GroupRoleManager} or ${GroupRoleOwner} access to this ${Group}`
+  export const RemoveGroupTeam = "Stop Sharing Calendars";
+  export const RemoveGroupTeamDescription =
+    `This person will still have access to this group but this person's ` +
+    `own calendars will be hidden from the rest of the group.`;
+  export function AddGroupMemberHeading(group?: string) {
+    return `Which ${TeamExec} would you like to add to ${group || "this " + Group}?`;
+  }
+  export function ClickToEdit(entity: string) {
+    return `Click to edit ${entity}`;
+  }
+
+  // Quick-share box
+  export const AddSelfToGroupDescription =
+    `Do you want to add your ${TeamExec} to this ${Group}? ` +
+    `Calendar data will be visible to any person with ` +
+    `${GroupRoleManager} or ${GroupRoleOwner} access.`;
+
   // Remove group
-  export const RemoveGroupBtn = "Remove";
+  export const RemoveGroupBtn = "Deactivate";
   export function removeGroupDescription(group?: string) {
-    return `Remove ${group || "this" + Group}?`;
+    return `Deactivate ${group || "this" + Group}?`;
   }
 
   // Sharing
