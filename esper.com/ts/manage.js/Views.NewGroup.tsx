@@ -33,6 +33,9 @@ module Esper.Views {
                 <Components.ModalPanel
                  busy={this.state.busy} disableOK={this.state.busy}
                  okText="Save" onOK={() => this.save()}>
+                  <div className="alert alert-info text-center">
+                    { Text.GroupDescription }
+                  </div>
                   <Components.NewGroupForm isAdmin={this.props.isAdmin}
                     ref={(c) => this._groupForm = c}
                     teams={Stores.Teams.all()}

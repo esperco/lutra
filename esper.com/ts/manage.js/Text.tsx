@@ -31,6 +31,10 @@ module Esper.Text {
   // Groups
   export const Group = "group";
   export const Groups = "groups";
+  export const GroupDescription =
+    `Create a ${_.capitalize(Group)} to combine calendar data for ` +
+    `multiple Esper ${TeamExecs} and see how others are spending ` +
+    `their time.`
 
   export const GroupMember = "group member";
   export const GroupMembers = "group members";
