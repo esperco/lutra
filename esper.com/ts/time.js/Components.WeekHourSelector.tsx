@@ -16,6 +16,7 @@ module Esper.Components {
   interface Props {
     hours: Types.WeekHours;
     updateHours: (weekHours: Types.WeekHours) => void;
+    showUnscheduled?: boolean;
     unscheduled: boolean;
     updateUnscheduled: (x: boolean) => void;
   }
@@ -103,13 +104,14 @@ module Esper.Components {
             </span>
           </div>
         </div>
-        <div className="unscheduled-selector">
-          <SimpleToggle
-            title={Text.IncUnscheduled}
-            active={this.props.unscheduled}
-            onChange={this.props.updateUnscheduled}
-          />
-        </div>
+        { this.props.showUnscheduled ?
+          <div className="unscheduled-selector">
+            <SimpleToggle
+              title={Text.IncUnscheduled}
+              active={this.props.unscheduled}
+              onChange={this.props.updateUnscheduled}
+            />
+          </div> : null }
       </div>;
     }
 

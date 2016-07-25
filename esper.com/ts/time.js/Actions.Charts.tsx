@@ -221,6 +221,7 @@ module Esper.Actions.Charts {
         updateHours={
           (x) => Charting.updateChart(o, { extra: { weekHours: x }})
         }
+        showUnscheduled={o.extra.type === "percent"}
         unscheduled={o.extra.incUnscheduled}
         updateUnscheduled={
           (x) => Charting.updateChart(o, { extra: { incUnscheduled: x }})
