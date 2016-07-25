@@ -18,12 +18,15 @@ module Esper.Components {
     var persons = getPersons(props.group);
     var selfGIM = _.find(props.group.group_individuals,
       (gim) => gim.uid === Login.me() || gim.email === Login.myEmail());
+    var isSuper = (selfGIM && selfGIM.role === "Owner") ||
+      Login.data.is_admin;
 
     return <div>
       <div className="list-group">
         { _.map(persons, (p) => <GroupMember
           key={p.email}
           person={p}
+          isSuper={isSuper}
           group={props.group}
           teams={props.teams}
           onRoleChange={props.onRoleChange}
@@ -87,21 +90,20 @@ module Esper.Components {
     return _.map(emailMap, (v) => v);
   }
 
-  function GroupMember(props: Props & { person: Person }) {
+  function GroupMember(props: Props & {
+    person: Person;
+    isSuper?: boolean;
+  }) {
     // Figure out permissions
     let person = props.person;
-    let selfGim = _.find(props.group.group_individuals,
-      (gim) => gim.uid === Login.myUid()
-    );
-    let isSuper = (selfGim && selfGim.role === "Owner") || Login.data.is_admin;
-    let canChangeRole = isSuper;
+    let canChangeRole = props.isSuper;
     let partOfTeam = hasTeam(person) ? !!_.find(props.teams,
       (t) => t.teamid === person.team.teamid
     ) : false;
     let canRemove = canChangeRole
       || (hasGIM(person) ? person.gim.uid === Login.myUid() : false)
       || partOfTeam;
-    let canRemoveCals = partOfTeam || (hasTeam(person) && isSuper);
+    let canRemoveCals = partOfTeam || (hasTeam(person) && props.isSuper);
     let canAddCals = !hasTeam(person) &&
       !!_.find(props.teams, (t) => t.team_executive === person.gim.uid);
 
