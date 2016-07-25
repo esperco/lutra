@@ -6,13 +6,9 @@ module Esper.Components {
 
   interface Props<T> {
     // Data is a list because we have calculation for each period
-    data: {
-      period: Period.Single|Period.Custom;
-      current: boolean; // Is this "active" period or a comparative period?
-      calculation: EventStats.CalcBase<T, any>;
-      fetching: boolean;
-      error: boolean;
-    }[];
+    periods: (
+      Types.PeriodData<EventStats.CalcBase<T, any>> & Types.HasStatus
+    )[];
   }
 
   export abstract class Chart<T extends EventStats.OptGrouping, U>
@@ -25,19 +21,19 @@ module Esper.Components {
     */
     shouldComponentUpdate(newProps: Props<T> & U) {
       // Different periods => update
-      if (newProps.data.length !== this.props.data.length) {
+      if (newProps.periods.length !== this.props.periods.length) {
         return true;
       }
 
       // Else compare each period, and make sure calculations don't
-      for (let i in newProps.data) {
-        let newData = newProps.data[i];
-        let oldData = this.props.data[i];
-        let isEqual = _.isEqual(newData.period, oldData.period) &&
-          newData.current === oldData.current &&
-          newData.fetching === oldData.fetching &&
-          newData.error === oldData.error &&
-          newData.calculation.eq(oldData.calculation);
+      for (let i in newProps.periods) {
+        let newPeriod = newProps.periods[i];
+        let oldPeriod = this.props.periods[i];
+        let isEqual = _.isEqual(newPeriod.period, oldPeriod.period) &&
+          newPeriod.current === oldPeriod.current &&
+          newPeriod.isBusy === oldPeriod.isBusy &&
+          newPeriod.hasError === oldPeriod.hasError &&
+          newPeriod.data.eq(oldPeriod.data);
         if (! isEqual) {
           return true;
         }
@@ -55,7 +51,7 @@ module Esper.Components {
     }
 
     setCalcSources() {
-      var calculations = _.map(this.props.data, (d) => d.calculation);
+      var calculations = _.map(this.props.periods, (d) => d.data);
       if (_.every(calculations, (c) => c.ready)) {
         this.setSources([]);
       } else {
@@ -64,26 +60,29 @@ module Esper.Components {
     }
 
     render() {
-      if (_.find(this.props.data, (p) => p.error)) {
+      if (_.find(this.props.periods, (p) => p.hasError)) {
         return this.renderMsg(<span>
           <i className="fa fa-fw fa-warning"></i>{" "}
           { Text.ChartFetchError }
         </span>);
       }
 
-      if (_.find(this.props.data, (p) => p.fetching)) {
+      if (_.find(this.props.periods, (p) => p.isBusy)) {
         return this.renderMsg(<span>
           <span className="esper-spinner esper-inline" />{" "}
           { Text.ChartFetching }
         </span>);
       }
 
-      var results = _.map(this.props.data, (d) =>
-       d.calculation
+      var results = _.map(this.props.periods, (p) =>
+       p.data
         .getResults()
         .flatMap((r) => Option.wrap({
-          period: d.period,
-          current: d.current,
+          period: p.period,
+          current: p.current,
+          total: p.total,
+          isBusy: p.isBusy,
+          hasError: p.hasError,
           data: r
         })));
       if (_.find(results, (r) => r.isNone())) {
@@ -111,7 +110,8 @@ module Esper.Components {
       </div>;
     }
 
-    abstract renderMain(data: Charting.PeriodData<T>[]): JSX.Element;
+    abstract renderMain(data: Charting.PeriodData<T>[])
+      : JSX.Element;
   }
 
   /*

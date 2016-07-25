@@ -24,6 +24,7 @@
 /// <reference path="../lib/Text.ts" />
 /// <reference path="../lib/Types.ts" />
 /// <reference path="../lib/Util.ts" />
+/// <reference path="../lib/WeekHours.ts" />
 
 /// <reference path="../lib/Components.Badge.tsx" />
 /// <reference path="../lib/Components.CalendarList.tsx" />

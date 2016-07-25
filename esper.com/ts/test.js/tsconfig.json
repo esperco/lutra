@@ -23,6 +23,7 @@
     "../lib/Queue2.Test.ts",
     "../lib/ReactHelpers.Test.ts",
     "../lib/Stores.Events.Test.ts",
+    "../lib/WeekHours.Test.ts",
     "Integration.ts",
     "Integration.Login.ts",
     "Integration.Time.ts"

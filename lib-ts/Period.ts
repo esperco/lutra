@@ -81,6 +81,7 @@ module Esper.Period {
     }
   }
 
+  // Beginning and end of period
   export function boundsFromPeriod(period: Single|Custom): [Date, Date] {
     if (isCustom(period)) {
       let startM = moment(Epoch).startOf('day').add(period.start, 'days');
@@ -92,6 +93,18 @@ module Esper.Period {
       let endM = startM.clone().endOf(period.interval);
       return [startM.toDate(), endM.toDate()];
     }
+  }
+
+  // Get a list of dates from start / end dates
+  export function datesFromBounds(start: Date, end: Date) {
+    var startM = moment(start).startOf('day');
+    var endM = moment(end).endOf('day');
+    var ret: Date[] = [];
+    while (endM.diff(startM) > 0) {
+      ret.push(startM.clone().toDate());
+      startM = startM.add(1, 'day');
+    }
+    return ret;
   }
 
   // If you need a relative number for comparing periods of identical intervals

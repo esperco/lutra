@@ -117,14 +117,15 @@ module Esper.Colors {
   export var first = presets[0];
   export var second = presets[1];
   export var black = "#000000";
-  export var lightGray = "#CECEDD";
+  export var lighterGray = "#E6E7E8";
+  export var lightGray = "#D1D3D4";
   export var gray = "#999";
   export var offWhite = "#FCFCFC";
   export var green = "#5CB85C";
   export var yellow = "#FFF59D";
   export var orange = "#F0AD4E";
   export var red = "#D9534F";
-  export var brand = "#a25cc6"; // Purple
+  export var brand = "#A25CC6";  // Purple
 
   // Rating colors
   export var level0 = "#64B5F6"; // Blue

@@ -485,16 +485,7 @@ module Esper.Stores.Events {
 
 
   /* Helpers */
-  export function datesFromBounds(start: Date, end: Date) {
-    var startM = moment(start).startOf('day');
-    var endM = moment(end).endOf('day');
-    var ret: Date[] = [];
-    while (endM.diff(startM) > 0) {
-      ret.push(startM.clone().toDate());
-      startM = startM.add(1, 'day');
-    }
-    return ret;
-  }
+  export var datesFromBounds = Period.datesFromBounds;
 
   export function overlapsDate(event: ApiT.GenericCalendarEvent, date: Date) {
     var dayStart = moment(date).clone().startOf('day');

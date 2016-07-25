@@ -14,8 +14,11 @@ module Esper.Components {
   }
 
   interface Props {
-    selected: Types.WeekHours;
-    updateFn: (weekHours: Types.WeekHours) => void;
+    hours: Types.WeekHours;
+    updateHours: (weekHours: Types.WeekHours) => void;
+    showUnscheduled?: boolean;
+    unscheduled: boolean;
+    updateUnscheduled: (x: boolean) => void;
   }
 
   /*
@@ -42,13 +45,13 @@ module Esper.Components {
 
     getDayHours(props: Props) {
       var dayHours = Option.flatten([
-        props.selected.sun,
-        props.selected.mon,
-        props.selected.tue,
-        props.selected.wed,
-        props.selected.thu,
-        props.selected.fri,
-        props.selected.sat
+        props.hours.sun,
+        props.hours.mon,
+        props.hours.tue,
+        props.hours.wed,
+        props.hours.thu,
+        props.hours.fri,
+        props.hours.sat
       ]);
       if (dayHours.length) {
         return dayHours[0];
@@ -68,37 +71,47 @@ module Esper.Components {
         { id: "sat", displayAs: day.add(1, 'day').format("dd") }
       ];
       let selectedIds: string[] = [];
-      _.each(this.props.selected, (v: Option.T<Types.DayHours>, k: string) => {
+      _.each(this.props.hours, (v: Option.T<Types.DayHours>, k: string) => {
         if (v && v.isSome()) { selectedIds.push(k) }
       });
 
-      return <div className="day-selector">
-        <div className="days">
-          <ListSelectorSimple
-            choices={choices}
-            listClasses="esper-select-menu esper-flex-list"
-            itemClasses="esper-selectable"
-            selectedItemClasses="active"
-            selectedIds={selectedIds}
-            selectOption={ListSelectOptions.MULTI_SELECT}
-            updateFn={(ids) => this.update({selectedIds: ids})}
-          />
-        </div>
-        <div className="times">
-          <span className="hour-minute">
-            <TimeOfDayMenu
-              onChange={(x) => this.update({ start: x })}
-              selected={this.state.dayHours.start}
+      return <div>
+        <div className="day-selector">
+          <div className="days">
+            <ListSelectorSimple
+              choices={choices}
+              listClasses="esper-select-menu esper-flex-list"
+              itemClasses="esper-selectable"
+              selectedItemClasses="active"
+              selectedIds={selectedIds}
+              selectOption={ListSelectOptions.MULTI_SELECT}
+              updateFn={(ids) => this.update({selectedIds: ids})}
             />
-          </span>
-          <span className="dash">&ndash;</span>
-          <span className="hour-minute">
-            <TimeOfDayMenu
-              onChange={(x) => this.update({ end: x })}
-              selected={this.state.dayHours.end}
-            />
-          </span>
+          </div>
+          <div className="times">
+            <span className="hour-minute">
+              <TimeOfDayMenu
+                onChange={(x) => this.update({ start: x })}
+                selected={this.state.dayHours.start}
+              />
+            </span>
+            <span className="dash">&ndash;</span>
+            <span className="hour-minute">
+              <TimeOfDayMenu
+                onChange={(x) => this.update({ end: x })}
+                selected={this.state.dayHours.end}
+              />
+            </span>
+          </div>
         </div>
+        { this.props.showUnscheduled ?
+          <div className="unscheduled-selector">
+            <SimpleToggle
+              title={Text.IncUnscheduled}
+              active={this.props.unscheduled}
+              onChange={this.props.updateUnscheduled}
+            />
+          </div> : null }
       </div>;
     }
 
@@ -119,16 +132,16 @@ module Esper.Components {
       }
       let dayHours = { start: newStart, end: newEnd };
       selectedIds = selectedIds || _.filter([
-        this.props.selected.sun.isSome() ? "sun" : null,
-        this.props.selected.mon.isSome() ? "mon" : null,
-        this.props.selected.tue.isSome() ? "tue" : null,
-        this.props.selected.wed.isSome() ? "wed" : null,
-        this.props.selected.thu.isSome() ? "thu" : null,
-        this.props.selected.fri.isSome() ? "fri" : null,
-        this.props.selected.sat.isSome() ? "sat" : null
+        this.props.hours.sun.isSome() ? "sun" : null,
+        this.props.hours.mon.isSome() ? "mon" : null,
+        this.props.hours.tue.isSome() ? "tue" : null,
+        this.props.hours.wed.isSome() ? "wed" : null,
+        this.props.hours.thu.isSome() ? "thu" : null,
+        this.props.hours.fri.isSome() ? "fri" : null,
+        this.props.hours.sat.isSome() ? "sat" : null
       ]);
-      this.props.updateFn(
-        Params.mapWeekHours(this.props.selected, (v, k) => this.updateHours(
+      this.props.updateHours(
+        WeekHours.map(this.props.hours, (v, k) => this.updateHours(
           v, _.includes(selectedIds, k), dayHours
         )));
     }
