@@ -23,7 +23,7 @@ module Esper.Views {
       });
       return <div>
         <GeneralPrefs prefs={prefs} group={group} />
-        <BadMeetingPrefs prefs={prefs} group={group} />
+        { /* <BadMeetingPrefs prefs={prefs} group={group} /> */ }
       </div>;
     }
   }
@@ -59,14 +59,14 @@ module Esper.Views {
           </div>
 
           {/* Weekly breakdown e-mail */}
-          <div className="esper-selectable"
+          {/* <div className="esper-selectable"
             onClick={() => toggleWeeklyBreakdownEmails(prefs) }>
             <i className={classNames("fa fa-fw", {
               "fa-check-square-o": weeklyBreakdownReminder,
               "fa-square-o": !weeklyBreakdownReminder
             }) } />{" "}
             { Text.SendWeeklyBreakdownEmail }
-          </div>
+          </div> */}
 
         </div>
       </div>
