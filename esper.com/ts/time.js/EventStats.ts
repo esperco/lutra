@@ -53,58 +53,12 @@ module Esper.EventStats {
 
   /////
 
-  /*
-    Wrapper around event with relative weight for an event as well as how we
-    should categorize or group this event
-  */
-  export interface Annotation {
-    event: Stores.Events.TeamEvent;
-
-    /*
-      Interface itself has no implied unit -- this can be seconds or people-
-      hours or anything other value we want to assign to an event. Up to
-      code using this interface to determine
-    */
-    value: number;
-
-    // Heirarchical list of tags to group this event by
-    groups: string[];
-  }
-
-  export interface EventMap {
-    [index: string]: boolean;
-  }
-
-  /*
-    Heirarchal maps of grouping strings to annotations
-  */
-  export interface Group {
-    annotations: Annotation[];
-    totalValue: number;   // Sum of all annotation values
-    totalUnique: number;  // Total unique events
-    eventMap: EventMap;   /* Map used to quickly test whether event exists
-                             in group */
-  }
-
-  /*
-    Collection of annotated events for a given date
-  */
-  export interface DateGroup extends Group {
-    date: Date;
-  }
-
-  export interface Subgroup extends Group {
-    subgroups: Grouping;
-  }
-
-  export interface Grouping {
-    [index: string]: Subgroup;
-  }
-
-  export interface OptGrouping extends Group {
-    some: Grouping;
-    none: Group;
-  }
+  export type Annotation = Types.Annotation;
+  export type Group = Types.EventGroup;
+  export type Grouping = Types.EventGrouping;
+  export type DateGroup = Types.EventDateGroup;
+  export type Subgroup = Types.EventSubgroup;
+  export type OptGrouping = Types.EventOptGrouping;
 
   function emptyGroup(): Group {
     return {

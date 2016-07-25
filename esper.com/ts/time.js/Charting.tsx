@@ -8,6 +8,9 @@ module Esper.Charting {
   export type BaseOpts<T> = Types.ChartBaseOpts<T>;
   export type ExtraOptsMaybe = Types.ChartExtraOptsMaybe;
   export type ExtraOpts = Types.ChartExtraOpts;
+  export type PeriodData<T> = Types.PeriodData<T>;
+  export type PeriodOptGroup = Types.PeriodOptGroup;
+  export type PeriodGrouping = Types.PeriodGrouping;
 
 
   /* Routing helpers */
@@ -96,20 +99,6 @@ module Esper.Charting {
       events: HighchartsPointEvents;
     }[]
   }
-
-  // Data tied to a particular point in time
-  export interface PeriodData<T> {
-    period: Period.Single|Period.Custom;
-    current: boolean; // Is this the "current" or active group?
-    data: T;
-  }
-
-  // PeriodOptGroup includes
-  export type PeriodOptGroup = PeriodData<EventStats.OptGrouping> & {
-    total: number;
-  };
-  export type PeriodGrouping = PeriodData<EventStats.Grouping>;
-
 
   interface EventSeriesOpts {
     displayName?: (key: string) => string; // Map key to value
@@ -216,12 +205,11 @@ module Esper.Charting {
     groups: PeriodOptGroup[],
     opts: EventGroupSeriesOpts = {}
   ): EventGroupSeries[] {
-    let groupings = _.map(groups, (g) => ({
+    let groupings: PeriodGrouping[] = _.map(groups, (g) => ({
       period: g.period,
       current: g.current,
       data: g.data.some,
-      totalData: g.data.totalValue,
-      totalAll: g.total
+      total: g.data.totalValue
     }));
 
     // Filter down to subgroups as appropriate
@@ -231,10 +219,10 @@ module Esper.Charting {
           let sub = g.data[key];
           if (g.data[key]) {
             g.data = sub.subgroups;
-            g.totalData = sub.totalValue;
+            g.total = sub.totalValue;
           } else {
             g.data = {};
-            g.totalData = 0;
+            g.total = 0;
           }
         });
       });
@@ -275,7 +263,7 @@ module Esper.Charting {
       }
 
       // Handle remainder
-      let remainder = g.totalAll - g.totalData;
+      let remainder = groups[periodIndex].total - g.total;
       if (remainder > 0) {
         let s = {
           name: Text.ChartRemainder,
@@ -339,6 +327,7 @@ module Esper.Charting {
     var groupings = _.map(groups, (g) => ({
       period: g.period,
       current: g.current,
+      total: g.total,
       data: g.data.some
     }));
     return sortGroupingKeys(groupings);

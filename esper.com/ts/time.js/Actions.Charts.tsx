@@ -31,6 +31,8 @@ module Esper.Actions.Charts {
     return _.map(periods, (p) => ({
       period: p,
       current: _.isEqual(p, o.period),
+      total: o.extra.incUnscheduled ?
+        WeekHours.totalForPeriod(p, o.extra.weekHours) : 0,
       data: Stores.Events.require({
         cals: cals,
         period: p
@@ -281,20 +283,20 @@ module Esper.Actions.Charts {
   }
 
   // Convert period data to calc data format used in Components.Charts.
-  function getPeriodCalcData<R, P>(
+  function getPeriodCalcData<R, P> (
     o: BaseOpts<P>,
     data: PeriodList[],
     getCalc: (events: Stores.Events.TeamEvent[])
       => EventStats.CalcBase<R /* results */, P /* props */>)
+    : (Types.PeriodData<EventStats.CalcBase<R, P>> & Types.HasStatus)[]
   {
     return _.map(data, (d) => ({
       period: d.period,
       current: d.current,
-      fetching: d.data.isBusy,
-      error: d.data.hasError,
-      calculation: getCalc(d.data.events),
-      total: o.extra.incUnscheduled ?
-        WeekHours.totalForPeriod(d.period, o.extra.weekHours) : 0
+      isBusy: d.data.isBusy,
+      hasError: d.data.hasError,
+      data: getCalc(d.data.events),
+      total: d.total
     }));
   }
 
@@ -318,9 +320,9 @@ module Esper.Actions.Charts {
           error={data.hasError}
         />,
         pct: (data) =>
-          <Components.DurationPercentChart data={getCalc(data)} />,
+          <Components.DurationPercentChart periods={getCalc(data)} />,
         abs: (data) =>
-          <Components.DurationHoursChart data={getCalc(data)} />,
+          <Components.DurationHoursChart periods={getCalc(data)} />,
       });
 
       return getChartView(o, {
@@ -353,10 +355,10 @@ module Esper.Actions.Charts {
           error={data.hasError}
         />,
         pct: (data) => <Components.CalendarPercentChart
-          calendars={calendars} data={getCalc(data)}
+          calendars={calendars} periods={getCalc(data)}
         />,
         abs: (data) => <Components.CalendarHoursChart
-          calendars={calendars} data={getCalc(data)}
+          calendars={calendars} periods={getCalc(data)}
         />,
       });
 
@@ -392,8 +394,8 @@ module Esper.Actions.Charts {
           fetching={data.isBusy}
           error={data.hasError}
         />,
-        pct: (data) => <Components.GuestPercentChart data={getCalc(data)} />,
-        abs: (data) => <Components.GuestHoursChart data={getCalc(data)} />,
+        pct: (data) => <Components.GuestPercentChart periods={getCalc(data)} />,
+        abs: (data) => <Components.GuestHoursChart periods={getCalc(data)} />,
       });
 
       return getChartView(o, { chart, events, group: "domains" });
@@ -420,10 +422,10 @@ module Esper.Actions.Charts {
           error={data.hasError}
         />,
         pct: (data) => <Components.GuestCountPercentChart
-          data={getCalc(data)}
+          periods={getCalc(data)}
         />,
         abs: (data) => <Components.GuestCountHoursChart
-          data={getCalc(data)}
+          periods={getCalc(data)}
         />,
       });
       return getChartView(o, { chart, events, group: "guest-counts" });
@@ -449,8 +451,8 @@ module Esper.Actions.Charts {
           fetching={data.isBusy}
           error={data.hasError}
         />,
-        pct: (data) => <Components.LabelPercentChart data={getCalc(data)} />,
-        abs: (data) => <Components.LabelHoursChart data={getCalc(data)} />,
+        pct: (data) => <Components.LabelPercentChart periods={getCalc(data)} />,
+        abs: (data) => <Components.LabelHoursChart periods={getCalc(data)} />,
       });
 
       return getChartView(o, {chart, events, group: "labels"});
@@ -477,8 +479,10 @@ module Esper.Actions.Charts {
           fetching={data.isBusy}
           error={data.hasError}
         />,
-        pct: (data) => <Components.RatingPercentChart data={getCalc(data)} />,
-        abs: (data) => <Components.RatingHoursChart data={getCalc(data)} />,
+        pct: (data) => <Components.RatingPercentChart
+          periods={getCalc(data)} />,
+        abs: (data) => <Components.RatingHoursChart
+          periods={getCalc(data)} />,
       });
 
       return getChartView(o, {chart, events, group: "ratings"});

@@ -7,6 +7,13 @@
 
 module Esper.Types {
 
+  // Mix into other interfaces for indicating simplified data status
+  export interface HasStatus {
+    isBusy: boolean;
+    hasError: boolean;
+  }
+
+
   /* Event Types */ //////////////////////////
 
   /*
@@ -52,12 +59,10 @@ module Esper.Types {
     Convenience interface for grouping together merged event list for multiple
     days
   */
-  export interface EventListData {
+  export interface EventListData extends HasStatus {
     start: Date;
     end: Date;
     events: TeamEvent[];
-    isBusy: boolean;
-    hasError: boolean;
   }
 
   /*
@@ -120,6 +125,76 @@ module Esper.Types {
   }
 
 
+  /* Event Calcs */ ///////////////////////
+
+  /*
+    Wrapper around event with relative weight for an event as well as how we
+    should categorize or group this event
+  */
+  export interface Annotation {
+    event: Stores.Events.TeamEvent;
+
+    /*
+      Interface itself has no implied unit -- this can be seconds or people-
+      hours or anything other value we want to assign to an event. Up to
+      code using this interface to determine
+    */
+    value: number;
+
+    // Heirarchical list of tags to group this event by
+    groups: string[];
+  }
+
+  export interface IdMap {
+    [index: string]: boolean;
+  }
+
+  /*
+    Heirarchal maps of grouping strings to annotations
+  */
+  export interface EventGroup {
+    annotations: Annotation[];
+    totalValue: number;   // Sum of all annotation values
+    totalUnique: number;  // Total unique events
+    eventMap: IdMap;      /* Map used to quickly test whether event exists
+                             in group */
+  }
+
+  /*
+    Collection of annotated events for a given date
+  */
+  export interface EventDateGroup extends EventGroup {
+    date: Date;
+  }
+
+  export interface EventSubgroup extends EventGroup {
+    subgroups: EventGrouping;
+  }
+
+  export interface EventGrouping {
+    [index: string]: EventSubgroup;
+  }
+
+  export interface EventOptGrouping extends EventGroup {
+    some: EventGrouping;
+    none: EventGroup;
+  }
+
+  export interface EventCalcOpts { // Standard calc opts for all charts
+    filterStr: string;
+    labels: ListSelectJSON;
+    domains: ListSelectJSON;
+    durations: ListSelectJSON;
+    guestCounts: ListSelectJSON;
+    ratings: ListSelectJSON;
+    weekHours: WeekHours;
+  }
+
+  export interface DomainNestOpts extends EventCalcOpts {
+    nestByDomain: boolean; // Used to nest domain => email in duration calc
+  }
+
+
   /* Charting */ //////////////////////////
 
   export type ChartType = "percent"|"absolute"|"calendar";
@@ -151,19 +226,6 @@ module Esper.Types {
     weekHours?: WeekHours;
   }
 
-  export interface EventCalcOpts { // Standard calc opts for all charts
-    filterStr: string;
-    labels: ListSelectJSON;
-    domains: ListSelectJSON;
-    durations: ListSelectJSON;
-    guestCounts: ListSelectJSON;
-    ratings: ListSelectJSON;
-    weekHours: WeekHours;
-  }
-  export interface DomainNestOpts extends EventCalcOpts {
-    nestByDomain: boolean; // Used to nest domain => email in duration calc
-  }
-
   export interface ChartExtraOpts extends ChartExtraOptsMaybe, EventCalcOpts {
     type: ChartType;
     incUnscheduled: boolean;
@@ -176,4 +238,14 @@ module Esper.Types {
     guestCounts: ListSelectJSON;
     weekHours: WeekHours;
   }
+
+  // Data tied to a particular period of time
+  export interface PeriodData<T> {
+    period: Period.Single|Period.Custom;
+    current: boolean; // Is this the "current" or active group?
+    total: number; // Optional total for period (for unscheduled time)
+    data: T;
+  }
+  export type PeriodOptGroup = PeriodData<EventOptGrouping>;
+  export type PeriodGrouping = PeriodData<EventGrouping>;
 }
