@@ -19,8 +19,9 @@ module Esper.Views {
 
     renderWithData() {
       return <div className="team-settings-page esper-full-screen minus-nav">
-        <Components.TeamsSidebar teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()} />
+        <Components.ManageSidebar teams={Stores.Teams.all()}
+          groups={Stores.Groups.all()}
+          newGroup={true} />
 
         <div className="esper-right-content padded">
           <div id="new-group-page" className="esper-expanded">

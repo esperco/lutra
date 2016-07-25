@@ -1,5 +1,5 @@
 /*
-  A sidebar for selecting teams
+  A sidebar for managing teams, groups and personal preferences
 */
 module Esper.Components {
 
@@ -9,10 +9,12 @@ module Esper.Components {
     pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
     activePersonal?: boolean;
+    newTeam?: boolean;
+    newGroup?: boolean;
     groups: ApiT.Group[];
   }
 
-  export class TeamsSidebar extends ReactHelpers.Component<Props, {}> {
+  export class ManageSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
       return <Components.SidebarWithToggle>
         <div className="esper-panel-section">
@@ -26,9 +28,7 @@ module Esper.Components {
           <ul className="esper-select-menu">
             <li>
               <a className={classNames({
-                active: !this.props.activeTeamId &&
-                        !this.props.activePersonal &&
-                        !this.props.activeGroupId
+                active: this.props.newTeam
               })}
               href={Paths.Manage.newTeam().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
@@ -47,9 +47,7 @@ module Esper.Components {
             <li className="divider" />
             <li>
               <a className={classNames({
-                active: !this.props.activeGroupId &&
-                        !this.props.activeTeamId &&
-                        !this.props.activePersonal
+                active: this.props.newGroup
               })}
               href={Paths.Manage.newGroup().href}>
                 <i className="fa fa-fw fa-user-plus" />{" "}
