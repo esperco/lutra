@@ -38,28 +38,26 @@ module Esper.Components {
           </ul>
         </div>
 
-        { Esper.PRODUCTION ? null :
-          <div className="esper-panel-section">
-            <label className="esper-header">
-              { Text.Groups }
-            </label>
-            <ul className="esper-select-menu">
-              { _.map(this.props.groups, (g) => this.renderGroup(g))}
-              <li className="divider" />
-              <li>
-                <a className={classNames({
-                  active: !this.props.activeGroupId &&
-                          !this.props.activeTeamId &&
-                          !this.props.activePersonal
-                })}
-                href={Paths.Manage.newGroup().href}>
-                  <i className="fa fa-fw fa-user-plus" />{" "}
-                  { Text.AddGroupLink }
-                </a>
-              </li>
-            </ul>
-          </div>
-        }
+        <div className="esper-panel-section">
+          <label className="esper-header">
+            { Text.Groups }
+          </label>
+          <ul className="esper-select-menu">
+            { _.map(this.props.groups, (g) => this.renderGroup(g))}
+            <li className="divider" />
+            <li>
+              <a className={classNames({
+                active: !this.props.activeGroupId &&
+                        !this.props.activeTeamId &&
+                        !this.props.activePersonal
+              })}
+              href={Paths.Manage.newGroup().href}>
+                <i className="fa fa-fw fa-user-plus" />{" "}
+                { Text.AddGroupLink }
+              </a>
+            </li>
+          </ul>
+        </div>
 
         <div className="esper-panel-section">
           <ul className="esper-select-menu"><li>
