@@ -54,6 +54,7 @@ function resizer() {
 function loadElements() {
   $(".nav-menu").click(function() { toggleNavMenu(); });
   $(".navbar-toggle").click(function() { toggleNavMenu(); });
+  $(".slack-btn").click(function() { slackSignIn(); });
 }
 
 function main() {
