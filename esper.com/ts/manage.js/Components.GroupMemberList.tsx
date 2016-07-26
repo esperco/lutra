@@ -198,14 +198,15 @@ module Esper.Components {
     </div>;
   }
 
-  function GroupRole({role, className, editable}: {
+  function GroupRole({role, className, editable, onClick}: {
     role: ApiT.GroupRole;
     className?: string;
     editable?: boolean
+    onClick?: () => void;
   }) {
     return <span className={classNames("role-box", className, {
       editable: editable
-    })}>
+    })} onClick={onClick}>
       { Util.match(role, [
         ["Owner", Text.GroupRoleOwner],
         ["Manager", Text.GroupRoleManager],

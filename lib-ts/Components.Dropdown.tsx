@@ -190,13 +190,13 @@ module Esper.Components {
       }, this.props.align);
 
       return <div className="dropdown-backdrop" onClick={() => this.close()}>
-        <div className={classNames(this.props.className, {
-               dropdown: _.isUndefined(this.props.className),
-               open: true
-             })}
-             style={style}
-             onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
-          { this.props.children }
+        <div style={style}>
+          <div className={classNames(this.props.className, {
+            dropdown: _.isUndefined(this.props.className),
+            open: true
+          })} onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
+            { this.props.children }
+          </div>
         </div>
       </div>;
     }
