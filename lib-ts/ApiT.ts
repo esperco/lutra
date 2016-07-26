@@ -132,6 +132,14 @@ module Esper.ApiT {
     score: number; // Float between 0 and 1
   }
 
+  export interface HashtagState {
+    hashtag: string;
+    hashtag_norm: string;
+    label?: string;
+    label_norm?: string;
+    approved?: boolean;
+  }
+
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
@@ -144,7 +152,7 @@ module Esper.ApiT {
     labels?: string[];
     labels_norm?: string[];
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
-    hashtags?: string[];
+    hashtags: HashtagState[];
     feedback: EventFeedback;
     location?: string;
     all_day: boolean;

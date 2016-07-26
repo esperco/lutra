@@ -193,6 +193,7 @@ module Esper.TestFixtures {
       all_day: false,
       labels: [],
       labels_norm: [],
+      hashtags: [],
       feedback: {},
       guests: [],
       transparent: false,
