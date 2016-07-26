@@ -58,12 +58,6 @@ module Esper.ApiT {
     team_cal_user: string;
     team_labels: string[];
     team_labels_norm: string[];
-    team_label_urgent: string;
-    team_label_new: string;
-    team_label_in_progress: string;
-    team_label_pending: string;
-    team_label_done: string;
-    team_label_canceled: string;
     team_timestats_calendars?: string[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
