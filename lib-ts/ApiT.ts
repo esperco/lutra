@@ -38,9 +38,9 @@ module Esper.ApiT {
     chrome_extension?: boolean;
     executive_email?: string;
     executive_name: string;
+    executive_timezone: string;
     executive_first_name?: string;
     executive_last_name?: string;
-    executive_timezone?: string;
     executive_address?: string;
     executive_phone?: string;
     executive_gender?: string;
