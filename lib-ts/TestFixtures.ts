@@ -164,12 +164,6 @@ module Esper.TestFixtures {
       team_executive: props.team_executive || uid,
       team_labels: props.team_labels || [],
       team_labels_norm: _.map(props.team_labels, normalizeLabel),
-      team_label_urgent: "Urgent",
-      team_label_new: "New",
-      team_label_in_progress: "In Progress",
-      team_label_pending: "Pending",
-      team_label_done: "Done",
-      team_label_canceled: "Canceled",
       team_timestats_calendars: props.team_timestats_calendars || ["calId"]
     }
   }
