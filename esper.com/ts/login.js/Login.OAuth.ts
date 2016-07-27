@@ -95,6 +95,12 @@ module Esper.Login {
       .then(function(x) {
         Log.d("Going off to " + x.url);
         location.href = x.url;
+      }, function(xhr: JQueryXHR) {
+        if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
+          return loginWithGoogle(opts);
+        } else {
+          return xhr;
+        }
       });
   }
 
