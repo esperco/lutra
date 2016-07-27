@@ -26,20 +26,37 @@ module Esper.Stores.Events {
     : TeamEvent
   {
     var labelScores = (() => {
+      var hashtags =
+        _(e.hashtags)
+          .filter((h) => h.approved !== false)
+          .map((h) => ({
+            id: h.label_norm || h.hashtag_norm,
+            displayAs: h.label || h.hashtag,
+            score: 1,
+            isHashtag: true
+          }))
+          .value();
+
       if (e.labels_norm) {
-        return Option.some(_.map(e.labels_norm, (n, i) => {
-          let [norm, display] = [n, e.labels[i]];
-          Labels.storeMapping({ norm: norm, display: display });
-          return {
-            id: norm,
-            displayAs: display,
-            score: 1
-          };
-        }));
-      } else if (Util.notEmpty(e.predicted_labels)) {
-        var team = Teams.require(teamId);
+        let labels = _(e.labels_norm)
+          .map((n, i) => {
+            let [norm, display] = [n, e.labels[i]];
+            Labels.storeMapping({ norm: norm, display: display });
+            return {
+              id: norm,
+              displayAs: display,
+              score: 1
+            };
+          })
+          .unionBy(hashtags, (l) => l.id)
+          .value();
+        return Option.some(labels);
+      } else if (!_.isEmpty(hashtags)) {
+        return Option.some(hashtags);
+      } else if (!_.isEmpty(e.predicted_labels)) {
+        let team = Teams.require(teamId);
         if (team) {
-          var labels = _.filter(e.predicted_labels,
+          let labels = _.filter(e.predicted_labels,
             (l) => _.includes(team.team_labels_norm, l.label_norm));
           if (labels.length) {
 
@@ -54,12 +71,12 @@ module Esper.Stores.Events {
               the event has predicted labels currently not included
               in the team label list).
             */
-            var labelCount = Math.max(team.team_labels_norm.length,
+            let labelCount = Math.max(team.team_labels_norm.length,
                                       e.predicted_labels.length);
-            var threshold = (1 / labelCount) +
+            let threshold = (1 / labelCount) +
               ((labelCount - 1) / labelCount) * PREDICTED_LABEL_PERCENT_CUTOFF;
 
-            var topPrediction = labels[0];
+            let topPrediction = labels[0];
             if (topPrediction.score > threshold) {
               return Option.some([{
                 id: topPrediction.label_norm,
