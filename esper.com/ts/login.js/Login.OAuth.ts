@@ -2,6 +2,7 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
+/// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Util.ts" />
@@ -50,6 +51,16 @@ module Esper.Login {
     opts = opts || {};
     var landingUrl = opts.landingUrl || getPath();
 
+    if (opts.email) {
+      Analytics.preIdentify({
+        email: opts.email,
+        platform: "Google"
+      });
+    }
+    Analytics.track(Analytics.Trackable.AttemptLogin, {
+      platform: "Google"
+    });
+
     return setLoginNonce()
       .then(function(loginNonce) {
         return Api.getGoogleAuthUrl(landingUrl,
@@ -86,6 +97,16 @@ module Esper.Login {
   export function loginWithNylas(opts?: LoginOpts) {
     opts = opts || {};
     var landingUrl = opts.landingUrl || getPath();
+
+    if (opts.email) {
+      Analytics.preIdentify({
+        email: opts.email,
+        platform: "Nylas"
+      });
+    }
+    Analytics.track(Analytics.Trackable.AttemptLogin, {
+      platform: "Nylas"
+    });
 
     return setLoginNonce()
       .then(function(loginNonce) {

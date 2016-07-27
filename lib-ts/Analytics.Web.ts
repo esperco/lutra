@@ -19,6 +19,17 @@ module Esper.Analytics {
     }
   }
 
+  /*
+    Identify if loginInfo is unavailable. Can use to identify someone's e-mail
+    before they login.
+  */
+  export function preIdentify<T extends {}>(props: T) {
+    analytics.ready(function() {
+      analytics.identify(props);
+    });
+  }
+
+  // Post-login identify
   export function identify(loginInfo?: ApiT.LoginResponse) {
     analytics.ready(function() {
       if (loginInfo && Login.myUid()) {

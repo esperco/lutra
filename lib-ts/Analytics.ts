@@ -9,10 +9,13 @@ module Esper.Analytics {
   // Events to track
   export enum Trackable {
 
+    ///////////* Login *////////////////////
+    AttemptLogin = 1,         // Login was initiated
+
     ///////////* Time Stats *///////////////
 
     // Labeling
-    ConfirmEventLabels = 1,   // Confirm predicted labels
+    ConfirmEventLabels,       // Confirm predicted labels
     EditEventLabels,          // Edit labels for event(s)
     PickLabelProfile,         // Label profiles
 
