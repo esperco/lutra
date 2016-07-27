@@ -143,11 +143,6 @@ module Esper.Util {
     }
   }
 
-  // Checks array is not null and is not empty
-  export function notEmpty(v: Array<any>) {
-    return v && v.length > 0;
-  }
-
   /*
     Do something after a short delay. Ensures that only one function is
     pending for any given id.

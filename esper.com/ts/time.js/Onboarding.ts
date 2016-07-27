@@ -8,7 +8,7 @@
 module Esper.Onboarding {
 
   export function needsTeam() {
-    return !Util.notEmpty(Stores.Teams.all());
+    return _.isEmpty(Stores.Teams.all());
   }
 
   export function needsLabels() {

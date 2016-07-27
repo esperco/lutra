@@ -362,7 +362,7 @@ module Esper.Views {
 
     refreshEvents() {
       this._eventIdMap = {}; // Reset remembered event list
-      if (Util.notEmpty(this.props.cals)) {
+      if (!_.isEmpty(this.props.cals)) {
         Stores.Events.fetchPredictions({
           teamId: this.props.cals[0].teamId,
           period: this.props.period,

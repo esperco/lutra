@@ -229,7 +229,7 @@ module Esper.Components {
         };
 
         var labels = Stores.Events.getLabels(event);
-        if (Util.notEmpty(labels)) {
+        if (!_.isEmpty(labels)) {
           var label = labels[0];
           var baseColor = Colors.getColorForLabel(label.id);
           ret.backgroundColor = baseColor;
