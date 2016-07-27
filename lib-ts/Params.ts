@@ -255,16 +255,26 @@ module Esper.Params {
   // Filter events by some attribute in a list
   export type ListSelectJSON = Types.ListSelectJSON;
 
-  export function cleanListSelectJSON(q: any = {}): ListSelectJSON {
+  export function cleanListSelectJSON(q: any = {}, defaults: {
+    all?: boolean;
+    none?: boolean;
+    some?: string[];
+  } = {}): ListSelectJSON {
     q = q || {
-      all: true,
-      none: true,
-      some: []
+      all: Util.some(defaults.all, true),
+      none: Util.some(defaults.none, true),
+      some: Util.some(defaults.some, [])
     } as ListSelectJSON;
 
-    if (! _.isBoolean(q.all)) { q.all = !_.isBoolean(q.none) && !q.some; }
-    if (! _.isBoolean(q.none)) { q.none = true; }
-    if (!q.some || !_.every(q.some, (i) => _.isString(i))) { q.some = []; }
+    if (! _.isBoolean(q.all)) {
+      q.all = Util.some(defaults.all,
+        !_.isBoolean(q.none) && !_.isArray(q.some)
+      );
+    }
+    if (! _.isBoolean(q.none)) { q.none = Util.some(defaults.none, true); }
+    if (!_.isArray(q.some) || !_.every(q.some, (i) => _.isString(i))) {
+      q.some = Util.some(defaults.some, []);
+    }
 
     return q;
   }

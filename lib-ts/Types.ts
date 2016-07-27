@@ -200,7 +200,7 @@ module Esper.Types {
   export type ChartType = "percent"|"absolute"|"calendar";
   export type ChartGroup = "calendars"
                           |"durations"
-                          |"domains"
+                          |"guests"
                           |"guest-counts"
                           |"labels"
                           |"ratings";
