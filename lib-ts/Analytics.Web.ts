@@ -23,14 +23,14 @@ module Esper.Analytics {
     Identify if loginInfo is unavailable. Can use to identify someone's e-mail
     before they login.
   */
-  export function preIdentify<T extends {}>(props: T) {
+  export function preIdentify<T extends {}>(props: T, cb?: () => void) {
     analytics.ready(function() {
-      analytics.identify(props);
+      analytics.identify(props, cb);
     });
   }
 
   // Post-login identify
-  export function identify(loginInfo?: ApiT.LoginResponse) {
+  export function identify(loginInfo?: ApiT.LoginResponse, cb?: () => void) {
     analytics.ready(function() {
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid() && loginInfo) {
@@ -46,7 +46,7 @@ module Esper.Analytics {
           analytics.identify(Login.myUid(), {
             email: loginInfo.email,
             platform: loginInfo.platform
-          });
+          }, cb);
         }
       } else {
         reset();
@@ -62,18 +62,19 @@ module Esper.Analytics {
   }
 
   // Track which page you're on
-  export function page(page: Page, properties?: any) {
+  export function page(page: Page, properties?: any, cb?: () => void) {
     properties = flatten(properties || {});
     properties['url'] = location.href; // So hash is included
     analytics.ready(function() {
-      analytics.page(Page[page], properties);
+      analytics.page(Page[page], properties, cb);
     });
   }
 
-  export function track(event: Trackable, properties?: Object) {
+  export function track(event: Trackable, properties?: Object,
+                        cb?: () => void) {
     var eventName = Trackable[event];
     analytics.ready(function() {
-      analytics.track(eventName, flatten(properties || {}));
+      analytics.track(eventName, flatten(properties || {}), cb);
     });
   }
 }
