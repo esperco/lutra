@@ -25,7 +25,7 @@ module Esper.Components {
     }
 
     componentWillReceiveProps(newProps: Props) {
-      if (Util.notEmpty(newProps.selectedCalendars)) {
+      if (!_.isEmpty(newProps.selectedCalendars)) {
         this.setState({ hasError: false });
       }
     }
@@ -114,11 +114,11 @@ module Esper.Components {
     // do anything other than show an error message if no calendars selected
     validate() {
       // If no available calendars, don't hold up validation
-      if (! Util.notEmpty(this.props.availableCalendars)) {
+      if (_.isEmpty(this.props.availableCalendars)) {
         return Option.some<ApiT.GenericCalendar[]>([]);
       }
 
-      if (Util.notEmpty(this.props.selectedCalendars)) {
+      if (!_.isEmpty(this.props.selectedCalendars)) {
         return Option.some(this.props.selectedCalendars);
       } else {
         this.mutateState((s) => s.hasError = true);
