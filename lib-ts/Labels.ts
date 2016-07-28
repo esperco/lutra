@@ -8,7 +8,6 @@ module Esper.Labels {
   interface LabelBase {
     id: string;        // Normalized form
     displayAs: string; // Display form
-    isHashtag?: boolean; // Whether this label is from a hashtag
   }
 
   // Either a predicted or user-predicted label

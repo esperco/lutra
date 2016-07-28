@@ -32,6 +32,7 @@ module Esper.Types {
     description: string;
 
     labelScores: Option.T<Labels.Label[]>;
+    hashtags: ApiT.HashtagState[];
 
     feedback: ApiT.EventFeedback;
     location: string;

@@ -134,6 +134,15 @@ module Esper.ApiT {
     approved?: boolean;
   }
 
+  export interface HashtagRequestItem {
+    hashtag: string;
+    approved: boolean;
+  }
+
+  export interface HashtagRequest {
+    hashtag_states: HashtagRequestItem[];
+  }
+
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
