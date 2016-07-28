@@ -229,4 +229,22 @@ module Esper.Util {
     let found = _.find(choices, (c) => testFn(c[0], x));
     return found ? found[1] : defaultChoice;
   }
+
+  /*
+    Returns an object with a callback and a promise. If callback is not called
+    by time t, promise will reject.
+  */
+  export function timeoutP(t: number) {
+    let dfd = $.Deferred<void>();
+    setTimeout(function() {
+      if (dfd.state() === "pending") { dfd.reject(); }
+    }, t);
+
+    return {
+      promise: dfd.promise(),
+      cb: function() {
+        if (dfd.state() === "pending") { dfd.resolve(); }
+      }
+    };
+  }
 }

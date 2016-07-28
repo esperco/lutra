@@ -12,23 +12,16 @@ module Esper.Components {
   interface LoginProps {
     children?: JSX.Element[];
 
-    // Show the Google button (uses Google API directly)
-    showGoogle?: boolean;
+    // Callback for Google login click
+    onGoogleLogin?: () => JQueryPromise<any>;
 
-    // Show the Microsoft button (uses Nylas)
-    showExchange?: boolean;
+    // Callback for Nylas login click
+    onNylasLogin?: (email: string) => JQueryPromise<any>;
 
-    // Show the "Other Provider" button (uses Nylas)
-    showNylas?: boolean;
-
-    // Redirect after login
-    landingUrl?: string;
-
-    // Platform
+    // If platform is known, can default to e-mail input as appropriate
     platform?: string; // Google / Exchange / Nylas
 
-    // Variables passed along to handle token issues or login prompt
-    inviteCode?: string;
+    // Pre-populate email input with this address
     email?: string;
   }
 
@@ -74,9 +67,9 @@ module Esper.Components {
 
         <div className={"buttons-container" +
                         (this.state.showNylasInput ? " shifted" : "")}>
-          { this.props.showGoogle ? this.renderGoogleButton() : null }
-          { this.props.showExchange ? this.renderExchangeButton() : null }
-          { this.props.showNylas ? this.renderNylasButton() : null }
+          { this.props.onGoogleLogin ? this.renderGoogleButton() : null }
+          { this.props.onNylasLogin ? this.renderExchangeButton() : null }
+          { this.props.onNylasLogin ? this.renderNylasButton() : null }
           { this.renderNylasInput() }
         </div>
 
@@ -120,13 +113,10 @@ module Esper.Components {
       </button>;
     }
 
-    loginToGoogle(email?: string) {
+    loginToGoogle() {
       this.setState({busy: true, serverError: false});
-      Login.loginWithGoogle({
-        landingUrl: Util.nullify(this.props.landingUrl),
-        inviteCode: Util.nullify(this.props.inviteCode),
-        email: email || Util.nullify(this.props.email)
-      }).fail(() => this.setState({busy: false, serverError: true}))
+      this.props.onGoogleLogin()
+        .fail(() => this.setState({busy: false, serverError: true}));
     }
 
     renderExchangeButton() {
@@ -194,17 +184,8 @@ module Esper.Components {
       var val = $(this._nylasInput).val();
       if (Util.validateEmailAddress(val)) {
         this.setState({busy: true, serverError: false, inputError: false});
-        Login.loginWithNylas({
-          email: val,
-          landingUrl: Util.nullify(this.props.landingUrl),
-          inviteCode: Util.nullify(this.props.inviteCode)
-        }).fail((xhr: JQueryXHR) => {
-          if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
-            this.loginToGoogle(val);
-          } else {
-            this.setState({busy: false, serverError: true});
-          }
-        });
+        this.props.onNylasLogin(val)
+          .fail(() => this.setState({busy: false, serverError: true}));
       } else {
         this.setState({busy: false, serverError: false, inputError: true});
       }

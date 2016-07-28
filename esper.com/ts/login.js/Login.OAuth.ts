@@ -2,13 +2,21 @@
   Refactored login code for OAuth clients (Zorilla, Grison, Otter)
 */
 
+/// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../lib/Login.Web.ts" />
 
 module Esper.Login {
-  var nonceKey = "login_nonce";
+  const nonceKey = "login_nonce";
+
+  /*
+    How long to wait for analytics to post before redirecting to Google or
+    Nylas. We need timeout because Segment's unavailability shouldn't break
+    login for our app.
+  */
+  const analyticsTimeout = 1500;
 
   function setLoginNonce() {
     /*
@@ -50,6 +58,18 @@ module Esper.Login {
     opts = opts || {};
     var landingUrl = opts.landingUrl || getPath();
 
+    var analyticsP1 = Util.timeoutP(analyticsTimeout);
+    if (opts.email) {
+      Analytics.preIdentify({
+        email: opts.email,
+        platform: "Google"
+      }, analyticsP1.cb);
+    }
+    var analyticsP2 = Util.timeoutP(analyticsTimeout);
+    Analytics.track(Analytics.Trackable.AttemptLogin, {
+      platform: "Google"
+    }, analyticsP2.cb);
+
     return setLoginNonce()
       .then(function(loginNonce) {
         return Api.getGoogleAuthUrl(landingUrl,
@@ -57,7 +77,9 @@ module Esper.Login {
       })
       .then(function(x) {
         Log.d("Going off to " + x.url);
-        location.href = x.url;
+        $.when(analyticsP1.promise, analyticsP2.promise).always(function() {
+          location.href = x.url;
+        });
       });
   }
 
@@ -87,6 +109,18 @@ module Esper.Login {
     opts = opts || {};
     var landingUrl = opts.landingUrl || getPath();
 
+    var analyticsP1 = Util.timeoutP(analyticsTimeout);
+    if (opts.email) {
+      Analytics.preIdentify({
+        email: opts.email,
+        platform: "Nylas"
+      }, analyticsP1.cb);
+    }
+    var analyticsP2 = Util.timeoutP(analyticsTimeout);
+    Analytics.track(Analytics.Trackable.AttemptLogin, {
+      platform: "Nylas"
+    }, analyticsP2.cb);
+
     return setLoginNonce()
       .then(function(loginNonce) {
         return Api.getNylasLoginUrl(opts.email, loginNonce,
@@ -94,7 +128,15 @@ module Esper.Login {
       })
       .then(function(x) {
         Log.d("Going off to " + x.url);
-        location.href = x.url;
+        $.when(analyticsP1.promise, analyticsP2.promise).always(function() {
+          location.href = x.url;
+        });
+      }, function(xhr: JQueryXHR) {
+        if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
+          return loginWithGoogle(opts);
+        } else {
+          return xhr;
+        }
       });
   }
 

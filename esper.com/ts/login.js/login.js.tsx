@@ -141,17 +141,25 @@ module Esper {
   function renderLogin(message?: string, error?: string) {
     var ext = Util.getParamByName(Login.extParam);
     var platform = Util.getParamByName(Login.platformParam);
-    var inviteCode = getInviteCode();
+    var defaultEmail = Util.nullify(getEmail());
+    var inviteCode = Util.nullify(getInviteCode());
+    var landingUrl = Util.nullify(getLandingUrl());
     Layout.render(<div id="esper-login-container" className="container">
       <div className="panel panel-default"><div className="panel-body">
         <Components.LoginPrompt
-          landingUrl={getLandingUrl()}
-          inviteCode={inviteCode}
-          email={getEmail()}
+          onGoogleLogin={() => Login.loginWithGoogle({
+            landingUrl: landingUrl,
+            inviteCode: inviteCode,
+            email: defaultEmail
+          })}
+          onNylasLogin={!ext ? (email) => Login.loginWithNylas({
+            landingUrl: landingUrl,
+            inviteCode: inviteCode,
+            email: email
+          }) : null}
+          email={defaultEmail}
           platform={platform}
-          showGoogle={true}
-          showExchange={!ext}
-          showNylas={!ext}>
+        >
           <div className={
             "alert text-center alert-" + (error ? "danger" : "info")
           }>{ error || message || (inviteCode && <span>
