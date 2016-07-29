@@ -51,7 +51,8 @@ module Esper.LocalStore {
 
   export function remove(k: string) {
     if (window.localStorage && localStorage.removeItem) {
-      localStorage.removeItem(k);
+      try { localStorage.removeItem(k); }
+      catch (err) { /* Nothing to do -- going to clear cookie anyway */ }
     }
     clearCookie(k);
   };
