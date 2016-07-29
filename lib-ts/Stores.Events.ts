@@ -32,8 +32,7 @@ module Esper.Stores.Events {
           .map((h) => ({
             id: h.label_norm || h.hashtag_norm,
             displayAs: h.label || h.hashtag,
-            score: 1,
-            isHashtag: true
+            score: 1
           }))
           .value();
 
@@ -100,6 +99,7 @@ module Esper.Stores.Events {
       title: e.title || "",
       description: e.description || "",
       labelScores: labelScores,
+      hashtags: e.hashtags,
       feedback: e.feedback,
       location: e.location || "",
       allDay: e.all_day,

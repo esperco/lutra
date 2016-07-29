@@ -174,16 +174,53 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      return Api.setPredictLabels(r.teamId, {
+      var promises =
+        _(r.events)
+          .map((e) => e.labelScores.match({
+            none: () => null,
+            some: (labels) => {
+              return Api.updateHashtagStates(e.teamId,
+                e.recurringEventId || e.id,
+                { hashtag_states: _.map(e.hashtags,
+                    (h) => {
+                      if (_.some(labels, (l) => h.label_norm == l.id ||
+                                                h.hashtag_norm == l.id))
+                        return {
+                          hashtag: h.hashtag,
+                          approved: true
+                        };
+                      else
+                        return {
+                          hashtag: h.hashtag,
+                          approved: false
+                        }
+                    })
+                }
+              );
+            }
+          }))
+          .compact()
+          .value();
+
+      var p = Api.setPredictLabels(r.teamId, {
         set_labels: _.map(r.events, (e) => ({
           id: e.recurringEventId || e.id,
           labels: e.labelScores.match({
             none: (): string[] => [],
-            some: (scores) => _.map(scores, (s) => s.displayAs)
+            some: (scores) =>
+              _(scores)
+                .filter(
+                  (s) => !_.some(e.hashtags,
+                    (h) => h.label_norm === s.id ||
+                           h.hashtag_norm === s.id))
+                .map((s) => s.displayAs)
+                .value()
           })
         })),
         predict_labels: r.fetchEventIds
       });
+
+      return Util.when(promises).then(() => p);
     },
 
     // Pre-processor
