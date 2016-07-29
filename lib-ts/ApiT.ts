@@ -143,6 +143,7 @@ module Esper.ApiT {
     title?: string;
     description?: string;
     description_messageids: string[];
+    color?: string;
     labels?: string[];
     labels_norm?: string[];
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
@@ -162,6 +163,11 @@ module Esper.ApiT {
 
   export interface GenericCalendarEventsCollection {
     [calId: string]: GenericCalendarEvents;
+  }
+
+  export interface EventColorRequest {
+    event_ids: string[];
+    color: string;
   }
 
   export interface Profile {

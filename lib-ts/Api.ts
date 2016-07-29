@@ -631,6 +631,17 @@ module Esper.Api {
     return JsonHttp.post(url, JSON.stringify(pref));
   }
 
+  export function setEventsColor(team_id: string, event_ids: string[],
+                                 color: string): JQueryPromise<void> {
+    var req: ApiT.EventColorRequest = {
+      event_ids: event_ids,
+      color: color,
+    };
+    var url = prefix + "/api/event/color/" + string(Login.myUid())
+            + "/" + encodeURIComponent(team_id);
+    return JsonHttp.post(url, JSON.stringify(req));
+  }
+
   // Temporary compatibility fix. Field `label` is now optional.
   function forceLabels(x: {labels?: string[]}) {
     if (! _.isArray(x.labels)) {
