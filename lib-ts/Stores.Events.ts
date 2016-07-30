@@ -381,7 +381,7 @@ module Esper.Stores.Events {
 
         // None => forgot to call fetch. Error.
         none: () => {
-          Log.e("Requested events but did not call fetch first");
+          Log.e("Requested events but did not call fetch first", q);
           return {
             start: start,
             end: end,
