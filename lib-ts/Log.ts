@@ -91,31 +91,45 @@ module Esper.Log {
   }
   export var w = warn;
 
-  /* error */
+  /* error - all errors are also logged with Raven */
   export function error(...a: any[]) {
-    // Sanity check since Raven isn't deployed on all front-end stuff yet
-    if ((<any> Esper).Raven || (<any> window).Raven) {
-
-      /*
-        Send error to Raven if simple error or string -- else treat as more
-        complicated event that requires an explicit call to Raven
-      */
-      var r: any = (a && a.length === 1) ? a[0] : a;
-      if (r instanceof Error) {
-        Raven.captureException(r);
-      } else if (typeof r === "string") {
-        // Create error object to log so we get a traceback
-        try {
-          throw new Error(r);
-        } catch (err) {
-          Raven.captureException(err);
-        }
-      }
-    }
-
+    let error = a[0];
+    let details = a.length > 2 ? a.slice(1) : a[1];
+    logToRaven(error, details);
     logBase(console.error, Level.ERROR, "E", a);
   }
   export var e = error;
+
+  // Logs error to Raven -- converts strings to Error
+  export function logToRaven(error: string|Error, details?: any) {
+    if (error instanceof Error) {
+      logErrToRaven(error, details);
+    } else {
+      // Create error object to log so we get a traceback
+      try {
+        throw new Error(error);
+      } catch (err) {
+        logErrToRaven(err, details);
+      }
+    }
+  }
+
+  // Logs error with optional details
+  function logErrToRaven(error: Error, details?: any) {
+    /*
+      Sanity check since Raven isn't deployed on all front-end stuff or
+      may be unavailable
+    */
+    if ((<any> Esper).Raven || (<any> window).Raven) {
+      if (details) {
+        Raven.captureException(error, {
+          extra: details
+        });
+      } else {
+        Raven.captureException(error);
+      }
+    }
+  }
 
   /* Log the beginning and the end of something */
   export function start(...a: any[]): { (): void } {
