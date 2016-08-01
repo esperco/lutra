@@ -381,12 +381,14 @@
 }
 
 /*
-  .esper-panel-sections are used to separate elements. Consecutive panel
-  sections get a dividing border and vertical spacing. Panel sections use
-  negative horizontal margins to ensure that padding doesn't stack up when
-  nested or when used inside Bootstrap modals and panels.
+  .esper-section is used to separate elements. Consecutive sections get a
+  vertical spacing. Panel sections use negative horizontal margins to ensure
+  that padding doesn't stack up when nested or when used inside Bootstrap
+  modals and panels.
+
+  Use .esper-panel-section to add borders between consecutive sections.
 */
-.esper-panel-section {
+.esper-section, .esper-panel-section {
   padding: 0 @esper-base-padding;
 
   .esper-left-sidebar & {
@@ -455,33 +457,40 @@
       padding: @panel-body-padding @panel-body-padding 0;
     }
   }
-}
 
-.esper-panel-section + .esper-panel-section {
-  border-top: 1px solid @brand-divider;
+  // Margin between consectuve sections
+  & + .modal-footer, & + .esper-section, & + .esper-panel-section {
+    margin-top: @esper-base-padding;
 
-  .esper-shade & {
-    border-color: @shade-divider;
+    .panel-body & {
+      margin-top: @panel-body-padding;
+    }
+
+    .modal-body & {
+      margin-top: @modal-inner-padding;
+    }
   }
 
-  .esper-inverse & {
-    border-color: @inverse-divider;
-  }
-}
+  // For panel sections, add border and a bit more spacing
+  & + .esper-panel-section, & + .modal-footer {
+    border-top: 1px solid @brand-divider;
+    padding-top: @esper-base-padding;
 
-.esper-panel-section + .modal-footer,
-.esper-panel-section + .esper-panel-section {
-  margin-top: @esper-base-padding;
-  padding-top: @esper-base-padding;
+    .esper-shade & {
+      border-color: @shade-divider;
+    }
 
-  .panel-body & {
-    margin-top: @panel-body-padding;
-    padding-top: @panel-body-padding;
-  }
+    .esper-inverse & {
+      border-color: @inverse-divider;
+    }
 
-  .modal-body & {
-    margin-top: @modal-inner-padding;
-    padding-top: @modal-inner-padding;
+    .panel-body & {
+      padding-top: @panel-body-padding;
+    }
+
+    .modal-body & {
+      padding-top: @modal-inner-padding;
+    }
   }
 }
 

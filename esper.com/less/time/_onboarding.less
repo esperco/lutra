@@ -34,23 +34,20 @@
   }
 
   .onboarding-team > .rm-action {
-    float: left;
+    float: right;
+    text-align: right;
     width: @onboarding-team-rm-action-width;
     padding: (2 * @padding-small-vertical) @padding-xs-horizontal;
   }
 
   .rm-action + .esper-expando {
-    margin-left: @onboarding-team-rm-action-width;
+    margin-right: @onboarding-team-rm-action-width;
   }
 
   .esper-expando {
     padding: @esper-base-padding;
     border: 1px solid @brand-border;
     border-radius: @border-radius-small;
-  }
-
-  .onboarding-team + .onboarding-team, .esper-expando + .esper-expando {
-    margin-top: @padding-large-vertical;
   }
 
   .esper-expando-body {
@@ -85,15 +82,6 @@
       .close-action + .form-set {
         margin-right: @onboarding-close-action-width;
       }
-    }
-  }
-
-  .add-team-div {
-    padding: @padding-small-vertical 0;
-    margin-top: @padding-small-vertical;
-
-    .esper-expando & {
-      border-top: 1px solid @brand-border;
     }
   }
 }

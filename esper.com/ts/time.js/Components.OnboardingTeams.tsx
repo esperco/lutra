@@ -23,7 +23,7 @@ module Esper.Components {
     render() {
       return <div>
         { _.map(this.props.teams, (t) =>
-          <div className="onboarding-team" key={t.teamid}>
+          <div className="onboarding-team esper-section" key={t.teamid}>
             <span className="action rm-action"
                   onClick={() => Actions.Teams.removeTeam(t.teamid)}>
               <i className="fa fa-fw fa-close" />
@@ -45,7 +45,7 @@ module Esper.Components {
           </div>
         )}
 
-        <div className="add-team-div clearfix">
+        <div className="add-team-div esper-section clearfix">
           <span className="action pull-right"
                 onClick={() => this.props.onAddTeam()}>
             <i className="fa fa-fw fa-plus" />{" "}Add Someone Else
