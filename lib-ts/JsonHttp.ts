@@ -104,35 +104,25 @@ module Esper.JsonHttp {
         reqBody: body,
         respBody: xhr.responseText
       };
-      switch (xhr.status) {
-      case 400:
-        Log.e("Bad request", details);
-        break;
-      case 401:
-        Log.e("Unauthorized", details);
-        break;
-      case 404:
-        Log.e("Not found", details);
-        break;
-      case 500: /* Server error */
-        Log.e("Server error", details);
-        break;
-      default: /* Fallback */
-        Log.e("Unknown error " + xhr.status, details);
-        break;
-      }
-
-      // Sanity check since Raven isn't deployed on all front-end stuff yet
-      if ((<any> Esper).Raven || (<any> window).Raven) {
-        /*
-          Status code == 0 means URL is unreachable -- probably a client
-          connectivity or DNS issue. We should use a service like Pingdom
-          to ensure our server is up rather than report to Sentry.
-        */
-        if (details.code !== 0 && ! ignoreError(xhr)) {
-          Raven.captureException(err, {
-            extra: details
-          });
+      if (details.code === 0 || ignoreError(xhr)) {
+        Log.w("Ignored error", details)
+      } else {
+        switch (xhr.status) {
+          case 400:
+            Log.e("Bad request", details);
+            break;
+          case 401:
+            Log.e("Unauthorized", details);
+            break;
+          case 404:
+            Log.e("Not found", details);
+            break;
+          case 500: /* Server error */
+            Log.e("Server error", details);
+            break;
+          default: /* Fallback */
+            Log.e("Unknown error " + xhr.status, details);
+            break;
         }
       }
     }
