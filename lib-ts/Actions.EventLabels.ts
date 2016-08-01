@@ -179,6 +179,9 @@ module Esper.Actions.EventLabels {
           .map((e) => e.labelScores.match({
             none: () => null,
             some: (labels) => {
+              if (_.isEmpty(e.hashtags)) {
+                return null;
+              }
               return Api.updateHashtagStates(e.teamId,
                 e.recurringEventId || e.id,
                 { hashtag_states: _.map(e.hashtags,
