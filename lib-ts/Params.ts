@@ -86,6 +86,16 @@ module Esper.Params {
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
   export function cleanCalIds(teamId: string, calIdsStr: string) {
     var team = Stores.Teams.require(teamId);
+    /*
+      Allow emptyCalIds only if explicitly specified (don't return empty
+      if inferred by lastCalIds or LocalStore
+    */
+    if (calIdsStr === emptyCalIds) {
+      LocalStore.set(lastCalIdsKey, defaultCalIds);
+      lastCalIds = defaultCalIds;
+      return [];
+    }
+
     if (calIdsStr) {
       LocalStore.set(lastCalIdsKey, calIdsStr);
     }
@@ -93,8 +103,9 @@ module Esper.Params {
     lastCalIds = calIdsStr || lastCalIds || LocalStore.get(lastCalIdsKey);
     if (typeof lastCalIds === "string" &&
         lastCalIds !== defaultCalIds) {
-      var calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
-      return _.intersection(team.team_timestats_calendars, calIds);
+      let calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
+      let ret = _.intersection(team.team_timestats_calendars, calIds);
+      if (ret.length) return ret;
     }
     return team.team_timestats_calendars.slice(0, MAX_DEFAULT_CALS);
   }
