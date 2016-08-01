@@ -60,15 +60,17 @@ module Esper.Components {
 
         { this.props.busy ?
           <LoadingMsg msg={Text.PredictionsLoading} hellip={true} /> :
-          <EventList events={events}
-            teams={this.props.teams}
-            onEventClick={this.props.onEventClick}
-            onAddLabelClick={this.props.onAddLabelClick}
-          /> }
+          <div className="esper-section">
+            <EventList events={events}
+              teams={this.props.teams}
+              onEventClick={this.props.onEventClick}
+              onAddLabelClick={this.props.onAddLabelClick}
+            />
+          </div> }
 
         {/* Button to load more events and update predictions, as applicable */}
         { events.length ?
-          <div className="form-group">
+          <div className="esper-section">
           {
             (needsConfirmation || this.hasMore()) ?
             <button className="btn btn-primary form-control"

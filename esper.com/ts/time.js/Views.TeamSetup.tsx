@@ -45,57 +45,61 @@ module Esper.Views {
           { Text.TeamSetupDescription }
         </div>
 
-        <Components.Expando onOpen={() => this.onOpenSelf()}
-          group={this._expandos}
-          header="Just Myself"
-          headerClasses="esper-panel-section"
-          bodyClasses="esper-panel-section"
-        >
-          <div>
-            { Stores.Profiles.get(Login.myUid()).match({
-              none: () =>
-                <span className="esper-spinner esper-medium esper-centered" />,
-              some: (p) => <div>
-                <p>{ Text.TeamSelfDescription }</p>
-                <Components.NewTeamForm
-                  ref={(c) => this._selfForm = c}
-                  name={p.display_name || ""}
-                  email={Login.myEmail()}
-                  supportsExec={false} />
-              </div>
-            })}
-          </div>
-        </Components.Expando>
-
-        <Components.Expando onOpen={() => this.onOpenExec()}
-          group={this._expandos}
-          header="Someone Else"
-          headerClasses="esper-panel-section"
-          bodyClasses="esper-panel-section"
-        >
-          <div>
-            <p>{ Text.TeamExecDescription }</p>
-            { _.map(this.state.newTeamIds, (id) =>
-              <div key={id} className="new-team">
-                { this.state.newTeamIds.length > 1 ?
-                  <span className="action close-action"
-                        onClick={() => this.rmTeam(id)}>
-                    <i className="fa fa-fw fa-close" />
-                  </span> : null
-                }
-                <Components.NewTeamForm
-                 ref={(c) => this._execForms[id] = c}
-                 supportsExec={true} />
-              </div>
-            )}
-            <div className="add-team-div clearfix">
-              <span className="action pull-right"
-                    onClick={() => this.addTeam()}>
-                <i className="fa fa-fw fa-plus" />{" "}Add Someone Else
-              </span>
+        <div className="esper-section">
+          <Components.Expando onOpen={() => this.onOpenSelf()}
+            group={this._expandos}
+            header="Just Myself"
+            headerClasses="esper-panel-section"
+            bodyClasses="esper-panel-section"
+          >
+            <div>
+              { Stores.Profiles.get(Login.myUid()).match({
+                none: () =>
+                  <span className="esper-spinner esper-medium esper-centered" />,
+                some: (p) => <div>
+                  <p>{ Text.TeamSelfDescription }</p>
+                  <Components.NewTeamForm
+                    ref={(c) => this._selfForm = c}
+                    name={p.display_name || ""}
+                    email={Login.myEmail()}
+                    supportsExec={false} />
+                </div>
+              })}
             </div>
-          </div>
-        </Components.Expando>
+          </Components.Expando>
+        </div>
+
+        <div className="esper-section">
+          <Components.Expando onOpen={() => this.onOpenExec()}
+            group={this._expandos}
+            header="Someone Else"
+            headerClasses="esper-panel-section"
+            bodyClasses="esper-panel-section"
+          >
+            <div>
+              <p>{ Text.TeamExecDescription }</p>
+              { _.map(this.state.newTeamIds, (id) =>
+                <div key={id} className="new-team esper-panel-section">
+                  { this.state.newTeamIds.length > 1 ?
+                    <span className="action close-action"
+                          onClick={() => this.rmTeam(id)}>
+                      <i className="fa fa-fw fa-close" />
+                    </span> : null
+                  }
+                  <Components.NewTeamForm
+                   ref={(c) => this._execForms[id] = c}
+                   supportsExec={true} />
+                </div>
+              )}
+              <div className="add-team-div esper-panel-section clearfix">
+                <span className="action pull-right"
+                      onClick={() => this.addTeam()}>
+                  <i className="fa fa-fw fa-plus" />{" "}Add Someone Else
+                </span>
+              </div>
+            </div>
+          </Components.Expando>
+        </div>
       </Components.OnboardingPanel>
     }
 

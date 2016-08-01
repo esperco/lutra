@@ -104,7 +104,7 @@ module Esper.Components {
     renderLabelInterface() {
       return <div>
         { _.isEmpty(this.props.team.team_labels) ?
-            <div className="form-group">
+            <div className="esper-section">
               <a className="btn btn-default form-control"
                    onClick={() => this.mutateState((s) => s.showProfiles = true)}>
                   <i className="fa fa-fw fa-arrow-circle-left" />
@@ -112,7 +112,7 @@ module Esper.Components {
               </a>
           </div> : null }
         { _.map(this.state.labels, (l) =>
-            <div key={"label-" + l.id} className="form-group">
+            <div key={"label-" + l.id} className="esper-section">
               <span className="label-icon">
                 <i className="fa fa-fw fa-tag" />
               </span>
@@ -130,7 +130,8 @@ module Esper.Components {
             </div>
         )}
 
-        <div key="add-label" className="add-label-div clearfix">
+        <div key="add-label"
+             className="add-label-div esper-panel-section clearfix">
           <span className="action pull-right"
                 onClick={() => this.onAdd()}>
             <i className="fa fa-fw fa-plus" />{" "}
