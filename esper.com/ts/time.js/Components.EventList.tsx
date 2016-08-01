@@ -49,7 +49,7 @@ module Esper.Components {
 
     renderDay(timestamp: number, events: Stores.Events.TeamEvent[]) {
       var m = moment(timestamp);
-      return <div className={classNames('day', {
+      return <div className={classNames('day', 'esper-section', {
         today: Time.sameDay(m, moment()),
         future: Time.diffDay(m, moment()) > 0,
       })} key={timestamp}>
