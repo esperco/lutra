@@ -9,10 +9,12 @@ module Esper.Route {
       Route.nav.go(Paths.Time.teamSetup());
     }
 
+    else if (Onboarding.needsCalendars()) {
+      Route.nav.go(Paths.Time.calendarSetup());
+    }
+
     // else if (Onboarding.needsLabels()) {
     //   Route.nav.go(Paths.Time.labelSetup());
-    // } else if (Onboarding.needsCalendars()) {
-    //   Route.nav.go(Paths.Time.calendarSetup());
     // }
 
     else {
