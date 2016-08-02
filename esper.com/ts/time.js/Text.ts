@@ -16,13 +16,14 @@ module Esper.Text {
     "so that person can retain access to his or her Esper data if you " +
     "decide to hand off calendar duties to someone else."
 
-  export const LabelSetupHeading = "Set Some Goals";
-  export const LabelSetupSelfDescription = "What do you want to spend more " +
-    "time on? We'll use these to categorize your calendar events and " +
-    "calculate how much time you're spending towards each goal.";
-  export const LabelSetupExecDescription = "Pick some goals for each person " +
-    "you're supporting. We'll use these to categorize their calendar " +
-    "events and calculate how much time they're spending towards each goal.";
+  export const LabelSetupHeading = `Pick Some ${_.capitalize(Labels)}`;
+  export const LabelSetupSelfDescription = "What do you want to prioritize? " +
+    "We'll use these to categorize your calendar events and " +
+    "calculate how much time you're spending towards each priority.";
+  export const LabelSetupExecDescription = `Pick some ${Labels} for each ` +
+    "person you're supporting. We'll use these to categorize their calendar " +
+    "events and calculate how much time they're spending towards each " +
+    "priority.";
 
   export const LabelProfiles: {
     name: string;
@@ -135,9 +136,9 @@ module Esper.Text {
   export const ChartDurationDescription =
     `Am I spending my time in many short meetings or a few long meetings?`;
   export const ChartLabelsDescription =
-    `Which ${Labels} am I spending the most time on?`;
+    `What am I spending the most time on?`;
   export const ChartGuestsDescription =
-    `Which ${Guests} am I meeting the most with?`;
+    `Who am I meeting the most with?`;
   export const ChartGuestsCountDescription =
     `Are there too many people invited to the meetings I attend?`
   export const ChartRatingsDescription =

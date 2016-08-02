@@ -15,8 +15,8 @@ module Esper.Text {
   export const DismissNotes = "Click to Dismiss";
 
   // Basics
-  export const Label = "goal";
-  export const Labels = "goals";
+  export const Label = "tag";
+  export const Labels = "tags";
 
   export const Calendar = "calendar";
   export const Calendars = "calendars";
