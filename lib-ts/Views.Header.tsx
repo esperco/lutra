@@ -172,15 +172,14 @@ module Esper.Views {
   class ReleaseNotes extends Component<{ lastDismiss: number }, {}> {
     render() {
       if (this.props.lastDismiss < Text.LatestRelease) {
-        return (
-        <div className="esper-release-notes esper-inverse text-center pinned">
+        return <div className="esper-release-notes esper-inverse pinned">
           <a className="action rm-action pull-right"
              title={Text.DismissNotes}
              onClick={this.dismissReleaseNotes.bind(this)}>
             <i className="fa fa-fw fa-close list-group-item-text" />
           </a>
           { Text.ReleaseNotes }
-        </div>);
+        </div>;
       }
       return null;
     }
