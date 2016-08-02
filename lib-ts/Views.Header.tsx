@@ -4,10 +4,11 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Save.ts" />
+/// <reference path="./Stores.ReleaseNotes.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
-/// <reference path="./Text.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Views {
   // Shorten references to React Component class
@@ -42,77 +43,79 @@ module Esper.Views {
 
       var hasTeams = Stores.Teams.all().length > 0;
 
-      return <nav
-              className="navbar navbar-default navbar-shadow navbar-fixed-top">
-        <div className="container-fluid">
-          <div className="navbar-header">
-            <button type="button" className={"navbar-toggle collapsed " +
-              (this.state.open ? "open " : "")}
-              onClick={this.toggleCollapse.bind(this)}
-              data-toggle="collapse"
-              data-target={this.getId(toggleId)}>
-              <i className={"fa " +
-                 (this.state.open ? "fa-times" : "fa-bars")} />
-            </button>
-            <SaveIndicator>
-              <a className={classNames("navbar-brand lg", {
-                "navbar-square": hasTeams
-              })} href="#!/">
-                <img alt="Esper" src="/img/esper-logo-purple.svg" />
-              </a>
-              { hasTeams ? null :
-                <a href="/" className="navbar-brand word-mark hidden-xs">
-                  <img className="logo-name" src="img/word-mark.svg" />
+      return <div className="navbar-fixed-top">
+        <ReleaseNotes lastDismiss={Stores.ReleaseNotes.get()} />
+        <nav className="navbar navbar-default navbar-shadow">
+          <div className="container-fluid">
+            <div className="navbar-header">
+              <button type="button" className={"navbar-toggle collapsed " +
+                (this.state.open ? "open " : "")}
+                onClick={this.toggleCollapse.bind(this)}
+                data-toggle="collapse"
+                data-target={this.getId(toggleId)}>
+                <i className={"fa " +
+                   (this.state.open ? "fa-times" : "fa-bars")} />
+              </button>
+              <SaveIndicator>
+                <a className={classNames("navbar-brand lg", {
+                  "navbar-square": hasTeams
+                })} href="#!/">
+                  <img alt="Esper" src="/img/esper-logo-purple.svg" />
                 </a>
-              }
-            </SaveIndicator>
-          </div>
+                { hasTeams ? null :
+                  <a href="/" className="navbar-brand word-mark hidden-xs">
+                    <img className="logo-name" src="img/word-mark.svg" />
+                  </a>
+                }
+              </SaveIndicator>
+            </div>
 
-          <div className={"esper-collapse" + (this.state.open ? " open" : "")}
-               id={this.getId(toggleId)}
-               onClick={() => this.toggleCollapse()}>
-            { hasTeams ? loginInfo.match({
-              none: () => null,
-              some: () => <ul className="nav navbar-nav">
-                <NavLink href={Paths.Time.charts({}).href}
-                         active={this.props.active === Header_.Tab.Charts}>
-                  <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
-                </NavLink>
-                <NavLink href={Paths.Time.calendarLabeling({}).href}
-                         active={this.props.active === Header_.Tab.Calendar}
-                         hiddenXs={true}>
-                  <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
-                </NavLink>
-                <NavLink href={Paths.Time.list({}).href}
-                         active={this.props.active === Header_.Tab.List}>
-                  <i className="fa fa-fw fa-th-list"></i>{" "}Event List
-                </NavLink>
-                <NavLink href={Paths.Manage.home().href}
-                         active={this.props.active === Header_.Tab.Manage}>
-                  <i className="fa fa-fw fa-cog"></i>{" "}Settings
-                </NavLink>
-              </ul>
-            }) : null}
+            <div className={"esper-collapse" + (this.state.open ? " open" : "")}
+                 id={this.getId(toggleId)}
+                 onClick={() => this.toggleCollapse()}>
+              { hasTeams ? loginInfo.match({
+                none: () => null,
+                some: () => <ul className="nav navbar-nav">
+                  <NavLink href={Paths.Time.charts({}).href}
+                           active={this.props.active === Header_.Tab.Charts}>
+                    <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
+                  </NavLink>
+                  <NavLink href={Paths.Time.calendarLabeling({}).href}
+                           active={this.props.active === Header_.Tab.Calendar}
+                           hiddenXs={true}>
+                    <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
+                  </NavLink>
+                  <NavLink href={Paths.Time.list({}).href}
+                           active={this.props.active === Header_.Tab.List}>
+                    <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+                  </NavLink>
+                  <NavLink href={Paths.Manage.home().href}
+                           active={this.props.active === Header_.Tab.Manage}>
+                    <i className="fa fa-fw fa-cog"></i>{" "}Settings
+                  </NavLink>
+                </ul>
+              }) : null}
 
-            <div className="nav navbar-nav navbar-right">
-              <div className="navbar-text hidden-xs">
-                <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
+              <div className="nav navbar-nav navbar-right">
+                <div className="navbar-text hidden-xs">
+                  <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
+                    { this.loginLinks() }
+                  </Components.LoginInfo>
+                </div>
+                <ul className="visible-xs-block esper-select-menu">
                   { this.loginLinks() }
-                </Components.LoginInfo>
+                </ul>
               </div>
-              <ul className="visible-xs-block esper-select-menu">
-                { this.loginLinks() }
-              </ul>
             </div>
           </div>
-        </div>
-        {
-          this.state.open ?
-          <div className="esper-collapse-backdrop"
-               onClick={() => this.toggleCollapse()} /> :
-          null
-        }
-      </nav>;
+          {
+            this.state.open ?
+            <div className="esper-collapse-backdrop"
+                 onClick={() => this.toggleCollapse()} /> :
+            null
+          }
+        </nav>
+      </div>;
     }
 
     toggleCollapse() {
@@ -163,6 +166,28 @@ module Esper.Views {
         return false;
       }
       return true;
+    }
+  }
+
+  class ReleaseNotes extends Component<{ lastDismiss: number }, {}> {
+    render() {
+      if (this.props.lastDismiss < Text.LatestRelease) {
+        return (
+        <div className="esper-release-notes esper-inverse text-center pinned">
+          <a className="action rm-action pull-right"
+             title={Text.DismissNotes}
+             onClick={this.dismissReleaseNotes.bind(this)}>
+            <i className="fa fa-fw fa-close list-group-item-text" />
+          </a>
+          { Text.ReleaseNotes }
+        </div>);
+      }
+      return null;
+    }
+
+    dismissReleaseNotes() {
+      Stores.ReleaseNotes.set(Date.now());
+      Route.nav.refresh();
     }
   }
 

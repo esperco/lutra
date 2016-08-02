@@ -18,7 +18,7 @@
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Events.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
-/// <reference path="../lib/Text.ts" />
+/// <reference path="../lib/Text.tsx" />
 /// <reference path="../lib/Types.ts" />
 /// <reference path="../lib/Util.ts" />
 

@@ -4,7 +4,7 @@
 
 /// <reference path="./Actions.Teams.ts" />
 /// <reference path="./ReactHelpers.ts" />
-/// <reference path="./Text.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Components {
   const DEFAULT_MIN_LABEL_COUNT = 3;

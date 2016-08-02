@@ -4,7 +4,7 @@
 
 module Esper.Views {
 
-  export function Date({date}: {date: Date}) {
+  export function DateView({date}: {date: Date}) {
     var mDate = moment(date).startOf('day');
     var nextDate = mDate.clone().add(1, 'day').toDate();
     var prevDate = mDate.clone().subtract(1, 'day').toDate();
