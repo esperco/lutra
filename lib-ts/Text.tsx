@@ -4,16 +4,15 @@
 
 module Esper.Text {
   // Release Notes
-  export function ReleaseNotesAugust2016() {
-    return <span>Esper now supports hashtags!
-      Read more about it <a href="https://blog.esper.com">here</a>.
-    </span>;
-  }
+  export const ReleaseNotesAugust2016 =
+    <a href="https://blog.esper.com" target="_blank">
+      Esper now supports hashtags!
+      Read more about it here.
+    </a>;
   export const August2016Release = 1470009600;
   export const LatestRelease = August2016Release;
-  export const ReleaseNotes = ReleaseNotesAugust2016();
-  export const DismissNotes = "Click to dismiss";
-
+  export const ReleaseNotes = ReleaseNotesAugust2016;
+  export const DismissNotes = "Click to Dismiss";
 
   // Basics
   export const Label = "goal";
