@@ -304,6 +304,6 @@ module Esper.Actions {
 
   // Render no-content view for a given date if no event on that date
   export function renderDatePage(date: Date) {
-    render(<Views.Date date={date} />);
+    render(<Views.DateView date={date} />);
   }
 }

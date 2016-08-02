@@ -16,7 +16,7 @@
 /// <reference path="../lib/Stores.TeamPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/Stores.Groups.ts" />
-/// <reference path="../lib/Text.ts" />
+/// <reference path="../lib/Text.tsx" />
 /// <reference path="../lib/Types.ts" />
 /// <reference path="../lib/Util.ts" />
 

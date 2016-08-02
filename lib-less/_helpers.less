@@ -22,7 +22,24 @@
   position: relative;
 }
 
+.esper-release-notes {
+  text-align: center;
+  font-size: @font-size-h5;
+  min-height: @release-notes-height;
+  line-height: @release-notes-height;
+  vertical-align: middle;
+  padding-right: 10px;
+}
+
 ///////
+
+#esper-main.has-release-notes {
+  & > .minus-nav {
+    @media screen and (min-width: @screen-sm-min) {
+      top: @navbar-height + @release-notes-height;
+    }
+  }
+}
 
 // Use for absolutely positioning a center div on screen
 .esper-center {
@@ -70,6 +87,7 @@
       top: @navbar-height;
     }
   }
+
 
   .sidebar-top-menu, .sidebar-bottom-menu {
     height: @input-height-base;

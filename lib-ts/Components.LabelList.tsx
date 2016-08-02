@@ -8,7 +8,7 @@
 /// <reference path="./Colors.ts" />
 /// <reference path="./Labels.ts" />
 /// <reference path="./Stores.Events.ts" />h
-/// <reference path="./Text.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Components {
   // How many labels to show in list by default

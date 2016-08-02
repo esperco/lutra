@@ -4,6 +4,8 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Route.ts" />
+/// <reference path="./Stores.ReleaseNotes.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Layout {
   // References to our jQuery selectors (defaults to one's in esper.com pages,
@@ -25,6 +27,13 @@ module Esper.Layout {
     if (! _.isUndefined(header)) {
       header = header || <span />;
       $(headerSelector).show().renderReact(header);
+    }
+
+    var showReleaseNotes = Stores.ReleaseNotes.get() < Text.LatestRelease;
+    if (showReleaseNotes) {
+      $(mainSelector).addClass("has-release-notes");
+    } else {
+      $(mainSelector).removeClass("has-release-notes");
     }
 
     $(mainSelector).renderReact(main);
