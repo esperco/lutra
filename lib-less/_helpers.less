@@ -380,6 +380,32 @@
   }
 }
 
+/* Helpers for adding vertical spacing between columns when reduced to rows */
+
+.row {
+  .pad-xs + .pad-xs {
+    @media screen and (max-width: @screen-xs-max) {
+      margin-top: @esper-base-padding;
+    }
+  }
+
+  .pad-sm + .pad-sm {
+    @media screen and (max-width: @screen-sm-max) {
+      margin-top: @esper-base-padding;
+    }
+  }
+
+  .pad-md + .pad-md {
+    @media screen and (max-width: @screen-md-max) {
+      margin-top: @esper-base-padding;
+    }
+  }
+
+  .pad-lg + .pad-lg {
+    margin-top: @esper-base-padding;
+  }
+}
+
 /*
   .esper-section is used to separate elements. Consecutive sections get a
   vertical spacing. Panel sections use negative horizontal margins to ensure
@@ -387,6 +413,9 @@
   modals and panels.
 
   Use .esper-panel-section to add borders between consecutive sections.
+
+  Use .esper-full-width inside a section or after a section to extend past
+  padding.
 */
 .esper-section, .esper-panel-section {
   padding: 0 @esper-base-padding;
@@ -459,7 +488,8 @@
   }
 
   // Margin between consectuve sections
-  & + .modal-footer, & + .esper-section, & + .esper-panel-section {
+  & + .modal-footer, & + .esper-section, & + .esper-panel-section,
+  & + .esper-full-width {
     margin-top: @esper-base-padding;
 
     .panel-body & {
