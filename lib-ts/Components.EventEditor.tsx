@@ -209,7 +209,9 @@ module Esper.Components {
           Don't worry! Ratings and notes are NOT shared with other
           meeting guests.
         </p>
-        { this.renderRating(event) }
+        <div className="esper-section">
+          { this.renderRating(event) }
+        </div>
         <div className="esper-full-width">
           <TextArea id={this.getId("notes")} placeholder="Notes"
             ref={(ref) => this.inputNotes = ref}
@@ -241,13 +243,13 @@ module Esper.Components {
 
     renderRating(event: Stores.Events.TeamEvent) {
       return <div className="row">
-        <div className="col-sm-8 form-group event-star-ratings">
+        <div className="col-sm-8 pad-xs event-star-ratings">
           <StarRating
             value={(Stores.Events.isActive(event)
                     && event.feedback.rating) || 0}
             onChange={(i) => this.submitStarRating(i)} />
         </div>
-        <div className="col-sm-4 form-group event-no-attend">
+        <div className="col-sm-4 pad-xs event-no-attend">
           <button className={"form-control btn btn-default" +
                     (Stores.Events.isActive(event) ? "" : " active")}
                   onClick={() => this.toggleAttended()}>
