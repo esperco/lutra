@@ -10,7 +10,7 @@ module Esper.Text {
       Read more about it here.
     </a>;
   export const August2016Release = 1470009600;
-  export const LatestRelease = August2016Release;
+  export const LatestRelease = -1; // Blog post not ready yet
   export const ReleaseNotes = ReleaseNotesAugust2016;
   export const DismissNotes = "Click to Dismiss";
 
