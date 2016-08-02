@@ -3,19 +3,14 @@
 */
 
 module Esper.Stores.ReleaseNotes {
-  export var DismissStore = new Model2.Store<string, number>();
+  export var DismissStore = new Model2.Store<'lastDismiss', number>();
 
-  const storeKey = "lastDismiss";
+  const storeKey: 'lastDismiss' = "lastDismiss";
 
   export function get(): number {
     return DismissStore.get(storeKey).flatMap((p) => p.data).match({
       some: (n) => n,
-      none: () => {
-        var local = LocalStore.get(storeKey) || 0;
-        DismissStore.set(storeKey, Option.some(local));
-
-        return local;
-      }
+      none: () => LocalStore.get(storeKey) || 0
     });
   }
 
