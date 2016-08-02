@@ -79,7 +79,8 @@ module Esper.Components {
     }
 
     close() {
-      clearDropdown();
+      if (this._menu) { this._menu.close(); }
+      this._menu = null; // Null to prevent future updates
     }
 
     /* Get specific toggle element from children */
@@ -207,7 +208,12 @@ module Esper.Components {
       elements and components.
     */
     close() {
-      clearDropdown();
+      /*
+        requestAnimationFrame because any React events that triggered the
+        dropdown menu closing may need to fully propogate before we remove
+        the menu from the DOM.
+      */
+      window.requestAnimationFrame(clearDropdown);
     }
 
     // Apply maxHeight after rendering if actual height breaks window edge
