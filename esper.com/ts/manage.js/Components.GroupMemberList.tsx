@@ -260,23 +260,20 @@ module Esper.Components {
   }
 
   class GroupMemberAdd extends ReactHelpers.Component<AddProps, {
-    highlight?: string;
+    active?: boolean;
     invalid?: boolean;
-    filteredEmails: string[];
   }> {
     _input: Components.FilterInput;
+    _list: Components.FilterList;
 
     constructor(props: AddProps) {
       super(props);
-      this.state = {
-        filteredEmails: props.emails
-      };
+      this.state = {};
     }
 
     componentWillReceiveProps(newProps: AddProps) {
-      // Unset e-mail list on group change
       if (newProps.group.groupid !== this.props.group.groupid) {
-        this.mutateState((s) => s.filteredEmails = []);
+        this.mutateState((s) => s.active = false);
       }
     }
 
@@ -289,14 +286,7 @@ module Esper.Components {
             <Components.FilterInput
               ref={(c) => this._input = c}
               placeholder="email@example.com"
-              filterChoices={_.map(this.props.emails, (e) => ({
-                id: e,
-                displayAs: e
-              }))}
-              onFilter={(emails) => this.mutateState(
-                (s) => s.filteredEmails = emails
-              )}
-              onChange={(e) => this.mutateState((s) => s.highlight = e)}
+              getList={() => this._list}
               onFocus={() => this.onFocus()}
               onSubmit={() => this.submit()}
             />
@@ -309,33 +299,36 @@ module Esper.Components {
           </div>
         </div>
 
-        {
-          this.state.filteredEmails.length ?
-          <div className="esper-select-menu">
-            { _.map(this.state.filteredEmails.slice(0, 5), (email) =>
-              <div key={email} className={classNames("esper-selectable", {
-                active: email === this.state.highlight
-              })} onClick={() => this.submit(email)}>
-                <i className="fa fa-fw fa-user-plus" />{" "}
-                { email }
-              </div>
-            )}
-          </div> : null
-        }
+        { this.state.active ?
+          <Components.FilterList
+            ref={(c) => this._list = c}
+            choices={this.props.emails}
+            className="esper-select-menu"
+            itemFn={(email, active) => this.renderEmailItem(email, active)}
+            newItemFn={(email, active) => this.renderEmailItem(email, active)}
+            showNewItem={Util.validateEmailAddress}
+            maxNewItems={5}
+          /> : null }
+      </div>;
+    }
+
+    renderEmailItem(email: string, active: boolean) {
+      return <div key={email} className={classNames("esper-selectable", {
+        highlight: active
+      })} onClick={() => this.submit(email)}>
+        <i className="fa fa-fw fa-user-plus" />{" "}{ email }
       </div>;
     }
 
     onFocus() {
-      this.mutateState((s) => s.filteredEmails = this._input ?
-        this._input.getFiltered() : this.state.filteredEmails
-      );
+      this.mutateState((s) => s.active = true);
     }
 
     submit(email?: string) {
       this.mutateState((s) => s.invalid = false);
       email = email || (() => {
-        if (this._input) {
-          var val = this._input.getVal();
+        if (this._list) {
+          var val = this._list.getValue();
           if (Util.validateEmailAddress(val)) {
             return val;
           } else {
