@@ -444,8 +444,13 @@ module Esper.Views {
         teams={teams}
         focusOnLabels={minFeedback}
         minFeedback={minFeedback}
-        onCancel={() => this.clearSelection()}
-        onDone={() => this.clearSelection()} />;
+        onCancel={() => this.modalDone()}
+        onDone={() => this.modalDone()} />;
+    }
+
+    modalDone() {
+      Layout.closeModal();
+      this.clearSelection();
     }
 
     clearSelection() {
