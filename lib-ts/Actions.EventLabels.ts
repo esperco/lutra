@@ -94,8 +94,8 @@ module Esper.Actions.EventLabels {
     var eventGroups = _.groupBy(events,
       (e) => e.recurringEventId ? recurring : notRecurring
     );
-    var events = eventGroups[notRecurring] || [];
-    if ((eventGroups[recurring] || []).length) {
+    events = eventGroups[notRecurring] || [];
+    if (! _.isEmpty(eventGroups[recurring])) {
       var recurringEventIds = _.map(eventGroups[recurring],
         (e) => e.recurringEventId
       );
@@ -114,11 +114,19 @@ module Esper.Actions.EventLabels {
     var newEvents = _.map(events, (e) => {
       var newEvent = _.cloneDeep(e);
       newEvent.labelScores = Option.some(getNewLabels(e, opts));
+      newEvent.hashtags = getNewHashtags(newEvent);
       return newEvent;
     });
+
+    /*
+      Keep recurring events for store update purposes, but filter out
+      recurring when passing to API call
+    */
+    var apiEvents = _.uniqBy(newEvents, (e) => e.recurringEventId || e.id);
+
     var p = TeamLabelQueue.enqueue(teamId, {
       teamId: teamId,
-      events: newEvents,
+      events: apiEvents,
       fetchEventIds: _.map(opts.fetchEvents, (e) => e.id)
     });
 
@@ -174,6 +182,22 @@ module Esper.Actions.EventLabels {
     return labels;
   }
 
+  // Returns updated hashtags object for event
+  function getNewHashtags(event: Stores.Events.TeamEvent): ApiT.HashtagState[] {
+    return _.map(event.hashtags, (h) => ({
+      hashtag: h.hashtag,
+      hashtag_norm: h.hashtag_norm,
+      label: h.label,
+      label_norm: h.label_norm,
+      approved: event.labelScores.match({
+        none: () => false,
+        some: (labels) => _.some(labels,
+          (l) => h.label_norm == l.id || h.hashtag_norm == l.id
+        )
+      })
+    }));
+  }
+
 
   interface QueueRequest {
     teamId: string;
@@ -194,20 +218,11 @@ module Esper.Actions.EventLabels {
               }
               return Api.updateHashtagStates(e.teamId,
                 e.recurringEventId || e.id,
-                { hashtag_states: _.map(e.hashtags,
-                    (h) => {
-                      if (_.some(labels, (l) => h.label_norm == l.id ||
-                                                h.hashtag_norm == l.id))
-                        return {
-                          hashtag: h.hashtag,
-                          approved: true
-                        };
-                      else
-                        return {
-                          hashtag: h.hashtag,
-                          approved: false
-                        }
-                    })
+                {
+                  hashtag_states: _.map(e.hashtags, (h) => ({
+                    hashtag: h.hashtag,
+                    approved: h.approved
+                  }))
                 }
               );
             }
@@ -245,7 +260,9 @@ module Esper.Actions.EventLabels {
       requests = _.filter(requests, (r) => {
         if (r.teamId === next.teamId) {
           // Ensure next (latter action) takes precedence
-          next.events = _.uniqBy(r.events.concat(next.events), (e) => e.id);
+          next.events = _.uniqBy(r.events.concat(next.events),
+            (e) => e.recurringEventId || e.id
+          );
           next.fetchEventIds = _.uniq(
             next.fetchEventIds.concat(r.fetchEventIds)
           );
