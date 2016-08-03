@@ -3,7 +3,7 @@
   just the input. Use separate component for actual list.
 */
 
-/// <refernece path="./ReactHelpers.ts" />
+/// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Option.ts" />
 
 module Esper.Components {
