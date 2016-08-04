@@ -9,6 +9,7 @@
 module Esper.Components {
 
   interface Props {
+    id?: string;
     className?: string;
     inputClass?: string;
     placeholder?: string;
@@ -51,7 +52,8 @@ module Esper.Components {
       return <div className={classNames(this.props.className, {
         "esper-has-right-icon": !!this.state.value
       })}>
-        <input ref={(c) => this._input = c}
+        <input id={this.props.id || this.getId("")}
+          ref={(c) => this._input = c}
           type="text"
           className={this.props.inputClass || "form-control"}
           placeholder={this.props.placeholder}

@@ -24,6 +24,8 @@ module Esper.Components {
       return <div />;
     }
 
+    let events = Option.flatten(_.map(props.eventData, (e) => e.data));
+    let inputId = Util.randomString();
     return props.eventData[0].data.match({
       none: () => <div />,
       some: (firstEvent) => <div className={props.className}>
@@ -41,13 +43,21 @@ module Esper.Components {
         }
         { props.eventData.length > 1 ||
           Stores.Events.isActive(firstEvent) ?
-          <LabelEditor
-            eventData={props.eventData}
-            teams={props.teams}
-            onDone={props.onDone}
-            autoFocus={props.focusOnLabels}
-            doneText="Done"
-          /> : null }
+          <div className="esper-panel-section">
+            <label htmlFor={inputId}>
+              { Text.Labels }
+            </label>
+            <LabelEditor
+              inputId={inputId}
+              events={events}
+              teams={props.teams}
+              onSelect={(label, active) => active ?
+                Actions.EventLabels.add(events, label) :
+                Actions.EventLabels.remove(events, label)
+              }
+              autoFocus={props.focusOnLabels}
+            />
+          </div> : null }
       </div>
     });
   }
@@ -193,7 +203,7 @@ module Esper.Components {
         </div>;
       }
 
-      return <Components.ModalPanel busy={busy} error={error} success={success}
+      return <ModalPanel busy={busy} error={error} success={success}
           okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
           className="event-notes esper-panel-section">
         <div className="action"
@@ -220,7 +230,7 @@ module Esper.Components {
             onChange={(v) => this.notesChange(v)}
           />
         </div>
-      </Components.ModalPanel>;
+      </ModalPanel>;
     }
 
     renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {

@@ -1,370 +1,217 @@
 /*
-  Component for updating labels for a given task
+  Component for updating labels for a given event
 */
+
+/// <reference path="./Components.FilterInput.tsx" />
+/// <reference path="./Labels.ts" />
+/// <reference path="./Types.ts" />
+/// <reference path="./Util.ts" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
 
-  //////
-
-  interface LabelEditorProps {
-    eventData: Model2.StoreData<Types.FullEventId, Types.TeamEvent>[];
+  interface Props {
+    inputId?: string;
+    events: Types.TeamEvent[];
     teams: ApiT.Team[];
-    onDone?: () => void;
-    doneText?: string;
+    onSelect: (label: string, active: boolean) => void;
     autoFocus?: boolean;
   }
 
-  export class LabelEditor extends Component<LabelEditorProps, {
-    // Did labels change in between props? Set in componentWillReceiveProps
-    labelsChanged?: boolean;
+  interface State {
+    /*
+      Labels are a function of events and teams in props, but we remember
+      label list statefully because toggling a label should not cause a
+      label to disappear from the list right away (i.e. give user a chance
+      to re-add removed label).
+    */
+    labels: Types.LabelCount[];
+  }
 
-    // Filter for labels shown
-    labelFilter?: string;
+  export class LabelEditor extends Component<Props, State> {
+    _input: FilterInput;
+    _list: FilterList;
 
-    // Which label is selected?
-    labelSelected?: string;
-  }> {
-    _input: LabelInput;
-
-    constructor(props: LabelEditorProps) {
+    constructor(props: Props) {
       super(props);
-      this.state = {};
+      let labelCounts = this.getLabelCounts(props);
+      this.state = {
+        labels: labelCounts
+      };
     }
 
-    componentWillReceiveProps(newProps: LabelEditorProps) {
-      // Events changed => not a label change
-      var oldIds = _.map(this.props.eventData, (d) => d.aliases[0]);
-      var newIds = _.map(newProps.eventData, (d) => d.aliases[0]);
-      if (! _.isEqual(oldIds, newIds)) {
-        this.setState({ labelsChanged: false });
-        return;
-      }
-
-      // Check if labels changed
-      var oldLabels = _.map(this.props.eventData, (d) => d.data.match({
-        none: (): string[] => [],
-        some: (e) => Stores.Events.getLabelIds(e)
-      }));
-      var newLabels = _.map(newProps.eventData, (d) => d.data.match({
-        none: (): string[] => [],
-        some: (e) => Stores.Events.getLabelIds(e)
-      }));
-      if (!_.isEqual(oldLabels, newLabels)) {
-        this.setState({ labelsChanged: true });
-      }
+    componentWillReceiveProps(newProps: Props) {
+      let labelCounts = this.getLabelCounts(newProps, this.state.labels);
+      this.setState({
+        labels: labelCounts
+      });
     }
 
     componentDidMount() {
       this.focus();
     }
 
-    componentDidUpdate(prevProps: LabelEditorProps) {
+    componentDidUpdate(prevProps: Props) {
+      super.componentDidUpdate();
+
       // Refocus input if adding/removing events (used in calendar view)
-      var newIds = _.map(this.props.eventData, (d) => d.aliases[0]);
-      var oldIds = _.map(prevProps.eventData, (d) => d.aliases[0]);
+      var newIds = _.map(this.props.events, (e) => e.id);
+      var oldIds = _.map(prevProps.events, (e) => e.id);
       if (! _.isEqual(oldIds, newIds)) {
         this.focus();
       }
     }
 
+    // Add any labels from props to existing label list
+    getLabelCounts(props: Props, current: Types.LabelCount[] = []) {
+      let labels = Labels.fromEvents(props.events);
+
+      // Add team labels
+      _.each(props.teams, (team) => {
+        let teamLabels = Labels.fromTeam(team)
+        labels = labels.concat(
+          _.map(teamLabels, (t) => ({
+            id: t.id,
+            displayAs: t.displayAs,
+            count: 0
+          }))
+        );
+      });
+
+      // Zero out current label count (event count takes precedence)
+      labels = labels.concat(_.map(current, (c) => ({
+        id: c.id,
+        displayAs: c.displayAs,
+        count: 0
+      })));
+
+      /*
+        Unique works left to right, so labels with counts should take
+        priority over labels with no counts
+      */
+      return _.uniqBy(labels, (l) => l.id);
+    }
+
     focus() {
       if (this.props.autoFocus) {
-        this.find("input[type=text]:first").focus();
+        this._input && this._input.focus();
       }
     }
 
     render() {
-      var props = this.props;
-      var events = this.getEvents();
+      let choices = _.map(this.state.labels, (l) => l.displayAs);
+      choices.sort();
 
-      var error = !!_.find(props.eventData, (data) =>
-        data.dataStatus === Model2.DataStatus.PUSH_ERROR ||
-        data.dataStatus === Model2.DataStatus.FETCH_ERROR
-      );
+      return <div className="label-selector">
+        <FilterInput
+          ref={(c) => this._input = c}
+          id={this.props.inputId}
+          className="form-group"
+          placeholder={_.capitalize(Text.FindAddLabels)}
+          getList={() => this._list}
+          onSubmit={(label) => this.toggle(label)}
+        />
 
-      var busy = !!_.find(props.eventData, (data) =>
-        data.dataStatus === Model2.DataStatus.INFLIGHT
-      );
-      var busyText = <span className="esper-footer-text">Saving &hellip;</span>;
-
-      var success = !busy && this.state.labelsChanged;
-      var selectedTeamId = events[0] ? events[0].teamId : "";
-
-      // NB: Use cancel button instead of OK button because purpose of button
-      // is just to close panel, not do anything
-      return <ModalPanel busy={busy} error={error} busyText={busyText}
-              onCancel={props.onDone ? (() => this.handleDone()) : null}
-              cancelText={props.doneText || "Close"}
-              success={success} className="esper-panel-section">
-        <div className="esper-panel-section">
-          { this.renderLabelInput(events) }
-          { this.renderLabelList(events) }
-          <div className="esper-select-menu">
-            <a className="esper-selectable"
-               href={Paths.Manage.Team.labels({teamId: selectedTeamId}).href}>
-            <i className="fa fa-fw fa-bars"></i>
-            {" "}{ Text.ManageLabels }
-            </a>
-          </div>
-        </div>
-      </ModalPanel>
+        <FilterList
+          ref={(c) => this._list = c}
+          className="esper-select-menu"
+          choices={choices}
+          itemFn={
+            (label, highlight) => this.renderLabel(label, highlight)
+          }
+          newItemFn={
+            (label, highlight) => this.renderNewLabel(label, highlight)
+          }
+        />
+      </div>
     }
 
-    handleDone() {
-      if (this._input) {
-        var val = this._input.getValue();
-        if (val) {
-          this.onSubmit(val, this.getEvents());
-        }
-      }
-      this.props.onDone();
-    }
-
-    renderLabelInput(events: Stores.Events.TeamEvent[]) {
-      return <LabelInput
-        ref={(c) => this._input = c}
-        className={ this.props.autoFocus ? "esper-modal-focus" : null }
-        onSubmit={(val) => this.onSubmit(val, events)}
-        onChange={(val) => this.setState({
-          labelFilter: val,
-          labelSelected: null
-        })}
-        onDown={(val) => this.handleUpDown(val, 1)}
-        onUp={(val) => this.handleUpDown(val, -1)}
+    renderNewLabel(label: string, highlight: boolean) {
+      let norm = Labels.getNorm(label);
+      return <NewLabel
+        key={norm}
+        label={label}
+        highlight={highlight}
+        onClick={() => this.toggle(label)}
       />;
     }
 
-    onSubmit(val: string, events: Stores.Events.TeamEvent[]) {
-      if (this.state.labelSelected) {
-        if (_.every(events,
-          (e) => _.includes(
-            Stores.Events.getLabelIds(e),
-            this.state.labelSelected
-          )
-        )) {
-          Actions.EventLabels.remove(events, val);
+    renderLabel(label: string, highlight: boolean) {
+      let norm = Labels.getNorm(label);
+      return <Label
+        key={norm}
+        displayAs={label}
+        color={Colors.getColorForLabel(norm)}
+        selected={this.isSelected(norm)}
+        highlight={highlight}
+        onClick={() => this.toggle(label)}
+      />;
+    }
+
+    // New label
+    toggle(label: string) {
+      let norm = Labels.getNorm(label);
+      let isSelected = this.isSelected(norm);
+      this.props.onSelect(label, isSelected === "some" || !isSelected);
+      this._input.reset();
+    }
+
+    /*
+      NB: This is O(n^2), which shouldn't be an issue if there aren't that
+      many labels. But if label count goes up, make label count a hash.
+    */
+    isSelected(labelNorm: string): Types.Fuzzy {
+      var labelCount = _.find(this.state.labels, (l) => l.id === labelNorm);
+      if (labelCount && labelCount.count) {
+        if (labelCount.count === this.props.events.length) {
+          return true;
         } else {
-          Actions.EventLabels.add(events, val);
+          return "some";
         }
-        return val;
       }
-
-      else {
-        var teamIds = _.map(events, (e) => e.teamId);
-        teamIds = _.uniq(teamIds);
-        _.each(teamIds, (teamId) => {
-          Actions.Teams.addLabel(teamId, val);
-        });
-        Actions.EventLabels.add(events, val);
-        this.setState({ labelFilter: null })
-        return "";
-      }
-    }
-
-    renderLabelList(events: Stores.Events.TeamEvent[]) {
-      var labels = this.getLabels();
-      return <div className="esper-select-menu">
-        {
-          _.map(labels,
-            (l) => <Label key={l.id} label={l} events={events}
-              highlight={l.id === this.state.labelSelected}
-            />
-          )
-        }
-      </div>;
-    }
-
-    getEvents() {
-      var events: Stores.Events.TeamEvent[] = [];
-      _.each(this.props.eventData, (e) => e.data.match({
-        none: () => null,
-        some: (e) => events.push(e)
-      }));
-      return events;
-    }
-
-    getLabels() {
-      var events = this.getEvents();
-      var labels = Labels.fromEvents(events, this.props.teams);
-      labels = Labels.sortLabels(labels);
-
-      if (this.state.labelFilter) {
-        var normFilter = this.state.labelFilter.toLowerCase();
-        labels = _.filter(labels,
-          (l) => _.includes(l.displayAs.toLowerCase(), normFilter)
-        );
-      }
-
-      return labels;
-    }
-
-    handleUpDown(val: string, incr: number) {
-      var labels = this.getLabels();
-      if (! labels.length) return val;
-
-      var currentIndex = _.findIndex(labels,
-        (l) => this.state.labelSelected === l.id
-      );
-      currentIndex += incr;
-
-      if (currentIndex < 0) {
-        currentIndex = 0;
-      } else if (currentIndex > labels.length - 1) {
-        currentIndex = labels.length - 1;
-      }
-
-      var selected = labels[currentIndex];
-      this.setState( { labelSelected: selected.id });
-      return labels[currentIndex].displayAs;
+      return false;
     }
   }
 
 
   ///////
 
-  interface LabelInputProps {
-    className?: string;
-    onSubmit: (val: string) => string;
-
-    // Triggered by user typing (not changes by onSubmit, onUp, onDown)
-    onChange?: (val: string) => void;
-
-    // Keyboard events
-    onDown?: (val: string) => string;
-    onUp?: (val: string) => string;
-  }
-
-  export class LabelInput extends Component<LabelInputProps, {
-    value: string;
-  }> {
-    constructor(props: LabelInputProps) {
-      super(props);
-      this.state = { value: "" }
-    }
-
-    getValue() {
-      return (this.state.value || "").trim();
-    }
-
-    render() {
-      return <div className="form-group">
-        <label htmlFor={this.getId("new-labels")}>
-          Find / Add Labels
-        </label>
-        <div className="input-group">
-          <div className={this.state.value ? "esper-has-right-icon" : ""}>
-            <input type="text"
-                   className={classNames("form-control", this.props.className)}
-                   id={this.getId("new-labels")}
-                   onKeyDown={this.inputKeydown.bind(this)}
-                   onChange={(e) => this.onChange(e)}
-                   value={this.state.value}
-                   placeholder="Ex: Q1 Sales Goal"
-            />
-            {
-              this.state.value ?
-              <span className="esper-clear-action esper-right-icon"
-                    onClick={() => this.reset()}>
-                <i className="fa fa-fw fa-times" />
-              </span> :
-              <span />
-            }
-          </div>
-          <span className="input-group-btn">
-            <button className="btn btn-default" type="button"
-                    onClick={this.submitInput.bind(this)}>
-              <i className="fa fa-fw fa-plus" />
-            </button>
-          </span>
-        </div>
-      </div>;
-    }
-
-    submitInput() {
-      var val = this.state.value;
-      if (val) {
-        var newVal = this.props.onSubmit(val);
-        this.setState({ value: newVal });
-      }
-    }
-
-    reset() {
-      this.setState({ value: "" });
-      this.props.onChange("");
-    }
-
-    // Catch enter / up / down keys
-    inputKeydown(e: KeyboardEvent) {
-      var val = (e.target as HTMLInputElement).value;
-      if (e.keyCode === 13) {         // Enter
-        e.preventDefault();
-        this.submitInput();
-      } else if (e.keyCode === 27) {  // ESC
-        e.preventDefault();
-        this.reset();
-      } else if (e.keyCode === 38 && this.props.onUp) {
-        e.preventDefault();
-        this.setState({ value: this.props.onUp(val) });
-      } else if (e.keyCode === 40 && this.props.onDown) {
-        e.preventDefault();
-        this.setState({ value: this.props.onDown(val) });
-      }
-    }
-
-    onChange(e: React.FormEvent) {
-      var val = (e.target as HTMLInputElement).value;
-      this.setState({ value: val })
-      if (this.props.onChange) {
-        this.props.onChange(val);
-      }
-    }
-  }
-
-
-  ///////
-
-  function Label(props: {
-    label: Labels.LabelCount;
-    events: Stores.Events.TeamEvent[];
+  function Label({displayAs, color, selected, highlight, onClick}: {
+    displayAs: string;
+    color: string;
+    selected: Types.Fuzzy;
     highlight?: boolean;
+    onClick?: () => void;
   }) {
-    var checkedByAll = props.label.count === props.events.length;
-    var checkedBySome = props.label.count > 0;
+    let className = classNames("esper-selectable", {
+      "active": selected === true,
+      "partial-active": selected === "some",
+      "highlight": highlight
+    });
 
-    var labelClass = (() => {
-      var ret = "esper-selectable";
-      if (checkedByAll) {
-        return ret + " active";
-      } else if (checkedBySome) {
-        return ret + " partial-active";
-      }
-      return ret;
-    })();
-    var icon = (() => {
-      if (checkedByAll) {
-        return "fa-check-square";
-      } else if (checkedBySome) {
-        return "fa-minus-square";
-      }
-      return "fa-square";
-    })();
-    if (props.highlight) {
-      labelClass += " highlight";
-    }
-    var iconStyle = { color: Colors.getColorForLabel(props.label.id) };
+    let icon = Util.match<Types.Fuzzy, string>(selected, [
+      [true, "fa-check-square"],
+      ["some", "fa-minus-square"]
+    ], "fa-square")
 
-    var handler = () => {
-      if (checkedByAll) {
-        Actions.EventLabels.remove(props.events, props.label.displayAs);
-      } else {
-        Actions.EventLabels.add(props.events, props.label.displayAs);
-      }
-    };
+    var iconStyle = { color: color };
 
-    return <a key={props.label.id} className={labelClass} onClick={handler}>
+    return <a className={className} onClick={onClick}>
       <i style={iconStyle} className={"fa fa-fw " + icon} />{" "}
-      {props.label.displayAs}
+      {displayAs}
+    </a>;
+  }
+
+  function NewLabel({label, highlight, onClick}: {
+    label: string;
+    highlight?: boolean;
+    onClick?: () => void;
+  }) {
+    let className = classNames("esper-selectable", {
+      "highlight": highlight
+    });
+    return <a className={className} onClick={onClick}>
+      <i className="fa fa-fw fa-plus" />{" "}{ label }
     </a>;
   }
 }
