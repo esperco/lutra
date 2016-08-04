@@ -7,6 +7,9 @@
 
 module Esper.Types {
 
+  // Trinary state
+  export type Fuzzy = boolean|"some";
+
   // Mix into other interfaces for indicating simplified data status
   export interface HasStatus {
     isBusy: boolean;
@@ -249,4 +252,21 @@ module Esper.Types {
   }
   export type PeriodOptGroup = PeriodData<EventOptGrouping>;
   export type PeriodGrouping = PeriodData<EventGrouping>;
+
+
+  /* Labels */
+
+  export interface LabelBase {
+    id: string;        // Normalized form
+    displayAs: string; // Display form
+  }
+
+  // Either a predicted or user-predicted label
+  export interface Label extends LabelBase {
+    score: number;     // 0 - 1 (1 = user-selected label)
+  }
+
+  export interface LabelCount extends LabelBase {
+    count: number;
+  }
 }
