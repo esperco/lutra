@@ -3,21 +3,12 @@
 */
 
 /// <reference path="./Stores.Events.ts" />
+/// <reference path="./Types.ts" />
 
 module Esper.Labels {
-  interface LabelBase {
-    id: string;        // Normalized form
-    displayAs: string; // Display form
-  }
-
-  // Either a predicted or user-predicted label
-  export interface Label extends LabelBase {
-    score: number;     // 0 - 1 (1 = user-selected label)
-  }
-
-  export interface LabelCount extends LabelBase {
-    count: number;
-  }
+  export type LabelBase = Types.LabelBase;
+  export type Label = Types.Label;
+  export type LabelCount = Types.LabelCount;
 
   /*
     Helper to normalize display versions of labels for sorting. Note that
