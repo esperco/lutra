@@ -10,6 +10,7 @@
 
 module Esper.TestFixtures {
   export var uid = "my-uid";
+  export var uid_hash = "test-hash";
   export var email = "me@esper.com";
 
   export var teamId0 = "team-id-0";
@@ -77,6 +78,7 @@ module Esper.TestFixtures {
   export function getLoginInfo(): ApiT.LoginResponse {
     return {
       uid: uid,
+      uid_hash: uid_hash,
       api_secret: "secret",
       account_created: "2015-10-23T21:18:08.020-08:00",
       is_admin: false,

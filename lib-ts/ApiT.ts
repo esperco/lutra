@@ -202,6 +202,7 @@ module Esper.ApiT {
 
   export interface LoginResponse {
     uid: string;
+    uid_hash: string;
     api_secret: string;
     account_created: string; // timestamp
     is_admin: boolean;

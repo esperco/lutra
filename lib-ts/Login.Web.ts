@@ -157,6 +157,7 @@ module Esper.Login {
     setTimeout(() => {
       window.intercomSettings = window.intercomSettings || {}
       window.intercomSettings.user_id = loginInfo.uid;
+      window.intercomSettings.user_hash = loginInfo.uid_hash;
       window.intercomSettings.email = loginInfo.email;
       if ((<any> window).Intercom) { // Make sure intercom is loaded
         Intercom("update", window.intercomSettings);
