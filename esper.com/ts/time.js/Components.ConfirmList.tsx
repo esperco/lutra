@@ -70,28 +70,20 @@ module Esper.Components {
 
         {/* Button to load more events and update predictions, as applicable */}
         { events.length ?
-          <div className="esper-section">
-          {
-            (needsConfirmation || this.hasMore()) ?
+          <div className="clearfix modal-footer">
             <button className="btn btn-primary form-control"
                     onClick={() => this.onNext(events)}>
-              { needsConfirmation ?
-                Text.ConfirmAllLabels :
-                Text.MorePredictions }
-            </button> :
-            <div className="text-center">
-              { Text.ConfirmationDone }
-            </div>
-          }
+              {(() => {
+                if (needsConfirmation) {
+                  return Text.ConfirmAllLabels;
+                }
+                if (this.hasMore()) {
+                  return Text.MorePredictions;
+                }
+                return Text.ConfirmationDone
+              })()}
+            </button>
           </div> : null }
-
-        {/* Button to close list / modal / whatever */}
-        <div className="clearfix modal-footer">
-          <button className="btn btn-default"
-                  onClick={() => this.onFinish()}>
-            Done
-          </button>
-        </div>
       </div>;
     }
 
@@ -112,6 +104,8 @@ module Esper.Components {
 
       if (this.hasMore()) {
         this.mutateState((s) => s.pageIndices = nextIndices);
+      } else {
+        this.onFinish();
       }
     }
 
