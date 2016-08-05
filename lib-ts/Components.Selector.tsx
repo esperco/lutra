@@ -1,6 +1,6 @@
 /*
-  Simple select menu (this is only the display value, use Dropdown or
-  DropdownModal for the actual menu itself).
+  Simple select menu (this is only the display value, use Dropdown
+  for the actual menu itself).
 */
 
 /// <reference path="./ReactHelpers.ts" />

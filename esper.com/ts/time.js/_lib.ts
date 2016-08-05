@@ -3,8 +3,8 @@
 */
 
 /// <reference path="../../../typings/browser/index.d.ts" />
-/// <refernece path="../lib/Actions.EventLabels.ts" />
-/// <refernece path="../lib/Actions.Feedback.ts" />
+/// <reference path="../lib/Actions.EventLabels.ts" />
+/// <reference path="../lib/Actions.Feedback.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
@@ -29,7 +29,6 @@
 /// <reference path="../lib/Components.Badge.tsx" />
 /// <reference path="../lib/Components.CalendarList.tsx" />
 /// <reference path="../lib/Components.Dropdown.tsx" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.EventEditor.tsx" />
 /// <reference path="../lib/Components.LabelList.tsx" />

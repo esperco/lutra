@@ -282,7 +282,7 @@ module Esper.Components {
       <span className="input-group-addon">
         <i className="fa fa-fw fa-tag" />
       </span>
-      <DropdownModal keepOpen={true}>
+      <Dropdown keepOpen={true}>
         <Selector className="dropdown-toggle end-of-group">
           { selectedText }
         </Selector>
@@ -291,7 +291,7 @@ module Esper.Components {
             className: "dropdown-menu"
           }, props) as LabelSelectorProps)
         }
-      </DropdownModal>
+      </Dropdown>
     </div>;
   }
 }

@@ -1,9 +1,9 @@
 /*
-  Drop in (more or less) replacement for <select> element using DropdownModal
+  Drop in (more or less) replacement for <select> element using Dropdown
   and Selector components
 */
 
-/// <reference path="./Components.DropdownModal.tsx" />
+/// <reference path="./Components.Dropdown.tsx" />
 /// <reference path="./Components.Selector.tsx" />
 
 module Esper.Components {
@@ -30,7 +30,7 @@ module Esper.Components {
           displayText = selectedOpt.display;
         }
       }
-      return <Components.DropdownModal>
+      return <Components.Dropdown>
         <Components.Selector id={this.props.id} className="dropdown-toggle">
           { displayText }
         </Components.Selector>
@@ -39,7 +39,7 @@ module Esper.Components {
             <a onClick={() => this.props.onChange(o.val)}>{ o.display }</a>
           </li>)}
         </ul>
-      </Components.DropdownModal>
+      </Components.Dropdown>
     }
   }
 }

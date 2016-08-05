@@ -3,7 +3,7 @@
 */
 
 /// <reference path="../lib/ReactHelpers.ts" />
-/// <reference path="../lib/Components.DropdownModal.tsx" />
+/// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="./Components.CalendarDaySelector.tsx" />
 
@@ -113,7 +113,7 @@ module Esper.Components {
   /////
 
   export class CalendarRangeSelectorDropdown extends Component<Props, {}> {
-    _dropdownModal: DropdownModal;
+    _dropdown: Dropdown;
 
     render() {
       var selectedText = "";
@@ -123,16 +123,14 @@ module Esper.Components {
         selectedText = `${Text.date(start)} - ${Text.date(end)}`;
       }
 
-      return <DropdownModal
-              ref={ (c) => this._dropdownModal = c }
-              keepOpen={true}>
+      return <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
         <Selector id={this.getId("")} className="dropdown-toggle">
           { selectedText }
         </Selector>
         <div className="dropdown-menu calendar-selector-menu">
           { React.createElement(CalendarRangeSelector, this.props) }
         </div>
-      </DropdownModal>;
+      </Dropdown>;
     }
   }
 }

@@ -11,7 +11,16 @@
   animation: fadein 0.3s ease-in-out;
   overflow: auto;
 
-  // Get rid of position absolute because wrapper in Components.Dropdown
+  // Styling done via JS normally, use static positioning for mobile only
+  @media screen and (max-width: @screen-xs-max) {
+    .dropdown-wrapper {
+      padding: @esper-base-padding;
+      max-height: 80vh;
+      overflow: auto;
+    }
+  }
+
+  // Get rid of position absolute because .dropdown-wrapper
   // should apply position
   .dropdown-menu {
     position: static;
