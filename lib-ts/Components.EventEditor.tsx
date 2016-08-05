@@ -44,9 +44,10 @@ module Esper.Components {
         { props.eventData.length > 1 ||
           Stores.Events.isActive(firstEvent) ?
           <div className="esper-panel-section">
-            <label htmlFor={inputId}>
-              { Text.Labels }
-            </label>
+            { props.eventData.length === 1 ?
+              <label htmlFor={inputId}>
+                { Text.Labels }
+              </label> : null }
             <LabelEditor
               inputId={inputId}
               events={events}

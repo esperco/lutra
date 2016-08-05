@@ -3,18 +3,15 @@
 */
 
 module Esper.Components {
-  const LABEL_COUNT_CUTOFF = 4;
-  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
-
   export module EventList_ {
     export interface Props {
-      events: Stores.Events.TeamEvent[];
-      selectedEvents?: Stores.Events.TeamEvent[];
+      events: Types.TeamEvent[];
+      selectedEvents?: Types.TeamEvent[];
       teams: ApiT.Team[];
-      onEventToggle?: (event: Stores.Events.TeamEvent) => void;
-      onEventClick?: (event: Stores.Events.TeamEvent) => void;
-      onFeedbackClick?: (event: Stores.Events.TeamEvent) => void;
-      onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
+      onEventToggle?: (event: Types.TeamEvent) => void;
+      onEventClick?: (event: Types.TeamEvent) => void;
+      onFeedbackClick?: (event: Types.TeamEvent) => void;
+      onAddLabelClick?: (event: Types.TeamEvent) => void;
     }
   }
 
@@ -109,9 +106,7 @@ module Esper.Components {
           </div>
           { isActive ?
             <div className="event-labels">
-              <LabelList event={event}
-                         team={this.getTeam(event)}
-                         onAddLabelClick={this.props.onAddLabelClick} />
+              <LabelList event={event} team={this.getTeam(event)} />
             </div> :
             null
           }

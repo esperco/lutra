@@ -106,23 +106,25 @@ module Esper.Components {
         <FilterInput
           ref={(c) => this._input = c}
           id={this.props.inputId}
-          className="form-group"
+          className="esper-section"
           placeholder={_.capitalize(Text.FindAddLabels)}
           getList={() => this._list}
           onSubmit={(label) => this.toggle(label)}
         />
 
-        <FilterList
-          ref={(c) => this._list = c}
-          className="esper-select-menu"
-          choices={choices}
-          itemFn={
-            (label, highlight) => this.renderLabel(label, highlight)
-          }
-          newItemFn={
-            (label, highlight) => this.renderNewLabel(label, highlight)
-          }
-        />
+        <div className="esper-section">
+          <FilterList
+            ref={(c) => this._list = c}
+            className="esper-select-menu"
+            choices={choices}
+            itemFn={
+              (label, highlight) => this.renderLabel(label, highlight)
+            }
+            newItemFn={
+              (label, highlight) => this.renderNewLabel(label, highlight)
+            }
+          />
+        </div>
       </div>
     }
 
