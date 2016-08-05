@@ -15,7 +15,6 @@ module Esper.Components {
     minFeedback?: boolean;
     initAction?: boolean;
     focusOnLabels?: boolean;
-    onDone?: () => void;
     className?: string;
   }
 
@@ -66,7 +65,7 @@ module Esper.Components {
   ////
 
   interface EventEditorModalProps extends EventEditorProps {
-    onCancel?: () => void;
+    onHidden?: () => void;
   }
 
   export class EventEditorModal
@@ -86,17 +85,10 @@ module Esper.Components {
         this.props.eventData.length + " Events Selected"
       );
 
-      // Don't call onDone twice if identical to onCancel
-      var onDone = this.props.onDone || Layout.closeModal;
-      if (this.props.onCancel === onDone) {
-        onDone = Layout.closeModal;
-      }
-
       return <Modal icon="fa-calendar-o" title={heading}
-                    onHidden={this.props.onCancel}>
+                    onHidden={this.props.onHidden}>
         <EventEditor eventData={this.props.eventData}
                      teams={this.props.teams}
-                     onDone={onDone}
                      focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />
       </Modal>;
