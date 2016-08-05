@@ -19,6 +19,8 @@ module Esper.Components {
   interface State {}
 
   export class LabelList extends ReactHelpers.Component<Props, State> {
+    _dropdown: Components.Dropdown;
+
     render() {
       var labels = _.sortBy(
         Option.matchList(this.props.event.labelScores),
@@ -35,7 +37,10 @@ module Esper.Components {
             />)
           }
 
-          <Components.Dropdown className="action dropdown" keepOpen={true}>
+          <Components.Dropdown ref={(c) => this._dropdown = c}
+            className="action dropdown"
+            keepOpen={true}
+          >
             <span className="dropdown-toggle">
               <i className="fa fa-fw fa-plus" />
               { labels.length ? "" : " " + Text.AddLabel }
@@ -53,6 +58,7 @@ module Esper.Components {
         autoFocus={true}
         events={[this.props.event]}
         teams={[this.props.team]}
+        onEsc={() => this._dropdown && this._dropdown.close()}
         onSelect={(label, active) => active ?
           Actions.EventLabels.add([this.props.event], label) :
           Actions.EventLabels.remove([this.props.event], label)

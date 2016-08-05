@@ -15,6 +15,7 @@ module Esper.Components {
     events: Types.TeamEvent[];
     teams: ApiT.Team[];
     onSelect: (label: string, active: boolean) => void;
+    onEsc?: () => void;
     autoFocus?: boolean;
   }
 
@@ -109,6 +110,7 @@ module Esper.Components {
           className="esper-section"
           placeholder={_.capitalize(Text.FindAddLabels)}
           getList={() => this._list}
+          onEsc={this.props.onEsc}
           onSubmit={(label) => this.toggle(label)}
         />
 
