@@ -167,7 +167,7 @@ module Esper.Components {
 
 
   export class CalSelectorDropdown extends CalSelector {
-    _dropdownModal: DropdownModal;
+    _dropdown: Dropdown;
 
     constructor(props: CalSelectorProps) {
       super(props);
@@ -196,19 +196,19 @@ module Esper.Components {
         return "No Calendars Selected"
       })();
 
-      return <DropdownModal
-              ref={ (c) => this._dropdownModal = c }
+      return <Dropdown
+              ref={ (c) => this._dropdown = c }
               keepOpen={ this.props.allowMulti }>
         <Selector id={this.props.id} className="dropdown-toggle end-of-group">
           { selectedText }
         </Selector>
         { super.render() }
-      </DropdownModal>;
+      </Dropdown>;
     }
 
     updateCal(selectedIds: {id: string, groupId: string}[]) {
-      if (this._dropdownModal && !this.props.allowMulti) {
-        this._dropdownModal.close();
+      if (this._dropdown && !this.props.allowMulti) {
+        this._dropdown.close();
       }
       return super.updateCal(selectedIds);
     }

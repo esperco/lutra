@@ -2,7 +2,7 @@
   Dropdown menu for selecting a timezone, with filtering
 */
 
-/// <reference path="./Components.DropdownModal.tsx" />
+/// <reference path="./Components.Dropdown.tsx" />
 /// <reference path="./Timezones.ts" />
 
 module Esper.Components {
@@ -29,7 +29,7 @@ module Esper.Components {
   }
 
   export class TimezoneSelector extends ReactHelpers.Component<Props, State> {
-    _dropdown: Components.DropdownModal;
+    _dropdown: Components.Dropdown;
     _input: HTMLInputElement;
 
     constructor(props: Props) {
@@ -52,7 +52,7 @@ module Esper.Components {
 
     render() {
       var zoneInfo = Timezones.get(this.props.selected);
-      return <Components.DropdownModal ref={(c) => this._dropdown = c}
+      return <Components.Dropdown ref={(c) => this._dropdown = c}
               keepOpen={true} className="esper-timezone-select"
               onOpen={() => this.onOpen()}
               disabled={this.props.disabled}>
@@ -64,13 +64,13 @@ module Esper.Components {
         <div className="dropdown-menu">
           { this.renderList() }
         </div>
-      </Components.DropdownModal>;
+      </Components.Dropdown>;
     }
 
     renderList() {
       var zones = this.state.zones;
-      return <div>
-        <div className="esper-timezone-filter-container form-group">
+      return <div className="esper-timezone-filter-container">
+        <div className="esper-section">
             <input ref={(c) => this._input = c}
                    className="form-control timezone-filter"
                    placeholder="Pacific Time"
@@ -78,7 +78,7 @@ module Esper.Components {
                    onKeyDown={(e) => this.inputKeydown(e)}
                    onChange={(e) => this.onChange(e)} />
           </div>
-          <div className="esper-select-menu esper-timezone-select-menu">
+          <div className="esper-select-menu esper-section">
             { _.map(zones, (z, i) =>
               <div key={z.id} className={classNames("esper-selectable", {
                 highlight: this.state.highlightIndex === i

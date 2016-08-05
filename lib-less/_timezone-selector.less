@@ -1,16 +1,12 @@
-@max-timezone-height: 250px;
-
-.esper-timezone-select-menu {
-  overflow: auto;
-  max-height: @max-timezone-height;
-
-  .esper-no-content {
-    margin: 0 @padding-small-horizontal @padding-small-vertical;
-  }
-}
+@max-timezone-height: 150px;
 
 .esper-timezone-filter-container {
-  padding: 0 @padding-small-horizontal;
+  .esper-select-menu {
+    overflow: auto;
+    max-height: @max-timezone-height;
 
-  .dropdown-modal-menu & { padding: 0; }
+    .esper-no-content {
+      margin: 0 @padding-small-horizontal @padding-small-vertical;
+    }
+  }
 }

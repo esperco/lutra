@@ -79,7 +79,7 @@ module Esper.Components {
           </span> :
           null
         }
-        <DropdownModal>
+        <Dropdown>
           <Selector id={this.props.id || this.getId("")}
                     className="dropdown-toggle">
             { periodStrs[selectedIndex] }
@@ -97,7 +97,7 @@ module Esper.Components {
               )
             }
           </ul>
-        </DropdownModal>
+        </Dropdown>
         <div className="input-group-btn">
           <button type="button" className={"btn btn-default"}
               disabled={disableLeft}

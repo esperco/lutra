@@ -575,3 +575,48 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
 .form-group:last-child {
   margin-bottom: 0;
 }
+
+
+/* Modal tweaks to be more full-screen */
+
+@media screen and (max-width: @screen-xs-max) {
+  .modal {
+    padding: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: auto;
+
+    .modal-dialog {
+      margin: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: auto;
+
+      .modal-content {
+        border-radius: 0;
+        border: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+
+        .modal-header, .modal-footer {
+          flex-grow: 0;
+          flex-shrink: 0;
+        }
+
+        .modal-body {
+          flex-grow: 1;
+          overflow: auto;
+        }
+      }
+    }
+  }
+}
+

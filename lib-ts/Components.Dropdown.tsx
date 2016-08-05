@@ -29,6 +29,8 @@
 /// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
+  const XS_MAX_WIDTH = 767; // Width in px of what constitutes XS in Bootstrap
+
   interface Props {
     children?: JSX.Element[];
     className?: string;
@@ -185,13 +187,20 @@ module Esper.Components {
     }
 
     render() {
-      var style = _.extend({
+      var xs = $(window).width() <= XS_MAX_WIDTH;
+      var style = xs ? {
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0
+      } : _.extend({
         minWidth: this.props.width,
         position: "absolute"
       }, this.props.align);
 
       return <div className="dropdown-backdrop" onClick={() => this.close()}>
-        <div style={style}>
+        <div className="dropdown-wrapper" style={style}>
           <div className={classNames(this.props.className, {
             dropdown: _.isUndefined(this.props.className),
             open: true

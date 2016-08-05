@@ -12,7 +12,7 @@ module Esper.Components {
     var selectedTeam = _.find(teams, (t) => t.teamid === selectedId);
     var displayName = selectedTeam ? selectedTeam.team_name : Text.NoTeam;
 
-    return <DropdownModal className="team-selector">
+    return <Dropdown className="team-selector">
       <div className="dropdown-toggle clearfix">
         { displayName }
         <span className="pull-right">
@@ -43,7 +43,7 @@ module Esper.Components {
           </a>
         </div>
       </div>
-    </DropdownModal>
+    </Dropdown>
   }
 
 }
