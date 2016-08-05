@@ -199,7 +199,7 @@ module Esper.Components {
           <a className={classNames("pull-right no-attend-action action", {
             active: !Stores.Events.isActive(event)
           })} onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-ban" />
+            <i className="fa fa-fw fa-eye-slash" />
           </a>
         </div>;
       }
@@ -264,7 +264,7 @@ module Esper.Components {
           <button className={"form-control btn btn-default" +
                     (Stores.Events.isActive(event) ? "" : " active")}
                   onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-ban" />{" "}
+            <i className="fa fa-fw fa-eye-slash" />{" "}
             { Stores.Events.isActive(event) ?
               Text.YesAttend : Text.NoAttend }
           </button>

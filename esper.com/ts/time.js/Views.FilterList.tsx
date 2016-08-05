@@ -128,28 +128,31 @@ module Esper.Views {
 
       return <div className="container filter-list">
         <div className="list-selectors">
-          <div className="row">
+          <div className="row pad">
             { this.renderCalSelector() }
             { this.renderMonthSelector() }
           </div>
-          <div className="row">
+          <div className="row pad">
             { this.renderLabelSelector(events) }
             { this.renderFilterStr() }
           </div>
         </div>
         { this.renderActionMenu(filteredEvents) }
         { this.state.actionsPinned ?
-          <div className="list-action-menu-filler" /> : null }
+          <div className="list-action-menu-filler esper-section" /> : null }
         { hiddenEvents ? this.renderFilterMsg(hiddenEvents) : null }
-        { (() => {
-          if (eventData.hasError) {
-            return <Components.ErrorMsg />;
-          }
-          if (eventData.isBusy) {
-            return <div className="esper-spinner esper-centered esper-large" />;
-          }
-          return this.renderMain(filteredEvents);
-        })() }
+        <div className="esper-section"><div className="esper-full-width">
+          { (() => {
+            if (eventData.hasError) {
+              return <Components.ErrorMsg />;
+            }
+            if (eventData.isBusy) {
+              return <div
+                className="esper-spinner esper-centered esper-large" />;
+            }
+            return this.renderMain(filteredEvents);
+          })() }
+        </div></div>
       </div>;
     }
 
@@ -157,7 +160,7 @@ module Esper.Views {
       var teams = Stores.Teams.all();
       var calendarsByTeamId = Stores.Calendars.byTeamId();
 
-      return <div className="col-sm-6 form-group">
+      return <div className="col-sm-6 pad-xs">
         <Components.CalSelectorDropdownWithIcon
           teams={teams}
           allowMulti={true}
@@ -171,7 +174,7 @@ module Esper.Views {
     }
 
     renderMonthSelector() {
-      return <div className="col-sm-6 form-group">
+      return <div className="col-sm-6 pad-xs">
         <Components.PeriodSelectorWithIcon
           period={this.props.period}
           updateFn={(x) => this.updateRoute({
@@ -189,7 +192,7 @@ module Esper.Views {
       var unconfirmedCount = _.filter(events,
         (e) => Stores.Events.needsConfirmation(e)
       ).length;
-      return <div className="col-sm-6 form-group">
+      return <div className="col-sm-6 pad-xs">
         <Components.LabelSelectorDropdown labels={labels}
           totalCount={events.length}
           unlabeledCount={Labels.countUnlabeled(events)}
@@ -218,7 +221,7 @@ module Esper.Views {
     }
 
     renderFilterStr() {
-      return <div className="col-sm-6 form-group">
+      return <div className="col-sm-6 pad-xs">
         <div className="input-group">
           <span className="input-group-addon">
             <i className="fa fa-fw fa-search" />
@@ -279,19 +282,6 @@ module Esper.Views {
               <i className="fa fa-fw fa-tag" />
               <span className="hidden-xs">
                 {" "}{ Text.EditLabels }
-              </span>
-            </div> :
-            null
-          }
-          {
-            !! _.find(this.state.selected,
-              (s) => Stores.Events.needsConfirmation(s)
-            ) ?
-            <div className="action"
-                 onClick={() => this.confirmSelectedEvents()}>
-              <i className="fa fa-fw fa-check" />
-              <span className="hidden-xs">
-                {" "}{ Text.ConfirmLabels }
               </span>
             </div> :
             null
@@ -391,22 +381,6 @@ module Esper.Views {
 
     editSelectedEvents() {
       this.renderModal(this.state.selected);
-    }
-
-    confirmSelectedEvents() {
-      Actions.EventLabels.confirm(this.state.selected);
-
-      // Update state with new (confirmed) labels
-      var updatedSelections = Option.flatten(
-        _(this.state.selected)
-          .map((s) => Stores.Events.storeId(s))
-          .map((_id) => Stores.Events.EventStore.get(_id))
-          .map((o) => o.flatMap((d) => d.data))
-          .value()
-      );
-      this.setState({
-        selected: updatedSelections
-      });
     }
 
     renderModal(events: Stores.Events.TeamEvent[], minFeedback=true) {

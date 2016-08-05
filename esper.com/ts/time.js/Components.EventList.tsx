@@ -46,12 +46,22 @@ module Esper.Components {
 
     renderDay(timestamp: number, events: Stores.Events.TeamEvent[]) {
       var m = moment(timestamp);
-      return <div className={classNames('day', 'esper-section', {
+      return <div className={classNames('day clearfix', {
         today: Time.sameDay(m, moment()),
         future: Time.diffDay(m, moment()) > 0,
       })} key={timestamp}>
-        <div className="day-title">{ m.format("MMM D - dddd") }</div>
-        <div className="list-group">
+        <div className="day-title">
+          <span className="month">
+            { m.format("MMM") }
+          </span>
+          <span className="day-of-month">
+            { m.format("D") }
+          </span>
+          <span className="day-of-week">
+            { m.format("ddd") }
+          </span>
+        </div>
+        <div className="day-events">
           { _.map(events, (e) => this.renderEvent(e)) }
         </div>
       </div>
@@ -61,12 +71,13 @@ module Esper.Components {
       var isActive = Stores.Events.isActive(event);
       var actionRequired = !!Stores.Events.needsConfirmation(event);
       return <div key={[event.teamId, event.calendarId, event.id].join(",")}
-                  className={classNames("list-group-item event", {
+                  className={classNames("event", {
                     "has-labels": !!Stores.Events.getLabels(event).length,
                     "needs-confirmation": actionRequired,
                     "no-attend": !isActive,
                     "past": moment(event.end).diff(moment()) < 0
                   })}>
+        <NoAttend event={event} />
         {
           this.props.onEventToggle ?
           <div className="event-checkbox"
@@ -77,47 +88,40 @@ module Esper.Components {
             }
           </div> : null
         }
-        <div className="event-content">
-          <NoAttend event={event} />
-          <div className={"title" +
-                 (this.props.onEventClick ? " esper-link" : "") +
-                 (Stores.Events.isActive(event) ? "": " no-attend")}
-               onClick={() => this.props.onEventClick &&
-                              this.props.onEventClick(event)}>
-            { event.title ||
-              <span className="no-title">{Text.NoEventTitle}</span> }
-          </div>
-          <div className="time">
-            <span className="start">
-              { moment(event.start).format("h:mm a") }
-            </span>{" to "}<span className="end">
-              { moment(event.end).format("h:mm a") }
-            </span>{" "}
-            { event.recurringEventId ?
-              <span className="recurring" title="Recurring">
-                <i className="fa fa-fw fa-refresh" />
-              </span> :
-              null
-            }
-          </div>
-          <div className="action event-feedback"
-               onClick={() => this.handleFeedbackClick(event)}>
-            <EventFeedback event={event} />
-          </div>
-          { isActive ?
-            <div className="event-labels">
-              <LabelList event={event} team={this.getTeam(event)} />
-            </div> :
+        <div className={"title" +
+               (this.props.onEventClick ? " esper-link" : "") +
+               (Stores.Events.isActive(event) ? "": " no-attend")}
+             onClick={() => this.props.onEventClick &&
+                            this.props.onEventClick(event)}>
+          { event.title ||
+            <span className="no-title">{Text.NoEventTitle}</span> }
+        </div>
+        <div className="time">
+          <span className="start">
+            { moment(event.start).format("h:mm a") }
+          </span>{" to "}<span className="end">
+            { moment(event.end).format("h:mm a") }
+          </span>{" "}
+          { event.recurringEventId ?
+            <span className="recurring" title="Recurring">
+              <i className="fa fa-fw fa-refresh" />
+            </span> :
             null
           }
-          {
-            event.feedback && event.feedback.notes ?
-            <div className="action-block event-feedback-notes"
-                 onClick={() => this.handleFeedbackClick(event)}>
-              <EventFeedbackNotes notes={event.feedback.notes} />
-            </div> : null
-          }
         </div>
+        { isActive ?
+          <div className="event-labels">
+            <LabelList event={event} team={this.getTeam(event)} />
+          </div> :
+          null
+        }
+        {
+          event.feedback && (event.feedback.notes || event.feedback.rating) ?
+          <div className="action-block event-feedback"
+             onClick={() => this.handleFeedbackClick(event)}>
+          <EventFeedback event={event} />
+        </div> : null
+        }
       </div>;
     }
 
@@ -156,7 +160,7 @@ module Esper.Components {
                                 active: !isActive
                               })} title={title}
         onClick={(e) => toggleAttend(e, event)}>
-      <i className="fa fa-fw fa-close" />
+      <i className="fa fa-fw fa-eye-slash" />
     </Tooltip>;
   }
 
@@ -171,28 +175,25 @@ module Esper.Components {
     // Check if no feedback
     var feedback = event.feedback || {}
 
-    // Format feedback
-    return <span>
-      { Stores.Events.isActive(event) ?
-        _.times(feedback.rating || 0, (i) =>
-          <i key={i.toString()} className="fa fa-fw fa-star" />
-        ) : null
-      }
-      {" "}
-    </span>;
-  }
-
-  function EventFeedbackNotes({notes}: {notes: string}) {
     /*
       Use text-overflow: ellipsis in CSS to truncate exactly at end of line but
       use JS to do a sanity-check too, and to keep DOM a little less cluttered.
     */
-    notes = notes.slice(0, 250);
+    var notes = (event.feedback.notes || "").slice(0, 250);
 
-    // Format feedback notes
+    // Format feedback
     return <span>
-      <i className="fa fa-fw fa-comment-o" />{" "}
-      { notes }
+      <i className="fa fa-left fa-fw fa-comment-o" />
+      <span className="star-rating">
+        { Stores.Events.isActive(event) ?
+          _.times(feedback.rating || 0, (i) =>
+            <i key={i.toString()} className="fa fa-fw fa-star" />
+          ) : null
+        }
+      </span>
+      <span className="notes">
+        { notes }
+      </span>
     </span>;
   }
 
