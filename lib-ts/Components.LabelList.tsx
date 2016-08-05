@@ -59,11 +59,21 @@ module Esper.Components {
         events={[this.props.event]}
         teams={[this.props.team]}
         onEsc={() => this._dropdown && this._dropdown.close()}
-        onSelect={(label, active) => active ?
-          Actions.EventLabels.add([this.props.event], label) :
-          Actions.EventLabels.remove([this.props.event], label)
-        }
+        onSelect={(label, active) => this.editEventLabel(label, active)}
       />;
+    }
+
+    editEventLabel(label: string, active: boolean) {
+      if (active) {
+        Actions.EventLabels.add([this.props.event], label);
+        Actions.Teams.addLabel(this.props.team.teamid, label);
+      } else {
+        Actions.EventLabels.remove([this.props.event], label)
+      }
+    }
+
+    rmEventLabel(label: string) {
+      Actions.EventLabels.remove([this.props.event], label)
     }
   }
 

@@ -51,10 +51,16 @@ module Esper.Components {
               inputId={inputId}
               events={events}
               teams={props.teams}
-              onSelect={(label, active) => active ?
-                Actions.EventLabels.add(events, label) :
-                Actions.EventLabels.remove(events, label)
-              }
+              onSelect={(label, active) => {
+                if (active) {
+                  Actions.EventLabels.add(events, label);
+                  _.each(props.teams,
+                    (team) => Actions.Teams.addLabel(team.teamid, label)
+                  );
+                } else {
+                  Actions.EventLabels.remove(events, label);
+                }
+              }}
               autoFocus={props.focusOnLabels}
             />
           </div> : null }
