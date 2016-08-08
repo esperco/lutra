@@ -1,211 +1,107 @@
 /*
-  Component for showing a list of labels for an event
+  Component for showing a list of labels for some events
 */
 
-/// <reference path="./Actions.EventLabels.ts" />
-/// <reference path="./Actions.Feedback.ts" />
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Colors.ts" />
+/// <reference path="./Components.LabelEditor.tsx" />
+/// <reference path="./Components.Dropdown.tsx" />
 /// <reference path="./Labels.ts" />
-/// <reference path="./Stores.Events.ts" />h
 /// <reference path="./Text.tsx" />
+/// <reference path="./Types.ts" />
 
 module Esper.Components {
-  // How many labels to show in list by default
-  const LABEL_COUNT_CUTOFF = 4;
-
   interface Props {
-    event: Stores.Events.TeamEvent;
+    event: Types.TeamEvent;
     team: ApiT.Team;
-    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
   }
 
-  /*
-    A list of toggle-able labels or predicted labels for an event.
-  */
-  export class LabelList extends ReactHelpers.Component<Props, {
-    initLabelList: Labels.Label[];
-    expanded: boolean;
-  }> {
-    constructor(props: Props) {
-      super(props);
+  interface State {}
 
-      /*
-        Track the initial set of labels (or predicted labels) for rendering
-        purposes. We don't want predicted labels or other options to disappear
-        just because the user toggled one.
-      */
-      this.state = {
-        initLabelList: this.getInitLabels(props.event),
-        expanded: false
-      }
-    }
-
-    /*
-      If new labels outside of the initial list are assigned, that means
-      user has added labels from outside the label toggle interface, so
-      reset our initial toggle list.
-    */
-    componentWillReceiveProps(props: Props) {
-      if (!this.state.expanded) {
-        var labelList = this.getInitLabels(props.event);
-        var newLabels = _.differenceBy(labelList, this.state.initLabelList,
-                                       (l) => l.id);
-        if (newLabels.length > 0) {
-           this.setState({
-            initLabelList: labelList,
-            expanded: this.state.expanded
-          });
-        }
-      }
-    }
-
-    // Returns a combination of predicted labels and team labels,
-    // up to threshold, for selection purposes.
-    getInitLabels(event: Stores.Events.TeamEvent): Labels.Label[] {
-      var labels = event.labelScores.match({
-        none: (): Labels.Label[] => [],
-        some: (l) => l
-      });
-
-      if (labels.length < LABEL_COUNT_CUTOFF) {
-        labels = labels.concat(Labels.fromTeam(this.props.team));
-        labels = _.uniqBy(labels, (l) => l.id);
-        labels = labels.slice(0, LABEL_COUNT_CUTOFF);
-      }
-
-      return labels;
-    }
+  export class LabelList extends ReactHelpers.Component<Props, State> {
+    _dropdown: Components.Dropdown;
 
     render() {
-      var labelList = this.state.initLabelList;
-      if (this.state.expanded) {
-        labelList = labelList.concat(Labels.fromTeam(this.props.team));
-        labelList = _.uniqBy(labelList, (l) => l.id);
-      }
+      var labels = _.sortBy(
+        Option.matchList(this.props.event.labelScores),
+        (l) => l.displayAs
+      );
+      return <div className="label-list">
+        <div className="event-labels">
+          <i className="fa fa-left fa-fw fa-tags" />
+          { _.map(labels, (l) =>
+            <Label key={l.id} label={l}
+              onRemove={() => Actions.EventLabels.remove(
+                [this.props.event], l.displayAs
+              )}
+            />)
+          }
 
-      return <div className="event-labels">
-        { Stores.Events.needsConfirmation(this.props.event) ?
-          <span className="label-list-actions">
-            <ConfirmPredictions event={this.props.event} />
-          </span> : null }
-        { _.map(labelList, (labelVal) =>
-          <LabelToggle key={labelVal.id}
-                       id={labelVal.id}
-                       displayAs={labelVal.displayAs}
-                       event={this.props.event} />
-        ) }
-        { this.state.expanded && this.props.onAddLabelClick ?
-          <span className="add-event-label action label-list-action"
-                onClick={() => this.props.onAddLabelClick(this.props.event)}>
-            {labelList.length ?
-              <span>
-                <i className="fa fa-fw fa-tag" />{" "}
-                <i className="fa fa-fw fa-ellipsis-h" />
-              </span> :
-              <span>
-                <i className="fa fa-fw fa-plus" />{" "}{Text.AddLabel}
-              </span>
-            }
-          </span> : null }
-        <span className="toggle-label-expansion action label-list-action"
-              onClick={() => this.toggleExpand()}>
-          <i className={classNames("fa", "fa-fw", {
-            "fa-chevron-left": this.state.expanded,
-            "fa-chevron-right": !this.state.expanded
-          })} />
-        </span>
+          <Components.Dropdown ref={(c) => this._dropdown = c}
+            className="action dropdown"
+            keepOpen={true}
+          >
+            <span className="dropdown-toggle">
+              <i className="fa fa-fw fa-plus" />
+              { labels.length ? "" : " " + Text.AddLabel }
+            </span>
+            <div className="dropdown-menu">
+              { this.renderEditor() }
+            </div>
+          </Components.Dropdown>
+        </div>
       </div>;
     }
 
-    // When contracting, re-adjust init label list
-    toggleExpand() {
-      this.setState({
-        initLabelList: (this.state.expanded ?
-          this.getInitLabels(this.props.event) :
-          this.state.initLabelList
-        ),
-        expanded: !this.state.expanded
-      });
+    renderEditor() {
+      return <LabelEditor
+        autoFocus={true}
+        events={[this.props.event]}
+        teams={[this.props.team]}
+        onEsc={() => this._dropdown && this._dropdown.close()}
+        onSelect={(label, active) => this.editEventLabel(label, active)}
+      />;
     }
-  }
 
-
-  interface LabelProps {
-    id: string;
-    displayAs: string;
-    event: Stores.Events.TeamEvent;
-  }
-
-  class LabelToggle extends ReactHelpers.Component<LabelProps, {}> {
-    render() {
-      var labelColor = Colors.getColorForLabel(this.props.id);
-      var score = this.getScore();
-      var style = (() => ({
-        borderStyle: "solid",
-        borderColor: labelColor,
-        background: score > 0 ? labelColor : "transparent",
-        color: score > 0 ? Colors.colorForText(labelColor) :
-                           Colors.darken(labelColor)
-      }))();
-
-      // Predicted label
-      if (score > 0 && score < 1) {
-        return <Tooltip style={style}
-          className="event-label predicted-label"
-          data-toggle="tooltip"
-          title={Text.predictionTooltip(score)}
-          onClick={() => {
-            score > 0 ? this.toggleOff() : this.toggleOn()
-        }}>
-          <i className="fa fa-fw fa-question-circle" />
-          {" "}
-          {this.props.displayAs}{" "}
-          <span className="label-score">
-            <SignalStrength strength={score} />
-          </span>
-        </Tooltip>;
+    editEventLabel(label: string, active: boolean) {
+      if (active) {
+        Actions.EventLabels.add([this.props.event], label);
+        Actions.Teams.addLabel(this.props.team.teamid, label);
+      } else {
+        Actions.EventLabels.remove([this.props.event], label)
       }
-
-      // User-selected label
-      return <span style={style} className="event-label"
-                   onClick={() => {
-                     score > 0 ? this.toggleOff() : this.toggleOn()
-                   }}>
-        <i className="fa fa-fw fa-tag" />{" "}
-        {this.props.displayAs}
-      </span>;
     }
 
-    getScore() {
-      return this.props.event.labelScores.match({
-        none: () => 0,
-        some: (labels) => Option.wrap(
-          _.find(labels, (l) => l.id === this.props.id)
-        ).match({
-          none: () => 0,
-          some: (label) => label.score
-        })
-      });
-    }
-
-    toggleOn() {
-      Actions.EventLabels.add([this.props.event],
-        this.props.displayAs);
-    }
-
-    toggleOff() {
-      Actions.EventLabels.remove([this.props.event],
-        this.props.displayAs);
+    rmEventLabel(label: string) {
+      Actions.EventLabels.remove([this.props.event], label)
     }
   }
 
-  function ConfirmPredictions({event}: { event: Stores.Events.TeamEvent }) {
-    return <Tooltip className="confirm-action action label-list-action"
-                    title={Text.ConfirmLabels}
-                    onClick={() => Actions.EventLabels.confirm([event])}>
-      <i className="fa fa-fw fa-check" />
-    </Tooltip>;
-  }
+  /*
+    Single label object -- supports a "partial" mode for use
+  */
+  function Label({label, onRemove}: {
+    label: Types.Label;
+    onRemove?: () => void;
+  }) {
+    var labelColor = Colors.getColorForLabel(label.id);
+    var style = {
+      borderStyle: "solid",
+      borderColor: labelColor,
+      background: labelColor,
+      color: Colors.colorForText(labelColor)
+    };
 
+    // Title isn't for real tooltip, just debugging predictions really
+    var title = label.score < 1 ?
+      Text.predictionTooltip(label.score) : label.displayAs;
+    return <span style={style} title={title} className="event-label">
+      { label.displayAs }{" "}
+      { onRemove ?
+        <span className="action rm-action hidden-xs"
+              onClick={onRemove}>
+          <i className="fa fa-fw fa-close" />
+        </span> : null }
+    </span>;
+  }
 }

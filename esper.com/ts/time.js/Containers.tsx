@@ -5,8 +5,7 @@
 module Esper.Containers {
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
-    onDone?: () => void;
-    onCancel?: () => void;
+    onHidden?: () => void;
   }) {
     opts = opts || { minFeedback: true };
     return ReactHelpers.contain(function() {
@@ -26,8 +25,7 @@ module Esper.Containers {
         teams={Stores.Events.getTeams(events)}
         focusOnLabels={opts.minFeedback}
         minFeedback={opts.minFeedback}
-        onDone={opts.onDone}
-        onCancel={opts.onCancel}
+        onHidden={opts.onHidden}
       />;
     })
   }
@@ -55,7 +53,7 @@ module Esper.Containers {
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
-            onDone: backFn
+            onHidden: backFn
           })
         );
       };
@@ -63,8 +61,7 @@ module Esper.Containers {
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: false,
-            onDone: backFn,
-            onCancel: backFn
+            onHidden: backFn
           })
         );
 
@@ -125,8 +122,7 @@ module Esper.Containers {
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
-            onDone: backFn,
-            onCancel: backFn
+            onHidden: backFn
           })
         );
       };

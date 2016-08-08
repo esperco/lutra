@@ -1,0 +1,44 @@
+@import "../lib/_bootstrap-variables.less";
+
+.label-list {
+  .fa-left {
+    color: @brand-text-muted;
+    @media screen and (max-width: @screen-xs-max) {
+      display: none;
+    }
+  }
+}
+
+.event-label, .event-labels > .action {
+  padding: @padding-xs-vertical @padding-xs-horizontal;
+  margin-top: @padding-small-vertical;
+  margin-right: @padding-xs-horizontal;
+  border-radius: @border-radius-small;
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid @brand-text-muted;
+  color: @brand-text-muted;
+}
+
+.event-labels > .action {
+  text-transform: capitalize;
+
+  &:hover {
+    color: @link-color;
+    border-color: @link-color;
+  }
+
+  &.active {
+    background: @link-color;
+    color: white;
+  }
+}
+
+.event-label .action.rm-action {
+  color: inherit;
+  opacity: 0.5;
+
+  &:hover, &.active {
+    color: white;
+  }
+}

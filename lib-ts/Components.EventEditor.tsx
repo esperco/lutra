@@ -15,7 +15,6 @@ module Esper.Components {
     minFeedback?: boolean;
     initAction?: boolean;
     focusOnLabels?: boolean;
-    onDone?: () => void;
     className?: string;
   }
 
@@ -44,17 +43,24 @@ module Esper.Components {
         { props.eventData.length > 1 ||
           Stores.Events.isActive(firstEvent) ?
           <div className="esper-panel-section">
-            <label htmlFor={inputId}>
-              { Text.Labels }
-            </label>
+            { props.eventData.length === 1 ?
+              <label htmlFor={inputId}>
+                { Text.Labels }
+              </label> : null }
             <LabelEditor
               inputId={inputId}
               events={events}
               teams={props.teams}
-              onSelect={(label, active) => active ?
-                Actions.EventLabels.add(events, label) :
-                Actions.EventLabels.remove(events, label)
-              }
+              onSelect={(label, active) => {
+                if (active) {
+                  Actions.EventLabels.add(events, label);
+                  _.each(props.teams,
+                    (team) => Actions.Teams.addLabel(team.teamid, label)
+                  );
+                } else {
+                  Actions.EventLabels.remove(events, label);
+                }
+              }}
               autoFocus={props.focusOnLabels}
             />
           </div> : null }
@@ -65,7 +71,7 @@ module Esper.Components {
   ////
 
   interface EventEditorModalProps extends EventEditorProps {
-    onCancel?: () => void;
+    onHidden?: () => void;
   }
 
   export class EventEditorModal
@@ -85,17 +91,10 @@ module Esper.Components {
         this.props.eventData.length + " Events Selected"
       );
 
-      // Don't call onDone twice if identical to onCancel
-      var onDone = this.props.onDone || Layout.closeModal;
-      if (this.props.onCancel === onDone) {
-        onDone = Layout.closeModal;
-      }
-
       return <Modal icon="fa-calendar-o" title={heading}
-                    onHidden={this.props.onCancel}>
+                    onHidden={this.props.onHidden}>
         <EventEditor eventData={this.props.eventData}
                      teams={this.props.teams}
-                     onDone={onDone}
                      focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />
       </Modal>;
@@ -198,7 +197,7 @@ module Esper.Components {
           <a className={classNames("pull-right no-attend-action action", {
             active: !Stores.Events.isActive(event)
           })} onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-ban" />
+            <i className="fa fa-fw fa-eye-slash" />
           </a>
         </div>;
       }
@@ -263,7 +262,7 @@ module Esper.Components {
           <button className={"form-control btn btn-default" +
                     (Stores.Events.isActive(event) ? "" : " active")}
                   onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-ban" />{" "}
+            <i className="fa fa-fw fa-eye-slash" />{" "}
             { Stores.Events.isActive(event) ?
               Text.YesAttend : Text.NoAttend }
           </button>

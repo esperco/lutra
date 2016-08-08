@@ -105,6 +105,15 @@ module Esper.ReactHelpers {
     // List of stores this component is listening to. Set via setSources.
     sources: Source[];
 
+    constructor(props: P) {
+      super(props);
+      this.sources = [];
+
+      // Not correct typing, but add empty object to save step in cases
+      // where state props are all optional.
+      this.state = <S> {};
+    }
+
     /*
       In subclass, you can choose to override either render or renderWithData.
       If using renderWithData, any references to Model.Store (or subclasses)
@@ -118,11 +127,6 @@ module Esper.ReactHelpers {
 
     renderWithData(): JSX.Element {
       return React.createElement("span");
-    }
-
-    constructor(props: P) {
-      super(props);
-      this.sources = [];
     }
 
     // Reference to JQuery-wrapped parent node

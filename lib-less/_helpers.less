@@ -402,9 +402,11 @@
   }
 }
 
-/* Helpers for adding vertical spacing between columns when reduced to rows */
+/* Helpers for adding vertical spacing rows and columns */
 
-.row {
+.row.pad {
+  + .row.pad { margin-top: @esper-base-padding; }
+
   .pad-xs + .pad-xs {
     @media screen and (max-width: @screen-xs-max) {
       margin-top: @esper-base-padding;
@@ -440,9 +442,10 @@
   padding.
 */
 .esper-section, .esper-panel-section {
-  padding: 0 @esper-base-padding;
+  padding-left: @esper-base-padding;
+  padding-right: @esper-base-padding;
 
-  .esper-left-sidebar & {
+  .esper-left-sidebar &, .esper-section &, .esper-panel-section & {
     margin-left: -@esper-base-padding;
     margin-right: -@esper-base-padding;
   }
@@ -1057,6 +1060,9 @@ a.action {
   }
 }
 
+.fa.fa-left {
+  margin-right: @padding-small-horizontal;
+}
 
 /* Misc formatting for "shaded" elements */
 .esper-shade {
