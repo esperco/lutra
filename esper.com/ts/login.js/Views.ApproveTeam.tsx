@@ -44,6 +44,38 @@ module Esper.Views {
       }
 
       return <div>
+        { this.renderMain() }
+        { this.renderFooter() }
+      </div>;
+    }
+
+    getUnapprovedTeams(info: ApiT.LoginResponse) {
+      return _.filter(info.teams,
+        (team) => team.team_executive === Login.me() && !team.team_approved
+      );
+    }
+
+    getApprovedTeams(info: ApiT.LoginResponse) {
+      return _(info.teams).difference(this.getUnapprovedTeams(info)).value();
+    }
+
+    getName(uid: string) {
+      return Stores.Profiles.get(uid).match({
+        none: () => "Unknown User",
+        some: (profile) => profile.display_name === profile.email ?
+          profile.display_name : `${profile.display_name} <${profile.email}>`
+      })
+    }
+
+    renderMain() {
+      var status = Stores.Profiles.status();
+      if (status) {
+        var loading = status === Model2.DataStatus.FETCHING;
+        var error = (status === Model2.DataStatus.FETCH_ERROR ||
+                     this.state.error);
+      }
+
+      return <div>
         <div className="alert alert-warning">
           <p>
             Someone's created a team for you on Esper. We need you to approve
@@ -75,26 +107,7 @@ module Esper.Views {
             )
           }
         </div>
-        { this.renderFooter() }
       </div>;
-    }
-
-    getUnapprovedTeams(info: ApiT.LoginResponse) {
-      return _.filter(info.teams,
-        (team) => team.team_executive === Login.me() && !team.team_approved
-      );
-    }
-
-    getApprovedTeams(info: ApiT.LoginResponse) {
-      return _(info.teams).difference(this.getUnapprovedTeams(info)).value();
-    }
-
-    getName(uid: string) {
-      return Stores.Profiles.get(uid).match({
-        none: () => "Unknown User",
-        some: (profile) => profile.display_name === profile.email ?
-          profile.display_name : `${profile.display_name} <${profile.email}>`
-      })
     }
 
     renderFooter() {
@@ -167,8 +180,8 @@ module Esper.Views {
   /*
     Modal-ized version of the above
   */
-  export class ApproveTeamsModal extends Component<ApproveProps, {}> {
-    render() {
+  export class ApproveTeamsModal extends ApproveTeams {
+    renderWithData() {
       // Wrap onApprove to close modal
       var callback = (info: ApiT.LoginResponse,
                       removedTeams: ApiT.Team[]) => {
@@ -176,13 +189,16 @@ module Esper.Views {
         this.jQuery().modal('hide');
       };
 
-      return <Components.Modal title="Approve Access" icon="fa-warning"
-                               fixed={true}>
-        { React.createElement(ApproveTeams, _.extend({}, this.props, {
-            callback: callback
-          }) as ApproveProps)
-        }
-      </Components.Modal>
+      return <Components.ModalBase fixed={true}>
+        <Components.ModalHeader title="Approve Access"
+          icon="fa-warning" fixed={true} />
+
+        <div className="modal-body">
+          { this.renderMain() }
+        </div>
+
+        { this.renderFooter() }
+      </Components.ModalBase>;
     }
   }
 }

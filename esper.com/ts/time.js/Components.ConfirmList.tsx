@@ -37,15 +37,14 @@ module Esper.Components {
 
     render() {
       var events = this.getEvents();
-      var needsConfirmation = !!_.find(events,
-        (e) => Stores.Events.needsConfirmation(e)
-      );
+      return <div>
+        { this.renderMain(events) }
+        { this.renderProgress(events) }
+        { this.renderFooter(events) }
+      </div>;
+    }
 
-      // Logarithmic progress bar
-      var progress = this.state.pageIndices[1] / this.props.events.length;
-      progress = Math.min(progress, 1);
-      progress = Math.sqrt(progress);
-
+    renderMain(events: Types.TeamEvent[]) {
       return <div>
         {/* Description of why we need confirmation */}
         { this.state.pageIndices[0] === 0 ?
@@ -56,8 +55,6 @@ module Esper.Components {
 
         { this.props.error ? <ErrorMsg /> : null }
 
-        <ProgressBar width={progress} skinny={false} />
-
         { this.props.busy ?
           <LoadingMsg msg={Text.PredictionsLoading} hellip={true} /> :
           <div className="esper-section">
@@ -67,23 +64,41 @@ module Esper.Components {
               onAddLabelClick={this.props.onAddLabelClick}
             />
           </div> }
+      </div>
+    }
 
-        {/* Button to load more events and update predictions, as applicable */}
-        { events.length ?
-          <div className="clearfix modal-footer">
-            <button className="btn btn-primary form-control"
-                    onClick={() => this.onNext(events)}>
-              {(() => {
-                if (needsConfirmation) {
-                  return Text.ConfirmAllLabels;
-                }
-                if (this.hasMore()) {
-                  return Text.MorePredictions;
-                }
-                return Text.ConfirmationDone
-              })()}
-            </button>
-          </div> : null }
+    renderProgress(events: Types.TeamEvent[]) {
+      // Logarithmic progress bar
+      var progress = this.state.pageIndices[1] / this.props.events.length;
+      progress = Math.min(progress, 1);
+      progress = Math.sqrt(progress);
+
+      return <ProgressBar width={progress} skinny={true} />
+    }
+
+    // Button to load more events and update predictions, as applicable
+    renderFooter(events: Types.TeamEvent[]) {
+      if (_.isEmpty(events)) {
+        return null;
+      }
+      var needsConfirmation = !!_.find(events,
+        (e) => Stores.Events.needsConfirmation(e)
+      );
+
+      return <div className="clearfix modal-footer">
+
+        <button className="btn btn-primary form-control"
+                onClick={() => this.onNext(events)}>
+          {(() => {
+            if (needsConfirmation) {
+              return Text.ConfirmAllLabels;
+            }
+            if (this.hasMore()) {
+              return Text.MorePredictions;
+            }
+            return Text.ConfirmationDone
+          })()}
+        </button>
       </div>;
     }
 
@@ -142,11 +157,16 @@ module Esper.Components {
 
   export class ConfirmListModal extends ConfirmList {
     render() {
-      return <Modal icon="fa-question-circle"
-                    title={Text.ConfirmLabelsHeading}
-                    onHidden={() => this.updateRemainder()}>
-        { super.render() }
-      </Modal>
+      var events = this.getEvents();
+      return <ModalBase onHidden={() => this.updateRemainder()}>
+        <ModalHeader icon="fa-question-circle"
+                     title={Text.ConfirmLabelsHeading} />
+        <div className="modal-body">
+          { this.renderMain(events) }
+        </div>
+        { this.renderProgress(events) }
+        { this.renderFooter(events) }
+      </ModalBase>;
     }
 
     /*
