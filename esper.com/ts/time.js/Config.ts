@@ -11,7 +11,7 @@ module Esper.Config {
     can go back or advance in relative time
   */
   export const MAX_QUARTER_INCR = 1;
-  export const MIN_QUARTER_INCR = -1;
+  export const MIN_QUARTER_INCR = -2;
 
   // 9 months total convering previous quarter to next
   export const MAX_MONTH_INCR = moment()
