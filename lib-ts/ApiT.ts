@@ -112,7 +112,6 @@ module Esper.ApiT {
   }
 
   export interface EventFeedback {
-    calid?: string;
     notes?: string;
     attended?: boolean;
     rating?: number;
@@ -156,7 +155,7 @@ module Esper.ApiT {
     labels_norm?: string[];
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
     hashtags: HashtagState[];
-    feedback: EventFeedback;
+    feedback?: EventFeedback;
     location?: string;
     all_day: boolean;
     guests: Attendee[];
