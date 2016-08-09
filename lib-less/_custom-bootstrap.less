@@ -607,13 +607,14 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
         height: 100%;
         overflow: hidden;
 
-        .modal-header, .modal-footer {
+        > div {
           flex-grow: 0;
           flex-shrink: 0;
         }
 
-        .modal-body {
+        > .modal-body {
           flex-grow: 1;
+          flex-shrink: 1;
           overflow: auto;
         }
       }
