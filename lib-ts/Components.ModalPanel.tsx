@@ -7,7 +7,37 @@
 /// <reference path="./Components.ErrorMsg.tsx" />
 
 module Esper.Components {
-  export function ModalPanelFooter(props: Types.ModalPanelFooterProps) {
+  export interface ModalPanelFooterProps {
+    // Show spinner?
+    busy?: boolean;
+
+    // Replaces buttons with text when busy
+    busyText?: string|JSX.Element;
+
+    // Show error icon?
+    error?: boolean;
+
+    // Element to show when error
+    errorText?: string|JSX.Element;
+
+    // Show success icon?
+    success?: boolean;
+
+    // Element to show when content on success, defaults to "saved"
+    successText?: string|JSX.Element;
+
+    // Cancel button options (subdued button)
+    onCancel?: () => void;
+    cancelText?: string|JSX.Element;
+    disableCancel?: boolean;
+
+    // OK button options (purple button)
+    onOK?: () => void;
+    okText?: string|JSX.Element;
+    disableOK?: boolean;
+  }
+
+  export function ModalPanelFooter(props: ModalPanelFooterProps) {
     if (!props.busy && !props.error && !props.onCancel && !props.onOK ) {
       return; // Don't show footer if nothing to show
     }

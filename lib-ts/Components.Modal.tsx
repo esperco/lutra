@@ -129,7 +129,7 @@ module Esper.Components {
   */
 
   interface ModalProps extends ModalBaseProps, ModalHeaderProps {
-    footer?: Types.ModalPanelFooterProps
+    footer?: ModalPanelFooterProps
   }
 
   export class Modal extends Component<ModalProps, {}> {
