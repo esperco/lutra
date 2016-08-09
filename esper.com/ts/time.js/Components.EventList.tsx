@@ -166,7 +166,7 @@ module Esper.Components {
 
   function toggleAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
     e.stopPropagation();
-    var newFeedback = _.clone(event.feedback);
+    var newFeedback = _.clone(event.feedback || {});
     newFeedback.attended = !Stores.Events.isActive(event);
     Actions.Feedback.post(event, newFeedback);
   }
@@ -179,7 +179,7 @@ module Esper.Components {
       Use text-overflow: ellipsis in CSS to truncate exactly at end of line but
       use JS to do a sanity-check too, and to keep DOM a little less cluttered.
     */
-    var notes = (event.feedback.notes || "").slice(0, 250);
+    var notes = (feedback.notes || "").slice(0, 250);
 
     // Format feedback
     return <span>
