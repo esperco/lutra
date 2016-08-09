@@ -91,33 +91,35 @@ module Esper.Views {
     }
 
     render() {
-      return <div className="panel panel-default">
-        <div className="panel-body">
-          {
-            this.props.exec.join(this.props.prefs,
-              (exec, prefs) => Option.some({exec: exec, prefs: prefs})
-            ).match({
-              none: () => <div className="esper-spinner esper-centered" />,
-              some: ({exec, prefs}) =>
-                <Components.ModalPanel
-                    busy={this.props.busy}
-                    error={this.props.error}
-                    success={this.state.didSave &&
-                             !this.props.busy && !this.props.error}
-                    onOK={() => this.save()} okText="Save">
-                  <Components.TeamForm ref={(c) => this._form = c}
-                    name={this.props.team.team_name}
-                    email={exec.email}
-                    timezone={prefs.current_timezone}
-                    showEmail={true}
-                    editableEmail={false}
-                    onUpdate={() => this.delayedSave()}
-                  />
-                </Components.ModalPanel>
-            })
-          }
+      return this.props.exec.join(this.props.prefs,
+        (exec, prefs) => Option.some({exec: exec, prefs: prefs})
+      ).match({
+        none: () => <div className="panel panel-default">
+          <div className="panel-body">
+            <div className="esper-spinner esper-centered" />
+          </div>
+        </div>,
+
+        some: ({exec, prefs}) => <div className="panel panel-default">
+          <div className="panel-body">
+            <Components.TeamForm ref={(c) => this._form = c}
+              name={this.props.team.team_name}
+              email={exec.email}
+              timezone={prefs.current_timezone}
+              showEmail={true}
+              editableEmail={false}
+              onUpdate={() => this.delayedSave()}
+            />
+          </div>
+          <Components.ModalPanelFooter
+            busy={this.props.busy}
+            error={this.props.error}
+            success={this.state.didSave &&
+                     !this.props.busy && !this.props.error}
+            onOK={() => this.save()} okText="Save"
+          />
         </div>
-      </div>;
+      });
     }
 
     // Save after inactivity

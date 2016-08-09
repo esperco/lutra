@@ -27,14 +27,14 @@ module Esper.Views {
                 { Text.AddTeamHeading }
               </div>
               <div className="panel-body">
-                <Components.ModalPanel
-                 busy={this.state.busy} disableOK={this.state.busy}
-                 okText="Save" onOK={() => this.save()}>
-                  <Components.NewTeamForm supportsExec={true}
-                    ref={(c) => this._teamForm = c}
-                  />
-                </Components.ModalPanel>
+                <Components.NewTeamForm supportsExec={true}
+                  ref={(c) => this._teamForm = c}
+                />
               </div>
+              <Components.ModalPanelFooter
+                busy={this.state.busy} disableOK={this.state.busy}
+                okText="Save" onOK={() => this.save()}
+              />
             </div>
           </div>
         </div>
