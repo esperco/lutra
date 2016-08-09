@@ -644,3 +644,7 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
   }
 }
 
+// Not really Bootstrap, but don't let Intercom clobber our modals on mobile
+#intercom-container {
+  z-index: @zindex-modal-background - 1;
+}
