@@ -17,7 +17,7 @@ module Esper.Stores.Events {
 
   /* Type modification */
 
-  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.2;
+  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.5;
   const PREDICTED_LABEL_MODIFIER = 0.95;
 
   export type TeamEvent = Types.TeamEvent;
@@ -58,31 +58,16 @@ module Esper.Stores.Events {
           let labels = _.filter(e.predicted_labels,
             (l) => _.includes(team.team_labels_norm, l.label_norm));
           if (labels.length) {
+            let labelsAboveThreshold = _(labels)
+              .filter((l) => l.score >= PREDICTED_LABEL_PERCENT_CUTOFF)
+              .map((l) => ({
+                id: l.label_norm,
+                displayAs: l.label,
+                score: l.score * PREDICTED_LABEL_MODIFIER
+              })).value();
 
-            /*
-              The score required for us to count a label depends on how
-              many labels the team has. The score must exceed random chance
-              by an amount dependent on the PREDICTED_LABEL_PERCENT_CUTOFF
-              value.
-
-              Note that we use the max of the number of labels the team has
-              and the number of label predictions the event has (in case
-              the event has predicted labels currently not included
-              in the team label list).
-            */
-            let labelCount = Math.max(team.team_labels_norm.length,
-                                      e.predicted_labels.length);
-            let threshold = (1 / labelCount) +
-              ((labelCount - 1) / labelCount) * PREDICTED_LABEL_PERCENT_CUTOFF;
-
-            let topPrediction = labels[0];
-            if (topPrediction.score > threshold) {
-              return Option.some([{
-                id: topPrediction.label_norm,
-                displayAs: topPrediction.label,
-                score: PREDICTED_LABEL_MODIFIER * topPrediction.score
-              }]);
-            }
+            if (labelsAboveThreshold.length)
+              return Option.some(labelsAboveThreshold);
           }
         }
       }

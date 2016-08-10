@@ -27,6 +27,75 @@ module Esper.Stores.Events {
       });
     });
 
+    describe("asTeamEvent", function() {
+      it("should convert hashtags to labels", function() {
+        let event = TestFixtures.makeGenericCalendarEvent({
+          hashtags: [{
+            hashtag: "#Floats",
+            hashtag_norm: "#floats"
+          }, {
+            hashtag: "#Sinks",
+            hashtag_norm: "#sinks"
+          }]
+        });
+        let teamEvent = asTeamEvent("team-id", event);
+        expect(teamEvent.labelScores.isSome()).toBe(true);
+
+        let labelScores = teamEvent.labelScores.unwrap();
+        expect(labelScores.length).toEqual(2);
+        expect(labelScores).toContain({
+          id: "#floats",
+          displayAs: "#Floats",
+          score: 1
+        });
+        expect(labelScores).toContain({
+          id: "#sinks",
+          displayAs: "#Sinks",
+          score: 1
+        });
+      });
+
+      it("should filter out predictions that are above the score of 0.5",
+         function() {
+        let event = TestFixtures.makeGenericCalendarEvent({
+          predicted_labels: [{
+            label: TestFixtures.team1Labels[0],
+            label_norm: TestFixtures
+              .normalizeLabel(TestFixtures.team1Labels[0]),
+            score: 0.8
+          }, {
+            label: TestFixtures.team1Labels[1],
+            label_norm: TestFixtures
+              .normalizeLabel(TestFixtures.team1Labels[1]),
+            score: 0.4
+          }, {
+            label: TestFixtures.team1Labels[2],
+            label_norm: TestFixtures
+              .normalizeLabel(TestFixtures.team1Labels[2]),
+            score: 0.5
+          }]
+        });
+
+        let teamEvent = asTeamEvent(TestFixtures.teamId1, event);
+        expect(teamEvent.labelScores.isSome()).toBe(true);
+
+        let labelScores = teamEvent.labelScores.unwrap();
+        expect(labelScores.length).toEqual(2);
+        expect(labelScores).toContain({
+          id: TestFixtures.normalizeLabel(TestFixtures.team1Labels[0]),
+          displayAs: TestFixtures.team1Labels[0],
+          // 0.8 * 0.95 (PREDICTED_LABEL_MODIFIER)
+          score: 0.76
+        });
+        expect(labelScores).toContain({
+          id: TestFixtures.normalizeLabel(TestFixtures.team1Labels[2]),
+          displayAs: TestFixtures.team1Labels[2],
+          // 0.5 * 0.95 (PREDICTED_LABEL_MODIFIER)
+          score: 0.475
+        });
+      });
+    });
+
     describe("overlapsDate", function() {
       var date = new Date(2016, 0, 2); // Jan 2
 

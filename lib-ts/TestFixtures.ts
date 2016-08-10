@@ -34,7 +34,7 @@ module Esper.TestFixtures {
   export var groupId = "group-id";
 
   // Stub normalization function for tests
-  function normalizeLabel(label: string) {
+  export function normalizeLabel(label: string) {
     return label.trim().toLowerCase();
   }
 
@@ -171,11 +171,15 @@ module Esper.TestFixtures {
   }
 
   export function makeGenericCalendarEvent(props: {
-    start?: string,
-    end?: string,
-    id?: string,
-    calendar_id?: string,
-    guests?: ApiT.Attendee[],
+    start?: string;
+    end?: string;
+    id?: string;
+    calendar_id?: string;
+    guests?: ApiT.Attendee[];
+    hashtags?: ApiT.HashtagState[];
+    labels?: string[];
+    labels_norm?: string[];
+    predicted_labels?: ApiT.PredictedLabel[];
     recurring_event_id?: string;
     transparent?: boolean;
     feedback?: ApiT.EventFeedback;
@@ -187,8 +191,6 @@ module Esper.TestFixtures {
       end: "2016-03-02T13:14:17.000-08:00",
       title: "Event",
       all_day: false,
-      labels: [],
-      labels_norm: [],
       hashtags: [],
       feedback: {},
       guests: [],
