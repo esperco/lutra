@@ -28,6 +28,34 @@ module Esper.ApiT {
     items: T[]
   }
 
+  export interface BatchHttpRequests<T> {
+    sequential?: boolean;
+    requests: HttpRequest<T>[];
+  }
+
+  export interface HttpRequest<T> {
+    request_method: HttpMethod;
+    request_uri: string; // including query if any
+    request_body?: T;
+  }
+
+  export type HttpMethod = 'DELETE'
+    | 'GET'
+    | 'HEAD'
+    | 'OPTIONS'
+    | 'PATCH'
+    | 'POST'
+    | 'PUT';
+
+  export interface BatchHttpResponses<T> {
+    responses: HttpResponse<T>[];
+  }
+
+  export interface HttpResponse<T> {
+    response_status: number; // HTTP status code
+    response_body: T;
+  }
+
   export interface ClientError {
     http_status_code: number; // 4xx
     error_message: string;
