@@ -5,6 +5,7 @@ module Esper.Components {
 
   interface Props {
     heading: JSX.Element|JSX.Element[]|string;
+    subheading?: JSX.Element|JSX.Element[]|string;
     progress: number; // 0 - 1
     busy?: boolean;
     disableNext?: boolean;
@@ -25,12 +26,20 @@ module Esper.Components {
         <div className="col-sm-offset-2 col-sm-8">
           <div className="panel panel-default onboarding-panel">
             <div className="panel-heading">
-              { this.props.backPath ?
-                <a className="action back-action" href={this.props.backPath}>
-                  <i className="fa fa-fw fa-arrow-circle-left" />
-                </a> : null
+              <h4 className="description-header">
+                { this.props.backPath ?
+                  <a className="action back-action" href={this.props.backPath}>
+                    <i className="fa fa-fw fa-arrow-circle-left" />
+                  </a> : null
+                }
+                { this.props.heading }
+              </h4>
+              {
+                this.props.subheading ?
+                <div className="description">
+                  { this.props.subheading }
+                </div> : null
               }
-              { this.props.heading }
             </div>
             <div className="panel-body">
               { this.props.children }
