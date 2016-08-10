@@ -36,15 +36,12 @@ module Esper.Views {
     }
 
     renderWithData() {
-      return <Components.OnboardingPanel heading={Text.TeamSetupHeading}
+      return <Components.OnboardingPanel heading={ Text.TeamSetupHeading }
+              subheading={ Text.TeamSetupDescription }
               progress={1/3} busy={this.state.busy}
               disableNext={!((this._selfForm && this.state.selfSelected) ||
                              this.state.execSelected)}
               onNext={() => this.onNext()}>
-        <div className="alert alert-info">
-          { Text.TeamSetupDescription }
-        </div>
-
         <div className="esper-section">
           <Components.Expando onOpen={() => this.onOpenSelf()}
             group={this._expandos}

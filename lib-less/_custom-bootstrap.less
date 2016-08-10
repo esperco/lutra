@@ -428,8 +428,11 @@ a {
   margin-bottom: @panel-body-padding;
 }
 
-.panel-heading {
+.modal-header, .panel-heading {
   text-transform: capitalize;
+  color: @shade-text;
+
+  h1, h2, h3, h4, h4, h6 { color: @shade-text-header; }
 }
 
 .panel {

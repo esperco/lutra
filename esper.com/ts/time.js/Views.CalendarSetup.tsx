@@ -36,15 +36,12 @@ module Esper.Views {
       });
 
       return <Components.OnboardingPanel heading={Text.CalendarSetupHeading}
-
-              progress={3/3} busy={busy}
+              subheading={ hasExec ?
+                Text.CalendarSetupExecDescription :
+                Text.CalendarSetupSelfDescription }
+              progress={2/3} busy={busy}
               backPath={Paths.Time.teamSetup().href}
               onNext={() => this.onNext()}>
-        <div className="alert alert-info">
-          { hasExec ?
-            Text.CalendarSetupExecDescription :
-            Text.CalendarSetupSelfDescription }
-        </div>
 
         <Components.OnboardingTeams
           ref={(c) => this._onboardingExpandos = c}
