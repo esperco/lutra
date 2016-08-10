@@ -55,12 +55,52 @@ module Esper.JsonHttp {
   /*
     Used to determine whether an JSON error should be ignored
   */
-  function ignoreError(xhr: JQueryXHR): boolean {
-    if (xhr.responseText.indexOf("Please log in with Google") >= 0) {
+  function ignoreError(code: number, respBody: string): boolean {
+    if (code === 0) {
+      return true;
+    }
+    if (respBody && respBody.indexOf("Please log in with Google") >= 0) {
       return true;
     }
     return false;
   }
+
+  /*
+    Error logging helper
+  */
+  interface AjaxError {
+    code: number
+    textStatus: string;
+    method: string;
+    url: string;
+    reqBody: any;
+    respBody: string;
+  }
+
+  function logError(details: AjaxError) {
+    if (ignoreError(details.code, details.respBody)) {
+      Log.w("Ignored error", details)
+    } else {
+      let body = details.respBody;
+      let errorMsg = body;
+      try {
+        let err = JSON.parse(body);
+        if (isClientError(err)) {
+          errorMsg = err.error_message;
+        }
+      } catch (err) { /* Ignore */ }
+      Log.e(`${details.code} ${errorMsg}`, details);
+    }
+  }
+
+  function isClientError(e: any): e is ApiT.ClientError {
+    let typedError = e as ApiT.ClientError;
+    return !_.isUndefined(typedError) &&
+      !!_.isNumber(typedError.http_status_code) &&
+      !!_.isString(typedError.error_message);
+  }
+
+
 
   /** Executes an http request using our standard authentication,
    *  logging and error handling. Can have a custom (ie non-JSON)
@@ -73,12 +113,12 @@ module Esper.JsonHttp {
    *  processData controls whether the body is converted to a query
    *  string. It is true by default.
    */
-  function httpRequest(method: string,
-                       path: string,
-                       body: string,
-                       dataType: string,
-                       contentType: string,
-                       processData = true) {
+  export function httpRequest(method: string,
+                              path: string,
+                              body: string,
+                              dataType: string,
+                              contentType: string,
+                              processData = true) {
     var id = Util.randomString();
 
     var contentTypeJQ : any = contentType == "" ? false : contentType;
@@ -93,38 +133,6 @@ module Esper.JsonHttp {
             + " " + path
             + " [" + latency + "s]",
             truncatedBody);
-    }
-
-    function logError(xhr: JQueryXHR, textStatus: string, err: Error) {
-      var details = {
-        code: xhr.status,
-        textStatus: textStatus,
-        method: method,
-        url: path,
-        reqBody: body,
-        respBody: xhr.responseText
-      };
-      if (details.code === 0 || ignoreError(xhr)) {
-        Log.w("Ignored error", details)
-      } else {
-        switch (xhr.status) {
-          case 400:
-            Log.e("Bad request", details);
-            break;
-          case 401:
-            Log.e("Unauthorized", details);
-            break;
-          case 404:
-            Log.e("Not found", details);
-            break;
-          case 500: /* Server error */
-            Log.e("Server error", details);
-            break;
-          default: /* Fallback */
-            Log.e("Unknown error " + xhr.status, details);
-            break;
-        }
-      }
     }
 
     /*
@@ -149,7 +157,16 @@ module Esper.JsonHttp {
         logResponse(method, path, respBody, latency);
       });
     if (! suppressWarnings) {
-      ret = ret.fail(logError);
+      ret = ret.fail((xhr: JQueryXHR, textStatus: string) => {
+        logError({
+          code: xhr.status,
+          textStatus: textStatus,
+          method: method,
+          url: path,
+          reqBody: body,
+          respBody: xhr.responseText
+        });
+      });
     }
     return ret;
   }
@@ -157,38 +174,102 @@ module Esper.JsonHttp {
   /** Executes an HTTP request using our standard authentication and
    *  error handling and a JSON content type.
    */
-  function jsonHttp(method: string,
+  function jsonHttp(method: ApiT.HttpMethod,
                     path: string,
-                    body?: string,
-                    dataType = "json",
-                    contentType?: string) {
-    if (!contentType && body && body.length > 0) {
-      contentType = "application/json; charset=UTF-8";
+                    body?: any) {
+    // Batch, don't fire call.
+    if (insideBatch) {
+      let request: ApiT.HttpRequest<any> = {
+        request_method: method,
+        request_uri: path
+      };
+      if (body) {
+        request.request_body = body;
+      }
+      let index = batchQueue.length;
+      batchQueue.push(request);
+      return batchDfd.promise()
+        .then((success) => {
+          let response = success.responses[index];
+          let status = response && response.response_status;
+          if (status && ((status >= 200 && status < 300) || status === 304)) {
+            return response.response_body;
+          } else {
+            logError({
+              code: status,
+              textStatus: "error",
+              method: method,
+              url: path,
+              reqBody: body,
+              respBody: JSON.stringify(response.response_body)
+            });
+            return $.Deferred().reject({
+              status: status,
+              responseText: response.response_body
+            });
+          }
+        });
     }
 
-    return httpRequest(method, path, body, dataType, contentType);
+    // Normal, non-batch
+    var contentType = body ? "application/json; charset=UTF-8" : "";
+    return httpRequest(
+      method,
+      path,
+      JSON.stringify(body),
+      "json",
+      contentType);
   }
 
-  export function get(path: string, dataType?: string) {
-    return jsonHttp("GET", path, null, dataType);
+  // Track whether we're inside a batch sequence.
+  var insideBatch = false;
+
+  // Queue up batched requests
+  var batchQueue: ApiT.HttpRequest<any>[] = [];
+  var batchDfd: JQueryDeferred<ApiT.BatchHttpResponses<any>>;
+
+  export function batch(fn: () => void, batchPath: string) {
+    var topLevel = !insideBatch;
+    if (topLevel) {
+      insideBatch = true;
+      batchDfd = $.Deferred();
+    }
+
+    try {
+      fn();
+      if (topLevel) {
+        insideBatch = false;
+        return jsonHttp("POST", batchPath, {
+          requests: batchQueue
+        }).then(
+          (r) => batchDfd.resolve(r),
+          (e) => batchDfd.reject(e)
+        );
+      }
+    } finally {
+      if (topLevel) {
+        insideBatch = false;
+        batchQueue = [];
+      }
+    }
+  }
+
+  export function get(path: string) {
+    return jsonHttp("GET", path, null);
   }
 
   export function post(path: string,
-                       body?: string,
-                       dataType?: string,
-                       contentType?: string) {
-    return jsonHttp("POST", path, body, dataType, contentType);
+                       body?: any) {
+    return jsonHttp("POST", path, body);
   }
 
   export function put(path: string,
-                      body?: string,
-                      dataType?: string,
-                      contentType?: string) {
-    return jsonHttp("PUT", path, body, dataType, contentType);
+                      body?: any) {
+    return jsonHttp("PUT", path, body);
   }
 
-  export function delete_(path: string, dataType?: string) {
-    return jsonHttp("DELETE", path, null, dataType);
+  export function delete_(path: string) {
+    return jsonHttp("DELETE", path, null);
   }
 
   /*

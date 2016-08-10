@@ -81,23 +81,11 @@ module Esper.Components {
       if (_.isEmpty(events)) {
         return null;
       }
-      var needsConfirmation = !!_.find(events,
-        (e) => Stores.Events.needsConfirmation(e)
-      );
 
       return <div className="clearfix modal-footer">
-
         <button className="btn btn-primary form-control"
                 onClick={() => this.onNext(events)}>
-          {(() => {
-            if (needsConfirmation) {
-              return Text.ConfirmAllLabels;
-            }
-            if (this.hasMore()) {
-              return Text.MorePredictions;
-            }
-            return Text.ConfirmationDone
-          })()}
+          { Text.ConfirmAllLabels }
         </button>
       </div>;
     }
@@ -110,12 +98,9 @@ module Esper.Components {
     }
 
     onNext(events: Stores.Events.TeamEvent[]) {
-      var eventsToConfirm = _.filter(events,
-        (e) => Stores.Events.needsConfirmation(e)
-      );
       var nextIndices = this.nextIndices();
       var nextEvents = this.props.events.slice(nextIndices[0], nextIndices[1]);
-      Actions.EventLabels.confirm(eventsToConfirm, nextEvents);
+      Actions.EventLabels.confirm(events, nextEvents);
 
       if (this.hasMore()) {
         this.mutateState((s) => s.pageIndices = nextIndices);
@@ -135,7 +120,9 @@ module Esper.Components {
       var eventsToUpdate = _.filter(this.props.events,
         (e) => Stores.Events.needsConfirmation(e)
       );
-      Actions.EventLabels.confirm([], eventsToUpdate);
+      if (eventsToUpdate.length < this.props.events.length) {
+        Actions.EventLabels.confirm([], eventsToUpdate);
+      }
     }
 
     perPage() {
