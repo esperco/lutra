@@ -267,7 +267,7 @@ module Esper.ReactHelpers {
           none: () => "",
           some: (s) => s
         });
-      return React.createElement('span', value);
+      return React.createElement('span', {}, value);
     }
   }
 
