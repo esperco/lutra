@@ -153,7 +153,7 @@ module Esper.Components {
         btn.attr("id", btnId);
         btn.click(() => {
           Stores.Events.invalidate();
-          Route.nav.refreshOnce();
+          Route.nav.refresh();
         });
         container.prepend(btn);
       }

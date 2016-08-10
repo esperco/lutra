@@ -252,28 +252,30 @@ module Esper.Stores.Events {
           window_end: XDate.toString(end)
         });
 
-        EventsForDateStore.transactP(apiP, (apiP2) =>
-          EventStore.transactP(apiP2, (apiP3) => {
-            _.each(calIds, (calId) => _.each(dates, (d) => {
-              var dateP = apiP3.then((eventMap) => {
-                let calMap = eventMap[calId] || {};
-                let events = calMap[d.getTime().toString()] || [];
-                return Option.wrap(_.map(events,
-                  (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
-                    itemKey: {
-                      teamId: teamId,
-                      calId: e.calendarId,
-                      eventId: e.id
-                    },
-                    data: Option.some(e)
-                  })));
-              });
+        EventsForDateStore.transact(() =>
+          EventsForDateStore.transactP(apiP, (apiP2) =>
+            EventStore.transactP(apiP2, (apiP3) => {
+              _.each(calIds, (calId) => _.each(dates, (d) => {
+                var dateP = apiP3.then((eventMap) => {
+                  let calMap = eventMap[calId] || {};
+                  let events = calMap[d.getTime().toString()] || [];
+                  return Option.wrap(_.map(events,
+                    (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
+                      itemKey: {
+                        teamId: teamId,
+                        calId: e.calendarId,
+                        eventId: e.id
+                      },
+                      data: Option.some(e)
+                    })));
+                });
 
-              EventsForDateStore.batchFetch({
-                teamId: teamId, calId: calId, date: d
-              }, dateP);
-            }))
-          })
+                EventsForDateStore.batchFetch({
+                  teamId: teamId, calId: calId, date: d
+                }, dateP);
+              }))
+            })
+          )
         );
 
         return apiP.then(() => null);
