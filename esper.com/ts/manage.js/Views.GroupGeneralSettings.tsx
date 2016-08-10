@@ -62,32 +62,35 @@ module Esper.Views {
     }
 
     render() {
-      return <div className="panel panel-default">
-        <div className="panel-body">
-          { this.props.editable ?
-
-            <Components.ModalPanel
-              busy={this.props.busy}
-              error={this.props.error}
-              success={this.state.didSave &&
-                       !this.props.busy && !this.props.error}
-              onCancel={() => this.save()}
-              cancelText="Save">
-              <Components.GroupForm ref={(c) => this._form = c}
-                name={this.props.group.group_name}
-                groupid={this.props.group.groupid}
-                uid={Login.me()}
-                timezone={this.props.group.group_timezone}
-                onUpdate={this.delayedSave.bind(this)}
-                onSubmit={this.save.bind(this)}
-              />
-            </Components.ModalPanel> :
-
+      if (! this.props.editable) {
+        return <div className="panel panel-default">
+          <div className="panel-body">
             <span className="esper-input-align">
               { this.props.group.group_name }
             </span>
-          }
+          </div>
+        </div>;
+      }
+
+      return <div className="panel panel-default">
+        <div className="panel-body">
+          <Components.GroupForm ref={(c) => this._form = c}
+            name={this.props.group.group_name}
+            groupid={this.props.group.groupid}
+            uid={Login.me()}
+            timezone={this.props.group.group_timezone}
+            onUpdate={this.delayedSave.bind(this)}
+            onSubmit={this.save.bind(this)}
+          />
         </div>
+        <Components.ModalPanelFooter
+          busy={this.props.busy}
+          error={this.props.error}
+          success={this.state.didSave &&
+                   !this.props.busy && !this.props.error}
+          onCancel={() => this.save()}
+          cancelText="Save"
+        />
       </div>;
     }
 

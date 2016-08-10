@@ -3,10 +3,11 @@
   and completion buttons that can also be used outside of a modal
 */
 
+/// <reference path="./Types.ts" />
 /// <reference path="./Components.ErrorMsg.tsx" />
 
 module Esper.Components {
-  interface FooterProps {
+  export interface ModalPanelFooterProps {
     // Show spinner?
     busy?: boolean;
 
@@ -36,20 +37,7 @@ module Esper.Components {
     disableOK?: boolean;
   }
 
-  interface ModalPanelProps extends FooterProps {
-    className?: string;
-    children?: JSX.Element[];
-  }
-
-  export function ModalPanel(props: ModalPanelProps) {
-    return <div className={props.className}>
-      { props.error ? <Components.ErrorMsg /> : null }
-      { props.children }
-      { ModalPanelFooter(props) }
-    </div>;
-  }
-
-  function ModalPanelFooter(props: FooterProps) {
+  export function ModalPanelFooter(props: ModalPanelFooterProps) {
     if (!props.busy && !props.error && !props.onCancel && !props.onOK ) {
       return; // Don't show footer if nothing to show
     }

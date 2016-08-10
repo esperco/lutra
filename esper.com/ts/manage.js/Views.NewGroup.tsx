@@ -30,20 +30,20 @@ module Esper.Views {
                 { Text.AddGroupHeading }
               </div>
               <div className="panel-body">
-                <Components.ModalPanel
-                 busy={this.state.busy} disableOK={this.state.busy}
-                 okText="Save" onOK={() => this.save()}>
-                  <div className="alert alert-info text-center">
-                    { Text.GroupDescription }
-                  </div>
-                  <Components.NewGroupForm isAdmin={this.props.isAdmin}
-                    ref={(c) => this._groupForm = c}
-                    teams={Stores.Teams.all()}
-                    userCalendars={Stores.Calendars.listAllForUser()}
-                    onSubmit={() => this.save()}
-                  />
-                </Components.ModalPanel>
+                <div className="alert alert-info text-center">
+                  { Text.GroupDescription }
+                </div>
+                <Components.NewGroupForm isAdmin={this.props.isAdmin}
+                  ref={(c) => this._groupForm = c}
+                  teams={Stores.Teams.all()}
+                  userCalendars={Stores.Calendars.listAllForUser()}
+                  onSubmit={() => this.save()}
+                />
               </div>
+              <Components.ModalPanelFooter
+                busy={this.state.busy} disableOK={this.state.busy}
+                okText="Save" onOK={() => this.save()}
+              />
             </div>
           </div>
         </div>

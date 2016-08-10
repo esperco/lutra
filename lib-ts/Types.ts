@@ -17,6 +17,29 @@ module Esper.Types {
   }
 
 
+  /* Periods */ ///////////
+
+  export type Interval = 'week'|'month'|'quarter';
+  export interface SinglePeriod {
+    interval: Interval;
+    index: number;
+  }
+
+  export type CustomInterval = 'custom';
+  export type IntervalOrCustom = Interval|CustomInterval;
+  export interface CustomPeriod {
+    interval: CustomInterval;
+    start: number;    // Days since epoch (inclusive)
+    end: number;      // Days since epoch (inclusive)
+  }
+
+  export interface PeriodRange {
+    interval: Interval;
+    start: number;
+    end: number;
+  }
+
+
   /* Event Types */ //////////////////////////
 
   /*
@@ -34,7 +57,7 @@ module Esper.Types {
     title: string;
     description: string;
 
-    labelScores: Option.T<Labels.Label[]>;
+    labelScores: Option.T<Label[]>;
     hashtags: ApiT.HashtagState[];
 
     feedback: ApiT.EventFeedback;
@@ -136,7 +159,7 @@ module Esper.Types {
     should categorize or group this event
   */
   export interface Annotation {
-    event: Stores.Events.TeamEvent;
+    event: TeamEvent;
 
     /*
       Interface itself has no implied unit -- this can be seconds or people-
@@ -213,7 +236,7 @@ module Esper.Types {
   export interface ChartBaseOpts<T> {
     teamId: string;
     calIds: string[];
-    period: Period.Single|Period.Custom;
+    period: SinglePeriod|CustomPeriod;
     extra: ChartExtraOpts & T;
   }
 
@@ -245,7 +268,7 @@ module Esper.Types {
 
   // Data tied to a particular period of time
   export interface PeriodData<T> {
-    period: Period.Single|Period.Custom;
+    period: SinglePeriod|CustomPeriod;
     current: boolean; // Is this the "current" or active group?
     total: number; // Optional total for period (for unscheduled time)
     data: T;

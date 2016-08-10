@@ -1,26 +1,16 @@
 /*
   Helpers for representing a period of time as an absolute integer
 */
+
+/// <reference path="./Types.ts" />
+
 module Esper.Period {
-  export type Interval = 'week'|'month'|'quarter';
-  export interface Single {
-    interval: Interval;
-    index: number;
-  }
-
-  export type CustomInterval = 'custom';
-  export type IntervalOrCustom = Interval|CustomInterval;
-  export interface Custom {
-    interval: CustomInterval;
-    start: number;    // Days since epoch (inclusive)
-    end: number;      // Days since epoch (inclusive)
-  }
-
-  export interface Range {
-    interval: Interval;
-    start: number;
-    end: number;
-  }
+  export type Interval = Types.Interval;
+  export type Single = Types.SinglePeriod;
+  export type CustomInterval = Types.CustomInterval;
+  export type IntervalOrCustom = Types.IntervalOrCustom;
+  export type Custom = Types.CustomPeriod;
+  export type Range = Types.PeriodRange;
 
   /*
     The "0" period for each interval is the period which contains the epoch.

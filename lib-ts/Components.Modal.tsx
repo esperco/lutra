@@ -2,87 +2,40 @@
   Generic Bootstrap modal wrapper
 */
 
+/// <reference path="./Components.ModalPanel.tsx" />
 /// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface ModalProps {
-    title?: JSX.Element|string;
-    busy?: boolean;
-    icon?: string;
-    small?: boolean;
-    disableOk?: boolean;
-    dismissText?: string;
-    fixed?: boolean;
-    okText?: string;
-    showFooter?: boolean;
-    okOnClick?: () => void;
-    onHidden?: () => void;
+  /*
+    Use ModalBase to provide custom header / footer
+  */
+
+  interface ModalBaseProps {
     children?: JSX.Element[];
+    fixed?: boolean;
+    small?: boolean;
+    onHidden?: () => void;
   }
 
-  export class Modal extends Component<ModalProps, {}> {
-    _mounted: boolean;
+  export class ModalBase extends Component<ModalBaseProps, {}> {
+     _mounted: boolean;
 
     render() {
       return (<div className="modal fade"
                    data-backdrop={this.props.fixed ? 'static' : 'true'}>
         <div className={"modal-dialog" + (this.props.small ? " modal-sm" : "")}>
           <div className="modal-content">
-            {
-              this.props.title ?
-              <div className="modal-header">
-                <h4 className="modal-title">
-                  { this.props.fixed ? null :
-                    <span className="action close-action pull-right"
-                          data-dismiss="modal">
-                      <span aria-hidden="true">
-                        <i className="fa fa-fw fa-times" />
-                      </span>
-                    </span>
-                  }
-                  { this.props.icon ?
-                    <span>
-                      <i className={"fa fa-fw " + this.props.icon} />{" "}
-                    </span> : ""
-                  }
-                  {this.props.title}
-                </h4>
-              </div> : null
-            }
-            <div className="modal-body">
-              {this.props.children}
-            </div>
-            {
-              (this.props.showFooter || this.props.okOnClick) ?
-              <div className="modal-footer">
-                {
-                  this.props.busy ?
-                  <span className="esper-spinner"></span> :
-                  ""
-                }
-                { this.props.fixed ? null :
-                  <button type="button" className="btn btn-default"
-                      data-dismiss="modal">
-                    {this.props.dismissText || "Close"}
-                  </button>
-                }
-                {
-                  this.props.okOnClick ?
-                  <button type="button"
-                      disabled={this.props.disableOk}
-                      onClick={this.props.okOnClick}
-                      className="btn btn-primary">
-                    {this.props.okText || "OK"}
-                  </button> : ""
-                }
-              </div>: ""
-            }
+            { this.props.children }
           </div>
         </div>
       </div>);
+    }
+
+    close() {
+      this.jQuery().modal('hide');
     }
 
     componentDidMount() {
@@ -103,6 +56,127 @@ module Esper.Components {
     componentWillUnmount() {
       this._mounted = false;
       super.componentWillUnmount();
+    }
+  }
+
+
+  interface ModalHeaderProps {
+    fixed?: boolean;
+    icon?: string;
+    title: JSX.Element|string;
+  }
+
+  export function ModalHeader(props: ModalHeaderProps) {
+    return <div className="modal-header">
+      <h4 className="modal-title">
+        { props.fixed ? null :
+          <span className="action close-action pull-right"
+                data-dismiss="modal">
+            <span aria-hidden="true">
+              <i className="fa fa-fw fa-times" />
+            </span>
+          </span>
+        }
+        { props.icon ?
+          <span>
+            <i className={"fa fa-fw " + props.icon} />{" "}
+          </span> : ""
+        }
+        {props.title}
+      </h4>
+    </div>;
+  }
+
+
+  interface ModalFooterProps {
+    busy?: boolean;
+    fixed?: boolean;
+    dismissText?: string;
+    disableOk?: boolean;
+    okText?: string;
+    okOnClick?: () => void;
+  }
+
+  export function ModalFooter(props: ModalFooterProps) {
+    return <div className="modal-footer">
+      {
+        props.busy ?
+        <span className="esper-spinner"></span> :
+        ""
+      }
+      { props.fixed ? null :
+        <button type="button" className="btn btn-default"
+                data-dismiss="modal">
+          {props.dismissText || "Close"}
+        </button>
+      }
+      {
+        props.okOnClick ?
+        <button type="button"
+            disabled={props.disableOk}
+            onClick={props.okOnClick}
+            className="btn btn-primary">
+          {props.okText || "OK"}
+        </button> : ""
+      }
+    </div>;
+  }
+
+
+  /*
+    Use Modal component for standard header with icon + footer with spinner
+    and dismiss button
+  */
+
+  interface ModalProps extends ModalBaseProps, ModalHeaderProps {
+    footer?: ModalPanelFooterProps
+  }
+
+  export class Modal extends Component<ModalProps, {}> {
+    _modalBase: ModalBase;
+
+    render() {
+      return <ModalBase
+        ref={(c) => this._modalBase = c}
+        fixed={this.props.fixed}
+        small={this.props.small}
+        onHidden={this.props.onHidden}
+      >
+        {
+          this.props.title ?
+          <ModalHeader
+            title={this.props.title}
+            icon={this.props.icon}
+            fixed={this.props.fixed}
+          /> : null
+        }
+        <div className="modal-body">
+          {this.props.children}
+        </div>
+        { this.props.footer ? this.renderFooter() : null }
+      </ModalBase>;
+    }
+
+    renderFooter() {
+      // Wrap footer callbacks so they close modal
+      let footerProps = _.clone(this.props.footer);
+      if (footerProps.onCancel) {
+        let origFn = footerProps.onCancel;
+        footerProps.onCancel = () => {
+          this._modalBase.close();
+          origFn();
+        };
+      }
+
+      if (footerProps.onOK) {
+        let origFn = footerProps.onOK;
+        footerProps.onOK = () => {
+          this._modalBase.close();
+          origFn();
+        };
+      }
+
+      return React.createElement(ModalPanelFooter, footerProps);
     }
   }
 }

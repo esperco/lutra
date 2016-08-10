@@ -202,9 +202,7 @@ module Esper.Components {
         </div>;
       }
 
-      return <ModalPanel busy={busy} error={error} success={success}
-          okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
-          className="event-notes esper-panel-section">
+      return <div className="event-notes esper-panel-section">
         <div className="action"
              onClick={() => this.setState({ minimize: true })}>
           <label htmlFor={this.getId("notes")}>
@@ -229,7 +227,11 @@ module Esper.Components {
             onChange={(v) => this.notesChange(v)}
           />
         </div>
-      </ModalPanel>;
+        <ModalPanelFooter
+          busy={busy} error={error} success={success}
+          okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
+        />
+      </div>;
     }
 
     renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {
