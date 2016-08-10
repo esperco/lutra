@@ -46,10 +46,6 @@ module Esper.Containers {
       // Set up actions so that hitting "done" goes back to the list
       var backFn = () => Layout.renderModal(eventListModal(events));
       var labelFn = (event: Stores.Events.TeamEvent) => {
-
-        // Confirm before opening modal
-        Actions.EventLabels.confirm([event]);
-
         Layout.renderModal(
           eventEditorModal([event], {
             minFeedback: true,
@@ -112,10 +108,6 @@ module Esper.Containers {
         confirmListModal(events, currentPageStart)
       );
       var labelFn = (event: Stores.Events.TeamEvent) => {
-
-        // Confirm before opening modal
-        Actions.EventLabels.confirm([event]);
-
         // Record page number
         currentPageStart = listRef ? listRef.state.pageIndices[0] : 0;
 

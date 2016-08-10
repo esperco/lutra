@@ -208,9 +208,6 @@ module Esper.Views {
         selectedList = [Stores.Events.storeId(event)];
       }
 
-      // Confirm labels (clicking means user has seen label selection)
-      Actions.EventLabels.confirm([event]);
-
       // Set state to trigger display changes
       this.setState({
         selected: selectedList

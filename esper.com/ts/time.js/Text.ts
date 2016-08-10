@@ -100,10 +100,8 @@ module Esper.Text {
   export const ConfirmationDescription = `Hi there! We've made some guesses ` +
     `about which ${Labels} to apply to your events. Help us out by ` +
     `confirming changing those guesses below.`;
-  export const MorePredictions = `More`;
   export const PredictionsLoading = `Updating ` + _.capitalize(Labels);
-  export const ConfirmAllLabels = `Confirm All`;
-  export const ConfirmationDone = `Thanks! That's all for now.`;
+  export const ConfirmAllLabels = `Confirm ${_.capitalize(Labels)}`;
 
   // Chart Types
   export const ChartPercentage = `Percent`;

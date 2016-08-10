@@ -8,11 +8,15 @@
 module Esper.Actions.EventLabels {
 
   export function add(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { addLabels: [label] });
+    apply(events, {
+      addLabels: [label]
+    });
   }
 
   export function remove(events: Stores.Events.TeamEvent[], label: string) {
-    apply(events, { removeLabels: [label] });
+    apply(events, {
+      removeLabels: [label],
+    });
   }
 
   // Confirm any predicted labels
@@ -47,7 +51,7 @@ module Esper.Actions.EventLabels {
   function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: string[];
     removeLabels?: string[];
-    fetchEvents?: Stores.Events.TeamEvent[];
+    fetchEvents?: Types.TeamEvent[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
     var fetchEventsByTeamId = _.groupBy(opts.fetchEvents, (e) => e.teamId);
@@ -59,14 +63,15 @@ module Esper.Actions.EventLabels {
 
     _.each(teamIds, (teamId) => {
       var teamEvents = eventsByTeamId[teamId] || [];
-      var fetchEvents = fetchEventsByTeamId[teamId] || [];
+      var teamFetchEvents = opts.fetchEvents ?
+        fetchEventsByTeamId[teamId] || [] : null;
       applyForTeam(teamId, teamEvents, {
         addLabels: opts.addLabels,
         removeLabels: opts.removeLabels,
-        fetchEvents: fetchEvents
+        fetchEvents: teamFetchEvents
       });
 
-      // Only fire analytics call if add/remove, not if confirming
+      // Fire different analytics calls if add/remove vs. confirming
       if (opts.addLabels || opts.removeLabels) {
         Analytics.track(Analytics.Trackable.EditEventLabels, {
           numEvents: teamEvents.length,
@@ -85,7 +90,7 @@ module Esper.Actions.EventLabels {
     opts: {
       addLabels?: string[];
       removeLabels?: string[];
-      fetchEvents?: Stores.Events.TeamEvent[];
+      fetchEvents?: Types.TeamEvent[];
     })
   {
     // Include recurring events
@@ -127,7 +132,9 @@ module Esper.Actions.EventLabels {
     var p = TeamLabelQueue.enqueue(teamId, {
       teamId: teamId,
       events: apiEvents,
-      fetchEventIds: _.map(opts.fetchEvents, (e) => e.id)
+      fetchEventIds: Option.wrap(opts.fetchEvents).flatMap(
+        (events) => Option.some( _.map(events, (e) => e.id) )
+      )
     });
 
     // Wrap the whole kaboodle in a transaction
@@ -202,7 +209,13 @@ module Esper.Actions.EventLabels {
   interface QueueRequest {
     teamId: string;
     events: Stores.Events.TeamEvent[];
-    fetchEventIds: string[];
+
+    /*
+      Option.some => update model and fetch more events
+        (if events is empty, just update model)
+      Option.none => update labels but not models
+    */
+    fetchEventIds: Option.T<string[]>;
   };
 
   var TeamLabelQueue = new Queue2.Processor(
@@ -230,22 +243,39 @@ module Esper.Actions.EventLabels {
           .compact()
           .value();
 
-      var p = Api.setPredictLabels(r.teamId, {
-        set_labels: _.map(r.events, (e) => ({
-          id: e.recurringEventId || e.id,
-          labels: e.labelScores.match({
-            none: (): string[] => [],
-            some: (scores) =>
-              _(scores)
-                .filter(
-                  (s) => !_.some(e.hashtags,
-                    (h) => h.label_norm === s.id ||
-                           h.hashtag_norm === s.id))
-                .map((s) => s.displayAs)
-                .value()
-          })
-        })),
-        predict_labels: r.fetchEventIds
+      var p = r.fetchEventIds.match({
+
+        // Just update labels without touching model
+        none: () => Api.batch(() => {
+          _.each(r.events, (e) => {
+            e.labelScores.match({
+              none: () => null,
+              some: (labels) => Api.updateEventLabels(
+                r.teamId, e.recurringEventId || e.id,
+                _.map(labels, (l) => l.displayAs)
+              )
+            });
+          });
+        }).then((): ApiT.GenericCalendarEvents => ({ events: [] })),
+
+        // Updating model, fetch new predictions
+        some: (eventIds) => Api.setPredictLabels(r.teamId, {
+          set_labels: _.map(r.events, (e) => ({
+            id: e.recurringEventId || e.id,
+            labels: e.labelScores.match({
+              none: (): string[] => [],
+              some: (scores) =>
+                _(scores)
+                  .filter(
+                    (s) => !_.some(e.hashtags,
+                      (h) => h.label_norm === s.id ||
+                             h.hashtag_norm === s.id))
+                  .map((s) => s.displayAs)
+                  .value()
+            })
+          })),
+          predict_labels: eventIds
+        })
       });
 
       return Util.when(promises).then(() => p);
@@ -263,9 +293,23 @@ module Esper.Actions.EventLabels {
           next.events = _.uniqBy(r.events.concat(next.events),
             (e) => e.recurringEventId || e.id
           );
-          next.fetchEventIds = _.uniq(
-            next.fetchEventIds.concat(r.fetchEventIds)
-          );
+
+          /*
+            Concat confirmations. If updating model for any, then update model
+            for all.
+          */
+          next.fetchEventIds = next.fetchEventIds.match({
+            none: () => r.fetchEventIds.match({
+              none: () => Option.none<any>(),
+              some: (rIds) => Option.some(rIds)
+            }),
+
+            some: (nextIds) => r.fetchEventIds.match({
+              none: () => Option.some(nextIds),
+              some: (rIds) => Option.some( _.uniq(nextIds.concat(rIds)) )
+            })
+          });
+
           return false;
         }
         return true;
