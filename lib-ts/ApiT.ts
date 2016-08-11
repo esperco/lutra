@@ -10,7 +10,7 @@ module Esper.ApiT {
   type uid = string;
   type email = string;
 
-  type ErrorDetails = Variant.Variant;
+  export type ErrorDetails = Variant.Variant;
     /*
       See wolverine/types/error_details.atd for the different possible cases.
     */

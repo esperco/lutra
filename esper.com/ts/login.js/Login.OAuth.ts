@@ -4,6 +4,7 @@
 
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
+/// <reference path="../lib/Errors.ts" />
 /// <reference path="../lib/LocalStore.ts" />
 /// <reference path="../lib/Util.ts" />
 /// <reference path="../lib/Login.Web.ts" />
@@ -131,11 +132,15 @@ module Esper.Login {
         $.when(analyticsP1.promise, analyticsP2.promise).always(function() {
           location.href = x.url;
         });
-      }, function(xhr: JQueryXHR) {
-        if (xhr.responseText && xhr.responseText.indexOf('Google') >= 0) {
+      }, function(err: JsonHttp.AjaxError) {
+        let useGoogle = Errors.handle(err.errorDetails, {
+          Use_google_oauth: () => true,
+          default: () => false
+        });
+        if (useGoogle) {
           return loginWithGoogle(opts);
         } else {
-          return xhr;
+          return err;
         }
       });
   }

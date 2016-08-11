@@ -199,7 +199,7 @@ module Esper.Login {
     }
   }
 
-  function onLoginFailure(err?: JQueryXHR) {
+  function onLoginFailure(err?: JsonHttp.AjaxError) {
     goToLogin({error: "login_error"});
   }
 

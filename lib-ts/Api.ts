@@ -14,6 +14,8 @@ module Esper.Api {
   // Can change prefix in init code depending on where API server is
   export var prefix = "";
 
+  type JsonPromise<T> = JsonHttp.Promise<T>;
+
   // Initialize defaults depending on whether we're in production mode
   if (Esper.PRODUCTION) {
     prefix = "https://app.esper.com";
@@ -54,25 +56,25 @@ module Esper.Api {
   /* Esper login and password management */
 
   export function getLoginInfo():
-  JQueryPromise<ApiT.LoginResponse> {
+  JsonPromise<ApiT.LoginResponse> {
     var url = prefix + "/api/login/" + string(Login.myUid()) + "/info";
     return JsonHttp.get(url);
   }
 
   export function loginAs(theirEmail: string):
-    JQueryPromise<ApiT.LoginResponse> {
+    JsonPromise<ApiT.LoginResponse> {
     return JsonHttp.get(prefix + "/api/login-as/" + string(Login.me())
       + "/" + string(theirEmail));
   }
 
   export function loginOnce(uid: string, loginNonce: string):
-    JQueryPromise<ApiT.LoginResponse> {
+    JsonPromise<ApiT.LoginResponse> {
     return JsonHttp.post(prefix + "/api/login/" + string(uid)
       + "/once/" + string(loginNonce),
       "");
   }
 
-  export function deactivate(uid?: string): JQueryPromise<void> {
+  export function deactivate(uid?: string): JsonPromise<void> {
     uid = uid || Login.myUid();
     return JsonHttp.post(
       prefix + `/api/deactivate/${Login.myUid()}/${uid}`,
@@ -80,30 +82,30 @@ module Esper.Api {
   }
 
   export function random():
-    JQueryPromise<ApiT.Random> {
+    JsonPromise<ApiT.Random> {
     return JsonHttp.post(prefix + "/api/random");
   }
 
   /*** Esper team management ***/
 
   export function getTeamForExec(email: string):
-    JQueryPromise<ApiT.TeamOption> {
+    JsonPromise<ApiT.TeamOption> {
     return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
       + "/email/" + string(email));
   }
 
-  export function getTeam(teamId: string): JQueryPromise<ApiT.Team> {
+  export function getTeam(teamId: string): JsonPromise<ApiT.Team> {
     return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
       + "/" + string(teamId));
   }
 
-  export function deactivateTeam(teamId: string): JQueryPromise<void> {
+  export function deactivateTeam(teamId: string): JsonPromise<void> {
     return JsonHttp.post(prefix + "/api/deactivate-team/" +
       string(Login.myUid()) + "/" + string(teamId));
   }
 
   export function inviteCreateTeam():
-    JQueryPromise<ApiT.UrlResult> {
+    JsonPromise<ApiT.UrlResult> {
     var fromUid = Login.me();
     var invite = { from_uid: fromUid };
     return JsonHttp.post(prefix + "/api/invite/" + string(fromUid) +
@@ -111,13 +113,13 @@ module Esper.Api {
   }
 
   export function inviteJoinTeam(invite: ApiT.InviteJoinTeam):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     return JsonHttp.post(prefix + "/api/invite/" + string(Login.me()) +
       "/join-team", invite);
   }
 
   export function setTeamName(teamid: string, name: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var fromUid = Login.me();
     return JsonHttp.put(prefix + "/api/team-name/" + string(fromUid)
       + "/" + string(teamid)
@@ -125,13 +127,13 @@ module Esper.Api {
       "");
   }
 
-  export function approveTeam(teamid: string): JQueryPromise<void> {
+  export function approveTeam(teamid: string): JsonPromise<void> {
     return JsonHttp.put(prefix + "/api/team-approve/" + string(Login.me()) +
       "/" + string(teamid) + "/true");
   }
 
   export function setTeamOwner(teamid: string, uid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     return JsonHttp.put(prefix + "/api/team-owner/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(uid),
@@ -139,7 +141,7 @@ module Esper.Api {
   }
 
   export function setTeamCalUser(teamid: string, uid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     return JsonHttp.put(prefix + "/api/team-cal-user/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(uid),
@@ -148,7 +150,7 @@ module Esper.Api {
 
   // restricted to admins and executive themselves
   export function addAssistant(teamid: string, uid: string):
-    JQueryPromise<ApiT.Team> {
+    JsonPromise<ApiT.Team> {
     return JsonHttp.put(prefix + "/api/team-assistant/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(uid),
@@ -156,7 +158,7 @@ module Esper.Api {
   }
 
   export function removeAssistant(teamid: string, memberUid: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     return JsonHttp.delete_(prefix + "/api/team/" + string(Login.me())
       + "/" + string(teamid)
@@ -166,7 +168,7 @@ module Esper.Api {
   /***** Esper group management *****/
 
   export function getGroups(teamid: string):
-    JQueryPromise<ApiT.GroupList>
+    JsonPromise<ApiT.GroupList>
   {
     var url = `${prefix}/api/group/team/${string(Login.me())}`
       + `/${string(teamid)}`;
@@ -176,7 +178,7 @@ module Esper.Api {
   export function getGroupsByUid(uid: string, opts: {
       withMembers?: boolean,
       withLabels?: boolean
-    }): JQueryPromise<ApiT.GroupList>
+    }): JsonPromise<ApiT.GroupList>
   {
     var query = opts.withMembers || opts.withLabels ? "?" : "";
     var membersParam = opts.withMembers ? "members=true" : "";
@@ -193,7 +195,7 @@ module Esper.Api {
   export function getGroupDetails(groupid: string, opts: {
       withMembers?: boolean,
       withLabels?: boolean
-    } = {}): JQueryPromise<ApiT.Group>
+    } = {}): JsonPromise<ApiT.Group>
   {
     var query = opts.withMembers || opts.withLabels ? "?" : "";
     var membersParam = opts.withMembers ? "members=true" : "";
@@ -207,7 +209,7 @@ module Esper.Api {
   }
 
   export function createGroup(uid: string, groupUpdate: ApiT.GroupUpdate):
-    JQueryPromise<ApiT.Group>
+    JsonPromise<ApiT.Group>
   {
     var url = prefix + "/api/group/create/" + string(Login.me())
       + "/" + string(uid);
@@ -215,7 +217,7 @@ module Esper.Api {
   }
 
   export function renameGroup(groupid: string, groupName: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/group-name/" + string(Login.me())
       + "/" + string(groupid)
@@ -224,7 +226,7 @@ module Esper.Api {
   }
 
   export function deleteGroup(groupid: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/delete/" + string(Login.me())
       + "/" + string(groupid);
@@ -232,7 +234,7 @@ module Esper.Api {
   }
 
   export function putGroupTimezone(groupid: string, timezone: string):
-    JQueryPromise<ApiT.Group>
+    JsonPromise<ApiT.Group>
   {
     var url = `${prefix}/api/group/timezone/${string(Login.me())}/`
       + `${string(groupid)}/${encodeURIComponent(string(timezone))}`;
@@ -240,7 +242,7 @@ module Esper.Api {
   }
 
   export function putGroupMember(groupid: string, teamid: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/member/" + string(Login.me())
       + "/" + string(groupid)
@@ -249,7 +251,7 @@ module Esper.Api {
   }
 
   export function removeGroupMember(groupid: string, teamid: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/member/" + string(Login.me())
       + "/" + string(groupid)
@@ -260,7 +262,7 @@ module Esper.Api {
   export function putGroupIndividual(groupid: string, uid: string, opts: {
     role?: string,
     resendNotif?: boolean
-  } = {}): JQueryPromise<ApiT.GroupIndividual>
+  } = {}): JsonPromise<ApiT.GroupIndividual>
   {
     var query = opts.role || opts.resendNotif ? "?" : "";
     var roleParam = opts.role ? "role=" + opts.role : "";
@@ -276,7 +278,7 @@ module Esper.Api {
   }
 
   export function removeGroupIndividual(groupid: string, uid: string):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/individual-member/" + string(Login.me())
       + "/" + string(groupid)
@@ -288,7 +290,7 @@ module Esper.Api {
     role?: string,
     resendNotif?: boolean
   } = {}):
-    JQueryPromise<ApiT.GroupIndividual>
+    JsonPromise<ApiT.GroupIndividual>
   {
     var query = opts.role || opts.resendNotif ? "?" : "";
     var roleParam = opts.role ? "role=" + opts.role : "";
@@ -304,7 +306,7 @@ module Esper.Api {
   }
 
   export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
-    JQueryPromise<void>
+    JsonPromise<void>
   {
     var url = prefix + "/api/group/event-labels/" + string(Login.me())
       + "/" + string(groupid);
@@ -312,14 +314,14 @@ module Esper.Api {
   }
 
   export function getAllGroupPrefs():
-    JQueryPromise<ApiT.GroupPreferencesList>
+    JsonPromise<ApiT.GroupPreferencesList>
   {
     var url = `${prefix}/api/group/preferences-all/${Login.me()}`;
     return JsonHttp.get(url);
   }
 
   export function getGroupPreferences(groupid: string):
-    JQueryPromise<ApiT.GroupPreferences>
+    JsonPromise<ApiT.GroupPreferences>
   {
     var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
     return JsonHttp.get(url);
@@ -328,19 +330,19 @@ module Esper.Api {
   export function putGroupPreferences(
     groupid: string,
     prefs: ApiT.GroupPreferences
-  ): JQueryPromise<void> {
+  ): JsonPromise<void> {
     var url = `${prefix}/api/group/preferences/${Login.me()}/${groupid}`;
     return JsonHttp.put(url, prefs);
   }
 
   /***** Opaque URLs with unique token *****/
 
-  export function getToken(token: string): JQueryPromise<ApiT.TokenInfo> {
+  export function getToken(token: string): JsonPromise<ApiT.TokenInfo> {
     return JsonHttp.get(prefix + "/api/token/" +
       encodeURIComponent(string(token)));
   }
 
-  export function postToken(token: string): JQueryPromise<ApiT.TokenResponse> {
+  export function postToken(token: string): JsonPromise<ApiT.TokenResponse> {
     return JsonHttp.noWarn(function() {
       return JsonHttp.post(prefix + "/api/token/"
                            + encodeURIComponent(string(token)));
@@ -348,7 +350,7 @@ module Esper.Api {
   }
 
   export function postTokenEmail(token: string, email: string, name: string):
-    JQueryPromise<ApiT.TokenResponse> {
+    JsonPromise<ApiT.TokenResponse> {
     var path = prefix +
       "/api/token-email/" + encodeURIComponent(string(token))
       + "/" + encodeURIComponent(string(email))
@@ -363,7 +365,7 @@ module Esper.Api {
     optLoginNonce: string,
     optInvite: string,
     optEmail: string,
-    optGmail?: boolean): JQueryPromise<ApiT.UrlResult>
+    optGmail?: boolean): JsonPromise<ApiT.UrlResult>
   {
     var url = prefix + "/api/google-auth-url";
     var q: string[] = [];
@@ -383,7 +385,7 @@ module Esper.Api {
   }
 
   export function getGoogleAuthUrlForTeam(uid: string, teamid: string,
-    optAuthLandingUrl: string): JQueryPromise<ApiT.UrlResult>
+    optAuthLandingUrl: string): JsonPromise<ApiT.UrlResult>
   {
     var url = prefix + "/api/google-auth-url/" + string(uid) + "/" +
       string(teamid);
@@ -395,7 +397,7 @@ module Esper.Api {
   }
 
   export function getGoogleAuthInfo(optAuthLandingUrl: string):
-    JQueryPromise<ApiT.GoogleAuthInfo>
+    JsonPromise<ApiT.GoogleAuthInfo>
   {
     var url = prefix + "/api/google/" + string(Login.me()) + "/auth/info";
     if (_.isString(optAuthLandingUrl)) {
@@ -405,7 +407,7 @@ module Esper.Api {
   }
 
   export function postGoogleAuthRevoke():
-    JQueryPromise<any>
+    JsonPromise<any>
   {
     var url = prefix + "/api/google/" + string(Login.me()) + "/auth/revoke";
     return JsonHttp.post(url);
@@ -416,7 +418,7 @@ module Esper.Api {
                                    nonce: string,
                                    landing_url: string,
                                    invite?: string):
-    JQueryPromise<ApiT.UrlResult> {
+    JsonPromise<ApiT.UrlResult> {
       var inviteParam = invite ? "&invite=" + invite : "";
       var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
         "?nonce=" + encodeURIComponent(nonce) +
@@ -427,7 +429,7 @@ module Esper.Api {
 
   /***** Slack *****/
   export function getSlackAuthInfo(teamid: string):
-  JQueryPromise<ApiT.SlackAuthInfo> {
+  JsonPromise<ApiT.SlackAuthInfo> {
     var url = prefix + "/api/slack/auth-info/" + string(Login.me())
             + "/" + encodeURIComponent(string(teamid));
     return JsonHttp.get(url);
@@ -436,14 +438,14 @@ module Esper.Api {
   /***** Team label syncing *****/
 
   export function getSyncedLabels(teamid: string):
-    JQueryPromise<ApiT.Labels> {
+    JsonPromise<ApiT.Labels> {
     var url = prefix + "/api/team/labels/" + string(Login.me()) +
       "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function putSyncedLabels(teamid: string, labels: {labels: string[]}):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/team/labels/" + string(Login.me()) +
       "/" + string(teamid);
     return JsonHttp.put(url, labels);
@@ -452,7 +454,7 @@ module Esper.Api {
   /***** Google profile information *****/
 
   export function getGoogleEmail(myUID: string, theirUID: string,
-    teamid: string): JQueryPromise<ApiT.AccountEmail>
+    teamid: string): JsonPromise<ApiT.AccountEmail>
   {
     var url = prefix +
       "/api/google/email/" + string(myUID)
@@ -462,7 +464,7 @@ module Esper.Api {
   }
 
   export function getProfile(uid: string, teamid: string):
-    JQueryPromise<ApiT.Profile> {
+    JsonPromise<ApiT.Profile> {
     var url =
       prefix + "/api/profile/" + string(Login.myUid())
       + "/" + string(uid)
@@ -471,7 +473,7 @@ module Esper.Api {
   }
 
   export function getAllTeamProfiles():
-  JQueryPromise<ApiT.ProfileList> {
+  JsonPromise<ApiT.ProfileList> {
     var url =
       prefix + "/api/profile/" + string(Login.myUid());
     return JsonHttp.get(url);
@@ -480,13 +482,13 @@ module Esper.Api {
   // Alias used in Otter
   export var getAllProfiles = getAllTeamProfiles;
 
-  export function getMyProfile(): JQueryPromise<ApiT.Profile> {
+  export function getMyProfile(): JsonPromise<ApiT.Profile> {
     var url = prefix + "/api/profile/" + string(Login.myUid()) + "/me";
     return JsonHttp.get(url);
   }
 
   export function putTeamEmails(teamid: string, aliases: ApiT.EmailAddresses):
-    JQueryPromise<ApiT.EmailAddresses> {
+    JsonPromise<ApiT.EmailAddresses> {
     var url = prefix + "api/team/" + string(Login.myUid())
       + "/" + string(teamid) + "/emails";
     return JsonHttp.put(url, aliases);
@@ -494,20 +496,20 @@ module Esper.Api {
 
   // supports generic calendar
   export function getGenericCalendarList(teamid: string):
-    JQueryPromise<ApiT.GenericCalendars> {
+    JsonPromise<ApiT.GenericCalendars> {
     var url = prefix + "/api/ts/calendars/" + string(Login.myUid())
             + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function getGenericCalendarListOfUser():
-    JQueryPromise<ApiT.GenericCalendars> {
+    JsonPromise<ApiT.GenericCalendars> {
     var url = prefix + "/api/ts/calendars/" + string(Login.myUid());
     return JsonHttp.get(url);
   }
 
   export function getTimestatsCalendarList(teamid: string):
-    JQueryPromise<ApiT.GenericCalendars> {
+    JsonPromise<ApiT.GenericCalendars> {
     var url = prefix + "/api/ts/ts-calendars/" + string(Login.myUid())
             + "/" + string(teamid);
     return JsonHttp.get(url);
@@ -516,7 +518,7 @@ module Esper.Api {
   // supports generic calendar
   export function postForGenericCalendarEvents(teamid: string, calid: string,
     q: ApiT.CalendarRequest):
-    JQueryPromise<ApiT.GenericCalendarEvents> {
+    JsonPromise<ApiT.GenericCalendarEvents> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid));
@@ -524,7 +526,7 @@ module Esper.Api {
   }
 
   export function postForTeamEvents(teamId: string, q: ApiT.CalendarRequest):
-    JQueryPromise<ApiT.GenericCalendarEventsCollection>
+    JsonPromise<ApiT.GenericCalendarEventsCollection>
   {
     var url = prefix + "/api/ts/events-team/" + string(Login.myUid())
             + "/" + string(teamId);
@@ -532,7 +534,7 @@ module Esper.Api {
   }
 
   export function getGenericEvent(teamid:string, calid:string, eventid:string):
-  JQueryPromise<ApiT.GenericCalendarEvent> {
+  JsonPromise<ApiT.GenericCalendarEvent> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
             + "/" + encodeURIComponent(string(calid))
@@ -544,7 +546,7 @@ module Esper.Api {
   export function postForCalendarEventsCSV(teamid: string,
     calid: string,
     q: ApiT.CalendarRequest):
-    JQueryPromise<string> {
+    JsonPromise<string> {
     var url = prefix + "/api/calendar/events/csv/" + string(Login.myUid())
       + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
     return JsonHttp.httpRequest("POST", url,
@@ -556,21 +558,21 @@ module Esper.Api {
 
   // supports generic calendar
   export function postForCalendarStats(teamid: string, calid: string,
-    q: ApiT.CalendarStatsRequest): JQueryPromise<ApiT.CalendarStatsResult> {
+    q: ApiT.CalendarStatsRequest): JsonPromise<ApiT.CalendarStatsResult> {
     var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
       + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
     return JsonHttp.post(url, q);
   }
 
   export function postForDailyStats(q: ApiT.DailyStatsRequest)
-    : JQueryPromise<ApiT.DailyStatsResponse>
+    : JsonPromise<ApiT.DailyStatsResponse>
   {
     var url = prefix + "/api/calendar/daily-stats/" + string(Login.myUid());
     return JsonHttp.post(url, q);
   }
 
   export function postEventFeedback(teamid: string, eventid: string,
-    feedback: ApiT.EventFeedback): JQueryPromise<ApiT.EventFeedback>
+    feedback: ApiT.EventFeedback): JsonPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))
@@ -580,7 +582,7 @@ module Esper.Api {
 
   export function postEventFeedbackAction(teamid: string, calid: string,
     eventid: string, action: ApiT.EventFeedbackAction)
-    : JQueryPromise<ApiT.EventFeedback>
+    : JsonPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))
@@ -591,14 +593,14 @@ module Esper.Api {
   }
 
   export function getAllPreferences():
-  JQueryPromise<ApiT.PreferencesList> {
+  JsonPromise<ApiT.PreferencesList> {
     var url =
       prefix + "/api/preferences/" + string(Login.myUid());
     return JsonHttp.get(url);
   }
 
   export function getPreferences(teamid: string):
-  JQueryPromise<ApiT.Preferences> {
+  JsonPromise<ApiT.Preferences> {
     var url =
       prefix + "/api/preferences/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -606,7 +608,7 @@ module Esper.Api {
   }
 
   export function putPreferences(teamid: string, prefs: ApiT.Preferences):
-  JQueryPromise<void> {
+  JsonPromise<void> {
     var url =
       prefix + "/api/preferences/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -614,7 +616,7 @@ module Esper.Api {
   }
 
   export function setGeneralPreferences(teamid: string,
-    general_prefs: ApiT.GeneralPrefsOpts): JQueryPromise<void>
+    general_prefs: ApiT.GeneralPrefsOpts): JsonPromise<void>
   {
       var url =
           prefix + "/api/preferences/general/" + string(Login.myUid())
@@ -630,7 +632,7 @@ module Esper.Api {
                              html_format: boolean,
                              include_task_notes: boolean,
                              recipients: string[]):
-  JQueryPromise<void> {
+  JsonPromise<void> {
     var url = prefix + "/api/agenda/send/" + string(Login.myUid());
     var pref = {
       teams: teams,
@@ -653,7 +655,7 @@ module Esper.Api {
   }
 
   export function getEventLabels(team_id: string, event_id: string):
-    JQueryPromise<{labels?: string[]}>
+    JsonPromise<{labels?: string[]}>
   {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
@@ -663,7 +665,7 @@ module Esper.Api {
 
   export function updateEventLabels(team_id: string, event_id: string,
                                     labels: string[]):
-  JQueryPromise<void> {
+  JsonPromise<void> {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
             + "/" + encodeURIComponent(event_id);
@@ -672,14 +674,14 @@ module Esper.Api {
 
   export function updateHashtagStates(teamId: string, eventId: string,
                                       hashtagRequest: ApiT.HashtagRequest):
-  JQueryPromise<void> {
+  JsonPromise<void> {
     var url = `${prefix}/api/event/hashtags/${string(Login.myUid())}`
       + `/${string(teamId)}/${encodeURIComponent(eventId)}`;
     return JsonHttp.post(url, hashtagRequest);
   }
 
   export function changeEventLabels(team_id: string,
-    req: ApiT.LabelChangeRequest): JQueryPromise<void>
+    req: ApiT.LabelChangeRequest): JsonPromise<void>
   {
     var url = prefix + "/api/event/label-change/" + string(Login.myUid())
             + "/" + string(team_id);
@@ -688,7 +690,7 @@ module Esper.Api {
 
   export function setPredictLabels(teamId: string,
     req: ApiT.LabelsSetPredictRequest)
-    : JQueryPromise<ApiT.GenericCalendarEvents>
+    : JsonPromise<ApiT.GenericCalendarEvents>
   {
     var url = prefix + "/api/event/labels/set-predict/" + string(Login.myUid())
             + "/" + string(teamId);
@@ -696,7 +698,7 @@ module Esper.Api {
   }
 
   export function getCustomerStatus(teamid: string):
-  JQueryPromise<ApiT.CustomerStatus> {
+  JsonPromise<ApiT.CustomerStatus> {
     var url =
       prefix + "/api/pay/status/short/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -704,7 +706,7 @@ module Esper.Api {
   }
 
   export function getCustomerDetails(teamid: string):
-  JQueryPromise<ApiT.CustomerDetails> {
+  JsonPromise<ApiT.CustomerDetails> {
     var url =
       prefix + "/api/pay/status/long/" + string(Login.myUid())
       + "/" + string(teamid);
@@ -713,14 +715,14 @@ module Esper.Api {
 
   /* Team creation */
   export function createTeam(body: ApiT.TeamCreationRequest)
-    : JQueryPromise<ApiT.Team>
+    : JsonPromise<ApiT.Team>
   {
     var url = prefix + "/api/team-create/" + string(Login.myUid());
     return JsonHttp.post(url, body);
   }
 
   export function putTeamTimestatsCalendars(teamid: string, cals: string[])
-    : JQueryPromise<ApiT.Team> {
+    : JsonPromise<ApiT.Team> {
     var url = prefix + "/api/team/" + string(Login.myUid())
       + "/" + string(teamid) + "/ts-calendars";
     return JsonHttp.put(url, { calendars: cals });
@@ -733,7 +735,7 @@ module Esper.Api {
 
   /** Sets email types given the correct JSON object. */
   export function setEmailTypes(teamid: string, email_types: ApiT.EmailTypes):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/preferences/emails/" + string(Login.me()) + "/" +
       string(teamid);
     return JsonHttp.put(url, email_types);
@@ -742,7 +744,7 @@ module Esper.Api {
   /** Sets email types given the correct JSON object. */
   export function setLabelReminderPrefs(teamid: string,
                                         email_pref: ApiT.SimpleEmailPref):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/preferences/label-reminder/"
             + string(Login.me()) + "/" + string(teamid);
     return JsonHttp.put(url, email_pref);
@@ -750,7 +752,7 @@ module Esper.Api {
 
   /** Set meeting feedback notification preferences */
   export function setTimestatsNotifyPrefs(teamid: string,
-                    prefs: ApiT.TimestatsNotifyPrefs): JQueryPromise<void> {
+                    prefs: ApiT.TimestatsNotifyPrefs): JsonPromise<void> {
     var url = prefix + "/api/preferences/notify/"
             + string(Login.me()) + "/" + string(teamid);
     return JsonHttp.put(url, prefs);
@@ -763,14 +765,14 @@ module Esper.Api {
   /*** Payments ***/
 
   export function getSubscriptionStatus(teamid: string):
-    JQueryPromise<ApiT.CustomerStatus> {
+    JsonPromise<ApiT.CustomerStatus> {
     var url = prefix + "/api/pay/status/long/" + string(Login.me())
       + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
   export function getSubscriptionStatusLong(teamid: string):
-    JQueryPromise<ApiT.CustomerDetails> {
+    JsonPromise<ApiT.CustomerDetails> {
     var url = prefix + "/api/pay/status/long/" + string(Login.me())
       + "/" + string(teamid);
 
@@ -778,7 +780,7 @@ module Esper.Api {
   }
 
   export function setSubscription(teamid: string, planid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/pay/subscribe/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(planid);
@@ -786,14 +788,14 @@ module Esper.Api {
   }
 
   export function cancelSubscription(teamid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/pay/unsubscribe/" + string(Login.me())
       + "/" + string(teamid);
     return JsonHttp.post(url);
   }
 
   export function addNewCard(teamid: string, cardToken: string):
-    JQueryPromise<ApiT.PaymentCard> {
+    JsonPromise<ApiT.PaymentCard> {
     var url = prefix + "/api/pay/new-card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + encodeURIComponent(string(cardToken));
@@ -801,7 +803,7 @@ module Esper.Api {
   }
 
   export function deleteCard(teamid: string, cardid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/pay/card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(cardid);
@@ -809,7 +811,7 @@ module Esper.Api {
   }
 
   export function setDefaultCard(teamid: string, cardid: string):
-    JQueryPromise<void> {
+    JsonPromise<void> {
     var url = prefix + "/api/pay/card/" + string(Login.me())
       + "/" + string(teamid)
       + "/" + string(cardid);
@@ -817,14 +819,14 @@ module Esper.Api {
   }
 
   export function getEventColors():
-    JQueryPromise<ApiT.CalendarEventPalette> {
+    JsonPromise<ApiT.CalendarEventPalette> {
     var url = prefix + "/api/gcal/colors/event/" + string(Login.me());
     return JsonHttp.get(url);
   }
 
   /* Support */
 
-  export function sendSupportEmail(msg: string): JQueryPromise<void> {
+  export function sendSupportEmail(msg: string): JsonPromise<void> {
     var url = prefix + "/api/support/email";
     var feedback: { body: string, user?: string } = { body: msg };
     var uid = Login.me();
