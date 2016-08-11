@@ -199,8 +199,7 @@ module Esper.Login {
     }
   }
 
-  function onLoginFailure(err?: Error) {
-    Log.e(err);
+  function onLoginFailure(err?: JQueryXHR) {
     goToLogin({error: "login_error"});
   }
 
