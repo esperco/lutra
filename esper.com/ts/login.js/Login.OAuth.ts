@@ -164,9 +164,7 @@ module Esper.Login {
     var loginNonce = getLoginNonce();
     if (! loginNonce) {
       Log.e("Login nonce missing");
-      return $.Deferred<ApiT.LoginResponse>()
-        .reject(MISSING_NONCE)
-        .promise();
+      throw new Error(MISSING_NONCE);
     }
     return Api.loginOnce(uid, loginNonce);
   }
