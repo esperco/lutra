@@ -283,7 +283,8 @@ module Esper.JsonHttp {
   var batchQueue: ApiT.HttpRequest<any>[] = [];
   var batchDfd: JQueryDeferred<ApiT.BatchHttpResponses<any>>;
 
-  export function batch(fn: () => void, batchPath: string) {
+  export function batch<T>(fn: () => JQueryPromise<T>|T,
+                           batchPath: string): Promise<T> {
     var topLevel = !insideBatch;
     if (topLevel) {
       insideBatch = true;
@@ -291,16 +292,17 @@ module Esper.JsonHttp {
     }
 
     try {
-      fn();
+      let ret = fn();
       if (topLevel) {
         insideBatch = false;
-        return jsonHttp("POST", batchPath, {
+        jsonHttp("POST", batchPath, {
           requests: batchQueue
         }).then(
           (r) => batchDfd.resolve(r),
           (e) => batchDfd.reject(e)
         );
       }
+      return batchDfd.then(() => ret);
     } finally {
       if (topLevel) {
         insideBatch = false;

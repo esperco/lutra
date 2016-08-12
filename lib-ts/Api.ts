@@ -51,7 +51,9 @@ module Esper.Api {
 
   /* Batch helpers */
 
-  export function batch(fn: () => void) {
+  export function batch<T>(fn: () => JQueryPromise<T>): JsonPromise<T>;
+  export function batch<T>(fn: () => T): JsonPromise<T>;
+  export function batch<T>(fn: () => T|JQueryPromise<T>): JsonPromise<T> {
     var url = prefix + "";
     return JsonHttp.batch(fn, prefix + "/http-batch-request");
   }
