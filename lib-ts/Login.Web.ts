@@ -82,7 +82,20 @@ module Esper.Login {
       rather than trying to initCredentals first.
     */
     if (initCredentials()) {
-      Api.getLoginInfo().then(onLoginSuccess, onLoginFailure);
+      Api.getLoginInfo()
+        .done(onLoginSuccess)
+
+        // If invalid auth headers, try fixing offset and retrying
+        .fail((err) => Errors.handle<any>(err.errorDetails, {
+            Invalid_authentication_headers: () => {
+              err.handled = true;
+              return fixOffset()
+                .then(Api.getLoginInfo)
+                .then(onLoginSuccess, onLoginFailure);
+            },
+            default: () => onLoginFailure(err)
+          })
+        );
     }
 
     /*
@@ -108,7 +121,13 @@ module Esper.Login {
     functionality in login.js
   */
   export function postLoginToken(token: string) {
-    Api.postToken(token).then(function(info: ApiT.TokenResponse) {
+    return Api.batch(function() {
+      var p1 = fixOffset();
+      var p2 = Api.postToken(token);
+
+      // Return token info, but only after we've had chance to adjust offset
+      return p1.then(() => p2);
+    }).then(function(info: ApiT.TokenResponse) {
       var x = info.token_value;
       switch (Variant.tag(x)) {
         case "Login":

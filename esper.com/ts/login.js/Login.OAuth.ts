@@ -167,7 +167,14 @@ module Esper.Login {
       Log.e("Login nonce missing");
       throw new Error(MISSING_NONCE);
     }
-    return Api.loginOnce(uid, loginNonce);
+
+    return Api.batch(function() {
+      var p1 = fixOffset();
+      var p2 = Api.loginOnce(uid, loginNonce);
+
+      // Return login nonce, but only after we've had chance to adjust offset
+      return p1.then(() => p2);
+    });
   }
 
   /*
