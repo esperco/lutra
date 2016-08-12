@@ -5,7 +5,9 @@
 
   See Login.Oauth for actual API calls.
 */
+
 /// <reference path="./ApiT.ts" />
+/// <reference path="./JsonHttp.ts" />
 
 module Esper.Login {
 
@@ -41,5 +43,16 @@ module Esper.Login {
 
   export function unsetCredentials() {
     credentials = null;
+  }
+
+  /*
+    When logging in, remember to fix offset before calling anything that
+    needs to be signed with the accurate time
+  */
+  export function fixOffset() {
+    return Api.clock().then((v) =>
+      (moment(v.timestamp).valueOf() / 1000) -
+      (Date.now() / 1000)
+    ).then((o) => JsonHttp.offset = o);
   }
 }

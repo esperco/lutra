@@ -65,7 +65,21 @@ module Esper {
     }
 
     else if (uid) {
-      handleLoginInfo(Login.loginOnce(uid));
+      try {
+        handleLoginInfo(Login.loginOnce(uid));
+      } catch (err) {
+
+        // If missing nonce exception, render special error message
+        if (err && err.name === Login.MISSING_NONCE) {
+          var errMsg = "There was an error logging you in. " +
+            " If you are using Safari, please try using a " +
+            "different browser. If you are in Incognito or Private Mode, " +
+            "please try disabling it.";
+          renderLogin("", errMsg);
+        } else {
+          throw err;
+        }
+      }
     }
 
     else if (token) {
@@ -183,7 +197,7 @@ module Esper {
     </div>);
   }
 
-  function handleLoginInfo(response: JQueryPromise<ApiT.LoginResponse>) {
+  function handleLoginInfo(response: JsonHttp.Promise<ApiT.LoginResponse>) {
     response
     .then(function(response) {
       Login.setCredentials(response.uid, response.api_secret);
@@ -227,12 +241,7 @@ module Esper {
       redirect(response.landing_url);
     }, function(err) {
       var errMsg = "There was an error logging you in."
-      if (err === Login.MISSING_NONCE) {
-        errMsg += (" If you are using Safari, please try using a " +
-          "different browser. If you are in Incognito or Private Mode, " +
-          "please try disabling it.");
-      }
-      renderLogin("", errMsg);
+      renderLogin("", "There was an error logging you in.");
     });
   }
 

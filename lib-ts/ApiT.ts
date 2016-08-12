@@ -10,7 +10,7 @@ module Esper.ApiT {
   type uid = string;
   type email = string;
 
-  type ErrorDetails = Variant.Variant;
+  export type ErrorDetails = Variant.Variant;
     /*
       See wolverine/types/error_details.atd for the different possible cases.
     */
@@ -60,6 +60,10 @@ module Esper.ApiT {
     http_status_code: number; // 4xx
     error_message: string;
     error_details: ErrorDetails;
+  }
+
+  export interface ClockResponse {
+    timestamp: string;
   }
 
   export interface TeamCreationRequest {

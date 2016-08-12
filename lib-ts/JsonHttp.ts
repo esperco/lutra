@@ -5,10 +5,69 @@
   Assumes CryptoJS
 */
 
+/// <reference path="./Errors.ts" />
 /// <reference path="./Log.ts" />
 /// <reference path="./Util.ts" />
 
 module Esper.JsonHttp {
+  /*
+    By default, JQueryPromiseType does not type errors. Let's extend the
+    interface to include proper typing for error messages.
+  */
+  export interface AjaxError {
+    code: number
+    textStatus: string;
+    method: string;
+    url: string;
+    reqBody: any;
+    respBody: string;
+
+    // Additional info populated if error is instance of ApiT.ClientError
+    errorMsg?: string;
+    errorDetails?: ApiT.ErrorDetails;
+
+    /*
+      Flag to signal that this error has been handled and should not be logged
+      to Sentry or thrown as an exception.
+    */
+    handled?: boolean;
+  }
+
+  type DoneCallback<T> = JQueryPromiseCallback<T>;
+  type ErrorCallback = JQueryPromiseCallback<AjaxError>;
+
+  // JQueryPromise with proper failure typing
+  export interface Promise<T> extends JQueryPromise<T> {
+    done(...cbs: Array<DoneCallback<T>|DoneCallback<T>[]>): Promise<T>;
+    fail(...cbs: Array<ErrorCallback|ErrorCallback[]>): Promise<T>;
+
+    /*
+      Handles case where failFilter doesn't change error type, return
+      value for .then is therefore another JsonHttp.Promise
+    */
+    then<U>(doneFilter: (value?: T, ...values: any[]) => U|Promise<U>,
+            failFilter?: (err: AjaxError) => AjaxError|void|Promise<U>,
+            progressFilter?: (...progression: any[]) => any): Promise<U>;
+
+    /*
+      Handles case where failFilter does change error type. We stop making
+      inferences about error typing at this point and just return default
+      JQueryPromise.
+    */
+    then<U>(doneFilter: (value?: T, ...values: any[]) => U|Promise<U>,
+            failFilter?: (err: AjaxError) => any,
+            progressFilter?: (...progression: any[]) => any): JQueryPromise<T>;
+
+    /*
+      Handles case where failFilter doesn't change error type, but voids
+      return value. So return value for .then is JsonHttp.Promise<void>
+    */
+    then(doneFilter: (value?: T, ...values: any[]) => void,
+         failFilter?: (err: AjaxError) => AjaxError|void|Promise<void>,
+         progressFilter?: (...progression: any[]) => any): Promise<void>;
+  }
+
+
   export function sign(unixTime: string,
                        path: string,
                        apiSecret: string):
@@ -25,10 +84,16 @@ module Esper.JsonHttp {
   /* The version needs to be set by the application, e.g. stoat-1.2.3 */
   export var esperVersion: string;
 
+  /*
+    Offset between browser time and server time in seconds. Use to correct for
+    user times being out of sync with us.
+  */
+  export var offset = 0;
+
   function setHttpHeaders(path: string) {
     return function(jqXHR: JQueryXHR) {
       if (Login.loggedIn()) {
-        var unixTime = Math.round(Date.now()/1000).toString();
+        var unixTime = Math.round(Date.now()/1000 + offset).toString();
         var apiSecret = Login.getApiSecret();
         var signature = sign(unixTime, path, apiSecret);
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
@@ -55,42 +120,40 @@ module Esper.JsonHttp {
   /*
     Used to determine whether an JSON error should be ignored
   */
-  function ignoreError(code: number, respBody: string): boolean {
-    if (code === 0) {
-      return true;
-    }
-    if (respBody && respBody.indexOf("Please log in with Google") >= 0) {
-      return true;
-    }
-    return false;
+  function ignoreError(details: AjaxError): boolean {
+    return details.code === 0;
   }
 
-  /*
-    Error logging helper
-  */
-  interface AjaxError {
-    code: number
-    textStatus: string;
-    method: string;
-    url: string;
-    reqBody: any;
-    respBody: string;
-  }
-
+  // Error logging helper
   function logError(details: AjaxError) {
-    if (ignoreError(details.code, details.respBody)) {
-      Log.w("Ignored error", details)
-    } else {
-      let body = details.respBody;
-      let errorMsg = body;
-      try {
-        let err = JSON.parse(body);
-        if (isClientError(err)) {
-          errorMsg = err.error_message;
-        }
-      } catch (err) { /* Ignore */ }
-      Log.e(`${details.code} ${errorMsg}`, details);
-    }
+
+    /*
+      Fire error asynchronously to give promises further down an opportunity
+      to resolve.
+    */
+    window.requestAnimationFrame(() => {
+      if (details.handled) {
+        Log.i("Handled error", details);
+      } else if (ignoreError(details)) {
+        Log.w("Ignored error", details)
+      } else {
+        let errorMsg = details.errorDetails ?
+          Variant.tag(details.errorDetails) : details.respBody;
+        Log.e(`${details.code} ${errorMsg}`, details);
+      }
+    });
+  }
+
+  // Populates AjaxError with details from body if applicable
+  function getErrorDetails(error: AjaxError): AjaxError {
+    try {
+      var parsedJson: ApiT.ClientError = JSON.parse(error.respBody);
+      if (isClientError(parsedJson)) {
+        error.errorMsg = parsedJson.error_message;
+        error.errorDetails = parsedJson.error_details;
+      }
+    } catch (err) { /* Ignore - not JSON response */ }
+    return error;
   }
 
   function isClientError(e: any): e is ApiT.ClientError {
@@ -99,7 +162,6 @@ module Esper.JsonHttp {
       !!_.isNumber(typedError.http_status_code) &&
       !!_.isString(typedError.error_message);
   }
-
 
 
   /** Executes an http request using our standard authentication,
@@ -118,7 +180,7 @@ module Esper.JsonHttp {
                               body: string,
                               dataType: string,
                               contentType: string,
-                              processData = true) {
+                              processData = true): Promise<any> {
     var id = Util.randomString();
 
     var contentTypeJQ : any = contentType == "" ? false : contentType;
@@ -151,23 +213,27 @@ module Esper.JsonHttp {
     Log.d("API request " + id + " " + method + " " + path, request);
 
     var startTime = Date.now();
-    var ret = $.ajax(request)
-      .done(function(respBody) {
-        var latency = (Date.now() - startTime) / 1000;
-        logResponse(method, path, respBody, latency);
-      });
+    var ret: Promise<any> = $.ajax(request).then(
+      (success) => success,
+      (xhr: JQueryXHR, textStatus: string) => getErrorDetails({
+        code: xhr.status,
+        textStatus: textStatus,
+        method: method,
+        url: path,
+        reqBody: body,
+        respBody: xhr.responseText
+      })
+    );
+
+    ret.done(function(respBody) {
+      var latency = (Date.now() - startTime) / 1000;
+      logResponse(method, path, respBody, latency);
+    });
+
     if (! suppressWarnings) {
-      ret = ret.fail((xhr: JQueryXHR, textStatus: string) => {
-        logError({
-          code: xhr.status,
-          textStatus: textStatus,
-          method: method,
-          url: path,
-          reqBody: body,
-          respBody: xhr.responseText
-        });
-      });
+      ret.fail(logError);
     }
+
     return ret;
   }
 
@@ -195,18 +261,16 @@ module Esper.JsonHttp {
           if (status && ((status >= 200 && status < 300) || status === 304)) {
             return response.response_body;
           } else {
-            logError({
+            let error = getErrorDetails({
               code: status,
               textStatus: "error",
               method: method,
               url: path,
               reqBody: body,
               respBody: JSON.stringify(response.response_body)
-            });
-            return $.Deferred().reject({
-              status: status,
-              responseText: response.response_body
-            });
+            })
+            logError(error);
+            return $.Deferred().reject(error);
           }
         });
     }
@@ -228,7 +292,8 @@ module Esper.JsonHttp {
   var batchQueue: ApiT.HttpRequest<any>[] = [];
   var batchDfd: JQueryDeferred<ApiT.BatchHttpResponses<any>>;
 
-  export function batch(fn: () => void, batchPath: string) {
+  export function batch<T>(fn: () => JQueryPromise<T>|T,
+                           batchPath: string): Promise<T> {
     var topLevel = !insideBatch;
     if (topLevel) {
       insideBatch = true;
@@ -236,16 +301,17 @@ module Esper.JsonHttp {
     }
 
     try {
-      fn();
+      let ret = fn();
       if (topLevel) {
         insideBatch = false;
-        return jsonHttp("POST", batchPath, {
+        jsonHttp("POST", batchPath, {
           requests: batchQueue
         }).then(
           (r) => batchDfd.resolve(r),
           (e) => batchDfd.reject(e)
         );
       }
+      return batchDfd.then(() => ret);
     } finally {
       if (topLevel) {
         insideBatch = false;
@@ -286,7 +352,7 @@ module Esper.JsonHttp {
 
   // Calls a function, but API calls within that call don't have the error
   // banner popping up -- use for custom error handling.
-  export function noWarn(callable: () => JQueryPromise<any>) {
+  export function noWarn(callable: () => Promise<any>) {
     suppressWarnings = true;
     let ret = callable();
     suppressWarnings = false;
