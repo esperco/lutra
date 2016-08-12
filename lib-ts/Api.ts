@@ -24,6 +24,10 @@ module Esper.Api {
     prefix = window.location.protocol + "//" + window.location.hostname;
   }
 
+  export function clock(): JsonPromise<ApiT.ClockResponse> {
+    return JsonHttp.get(prefix + "/clock");
+  }
+
   export function echo(serializable: any) {
     return JsonHttp.post(prefix + "/echo",
                          serializable);

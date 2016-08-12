@@ -62,6 +62,10 @@ module Esper.ApiT {
     error_details: ErrorDetails;
   }
 
+  export interface ClockResponse {
+    timestamp: string;
+  }
+
   export interface TeamCreationRequest {
     chrome_extension?: boolean;
     executive_email?: string;

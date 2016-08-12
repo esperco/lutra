@@ -78,10 +78,16 @@ module Esper.JsonHttp {
   /* The version needs to be set by the application, e.g. stoat-1.2.3 */
   export var esperVersion: string;
 
+  /*
+    Offset between browser time and server time in seconds. Use to correct for
+    user times being out of sync with us.
+  */
+  export var offset = 0;
+
   function setHttpHeaders(path: string) {
     return function(jqXHR: JQueryXHR) {
       if (Login.loggedIn()) {
-        var unixTime = Math.round(Date.now()/1000).toString();
+        var unixTime = Math.round(Date.now()/1000 + offset).toString();
         var apiSecret = Login.getApiSecret();
         var signature = sign(unixTime, path, apiSecret);
         jqXHR.setRequestHeader("Esper-Timestamp", unixTime);
