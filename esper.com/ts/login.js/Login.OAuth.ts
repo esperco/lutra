@@ -138,6 +138,7 @@ module Esper.Login {
           default: () => false
         });
         if (useGoogle) {
+          err.handled = true;
           return loginWithGoogle(opts);
         } else {
           return err;

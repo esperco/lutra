@@ -25,6 +25,12 @@ module Esper.JsonHttp {
     // Additional info populated if error is instance of ApiT.ClientError
     errorMsg?: string;
     errorDetails?: ApiT.ErrorDetails;
+
+    /*
+      Flag to signal that this error has been handled and should not be logged
+      to Sentry or thrown as an exception.
+    */
+    handled?: boolean;
   }
 
   type DoneCallback<T> = JQueryPromiseCallback<T>;
@@ -115,24 +121,27 @@ module Esper.JsonHttp {
     Used to determine whether an JSON error should be ignored
   */
   function ignoreError(details: AjaxError): boolean {
-    if (details.code === 0) {
-      return true;
-    }
-    return Errors.handle(details.errorDetails, {
-      Use_google_oauth: () => true,
-      default: () => false
-    });
+    return details.code === 0;
   }
 
   // Error logging helper
   function logError(details: AjaxError) {
-    if (ignoreError(details)) {
-      Log.w("Ignored error", details)
-    } else {
-      let errorMsg = details.errorDetails ?
-        Variant.tag(details.errorDetails) : details.respBody;
-      Log.e(`${details.code} ${errorMsg}`, details);
-    }
+
+    /*
+      Fire error asynchronously to give promises further down an opportunity
+      to resolve.
+    */
+    window.requestAnimationFrame(() => {
+      if (details.handled) {
+        Log.i("Handled error", details);
+      } else if (ignoreError(details)) {
+        Log.w("Ignored error", details)
+      } else {
+        let errorMsg = details.errorDetails ?
+          Variant.tag(details.errorDetails) : details.respBody;
+        Log.e(`${details.code} ${errorMsg}`, details);
+      }
+    });
   }
 
   // Populates AjaxError with details from body if applicable
