@@ -12,9 +12,11 @@ module Esper.Actions.Feedback {
     Post event feedback object
   */
   export function post(event: Stores.Events.TeamEvent,
-                       feedback: ApiT.EventFeedback) {
+                       feedback: ApiT.EventFeedbackUpdate) {
     var newEvent = _.cloneDeep(event);
-    newEvent.feedback = feedback;
+    newEvent.feedback = _.extend(
+      newEvent.feedback, feedback
+    ) as ApiT.EventFeedback;
 
     Analytics.track(Analytics.Trackable.SubmitFeedback, {
       teamId: newEvent.teamId,
@@ -24,7 +26,7 @@ module Esper.Actions.Feedback {
     });
 
     var p = Api.postEventFeedback(
-      newEvent.teamId, newEvent.id, newEvent.feedback
+      newEvent.teamId, newEvent.id, feedback
     );
     Stores.Events.EventStore.push(Stores.Events.storeId(newEvent), p,
       Option.some(newEvent)

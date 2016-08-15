@@ -143,10 +143,15 @@ module Esper.ApiT {
     calendars: GenericCalendar[];
   }
 
-  export interface EventFeedback {
+  export interface EventFeedbackUpdate {
     notes?: string;
     attended?: boolean;
     rating?: number;
+  }
+
+  export interface EventFeedback extends EventFeedbackUpdate {
+    teamid: string;
+    eventid: string;
   }
 
   export type EventFeedbackAction = string;

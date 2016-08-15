@@ -166,27 +166,24 @@ module Esper.Components {
 
   function toggleAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
     e.stopPropagation();
-    var newFeedback = _.clone(event.feedback || {});
-    newFeedback.attended = !Stores.Events.isActive(event);
-    Actions.Feedback.post(event, newFeedback);
+    Actions.Feedback.post(event, {
+      attended: !Stores.Events.isActive(event)
+    });
   }
 
   function EventFeedback({event}: {event: Stores.Events.TeamEvent}) {
-    // Check if no feedback
-    var feedback = event.feedback || {}
-
     /*
       Use text-overflow: ellipsis in CSS to truncate exactly at end of line but
       use JS to do a sanity-check too, and to keep DOM a little less cluttered.
     */
-    var notes = (feedback.notes || "").slice(0, 250);
+    var notes = (event.feedback.notes || "").slice(0, 250);
 
     // Format feedback
     return <span>
       <i className="fa fa-left fa-fw fa-comment-o" />
       <span className="star-rating">
         { Stores.Events.isActive(event) ?
-          _.times(feedback.rating || 0, (i) =>
+          _.times(event.feedback.rating || 0, (i) =>
             <i key={i.toString()} className="fa fa-fw fa-star" />
           ) : null
         }

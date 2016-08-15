@@ -86,7 +86,11 @@ module Esper.Stores.Events {
       labelScores: labelScores,
       hashtags: e.hashtags,
       feedback: e.feedback || {
-        notes: ""
+        notes: "", // Optional, but since we don't ever treat null notes
+                   // differently than empty notes, default to blank string
+                   // to avoid possible type errors
+        teamid: teamId,
+        eventid: e.id
       },
       location: e.location || "",
       allDay: e.all_day,
