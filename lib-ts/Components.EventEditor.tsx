@@ -281,29 +281,26 @@ module Esper.Components {
     submitNotes() {
       var event = this.props.event;
       if (event.feedback.notes !== this.state.notes) {
-        var feedback = _.extend({}, event.feedback, {
-          notes: this.state.notes
-        }) as ApiT.EventFeedback;
-        this.submitFeedback(feedback);
+        this.submitFeedback({ notes: this.state.notes });
       }
     }
 
     toggleAttended() {
       var event = this.props.event;
-      this.submitFeedback(_.extend({}, event.feedback, {
+      this.submitFeedback({
         attended: !Stores.Events.isActive(event)
-      }) as ApiT.EventFeedback);
+      });
     }
 
     submitStarRating(rating: number) {
       var event = this.props.event;
-      this.submitFeedback(_.extend({}, event.feedback, {
+      this.submitFeedback({
         rating: rating,
         attended: true
-      }) as ApiT.EventFeedback);
+      });
     }
 
-    submitFeedback(feedback: ApiT.EventFeedback) {
+    submitFeedback(feedback: ApiT.EventFeedbackUpdate) {
       var newEvent = Actions.Feedback.post(this.props.event, feedback);
       this.setState({lastSavedEvent: newEvent});
     }

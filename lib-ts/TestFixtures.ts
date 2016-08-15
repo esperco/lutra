@@ -192,7 +192,6 @@ module Esper.TestFixtures {
       title: "Event",
       all_day: false,
       hashtags: [],
-      feedback: {},
       guests: [],
       transparent: false,
       description_messageids: []

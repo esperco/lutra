@@ -20,7 +20,8 @@ module Esper.EventStats {
     // Inactive event calculations should ignore
     var noAttendEvent = Stores.Events.asTeamEvent(
       teamId, TestFixtures.makeGenericCalendarEvent({
-        feedback: { attended: false }
+        id: "no-attend",
+        feedback: { attended: false, teamid: teamId, eventid: "no-attend" }
       })
     );
 
@@ -595,7 +596,8 @@ module Esper.EventStats {
       // Overlaps 2 but is not active
       var e4 = Stores.Events.asTeamEvent("team-id",
         TestFixtures.makeGenericCalendarEvent({
-          feedback: { attended: false },
+          id: "e4",
+          feedback: { attended: false, teamid: "team-id", eventid: "e4" },
           start: XDate.toString(new Date(2016, 0, 2, 4)),
           end:   XDate.toString(new Date(2016, 0, 2, 6)),
         }));

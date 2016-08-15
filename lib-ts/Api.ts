@@ -578,16 +578,12 @@ module Esper.Api {
   }
 
   export function postEventFeedback(teamid: string, eventid: string,
-    feedback: ApiT.EventFeedback): JsonPromise<ApiT.EventFeedback>
+    feedback: ApiT.EventFeedbackUpdate): JsonPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))
             + "/" + encodeURIComponent(string(eventid));
-    var newFeedback = _.extend({}, feedback, {
-      teamid: teamid,
-      eventid: eventid
-    });
-    return JsonHttp.post(url, newFeedback);
+    return JsonHttp.post(url, feedback);
   }
 
   export function postEventFeedbackAction(teamid: string, calid: string,
