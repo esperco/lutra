@@ -85,7 +85,9 @@ module Esper.Stores.Events {
       description: e.description || "",
       labelScores: labelScores,
       hashtags: e.hashtags,
-      feedback: e.feedback,
+      feedback: e.feedback || {
+        notes: ""
+      },
       location: e.location || "",
       allDay: e.all_day,
       guests: e.guests,
