@@ -583,7 +583,11 @@ module Esper.Api {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
             + "/" + encodeURIComponent(string(teamid))
             + "/" + encodeURIComponent(string(eventid));
-    return JsonHttp.post(url, feedback);
+    var newFeedback = _.extend({}, feedback, {
+      teamid: teamid,
+      eventid: eventid
+    });
+    return JsonHttp.post(url, newFeedback);
   }
 
   export function postEventFeedbackAction(teamid: string, calid: string,
