@@ -40,7 +40,7 @@ module Esper.Views {
 
     renderWithData() {
       return <div id="charts-page" className="esper-full-screen minus-nav">
-        <Components.SidebarWithToggle>
+        <Components.Sidebar className="esper-shade">
           <div className="sidebar-top-menu">
             <div className="esper-tab-menu">
               { this.renderSidebarTab("main",
@@ -65,8 +65,8 @@ module Esper.Views {
                 teamId: teamId
               })} />
           </div>
-        </Components.SidebarWithToggle>
-        <div className="esper-right-content">
+        </Components.Sidebar>
+        <div className="esper-content">
           { this.renderPeriodSelector() }
           { this.props.chart }
         </div>

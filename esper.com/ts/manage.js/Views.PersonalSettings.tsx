@@ -14,7 +14,7 @@ module Esper.Views {
           activePersonal={true}
         />
 
-        <div className="esper-right-content">
+        <div className="esper-content">
           <div className="esper-expanded">
             <Deactivate />
           </div>

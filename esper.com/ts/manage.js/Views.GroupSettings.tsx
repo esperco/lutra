@@ -26,7 +26,7 @@ module Esper.Views {
           pathFn={this.pathFn}
         />
 
-        <div className="esper-right-content padded">
+        <div className="esper-content padded">
           <Components.GroupSettingsMenu
             group={group}
             pathFn={this.pathFn}
