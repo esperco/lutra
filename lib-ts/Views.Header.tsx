@@ -48,14 +48,7 @@ module Esper.Views {
         <nav className="navbar navbar-default navbar-shadow">
           <div className="container-fluid">
             <div className="navbar-header">
-              <button type="button" className={"navbar-toggle collapsed " +
-                (this.state.open ? "open " : "")}
-                onClick={this.toggleCollapse.bind(this)}
-                data-toggle="collapse"
-                data-target={this.getId(toggleId)}>
-                <i className={"fa " +
-                   (this.state.open ? "fa-times" : "fa-bars")} />
-              </button>
+              <Components.SidebarToggle className="navbar-toggle" />
               <SaveIndicator>
                 <a className={classNames("navbar-brand lg", {
                   "navbar-square": hasTeams
@@ -68,52 +61,40 @@ module Esper.Views {
                   </a>
                 }
               </SaveIndicator>
-            </div>
-
-            <div className={"esper-collapse" + (this.state.open ? " open" : "")}
-                 id={this.getId(toggleId)}
-                 onClick={() => this.toggleCollapse()}>
-              { hasTeams ? loginInfo.match({
-                none: () => null,
-                some: () => <ul className="nav navbar-nav">
-                  <NavLink href={Paths.Time.charts({}).href}
-                           active={this.props.active === Header_.Tab.Charts}>
-                    <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
-                  </NavLink>
-                  <NavLink href={Paths.Time.calendarLabeling({}).href}
-                           active={this.props.active === Header_.Tab.Calendar}
-                           hiddenXs={true}>
-                    <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
-                  </NavLink>
-                  <NavLink href={Paths.Time.list({}).href}
-                           active={this.props.active === Header_.Tab.List}>
-                    <i className="fa fa-fw fa-th-list"></i>{" "}Event List
-                  </NavLink>
-                  <NavLink href={Paths.Manage.home().href}
-                           active={this.props.active === Header_.Tab.Manage}>
-                    <i className="fa fa-fw fa-cog"></i>{" "}Settings
-                  </NavLink>
-                </ul>
-              }) : null}
-
-              <div className="nav navbar-nav navbar-right">
-                <div className="navbar-text hidden-xs">
-                  <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
-                    { this.loginLinks() }
-                  </Components.LoginInfo>
-                </div>
-                <ul className="visible-xs-block esper-select-menu">
-                  { this.loginLinks() }
-                </ul>
+              <div className="navbar-toggle"
+                   onClick={this.toggleCollapse.bind(this)}>
+                <i className={"fa " +
+                   (this.state.open ? "fa-times" : "fa-ellipsis-h")} />
               </div>
             </div>
+
+            <div className="hidden-xs">
+              { hasTeams ? loginInfo.match({
+                none: () => null,
+                some: () => this.navLinks("nav navbar-nav")
+              }) : null}
+
+              <div className="navbar-text navbar-right">
+                <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
+                  { this.loginLinks("esper-select-menu") }
+                </Components.LoginInfo>
+              </div>
+            </div>
+
+            <Components.SidebarBase
+              className="visible-xs-block"
+              side="right"
+              open={this.state.open}
+              toggleState={() => this.toggleCollapse()}
+            >
+              { this.navLinks(
+                "nav navbar-nav esper-panel-section esper-full-width"
+              ) }
+              { this.loginLinks(
+                "nav navbar-nav esper-panel-section esper-full-width"
+              ) }
+            </Components.SidebarBase>
           </div>
-          {
-            this.state.open ?
-            <div className="esper-collapse-backdrop"
-                 onClick={() => this.toggleCollapse()} /> :
-            null
-          }
         </nav>
       </div>;
     }
@@ -122,33 +103,56 @@ module Esper.Views {
       this.setState({ open: !this.state.open });
     }
 
-    loginLinks() {
-      return [
-        <li key="0"><a href={Paths.Landing.home().href} target="_blank">
+    navLinks(className?: string) {
+      return <ul className={className}
+                 onClick={() => this.toggleCollapse()}>
+        <NavLink href={Paths.Time.charts({}).href}
+                 active={this.props.active === Header_.Tab.Charts}>
+          <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
+        </NavLink>
+        <NavLink href={Paths.Time.calendarLabeling({}).href}
+                 active={this.props.active === Header_.Tab.Calendar}
+                 hiddenXs={true}>
+          <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
+        </NavLink>
+        <NavLink href={Paths.Time.list({}).href}
+                 active={this.props.active === Header_.Tab.List}>
+          <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+        </NavLink>
+        <NavLink href={Paths.Manage.home().href}
+                 active={this.props.active === Header_.Tab.Manage}>
+          <i className="fa fa-fw fa-cog"></i>{" "}Settings
+        </NavLink>
+      </ul>;
+    }
+
+    loginLinks(className?: string) {
+      return <ul className={className}>
+        <li><a href={Paths.Landing.home().href} target="_blank">
           <i className="fa fa-fw fa-home"></i>{" "}
           Home
-        </a></li>,
-        <li key="1"><a href={Paths.Landing.contact().href} target="_blank">
+        </a></li>
+        <li><a href={Paths.Landing.contact().href} target="_blank">
           <i className="fa fa-fw fa-envelope"></i>{" "}
           Contact Us
-        </a></li>,
-        <li key="2"><a href={Paths.Landing.privacy().href} target="_blank">
+        </a></li>
+        <li><a href={Paths.Landing.privacy().href} target="_blank">
           <i className="fa fa-fw fa-lock"></i>{" "}
           Privacy
-        </a></li>,
-        <li key="3"><a href={Paths.Landing.terms().href} target="_blank">
+        </a></li>
+        <li><a href={Paths.Landing.terms().href} target="_blank">
           <i className="fa fa-fw fa-legal"></i>{" "}
           Terms
-        </a></li>,
-        <li key="4" className="divider" />,
-        <li key="5"><a onClick={() => Login.goToLogout()}>
+        </a></li>
+        <li className="divider" />
+        <li><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
           Log out
           <span className="visible-xs-inline">
             {" of "}{Login.myEmail()}
           </span>
         </a></li>
-      ];
+      </ul>;
     }
 
     componentDidMount() {
@@ -221,18 +225,18 @@ module Esper.Views {
 
     render() {
       if (this.state.busy) {
-        return <span className="navbar-square">
+        return <span><span className="navbar-square">
           <span className="esper-spinner" />
-        </span>;
+        </span></span>;
       }
       if (this.state.error) {
-        return <span className="navbar-square">
+        return <span><span className="navbar-square">
           <Components.Tooltip className="esper-save-error text-danger"
                               title={Text.DefaultErrorTooltip}
                               placement="right">
             <i className="fa fa-fw fa-warning" />
           </Components.Tooltip>
-        </span>;
+        </span></span>;
       }
       return <span>
         { this.props.children }

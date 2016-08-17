@@ -26,7 +26,7 @@ module Esper.Views {
           pathFn={this.pathFn}
         />
 
-        <div className="esper-right-content">
+        <div className="esper-content">
           <Components.TeamSettingsMenu
             teamId={this.props.teamId}
             pathFn={this.pathFn}

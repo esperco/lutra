@@ -214,20 +214,6 @@ input.form-control, textarea.form-control, select.form-control {
 
 ////
 
-.navbar .container-fluid {
-  padding-left: @grid-gutter-width / 2;
-  padding-right: @grid-gutter-width / 2;
-
-  @media (min-width: @screen-sm-min) {
-    padding-left: @padding-base-horizontal;
-    padding-right: @padding-base-horizontal;
-
-    .navbar-right {
-      margin-right: 0;
-    }
-  }
-}
-
 .list-group-item.one-line {
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -301,6 +287,53 @@ a {
   }
 }
 
+
+/////
+
+.navbar {
+  margin-bottom: 0;
+  max-height: @navbar-height;
+  overflow: hidden;
+}
+
+.navbar .container-fluid {
+  padding-left: @grid-gutter-width / 2;
+  padding-right: @grid-gutter-width / 2;
+
+  @media (min-width: @screen-sm-min) {
+    padding-left: @padding-base-horizontal;
+    padding-right: @padding-base-horizontal;
+
+    .navbar-right {
+      margin-right: 0;
+    }
+  }
+}
+
+@media screen and (max-width: @screen-xs-max) {
+  .navbar .navbar-header {
+    display: flex;
+
+    > div, > span {
+      flex-grow: 1;
+      text-align: center;
+
+      &:first-child {
+        text-align: left;
+      }
+
+      &:last-child {
+        text-align: right;
+      }
+    }
+
+    .navbar-brand {
+      float: none;
+      display: inline-block;
+    }
+  }
+}
+
 .navbar-brand {
   line-height: @navbar-height - (@navbar-padding-vertical * 2);
   vertical-align: middle;
@@ -308,7 +341,7 @@ a {
   img {
     height: @navbar-height - (@navbar-padding-vertical * 2);
     width: auto;
-    margin: 0 @navbar-padding-horizontal;
+    margin: 0 auto;
   }
 
   &.lg {
@@ -318,7 +351,6 @@ a {
 
     img {
       height: @navbar-height - (@navbar-padding-vertical * 4/3);
-      margin: 0 (@navbar-padding-horizontal * 2/3);
     }
   }
 }
@@ -354,6 +386,8 @@ a {
 
 .navbar-toggle {
   padding: @padding-base-vertical @padding-base-horizontal;
+  margin-left: @padding-base-horizontal;
+  margin-right: @padding-base-horizontal;
 }
 
 
@@ -656,7 +690,7 @@ input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
   }
 }
 
-// Not really Bootstrap, but don't let Intercom clobber our modals on mobile
+// Not really Bootstrap, but don't let Intercom clobber modals, dropdowns, etc.
 #intercom-container {
-  z-index: @zindex-modal-background - 1;
+  z-index: @zindex-navbar-fixed + 1;
 }

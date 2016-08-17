@@ -16,7 +16,7 @@ module Esper.Components {
 
   export class ManageSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
-      return <Components.SidebarWithToggle>
+      return <Components.Sidebar className="esper-shade">
         <div className="esper-panel-section">
           <label className="esper-header">
             { Text.TeamExecs }
@@ -68,7 +68,7 @@ module Esper.Components {
             </a>
           </li></ul>
         </div>
-      </Components.SidebarWithToggle>;
+      </Components.Sidebar>;
     }
 
     renderTeam(team: ApiT.Team) {

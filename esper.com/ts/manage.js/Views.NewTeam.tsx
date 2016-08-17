@@ -20,7 +20,7 @@ module Esper.Views {
           newTeam={true}
           groups={Stores.Groups.all()} />
 
-        <div className="esper-right-content">
+        <div className="esper-content">
           <div id="new-team-page" className="esper-expanded">
             <div className="panel panel-default">
               <div className="panel-heading">
