@@ -23,21 +23,8 @@ module Esper.Actions.EventLabels {
   export function confirm(events: Stores.Events.TeamEvent[],
                           fetchEvents: Stores.Events.TeamEvent[] = [])
   {
-    events = _.filter(events, (e) => e.labelScores.match({
-      // None => no label, so confirm empty
-      none: () => true,
-
-      /*
-        Some => only confirm if score < 1 (don't need to confirm user labels)
-        or if this is an unapproved hashtag
-      */
-      some: (labels) => _.some(labels,
-        (l) => l.score < 1 || _.some(e.hashtags,
-          (h) => (l.id === h.label_norm || l.id === h.hashtag_norm)
-                 && !h.approved
-        )
-      )
-    }));
+    // Don't confirm inactive events
+    events = _.filter(events, (e) => Stores.Events.isActive(e));
 
     if (events.length > 0 || fetchEvents.length > 0) {
       apply(events, {
