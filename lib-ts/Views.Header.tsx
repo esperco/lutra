@@ -37,10 +37,8 @@ module Esper.Views {
     }
 
     renderWithData() {
-      var toggleId = "esper-nav-toggle";
       var loginInfo = Login.getLoginInfo();
       var busy = Login.getStatus() !== Model2.DataStatus.READY;
-
       var hasTeams = Stores.Teams.all().length > 0;
 
       return <div className="navbar-fixed-top">
