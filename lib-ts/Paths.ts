@@ -68,6 +68,14 @@ module Esper.Paths {
   export module Time {
     export const prefix = "/time";
 
+    export function report({ teamId, interval, period } : {
+      teamId?: string;
+      interval?: string;
+      period?: string;
+    } = {}) {
+      return optPath(prefix, "report", teamId, interval, period);
+    }
+
     export interface chartPathOpts {
       teamId?: string;
       calIds?: string;

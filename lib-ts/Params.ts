@@ -245,6 +245,17 @@ module Esper.Params {
     }
   }
 
+  // Spits out strings to use for period in URL
+  export function periodStr(period: Types.SinglePeriod|Types.CustomPeriod) {
+    var str = Period.isCustom(period) ?
+      [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
+      period.index.toString();
+    return {
+      interval: period.interval[0],
+      period: str
+    };
+  }
+
 
   /* Validation for common query JSON */
 
