@@ -120,9 +120,7 @@ module Esper.Components {
       var eventsToUpdate = _.filter(this.props.events,
         (e) => Stores.Events.needsConfirmation(e)
       );
-      if (eventsToUpdate.length < this.props.events.length) {
-        Actions.EventLabels.confirm([], eventsToUpdate);
-      }
+      Actions.EventLabels.confirm([], eventsToUpdate);
     }
 
     perPage() {

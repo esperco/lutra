@@ -362,6 +362,9 @@ module Esper.Charting {
   /* Helper functions for Highcharts */
 
   export function onEventClick(event: Stores.Events.TeamEvent) {
+    // Confirm predicted labels when opening single event
+    Actions.EventLabels.confirm([event]);
+
     Layout.renderModal(Containers.eventEditorModal([event]));
     return false;
   }

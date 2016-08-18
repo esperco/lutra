@@ -66,6 +66,12 @@ module Esper.Stores.Events {
                 score: l.score * PREDICTED_LABEL_MODIFIER
               })).value();
 
+            /*
+              Only return Option.some if we have predicted labels above
+              threshold. This helps us distinguish between an intentional
+              user-selected empty set (Option.some([])) and a lack of
+              predictions (Option.none).
+            */
             if (labelsAboveThreshold.length)
               return Option.some(labelsAboveThreshold);
           }

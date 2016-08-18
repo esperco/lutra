@@ -208,6 +208,9 @@ module Esper.Views {
         selectedList = [Stores.Events.storeId(event)];
       }
 
+      // Confirm before opening modal
+      Actions.EventLabels.confirm([event]);
+
       // Set state to trigger display changes
       this.setState({
         selected: selectedList

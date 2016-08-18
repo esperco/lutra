@@ -180,10 +180,6 @@ module Esper.Actions.Teams {
     var team = Stores.Teams.require(_id);
     if (! team) return;
 
-    if (_.isEqual(team.team_labels, labels)) {
-      return $.Deferred<void>().resolve().promise();
-    }
-
     return setTeamLabels(_id, team, labels);
   }
 
@@ -196,6 +192,11 @@ module Esper.Actions.Teams {
       than in the gajillion places where we pull a list of team labels)
     */
     labels = _.sortBy(labels, Labels.normalizeForSort);
+
+    // Don't do anything if no change
+    if (_.isEqual(team.team_labels, labels)) {
+      return $.Deferred<void>().resolve().promise();
+    }
 
     teamCopy.team_labels = labels;
     teamCopy.team_labels_norm = _.map(labels, Labels.getNorm);
