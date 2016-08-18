@@ -375,6 +375,7 @@ module Esper.Views {
     }
 
     editEvent(event: Stores.Events.TeamEvent, minFeedback=true) {
+      Actions.EventLabels.confirm([event]);
       this.renderModal([event], minFeedback);
     }
 

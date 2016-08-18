@@ -74,8 +74,7 @@ module Esper.Actions.EventLabels {
 
     _.each(teamIds, (teamId) => {
       var teamEvents = eventsByTeamId[teamId] || [];
-      var teamFetchEvents = opts.fetchEvents ?
-        fetchEventsByTeamId[teamId] || [] : null;
+      var teamFetchEvents = fetchEventsByTeamId[teamId];
       applyForTeam(teamId, teamEvents, {
         addLabels: opts.addLabels,
         removeLabels: opts.removeLabels,
@@ -143,9 +142,7 @@ module Esper.Actions.EventLabels {
     var p = TeamLabelQueue.enqueue(teamId, {
       teamId: teamId,
       events: apiEvents,
-      fetchEventIds: Option.wrap(opts.fetchEvents).flatMap(
-        (events) => Option.some( _.map(events, (e) => e.id) )
-      )
+      fetchEventIds: _.map(opts.fetchEvents, (e) => e.id)
     });
 
     // Wrap the whole kaboodle in a transaction
@@ -220,13 +217,7 @@ module Esper.Actions.EventLabels {
   interface QueueRequest {
     teamId: string;
     events: Stores.Events.TeamEvent[];
-
-    /*
-      Option.some => update model and fetch more events
-        (if events is empty, just update model)
-      Option.none => update labels but not models
-    */
-    fetchEventIds: Option.T<string[]>;
+    fetchEventIds: string[];
   };
 
   var TeamLabelQueue = new Queue2.Processor(
@@ -254,39 +245,22 @@ module Esper.Actions.EventLabels {
           .compact()
           .value();
 
-      var p = r.fetchEventIds.match({
-
-        // Just update labels without touching model
-        none: () => Api.batch(() => {
-          _.each(r.events, (e) => {
-            e.labelScores.match({
-              none: () => null,
-              some: (labels) => Api.updateEventLabels(
-                r.teamId, e.recurringEventId || e.id,
-                _.map(labels, (l) => l.displayAs)
-              )
-            });
-          });
-        }).then((): ApiT.GenericCalendarEvents => ({ events: [] })),
-
-        // Updating model, fetch new predictions
-        some: (eventIds) => Api.setPredictLabels(r.teamId, {
-          set_labels: _.map(r.events, (e) => ({
-            id: e.recurringEventId || e.id,
-            labels: e.labelScores.match({
-              none: (): string[] => [],
-              some: (scores) =>
-                _(scores)
-                  .filter(
-                    (s) => !_.some(e.hashtags,
-                      (h) => h.label_norm === s.id ||
-                             h.hashtag_norm === s.id))
-                  .map((s) => s.displayAs)
-                  .value()
-            })
-          })),
-          predict_labels: eventIds
-        })
+      var p = Api.setPredictLabels(r.teamId, {
+        set_labels: _.map(r.events, (e) => ({
+          id: e.recurringEventId || e.id,
+          labels: e.labelScores.match({
+            none: (): string[] => [],
+            some: (scores) =>
+              _(scores)
+                .filter(
+                  (s) => !_.some(e.hashtags,
+                    (h) => h.label_norm === s.id ||
+                           h.hashtag_norm === s.id))
+                .map((s) => s.displayAs)
+                .value()
+          })
+        })),
+        predict_labels: r.fetchEventIds
       });
 
       return Util.when(promises).then(() => p);
@@ -304,23 +278,9 @@ module Esper.Actions.EventLabels {
           next.events = _.uniqBy(r.events.concat(next.events),
             (e) => e.recurringEventId || e.id
           );
-
-          /*
-            Concat confirmations. If updating model for any, then update model
-            for all.
-          */
-          next.fetchEventIds = next.fetchEventIds.match({
-            none: () => r.fetchEventIds.match({
-              none: () => Option.none<any>(),
-              some: (rIds) => Option.some(rIds)
-            }),
-
-            some: (nextIds) => r.fetchEventIds.match({
-              none: () => Option.some(nextIds),
-              some: (rIds) => Option.some( _.uniq(nextIds.concat(rIds)) )
-            })
-          });
-
+          next.fetchEventIds = _.uniq(
+            next.fetchEventIds.concat(r.fetchEventIds)
+          );
           return false;
         }
         return true;
