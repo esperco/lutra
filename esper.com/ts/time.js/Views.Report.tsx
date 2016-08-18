@@ -12,6 +12,16 @@ module Esper.Views {
   export class Report extends ReactHelpers.Component<Props, {}> {
 
     renderWithData() {
+      var team = Stores.Teams.require(this.props.teamId);
+      var cals = _.map(team.team_timestats_calendars, (calId) => ({
+        calId: calId,
+        teamId: this.props.teamId
+      }));
+      var eventData = Stores.Events.require({
+        cals: cals,
+        period: this.props.period
+      });
+
       return <div id="reports-page" className="esper-full-screen minus-nav">
         <Components.Sidebar className="esper-shade">
           <div className="sidebar-bottom-menu">
@@ -25,9 +35,47 @@ module Esper.Views {
         </Components.Sidebar>
 
         <div className="esper-content">
-          { this.props.teamId }
+          { this.renderPeriodSelector() }
+          { (() => {
+            if (eventData.hasError) {
+              return <Msg>
+                <i className="fa fa-fw fa-warning"></i>{" "}
+                { Text.ChartFetchError }
+              </Msg>;
+            }
+            if (eventData.isBusy) {
+              return <Msg>
+                <span className="esper-spinner esper-inline" />{" "}
+                { Text.ChartFetching }
+              </Msg>;
+            }
+            return this.renderMain(eventData);
+          })() }
         </div>
 
+      </div>;
+    }
+
+    renderPeriodSelector() {
+      return <div className={"esper-content-header period-selector " +
+                             "row fixed clearfix"}>
+        <Components.IntervalOrCustomSelector
+          className="col-sm-6"
+          period={this.props.period}
+          updateFn={(p) => this.update({period: p})}
+        />
+        <div className="col-sm-6">
+          <Components.SingleOrCustomPeriodSelector
+            period={this.props.period}
+            updateFn={(p) => this.update({period: p})}
+          />
+        </div>
+      </div>;
+    }
+
+    renderMain(eventData: Types.EventListData) {
+      return <div>
+        { eventData.events.length }
       </div>;
     }
 
@@ -45,6 +93,12 @@ module Esper.Views {
     }
   }
 
-
-
+  // Wrapper around error messages
+  function Msg({children}: { children?: JSX.Element|JSX.Element[]}) {
+    return <div className="esper-expanded esper-no-content">
+      <div className="panel-body">
+        { children }
+      </div>
+    </div>;
+  }
 }

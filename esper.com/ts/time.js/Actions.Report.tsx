@@ -11,6 +11,15 @@ module Esper.Actions {
     teamId: string;
     period: Types.SinglePeriod|Types.CustomPeriod;
   }) {
+    // Fetch events
+    var team = Stores.Teams.require(teamId);
+    var calIds = team.team_timestats_calendars;
+    _.each(calIds, (_id) => Stores.Events.fetchPredictions({
+      teamId: teamId,
+      period: period
+    }));
+
+    // Render view
     render(<Views.Report teamId={teamId} period={period} />);
 
     // Delay tracking by 2 seconds to ensure user is actually looking at list
