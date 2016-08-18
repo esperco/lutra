@@ -74,8 +74,8 @@ module Esper.Views {
     }
 
     renderMain(eventData: Types.EventListData) {
-      return <div>
-        { eventData.events.length }
+      return <div className="report">
+        <TopLine period={this.props.period} eventData={eventData} />
       </div>;
     }
 
@@ -99,6 +99,29 @@ module Esper.Views {
       <div className="panel-body">
         { children }
       </div>
+    </div>;
+  }
+
+  // Event bar at top of report with number of events + hours
+  function TopLine({period, eventData} : {
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData
+  }) {
+    return <div className="topline">
+      <div className="aggregate-metrics clearfix">
+        <span className="metric pull-left">
+          { Text.events(eventData.events.length) }
+        </span>
+        <span className="metric pull-right">
+          { Text.hours(EventStats.toHours(
+              EventStats.aggregateDuration(eventData.events)
+          )) }
+        </span>
+      </div>
+      <Components.EventBar
+        period={period}
+        events={eventData.events}
+      />
     </div>;
   }
 }
