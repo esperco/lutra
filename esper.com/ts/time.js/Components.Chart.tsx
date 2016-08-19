@@ -5,6 +5,8 @@
 module Esper.Components {
 
   interface Props<T> {
+    simplified?: boolean; // Simplified version of chart for report
+
     // Data is a list because we have calculation for each period
     periods: (
       Types.PeriodData<EventStats.CalcBase<T, any>> & Types.HasStatus

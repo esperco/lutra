@@ -37,7 +37,7 @@ module Esper.Params{
     });
   }
 
-  export function cleanWeekHours(weekHours: Types.WeekHours) {
+  export function cleanWeekHours(weekHours?: Types.WeekHours) {
     return WeekHours.map(weekHours || weekHoursAll(),
       (v,k) => cleanDayHoursOpt(v));
   }

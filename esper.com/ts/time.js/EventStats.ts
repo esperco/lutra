@@ -321,6 +321,18 @@ module Esper.EventStats {
   export type CalcOpts = Types.EventCalcOpts;
   export type DomainNestOpts = Types.DomainNestOpts;
 
+  export function defaultCalcOpts(): CalcOpts {
+    return {
+      filterStr: "",
+      labels: Params.cleanListSelectJSON(),
+      domains: Params.cleanListSelectJSON(),
+      durations: Params.cleanListSelectJSON(),
+      ratings: Params.cleanListSelectJSON(),
+      guestCounts: Params.cleanListSelectJSON(),
+      weekHours: Params.weekHoursAll()
+    };
+  }
+
   // How many events to annotate or group at any given time
   const DEFAULT_MAX_PROCESS_EVENTS = 10;
 

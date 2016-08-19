@@ -1,14 +1,29 @@
 @import "../lib/_bootstrap-variables.less";
 
 .report {
-  .aggregate-metrics {
+  h1, h2, h3, h4 {
+    text-transform: capitalize;
   }
 
-  .aggregate-metrics .metric {
-    display: block;
-    font-weight: bold;
-    color: @brand-text-header;
-    text-transform: capitalize;
-    font-size: @font-size-h3;
+  .topline {
+    h1, h2, h3, h4 {
+      margin-top: @esper-base-padding;
+    }
+  }
+
+  @media screen and (min-width: @screen-sm-min) {
+    .description, .chart-content {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .description {
+      width: 40%;
+    }
+
+    .chart-content {
+      padding-top: @line-height-computed;
+      width: 60%;
+    }
   }
 }

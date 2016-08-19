@@ -76,6 +76,7 @@ module Esper.Views {
     renderMain(eventData: Types.EventListData) {
       return <div className="report">
         <TopLine period={this.props.period} eventData={eventData} />
+        <LabelsReport period={this.props.period} eventData={eventData} />
       </div>;
     }
 
@@ -102,26 +103,56 @@ module Esper.Views {
     </div>;
   }
 
+
   // Event bar at top of report with number of events + hours
   function TopLine({period, eventData} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
-    eventData: Types.EventListData
+    eventData: Types.EventListData;
   }) {
-    return <div className="topline">
+    return <div className="esper-section topline">
       <div className="aggregate-metrics clearfix">
-        <span className="metric pull-left">
+        <h3 className="pull-left">
           { Text.events(eventData.events.length) }
-        </span>
-        <span className="metric pull-right">
+        </h3>
+        <h3 className="pull-right">
           { Text.hours(EventStats.toHours(
               EventStats.aggregateDuration(eventData.events)
           )) }
-        </span>
+        </h3>
       </div>
       <Components.EventBar
         period={period}
         events={eventData.events}
       />
     </div>;
+  }
+
+
+  function LabelsReport({period, eventData} : {
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData;
+  }) {
+    var opts = EventStats.defaultCalcOpts();
+    opts.labels.none = false;
+
+    console.info(opts);
+
+    var calc = new EventStats.LabelDurationCalc(
+      eventData.events, opts);
+
+    return <div className="esper-section">
+      <div className="description">
+        <h3>{ Text.ChartLabels }</h3>
+        <p>Something something darkside of the force</p>
+      </div>
+      <Components.LabelPercentChart periods={[{
+        period: period,
+        current: true,
+        isBusy: eventData.isBusy,
+        hasError: eventData.hasError,
+        data: calc,
+        total: 0 // Not used
+      }]} simplified={true} />
+    </div>
   }
 }
