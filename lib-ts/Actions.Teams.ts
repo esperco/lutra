@@ -183,9 +183,18 @@ module Esper.Actions.Teams {
     return setTeamLabels(_id, team, labels);
   }
 
+  // Cleans labels before submission to server
+  export function cleanLabel(label: string) {
+    return (label
+      .replace(/##+/g, "#") // ## is reserved
+      .trim());
+  }
+
   function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
     // Store values immutable so clone
     var teamCopy = _.cloneDeep(team);
+
+    labels = _.map(labels, cleanLabel);
 
     /*
       Alphabetize when setting labels (better performance to sort now

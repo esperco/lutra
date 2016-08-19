@@ -2,6 +2,7 @@
   Module for applying labels to events
 */
 
+/// <reference path="./Actions.Teams.ts" />
 /// <reference path="./Queue2.ts" />
 /// <reference path="./Stores.Events.ts" />
 
@@ -158,12 +159,13 @@ module Esper.Actions.EventLabels {
     removeLabels?: string[];
   }) {
     var labels = _.cloneDeep(Stores.Events.getLabels(event));
-    _.each(opts.addLabels, (l) => {
-      let normalized = Labels.getNorm(l);
+    _.each(opts.addLabels, (label) => {
+      let cleaned = Actions.Teams.cleanLabel(label);
+      let normalized = Labels.getNorm(cleaned);
       if (! _.find(labels, (l) => l.id === normalized)) {
         labels.push({
           id: normalized,
-          displayAs: l,
+          displayAs: cleaned,
           score: 1
         });
       }
