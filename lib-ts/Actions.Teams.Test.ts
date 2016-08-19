@@ -30,9 +30,10 @@ module Esper.Actions.Teams {
 
     it("should de-duplicate similar labels when adding", function() {
       addLabel(this.teamId, "label 3");
-      expect(Api.putSyncedLabels).toHaveBeenCalledWith(this.teamId, {
-        labels: ["Label 1", "Label 2", "Label 3"]
-      });
+      expect(Stores.Teams.require(this.teamId).team_labels).toEqual(
+        ["Label 1", "Label 2", "Label 3"]
+      );
+      expect(Api.putSyncedLabels).not.toHaveBeenCalledWith();
     });
   });
 }
