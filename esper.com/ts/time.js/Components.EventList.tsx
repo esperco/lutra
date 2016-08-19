@@ -116,11 +116,12 @@ module Esper.Components {
           null
         }
         {
-          event.feedback && (event.feedback.notes || event.feedback.rating) ?
+          event.feedback && (event.feedback.notes ||
+            (Stores.Events.isActive(event) && event.feedback.rating)) ?
           <div className="action-block event-feedback"
-             onClick={() => this.handleFeedbackClick(event)}>
-          <EventFeedback event={event} />
-        </div> : null
+               onClick={() => this.handleFeedbackClick(event)}>
+            <EventFeedback event={event} />
+          </div> : null
         }
       </div>;
     }
