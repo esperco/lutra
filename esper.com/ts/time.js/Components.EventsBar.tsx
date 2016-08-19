@@ -75,7 +75,7 @@ module Esper.Components {
     return <Tooltip style={style} className="time-block"
             title={event.title || Text.NoEventTitle}
             onClick={() => Charting.onEventClick(event)}>
-      <span style={{background: Colors.presets[0]}} />
+      <span />
     </Tooltip>;
   }
 }
