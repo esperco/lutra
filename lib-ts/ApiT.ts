@@ -190,6 +190,7 @@ module Esper.ApiT {
     description_messageids: string[];
     labels?: string[];
     labels_norm?: string[];
+    predicted_attended?: number;         // Floating score
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
     hashtags: HashtagState[];
     feedback?: EventFeedback;

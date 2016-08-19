@@ -18,6 +18,7 @@ module Esper.Stores.Events {
   /* Type modification */
 
   const PREDICTED_LABEL_PERCENT_CUTOFF = 0.5;
+  const PREDICTED_ATTENDED_CUTOFF = 0.5;
   const PREDICTED_LABEL_MODIFIER = 0.95;
 
   export type TeamEvent = Types.TeamEvent;
@@ -80,6 +81,20 @@ module Esper.Stores.Events {
       return Option.none<Labels.Label[]>();
     })();
 
+    /*
+      Use predicted_attended number if available. Else look to transparency.
+      Presence of user labels should imply attended.
+      Always override with direct user feedback.
+    */
+    let attendScore = _.isNumber(e.predicted_attended) ?
+      e.predicted_attended : (e.transparent ? 0.1 : 0.9);
+    if (e.labels || _.some(e.hashtags, (h) => h.approved || !!h.label_norm)) {
+      attendScore = 1;
+    }
+    if (e.feedback && _.isBoolean(e.feedback.attended)) {
+      attendScore = e.feedback.attended ? 1 : 0;
+    }
+
     return {
       id: e.id,
       calendarId: e.calendar_id,
@@ -101,7 +116,7 @@ module Esper.Stores.Events {
       location: e.location || "",
       allDay: e.all_day,
       guests: e.guests,
-      transparent: e.transparent,
+      attendScore: attendScore,
       recurringEventId: e.recurring_event_id
     };
   }
@@ -601,10 +616,15 @@ module Esper.Stores.Events {
     return _.map(getLabels(event), (l) => l.id);
   }
 
+  /*
+    Event needs confirmation if scores are between 0 and 1 and if active.
+    For the purpose of determing active, we look towards actual user
+    confirmation. If we predicted an event to active
+  */
   export function needsConfirmation(event: TeamEvent) {
     return event.labelScores.match({
       none: () => true, // No labels, let user confirm empty set
-      some: (labels) => !!_.find(labels, (l) => l.score > 0 && l.score < 1)
+      some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1)
     }) && isActive(event);
   }
 
@@ -618,17 +638,13 @@ module Esper.Stores.Events {
   }
 
   /*
-    "Active" event means we count it in time-stats. If the event is
-    transparent, i.e. marked as "available", we require explicit user
+    "Active" event means we count it in time-stats. If the event's predicted
+    active score is less than the thresholdb, we require explicit user
     action to make it active. Otherwise, it defaults to "active" unless
     the user marks it otherwise.
   */
   export function isActive(event: TeamEvent) {
-    if (event.transparent) {
-      return event.feedback && event.feedback.attended === true;
-    }
-
-    return !(event.feedback && event.feedback.attended === false);
+    return event.attendScore >= PREDICTED_ATTENDED_CUTOFF;
   }
 
   /*
