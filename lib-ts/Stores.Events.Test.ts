@@ -238,6 +238,97 @@ module Esper.Stores.Events {
       });
     });
 
+    describe("needsConfirmation", function() {
+      it("should return true if there are predicted labels to confirm",
+      function() {
+        var e = asTeamEvent(TestFixtures.teamId1,
+          TestFixtures.makeGenericCalendarEvent({
+            predicted_labels: [{ // Label gets ignored
+              label: "Label",
+              label_norm: "label",
+              score: 0.9
+            }],
+            feedback: {
+              teamid: TestFixtures.teamId1,
+              eventid: "e",
+              attended: true
+            }
+          })
+        );
+        expect(needsConfirmation(e)).toBe(true);
+      });
+
+      it("should return true if there were no predictions at all",
+      function() {
+        var e = asTeamEvent(TestFixtures.teamId1,
+          TestFixtures.makeGenericCalendarEvent({
+            predicted_labels: [],
+            feedback: {
+              teamid: TestFixtures.teamId1,
+              eventid: "e",
+              attended: true
+            }
+          })
+        );
+        expect(needsConfirmation(e)).toBe(true);
+      });
+
+      it("should return false if attendance needs confirmation but labels " +
+         "are already confirmed", function() {
+        var e = asTeamEvent(TestFixtures.teamId1,
+          TestFixtures.makeGenericCalendarEvent({
+            labels: ["Label"],
+            labels_norm: ["label"],
+            predicted_attended: 0.9
+          })
+        );
+        expect(needsConfirmation(e)).toBe(false);
+      });
+
+      it("should return true if there are hashtags to approve", function() {
+        var e = asTeamEvent(TestFixtures.teamId1,
+          TestFixtures.makeGenericCalendarEvent({
+            id: "e",
+            labels: ["Label"],
+            labels_norm: ["label"],
+            hashtags: [{
+              hashtag: "#Label2",
+              hashtag_norm: "#label2",
+              approved: false
+            }],
+            feedback: {
+              teamid: TestFixtures.teamId1,
+              eventid: "e",
+              attended: true
+            }
+          })
+        );
+        expect(needsConfirmation(e)).toBe(true);
+      });
+
+      it("should return false if all labels + hashtags + attendance confirmed",
+      function() {
+        var e = asTeamEvent(TestFixtures.teamId1,
+          TestFixtures.makeGenericCalendarEvent({
+            id: "e",
+            labels: ["Label"],
+            labels_norm: ["label"],
+            hashtags: [{
+              hashtag: "#Label2",
+              hashtag_norm: "#label2",
+              approved: true
+            }],
+            feedback: {
+              teamid: TestFixtures.teamId1,
+              eventid: "e",
+              attended: true
+            }
+          })
+        );
+        expect(needsConfirmation(e)).toBe(false);
+      });
+    });
+
     describe("overlapsDate", function() {
       var date = new Date(2016, 0, 2); // Jan 2
 

@@ -617,15 +617,24 @@ module Esper.Stores.Events {
   }
 
   /*
-    Event needs confirmation if scores are between 0 and 1 and if active.
-    For the purpose of determing active, we look towards actual user
-    confirmation. If we predicted an event to active
+    Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
     return event.labelScores.match({
-      none: () => true, // No labels, let user confirm empty set
-      some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1)
-    }) && isActive(event);
+
+      // None => no label or user action, so can confirm  empty
+      none: () => true,
+
+      /*
+        Some => only confirm if score < 1 (don't need to confirm user labels)
+        or if this is an unapproved hashtag. If labelScores is some([]), this
+        means user has already explicitly set labels to empty and the event
+        should be buffered on the backend. If none of the predictions cross
+        the threshold, then labelScores should be none.
+      */
+      some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
+                        _.some(event.hashtags, (h) => !h.approved)
+    }) || (event.attendScore > 0 && event.attendScore < 1);
   }
 
   export function getTeams(events: TeamEvent[]) {

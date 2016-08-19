@@ -23,33 +23,7 @@ module Esper.Actions.EventLabels {
   export function confirm(events: Stores.Events.TeamEvent[],
                           fetchEvents: Stores.Events.TeamEvent[] = [])
   {
-    events = _.filter(events,
-
-      // Don't confirm inactive events
-      (e) => Stores.Events.isActive(e) &&
-
-      // Don't confirm already posted events
-      e.labelScores.match({
-
-        // None => no label or user action, so confirm empty
-        none: () => true,
-
-        /*
-          Some => only confirm if score < 1 (don't need to confirm user labels)
-          or if this is an unapproved hashtag. If labelScores is some([]), this
-          means user has already explicitly set labels to empty and the event
-          should be buffered on the backend. If none of the predictions cross
-          the threshold, then labelScores should be none.
-        */
-        some: (labels) => _.some(labels,
-          (l) => l.score < 1 || _.some(e.hashtags,
-            (h) => (l.id === h.label_norm || l.id === h.hashtag_norm)
-                   && !h.approved
-          )
-        )
-      })
-    );
-
+    events = _.filter(events, Stores.Events.needsConfirmation);
     if (events.length > 0 || fetchEvents.length > 0) {
       apply(events, {
         fetchEvents: fetchEvents
