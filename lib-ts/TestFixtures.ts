@@ -179,6 +179,7 @@ module Esper.TestFixtures {
     hashtags?: ApiT.HashtagState[];
     labels?: string[];
     labels_norm?: string[];
+    predicted_attended?: number;
     predicted_labels?: ApiT.PredictedLabel[];
     recurring_event_id?: string;
     transparent?: boolean;

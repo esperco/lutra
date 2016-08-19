@@ -17,6 +17,9 @@ module Esper.Actions.Feedback {
     newEvent.feedback = _.extend(
       newEvent.feedback, feedback
     ) as ApiT.EventFeedback;
+    if (_.isBoolean(feedback.attended)) {
+      newEvent.attendScore = feedback.attended ? 1 : 0;
+    }
 
     Analytics.track(Analytics.Trackable.SubmitFeedback, {
       teamId: newEvent.teamId,
@@ -58,13 +61,41 @@ module Esper.Actions.Feedback {
       case "good":
         initNewData.feedback.attended = true;
         initNewData.feedback.rating = 5;
+        initNewData.attendScore = 1;
         break;
       case "bad":
         initNewData.feedback.attended = true;
         initNewData.feedback.rating = 1;
+        initNewData.attendScore = 1;
+        break;
+      case "one_star":
+        initNewData.feedback.attended = true;
+        initNewData.feedback.rating = 1;
+        initNewData.attendScore = 1;
+        break;
+      case "two_stars":
+        initNewData.feedback.attended = true;
+        initNewData.feedback.rating = 2;
+        initNewData.attendScore = 1;
+        break;
+      case "three_stars":
+        initNewData.feedback.attended = true;
+        initNewData.feedback.rating = 3;
+        initNewData.attendScore = 1;
+        break;
+      case "four_stars":
+        initNewData.feedback.attended = true;
+        initNewData.feedback.rating = 4;
+        initNewData.attendScore = 1;
+        break;
+      case "five_stars":
+        initNewData.feedback.attended = true;
+        initNewData.feedback.rating = 5;
+        initNewData.attendScore = 1;
         break;
       case "didnt_attend":
         initNewData.feedback.attended = false;
+        initNewData.attendScore = 0;
         break;
       default:
         break;

@@ -59,12 +59,12 @@ module Esper.Types {
 
     labelScores: Option.T<Label[]>;
     hashtags: ApiT.HashtagState[];
+    attendScore: number;
 
     feedback: ApiT.EventFeedback;
     location: string;
     allDay: boolean;
     guests: ApiT.Attendee[];
-    transparent: boolean;
     recurringEventId?: string;
   }
 
