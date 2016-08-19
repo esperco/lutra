@@ -130,6 +130,15 @@ module Esper.Actions.EventLabels {
       var newEvent = _.cloneDeep(e);
       newEvent.labelScores = Option.some(getNewLabels(e, opts));
       newEvent.hashtags = getNewHashtags(newEvent);
+
+      // Event labeling of any kind implies attendance
+      newEvent.attendScore = 1;
+      newEvent.feedback = newEvent.feedback || {
+        eventid: e.id,
+        teamid: e.teamId
+      };
+      newEvent.feedback.attended = true;
+
       return newEvent;
     });
 
@@ -223,7 +232,8 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      var promises =
+      return Api.batch(function() {
+        var promises =
         _(r.events)
           .map((e) => e.labelScores.match({
             none: () => null,
@@ -245,25 +255,27 @@ module Esper.Actions.EventLabels {
           .compact()
           .value();
 
-      var p = Api.setPredictLabels(r.teamId, {
-        set_labels: _.map(r.events, (e) => ({
-          id: e.recurringEventId || e.id,
-          labels: e.labelScores.match({
-            none: (): string[] => [],
-            some: (scores) =>
-              _(scores)
-                .filter(
-                  (s) => !_.some(e.hashtags,
-                    (h) => h.label_norm === s.id ||
-                           h.hashtag_norm === s.id))
-                .map((s) => s.displayAs)
-                .value()
-          })
-        })),
-        predict_labels: r.fetchEventIds
-      });
+        var p = Api.setPredictLabels(r.teamId, {
+          set_labels: _.map(r.events, (e) => ({
+            id: e.recurringEventId || e.id,
+            labels: e.labelScores.match({
+              none: (): string[] => [],
+              some: (scores) =>
+                _(scores)
+                  .filter(
+                    (s) => !_.some(e.hashtags,
+                      (h) => h.label_norm === s.id ||
+                             h.hashtag_norm === s.id))
+                  .map((s) => s.displayAs)
+                  .value()
+            }),
+            attended: true // EventLabels change implies attended is true
+          })),
+          predict_labels: r.fetchEventIds
+        });
 
-      return Util.when(promises).then(() => p);
+        return Util.when(promises).then(() => p);
+      });
     },
 
     // Pre-processor
