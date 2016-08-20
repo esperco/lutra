@@ -871,26 +871,37 @@ module Esper.EventStats {
       }, emptyOptGrouping()) as LabelCalcCount;
     }
 
+    /*
+      Because we use label count calc to look for unconfirmed events, don't
+      filter out inactive events here.
+    */
+    filterEvent(event: Stores.Events.TeamEvent) {
+      return true;
+    }
+
     processBatch(events: Stores.Events.TeamEvent[], results: LabelCalcCount) {
       _.each(events, (e) => {
+        var annotations: Annotation[] = [];
         var eventKey = Stores.Events.strId(e);
         var newEvent = !(results && results.eventMap[eventKey]);
 
-        var labelIds = Stores.Events.getLabelIds(e);
-        var annotations = labelIds.length ?
-          // Create annotation for each label
-          _.map(labelIds, (labelId) => ({
-            event: e,
-            value: 1,
-            groups: [labelId]
-          })) :
+        if (Stores.Events.isActive(e)) {
+          let labelIds = Stores.Events.getLabelIds(e);
+          annotations = labelIds.length ?
+            // Create annotation for each label
+            _.map(labelIds, (labelId) => ({
+              event: e,
+              value: 1,
+              groups: [labelId]
+            })) :
 
-          // Empty label => no labels
-          [{
-            event: e,
-            value: 1,
-            groups: []
-          }];
+            // Empty label => no labels
+            [{
+              event: e,
+              value: 1,
+              groups: []
+            }];
+        }
 
         results = _.extend({
           unconfirmed: [],
