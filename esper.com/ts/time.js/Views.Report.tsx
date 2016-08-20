@@ -134,25 +134,21 @@ module Esper.Views {
   }) {
     var opts = EventStats.defaultCalcOpts();
     opts.labels.none = false;
-
-    console.info(opts);
-
-    var calc = new EventStats.LabelDurationCalc(
-      eventData.events, opts);
+    var periods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.LabelDurationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
 
     return <div className="esper-section">
       <div className="description">
         <h3>{ Text.ChartLabels }</h3>
-        <p>Something something darkside of the force</p>
+        <Components.LabelChartInsight periods={periods} />
       </div>
-      <Components.LabelPercentChart periods={[{
-        period: period,
-        current: true,
-        isBusy: eventData.isBusy,
-        hasError: eventData.hasError,
-        data: calc,
-        total: 0 // Not used
-      }]} simplified={true} />
+      <Components.LabelPercentChart periods={periods} simplified={true} />
     </div>
   }
 }

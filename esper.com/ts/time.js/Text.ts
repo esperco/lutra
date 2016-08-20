@@ -129,18 +129,19 @@ module Esper.Text {
 
   // Chart descriptions
   export const ChartCalendarsDescription =
-    `Which of my calendars has more events scheduled? You can use this to ` +
+    `Which of your calendars has more events scheduled? You can use this to ` +
     `compare your work and personal calendars.`;
   export const ChartDurationDescription =
-    `Am I spending my time in many short meetings or a few long meetings?`;
+    `Are you spending my time in many short meetings or a few long meetings?`;
   export const ChartLabelsDescription =
-    `What am I spending the most time on?`;
+    `You can add ${Labels} to your events to ` +
+    `categorize them and see what you're spending the most time on.`;
   export const ChartGuestsDescription =
-    `Who am I meeting the most with?`;
+    `Who are you meeting the most with?`;
   export const ChartGuestsCountDescription =
-    `Are there too many people invited to the meetings I attend?`
+    `Are there too many people invited to the meetings you attend?`
   export const ChartRatingsDescription =
-    `How much time do I spend in good meetings vs. bad meetings?`;
+    `How much time do you spend in good meetings vs. bad meetings?`;
 
   /* Chart Misc */
 

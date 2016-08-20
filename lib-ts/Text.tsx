@@ -19,6 +19,7 @@ module Esper.Text {
   // Basics
   export const Label = "tag";
   export const Labels = "tags";
+  export const Labeled = "tagged"
 
   export const Calendar = "calendar";
   export const Calendars = "calendars";
