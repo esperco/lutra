@@ -72,7 +72,7 @@ module Esper.Views {
                 some: () => this.navLinks("nav navbar-nav")
               }) : null}
 
-              <div className="navbar-text navbar-right">
+              <div className="navbar-text pull-right">
                 <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
                   { this.loginLinks("esper-select-menu") }
                 </Components.LoginInfo>
