@@ -96,7 +96,8 @@ module Esper.Components {
 
       var data = Option.flatten(results);
       if (_.every(data, (d) => this.noData(d.data))) {
-        return this.renderMsg(Text.ChartNoData)
+        return this.props.simplified ?
+          <span /> : this.renderMsg(Text.ChartNoData)
       }
 
       return this.renderMain(data);
