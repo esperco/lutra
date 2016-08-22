@@ -633,7 +633,7 @@ module Esper.Stores.Events {
         the threshold, then labelScores should be none.
       */
       some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
-                        _.some(event.hashtags, (h) => !h.approved)
+                        _.some(event.hashtags, (h) => !_.isBoolean(h.approved))
     }) || (event.attendScore > 0 && event.attendScore < 1);
   }
 
