@@ -14,12 +14,17 @@ module Esper.Components {
         yFn: EventStats.toHours
       });
 
+      if (this.props.simplified) {
+        series = series.slice(0, 4);
+      }
+
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
         <AbsoluteChart
           orientation="horizontal"
           series={series}
           categories={keys}
+          simplified={this.props.simplified}
           yAxis={`${Text.ChartGuests} (${Text.ChartHoursUnit})`}
         />
       </div>;
@@ -30,8 +35,11 @@ module Esper.Components {
   export class GuestPercentChart extends DefaultChart {
     renderMain(groups: Charting.PeriodOptGroup[]) {
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
-        <GuestPercentDrilldownChart groups={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
+        <GuestPercentDrilldownChart
+          groups={groups}
+          simplified={this.props.simplified}
+        />
       </div>;
     }
   }
@@ -46,7 +54,8 @@ module Esper.Components {
   const MAX_COLOR_DELTA = 0.3;
 
   class GuestPercentDrilldownChart extends ReactHelpers.Component<{
-    groups: Charting.PeriodOptGroup[]
+    groups: Charting.PeriodOptGroup[];
+    simplified?: boolean;
   }, {
     subgroup?: string[];
   }> {
@@ -69,6 +78,7 @@ module Esper.Components {
       return <div className="chart-holder-parent">
         <PercentageChart
           series={series}
+          simplified={this.props.simplified}
           yAxis={`${Text.ChartGuests} (${Text.ChartPercentUnit})`}
         />
         {

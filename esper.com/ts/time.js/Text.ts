@@ -137,7 +137,9 @@ module Esper.Text {
     `You can add ${Labels} to your events to ` +
     `categorize them and see what you're spending the most time on.`;
   export const ChartGuestsDescription =
-    `Who are you meeting the most with?`;
+    `These are the people with whom you have the most meeting time scheduled.`;
+  export const ChartNoGuests =
+    `None of these events have any guests invited.`;
   export const ChartGuestsCountDescription =
     `Are there too many people invited to the meetings you attend?`
   export const ChartRatingsDescription =

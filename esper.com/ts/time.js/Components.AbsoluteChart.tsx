@@ -20,7 +20,7 @@ module Esper.Components {
         type: 'column'
       } : {
         type: 'bar',
-        height: series.length * 50 + 120
+        height: simplified ? series.length * 50 : series.length * 50 + 120
       },
 
       tooltip: Charting.eventPointTooltip,
@@ -45,7 +45,8 @@ module Esper.Components {
       },
 
       yAxis: [{
-        title: yAxis ? { text: yAxis } : null,
+        title: yAxis && !simplified ? { text: yAxis } : null,
+        visible: !simplified,
         stackLabels: {
           enabled: !simplified,
           formatter: Charting.stackPointFormatter,

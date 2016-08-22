@@ -12,18 +12,18 @@
   }
 
   @media screen and (min-width: @screen-sm-min) {
-    .description, .chart-content {
+    .description.narrow, .description.narrow + .chart-content {
       display: inline-block;
       vertical-align: top;
     }
 
-    .description {
-      width: 50%;
+    .description.narrow {
+      width: 35%;
     }
 
-    .chart-content {
+    .description.narrow + .chart-content {
       padding-top: @line-height-computed;
-      width: 50%;
+      width: 65%;
       .chart-holder { height: 300px; }
     }
   }

@@ -77,6 +77,7 @@ module Esper.Views {
       return <div className="report">
         <TopLine period={this.props.period} eventData={eventData} />
         <LabelsReport period={this.props.period} eventData={eventData} />
+        <GuestReport period={this.props.period} eventData={eventData} />
       </div>;
     }
 
@@ -144,11 +145,37 @@ module Esper.Views {
     }];
 
     return <div className="esper-section">
-      <div className="description">
+      <div className="description narrow">
         <h3>{ Text.ChartLabels }</h3>
         <Components.LabelChartInsight periods={periods} />
       </div>
       <Components.LabelPercentChart periods={periods} simplified={true} />
+    </div>
+  }
+
+
+  function GuestReport({period, eventData} : {
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData;
+  }) {
+    var opts = _.extend(EventStats.defaultCalcOpts(), {
+      nestByDomain: false
+    }) as EventStats.DomainNestOpts ;
+    var periods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.GuestDurationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
+
+    return <div className="esper-section">
+      <div className="description">
+        <h3>{ Text.ChartGuests }</h3>
+        <Components.GuestChartInsight periods={periods} />
+      </div>
+      <Components.GuestHoursChart periods={periods} simplified={true} />
     </div>
   }
 }
