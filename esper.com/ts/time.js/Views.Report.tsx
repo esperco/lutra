@@ -132,7 +132,7 @@ module Esper.Views {
           )) }
         </h3>
       </div>
-      <Components.EventBar
+      <Components.EventTimeline
         period={period}
         events={eventData.events}
       />

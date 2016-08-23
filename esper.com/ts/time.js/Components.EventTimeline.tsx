@@ -1,11 +1,11 @@
 /*
-  Chart-like object that just shows a stacked bar chart for all events
+  Chart-like object that just shows a timeline for all events
 */
 
 module Esper.Components {
   const MAX_TICKS = 10;
 
-  export function EventBar({period, events}: {
+  export function EventTimeline({period, events}: {
     period: Types.SinglePeriod|Types.CustomPeriod;
     events: Types.TeamEvent[];
   }) {
