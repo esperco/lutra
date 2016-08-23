@@ -17,9 +17,9 @@ module Esper.Components {
 
     if (childrenArr.length === 2) {
       return <span>
-        childrenArr[0]
+        { childrenArr[0] }
         {" and "}
-        childrenArr[1]
+        { childrenArr[1] }
       </span>;
     }
 
