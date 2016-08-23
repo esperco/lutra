@@ -9,14 +9,11 @@ module Esper.Components {
     // For insights, OK to leave blank if error, busy (there should be some
     // accompanying other chart to flash messages)
     renderMsg() { return <span />; }
+
+    // Always return false -- let renderMain handle no data scenario
+    noData(data: T) { return false; }
   }
 
   export abstract class ChartGroupingInsight<U>
-    extends ChartInsight<Types.EventOptGrouping, U> {
-
-    // Always return false -- let renderMain handle no data scenario
-    noData(data: Types.EventOptGrouping) {
-      return false;
-    }
-  }
+    extends ChartInsight<Types.EventOptGrouping, U> { }
 }

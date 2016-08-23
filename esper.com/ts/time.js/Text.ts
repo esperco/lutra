@@ -143,9 +143,11 @@ module Esper.Text {
     `We've grouped the people you meet with by which organization their ` +
     `email address belongs to.`;
   export const ChartNoGuests =
-    `None of these events have any guests invited.`;
+    `None of these events have any ${Guests} invited.`;
   export const ChartGuestsCountDescription =
-    `Are there too many people invited to the meetings you attend?`
+    `We've added up the number of ${Guests} invited to each meeting. ` +
+    `Meetings with too many ${Guests} tend not be a productive use ` +
+    `of everyone's time.`;
   export const ChartRatingsDescription =
     `How much time do you spend in good meetings vs. bad meetings?`;
 

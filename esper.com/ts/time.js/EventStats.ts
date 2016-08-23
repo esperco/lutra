@@ -1075,6 +1075,22 @@ module Esper.EventStats {
     return _.findLast(GUEST_COUNT_BUCKETS, (b) => count >= b.gte);
   }
 
+  export class GuestCountAnnotationCalc
+    extends EventCountCalc<[Types.TeamEvent, number][], {}>
+  {
+    initResult(): [Types.TeamEvent, number][] {return []; }
+
+    processBatch(events: Stores.Events.TeamEvent[],
+                 results: [Types.TeamEvent, number][])
+    {
+      return results.concat(
+        _.map(events, (e): [Types.TeamEvent, number] =>
+          [e, Stores.Events.getGuests(e).length]
+        )
+      );
+    }
+  }
+
   export class GuestCountDurationCalc
       extends DurationCalc<OptGrouping, CalcOpts> {
     static BUCKETS = GUEST_COUNT_BUCKETS;

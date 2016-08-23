@@ -87,6 +87,7 @@ module Esper.Views {
         /> : null}
         <GuestsReport period={this.props.period} eventData={eventData} />
         <DomainsReport period={this.props.period} eventData={eventData} />
+        <GuestCountReport period={this.props.period} eventData={eventData} />
       </div>;
     }
 
@@ -244,6 +245,42 @@ module Esper.Views {
         <Components.DomainChartInsight periods={periods} />
       </div>
       <Components.GuestPercentChart periods={periods} simplified={true} />
+    </div>
+  }
+
+
+  function GuestCountReport({period, eventData} : {
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData;
+  }) {
+    var opts = EventStats.defaultCalcOpts();
+    opts.guestCounts.none = false;
+
+    var chartPeriods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.GuestCountDurationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
+    var insightPeriods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.GuestCountAnnotationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
+    return <div className="esper-section">
+      <div className="description narrow">
+        <h3>{ Text.ChartGuestsCount  }</h3>
+        <Components.GuestCountChartInsight periods={insightPeriods} />
+      </div>
+      <Components.GuestCountPercentChart
+        periods={chartPeriods}
+        simplified={true}
+      />
     </div>
   }
 }

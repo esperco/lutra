@@ -11,9 +11,6 @@ module Esper.Components {
       let periodGroup = _.find(groups, (g) => g.current);
       if (! periodGroup) return <span />;
 
-      let noGuests =
-        periodGroup.data.totalUnique === periodGroup.data.none.totalUnique;
-
       /*
         NB: We'd move more of this to Text namespace but given the complexity
         of the scenarios, leave alone for the time being
@@ -24,9 +21,9 @@ module Esper.Components {
           Insights.matchScenario(periodGroup.data, {
             allNone: () => <p>{ Text.ChartNoGuests }</p>,
 
-            allOne: (label) => <p>
+            allOne: (domain) => <p>
               All of your meetings are with {Text.Guests} from
-              <InlineDomain domain={label} />.
+              <InlineDomain domain={domain} />.
             </p>,
 
             allEqual: (pairs) => <p>
