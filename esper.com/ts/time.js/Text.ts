@@ -129,8 +129,9 @@ module Esper.Text {
 
   // Chart descriptions
   export const ChartCalendarsDescription =
-    `Which of your calendars has more events scheduled? You can use this to ` +
-    `compare your work and personal calendars.`;
+    `You have more than one calendar hooked up to Esper. We've grouped your ` +
+    `events by which calendar they're on. This can be helpful for tracking ` +
+    `how much time you spend on personal vs. work-related events`;
   export const ChartDurationDescription =
     `Are you spending my time in many short meetings or a few long meetings?`;
   export const ChartLabelsDescription =

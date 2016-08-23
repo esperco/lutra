@@ -74,9 +74,17 @@ module Esper.Views {
     }
 
     renderMain(eventData: Types.EventListData) {
+      var calendars = Option.matchList(
+        Stores.Calendars.list(this.props.teamId)
+      );
       return <div className="report">
         <TopLine period={this.props.period} eventData={eventData} />
         <LabelsReport period={this.props.period} eventData={eventData} />
+        { calendars.length > 1 ? <CalendarsReport
+          period={this.props.period}
+          eventData={eventData}
+          calendars={calendars}
+        /> : null}
         <GuestsReport period={this.props.period} eventData={eventData} />
         <DomainsReport period={this.props.period} eventData={eventData} />
       </div>;
@@ -151,6 +159,38 @@ module Esper.Views {
         <Components.LabelChartInsight periods={periods} />
       </div>
       <Components.LabelPercentChart periods={periods} simplified={true} />
+    </div>
+  }
+
+
+  function CalendarsReport({calendars, period, eventData} : {
+    calendars: ApiT.GenericCalendar[];
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData;
+  }) {
+    var opts = EventStats.defaultCalcOpts();
+    var periods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.CalendarDurationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
+
+    return <div className="esper-section">
+      <div className="description narrow">
+        <h3>{ Text.ChartCalendars }</h3>
+        <Components.CalendarChartInsight
+          calendars={calendars}
+          periods={periods}
+        />
+      </div>
+      <Components.CalendarPercentChart
+        calendars={calendars}
+        periods={periods}
+        simplified={true}
+      />
     </div>
   }
 
