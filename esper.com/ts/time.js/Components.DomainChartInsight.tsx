@@ -22,7 +22,7 @@ module Esper.Components {
             allNone: () => <p>{ Text.ChartNoGuests }</p>,
 
             allOne: (domain) => <p>
-              All of your meetings are with {Text.Guests} from
+              All of your meetings are with {Text.Guests} from{" "}
               <InlineDomain domain={domain} />.
             </p>,
 

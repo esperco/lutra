@@ -836,6 +836,21 @@ module Esper.EventStats {
     }
   }
 
+  export class DurationAnnotationCalc
+    extends DurationCalc<[Types.TeamEvent, number][], {}>
+  {
+    initResult(): [Types.TeamEvent, number][] {return []; }
+
+    processOne(
+      event: Types.TeamEvent,
+      duration: number,
+      results: [Types.TeamEvent, number][]
+    ) {
+      results.push([event, duration]);
+      return results;
+    }
+  }
+
 
   /* Calc for sorting events by calendar */
 
@@ -1085,7 +1100,7 @@ module Esper.EventStats {
     {
       return results.concat(
         _.map(events, (e): [Types.TeamEvent, number] =>
-          [e, Stores.Events.getGuests(e).length]
+          [e, Stores.Events.getGuests(e).length + 1] // +1 for exec
         )
       );
     }

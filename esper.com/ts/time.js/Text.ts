@@ -133,7 +133,9 @@ module Esper.Text {
     `events by which calendar they're on. This can be helpful for tracking ` +
     `how much time you spend on personal vs. work-related events`;
   export const ChartDurationDescription =
-    `Are you spending my time in many short meetings or a few long meetings?`;
+    `We've grouped your events by how long they are. If you need to touch ` +
+    `base with many different ${Guests}, it may help to schedule shorter ` +
+    `meetings.`;
   export const ChartLabelsDescription =
     `You can add ${Labels} to your events to ` +
     `categorize them and see what you're spending the most time on.`;
@@ -168,6 +170,14 @@ module Esper.Text {
   export function hours(n?: number) {
     if (_.isUndefined(n)) { return 'hours'; }
     return `${Util.roundStr(n, 2)} hour${s(n)}`;
+  }
+
+  export function hoursOrMinutes(minutes: number) {
+    if (minutes < 60) {
+      minutes = Math.round(minutes)
+      return `${minutes} minute${s(minutes)}`;
+    }
+    return hours(minutes / 60);
   }
 
   export function hoursUnit(n: number) {
