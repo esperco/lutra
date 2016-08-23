@@ -11,67 +11,52 @@ module Esper.Components {
       let periodGroup = _.find(groups, (g) => g.current);
       if (! periodGroup) return <span />;
 
-      let tuples = _.map(periodGroup.data.some,
-        (v, k): [string, number] => [k,
-          v.totalValue / periodGroup.data.totalValue]
-      );
-      tuples = _.sortBy(tuples, (t) => -t[1]);
-
-      let tier1 = tier(tuples);
-      let tier2 = tier(tuples.slice(tier1.length));
-
+      /*
+        NB: We'd move more of this to Text namespace but given the complexity
+        of the scenarios, leave alone for the time being
+      */
       return <div>
         <p>{ Text.ChartLabelsDescription }</p>
+        {
+          Insights.matchScenario(periodGroup.data, {
+            allNone: () => <p>None of your events are {Text.Labeled}.</p>,
 
-        { _.isEmpty(tier1) ?
-          <p>None of your events are {Text.Labeled}/</p> :
-          <p>
-            You're spending the bulk of your time on events
-            {" " + Text.Labeled + " "}
-            <CommaList>
-              { _.map(tier1, (t) => <InlineLabel key={t[0]} id={t[0]} />) }
-            </CommaList>
+            allOne: (label) => <p>
+              All of your {Text.Labeled} time is being spent on {" "}
+              <InlineLabel id={label} />.
+            </p>,
 
-            { _.isEmpty(tier2) ? null :
-              <span>
-                {" "}followed by{" "}
-                <CommaList>
-                  { _.map(tier2, (t) => <InlineLabel key={t[0]} id={t[0]} />) }
-                </CommaList>
-              </span>
-            }.
-          </p>
+            allEqual: (pairs) => <p>
+              Your time is being spent roughly equally between{" "}
+              <InlineLabelList pairs={pairs} />.
+            </p>,
+
+            tiersMajority: (tier1, tier2) => <p>
+              You're spending the majority of your time on events
+              {" " + Text.Labeled + " "}
+              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} />.
+            </p>,
+
+            tiersPlurality: (tier1, tier2) => <p>
+              You're spending the bulk of your time on events
+              {" " + Text.Labeled + " "}
+              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} />.
+            </p>
+          }, (pairs) => <p>
+            Your top {Text.Labels} are{" "}
+            <InlineLabelList pairs={pairs.slice(0, 3)} />.
+          </p>)
         }
       </div>;
     }
   }
 
-  /*
-    Given a list of sorted [string, number] pairs, where the number is a
-    a float betwen 0 and 1, returns the first "tier" of pairs (i.e. pairs where
-    the number is reasonably close to the largest number).
-  */
-  function tier(pairs: [string, number][]) {
-    let ret: [string, number][] = [];
-    let index = 0;
-
-    if (pairs.length) {
-      ret.push(pairs[0]);
-      let base = pairs[0][1];
-      let threshold = Math.max(0.8 * base, 0.02);
-      index += 1;
-
-      while (pairs[index]) {
-        if (pairs[index][1] >= threshold) {
-          ret.push(pairs[index]);
-          index += 1;
-        } else {
-          break;
-        }
-      }
-    }
-
-    return ret;
+  function InlineLabelList({pairs} : {pairs: [string, number][]}) {
+    return <CommaList>
+      { _.map(pairs, (p) => <InlineLabel key={p[0]} id={p[0]} />) }
+    </CommaList>
   }
 
   function InlineLabel({id}: {id: string}) {
