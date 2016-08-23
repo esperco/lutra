@@ -86,7 +86,7 @@ module Esper.Text {
   export const Unconfirmed = `New Events`;
   export const SearchEventsPlaceholder = `Filter Events`;
 
-  export const GuestDomains = `Organization`;
+  export const GuestDomains = `Organizations`;
   export const NoGuests = `No Guests`;
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
@@ -137,7 +137,10 @@ module Esper.Text {
     `You can add ${Labels} to your events to ` +
     `categorize them and see what you're spending the most time on.`;
   export const ChartGuestsDescription =
-    `These are the people with whom you have the most meeting time scheduled.`;
+    `These are the people whom you spend the most time in meetings with.`;
+  export const ChartDomainsDescription =
+    `We've grouped the people you meet with by which organization their ` +
+    `email address belongs to.`;
   export const ChartNoGuests =
     `None of these events have any guests invited.`;
   export const ChartGuestsCountDescription =

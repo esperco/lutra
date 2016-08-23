@@ -70,9 +70,10 @@ module Esper.Components {
         noneName: Text.NoGuests,
         yFn: EventStats.toHours,
         subgroup: this.state.subgroup,
-        onDrilldown: (subgroup: string[]) => this.setState({
-          subgroup: subgroup
-        })
+        onDrilldown: this.props.simplified ? null :
+          (subgroup: string[]) => this.setState({
+            subgroup: subgroup
+          })
       });
 
       return <div className="chart-holder-parent">
