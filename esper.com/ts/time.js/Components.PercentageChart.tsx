@@ -28,15 +28,18 @@ module Esper.Components {
           allowPointSelect: true,
           cursor: 'pointer',
           dataLabels: {
-            enabled: !simplified,
+            enabled: true,
             formatter: function() {
               if (this.percentage) {
+                if (simplified && this.percentage < 5) {
+                  return null;
+                }
                 return `${this.point.name} ` +
                   `(${Util.roundStr(this.percentage, 1)}%)`;
               }
             }
           },
-          size: simplified ? '100%' : '80%'
+          size: simplified ? '90%' : '80%'
         }
       },
 
