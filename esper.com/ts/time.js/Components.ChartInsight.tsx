@@ -6,16 +6,17 @@
 
 module Esper.Components {
   export abstract class ChartInsight<T, U> extends Chart<T, U> {
-    // For insights, OK to leave blank if no data (there should be some
-    // accompanying other chart to flash an error)
+    // For insights, OK to leave blank if error, busy (there should be some
+    // accompanying other chart to flash messages)
     renderMsg() { return <span />; }
   }
 
   export abstract class ChartGroupingInsight<U>
     extends ChartInsight<Types.EventOptGrouping, U> {
 
+    // Always return false -- let renderMain handle no data scenario
     noData(data: Types.EventOptGrouping) {
-      return _.isEmpty(data.none.annotations) && _.isEmpty(data.some);
+      return false;
     }
   }
 }
