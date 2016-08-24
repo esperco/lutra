@@ -40,7 +40,9 @@ module Esper.Components {
     }
 
     let title = annotation.event.title || Text.NoEventTitle;
-    title += ` (${bucket.label})`;
+    let minutes = (annotation.event.end.getTime() -
+      annotation.event.start.getTime()) / 60000;
+    title += ` (${Text.hoursOrMinutes(minutes)})`;
 
     return <Tooltip title={title}
       style={{ flexBasis: annotation.value }}
