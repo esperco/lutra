@@ -452,7 +452,6 @@ module Esper.Actions.Charts {
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.LabelDurationCalc(events, o.extra)
     );
-    console.info(o.extra);
     render(ReactHelpers.contain(function() {
       let {chart, events} = getChart(o, {
         cal: (data) => <Components.LabelEventGrid

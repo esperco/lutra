@@ -22,8 +22,8 @@ module Esper.Components {
             allNone: () => <p>None of your events are {Text.Labeled}.</p>,
 
             allOne: (label) => <p>
-              All of your {Text.Labeled} time is being spent on {" "}
-              <InlineLabel id={label} />.
+              All of your {" " + Text.Labeled + " "} time is being spent on
+              {" "}<InlineLabel id={label} />.
             </p>,
 
             allEqual: (pairs) => <p>

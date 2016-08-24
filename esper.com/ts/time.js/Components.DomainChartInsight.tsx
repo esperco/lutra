@@ -22,24 +22,24 @@ module Esper.Components {
             allNone: () => <p>{ Text.ChartNoGuests }</p>,
 
             allOne: (domain) => <p>
-              All of your meetings are with {Text.Guests} from{" "}
+              All of your meetings are with {" " + Text.Guests} from{" "}
               <InlineDomain domain={domain} />.
             </p>,
 
             allEqual: (pairs) => <p>
               Your time is being spent roughly equally between
-              {Text.Guests} from{" "}
+              {" " + Text.Guests} from{" "}
               <InlineDomainList pairs={pairs} />.
             </p>,
 
             tiersMajority: (tier1, tier2) => <p>
               You're spending the majority of your meetings with
-              {Text.Guests} from{" "}
+              {" " + Text.Guests} from{" "}
               <InlineDomainList pairs={tier1} />, {" "}followed by{" "}
               <InlineDomainList pairs={tier2} />.
             </p>
           }, (pairs) => <p>
-            You meet the most with {Text.Guests} from{" "}
+            You meet the most with {" " + Text.Guests} from{" "}
             <InlineDomainList pairs={pairs.slice(0, 3)} />.
           </p>)
         }
