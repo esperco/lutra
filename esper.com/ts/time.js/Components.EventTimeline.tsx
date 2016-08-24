@@ -59,7 +59,7 @@ module Esper.Components {
     start: number; // Seconds
     total: number; // Seconds
   }) {
-    let eventStart = (event.start.getTime() / 1000) - start;
+    let eventStart = Math.max((event.start.getTime() / 1000) - start, 0);
 
     // Clip so event duration doesn't go past total
     let eventDuration = Math.min(
