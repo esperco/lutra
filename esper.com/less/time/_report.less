@@ -1,6 +1,13 @@
 @import "../lib/_bootstrap-variables.less";
 
 .report {
+  width: 100%;
+  max-width: @screen-md-min;
+  margin: 0 auto @esper-base-padding;
+  padding: 0 @esper-base-padding;
+  background: @brand-contrast;
+  border-radius: @border-radius-base;
+
   h1, h2, h3, h4 {
     text-transform: capitalize;
   }
@@ -23,7 +30,8 @@
 
     .description.narrow + .chart-content {
       padding-top: @line-height-computed;
-      width: 65%;
+      margin-left: 4%;
+      width: 60%;
       .chart-holder { height: 300px; }
     }
   }
