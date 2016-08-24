@@ -4,7 +4,7 @@
 
 /// <reference path="./Components.Chart.tsx" />
 /// <reference path="./Components.EventGrid.tsx" />
-/// <reference path="./Text.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Components {
   function displayNameForRating(rating: string) {

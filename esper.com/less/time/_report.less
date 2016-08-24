@@ -24,20 +24,30 @@
   }
 
   @media screen and (min-width: @screen-sm-min) {
-    .description.narrow, .description.narrow + .chart-content {
-      display: inline-block;
-      vertical-align: top;
-    }
+    .report-section {
+      display: flex;
+      flex-flow: row wrap;
+      align-items: flex-start;
 
-    .description.narrow {
-      width: 35%;
-    }
+      .description {
+        flex: 1 30%;
+      }
 
-    .description.narrow + .chart-content {
-      padding-top: @line-height-computed;
-      margin-left: 4%;
-      width: 60%;
-      .chart-holder { height: 300px; }
+      .chart-content {
+        flex: 2 65%;
+        margin-left: @esper-base-padding;
+
+        .chart-holder { height: 300px; }
+      }
+
+      .wide {
+        flex: 1 100%;
+
+        .chart-content {
+          margin-left: 0;
+          .chart-holder { height: auto; }
+        }
+      }
     }
   }
 }

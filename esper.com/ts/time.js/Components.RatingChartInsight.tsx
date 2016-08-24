@@ -86,16 +86,7 @@ module Esper.Components {
               </span>
             })()}
           </p> :
-          <p>
-            You don't have any ratings. You can rate events by clicking
-            on them in the
-            {" "}<a href={Paths.Time.list().href}>event list</a>. You
-            can also {" "}
-            <a href={Paths.Manage.Team.notifications().href}>
-              enable email and Slack notifications to rate events
-              in the settings page
-            </a>.
-          </p>
+          <p>{ Text.NoRatingsMessage }</p>
         }
       </div>;
     }

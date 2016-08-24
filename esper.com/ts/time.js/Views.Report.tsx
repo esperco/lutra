@@ -158,8 +158,8 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section">
-      <div className="description narrow">
+    return <div className="esper-section report-section">
+      <div className="description">
         <h3>{ Text.ChartLabels }</h3>
         <Components.LabelChartInsight periods={periods} />
       </div>
@@ -183,8 +183,8 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section">
-      <div className="description narrow">
+    return <div className="esper-section report-section">
+      <div className="description">
         <h3>{ Text.ChartCalendars }</h3>
         <Components.CalendarChartInsight
           calendars={calendars}
@@ -216,12 +216,14 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section">
+    return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartGuests }</h3>
         <Components.GuestChartInsight periods={periods} />
       </div>
-      <Components.GuestHoursChart periods={periods} simplified={true} />
+      <div className="wide">
+        <Components.GuestHoursChart periods={periods} simplified={true} />
+      </div>
     </div>
   }
 
@@ -243,8 +245,8 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section">
-      <div className="description narrow">
+    return <div className="esper-section report-section">
+      <div className="description">
         <h3>{ Text.GuestDomains }</h3>
         <Components.DomainChartInsight periods={periods} />
       </div>
@@ -276,8 +278,8 @@ module Esper.Views {
       data: new EventStats.GuestCountAnnotationCalc(eventData.events, opts),
       total: 0 // Not used
     }];
-    return <div className="esper-section">
-      <div className="description narrow">
+    return <div className="esper-section report-section">
+      <div className="description">
         <h3>{ Text.ChartGuestsCount  }</h3>
         <Components.GuestCountChartInsight periods={insightPeriods} />
       </div>
@@ -302,15 +304,17 @@ module Esper.Views {
       data: new EventStats.DurationBucketCalc(eventData.events, opts),
       total: 0 // Not used
     }];
-    return <div className="esper-section">
+    return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartDuration }</h3>
         <Components.DurationChartInsight periods={periods} />
       </div>
-      <Components.DurationStack
-        periods={periods}
-        eventOnClick={Charting.onEventClick}
-      />
+      <div className="wide">
+        <Components.DurationStack
+          periods={periods}
+          eventOnClick={Charting.onEventClick}
+        />
+      </div>
     </div>
   }
 
@@ -330,8 +334,8 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section">
-      <div className="description narrow">
+    return <div className="esper-section report-section">
+      <div className="description">
         <h3>{ Text.ChartRatings }</h3>
         <Components.RatingChartInsight periods={periods} />
       </div>
@@ -348,17 +352,25 @@ module Esper.Views {
     teams: ApiT.Team[];
   }) {
     events = _.filter(events, (e) => e.feedback && e.feedback.notes);
-    return <div className="esper-section">
-      <h3>{ Text.NotesHeading }</h3>
-      <Components.EventList
-        events={events}
-        teams={teams}
-        onEventClick={() => events.length && editEventNotes(events[0])}
-        onFeedbackClick={() => events.length && editEventNotes(events[0])}
-        showFeedback={true}
-        showLabels={false}
-        showAttendToggle={false}
-      />
+    return <div className="esper-section report-section">
+      <div className="wide">
+        <h3>{ Text.NotesHeading }</h3>
+        { _.isEmpty(events) ?
+          <p>{ Text.NoNotesMessage }</p> :
+          <div>
+            <p>{ Text.NotesDescription }</p>
+            <Components.EventList
+              events={events}
+              teams={teams}
+              onEventClick={() => events.length && editEventNotes(events[0])}
+              onFeedbackClick={() => events.length && editEventNotes(events[0])}
+              showFeedback={true}
+              showLabels={false}
+              showAttendToggle={false}
+            />
+          </div>
+        }
+      </div>
     </div>
   }
 
