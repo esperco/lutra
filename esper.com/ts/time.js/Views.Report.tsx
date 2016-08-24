@@ -89,6 +89,7 @@ module Esper.Views {
         <DomainsReport period={this.props.period} eventData={eventData} />
         <GuestCountReport period={this.props.period} eventData={eventData} />
         <DurationReport period={this.props.period} eventData={eventData} />
+        <RatingsReport period={this.props.period} eventData={eventData} />
       </div>;
     }
 
@@ -305,6 +306,34 @@ module Esper.Views {
         <Components.DurationChartInsight periods={periods} />
       </div>
       <Components.DurationStack periods={periods} />
+    </div>
+  }
+
+
+  function RatingsReport({period, eventData} : {
+    period: Types.SinglePeriod|Types.CustomPeriod;
+    eventData: Types.EventListData;
+  }) {
+    var opts = EventStats.defaultCalcOpts();
+    opts.ratings.none = false;
+    var periods = [{
+      period: period,
+      current: true,
+      isBusy: eventData.isBusy,
+      hasError: eventData.hasError,
+      data: new EventStats.RatingDurationCalc(eventData.events, opts),
+      total: 0 // Not used
+    }];
+
+    return <div className="esper-section">
+      <div className="description narrow">
+        <h3>{ Text.ChartRatings }</h3>
+        <Components.RatingChartInsight periods={periods} />
+      </div>
+      <Components.RatingPercentChart
+        periods={periods}
+        simplified={true}
+      />
     </div>
   }
 }

@@ -151,7 +151,8 @@ module Esper.Text {
     `Meetings with too many ${Guests} tend not be a productive use ` +
     `of everyone's time.`;
   export const ChartRatingsDescription =
-    `How much time do you spend in good meetings vs. bad meetings?`;
+    `Rate your meetings with Esper to help identify what kinds of ` +
+    `meetings are helpful and what kinds aren't worth the time.`;
 
   /* Chart Misc */
 
@@ -201,7 +202,7 @@ module Esper.Text {
   }
 
   export function stars(n: number) {
-    return `${n} star${s(n)}`;
+    return `${Util.roundStr(n, 1)} star${s(n)}`;
   }
 
   export function date(d: Date|moment.Moment|string) {
