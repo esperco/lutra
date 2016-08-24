@@ -305,7 +305,10 @@ module Esper.Views {
         <h3>{ Text.ChartDuration }</h3>
         <Components.DurationChartInsight periods={periods} />
       </div>
-      <Components.DurationStack periods={periods} />
+      <Components.DurationStack
+        periods={periods}
+        eventOnClick={Charting.onEventClick}
+      />
     </div>
   }
 
