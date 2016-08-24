@@ -162,6 +162,10 @@ module Esper.Text {
   // For showing unscheduled time if we've selected less than total
   export const ChartRemainder = "Unscheduled Time";
 
+  /* Reports Misc */
+
+  export const NotesHeading = "Meeting Notes";
+
   /////
 
   function s(n: number) {

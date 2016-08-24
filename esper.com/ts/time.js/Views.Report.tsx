@@ -77,6 +77,7 @@ module Esper.Views {
       var calendars = Option.matchList(
         Stores.Calendars.list(this.props.teamId)
       );
+      var team = Stores.Teams.require(this.props.teamId);
       return <div className="report">
         <TopLine period={this.props.period} eventData={eventData} />
         <LabelsReport period={this.props.period} eventData={eventData} />
@@ -90,6 +91,7 @@ module Esper.Views {
         <GuestCountReport period={this.props.period} eventData={eventData} />
         <DurationReport period={this.props.period} eventData={eventData} />
         <RatingsReport period={this.props.period} eventData={eventData} />
+        <NotesReport events={eventData.events} teams={[team]} />
       </div>;
     }
 
@@ -338,5 +340,32 @@ module Esper.Views {
         simplified={true}
       />
     </div>
+  }
+
+  // List all events with notes
+  function NotesReport({events, teams} : {
+    events: Types.TeamEvent[];
+    teams: ApiT.Team[];
+  }) {
+    events = _.filter(events, (e) => e.feedback && e.feedback.notes);
+    return <div className="esper-section">
+      <h3>{ Text.NotesHeading }</h3>
+      <Components.EventList
+        events={events}
+        teams={teams}
+        onEventClick={() => events.length && editEventNotes(events[0])}
+        onFeedbackClick={() => events.length && editEventNotes(events[0])}
+        showFeedback={true}
+        showLabels={false}
+        showAttendToggle={false}
+      />
+    </div>
+  }
+
+  function editEventNotes(event: Types.TeamEvent) {
+    Actions.EventLabels.confirm([event]);
+    Layout.renderModal(Containers.eventEditorModal([event], {
+      minFeedback: false
+    }));
   }
 }
