@@ -11,7 +11,6 @@ module Esper.Components {
       onEventToggle?: (event: Types.TeamEvent) => void;
       onEventClick?: (event: Types.TeamEvent) => void;
       onFeedbackClick?: (event: Types.TeamEvent) => void;
-      onAddLabelClick?: (event: Types.TeamEvent) => void;
     }
   }
 
