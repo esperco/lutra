@@ -63,6 +63,7 @@ module Esper.EventStats {
   function emptyGroup(): Group {
     return {
       annotations: [],
+      events: [],
       totalValue: 0,
       totalUnique: 0,
       eventMap: {}
@@ -74,6 +75,7 @@ module Esper.EventStats {
     return {
       date: date,
       annotations: group.annotations,
+      events: group.events,
       totalValue: group.totalValue,
       totalUnique: group.totalUnique,
       eventMap: group.eventMap
@@ -83,6 +85,7 @@ module Esper.EventStats {
   function emptySubgroup(): Subgroup {
     return {
       annotations: [],
+      events: [],
       totalValue: 0,
       totalUnique: 0,
       subgroups: {},
@@ -97,7 +100,8 @@ module Esper.EventStats {
       totalValue: 0,
       totalUnique: 0,
       eventMap: {},
-      annotations: []
+      annotations: [],
+      events: []
     }
   }
 
@@ -143,6 +147,7 @@ module Esper.EventStats {
       grouping.annotations.push(a);
       if (! grouping.eventMap[eventKey]) {
         grouping.eventMap[eventKey] = true;
+        grouping.events.push(a.event);
         grouping.totalUnique += 1;
       }
     });

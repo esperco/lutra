@@ -6,146 +6,84 @@
 
 module Esper.Insights {
   describe("Insights", function() {
+
+    // Helper function for creating calc data
+    function makeScenario(
+      some: {[index: string]: number} = {},
+      none = 0
+    ): Types.EventOptGrouping {
+      let someGroups: {[index: string]: Types.EventSubgroup} = {};
+      _.each(some, (v, k) => {
+        someGroups[k] = {
+          annotations: [],
+          events: [],
+          eventMap: {},
+          totalUnique: v,
+          totalValue: v,
+          subgroups: {}
+        };
+      });
+
+      let total = _.sum(_.values(some)) + none;
+
+      return {
+        // Empty map + annotations not accurate, but shouldn't matter if
+        // we're looking at total values
+        annotations: [],
+        events: [],
+        eventMap: {},
+        totalValue: total,
+        totalUnique: total,
+        some: someGroups,
+        none: {
+          annotations: [],
+          events: [],
+          eventMap: {},
+          totalValue: none,
+          totalUnique: none
+        }
+      };
+    }
+
     describe("matchScenario", function() {
       it("should match scenarios where data is all none", function() {
-        let ret = matchScenario({
-          // Empty map + annotations not accurate, but shouldn't matter if
-          // we're looking at total values
-          annotations: [],
-          eventMap: {},
-          totalValue: 100,
-          totalUnique: 100,
-          some: {},
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 100,
-            totalUnique: 100
-          }
-        }, {
-          allNone: () => "none"
-        }, function() { return "fallback"; });
+        let ret = matchScenario(
+          makeScenario({}, 100),
+          {
+            allNone: () => "none"
+          }, function() { return "fallback"; });
 
         expect(ret).toEqual("none");
       });
 
       it("should match scenarios where some data is all one key", function() {
-        let ret = matchScenario({
-          annotations: [],
-          eventMap: {},
-          totalValue: 100,
-          totalUnique: 100,
-          some: {
-            "bob": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 50,
-              totalUnique: 50,
-              subgroups: {}
-            },
-            "other": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 0,
-              totalUnique: 0,
-              subgroups: {}
-            }
-          },
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 50,
-            totalUnique: 50
-          }
-        }, {
-          allOne: (value) => value
-        }, function() { return "fallback"; });
+        let ret = matchScenario(
+          makeScenario({"bob": 50, "other": 0}, 50),
+          {
+            allOne: (value) => value
+          }, function() { return "fallback"; });
 
         expect(ret).toEqual("bob");
       });
 
       it("should match scenarios where all keys are roughly equal",
       function() {
-        let ret = matchScenario({
-          annotations: [],
-          eventMap: {},
-          totalValue: 150,
-          totalUnique: 150,
-          some: {
-            "bob": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 32,
-              totalUnique: 32,
-              subgroups: {}
-            },
-            "joe": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 33,
-              totalUnique: 33,
-              subgroups: {}
-            },
-            "sam": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 34,
-              totalUnique: 34,
-              subgroups: {}
-            }
-          },
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 50,
-            totalUnique: 50
-          }
-        }, {
-          allEqual: (pairs) => "equal " + _.map(pairs, (p) => p[0]).join(",")
-        }, function() { return "fallback"; });
+        let ret = matchScenario(
+          makeScenario({"bob": 32, "joe": 33, "sam": 34}, 50),
+          {
+            allEqual: (pairs) => "equal " + _.map(pairs, (p) => p[0]).join(",")
+          }, function() { return "fallback"; });
 
         expect(ret).toEqual("equal sam,joe,bob");
       });
 
       it("should not match scenarios where all keys are not equal to allEqual",
       function() {
-        let ret = matchScenario({
-          annotations: [],
-          eventMap: {},
-          totalValue: 250,
-          totalUnique: 250,
-          some: {
-            "bob": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 50,
-              totalUnique: 50,
-              subgroups: {}
-            },
-            "joe": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 50,
-              totalUnique: 50,
-              subgroups: {}
-            },
-            "sam": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 100,
-              totalUnique: 100,
-              subgroups: {}
-            }
-          },
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 50,
-            totalUnique: 50
-          }
-        }, {
-          allEqual: (pairs) => "equal"
-        }, function() { return "fallback"; });
+        let ret = matchScenario(
+          makeScenario({"bob": 50, "joe": 50, "sam": 100}, 50),
+          {
+            allEqual: (pairs) => "equal"
+          }, function() { return "fallback"; });
 
         expect(ret).toEqual("fallback");
       });
@@ -155,44 +93,12 @@ module Esper.Insights {
         let listKeys = (pairs: [string, number][]) => {
           return _.map(pairs, (p) => p[0]).join(",");
         }
-        let ret = matchScenario({
-          annotations: [],
-          eventMap: {},
-          totalValue: 150,
-          totalUnique: 150,
-          some: {
-            "bob": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 40,
-              totalUnique: 40,
-              subgroups: {}
-            },
-            "joe": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 39,
-              totalUnique: 39,
-              subgroups: {}
-            },
-            "sam": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 21,
-              totalUnique: 21,
-              subgroups: {}
-            }
-          },
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 50,
-            totalUnique: 50
-          }
-        }, {
-          tiersMajority: (t1, t2) => `m ${listKeys(t1)} ${listKeys(t2)}`,
-          tiersPlurality: (t1, t2) => `p ${listKeys(t1)} ${listKeys(t2)}`,
-        }, function() { return "fallback"; });
+        let ret = matchScenario(
+          makeScenario({"bob": 40, "joe": 39, "sam": 21}, 50),
+          {
+            tiersMajority: (t1, t2) => `m ${listKeys(t1)} ${listKeys(t2)}`,
+            tiersPlurality: (t1, t2) => `p ${listKeys(t1)} ${listKeys(t2)}`,
+          }, function() { return "fallback"; });
 
         expect(ret).toEqual("m bob,joe sam");
       });
@@ -202,55 +108,9 @@ module Esper.Insights {
         let listKeys = (pairs: [string, number][]) => {
           return _.map(pairs, (p) => p[0]).join(",");
         }
-        let ret = matchScenario({
-          annotations: [],
-          eventMap: {},
-          totalValue: 150,
-          totalUnique: 150,
-          some: {
-            "bob": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 25,
-              totalUnique: 25,
-              subgroups: {}
-            },
-            "joe": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 24,
-              totalUnique: 24,
-              subgroups: {}
-            },
-            "sam": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 18,
-              totalUnique: 18,
-              subgroups: {}
-            },
-            "frank": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 17,
-              totalUnique: 17,
-              subgroups: {}
-            },
-            "al": {
-              annotations: [],
-              eventMap: {},
-              totalValue: 16,
-              totalUnique: 16,
-              subgroups: {}
-            }
-          },
-          none: {
-            annotations: [],
-            eventMap: {},
-            totalValue: 50,
-            totalUnique: 50
-          }
-        }, {
+        let ret = matchScenario(makeScenario(
+          {"bob": 25, "joe": 24, "sam": 18, "frank": 17, "al": 16}, 50
+        ), {
           tiersMajority: (t1, t2) => `m ${listKeys(t1)} ${listKeys(t2)}`,
           tiersPlurality: (t1, t2) => `p ${listKeys(t1)} ${listKeys(t2)}`,
         }, function() { return "fallback"; });

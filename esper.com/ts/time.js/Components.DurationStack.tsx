@@ -25,9 +25,10 @@ module Esper.Components {
       if (_.isEmpty(annotations)) return <span />;
 
       return <div className="event-stack">
-        { _.map(annotations, (a) => <EventBlock key={a.event.id}
-          annotation={a} onClick={this.props.eventOnClick}
-        />) }
+        { _.map(annotations, (a) =>
+          <EventBlock key={Stores.Events.strId(a.event)}
+            annotation={a} onClick={this.props.eventOnClick}
+          />) }
       </div>;
     }
   }

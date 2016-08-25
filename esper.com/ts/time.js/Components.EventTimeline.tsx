@@ -36,7 +36,7 @@ module Esper.Components {
     // Absolutely positioned on top of dayBlocks
     var eventBlocks = _(events)
       .filter((e) => Stores.Events.isActive(e))
-      .map((e) => <EventBlock key={e.id}
+      .map((e) => <EventBlock key={Stores.Events.strId(e)}
         event={e}
         start={start}
         total={total}
