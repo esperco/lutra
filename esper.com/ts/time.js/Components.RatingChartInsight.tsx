@@ -49,7 +49,6 @@ module Esper.Components {
       </CommaList>;
 
       return <div>
-        <p>{ Text.ChartRatingsDescription }</p>
         { totalRating > 0 ?
           <p>
             Your average event rating is{" "}

@@ -20,9 +20,7 @@ module Esper.Components {
         periodGroup.data.totalUnique === periodGroup.data.none.totalUnique;
 
       return <div>
-        <p>{ noGuests ?
-             Text.ChartNoGuests :
-             Text.ChartGuestsDescription }</p>
+        { noGuests ? <p>{ Text.ChartNoGuests }</p> : null }
       </div>;
     }
   }

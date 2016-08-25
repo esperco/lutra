@@ -7,9 +7,10 @@
 module Esper.Actions {
   const analyticsId = "report-analytics-id";
 
-  export function renderReport({teamId, period}: {
+  export function renderReport({teamId, period, extra}: {
     teamId: string;
     period: Types.SinglePeriod|Types.CustomPeriod;
+    extra?: any;
   }) {
     // Fetch events
     var team = Stores.Teams.require(teamId);
@@ -19,8 +20,11 @@ module Esper.Actions {
       period: period
     }));
 
+    extra = extra || {};
+    var labels = Params.cleanListSelectJSON(extra.labels);
+
     // Render view
-    render(<Views.Report teamId={teamId} period={period} />);
+    render(<Views.Report teamId={teamId} period={period} labels={labels} />);
 
     // Delay tracking by 2 seconds to ensure user is actually looking at list
     Util.delayOne(analyticsId, function() {

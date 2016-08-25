@@ -50,7 +50,8 @@ module Esper.Route {
                                                   ctx.params["period"]);
     Actions.renderReport({
       teamId: teamId,
-      period: period
+      period: period,
+      extra: getJSONQuery(ctx)
     });
   });
 

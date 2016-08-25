@@ -22,6 +22,8 @@ module Esper.Components {
         .flatten<Types.Annotation>()
         .value();
 
+      if (_.isEmpty(annotations)) return <span />;
+
       return <div className="event-stack">
         { _.map(annotations, (a) => <EventBlock key={a.event.id}
           annotation={a} onClick={this.props.eventOnClick}

@@ -39,28 +39,27 @@ module Esper.Components {
         });
       }
 
+      if (! bucket) {
+        return <p>{ Text.ChartNoData }</p>;
+      }
+
       // Recalculate seconds since value corresponds to duration in chart,
       // not duration scheduled.
-      let halfWaySeconds = (
+      let halfWaySeconds = halfWayAnnotation && (
         halfWayAnnotation.event.end.getTime()
         - halfWayAnnotation.event.start.getTime()
       ) / 1000;
-      let mostlyLong = halfWaySeconds >
-        EventStats.DURATION_BUCKETS[2].gte;
-      console.info(halfWayAnnotation);
+      let mostlyLong = halfWaySeconds && (halfWaySeconds >
+        EventStats.DURATION_BUCKETS[2].gte);
 
       return <div>
-        <p>{ Text.ChartDurationDescription }</p>
-        <p>{ bucket ?
-          <span>
-            At least half of your time is spent on events that last {" "}
-            <Components.Badge
-              color={bucket.color}
-              text={Text.hoursOrMinutes(halfWaySeconds / 60)}
-            />{" or "}{ mostlyLong ? "more" : "less"}.
-          </span> :
-          Text.ChartNoData
-        }</p>
+        <p>
+          At least half of your time is spent on events that last {" "}
+          <Components.Badge
+            color={bucket.color}
+            text={Text.hoursOrMinutes(halfWaySeconds / 60)}
+          />{" or "}{ mostlyLong ? "more" : "less"}.
+        </p>
       </div>;
     }
   }

@@ -39,6 +39,9 @@
 
       .esper-no-content {
         flex: 1 100%;
+        line-height: @report-chart-height
+          - (@esper-base-padding * 2)
+          - (@panel-body-padding * 2);
       }
 
       .chart-content {
@@ -57,6 +60,10 @@
           margin-left: 0;
           min-height: 0;
           .chart-holder { height: auto; }
+        }
+
+        .esper-no-content {
+          line-height: @line-height-base;
         }
       }
     }

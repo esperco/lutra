@@ -39,7 +39,6 @@ module Esper.Components {
       }
 
       return <div>
-        <p>{ Text.ChartGuestsCountDescription }</p>
         <p>{ sorted.length && medianBucket && maxBucket ?
           <span>
             Your median event has{" "}<Components.Badge

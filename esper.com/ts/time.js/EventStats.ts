@@ -321,15 +321,23 @@ module Esper.EventStats {
   export type CalcOpts = Types.EventCalcOpts;
   export type DomainNestOpts = Types.DomainNestOpts;
 
-  export function defaultCalcOpts(): CalcOpts {
+  export function defaultCalcOpts(opts: {
+    filterStr?: string;
+    labels?: Types.ListSelectJSON;
+    domains?: Types.ListSelectJSON;
+    durations?: Types.ListSelectJSON;
+    ratings?: Types.ListSelectJSON;
+    guestCounts?: Types.ListSelectJSON;
+    weekHours?: Types.WeekHours;
+  } = {}): CalcOpts {
     return {
-      filterStr: "",
-      labels: Params.cleanListSelectJSON(),
-      domains: Params.cleanListSelectJSON(),
-      durations: Params.cleanListSelectJSON(),
-      ratings: Params.cleanListSelectJSON(),
-      guestCounts: Params.cleanListSelectJSON(),
-      weekHours: Params.weekHoursAll()
+      filterStr: opts.filterStr || "",
+      labels: opts.labels || Params.cleanListSelectJSON(),
+      domains: opts.domains || Params.cleanListSelectJSON(),
+      durations: opts.durations || Params.cleanListSelectJSON(),
+      ratings: opts.ratings || Params.cleanListSelectJSON(),
+      guestCounts: opts.guestCounts || Params.cleanListSelectJSON(),
+      weekHours: opts.weekHours || Params.weekHoursAll()
     };
   }
 
@@ -1091,7 +1099,7 @@ module Esper.EventStats {
   }
 
   export class GuestCountAnnotationCalc
-    extends EventCountCalc<[Types.TeamEvent, number][], {}>
+    extends EventListCalc<[Types.TeamEvent, number][], {}>
   {
     initResult(): [Types.TeamEvent, number][] {return []; }
 

@@ -16,7 +16,6 @@ module Esper.Components {
         of the scenarios, leave alone for the time being
       */
       return <div>
-        <p>{ Text.ChartLabelsDescription }</p>
         {
           Insights.matchScenario(periodGroup.data, {
             allNone: () => <p>None of your events are {Text.Labeled}.</p>,
