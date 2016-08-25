@@ -192,6 +192,8 @@ module Esper.Text {
     </a>.
   </span>;
 
+  export const SeeMoreLinkText = "See More Details";
+
   /////
 
   function s(n: number) {

@@ -80,17 +80,35 @@ module Esper.Views {
       var team = Stores.Teams.require(this.props.teamId);
       return <div className="report">
         <TopLine period={this.props.period} eventData={eventData} />
-        <LabelsReport period={this.props.period} eventData={eventData} />
+        <LabelsReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
         { calendars.length > 1 ? <CalendarsReport
-          period={this.props.period}
+          period={this.props.period} teamId={this.props.teamId}
           eventData={eventData}
           calendars={calendars}
         /> : null}
-        <GuestsReport period={this.props.period} eventData={eventData} />
-        <DomainsReport period={this.props.period} eventData={eventData} />
-        <GuestCountReport period={this.props.period} eventData={eventData} />
-        <DurationReport period={this.props.period} eventData={eventData} />
-        <RatingsReport period={this.props.period} eventData={eventData} />
+        <GuestsReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
+        <DomainsReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
+        <GuestCountReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
+        <DurationReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
+        <RatingsReport
+          period={this.props.period} teamId={this.props.teamId}
+          eventData={eventData}
+        />
         <NotesReport events={eventData.events} teams={[team]} />
       </div>;
     }
@@ -143,9 +161,10 @@ module Esper.Views {
   }
 
 
-  function LabelsReport({period, eventData} : {
+  function LabelsReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = EventStats.defaultCalcOpts();
     opts.labels.none = false;
@@ -162,16 +181,21 @@ module Esper.Views {
       <div className="description">
         <h3>{ Text.ChartLabels }</h3>
         <Components.LabelChartInsight periods={periods} />
+        <SeeMoreLink
+          fn={Paths.Time.labelsChart} type="percent"
+          period={period} teamId={teamId}
+        />
       </div>
       <Components.LabelPercentChart periods={periods} simplified={true} />
     </div>
   }
 
 
-  function CalendarsReport({calendars, period, eventData} : {
+  function CalendarsReport({calendars, period, eventData, teamId} : {
     calendars: ApiT.GenericCalendar[];
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = EventStats.defaultCalcOpts();
     var periods = [{
@@ -190,6 +214,10 @@ module Esper.Views {
           calendars={calendars}
           periods={periods}
         />
+        <SeeMoreLink
+          fn={Paths.Time.calendarsChart} type="percent"
+          period={period} teamId={teamId}
+        />
       </div>
       <Components.CalendarPercentChart
         calendars={calendars}
@@ -200,9 +228,10 @@ module Esper.Views {
   }
 
 
-  function GuestsReport({period, eventData} : {
+  function GuestsReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = _.extend(EventStats.defaultCalcOpts(), {
       nestByDomain: false
@@ -216,21 +245,24 @@ module Esper.Views {
       total: 0 // Not used
     }];
 
-    return <div className="esper-section report-section">
+    return <div className="esper-section report-section wide">
       <div className="description">
         <h3>{ Text.ChartGuests }</h3>
         <Components.GuestChartInsight periods={periods} />
+        <SeeMoreLink
+          fn={Paths.Time.guestsChart} type="absolute"
+          period={period} teamId={teamId}
+        />
       </div>
-      <div className="wide">
-        <Components.GuestHoursChart periods={periods} simplified={true} />
-      </div>
+      <Components.GuestHoursChart periods={periods} simplified={true} />
     </div>
   }
 
 
-  function DomainsReport({period, eventData} : {
+  function DomainsReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = _.extend(EventStats.defaultCalcOpts(), {
       nestByDomain: true
@@ -249,15 +281,20 @@ module Esper.Views {
       <div className="description">
         <h3>{ Text.GuestDomains }</h3>
         <Components.DomainChartInsight periods={periods} />
+        <SeeMoreLink
+          fn={Paths.Time.labelsChart} type="percent"
+          period={period} teamId={teamId}
+        />
       </div>
       <Components.GuestPercentChart periods={periods} simplified={true} />
     </div>
   }
 
 
-  function GuestCountReport({period, eventData} : {
+  function GuestCountReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = EventStats.defaultCalcOpts();
     opts.guestCounts.none = false;
@@ -282,6 +319,10 @@ module Esper.Views {
       <div className="description">
         <h3>{ Text.ChartGuestsCount  }</h3>
         <Components.GuestCountChartInsight periods={insightPeriods} />
+        <SeeMoreLink
+          fn={Paths.Time.guestsCountChart} type="percent"
+          period={period} teamId={teamId}
+        />
       </div>
       <Components.GuestCountPercentChart
         periods={chartPeriods}
@@ -291,9 +332,10 @@ module Esper.Views {
   }
 
 
-  function DurationReport({period, eventData} : {
+  function DurationReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = EventStats.defaultCalcOpts();
     var periods = [{
@@ -304,24 +346,27 @@ module Esper.Views {
       data: new EventStats.DurationBucketCalc(eventData.events, opts),
       total: 0 // Not used
     }];
-    return <div className="esper-section report-section">
+    return <div className="esper-section report-section wide">
       <div className="description">
         <h3>{ Text.ChartDuration }</h3>
         <Components.DurationChartInsight periods={periods} />
-      </div>
-      <div className="wide">
-        <Components.DurationStack
-          periods={periods}
-          eventOnClick={Charting.onEventClick}
+        <SeeMoreLink
+          fn={Paths.Time.durationsChart} type="absolute"
+          period={period} teamId={teamId}
         />
       </div>
+      <Components.DurationStack
+        periods={periods}
+        eventOnClick={Charting.onEventClick}
+      />
     </div>
   }
 
 
-  function RatingsReport({period, eventData} : {
+  function RatingsReport({period, eventData, teamId} : {
     period: Types.SinglePeriod|Types.CustomPeriod;
     eventData: Types.EventListData;
+    teamId: string;
   }) {
     var opts = EventStats.defaultCalcOpts();
     opts.ratings.none = false;
@@ -338,6 +383,10 @@ module Esper.Views {
       <div className="description">
         <h3>{ Text.ChartRatings }</h3>
         <Components.RatingChartInsight periods={periods} />
+        <SeeMoreLink
+          fn={Paths.Time.ratingsChart} type="percent"
+          period={period} teamId={teamId}
+        />
       </div>
       <Components.RatingPercentChart
         periods={periods}
@@ -352,25 +401,23 @@ module Esper.Views {
     teams: ApiT.Team[];
   }) {
     events = _.filter(events, (e) => e.feedback && e.feedback.notes);
-    return <div className="esper-section report-section">
-      <div className="wide">
-        <h3>{ Text.NotesHeading }</h3>
-        { _.isEmpty(events) ?
-          <p>{ Text.NoNotesMessage }</p> :
-          <div>
-            <p>{ Text.NotesDescription }</p>
-            <Components.EventList
-              events={events}
-              teams={teams}
-              onEventClick={() => events.length && editEventNotes(events[0])}
-              onFeedbackClick={() => events.length && editEventNotes(events[0])}
-              showFeedback={true}
-              showLabels={false}
-              showAttendToggle={false}
-            />
-          </div>
-        }
-      </div>
+    return <div className="esper-section report-section wide">
+      <h3>{ Text.NotesHeading }</h3>
+      { _.isEmpty(events) ?
+        <p>{ Text.NoNotesMessage }</p> :
+        <div>
+          <p>{ Text.NotesDescription }</p>
+          <Components.EventList
+            events={events}
+            teams={teams}
+            onEventClick={() => events.length && editEventNotes(events[0])}
+            onFeedbackClick={() => events.length && editEventNotes(events[0])}
+            showFeedback={true}
+            showLabels={false}
+            showAttendToggle={false}
+          />
+        </div>
+      }
     </div>
   }
 
@@ -379,5 +426,33 @@ module Esper.Views {
     Layout.renderModal(Containers.eventEditorModal([event], {
       minFeedback: false
     }));
+  }
+
+
+  function SeeMoreLink({fn, period, teamId, type}: {
+    fn: (opts: Paths.Time.chartPathOpts) => Paths.Path;
+    period: Period.Single|Period.Custom;
+    teamId: string;
+    type?: Types.ChartType;
+  }) {
+    let periodStr = Params.periodStr(period);
+
+    // NB: TeamId should be auto-set to last team
+    let path = fn({
+      calIds: "default",
+      teamId: teamId,
+      interval: periodStr.interval,
+      period: periodStr.period
+    });
+    let opts = type ? { jsonQuery: { type: type }} : {}
+    let href = Route.nav.href(path, opts);
+
+    return <p>
+      <a className="more-link" href={href}
+         onClick={() => Route.nav.go(path, opts)}>
+        <i className="fa fa-fw fa-left fa-caret-right" />
+        { Text.SeeMoreLinkText }
+      </a>
+    </p>;
   }
 }
