@@ -44,25 +44,41 @@ module Esper.Components {
           Stores.Events.isActive(firstEvent) ?
           <div className="esper-panel-section">
             { props.eventData.length === 1 ?
-              <label htmlFor={inputId}>
-                { Text.Labels }
-              </label> : null }
-            <LabelEditor
-              inputId={inputId}
-              events={events}
-              teams={props.teams}
-              onSelect={(label, active) => {
-                if (active) {
-                  Actions.EventLabels.add(events, label);
-                  _.each(props.teams,
-                    (team) => Actions.Teams.addLabel(team.teamid, label)
-                  );
-                } else {
-                  Actions.EventLabels.remove(events, label);
+
+              /*
+                Only one event => use label list (same list as used with
+                event list
+              */
+              <LabelList
+                event={events[0]}
+                team={
+                  _.find(props.teams, (t) => t.teamid === events[0].teamId)
                 }
-              }}
-              autoFocus={props.focusOnLabels}
-            />
+              /> :
+
+              /*
+                Use label editor for multi-event scenarios because label
+                list doesn't work well with scenarios where a label is selected
+                for one event but not another.
+              */
+              <LabelEditor
+                inputId={inputId}
+                events={events}
+                teams={props.teams}
+                onSelect={(label, active) => {
+                  if (active) {
+                    Actions.EventLabels.add(events, label);
+                    _.each(props.teams,
+                      (team) => Actions.Teams.addLabel(team.teamid, label)
+                    );
+                  } else {
+                    Actions.EventLabels.remove(events, label);
+                  }
+                }}
+                autoFocus={props.focusOnLabels}
+              />
+            }
+
           </div> : null }
       </div>
     });

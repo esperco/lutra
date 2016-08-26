@@ -9,6 +9,11 @@
   }
 }
 
+// Correct for margin-top added below
+.esper-panel-section > .label-list:first-child {
+  margin-top: -@padding-small-vertical;
+}
+
 .event-label, .event-labels > .action {
   padding: @padding-xs-vertical @padding-xs-horizontal;
   margin-top: @padding-small-vertical;
