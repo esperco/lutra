@@ -54,13 +54,7 @@ module Esper.Components {
 
     componentDidUpdate(prevProps: Props) {
       super.componentDidUpdate();
-
-      // Refocus input if adding/removing events (used in calendar view)
-      var newIds = _.map(this.props.events, (e) => e.id);
-      var oldIds = _.map(prevProps.events, (e) => e.id);
-      if (! _.isEqual(oldIds, newIds)) {
-        this.focus();
-      }
+      this.focus();
     }
 
     // Add any labels from props to existing label list
