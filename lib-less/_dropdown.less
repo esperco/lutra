@@ -11,18 +11,16 @@
   animation: fadein 0.3s ease-in-out;
   overflow: auto;
 
-  // Styling done via JS normally, use static positioning for mobile only
+  // Styling done via JS normally
   @media screen and (max-width: @screen-xs-max) {
     .dropdown-wrapper {
       padding: @esper-base-padding;
-      max-height: 80vh;
-      overflow: auto;
     }
   }
 
-  // Get rid of position absolute because .dropdown-wrapper
-  // should apply position. Float is also unnecessary.
   .dropdown-menu {
+    // Get rid of position absolute because .dropdown-wrapper
+    // should apply position. Float is also unnecessary.
     position: static;
     float: none;
   }

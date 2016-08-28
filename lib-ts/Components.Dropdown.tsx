@@ -26,10 +26,11 @@
 */
 
 /// <reference path="./ReactHelpers.ts" />
-/// <reference path="./Components.Modal.tsx" />
+/// <reference path="./Components.Overlay.tsx" />
+/// <reference path="./Components.IfXS.tsx" />
 
 module Esper.Components {
-  const XS_MAX_WIDTH = 767; // Width in px of what constitutes XS in Bootstrap
+  const dropdownContainerId = "esper-dropdown";
 
   interface Props {
     children?: JSX.Element[];
@@ -39,41 +40,39 @@ module Esper.Components {
     onOpen?: () => void;
   }
 
-  export class Dropdown extends ReactHelpers.Component<Props, {}> {
-    _menu: DropdownMenu;
+  interface State {
+    open?: boolean;
+  }
+
+  export class Dropdown extends ReactHelpers.Component<Props, State> {
+    // Attributes set after initial render of toggle
+    _align: Align;
+    _width: number;
+
+    constructor(props: Props) {
+      super(props);
+      this.state = {
+        open: false
+      };
+    }
 
     render() {
-      // Just render
-      var children = React.Children.toArray(this.props.children);
-
       // Get dropdown toggle handler
       var toggle = this.getToggle();
       if (! toggle) { return; }
-
-      // Update existing menu if applicable
-      if (this._menu) {
-
-        /*
-          requestAnimationFrame to avoid accessing DOM node from inside
-          render function. Not ideal, but should be OK so long as we're
-          we only update the dropdow menu itself and don't touch the toggle
-        */
-        window.requestAnimationFrame(
-          () => renderDropdown(this.getMenuWrapper())
-        );
-      }
 
       return <div className={classNames(this.props.className, {
                     dropdown: _.isUndefined(this.props.className)
                   })}
                   onClick={() => this.open()}>
         {toggle}
+        { this.state.open ? this.getOverlay() : null }
       </div>;
     }
 
     open() {
-      if (!this.props.disabled) {
-        renderDropdown(this.getMenuWrapper())
+      if (! this.props.disabled && !this.state.open) {
+        this.setState({ open: true });
         if (this.props.onOpen) {
           this.props.onOpen();
         }
@@ -81,8 +80,7 @@ module Esper.Components {
     }
 
     close() {
-      if (this._menu) { this._menu.close(); }
-      this._menu = null; // Null to prevent future updates
+      this.setState({ open: false });
     }
 
     /* Get specific toggle element from children */
@@ -105,26 +103,41 @@ module Esper.Components {
       );
       if (! menu) {
         Log.e("No dropdown menu found");
+        return null;
       }
-      return menu;
+
+      // Wrap with .dropdown class
+      return <div className={classNames(this.props.className, {
+        dropdown: _.isUndefined(this.props.className),
+        open: true
+      })} onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
+        { menu }
+      </div>;
     }
 
-    getMenuWrapper() {
-      // Actual toggle should have been rendered in DOM -- we need this
-      // to calculate menu position
+    /* If dropdown open => update position of toggle to align menu */
+    componentWillUpdate(nextProps: Props, nextState: State) {
+      if (nextState.open) {
+        this.updateTogglePosition();
+      }
+    }
+
+    // Set toggle position that can be used later for rendering menu
+    updateTogglePosition() {
       var toggle = this.find('.dropdown-toggle');
-      if (!(toggle && toggle.length)) {
-        Log.e("getMenu called without active toggle");
+      if (_.isEmpty(toggle)) {
+        Log.e("Dropdown mounted without active toggle");
         return;
       }
 
       var offset = toggle.offset() || { left: 0, top: 0 };
       var height = toggle.outerHeight();
-      var width = toggle.outerWidth();
+      this._width = toggle.outerWidth();
+
       var top = offset.top - $(window).scrollTop() + toggle.outerHeight();
       var bottom = $(window).height() - offset.top;
       var left = offset.left - $(window).scrollLeft();
-      var right = $(window).width() - (offset.left + width);
+      var right = $(window).width() - (offset.left + this._width);
 
       // Align right if if right edge is pretty far over
       var alignRight = (right / $(window).width()) <= 0.3;
@@ -132,7 +145,7 @@ module Esper.Components {
       // Drop-up if top is too low
       var alignTop = (top / $(window).height()) > 0.7;
 
-      var align: Align = alignTop ?
+      this._align = alignTop ?
 
         // Dropup
         ( alignRight ?
@@ -143,19 +156,36 @@ module Esper.Components {
         ( alignRight ?
           { top: top, right: right } :
           { top: top, left: left } );
+    }
+
+    getOverlay() {
+      // Actual toggle should have been rendered in DOM -- we need this
+      // to calculate menu position
+      if (!this._align || !this._width) {
+        Log.e("getMenu called without active toggle");
+        return;
+      }
 
       var menu = this.getMenu();
       if (! menu) { return; }
 
-      return <DropdownMenu
-        ref={(c) => this._menu = c}
-        align={align}
-        width={width}
-        className={this.props.className}
-        keepOpen={this.props.keepOpen}
-      >
-        { menu }
-      </DropdownMenu>;
+      return <Overlay id={dropdownContainerId}>
+        <div className="dropdown-backdrop" onClick={() => this.close()}>
+          {ifXS(
+
+            // Mobile, no positioning
+            <DropdownWrapper>
+              { menu }
+            </DropdownWrapper>,
+
+            // Desktop, align
+            <DropdownWrapper align={this._align} width={this._width}>
+              {menu}
+            </DropdownWrapper>
+
+          )}
+        </div>
+      </Overlay>;
     }
   }
 
@@ -169,60 +199,40 @@ module Esper.Components {
     { top: number; right: number; }|
     { bottom: number; left: number; }|
     { bottom: number; right: number; }
+
   interface MenuProps {
     children?: JSX.Element[];
-    className?: string;
-    keepOpen?: boolean;
     width?: number|string;
-    align: Align;
+    align?: Align;
   }
 
   function hasTop(x: {top: number}|{bottom: number}): x is {top: number} {
     return x.hasOwnProperty('top');
   }
 
-  class DropdownMenu extends ReactHelpers.Component<MenuProps, {}> {
-    constructor(props: MenuProps) {
-      super(props);
-    }
-
+  // Desktop only -- mobile is simpler
+  class DropdownWrapper extends ReactHelpers.Component<MenuProps, {}> {
     render() {
-      var xs = $(window).width() <= XS_MAX_WIDTH;
-      var style = xs ? {
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-      } : _.extend({
-        minWidth: this.props.width,
-        position: "absolute"
-      }, this.props.align);
+      var style = this.props.align ?
 
-      return <div className="dropdown-backdrop" onClick={() => this.close()}>
-        <div className="dropdown-wrapper" style={style}>
-          <div className={classNames(this.props.className, {
-            dropdown: _.isUndefined(this.props.className),
-            open: true
-          })} onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
-            { this.props.children }
-          </div>
-        </div>
+        // Desktop
+        _.extend({
+          minWidth: this.props.width,
+          position: "absolute"
+        }, this.props.align) :
+
+        // Mobile
+        {
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0
+        };
+
+      return <div className="dropdown-wrapper" style={style}>
+        { this.props.children }
       </div>;
-    }
-
-    /*
-      No open() function -- use renderDropdown to just render a new menu.
-      If menu already exists, React should be smart enough to re-use DOM
-      elements and components.
-    */
-    close() {
-      /*
-        requestAnimationFrame because any React events that triggered the
-        dropdown menu closing may need to fully propogate before we remove
-        the menu from the DOM.
-      */
-      window.requestAnimationFrame(clearDropdown);
     }
 
     // Apply maxHeight after rendering if actual height breaks window edge
@@ -237,14 +247,19 @@ module Esper.Components {
 
     applyMax() {
       let align = this.props.align;
-      let menu = this.find('.dropdown-menu');
-      let maxHeight = hasTop(align) ?
+      let maxHeight = align ?
 
-        // Dropdown
-        $(window).height() - align.top :
+        // Has align => desktop
+        ( hasTop(align) ?
 
-        // Dropup
-        $(window).height() - align.bottom;
+          // Dropdown
+          $(window).height() - align.top :
+
+          // Dropup
+          $(window).height() - align.bottom ) :
+
+        // No align => mobile
+        $(window).height();
 
       // Buffer slightly
       maxHeight = maxHeight * 0.9;
@@ -254,22 +269,5 @@ module Esper.Components {
         "overflow": "auto"
       });
     }
-  }
-
-
-  /* Creates divs and whatnot for dropdowns */
-  const dropdownContainerId = "esper-dropdown";
-  function renderDropdown(content: JSX.Element) {
-    var container = $("#" + dropdownContainerId);
-    if (!container || !container.length) {
-      container = $('<div>').attr("id", dropdownContainerId);
-      $('body').append(container);
-    }
-    container.renderReact(content);
-  }
-
-  function clearDropdown() {
-    var container = $("#" + dropdownContainerId);
-    container.remove();
   }
 }
