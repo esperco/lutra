@@ -80,7 +80,6 @@ module Esper.Params {
   // Assumes calendar IDs never have commas in them. Use something else
   // if this proves to be untrue.
   export const CAL_ID_SEPARATOR = ",";
-  export const MAX_DEFAULT_CALS = 10;
   export const defaultCalIds = "default";
 
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
@@ -107,7 +106,7 @@ module Esper.Params {
       let ret = _.intersection(team.team_timestats_calendars, calIds);
       if (ret.length) return ret;
     }
-    return team.team_timestats_calendars.slice(0, MAX_DEFAULT_CALS);
+    return team.team_timestats_calendars;
   }
 
   // Like cleanCalIds, but returns team/cal objects
@@ -243,6 +242,17 @@ module Esper.Params {
     } else {
       return cleanSinglePeriod(interval, periodStr);
     }
+  }
+
+  // Spits out strings to use for period in URL
+  export function periodStr(period: Types.SinglePeriod|Types.CustomPeriod) {
+    var str = Period.isCustom(period) ?
+      [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
+      period.index.toString();
+    return {
+      interval: period.interval[0],
+      period: str
+    };
   }
 
 

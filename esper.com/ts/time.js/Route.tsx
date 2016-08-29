@@ -37,6 +37,25 @@ module Esper.Route {
     redirectPath(Paths.Time.charts())
   );
 
+  // Reports / All-the-Charts page
+  route(Paths.Time.report({
+    teamId: ":teamId?",
+    interval: ":interval?",
+    period: ":period?"
+  }).hash, function(ctx) {
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
+                                                "week");
+    var period = Params.cleanSingleOrCustomPeriod(interval,
+                                                  ctx.params["period"]);
+    Actions.renderReport({
+      teamId: teamId,
+      period: period,
+      extra: getJSONQuery(ctx)
+    });
+  });
+
+
   // Charts
 
   /*

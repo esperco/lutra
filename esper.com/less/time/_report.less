@@ -1,0 +1,71 @@
+@import "../lib/_bootstrap-variables.less";
+
+@report-chart-width: 65%;
+@report-chart-height: 300px;
+
+.report {
+  width: 100%;
+  max-width: @screen-md-min;
+  margin: 0 auto @esper-base-padding * 3;
+  padding: 0 @esper-base-padding;
+  background: @brand-contrast;
+  border-radius: @border-radius-base;
+
+  // Padding-bottom doesn't work for some reason
+  > *:last-child {
+    margin-bottom: @esper-base-padding;
+  }
+
+  h1, h2, h3, h4 {
+    text-transform: capitalize;
+  }
+
+  .topline {
+    h1, h2, h3, h4 {
+      margin-top: @esper-base-padding;
+    }
+  }
+
+  .more-link { font-weight: bold; line-height: @input-height-base; }
+
+  @media screen and (min-width: @screen-sm-min) {
+    .report-section {
+      display: flex;
+      align-items: flex-start;
+
+      .description {
+        flex: 1 (100% - @report-chart-width);
+      }
+
+      .esper-no-content {
+        flex: 1 100%;
+        line-height: @report-chart-height
+          - (@esper-base-padding * 2)
+          - (@panel-body-padding * 2);
+      }
+
+      .chart-content {
+        flex: 1 @report-chart-width;
+        margin-left: @esper-base-padding;
+        min-height: @report-chart-height;
+
+        .chart-holder { height: @report-chart-height; }
+      }
+
+      // Wide => we're not doing columns. Apply to report section
+      &.wide {
+        display: block;
+
+        .chart-content {
+          margin-left: 0;
+          min-height: 0;
+          .chart-holder { height: auto; }
+        }
+
+        .esper-no-content {
+          line-height: @line-height-base;
+        }
+      }
+    }
+  }
+}

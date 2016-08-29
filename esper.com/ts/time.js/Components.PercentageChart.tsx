@@ -4,12 +4,13 @@
   horizontal stacked bar charts
 */
 module Esper.Components {
-  export function PercentageChart({series, yAxis} : {
+  export function PercentageChart({series, simplified, yAxis} : {
     series: Charting.EventGroupSeries[];
+    simplified?: boolean;
     yAxis?: string;
   }) {
     series = _.sortBy(series, (s) => s.index);
-    return <Components.Highchart opts={{
+    return <Components.Highchart showExport={!simplified} opts={{
       chart: series.length > 1 ? {
         type: 'bar',
         height: series.length * 100 + 120
@@ -30,12 +31,15 @@ module Esper.Components {
             enabled: true,
             formatter: function() {
               if (this.percentage) {
+                if (simplified && this.percentage < 5) {
+                  return null;
+                }
                 return `${this.point.name} ` +
                   `(${Util.roundStr(this.percentage, 1)}%)`;
               }
             }
           },
-          size: '80%'
+          size: simplified ? '90%' : '80%'
         }
       },
 

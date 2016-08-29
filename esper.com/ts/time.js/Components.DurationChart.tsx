@@ -25,9 +25,10 @@ module Esper.Components {
       });
 
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
         <AbsoluteChart
           series={series} categories={keys} orientation="vertical"
+          simplified={this.props.simplified}
           yAxis={`${Text.ChartDuration} (${Text.ChartHoursUnit})`}
         />
       </div>;
@@ -47,9 +48,10 @@ module Esper.Components {
       });
 
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
         <PercentageChart
           series={series}
+          simplified={this.props.simplified}
           yAxis={`${Text.ChartDuration} (${Text.ChartPercentUnit})`}
         />
       </div>;

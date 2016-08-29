@@ -10,7 +10,6 @@ module Esper.Components {
     events: Stores.Events.TeamEvent[];
     teams: ApiT.Team[];
     onEventClick?: (event: Stores.Events.TeamEvent) => void;
-    onAddLabelClick?: (event: Stores.Events.TeamEvent) => void;
     perPage?: number;
     initPageStart?: number;
   }
@@ -61,7 +60,6 @@ module Esper.Components {
             <EventList events={events}
               teams={this.props.teams}
               onEventClick={this.props.onEventClick}
-              onAddLabelClick={this.props.onAddLabelClick}
             />
           </div> }
       </div>

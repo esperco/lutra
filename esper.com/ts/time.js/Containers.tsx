@@ -68,7 +68,6 @@ module Esper.Containers {
       return <Components.FilteredEventListModal
         events={events} teams={teams}
         onEventClick={labelFn}
-        onAddLabelClick={labelFn}
         onFeedbackClick={feedbackFn}
       />;
     });
@@ -134,7 +133,6 @@ module Esper.Containers {
         events={events}
         teams={teams}
         onEventClick={labelFn}
-        onAddLabelClick={labelFn}
       />;
     });
   }

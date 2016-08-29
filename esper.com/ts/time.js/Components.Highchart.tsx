@@ -13,6 +13,7 @@ module Esper.Components {
 
   export interface HighchartsOpts {
     opts: HighchartsOptions;
+    showExport?: boolean;
     units?: string;
   }
 
@@ -27,11 +28,11 @@ module Esper.Components {
                   className="chart-holder-parent">
         <div ref={(c) => this._target = c}
              className="chart-holder" />
-        <button type="button"
+        { this.props.showExport ? <button type="button"
                 onClick={() => this.exportChart()}
                 className={classNames("btn", "btn-default", EXPORT_ID_CLS)}>
           <i className="fa fa-fw fa-download" />
-        </button>
+        </button> : null }
       </div>;
     }
 

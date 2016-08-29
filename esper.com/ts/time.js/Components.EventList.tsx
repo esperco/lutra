@@ -11,7 +11,9 @@ module Esper.Components {
       onEventToggle?: (event: Types.TeamEvent) => void;
       onEventClick?: (event: Types.TeamEvent) => void;
       onFeedbackClick?: (event: Types.TeamEvent) => void;
-      onAddLabelClick?: (event: Types.TeamEvent) => void;
+      showLabels?: boolean; // => default true
+      showFeedback?: boolean; // => default true
+      showAttendToggle?: boolean; // => default true
     }
   }
 
@@ -70,6 +72,10 @@ module Esper.Components {
     renderEvent(event: Stores.Events.TeamEvent) {
       var isActive = Stores.Events.isActive(event);
       var actionRequired = !!Stores.Events.needsConfirmation(event);
+      var showLabels = this.props.showLabels !== false;
+      var showFeedback = this.props.showFeedback !== false;
+      var showAttendToggle = this.props.showAttendToggle !== false;
+
       return <div key={[event.teamId, event.calendarId, event.id].join(",")}
                   className={classNames("event", {
                     "has-labels": !!Stores.Events.getLabels(event).length,
@@ -77,7 +83,7 @@ module Esper.Components {
                     "no-attend": !isActive,
                     "past": moment(event.end).diff(moment()) < 0
                   })}>
-        <NoAttend event={event} />
+        { showAttendToggle ? <NoAttend event={event} /> : null }
         {
           this.props.onEventToggle ?
           <div className="event-checkbox"
@@ -109,14 +115,14 @@ module Esper.Components {
             null
           }
         </div>
-        { isActive ?
+        { isActive && showLabels ?
           <div className="event-labels">
             <LabelList event={event} team={this.getTeam(event)} />
           </div> :
           null
         }
         {
-          event.feedback && (event.feedback.notes ||
+          showFeedback && event.feedback && (event.feedback.notes ||
             (Stores.Events.isActive(event) && event.feedback.rating)) ?
           <div className="action-block event-feedback"
                onClick={() => this.handleFeedbackClick(event)}>

@@ -86,7 +86,7 @@ module Esper.Text {
   export const Unconfirmed = `New Events`;
   export const SearchEventsPlaceholder = `Filter Events`;
 
-  export const GuestDomains = `Organization`;
+  export const GuestDomains = `Organizations`;
   export const NoGuests = `No Guests`;
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
@@ -129,18 +129,30 @@ module Esper.Text {
 
   // Chart descriptions
   export const ChartCalendarsDescription =
-    `Which of my calendars has more events scheduled? You can use this to ` +
-    `compare your work and personal calendars.`;
+    `You have more than one calendar hooked up to Esper. We've grouped your ` +
+    `events by which calendar they're on. This can be helpful for tracking ` +
+    `how much time you spend on personal vs. work-related events`;
   export const ChartDurationDescription =
-    `Am I spending my time in many short meetings or a few long meetings?`;
+    `We've grouped your events by how long they are. If you need to touch ` +
+    `base with many different ${Guests}, it may help to schedule shorter ` +
+    `meetings.`;
   export const ChartLabelsDescription =
-    `What am I spending the most time on?`;
+    `You can add ${Labels} to your events to ` +
+    `categorize them and see what you're spending the most time on.`;
   export const ChartGuestsDescription =
-    `Who am I meeting the most with?`;
+    `These are the people whom you spend the most time in meetings with.`;
+  export const ChartDomainsDescription =
+    `We've grouped the people you meet with by which organization their ` +
+    `email address belongs to.`;
+  export const ChartNoGuests =
+    `None of these events have any ${Guests} invited.`;
   export const ChartGuestsCountDescription =
-    `Are there too many people invited to the meetings I attend?`
+    `We've added up the number of ${Guests} invited to each meeting. ` +
+    `Meetings with too many ${Guests} tend not be a productive use ` +
+    `of everyone's time.`;
   export const ChartRatingsDescription =
-    `How much time do I spend in good meetings vs. bad meetings?`;
+    `Rate your meetings with Esper to help identify what kinds of ` +
+    `meetings are helpful and what kinds aren't worth the time.`;
 
   /* Chart Misc */
 
@@ -149,6 +161,38 @@ module Esper.Text {
 
   // For showing unscheduled time if we've selected less than total
   export const ChartRemainder = "Unscheduled Time";
+
+  /* Reports Misc */
+  export const NotesHeading = "Meeting Notes";
+  export const NotesDescription =
+    `These are are the meeting notes you've taken during this time period.`;
+  export const NoNotesMessage = <span>
+    You don't have any meeting notes for this time period. You can add notes to
+    events by clicking on them in the{" "}
+    <a href={Paths.Time.list().href}>event list</a>.
+
+    You can also open takes notes on your most recent event by visiting
+    {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
+    <a href={Paths.Manage.Team.notifications().href}>
+      enable email and Slack notifications to rate events
+      in the settings page
+    </a>.
+  </span>;
+
+  export const NoRatingsMessage = <span>
+    You don't have any ratings for this time period. You can rate events
+    by clicking on them in the{" "}
+    <a href={Paths.Time.list().href}>event list</a>.
+
+    You can also open rate your most recent event by visiting
+    {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
+    <a href={Paths.Manage.Team.notifications().href}>
+      enable email and Slack notifications to rate events
+      in the settings page
+    </a>.
+  </span>;
+
+  export const SeeMoreLinkText = "See More Details";
 
   /////
 
@@ -159,6 +203,14 @@ module Esper.Text {
   export function hours(n?: number) {
     if (_.isUndefined(n)) { return 'hours'; }
     return `${Util.roundStr(n, 2)} hour${s(n)}`;
+  }
+
+  export function hoursOrMinutes(minutes: number) {
+    if (minutes < 60) {
+      minutes = Math.round(minutes)
+      return `${minutes} minute${s(minutes)}`;
+    }
+    return hours(minutes / 60);
   }
 
   export function hoursUnit(n: number) {
@@ -182,7 +234,7 @@ module Esper.Text {
   }
 
   export function stars(n: number) {
-    return `${n} star${s(n)}`;
+    return `${Util.roundStr(n, 1)} star${s(n)}`;
   }
 
   export function date(d: Date|moment.Moment|string) {

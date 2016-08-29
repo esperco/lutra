@@ -4,7 +4,7 @@
 
 /// <reference path="./Components.Chart.tsx" />
 /// <reference path="./Components.EventGrid.tsx" />
-/// <reference path="./Text.ts" />
+/// <reference path="./Text.tsx" />
 
 module Esper.Components {
   function displayNameForRating(rating: string) {
@@ -42,9 +42,10 @@ module Esper.Components {
       });
 
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
         <AbsoluteChart
           series={series} categories={CATEGORIES} orientation="vertical"
+          simplified={this.props.simplified}
           yAxis={`${Text.ChartRatings} (${Text.ChartHoursUnit})`}
         />
       </div>;
@@ -63,9 +64,9 @@ module Esper.Components {
       });
 
       return <div className="chart-content">
-        <TotalsBar periodTotals={groups} />
+        { this.props.simplified ? null : <TotalsBar periodTotals={groups} /> }
         <PercentageChart
-          series={series}
+          series={series} simplified={this.props.simplified}
           yAxis={`${Text.ChartRatings} (${Text.ChartPercentUnit})`}
         />
       </div>;

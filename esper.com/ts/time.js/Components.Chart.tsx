@@ -5,13 +5,15 @@
 module Esper.Components {
 
   interface Props<T> {
+    simplified?: boolean; // Simplified version of chart for report
+
     // Data is a list because we have calculation for each period
     periods: (
       Types.PeriodData<EventStats.CalcBase<T, any>> & Types.HasStatus
     )[];
   }
 
-  export abstract class Chart<T extends EventStats.OptGrouping, U>
+  export abstract class Chart<T, U>
          extends ReactHelpers.Component<Props<T> & U, {}> {
 
     /*
@@ -93,10 +95,9 @@ module Esper.Components {
       }
 
       var data = Option.flatten(results);
-      if (_.every(data, (d) =>
-        _.isEmpty(d.data.none.annotations) && _.isEmpty(d.data.some)
-      )) {
-        return this.renderMsg(Text.ChartNoData)
+      if (_.every(data, (d) => this.noData(d.data))) {
+        return this.props.simplified ?
+          <span /> : this.renderMsg(Text.ChartNoData)
       }
 
       return this.renderMain(data);
@@ -110,15 +111,22 @@ module Esper.Components {
       </div>;
     }
 
+    abstract noData(data: T): boolean;
+
     abstract renderMain(data: Charting.PeriodData<T>[])
       : JSX.Element;
   }
 
   /*
-    Default chart option for group data and nothing more
+    Default chart option for group data
   */
   export abstract class DefaultGroupingChart<T>
-    extends Chart<EventStats.OptGrouping, T> {}
+    extends Chart<Types.EventOptGrouping, T> {
+
+    noData(data: Types.EventOptGrouping) {
+      return _.isEmpty(data.none.annotations) && _.isEmpty(data.some);
+    }
+  }
 
   export abstract class DefaultChart extends DefaultGroupingChart<{}> {}
 }

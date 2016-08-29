@@ -2,10 +2,12 @@
   Badge used in ListSelector
 */
 
+/// <reference path="./Colors.ts" />
 /// <reference path="./ReactHelpers.ts" />
 
 module Esper.Components {
   interface BadgeProps {
+    className?: string;
     text: string;
     hoverText?: string;
     color?: string;
@@ -21,9 +23,11 @@ module Esper.Components {
 
     render() {
       var badgeStyle = (this.props.color) ? {
-        background: this.props.color
+        background: this.props.color,
+        color: Colors.colorForText(this.props.color)
       } : {};
-      return <span className="badge" style={badgeStyle}
+      return <span className={"badge " + this.props.className}
+              style={badgeStyle}
               onMouseEnter={this.onMouseEnter.bind(this)}
               onMouseLeave={this.onMouseLeave.bind(this)}>
         {

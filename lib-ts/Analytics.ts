@@ -75,6 +75,7 @@ module Esper.Analytics {
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
     LabelSetup,            // /#!/label-setup
+    Report,                // /#!/report
     TeamSetup              // /#!/team-setup
   }
 

@@ -63,6 +63,7 @@ module Esper.EventStats {
   function emptyGroup(): Group {
     return {
       annotations: [],
+      events: [],
       totalValue: 0,
       totalUnique: 0,
       eventMap: {}
@@ -74,6 +75,7 @@ module Esper.EventStats {
     return {
       date: date,
       annotations: group.annotations,
+      events: group.events,
       totalValue: group.totalValue,
       totalUnique: group.totalUnique,
       eventMap: group.eventMap
@@ -83,6 +85,7 @@ module Esper.EventStats {
   function emptySubgroup(): Subgroup {
     return {
       annotations: [],
+      events: [],
       totalValue: 0,
       totalUnique: 0,
       subgroups: {},
@@ -97,7 +100,8 @@ module Esper.EventStats {
       totalValue: 0,
       totalUnique: 0,
       eventMap: {},
-      annotations: []
+      annotations: [],
+      events: []
     }
   }
 
@@ -143,6 +147,7 @@ module Esper.EventStats {
       grouping.annotations.push(a);
       if (! grouping.eventMap[eventKey]) {
         grouping.eventMap[eventKey] = true;
+        grouping.events.push(a.event);
         grouping.totalUnique += 1;
       }
     });
@@ -320,6 +325,26 @@ module Esper.EventStats {
 
   export type CalcOpts = Types.EventCalcOpts;
   export type DomainNestOpts = Types.DomainNestOpts;
+
+  export function defaultCalcOpts(opts: {
+    filterStr?: string;
+    labels?: Types.ListSelectJSON;
+    domains?: Types.ListSelectJSON;
+    durations?: Types.ListSelectJSON;
+    ratings?: Types.ListSelectJSON;
+    guestCounts?: Types.ListSelectJSON;
+    weekHours?: Types.WeekHours;
+  } = {}): CalcOpts {
+    return {
+      filterStr: opts.filterStr || "",
+      labels: opts.labels || Params.cleanListSelectJSON(),
+      domains: opts.domains || Params.cleanListSelectJSON(),
+      durations: opts.durations || Params.cleanListSelectJSON(),
+      ratings: opts.ratings || Params.cleanListSelectJSON(),
+      guestCounts: opts.guestCounts || Params.cleanListSelectJSON(),
+      weekHours: opts.weekHours || Params.weekHoursAll()
+    };
+  }
 
   // How many events to annotate or group at any given time
   const DEFAULT_MAX_PROCESS_EVENTS = 10;
@@ -824,6 +849,21 @@ module Esper.EventStats {
     }
   }
 
+  export class DurationAnnotationCalc
+    extends DurationCalc<[Types.TeamEvent, number][], {}>
+  {
+    initResult(): [Types.TeamEvent, number][] {return []; }
+
+    processOne(
+      event: Types.TeamEvent,
+      duration: number,
+      results: [Types.TeamEvent, number][]
+    ) {
+      results.push([event, duration]);
+      return results;
+    }
+  }
+
 
   /* Calc for sorting events by calendar */
 
@@ -1061,6 +1101,22 @@ module Esper.EventStats {
     let emails = Stores.Events.getGuestEmails(event, domains);
     let count = emails.length + 1; // +1 for exec
     return _.findLast(GUEST_COUNT_BUCKETS, (b) => count >= b.gte);
+  }
+
+  export class GuestCountAnnotationCalc
+    extends EventListCalc<[Types.TeamEvent, number][], {}>
+  {
+    initResult(): [Types.TeamEvent, number][] {return []; }
+
+    processBatch(events: Stores.Events.TeamEvent[],
+                 results: [Types.TeamEvent, number][])
+    {
+      return results.concat(
+        _.map(events, (e): [Types.TeamEvent, number] =>
+          [e, Stores.Events.getGuests(e).length + 1] // +1 for exec
+        )
+      );
+    }
   }
 
   export class GuestCountDurationCalc

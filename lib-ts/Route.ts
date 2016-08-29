@@ -239,6 +239,12 @@ module Esper.Route {
       }
     }
 
+    // Get link for path
+    export function href(dest: string|string[]|Paths.Path, opts?: Opts) {
+      let href = isPath(dest) ? dest.href : normalize(dest);
+      return href + getQueryStr(opts);
+    }
+
     // Alias for old code
     export var path = go;
 

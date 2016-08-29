@@ -11,7 +11,8 @@
 
   "devOnly": [
     "../lib/JasmineStub.ts",
-    "EventStats.Test.ts"
+    "EventStats.Test.ts",
+    "Insights.Test.ts"
   ],
 
   "prodOnly": [

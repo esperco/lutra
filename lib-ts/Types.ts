@@ -180,7 +180,12 @@ module Esper.Types {
     Heirarchal maps of grouping strings to annotations
   */
   export interface EventGroup {
+    /*
+      Separate annotation + event lists, b/c maybe more than one annotation
+      per event
+    */
     annotations: Annotation[];
+    events: TeamEvent[];
     totalValue: number;   // Sum of all annotation values
     totalUnique: number;  // Total unique events
     eventMap: IdMap;      /* Map used to quickly test whether event exists

@@ -4,20 +4,23 @@
   on options.
 */
 module Esper.Components {
-  export function AbsoluteChart({series, categories, orientation, yAxis} : {
+  export function AbsoluteChart({
+    series, categories, simplified, orientation, yAxis
+  } : {
     series: Charting.EventSeries[],
     categories: string[];
+    simplified?: boolean;
     orientation?: 'vertical'|'horizontal'
     yAxis?: string;
   }) {
     orientation = orientation || 'horizontal';
 
-    return <Components.Highchart opts={{
+    return <Components.Highchart showExport={!simplified} opts={{
       chart: orientation === 'vertical' ? {
         type: 'column'
       } : {
         type: 'bar',
-        height: series.length * 50 + 120
+        height: simplified ? series.length * 50 : series.length * 50 + 120
       },
 
       tooltip: Charting.eventPointTooltip,
@@ -42,9 +45,10 @@ module Esper.Components {
       },
 
       yAxis: [{
-        title: yAxis ? { text: yAxis } : null,
+        title: yAxis && !simplified ? { text: yAxis } : null,
+        visible: !simplified,
         stackLabels: {
-          enabled: true,
+          enabled: !simplified,
           formatter: Charting.stackPointFormatter,
           style: {
             fontSize: "10px",

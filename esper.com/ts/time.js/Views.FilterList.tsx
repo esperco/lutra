@@ -368,7 +368,6 @@ module Esper.Views {
         teams={teams}
         selectedEvents={this.state.selected}
         onEventClick={(event) => this.editEvent(event)}
-        onAddLabelClick={(event) => this.editEvent(event)}
         onFeedbackClick={(event) => this.editEvent(event, false)}
         onEventToggle={(event) => this.toggleEvent(event)}
       />;
