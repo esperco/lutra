@@ -61,14 +61,16 @@ module Esper.Components {
                 calendars={this.props.calendars}
                 pairs={tier2}
               />{" "}calendar{tier2.length === 1 ? "" : "s"}.
+            </p>,
+
+            fallback: (pairs) => <p>
+              Your top calendars are the{" "}
+              <InlineCalList
+                calendars={this.props.calendars}
+                pairs={pairs}
+              />{" "}calendar{pairs.length === 1 ? "" : "s"}.
             </p>
-          }, (pairs) => <p>
-            Your top calendars are the{" "}
-            <InlineCalList
-              calendars={this.props.calendars}
-              pairs={pairs}
-            />{" "}calendar{pairs.length === 1 ? "" : "s"}.
-          </p>)
+          })
         }
       </div>;
     }

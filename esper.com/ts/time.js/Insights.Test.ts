@@ -50,8 +50,9 @@ module Esper.Insights {
         let ret = matchScenario(
           makeScenario({}, 100),
           {
-            allNone: () => "none"
-          }, function() { return "fallback"; });
+            allNone: () => "none",
+            fallback: () => "fallback"
+          });
 
         expect(ret).toEqual("none");
       });
@@ -60,8 +61,9 @@ module Esper.Insights {
         let ret = matchScenario(
           makeScenario({"bob": 50, "other": 0}, 50),
           {
-            allOne: (value) => value
-          }, function() { return "fallback"; });
+            allOne: (value) => value,
+            fallback: () => "fallback"
+          });
 
         expect(ret).toEqual("bob");
       });
@@ -71,8 +73,9 @@ module Esper.Insights {
         let ret = matchScenario(
           makeScenario({"bob": 32, "joe": 33, "sam": 34}, 50),
           {
-            allEqual: (pairs) => "equal " + _.map(pairs, (p) => p[0]).join(",")
-          }, function() { return "fallback"; });
+            allEqual: (pairs) => "equal " + _.map(pairs, (p) => p[0]).join(","),
+            fallback: () => "fallback"
+          });
 
         expect(ret).toEqual("equal sam,joe,bob");
       });
@@ -82,8 +85,9 @@ module Esper.Insights {
         let ret = matchScenario(
           makeScenario({"bob": 50, "joe": 50, "sam": 100}, 50),
           {
-            allEqual: (pairs) => "equal"
-          }, function() { return "fallback"; });
+            allEqual: (pairs) => "equal",
+            fallback: () => "fallback"
+          });
 
         expect(ret).toEqual("fallback");
       });
@@ -98,7 +102,8 @@ module Esper.Insights {
           {
             tiersMajority: (t1, t2) => `m ${listKeys(t1)} ${listKeys(t2)}`,
             tiersPlurality: (t1, t2) => `p ${listKeys(t1)} ${listKeys(t2)}`,
-          }, function() { return "fallback"; });
+            fallback: () => "fallback"
+          });
 
         expect(ret).toEqual("m bob,joe sam");
       });
@@ -113,7 +118,8 @@ module Esper.Insights {
         ), {
           tiersMajority: (t1, t2) => `m ${listKeys(t1)} ${listKeys(t2)}`,
           tiersPlurality: (t1, t2) => `p ${listKeys(t1)} ${listKeys(t2)}`,
-        }, function() { return "fallback"; });
+          fallback: () => "fallback"
+        });
 
         expect(ret).toEqual("p bob,joe sam,frank,al");
       });

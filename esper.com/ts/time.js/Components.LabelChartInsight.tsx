@@ -42,11 +42,13 @@ module Esper.Components {
               {" " + Text.Labeled + " "}
               <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
               <InlineLabelList pairs={tier2} />.
+            </p>,
+
+            fallback: (pairs) => <p>
+              Your top {Text.Labels} are{" "}
+              <InlineLabelList pairs={pairs.slice(0, 3)} />.
             </p>
-          }, (pairs) => <p>
-            Your top {Text.Labels} are{" "}
-            <InlineLabelList pairs={pairs.slice(0, 3)} />.
-          </p>)
+          })
         }
       </div>;
     }

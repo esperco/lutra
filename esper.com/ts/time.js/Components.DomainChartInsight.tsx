@@ -36,11 +36,13 @@ module Esper.Components {
               {" " + Text.Guests} from{" "}
               <InlineDomainList pairs={tier1} />, {" "}followed by{" "}
               <InlineDomainList pairs={tier2} />.
+            </p>,
+
+            fallback: (pairs) => <p>
+              You meet the most with {" " + Text.Guests} from{" "}
+              <InlineDomainList pairs={pairs.slice(0, 3)} />.
             </p>
-          }, (pairs) => <p>
-            You meet the most with {" " + Text.Guests} from{" "}
-            <InlineDomainList pairs={pairs.slice(0, 3)} />.
-          </p>)
+          })
         }
       </div>;
     }

@@ -32,11 +32,14 @@ module Esper.Insights {
       returns the next tier of keys.
     */
     tiersPlurality?: (t1: Pair[], t2: Pair[]) => T;
-  }, /* No match above */ fallback: (top: Pair[]) => T) {
+
+    /* No match above */
+    fallback: (top: Pair[]) => T;
+  }) {
 
     // Everything is none.
     if (data.none.totalUnique === data.totalUnique) {
-      return cbs.allNone ? cbs.allNone() : fallback([]);
+      return cbs.allNone ? cbs.allNone() : cbs.fallback([]);
     }
 
     // Sorted key, pct rankings
@@ -70,7 +73,7 @@ module Esper.Insights {
     }
 
     // No plurality function => fallback
-    return fallback(pairs);
+    return cbs.fallback(pairs);
   }
 
 
