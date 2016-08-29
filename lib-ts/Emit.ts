@@ -9,7 +9,7 @@ declare module Esper {
 }
 
 module Esper.Emit {
-  export abstract class EmitBase extends EventEmitter {
+  export class EmitBase extends EventEmitter {
     public id: string;
 
     constructor() {
@@ -56,7 +56,7 @@ module Esper.Emit {
     protected alreadyEmitted = false;
 
     // Call this whenever the store is changed.
-    protected emitChange(...args: any[]): void {
+    emitChange(...args: any[]): void {
       if (this.alreadyEmitted) {
         throw new Error("Unidirectional data flow error: Cannot update " +
           "store via change handler");

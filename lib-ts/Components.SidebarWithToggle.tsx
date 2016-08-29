@@ -1,66 +1,62 @@
 /*
-  Component for toggling left sidebar. Sidebar toggle and actual sidebar
+  Component for toggling sidebar. Sidebar toggle and actual sidebar
   component themselves are separate. There should only be a single sidebar
-  at any given moment.
+  per side at any given moment.
 */
 
 /// <reference path="./Option.ts" />
 /// <reference path="./ReactHelpers.ts" />
+/// <reference path="./Components.Overlay.tsx" />
+/// <reference path="./Components.IfXS.tsx" />
 
 module Esper.Components {
-  // Ref to active sidebar.
-  var _toggle = Option.none<SidebarToggle>();
-  var _sidebar = Option.none<Sidebar>();
+  const sidebarLeftId = "esper-sidebar-left";
+  const sidebarRightId = "esper-sidebar-right";
+
+  // Ref to active sidebars
+  var _sidebarLeft = Option.none<Sidebar>();
+  var _sidebarRight = Option.none<Sidebar>();
+
 
   // Toggle element - renders nothing if no _sidebar active.
   export class SidebarToggle extends ReactHelpers.Component<{
     className?: string;
-  }, {
-    hasSidebar?: boolean;
-  }> {
-    constructor(props: {}) {
-      super(props);
-      this.state = { hasSidebar: _sidebar.isSome() };
-    }
-
+    side: "left"|"right";
+    children?: JSX.Element|JSX.Element[];
+  }, {}> {
     render() {
-      if (this.state.hasSidebar) {
-        return <div className={classNames(
-          "action esper-sidebar-toggle",
-          this.props.className
-        )} onClick={() => this.toggle()}>
-          <i className="fa fa-fw fa-bars" />
-        </div>;
-      }
-      return null;
-    }
-
-    componentDidMount() {
-      _toggle = Option.some(this);
-    }
-
-    componentWillUnmount() {
-      super.componentWillUnmount();
-      _toggle = Option.none<SidebarToggle>();
+      return <div className={classNames(
+        "action esper-sidebar-toggle",
+        this.props.className
+      )} onClick={() => this.toggle()}>
+        { this.props.children }
+      </div>;
     }
 
     toggle() {
-      _sidebar.match({
-        none: () => null,
-        some: (sidebar) => sidebar.toggle()
+      // Default left
+      let sidebar = this.props.side === "right" ?
+        _sidebarRight : _sidebarLeft;
+      sidebar.match({
+        none: () => Log.e("Sidebar " + this.props.side +
+                          " toggle without sidebar"),
+        some: (s) => s.toggle()
       });
     }
   }
 
+
   // Actual sidebar itself
-  export class Sidebar extends ReactHelpers.Component<{
+  interface SidebarProps {
+    side: "left"|"right";
     className?: string;
-    side?: "left"|"right";
     children?: JSX.Element|JSX.Element[];
-  }, {
+  }
+
+  export class Sidebar extends ReactHelpers.Component<SidebarProps, {
     open: boolean;
   }> {
-    constructor(props: {}) {
+    constructor(props: SidebarProps) {
       super(props);
       this.state = { open: false };
     }
@@ -82,25 +78,21 @@ module Esper.Components {
 
     componentDidMount() {
       Route.onBack(this.onBack);
-      _sidebar = Option.some(this);
-      _toggle.match({
-        none: () => null,
-        some: (toggle) => toggle.setState({
-          hasSidebar: true
-        })
-      });
+      if (this.props.side === "right") {
+        _sidebarRight = Option.some(this);
+      } else {
+        _sidebarLeft = Option.some(this);
+      }
     }
 
     componentWillUnmount() {
       super.componentWillUnmount();
       Route.offBack(this.onBack);
-      _sidebar = Option.none<Sidebar>();
-      _toggle.match({
-        none: () => null,
-        some: (toggle) => toggle.setState({
-          hasSidebar: false
-        })
-      });
+      if (this.props.side === "right") {
+        _sidebarRight = Option.none<Sidebar>();
+      } else {
+        _sidebarLeft = Option.none<Sidebar>();
+      }
     }
 
     onBack = () => {
@@ -112,9 +104,10 @@ module Esper.Components {
     }
   }
 
+
   /*
     Base component if you want to create additional sidebar like objects
-    different from the main sidebar
+    different from the main sidebars
   */
   export function SidebarBase({className, open, side, children, toggleState}: {
     className?: string;
@@ -125,19 +118,29 @@ module Esper.Components {
   }) {
     let left = side !== "right";  // If blank, left
     let right = side === "right";
-    return <div className={classNames("esper-sidebar", className, {
+    let classes = classNames("esper-sidebar", className, {
       "esper-sidebar-left": left,
-      "esper-sidebar-right": right
-    })}>
-      { open ?
-        <div className="esper-sidebar-backdrop"
-             onClick={toggleState} /> :
-        null }
-      <div className={classNames("esper-sidebar-content", {
-        open: open
-      })} onClick={(e) => e.stopPropagation()}>
+      "esper-sidebar-right": right,
+      "open": open
+    });
+
+    // This div only wraps the inline bit (overlay is separate)
+    return ifXS(
+      // Mobile => overlay
+      <Overlay id={left ? sidebarLeftId : sidebarRightId}>
+        { open ?
+          <div className="esper-sidebar-backdrop"
+               onClick={toggleState} /> :
+          null }
+        <div className={classes} onClick={(e) => e.stopPropagation()}>
+          { children }
+        </div>
+      </Overlay>,
+
+      // Desktop => inline
+      <div className={classes}>
         { children }
       </div>
-    </div>;
+    );
   }
 }

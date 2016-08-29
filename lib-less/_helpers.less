@@ -85,32 +85,32 @@
   height: @input-height-base;
 }
 
-.esper-sidebar-content, .esper-sidebar + .esper-content {
+.esper-sidebar, .esper-sidebar + .esper-content {
   padding: @esper-base-padding;
   position: absolute;
-  overflow-y: auto;
   top: 0;
   bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  transition: left 0.6s, right 0.6s;
+
+  background: @body-bg;
+  border-color: @brand-border;
+  border-style: solid;
+  border-width: 0;
+
+  .esper-shade & {
+    background: @shade-bg;
+    border-color: @shade-border;
+  }
+
+  .esper-inverse & {
+    background: @shade-bg;
+    border-color: @shade-border;
+  }
 }
 
-.esper-sidebar-content {
-  background: @body-bg;
-  overflow-x: hidden;
-
-  .esper-sidebar-left & {
-    left: 0;
-    border-right: 1px solid @brand-border;
-  }
-
-  .esper-sidebar-right & {
-    right: 0;
-    border-left: 1px solid @brand-border;
-  }
-
-  .sidebar-backdrop {
-    display: none;
-  }
-
+.esper-sidebar {
   .sidebar-top-menu, .sidebar-bottom-menu {
     position: absolute;
     left: 0; right: 0;
@@ -153,6 +153,16 @@
 
   @media (min-width: @screen-sm-min) {
     width: @sidebar-sm-width;
+
+    &.esper-sidebar-left {
+      left: 0;
+      border-right-width: 1px;
+    }
+
+    &.esper-sidebar-right {
+      right: 0;
+      border-left-width: 1px;
+    }
   }
 
   @media (min-width: @screen-md-min) {
@@ -167,22 +177,18 @@
     position: fixed;
     z-index: @zindex-sidebar;
     width: @sidebar-xs-width;
-    top: 0;
-    bottom: 0;
-    right: auto;
-    transition: left 0.6s, right 0.6s;
 
-    .esper-sidebar-left & {
+    &.esper-sidebar-left {
       left: -100%;
-      border: 0;
+
       &.open {
         left: 0;
       }
     }
 
-    .esper-sidebar-right & {
+    &.esper-sidebar-right {
       right: -100%;
-      border: 0;
+
       &.open {
         right: 0;
       }
@@ -192,23 +198,11 @@
       box-shadow: 6px 0px 12px rgba(0, 0, 0, 0.16);
     }
   }
-
-  .esper-shade & {
-    background: @shade-bg;
-    border-color: @shade-border;
-  }
-
-  .esper-inverse & {
-    background: @shade-bg;
-    border-color: @shade-border;
-  }
 }
 
 .esper-sidebar-left + .esper-content { right: 0; }
 .esper-sidebar-right + .esper-content { left: 0; }
 .esper-sidebar + .esper-content {
-  background: @body-bg;
-
   @media (min-width: @screen-sm-min) {
     width: 100% - @sidebar-sm-width;
   }

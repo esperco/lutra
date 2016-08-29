@@ -31,7 +31,7 @@ module Esper.Views {
         eventData.events, opts);
 
       return <div id="reports-page" className="esper-full-screen minus-nav">
-        <Components.Sidebar className="esper-shade">
+        <Components.Sidebar side="left" className="esper-shade">
           <Components.LabelCalcSelector
             primary={true}
             team={team}
