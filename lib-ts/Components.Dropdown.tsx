@@ -41,7 +41,7 @@ module Esper.Components {
   }
 
   interface State {
-    open?: boolean;
+    open: boolean;
   }
 
   export class Dropdown extends ReactHelpers.Component<Props, State> {
