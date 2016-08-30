@@ -1,8 +1,12 @@
-/* CSS for the landing page header  */
+/* CSS for the header div */
 
 @word-mark-height: 12px;
 @nav-menu-link-vertical: 2 * @padding-large-vertical;
 @nav-menu-link-horizontal: 2 * @padding-large-horizontal;
+
+.navbar-fixed-top + * {
+  margin-top: @navbar-height + @navbar-margin-bottom;
+}
 
 .navbar-brand.word-mark {
   line-height: @navbar-height;
@@ -97,3 +101,4 @@
     animation: flash 0.2s ease-in-out 0s 5;
   }
 }
+

@@ -21,27 +21,26 @@
   position: relative;
 }
 
+// Release notes in top banner
 .esper-release-notes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
   text-align: center;
   font-size: @font-size-h5;
-  min-height: @release-notes-height;
+  height: @release-notes-height;
   line-height: @release-notes-height;
   vertical-align: middle;
   padding-right: 10px;
 }
 
-///////
+.esper-release-notes + * {
+  margin-top: @release-notes-height;
+}
 
-#esper-main.has-release-notes {
-  & > .minus-nav {
-    @media screen and (min-width: @screen-sm-min) {
-      top: @navbar-height + @release-notes-height;
-    }
-  }
-
-  & > .container:first-child {
-    margin-top: @navbar-height + @release-notes-height;
-  }
+.esper-release-notes + .navbar-fixed-top + * {
+  margin-top: @release-notes-height + @navbar-height + @navbar-margin-bottom;
 }
 
 // Use for absolutely positioning a center div on screen

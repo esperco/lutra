@@ -22,20 +22,12 @@ module Esper.Integration {
         Test.goTo("/time", done);
       });
 
-      it("should have a header", function() {
-        expect(Test.getTestDoc().find(Layout.headerSelector).length).toEqual(1);
-      });
-
-      it("should have a footer", function() {
-        expect(Test.getTestDoc().find(Layout.footerSelector).length).toEqual(1);
-      });
-
       it("should have a main div", function() {
         expect(Test.getTestDoc().find(Layout.mainSelector).length).toEqual(1);
       });
 
       it("should have a loading div", function() {
-        expect(Test.getTestDoc().find(Layout.loadingSelector).length).toEqual(1);
+        expect(Test.getTestDoc().find("#esper-loading").length).toEqual(1);
       });
 
       describe("after loading", function() {
@@ -44,7 +36,7 @@ module Esper.Integration {
         });
 
         it("should hide the loader div", function() {
-          expect(Test.getTestDoc().find(Layout.loadingSelector).is(":visible"))
+          expect(Test.getTestDoc().find("#esper-loading").is(":visible"))
             .toBe(false);
         });
       });

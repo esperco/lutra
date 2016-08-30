@@ -4,11 +4,11 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Save.ts" />
-/// <reference path="./Stores.ReleaseNotes.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
+/// <reference path="./Stores.Teams.ts" />
 /// <reference path="./Text.tsx" />
 
 module Esper.Views {
@@ -38,7 +38,6 @@ module Esper.Views {
       var hasTeams = Stores.Teams.all().length > 0;
 
       return <div className="navbar-fixed-top">
-        <ReleaseNotes lastDismiss={Stores.ReleaseNotes.get()} />
         <nav className="navbar navbar-default navbar-shadow">
           <div className="container-fluid">
             <div className="navbar-header">
@@ -80,12 +79,14 @@ module Esper.Views {
               className="visible-xs-block navbar-default"
               side="right"
             >
-              { this.navLinks(
-                "nav navbar-nav esper-panel-section esper-full-width"
-              ) }
-              { this.loginLinks(
-                "nav navbar-nav esper-panel-section esper-full-width"
-              ) }
+              <div className="esper-section">
+                { this.navLinks(
+                  "nav navbar-nav esper-panel-section esper-full-width"
+                ) }
+                { this.loginLinks(
+                  "nav navbar-nav esper-panel-section esper-full-width"
+                ) }
+              </div>
             </Components.Sidebar>
           </div>
         </nav>
@@ -147,27 +148,6 @@ module Esper.Views {
           </span>
         </a></li>
       </ul>;
-    }
-  }
-
-  class ReleaseNotes extends Component<{ lastDismiss: number }, {}> {
-    render() {
-      if (this.props.lastDismiss < Text.LatestRelease) {
-        return <div className="esper-release-notes esper-inverse pinned">
-          <a className="action rm-action pull-right"
-             title={Text.DismissNotes}
-             onClick={this.dismissReleaseNotes.bind(this)}>
-            <i className="fa fa-fw fa-close list-group-item-text" />
-          </a>
-          { Text.ReleaseNotes }
-        </div>;
-      }
-      return null;
-    }
-
-    dismissReleaseNotes() {
-      Stores.ReleaseNotes.set(Date.now());
-      Route.nav.refresh();
     }
   }
 

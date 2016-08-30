@@ -11,18 +11,21 @@
   <link rel="icon" href="img/favicon.ico" type="image/x-icon">
 {% endblock %}
 
-{# Clear header by default -- app will re-render #}
+{# Clear header by default -- app will re-render inside main probably #}
 {% block header %}{% endblock %}
 
-{% block postfooter %}
-  {% block loading %}
+{% block main %}
+  <div id="esper-main">
+    {# This should get cleared after initial render #}
     <div id="esper-loading">
       <div class="esper-center">
         <div class="esper-spinner"></div>
       </div>
     </div>
-  {% endblock %}
+  </div>
+{% endblock %}
 
+{% block postfooter %}
   {% block modal %}
     <div id="esper-modal"></div>
   {% endblock %}

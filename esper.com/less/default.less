@@ -11,29 +11,31 @@
 @import "./_social";
 
 
+// No navbar margin for splash
+.navbar-fixed-top + .splash-content, .navbar-fixed-top + .splash {
+  margin-top: @navbar-height;
+}
+
+
 /* Make navbar a little taller on desktop splash pages */
 @extra-navbar-padding: 10px;
 
 @media screen and (min-width: @screen-sm-min) {
-  .navbar {
+  .navbar-fixed-top {
     &.navbar-default {
       background: @navbar-default-bg;
     }
     padding: @extra-navbar-padding 0;
     max-height: @navbar-height + (@extra-navbar-padding * 2);
+
+    + *, + .splash, + .splash-content {
+      margin-top: @navbar-height + (@extra-navbar-padding * 2);
+    }
   }
 }
 
 
 /* General */
-
-body.esper {
-  padding-top: @navbar-height;
-
-  @media screen and (min-width: @screen-sm-min) {
-    padding-top: @navbar-height + (@extra-navbar-padding * 2);
-  }
-}
 
 .no-break {
   display: inline-block;
