@@ -68,7 +68,7 @@ module Esper.Views {
         </Components.Sidebar>
         <div className="esper-content">
           { this.renderPeriodSelector() }
-          <div className="esper-expanded">
+          <div id="chart-expanded" className="esper-expanded">
             { this.props.chart }
           </div>
         </div>
