@@ -171,19 +171,19 @@ module Esper.Components {
 
       return <Overlay id={dropdownContainerId}>
         <div className="dropdown-backdrop" onClick={() => this.close()}>
-          {ifXS(
+          {ifXS({
 
             // Mobile, no positioning
-            <DropdownWrapper>
+            xs: <DropdownWrapper>
               { menu }
             </DropdownWrapper>,
 
             // Desktop, align
-            <DropdownWrapper align={this._align} width={this._width}>
+            other: <DropdownWrapper align={this._align} width={this._width}>
               {menu}
             </DropdownWrapper>
 
-          )}
+          })}
         </div>
       </Overlay>;
     }

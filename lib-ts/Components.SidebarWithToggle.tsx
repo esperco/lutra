@@ -171,9 +171,9 @@ module Esper.Components {
     });
 
     // This div only wraps the inline bit (overlay is separate)
-    return ifXS(
+    return ifXS({
       // Mobile => overlay
-      <Overlay id={left ? sidebarLeftId : sidebarRightId}>
+      xs: <Overlay id={left ? sidebarLeftId : sidebarRightId}>
         { open ?
           <div className="esper-sidebar-backdrop"
                onClick={toggleState} /> :
@@ -184,9 +184,9 @@ module Esper.Components {
       </Overlay>,
 
       // Desktop => inline
-      <div className={classes}>
+      other: <div className={classes}>
         { children }
       </div>
-    );
+    });
   }
 }

@@ -3,10 +3,10 @@
   We do this rendering a Bootstrap "xs" element on the screen first, checking
   if it's visible, and then render the appropriate element accordingly.
 
-    ifXS(
-      <div>Mobile UI</div>,
-      <div>Desktop UI</div>
-    )
+    ifXS({
+      xs: <div>Mobile UI</div>,
+      other: <div>Desktop UI</div>
+    })
 */
 
 /// <reference path="./Emit.ts" />
@@ -43,7 +43,10 @@ module Esper.Components {
 
 
   // Functional around IfXS component
-  export function ifXS(xs: JSX.Element, other?: JSX.Element) {
+  export function ifXS({xs, other} : {
+    xs: JSX.Element;
+    other?: JSX.Element
+  }) {
     return <IfXS xs={xs} other={other} />;
   }
 
