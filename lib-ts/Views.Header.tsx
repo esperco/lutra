@@ -15,21 +15,7 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Namespace for Header related vars
-  export module Header_ {
-    export enum Tab {
-      Charts = 1,
-      Calendar,
-      List,
-      Manage
-    }
-  }
-
-  interface Props {
-    active?: Header_.Tab
-  }
-
-  export class Header extends Component<Props, {}> {
+  export class Header extends Component<{}, {}> {
     _navSidebar: Components.Sidebar;
 
     renderWithData() {
@@ -101,21 +87,16 @@ module Esper.Views {
 
     navLinks(className?: string) {
       return <ul className={className} onClick={() => this.toggleNavSidebar()}>
-        <NavLink href={Paths.Time.charts({}).href}
-                 active={this.props.active === Header_.Tab.Charts}>
+        <NavLink path={Paths.Time.charts({})}>
           <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
         </NavLink>
-        <NavLink href={Paths.Time.calendarLabeling({}).href}
-                 active={this.props.active === Header_.Tab.Calendar}
-                 hiddenXs={true}>
+        <NavLink path={Paths.Time.calendarLabeling({})} hiddenXs={true}>
           <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
         </NavLink>
-        <NavLink href={Paths.Time.list({}).href}
-                 active={this.props.active === Header_.Tab.List}>
+        <NavLink path={Paths.Time.list({})}>
           <i className="fa fa-fw fa-th-list"></i>{" "}Event List
         </NavLink>
-        <NavLink href={Paths.Manage.home().href}
-                 active={this.props.active === Header_.Tab.Manage}>
+        <NavLink path={Paths.Manage.home()}>
           <i className="fa fa-fw fa-cog"></i>{" "}Settings
         </NavLink>
       </ul>;
@@ -152,20 +133,18 @@ module Esper.Views {
   }
 
   interface NavLinkProps {
-    href: string;
+    path: Paths.Path;
     children?: JSX.Element[];
     hiddenXs?: boolean;
-    active?: boolean;
   }
 
   class NavLink extends Component<NavLinkProps, {}> {
     render() {
-      var selected = Route.nav.isActive(this.props.href);
       return <li className={classNames({
-        active: this.props.active,
+        active: Route.nav.isActive(this.props.path),
         "hidden-xs": this.props.hiddenXs
       })}>
-        <a href={this.props.href}>
+        <a href={this.props.path.href}>
           {this.props.children}
         </a>
       </li>;
