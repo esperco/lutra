@@ -131,7 +131,7 @@ module Esper.Text {
   export const ChartCalendarsDescription =
     `You have more than one calendar hooked up to Esper. We've grouped your ` +
     `events by which calendar they're on. This can be helpful for tracking ` +
-    `how much time you spend on personal vs. work-related events`;
+    `how much time you spend on personal vs. work-related events.`;
   export const ChartDurationDescription =
     `We've grouped your events by how long they are. If you need to touch ` +
     `base with many different ${Guests}, it may help to schedule shorter ` +
@@ -171,10 +171,10 @@ module Esper.Text {
     events by clicking on them in the{" "}
     <a href={Paths.Time.list().href}>event list</a>.
 
-    You can also open takes notes on your most recent event by visiting
+    You can also take notes on your most recent event by visiting
     {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
     <a href={Paths.Manage.Team.notifications().href}>
-      enable email and Slack notifications to rate events
+      enabling email and Slack notifications
       in the settings page
     </a>.
   </span>;
@@ -184,10 +184,10 @@ module Esper.Text {
     by clicking on them in the{" "}
     <a href={Paths.Time.list().href}>event list</a>.
 
-    You can also open rate your most recent event by visiting
+    You can also rate your most recent event by visiting
     {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
     <a href={Paths.Manage.Team.notifications().href}>
-      enable email and Slack notifications to rate events
+      enabling email and Slack notifications
       in the settings page
     </a>.
   </span>;
