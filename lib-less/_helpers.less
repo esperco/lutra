@@ -9,10 +9,14 @@
 @sidebar-md-width: 25%;
 @sidebar-lg-width: 20%;
 
-
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
   out into Marten for reuse with Chrome extension
+*/
+
+/*
+  Simple-content for large (but not full screen content).
+  Pair with esper-center.
 */
 .esper-simple-content {
   margin: 50px auto;
@@ -43,7 +47,10 @@
   margin-top: @release-notes-height + @navbar-height + @navbar-margin-bottom;
 }
 
-// Use for absolutely positioning a center div on screen
+/*
+  Use for absolutely positioning a center div on screen. Use within
+  .esper-expanded for best results.
+*/
 .esper-center {
   position: absolute;
   top: 45%; // Nudge up slightly
@@ -55,7 +62,7 @@
   // Modal-ish message
   &.esper-msg {
     padding: @modal-inner-padding;
-    z-index: 5;
+    z-index: @zindex-message;
     background: @body-bg;
     border: 1px solid @component-active-bg;
     border-radius: @border-radius-base;
@@ -63,20 +70,24 @@
   }
 }
 
-.esper-full-screen {
-  background: @body-bg;
+// Expand to edges of container
+.esper-expanded {
   min-height: @min-fullscreen-height;
   position: relative;
+  z-index: @zindex-navbar-fixed - 1;
 
   @media screen and (min-width: @screen-sm-min) {
-    padding: @esper-base-padding;
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    z-index: 1;
+    overflow: auto;
+  }
 
-    &.minus-nav {
-      top: @navbar-height;
-    }
+  .navbar-fixed-top + & {
+    margin-top: @navbar-height;
+  }
+
+  .esper-release-notes + .navbar-fixed-top + & {
+    margin-top: @release-notes-height + @navbar-height;
   }
 }
 
@@ -85,7 +96,6 @@
 }
 
 .esper-sidebar, .esper-sidebar + .esper-content {
-  padding: @esper-base-padding;
   position: absolute;
   top: 0;
   bottom: 0;
@@ -129,7 +139,6 @@
 
   .sidebar-minus-top-menu, .sidebar-minus-bottom-menu {
     position: absolute;
-    padding: @esper-base-padding;
     left: 0; right: 0;
     overflow-x: hidden;
     overflow-y: auto;
@@ -201,7 +210,7 @@
 
 .esper-sidebar-left + .esper-content { right: 0; }
 .esper-sidebar-right + .esper-content { left: 0; }
-.esper-sidebar + .esper-content {
+.esper-content {
   @media (min-width: @screen-sm-min) {
     width: 100% - @sidebar-sm-width;
   }
@@ -220,26 +229,25 @@
     min-height: @min-fullscreen-height;
   }
 
-  display: flex;
-  flex-direction: column;
-
+  /*
+    Header in the content area (fixed in place on desktop if followed by
+    esper-expanded)
+  */
   > .esper-content-header {
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin-bottom: @padding-large-vertical;
-  }
+    line-height: @input-height-base;
+    padding: @esper-base-padding;
+    overflow: auto;
 
-  > .esper-expanded {
-    flex-grow: 1;
-    min-height: @min-fullscreen-height / 2;
-    position: relative;
+    @media screen and (min-width: @screen-sm-min) {
+      position: absolute;
+      top: 0; left: 0; right: 0;
 
-    &.esper-no-content > *:first-child {
-      .esper-center;
+      + * {
+        margin-top: @input-height-base + @esper-base-padding * 2;
+      }
     }
   }
 }
-
 
 .esper-sidebar-backdrop {
   background: rgba(0, 0, 0, 0.25);
@@ -374,96 +382,37 @@
   padding. Or use on the section element itself to remove side padding.
 */
 .esper-section, .esper-panel-section {
-  padding-left: @esper-base-padding;
-  padding-right: @esper-base-padding;
+  padding: @esper-base-padding;
 
   &.esper-full-width { padding-left: 0; padding-right: 0; }
 
-  .esper-sidebar &, .esper-section &, .esper-panel-section & {
-    margin-left: -@esper-base-padding;
-    margin-right: -@esper-base-padding;
+  // Resets for panel + modal body
+  .panel-body > & {
+    margin: -@panel-body-padding;
   }
 
-  .panel-body & {
-    margin-left: -@panel-body-padding;
-    margin-right: -@panel-body-padding;
-    padding-left: @panel-body-padding;
-    padding-right: @panel-body-padding;
+  .modal-body > & {
+    margin: -@modal-inner-padding;
   }
 
-  .modal-body & {
-    margin-left: -@modal-inner-padding;
-    margin-right: -@modal-inner-padding;
-    padding-left: @modal-inner-padding;
-    padding-right: @modal-inner-padding;
-  }
+  // Negative margin so padding doesn't stack
+  .esper-section &, .esper-panel-section & {
+    margin: -@esper-base-padding;
 
-  .esper-full-width {
-    margin-left: -@esper-base-padding;
-    margin-right: -@esper-base-padding;
-
-    .panel-body & {
-      margin-left: -@panel-body-padding;
-      margin-right: -@panel-body-padding;
-    }
-
-    .modal-body & {
-      margin-left: -@modal-inner-padding;
-      margin-right: -@modal-inner-padding;
+    // Except for panel section + footer, need some margin
+    & + .esper-panel-section, & + .modal-footer {
+      margin-top: @esper-base-padding;
     }
   }
 
-  .esper-subheader {
-    text-transform: capitalize;
-    margin: 0 0 @padding-base-vertical;
-    font-weight: bold;
-    color: @brand-text-header;
-
-    .esper-shade & {
-      color: @shade-text-header;
-    }
-
-    .esper-inverse & {
-      color: @inverse-text-header;
-    }
+  // For normal sections, collapse padding of following element
+  & + .esper-section {
+    margin-top: -@esper-base-padding;
   }
 
-  .modal-footer {
-    margin-left: -@esper-base-padding;
-    margin-right: -@esper-base-padding;
-    padding: @esper-base-padding @esper-base-padding 0;
-
-    .modal-body & {
-      margin-left: -@modal-inner-padding;
-      margin-right: -@modal-inner-padding;
-      padding: @modal-inner-padding @modal-inner-padding 0;
-    }
-
-    .panel-body & {
-      margin-left: -@panel-body-padding;
-      margin-right: -@panel-body-padding;
-      padding: @panel-body-padding @panel-body-padding 0;
-    }
-  }
-
-  // Margin between consectuve sections
-  & + .modal-footer, & + .esper-section, & + .esper-panel-section,
-  & + .esper-full-width {
-    margin-top: @esper-base-padding;
-
-    .panel-body & {
-      margin-top: @panel-body-padding;
-    }
-
-    .modal-body & {
-      margin-top: @modal-inner-padding;
-    }
-  }
-
-  // For panel sections, add border and a bit more spacing
+  // For panel sections, add border
   & + .esper-panel-section, & + .modal-footer {
     border-top: 1px solid @brand-divider;
-    padding-top: @esper-base-padding;
 
     .esper-shade & {
       border-color: @shade-divider;
@@ -472,14 +421,26 @@
     .esper-inverse & {
       border-color: @inverse-divider;
     }
+  }
 
-    .panel-body & {
-      padding-top: @panel-body-padding;
-    }
+  .modal-footer {
+    margin: -@esper-base-padding;
+    padding: @esper-base-padding;
+  }
+}
 
-    .modal-body & {
-      padding-top: @modal-inner-padding;
-    }
+.esper-subheader {
+  text-transform: capitalize;
+  margin: 0 0 @padding-base-vertical;
+  font-weight: bold;
+  color: @brand-text-header;
+
+  .esper-shade & {
+    color: @shade-text-header;
+  }
+
+  .esper-inverse & {
+    color: @inverse-text-header;
   }
 }
 
@@ -509,8 +470,9 @@
     border-color: @inverse-border;
   }
 
-  &.esper-expanded {
+  .esper-expanded > & {
     border: 0;
+    .esper-center;
   }
 }
 
@@ -670,7 +632,7 @@ flexibility with non-UL elements */
   .esper-selectable, li > a {
     display: block;
     cursor: pointer;
-    padding: @padding-xs-vertical @padding-xs-horizontal;
+    padding: @padding-xs-vertical @esper-base-padding;
     clear: both;
     font-weight: normal;
     line-height: @line-height-base;
