@@ -21,7 +21,7 @@ module Esper.Components {
     }
 
     render() {
-      return <div>
+      return <div className="esper-section">
         { _.map(this.props.teams, (t) =>
           <div className="onboarding-team esper-section" key={t.teamid}>
             <span className="action rm-action"

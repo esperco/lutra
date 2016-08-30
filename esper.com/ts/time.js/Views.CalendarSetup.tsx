@@ -72,6 +72,7 @@ module Esper.Views {
             team={team}
             availableCalendars={available}
             selectedCalendars={selected}
+            className="esper-section esper-full-width"
             listClasses="esper-select-menu"
             itemClasses="esper-selectable"
             selectedItemClasses="active"

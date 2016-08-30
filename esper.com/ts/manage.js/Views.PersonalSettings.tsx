@@ -7,7 +7,7 @@
 module Esper.Views {
   export class PersonalSettings extends ReactHelpers.Component<{}, {}> {
     renderWithData() {
-      return <div className="esper-full-screen minus-nav">
+      return <div className="esper-expanded">
         <Components.ManageSidebar
           teams={Stores.Teams.all()}
           groups={Stores.Groups.all()}

@@ -18,7 +18,7 @@ module Esper.Views {
       var team = Stores.Teams.require(this.props.teamId);
       if (! team) return <span />;
 
-      return <div className="team-settings-page esper-full-screen minus-nav">
+      return <div className="team-settings-page esper-expanded">
         <Components.ManageSidebar
           activeTeamId={this.props.teamId}
           teams={Stores.Teams.all()}

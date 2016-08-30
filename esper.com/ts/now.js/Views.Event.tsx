@@ -66,12 +66,14 @@ module Esper.Views {
             onNext={() => Actions.goToNext(event)}
           />
           <div className="panel panel-default">
-            <Components.EventEditor
-              className="panel-body"
-              eventData={[eventData]}
-              teams={team ? [team] : []}
-              initAction={this.props.initAction}
-            />
+            <div className="panel-body">
+              <Components.EventEditor
+                className="esper-section"
+                eventData={[eventData]}
+                teams={team ? [team] : []}
+                initAction={this.props.initAction}
+              />
+            </div>
           </div>
         </div>
       });

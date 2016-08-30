@@ -28,6 +28,10 @@
 
   .more-link { font-weight: bold; line-height: @input-height-base; }
 
+  .report-section {
+    .esper-no-content { border: 0; }
+  }
+
   @media screen and (min-width: @screen-sm-min) {
     .report-section {
       display: flex;
@@ -39,9 +43,8 @@
 
       .esper-no-content {
         flex: 1 100%;
-        line-height: @report-chart-height
-          - (@esper-base-padding * 2)
-          - (@panel-body-padding * 2);
+        margin: @line-height-computed 0 0 @line-height-computed;
+        line-height: @report-chart-height;
       }
 
       .chart-content {
@@ -63,6 +66,7 @@
         }
 
         .esper-no-content {
+          margin: 0;
           line-height: @line-height-base;
         }
       }

@@ -97,7 +97,7 @@ module Esper.Components {
       let choices = _.map(this.state.labels, (l) => l.displayAs);
       choices.sort();
 
-      return <div className="label-selector">
+      return <div className="label-selector esper-section">
         <FilterInput
           ref={(c) => this._input = c}
           id={this.props.inputId}
@@ -108,7 +108,7 @@ module Esper.Components {
           onSubmit={(label) => this.toggle(label)}
         />
 
-        <div className="esper-section">
+        <div className="esper-section esper-full-width">
           <FilterList
             ref={(c) => this._list = c}
             className="esper-select-menu"

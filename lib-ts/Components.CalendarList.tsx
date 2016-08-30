@@ -11,6 +11,7 @@ module Esper.Components {
     selectedCalendars: ApiT.GenericCalendar[];
     availableCalendars: ApiT.GenericCalendar[];
 
+    className?: string;
     listClasses?: string;
     itemClasses?: string;
     selectedItemClasses?: string;
@@ -42,7 +43,7 @@ module Esper.Components {
       }));
       var calSelected = _.map(this.props.selectedCalendars, (c) => c.id);
 
-      return <div className="calendar-list">
+      return <div className={this.props.className}>
         { this.state.hasError ?
           ( calendars && calendars.length ?
             <div className="alert alert-danger">
@@ -61,39 +62,37 @@ module Esper.Components {
           </div> :
 
           // Approved (or not Nylas)
-          <div>
-            { calendars && calendars.length ?
+          ( calendars && calendars.length ?
 
-              <ListSelectorSimple
-                choices={calChoices}
-                selectedIds={calSelected}
+            <ListSelectorSimple
+              choices={calChoices}
+              selectedIds={calSelected}
 
-                selectOption={ListSelectOptions.MULTI_SELECT}
-                selectedIcon="fa-calendar-check-o"
-                unselectedIcon="fa-calendar-o"
+              selectOption={ListSelectOptions.MULTI_SELECT}
+              selectedIcon="fa-calendar-check-o"
+              unselectedIcon="fa-calendar-o"
 
-                listClasses={this.props.listClasses}
-                itemClasses={this.props.itemClasses}
-                selectedItemClasses={this.props.selectedItemClasses}
+              listClasses={this.props.listClasses}
+              itemClasses={this.props.itemClasses}
+              selectedItemClasses={this.props.selectedItemClasses}
 
-                updateFn={(ids) => this.update(ids)}
-              /> :
+              updateFn={(ids) => this.update(ids)}
+            /> :
 
-              // No calendars
-              <div className="esper-no-content">
-                No calendars found.{" "}
-                { Login.usesNylas() ?
-                  <span>
-                    It may take a few minutes for your calendar provider
-                    to sync with Esper. Please try{" "}
-                    <a onClick={() => location.reload()}>
-                      refreshing the page
-                    </a>
-                    {" "}in a few minutes.
-                  </span> : null }
-              </div>
-            }
-          </div>
+            // No calendars
+            <div className="esper-no-content">
+              No calendars found.{" "}
+              { Login.usesNylas() ?
+                <span>
+                  It may take a few minutes for your calendar provider
+                  to sync with Esper. Please try{" "}
+                  <a onClick={() => location.reload()}>
+                    refreshing the page
+                  </a>
+                  {" "}in a few minutes.
+                </span> : null }
+            </div>
+          )
         }
       </div>;
     }

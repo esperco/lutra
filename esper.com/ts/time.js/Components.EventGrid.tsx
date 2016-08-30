@@ -89,8 +89,8 @@ module Esper.Components {
     }
 
     renderMsg(elm: JSX.Element|string) {
-      return <div className="esper-expanded esper-no-content">
-        <div className="panel-body">
+      return <div className="esper-expanded">
+        <div className="esper-no-content">
           {elm}
         </div>
       </div>;

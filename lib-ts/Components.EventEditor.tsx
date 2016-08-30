@@ -110,7 +110,8 @@ module Esper.Components {
 
       return <Modal icon="fa-calendar-o" title={heading}
                     onHidden={this.props.onHidden}>
-        <EventEditor eventData={this.props.eventData}
+        <EventEditor className="esper-section"
+                     eventData={this.props.eventData}
                      teams={this.props.teams}
                      focusOnLabels={this.props.focusOnLabels}
                      minFeedback={this.props.minFeedback} />
@@ -236,7 +237,7 @@ module Esper.Components {
         <div className="esper-section">
           { this.renderRating(event) }
         </div>
-        <div className="esper-full-width">
+        <div className="esper-section esper-full-width">
           <TextArea id={this.getId("notes")} placeholder="Notes"
             ref={(ref) => this.inputNotes = ref}
             className="form-control esper-modal-focus"

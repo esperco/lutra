@@ -39,7 +39,7 @@ module Esper.Views {
     }
 
     renderWithData() {
-      return <div id="charts-page" className="esper-full-screen minus-nav">
+      return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-top-menu">
             <div className="esper-tab-menu">
@@ -68,7 +68,9 @@ module Esper.Views {
         </Components.Sidebar>
         <div className="esper-content">
           { this.renderPeriodSelector() }
-          { this.props.chart }
+          <div className="esper-expanded">
+            { this.props.chart }
+          </div>
         </div>
       </div>;
     }
@@ -280,19 +282,20 @@ module Esper.Views {
     }
 
     renderPeriodSelector() {
-      return <div className={"esper-content-header period-selector " +
-                             "row fixed clearfix"}>
-        <Components.IntervalOrCustomSelector
-          className="col-sm-6"
-          period={this.props.period}
-          show={this.props.extra.type === "calendar" ? ["month"] : undefined}
-          updateFn={(p) => this.updatePeriod(p)}
-        />
-        <div className="col-sm-6">
-          <Components.SingleOrCustomPeriodSelector
+      return <div className="esper-content-header container-fluid">
+        <div className="row period-selector">
+          <Components.IntervalOrCustomSelector
+            className="col-sm-6"
             period={this.props.period}
+            show={this.props.extra.type === "calendar" ? ["month"] : undefined}
             updateFn={(p) => this.updatePeriod(p)}
           />
+          <div className="col-sm-6">
+            <Components.SingleOrCustomPeriodSelector
+              period={this.props.period}
+              updateFn={(p) => this.updatePeriod(p)}
+            />
+          </div>
         </div>
       </div>;
     }

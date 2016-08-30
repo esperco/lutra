@@ -45,7 +45,7 @@ module Esper.Components {
     }
 
     render() {
-      return <div className="fullcalendar-holder esper-expanded padded">
+      return <div className="fullcalendar-holder esper-expanded esper-section">
         <div ref={(c) => this._fcDiv = c}></div>
         {this.renderMessage()}
       </div>;

@@ -141,7 +141,7 @@ module Esper.Views {
         { this.state.actionsPinned ?
           <div className="list-action-menu-filler esper-section" /> : null }
         { hiddenEvents ? this.renderFilterMsg(hiddenEvents) : null }
-        <div className="esper-section"><div className="esper-full-width">
+        <div className="esper-section esper-full-width">
           { (() => {
             if (eventData.hasError) {
               return <Components.ErrorMsg />;
@@ -152,7 +152,7 @@ module Esper.Views {
             }
             return this.renderMain(filteredEvents);
           })() }
-        </div></div>
+        </div>
       </div>;
     }
 
