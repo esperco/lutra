@@ -54,7 +54,7 @@ module Esper.Components {
     render() {
       return <div id="esper-login">
         { this.state.busy ?
-          <div className="esper-spinner esper-centered esper-medium" /> :
+          <div className="esper-spinner" /> :
           ( this.state.serverError ?
             <div className="alert alert-danger text-center">
               We were unable to log you in. Please

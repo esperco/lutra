@@ -35,7 +35,7 @@ module Esper.Components {
         {
           this.state.error ?
           <ErrorMsg /> :
-          <div className="esper-spinner esper-large esper-centered" />
+          <div className="esper-spinner" />
         }
       </div>;
     }

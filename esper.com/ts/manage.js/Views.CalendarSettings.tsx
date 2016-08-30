@@ -36,7 +36,7 @@ module Esper.Views {
           available: available, selected: selected
         })
       ).match({
-        none: () => <div className="esper-spinner esper-centered" />,
+        none: () => <div className="esper-spinner" />,
         some: ({available, selected}) =>
           <Components.CalendarList
             team={team}

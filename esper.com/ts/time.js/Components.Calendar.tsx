@@ -55,7 +55,7 @@ module Esper.Components {
       var msg: JSX.Element;
       if (this.props.busy) {
         msg = <span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
           Loading &hellip;
         </span>;
       }

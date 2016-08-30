@@ -52,7 +52,7 @@ module Esper.Views {
             <div>
               { Stores.Profiles.get(Login.myUid()).match({
                 none: () =>
-                  <span className="esper-spinner esper-medium esper-centered" />,
+                  <span className="esper-spinner" />,
                 some: (p) => <div>
                   <p>{ Text.TeamSelfDescription }</p>
                   <Components.NewTeamForm

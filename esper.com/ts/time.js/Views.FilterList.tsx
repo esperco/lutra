@@ -148,7 +148,7 @@ module Esper.Views {
             }
             if (eventData.isBusy) {
               return <div
-                className="esper-spinner esper-centered esper-large" />;
+                className="esper-spinner" />;
             }
             return this.renderMain(filteredEvents);
           })() }

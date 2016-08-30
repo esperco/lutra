@@ -68,14 +68,14 @@ module Esper.Components {
 
       if (this.props.fetching) {
         return this.renderMsg(<span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
           { Text.ChartFetching }
         </span>);
       }
 
       return this.props.calculation.getResults().match({
         none: () => this.renderMsg(<span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
             { Text.ChartCalculating }
           </span>),
 
