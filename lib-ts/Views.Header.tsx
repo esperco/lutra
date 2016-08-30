@@ -7,6 +7,7 @@
 /// <reference path="./Stores.ReleaseNotes.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
+/// <reference path="./Components.SidebarWithToggle.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
 /// <reference path="./Text.tsx" />
 
@@ -28,13 +29,8 @@ module Esper.Views {
     active?: Header_.Tab
   }
 
-  export class Header extends Component<Props, {
-    open: boolean;
-  }> {
-    constructor(props: Props) {
-      super(props);
-      this.state = { open: false };
-    }
+  export class Header extends Component<Props, {}> {
+    _navSidebar: Components.Sidebar;
 
     renderWithData() {
       var loginInfo = Login.getLoginInfo();
@@ -46,7 +42,9 @@ module Esper.Views {
         <nav className="navbar navbar-default navbar-shadow">
           <div className="container-fluid">
             <div className="navbar-header">
-              <Components.SidebarToggle className="navbar-toggle" />
+              <Components.SidebarToggle side="left" className="navbar-toggle">
+                <i className="fa fa-fw fa-bars" />
+              </Components.SidebarToggle>
               <SaveIndicator>
                 <a className={classNames("navbar-brand lg", {
                   "navbar-square": hasTeams
@@ -59,11 +57,9 @@ module Esper.Views {
                   </a>
                 }
               </SaveIndicator>
-              <div className="navbar-toggle"
-                   onClick={this.toggleCollapse.bind(this)}>
-                <i className={"fa " +
-                   (this.state.open ? "fa-times" : "fa-ellipsis-h")} />
-              </div>
+              <Components.SidebarToggle side="right" className="navbar-toggle">
+                <i className="fa fa-fw fa-ellipsis-h" />
+              </Components.SidebarToggle>
             </div>
 
             <div className="hidden-xs">
@@ -79,11 +75,10 @@ module Esper.Views {
               </div>
             </div>
 
-            <Components.SidebarBase
-              className="visible-xs-block"
+            <Components.Sidebar
+              ref={(c) => this._navSidebar = c}
+              className="visible-xs-block navbar-default"
               side="right"
-              open={this.state.open}
-              toggleState={() => this.toggleCollapse()}
             >
               { this.navLinks(
                 "nav navbar-nav esper-panel-section esper-full-width"
@@ -91,19 +86,20 @@ module Esper.Views {
               { this.loginLinks(
                 "nav navbar-nav esper-panel-section esper-full-width"
               ) }
-            </Components.SidebarBase>
+            </Components.Sidebar>
           </div>
         </nav>
       </div>;
     }
 
-    toggleCollapse() {
-      this.setState({ open: !this.state.open });
+    toggleNavSidebar() {
+      if (this._navSidebar) {
+        this._navSidebar.toggle();
+      }
     }
 
     navLinks(className?: string) {
-      return <ul className={className}
-                 onClick={() => this.toggleCollapse()}>
+      return <ul className={className} onClick={() => this.toggleNavSidebar()}>
         <NavLink href={Paths.Time.charts({}).href}
                  active={this.props.active === Header_.Tab.Charts}>
           <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
@@ -151,23 +147,6 @@ module Esper.Views {
           </span>
         </a></li>
       </ul>;
-    }
-
-    componentDidMount() {
-      Route.onBack(this.onBack);
-    }
-
-    componentWillUnmount() {
-      super.componentWillUnmount();
-      Route.offBack(this.onBack);
-    }
-
-    onBack = () => {
-      if (this.state.open) {
-        this.setState({open: false});
-        return false;
-      }
-      return true;
     }
   }
 

@@ -115,7 +115,7 @@ module Esper.Model2 {
     private inTransaction: boolean;
 
     // Update emitChange to handle aliases
-    protected emitChange(_ids?: TKey[]): void {
+    emitChange(_ids?: TKey[]): void {
       if (this.inTransaction) {
         if (_ids) {
           this.emittedIds = (this.emittedIds || []).concat(_ids);

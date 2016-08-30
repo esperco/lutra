@@ -40,7 +40,7 @@ module Esper.Views {
 
     renderWithData() {
       return <div id="charts-page" className="esper-full-screen minus-nav">
-        <Components.Sidebar className="esper-shade">
+        <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-top-menu">
             <div className="esper-tab-menu">
               { this.renderSidebarTab("main",

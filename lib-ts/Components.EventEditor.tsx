@@ -3,6 +3,7 @@
 */
 
 /// <reference path="./Components.LabelEditor.tsx" />
+/// <reference path="./Components.LabelList.tsx" />
 /// <reference path="./Components.TextArea.tsx" />
 
 module Esper.Components {

@@ -16,7 +16,7 @@ module Esper.Components {
 
   export class ManageSidebar extends ReactHelpers.Component<Props, {}> {
     render() {
-      return <Components.Sidebar className="esper-shade">
+      return <Components.Sidebar side="left" className="esper-shade">
         <div className="esper-panel-section">
           <label className="esper-header">
             { Text.TeamExecs }
