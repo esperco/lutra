@@ -60,6 +60,43 @@ module Esper.Charting {
     }), opts);
   }
 
+  /*
+    Clean up different query params that could be passed
+  */
+  export function cleanExtra(
+    e: any,
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path
+  ): ExtraOpts {
+    e = e || {};
+    var typedQ: ExtraOpts = e;
+    typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
+    if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
+      typedQ.type = "percent";
+    }
+    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
+    typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
+
+    /* Don't initially include none in selector if grouping by attr */
+    typedQ.labels = Params.cleanListSelectJSON(typedQ.labels, {
+      none: pathFn !== Paths.Time.labelsChart
+    });
+    typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings, {
+      none: pathFn !== Paths.Time.ratingsChart
+    });
+
+    // Domain selector none and guest count none should match.
+    typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts, {
+      none: pathFn !== Paths.Time.guestsChart &&
+            pathFn !== Paths.Time.guestsCountChart
+    });
+    typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
+    typedQ.domains.none = typedQ.guestCounts.none;
+
+    typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
+    typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
+    return typedQ;
+  }
+
 
   /* Highcharts Helpers */
 

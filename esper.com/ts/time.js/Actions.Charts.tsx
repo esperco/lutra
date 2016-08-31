@@ -51,44 +51,6 @@ module Esper.Actions.Charts {
     });
   }
 
-  /*
-    Clean up different query params that could be passed
-  */
-  function cleanExtra(
-    e: any,
-    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path
-  ): ExtraOpts {
-    e = e || {};
-    var typedQ: ExtraOpts = e;
-    typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
-    if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
-      typedQ.type = "percent";
-    }
-    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
-    typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
-
-    /* Don't initially include none in selector if grouping by attr */
-    typedQ.labels = Params.cleanListSelectJSON(typedQ.labels, {
-      none: pathFn !== Paths.Time.labelsChart
-    });
-    typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings, {
-      none: pathFn !== Paths.Time.ratingsChart
-    });
-
-    // Domain selector none and guest count none should match.
-    typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts, {
-      none: pathFn !== Paths.Time.guestsChart &&
-            pathFn !== Paths.Time.guestsCountChart
-    });
-    typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
-    typedQ.domains.none = typedQ.guestCounts.none;
-
-    typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
-    typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
-    return typedQ;
-  }
-
-
   function toMonth(p: Period.Single|Period.Custom): Period.Single {
     if (p.interval === "month") {
       return p as Period.Single;
@@ -101,7 +63,7 @@ module Esper.Actions.Charts {
     based on extra vars
   */
   function fetchAndClean(o: BaseOpts<{}>) {
-    o.extra = cleanExtra(o.extra, o.pathFn);
+    o.extra = Charting.cleanExtra(o.extra, o.pathFn);
     if (o.extra.type === "calendar") {
       o.period = toMonth(o.period);
     }
