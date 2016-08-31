@@ -10,14 +10,6 @@ var lodash        = require("lodash"),
     jQuery        = require("jquery"),
     polyfill      = require("./polyfill");
 
-var highcharts;
-
-// Dependencies that add to jQuery global
-inject({jQuery: jQuery, $: jQuery}, function() {
-  require("bootstrap");
-  // highcharts = require("highcharts");
-});
-
 // Create a global Esper object with our vendor dependencies
 // NB: Since we don't have to worry about namespacing on our own site, we're
 // just going to make Esper and window synonymous here.
@@ -30,7 +22,6 @@ Esper = (function(esperObj) {
     _:            lodash.noConflict(),
     $:            jQuery,
     jQuery:       jQuery,
-    // Highcharts:   highcharts,
     PRODUCTION:   (process.env.NODE_ENV === "production")
   };
   for (var name in assignments) {

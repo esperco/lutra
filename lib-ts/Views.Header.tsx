@@ -209,8 +209,7 @@ module Esper.Views {
       if (this.state.error) {
         return <span><span className="navbar-square">
           <Components.Tooltip className="esper-save-error text-danger"
-                              title={Text.DefaultErrorTooltip}
-                              placement="right">
+                              title={Text.DefaultErrorTooltip}>
             <i className="fa fa-fw fa-warning" />
           </Components.Tooltip>
         </span></span>;
