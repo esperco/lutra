@@ -8,7 +8,6 @@
 
 module Esper.Components {
 
-  // Only one tooltip at any given time
   const overlayPrefix = "esper-tooltip-";
 
   interface Props {
