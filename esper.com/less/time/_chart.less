@@ -41,7 +41,17 @@
         @input-height-base + (@esper-base-padding * 2) +
         @input-height-base + @esper-base-padding));
     }
+  }
+}
 
+// Variant for release notes
+.esper-release-notes + .navbar-fixed-top + * {
+  #chart-expanded .chart-holder {
+    @media screen and (min-width: @screen-sm-min) {
+      min-height: calc(~"100vh - "(@navbar-height +
+        @input-height-base + (@esper-base-padding * 2) +
+        @input-height-base + @esper-base-padding + @release-notes-height));
+    }
   }
 }
 
