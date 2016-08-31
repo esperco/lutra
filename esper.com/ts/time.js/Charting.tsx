@@ -27,27 +27,41 @@ module Esper.Charting {
     var teamId = p.teamId || o.teamId;
     var calIds = p.calIds || o.calIds;
     var period = p.period || o.period;
+    var newExtras: (ExtraOptsMaybe & T)|{} = {}
 
     // Chart change => blank out filter params unless provided
     if (pathFn !== o.pathFn && p.extra) {
-      opts.jsonQuery = p.extra;
+      newExtras = p.extra;
     }
 
-    // Preserve params only if same team change. Also switch cals.
+    // Team change => Don't preserve filter params, reset cals
     else if (teamId !== o.teamId) {
       calIds = [Params.defaultCalIds];
-      opts.jsonQuery = {};
     }
 
     // Else merge old extra with new params
     else {
-      opts.jsonQuery = _.extend({}, o.extra, p.extra);
-      if (opts.jsonQuery.weekHours) {
-        opts.jsonQuery.weekHours =
-          Params.weekHoursJSON(opts.jsonQuery.weekHours);
-      }
+      newExtras = _.extend({}, o.extra, p.extra);
     }
 
+    // Remove params from querystring if identical to default
+    let keys = _.keys(newExtras);
+    if (keys.length) {
+      let defaults: any = cleanExtra({}, pathFn);
+      _.each(keys, (key) => {
+        if (_.isEqual((newExtras as any)[key], defaults[key])) {
+          delete (newExtras as any)[key];
+        }
+      });
+    }
+
+    // Convert weekHours object to serialized JSON
+    opts.jsonQuery = newExtras;
+    if (opts.jsonQuery.weekHours) {
+      opts.jsonQuery.weekHours = Params.weekHoursJSON(opts.jsonQuery.weekHours);
+    }
+
+    // Convert period object to string
     var periodStr = Period.isCustom(period) ?
       [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
       period.index.toString();
