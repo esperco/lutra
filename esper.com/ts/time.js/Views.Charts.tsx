@@ -273,7 +273,7 @@ module Esper.Views {
       return <button className={classNames("btn btn-default", {
         active: type === this.props.extra.type
       })} onClick={() => this.updateExtra({ type: type })}>
-        <Components.Tooltip title={title} placement="bottom">
+        <Components.Tooltip title={title}>
           <i style={{width: "100%"}} className={"fa fa-fw " + icon} />
         </Components.Tooltip>
       </button>
