@@ -208,7 +208,7 @@ module Esper.Views {
       icon?: string;
       content?: JSX.Element|string;
     }) {
-      var active = pathFn === Charting.currentPathFn;
+      var active = pathFn === this.props.pathFn;
       return <div className="esper-panel-section action-block"
         onClick={() => {
           Charting.updateChart(this.props, {

@@ -230,15 +230,10 @@ module Esper.Types {
   /* Charting */ //////////////////////////
 
   export type ChartType = "percent"|"absolute"|"calendar";
-  export type ChartGroup = "calendars"
-                          |"durations"
-                          |"guests"
-                          |"guest-counts"
-                          |"labels"
-                          |"ratings";
 
   // Base options needed to fetch and get events
   export interface ChartBaseOpts<T> {
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
     teamId: string;
     calIds: string[];
     period: SinglePeriod|CustomPeriod;

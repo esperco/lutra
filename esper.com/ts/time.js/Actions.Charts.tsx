@@ -54,7 +54,10 @@ module Esper.Actions.Charts {
   /*
     Clean up different query params that could be passed
   */
-  function cleanExtra(e: any, group?: Types.ChartGroup): ExtraOpts {
+  function cleanExtra(
+    e: any,
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path
+  ): ExtraOpts {
     e = e || {};
     var typedQ: ExtraOpts = e;
     typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
@@ -65,17 +68,17 @@ module Esper.Actions.Charts {
     typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
 
     /* Don't initially include none in selector if grouping by attr */
-
     typedQ.labels = Params.cleanListSelectJSON(typedQ.labels, {
-      none: group !== "labels"
+      none: pathFn !== Paths.Time.labelsChart
     });
     typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings, {
-      none: group !== "ratings"
+      none: pathFn !== Paths.Time.ratingsChart
     });
 
     // Domain selector none and guest count none should match.
     typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts, {
-      none: group !== "guest-counts" && group !== "guests"
+      none: pathFn !== Paths.Time.guestsChart &&
+            pathFn !== Paths.Time.guestsCountChart
     });
     typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
     typedQ.domains.none = typedQ.guestCounts.none;
@@ -84,6 +87,7 @@ module Esper.Actions.Charts {
     typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
     return typedQ;
   }
+
 
   function toMonth(p: Period.Single|Period.Custom): Period.Single {
     if (p.interval === "month") {
@@ -96,17 +100,17 @@ module Esper.Actions.Charts {
     Some cleaning should happen in routing, but this makes additional changes
     based on extra vars
   */
-  function fetchAndClean(o: BaseOpts<{}>, group?: Types.ChartGroup) {
-    o.extra = cleanExtra(o.extra, group);
+  function fetchAndClean(o: BaseOpts<{}>) {
+    o.extra = cleanExtra(o.extra, o.pathFn);
     if (o.extra.type === "calendar") {
       o.period = toMonth(o.period);
     }
     fetchEvents(o);
   }
 
-  function initChart(o: BaseOpts<{}>, group?: Types.ChartGroup) {
-    fetchAndClean(o, group);
-    trackChart(o, group);
+  function initChart(o: BaseOpts<{}>) {
+    fetchAndClean(o);
+    trackChart(o);
   }
 
   function eventsFromData(data: PeriodList[]|Stores.Events.EventDateData)
@@ -124,7 +128,17 @@ module Esper.Actions.Charts {
 
   var analyticsId = "chart-analytics-id";
 
-  function trackChart(o: BaseOpts<{}>, group: Types.ChartGroup) {
+  function trackChart(o: BaseOpts<{}>) {
+    /*
+      Determine group based on path -- we assume all chart routes start with
+      the chart prefix
+    */
+    var prefix = Paths.Time.charts().hash;
+    var sliced = Route.current.slice(prefix.length);
+    var parts = sliced.split("/");
+
+    // If [0] is empty (path started with "/"), go to next
+    var group = parts[0] || parts[1];
 
     // Delay tracking by 2 seconds to ensure user is actually looking at chart
     Util.delayOne(analyticsId, function() {
@@ -143,7 +157,6 @@ module Esper.Actions.Charts {
   function getChartView(o: BaseOpts<{}>, p: {
     chart: JSX.Element;
     events: Stores.Events.TeamEvent[];
-    group?: Charting.ChartGroup;
     selectors?: JSX.Element[];
     menus?: Types.ChartViewMenu[];
   }) {
@@ -178,7 +191,7 @@ module Esper.Actions.Charts {
     var selectors = [
       cals.length <= 1 ? null :
       <Components.CalCalcSelector key="calendars"
-        primary={p.group === "calendars"}
+        primary={o.pathFn === Paths.Time.calendarsChart}
         calendars={cals}
         selectedIds={o.calIds}
         calculation={new EventStats.CalendarCountCalc(p.events, o.extra)}
@@ -186,7 +199,7 @@ module Esper.Actions.Charts {
       />,
 
       <Components.LabelCalcSelector key="labels"
-        primary={p.group === "labels"}
+        primary={o.pathFn === Paths.Time.labelsChart}
         team={team}
         selected={o.extra.labels}
         calculation={labelCalc}
@@ -194,7 +207,7 @@ module Esper.Actions.Charts {
       />,
 
       <Components.DomainSelector key="guests"
-        primary={p.group === "guests"}
+        primary={o.pathFn === Paths.Time.guestsChart}
         selected={o.extra.domains}
         calculation={new EventStats.DomainCountCalc(p.events, o.extra)}
         updateFn={(domains) => Charting.updateChart(o, {
@@ -210,21 +223,21 @@ module Esper.Actions.Charts {
       />,
 
       <Components.RatingSelector key="ratings"
-        primary={p.group === "ratings"}
+        primary={o.pathFn === Paths.Time.ratingsChart}
         selected={o.extra.ratings}
         calculation={new EventStats.RatingCountCalc(p.events, o.extra)}
         updateFn={(x) => Charting.updateChart(o, { extra: {ratings: x} })}
       />,
 
       <Components.DurationSelector key="durations"
-        primary={p.group === "durations"}
+        primary={o.pathFn === Paths.Time.durationsChart}
         selected={o.extra.durations}
         calculation={new EventStats.DurationBucketCalc(p.events, o.extra)}
         updateFn={(x) => Charting.updateChart(o, { extra: { durations: x }})}
       />,
 
       <Components.GuestCountSelector key="guest-counts"
-        primary={p.group === "guest-counts"}
+        primary={o.pathFn === Paths.Time.guestsCountChart}
         selected={o.extra.guestCounts}
         calculation={new EventStats.GuestCountBucketCalc(p.events, o.extra)}
         updateFn={(x) => Charting.updateChart(o, { extra: { guestCounts: x }})}
@@ -252,13 +265,10 @@ module Esper.Actions.Charts {
     ];
 
     return <Views.Charts
-      teamId={o.teamId}
-      calIds={o.calIds}
-      period={o.period}
-      extra={o.extra}
       chart={p.chart}
       selectors={selectors.concat(p.selectors || [])}
       menus={[confirmationMenu].concat(p.menus || [])}
+      { ...o }
     />;
   }
 
@@ -319,7 +329,7 @@ module Esper.Actions.Charts {
   /* Duration Charts */
 
   export function renderDurations(o: BaseOpts<{}>) {
-    initChart(o, "durations");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.DurationBucketCalc(events, o.extra)
@@ -341,7 +351,6 @@ module Esper.Actions.Charts {
 
       return getChartView(o, {
         chart,
-        group: "durations",
         events: events
       });
     }));
@@ -351,7 +360,7 @@ module Esper.Actions.Charts {
   /* Calendars Charts */
 
   export function renderCalendars(o: BaseOpts<{}>) {
-    initChart(o, "calendars");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.CalendarDurationCalc(events, o.extra)
@@ -377,7 +386,6 @@ module Esper.Actions.Charts {
 
       return getChartView(o, {
         chart,
-        group: "calendars",
         events: events
       });
     }));
@@ -387,7 +395,7 @@ module Esper.Actions.Charts {
   /* Guest Charts */
 
   export function renderGuests(o: BaseOpts<{}>) {
-    initChart(o, "guests");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.GuestDurationCalc(events,
@@ -410,7 +418,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.GuestHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, { chart, events, group: "guests" });
+      return getChartView(o, { chart, events });
     }));
   }
 
@@ -418,7 +426,7 @@ module Esper.Actions.Charts {
   /* Guest Count Charts */
 
   export function renderGuestsCount(o: BaseOpts<{}>) {
-    initChart(o, "guest-counts");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.GuestCountDurationCalc(events, o.extra)
@@ -439,7 +447,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)}
         />,
       });
-      return getChartView(o, { chart, events, group: "guest-counts" });
+      return getChartView(o, { chart, events });
     }));
   }
 
@@ -447,7 +455,7 @@ module Esper.Actions.Charts {
   /* Label Charts */
 
   export function renderLabels(o: BaseOpts<{}>) {
-    initChart(o, "labels");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.LabelDurationCalc(events, o.extra)
@@ -465,7 +473,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.LabelHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events, group: "labels"});
+      return getChartView(o, {chart, events});
     }));
   }
 
@@ -473,7 +481,7 @@ module Esper.Actions.Charts {
   /* Rating Charts */
 
   export function renderRatings(o: BaseOpts<{}>) {
-    initChart(o, "ratings");
+    initChart(o);
 
     var getCalc = (data: PeriodList[]) => getPeriodCalcData(
       o, data, (events) => new EventStats.RatingDurationCalc(events, o.extra)
@@ -494,7 +502,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events, group: "ratings"});
+      return getChartView(o, {chart, events});
     }));
   }
 }

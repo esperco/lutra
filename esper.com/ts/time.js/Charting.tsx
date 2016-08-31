@@ -4,7 +4,6 @@
 
 module Esper.Charting {
   export type ChartType = Types.ChartType;
-  export type ChartGroup = Types.ChartGroup;
   export type BaseOpts<T> = Types.ChartBaseOpts<T>;
   export type ExtraOptsMaybe = Types.ChartExtraOptsMaybe;
   export type ExtraOpts = Types.ChartExtraOpts;
@@ -15,9 +14,6 @@ module Esper.Charting {
 
   /* Routing helpers */
 
-  // Current pathFn for charts (set by Route.routeChart)
-  export var currentPathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
-
   export function updateChart<T>(o: BaseOpts<T>, p: {
     pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
     teamId?: string;
@@ -27,13 +23,13 @@ module Esper.Charting {
     opts?: Route.nav.Opts;
   }) {
     var opts = p.opts || {};
-    var pathFn = p.pathFn || currentPathFn;
+    var pathFn = p.pathFn || o.pathFn;
     var teamId = p.teamId || o.teamId;
     var calIds = p.calIds || o.calIds;
     var period = p.period || o.period;
 
     // Chart change => blank out filter params unless provided
-    if (pathFn !== Charting.currentPathFn && p.extra) {
+    if (pathFn !== o.pathFn && p.extra) {
       opts.jsonQuery = p.extra;
     }
 
