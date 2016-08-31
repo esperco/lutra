@@ -21,7 +21,6 @@ var SHA1          = require("crypto-js/sha1.js");
 // Dependencies that add to jQuery global
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap/js/modal");
-  require("bootstrap/js/tooltip");
   require("bootstrap/js/transition");
 });
 

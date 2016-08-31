@@ -45,19 +45,19 @@ module Esper.Components {
     var shortText = Text.hoursShort(hours);
     var longText = Text.hours(hours);
     if (short) {
-      return <ValueTooltip tooltip={longText}>
+      return <Tooltip title={longText}>
         { shortText }
-      </ValueTooltip>;
+      </Tooltip>;
     }
 
-    return <ValueTooltip tooltip={longText}>
+    return <Tooltip title={longText}>
       <span className="hidden-xs">
         { shortText }
       </span>
       <span className="visible-xs-inline">
         { longText }
       </span>
-    </ValueTooltip>;
+    </Tooltip>;
   }
 
   function TotalEvents({short, count}: {
@@ -66,42 +66,18 @@ module Esper.Components {
     var shortText = count.toString();
     var longText = Text.events(count);
     if (short) {
-      return <ValueTooltip tooltip={longText}>
+      return <Tooltip title={longText}>
         { shortText }
-      </ValueTooltip>;
+      </Tooltip>;
     }
 
-    return <ValueTooltip tooltip={longText}>
+    return <Tooltip title={longText}>
       <span className="hidden-xs">
         { shortText }
       </span>
       <span className="visible-xs-inline">
         { longText }
       </span>
-    </ValueTooltip>;
-  }
-
-  class ValueTooltip extends ReactHelpers.Component<{
-    tooltip: string,
-    children?: JSX.Element[]
-  }, {}> {
-    _elm: HTMLSpanElement;
-
-    render() {
-      return <span ref={(c) => this._elm = c} className="value"
-                   title={this.props.tooltip}
-                   data-original-title={this.props.tooltip}
-                   data-toogle="tooltip">
-        { this.props.children }
-      </span>;
-    }
-
-    componentDidMount() {
-      $(this._elm).tooltip();
-    }
-
-    componentDidUpdate() {
-      $(this._elm).tooltip();
-    }
+    </Tooltip>;
   }
 }
