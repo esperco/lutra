@@ -94,7 +94,7 @@ module Esper.Views {
         <div>
           { error ? <Components.ErrorMsg /> : null }
           { loading ?
-            <span className="esper-spinner esper-centered esper-medium" /> :
+            <span className="esper-spinner" /> :
             _.map(this.getUnapprovedTeams(this.props.info), (team) =>
               <ul className="list-group" key={team.teamid}>
                 { _.map(team.team_assistants, (asst) =>

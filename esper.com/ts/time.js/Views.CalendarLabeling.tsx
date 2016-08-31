@@ -33,8 +33,7 @@ module Esper.Views {
       var teams = Stores.Teams.all();
       var calendarsByTeamId = Stores.Calendars.byTeamId();
 
-      return <div id="calendar-page"
-                  className="esper-full-screen minus-nav">
+      return <div id="calendar-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="esper-panel-section">
             <label htmlFor={this.getId("cal-select")}>
@@ -91,9 +90,8 @@ module Esper.Views {
     }
 
     renderMessage(elm: JSX.Element|string) {
-      return <div className={"esper-expanded panel panel-default " +
-                             "esper-no-content"}>
-        <div className="panel-body">
+      return <div className="esper-expanded">
+        <div className="esper-no-content">
           {elm}
         </div>
       </div>;

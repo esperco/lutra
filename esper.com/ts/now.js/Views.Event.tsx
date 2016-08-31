@@ -38,7 +38,7 @@ module Esper.Views {
     renderContent(eventData: Stores.Events.EventData) {
       var busy = eventData.dataStatus === Model2.DataStatus.FETCHING
       if (busy) {
-        return <div className="esper-spinner esper-centered esper-medium" />;
+        return <div className="esper-spinner" />;
       }
 
       var error = eventData.dataStatus === Model2.DataStatus.FETCH_ERROR;
@@ -66,12 +66,14 @@ module Esper.Views {
             onNext={() => Actions.goToNext(event)}
           />
           <div className="panel panel-default">
-            <Components.EventEditor
-              className="panel-body"
-              eventData={[eventData]}
-              teams={team ? [team] : []}
-              initAction={this.props.initAction}
-            />
+            <div className="panel-body">
+              <Components.EventEditor
+                className="esper-section"
+                eventData={[eventData]}
+                teams={team ? [team] : []}
+                initAction={this.props.initAction}
+              />
+            </div>
           </div>
         </div>
       });

@@ -102,7 +102,7 @@ module Esper {
 
   // Show spinner while everything is loading
   function showSpinner() {
-    Layout.render(<div className="esper-full-screen">
+    Layout.render(<div className="esper-expanded">
       <div className="esper-center">
         <div className="esper-spinner"></div>
       </div>

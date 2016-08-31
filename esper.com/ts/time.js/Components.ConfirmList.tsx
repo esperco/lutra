@@ -44,7 +44,7 @@ module Esper.Components {
     }
 
     renderMain(events: Types.TeamEvent[]) {
-      return <div>
+      return <div className="esper-section">
         {/* Description of why we need confirmation */}
         { this.state.pageIndices[0] === 0 ?
           <div className="alert alert-info">

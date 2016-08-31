@@ -29,5 +29,5 @@
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
-/// <reference path="../lib/Views.Header.tsx" />
+/// <reference path="../lib/Views.App.tsx" />
 /// <reference path="../lib/Views.NotFound.tsx" />

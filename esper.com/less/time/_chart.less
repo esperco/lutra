@@ -14,28 +14,48 @@
       }
     }
   }
+}
+
+// Single full-page chart
+#chart-expanded {
+  padding: 0 @esper-base-padding @esper-base-padding;
 
   .chart-content {
     position: relative;
-    flex-grow: 1;
-    min-height: 400px;
 
-    // Chart content is also a flexbox -- yay!
-    display: flex;
-    flex-direction: column;
+    // For some reason, Highcharts bar charts spill over with some whitespace
+    overflow-x: hidden;
   }
 
   .chart-holder {
     min-height: 400px;
+
+    @media screen and (min-width: @screen-sm-min) {
+
+      /*
+        Makes height defaults to max available area (defined as 100% of
+        screen height minus navbar, height of period selector, height
+        of totals bar, and padding at bottom of #chart-expanded)
+      */
+      min-height: calc(~"100vh - "(@navbar-height +
+        @input-height-base + (@esper-base-padding * 2) +
+        @input-height-base + @esper-base-padding));
+    }
   }
 }
 
-.chart-holder, .chart-holder-parent {
-  flex-grow: 1;
+// Variant for release notes
+.esper-release-notes + .navbar-fixed-top + * {
+  #chart-expanded .chart-holder {
+    @media screen and (min-width: @screen-sm-min) {
+      min-height: calc(~"100vh - "(@navbar-height +
+        @input-height-base + (@esper-base-padding * 2) +
+        @input-height-base + @esper-base-padding + @release-notes-height));
+    }
+  }
 }
 
 .chart-holder-parent {
-  display: flex;
   position: relative;
 
   .highchart-drillup, .highchart-export {
@@ -56,9 +76,8 @@
 
 .totals-bar {
   color: @brand-text;
-  margin-bottom: @padding-large-vertical;
-  flex-shrink: 0;
-  flex-grow: 0;
+  line-height: @input-height-base;
+  vertical-align: middle;
   text-align: center;
 
   .period-total {
@@ -71,6 +90,10 @@
   .period-desc {
     font-weight: bold;
   }
+}
+
+.chart-content {
+  position: relative;
 }
 
 @media (min-width: @screen-sm-min) {

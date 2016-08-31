@@ -14,7 +14,7 @@ module Esper.Views {
       var profilesLoading =
         Stores.Profiles.getInitPromise().state() === "pending";
       if (status === Model2.DataStatus.FETCHING || profilesLoading) {
-        return <div className="esper-spinner esper-medium esper-centered" />;
+        return <div className="esper-spinner" />;
       }
 
       if (status === Model2.DataStatus.FETCH_ERROR) {
@@ -96,7 +96,7 @@ module Esper.Views {
       ).match({
         none: () => <div className="panel panel-default">
           <div className="panel-body">
-            <div className="esper-spinner esper-centered" />
+            <div className="esper-spinner" />
           </div>
         </div>,
 

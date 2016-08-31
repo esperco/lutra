@@ -304,9 +304,24 @@ module Esper.Route {
     var refreshRequired = false;
 
     // Is the current path active?
-    export function isActive(frag: string) {
-      return normalize(current).split("?")[0] ===
-             normalize(frag).split("?")[0];
+    export function isActive(path: Paths.Path|string) {
+      var frag: string;
+
+      // If path, check base -- else, just check hash
+      if (isPath(path)) {
+        if (path.base !== base) return false;
+        frag = path.hash;
+      } else {
+        frag = path;
+      }
+
+      /*
+        Check current path starts with frag (assume nested paths
+        are "active" forms of parent paths)
+      */
+      let normCurrent = normalize(current).split("?")[0];
+      let normFrag = normalize(frag).split("?")[0];
+      return _.startsWith(normCurrent, normFrag);
     }
   }
 }

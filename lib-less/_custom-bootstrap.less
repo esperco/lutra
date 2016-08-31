@@ -485,7 +485,16 @@ a {
 
 .panel {
   box-shadow: @default-box-shadow;
-  margin-bottom: @panel-margin-bottom;
+  margin-bottom: 0;
+
+  @media screen and (max-width: @screen-xs-max) {
+    border-radius: 0;
+    border-width: 1px 0;
+  }
+
+  + .panel {
+    margin: @esper-lg-padding 0;
+  }
 }
 
 .modal-body, .panel-body {
@@ -499,7 +508,6 @@ a {
 
 .dropdown {
   .dropdown-menu {
-    padding: (@line-height-computed / 2) 0;
     width: 100%;
 
     @media screen and (min-width: @screen-sm-min) {
@@ -514,7 +522,7 @@ a {
   }
 }
 
-input.form-control.dropdown-toggle[readonly], .dropdown-toggle {
+input.form-control.dropdown-toggle[readonly] {
   background: @input-bg;
   float: none;
   cursor: pointer;

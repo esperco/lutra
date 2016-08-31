@@ -71,7 +71,7 @@ module Esper.Components {
 
       if (_.find(this.props.periods, (p) => p.isBusy)) {
         return this.renderMsg(<span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
           { Text.ChartFetching }
         </span>);
       }
@@ -89,7 +89,7 @@ module Esper.Components {
         })));
       if (_.find(results, (r) => r.isNone())) {
         return this.renderMsg(<span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
           { Text.ChartCalculating }
         </span>);
       }
@@ -104,10 +104,8 @@ module Esper.Components {
     }
 
     renderMsg(elm: JSX.Element|string) {
-      return <div className="esper-expanded esper-no-content">
-        <div className="panel-body">
-          {elm}
-        </div>
+      return <div className="esper-no-content">
+        {elm}
       </div>;
     }
 

@@ -30,7 +30,7 @@ module Esper.Views {
       var labelDurationCalc = new EventStats.LabelDurationCalc(
         eventData.events, opts);
 
-      return <div id="reports-page" className="esper-full-screen minus-nav">
+      return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <Components.LabelCalcSelector
             primary={true}
@@ -52,39 +52,42 @@ module Esper.Views {
 
         <div className="esper-content">
           { this.renderPeriodSelector() }
-          <ReportMain
-            calendars={
-              Option.matchList(Stores.Calendars.list(this.props.teamId))
-            }
-            team={team}
-            labels={this.props.labels}
-            periods={[{
-              period: this.props.period,
-              current: true,
-              data: labelDurationCalc,
-              hasError: eventData.hasError,
-              isBusy: eventData.isBusy,
-              total: 0 // Not used
-            }]}
-          />
+          <div className="esper-expanded">
+            <ReportMain
+              calendars={
+                Option.matchList(Stores.Calendars.list(this.props.teamId))
+              }
+              team={team}
+              labels={this.props.labels}
+              periods={[{
+                period: this.props.period,
+                current: true,
+                data: labelDurationCalc,
+                hasError: eventData.hasError,
+                isBusy: eventData.isBusy,
+                total: 0 // Not used
+              }]}
+            />
+          </div>
         </div>
 
       </div>;
     }
 
     renderPeriodSelector() {
-      return <div className={"esper-content-header period-selector " +
-                             "row fixed clearfix"}>
-        <Components.IntervalOrCustomSelector
-          className="col-sm-6"
-          period={this.props.period}
-          updateFn={(p) => this.update({period: p})}
-        />
-        <div className="col-sm-6">
-          <Components.SingleOrCustomPeriodSelector
+      return <div className="esper-content-header container-fluid">
+        <div className="row period-selector">
+          <Components.IntervalOrCustomSelector
+            className="col-sm-6"
             period={this.props.period}
             updateFn={(p) => this.update({period: p})}
           />
+          <div className="col-sm-6">
+            <Components.SingleOrCustomPeriodSelector
+              period={this.props.period}
+              updateFn={(p) => this.update({period: p})}
+            />
+          </div>
         </div>
       </div>;
     }

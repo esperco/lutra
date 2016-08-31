@@ -293,8 +293,7 @@ module Esper.Stores.Events {
             labels_norm: ["label"],
             hashtags: [{
               hashtag: "#Label2",
-              hashtag_norm: "#label2",
-              approved: false
+              hashtag_norm: "#label2"
             }],
             feedback: {
               teamid: TestFixtures.teamId1,

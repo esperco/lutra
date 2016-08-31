@@ -4,32 +4,18 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Save.ts" />
-/// <reference path="./Stores.ReleaseNotes.ts" />
 /// <reference path="./Route.ts" />
 /// <reference path="./Components.LoginInfo.tsx" />
 /// <reference path="./Components.SidebarWithToggle.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
+/// <reference path="./Stores.Teams.ts" />
 /// <reference path="./Text.tsx" />
 
 module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  // Namespace for Header related vars
-  export module Header_ {
-    export enum Tab {
-      Charts = 1,
-      Calendar,
-      List,
-      Manage
-    }
-  }
-
-  interface Props {
-    active?: Header_.Tab
-  }
-
-  export class Header extends Component<Props, {}> {
+  export class Header extends Component<{}, {}> {
     _navSidebar: Components.Sidebar;
 
     renderWithData() {
@@ -38,7 +24,6 @@ module Esper.Views {
       var hasTeams = Stores.Teams.all().length > 0;
 
       return <div className="navbar-fixed-top">
-        <ReleaseNotes lastDismiss={Stores.ReleaseNotes.get()} />
         <nav className="navbar navbar-default navbar-shadow">
           <div className="container-fluid">
             <div className="navbar-header">
@@ -80,12 +65,14 @@ module Esper.Views {
               className="visible-xs-block navbar-default"
               side="right"
             >
-              { this.navLinks(
-                "nav navbar-nav esper-panel-section esper-full-width"
-              ) }
-              { this.loginLinks(
-                "nav navbar-nav esper-panel-section esper-full-width"
-              ) }
+              <div className="esper-section">
+                { this.navLinks(
+                  "nav navbar-nav esper-panel-section esper-full-width"
+                ) }
+                { this.loginLinks(
+                  "nav navbar-nav esper-panel-section esper-full-width"
+                ) }
+              </div>
             </Components.Sidebar>
           </div>
         </nav>
@@ -100,21 +87,16 @@ module Esper.Views {
 
     navLinks(className?: string) {
       return <ul className={className} onClick={() => this.toggleNavSidebar()}>
-        <NavLink href={Paths.Time.charts({}).href}
-                 active={this.props.active === Header_.Tab.Charts}>
+        <NavLink path={Paths.Time.charts({})}>
           <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
         </NavLink>
-        <NavLink href={Paths.Time.calendarLabeling({}).href}
-                 active={this.props.active === Header_.Tab.Calendar}
-                 hiddenXs={true}>
+        <NavLink path={Paths.Time.calendarLabeling({})} hiddenXs={true}>
           <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
         </NavLink>
-        <NavLink href={Paths.Time.list({}).href}
-                 active={this.props.active === Header_.Tab.List}>
+        <NavLink path={Paths.Time.list({})}>
           <i className="fa fa-fw fa-th-list"></i>{" "}Event List
         </NavLink>
-        <NavLink href={Paths.Manage.home().href}
-                 active={this.props.active === Header_.Tab.Manage}>
+        <NavLink path={Paths.Manage.home()}>
           <i className="fa fa-fw fa-cog"></i>{" "}Settings
         </NavLink>
       </ul>;
@@ -150,42 +132,19 @@ module Esper.Views {
     }
   }
 
-  class ReleaseNotes extends Component<{ lastDismiss: number }, {}> {
-    render() {
-      if (this.props.lastDismiss < Text.LatestRelease) {
-        return <div className="esper-release-notes esper-inverse pinned">
-          <a className="action rm-action pull-right"
-             title={Text.DismissNotes}
-             onClick={this.dismissReleaseNotes.bind(this)}>
-            <i className="fa fa-fw fa-close list-group-item-text" />
-          </a>
-          { Text.ReleaseNotes }
-        </div>;
-      }
-      return null;
-    }
-
-    dismissReleaseNotes() {
-      Stores.ReleaseNotes.set(Date.now());
-      Route.nav.refresh();
-    }
-  }
-
   interface NavLinkProps {
-    href: string;
+    path: Paths.Path;
     children?: JSX.Element[];
     hiddenXs?: boolean;
-    active?: boolean;
   }
 
   class NavLink extends Component<NavLinkProps, {}> {
     render() {
-      var selected = Route.nav.isActive(this.props.href);
       return <li className={classNames({
-        active: this.props.active,
+        active: Route.nav.isActive(this.props.path),
         "hidden-xs": this.props.hiddenXs
       })}>
-        <a href={this.props.href}>
+        <a href={this.props.path.href}>
           {this.props.children}
         </a>
       </li>;

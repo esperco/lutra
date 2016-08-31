@@ -45,7 +45,7 @@ module Esper.Components {
     }
 
     render() {
-      return <div className="fullcalendar-holder esper-expanded padded">
+      return <div className="fullcalendar-holder esper-expanded esper-section">
         <div ref={(c) => this._fcDiv = c}></div>
         {this.renderMessage()}
       </div>;
@@ -55,7 +55,7 @@ module Esper.Components {
       var msg: JSX.Element;
       if (this.props.busy) {
         msg = <span>
-          <span className="esper-spinner esper-inline" />{" "}
+          <span className="esper-spinner" />{" "}
           Loading &hellip;
         </span>;
       }

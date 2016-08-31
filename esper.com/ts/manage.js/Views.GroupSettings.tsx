@@ -18,7 +18,7 @@ module Esper.Views {
       var group = Stores.Groups.require(this.props.groupId);
       if (! group) return <span />;
 
-      return <div className="group-settings-page esper-full-screen minus-nav">
+      return <div className="group-settings-page esper-expanded">
         <Components.ManageSidebar
           activeGroupId={this.props.groupId}
           teams={Stores.Teams.all()}

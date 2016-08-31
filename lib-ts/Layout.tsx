@@ -4,16 +4,12 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Route.ts" />
-/// <reference path="./Stores.ReleaseNotes.ts" />
-/// <reference path="./Text.tsx" />
+/// <reference path="./Views.App.tsx" />
 
 module Esper.Layout {
   // References to our jQuery selectors (defaults to one's in esper.com pages,
   // can replace if using in a Chrome extension or other)
   export var mainSelector = "#esper-main";
-  export var headerSelector = "#esper-header";
-  export var footerSelector = "#esper-footer";
-  export var loadingSelector = "#esper-loading";
   export var modalSelector = "#esper-modal";
 
   /*
@@ -21,35 +17,19 @@ module Esper.Layout {
     header and footer if none are passed. Renders blank if you explicitly pass
     a null header or footer.
   */
-  export function render(main: React.ReactElement<any>,
-                         header?: React.ReactElement<any>,
-                         footer?: React.ReactElement<any>) {
-    if (! _.isUndefined(header)) {
-      header = header || <span />;
-      $(headerSelector).show().renderReact(header);
-    }
-
-    var showReleaseNotes = Stores.ReleaseNotes.get() < Text.LatestRelease;
-    if (showReleaseNotes) {
-      $(mainSelector).addClass("has-release-notes");
-    } else {
-      $(mainSelector).removeClass("has-release-notes");
-    }
-
+  export function render(main: React.ReactElement<any>) {
     $(mainSelector).renderReact(main);
-
-    if (! _.isUndefined(footer)) {
-      footer = footer || <span />;
-      $(footerSelector).renderReact(footer);
-    }
 
     /*
       window.requestAnimationFrame ensures that all synchronous JS operations
       are done before we hide the loader
     */
-    window.requestAnimationFrame(hideLoader);
+    window.requestAnimationFrame(function() {
+      if (loaderDeferred.state() === "pending") {
+        loaderDeferred.resolve(true);
+      }
+    });
   }
-
 
   //////
 
@@ -127,24 +107,6 @@ module Esper.Layout {
   export function modalIsVisible(modalId?: number) {
     if ($(modalSelector).find(".modal").is(":visible")) {
       return _.isUndefined(modalId) || modalId === currentModalId;
-    }
-  }
-
-  // Hide the loading screen
-  function hideLoader() {
-    var loading = $(loadingSelector);
-    if ((loading).is(":visible")) {
-      var hide = function() {
-        loading.hide();
-        loaderDeferred.resolve(true);
-      };
-
-      loading
-        .addClass("fade-out")
-        .on('transitionend webkitTransitionEnd oTransitionEnd', hide);
-
-      // Set max 3 second timeout in case transitionend doesn't fire
-      setTimeout(hide, 3000);
     }
   }
 

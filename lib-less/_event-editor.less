@@ -1,3 +1,5 @@
+@import "./_label-list";
+
 .event-star-ratings {
   @media (max-width: @screen-xs-max) {
     text-align: center;
@@ -73,17 +75,15 @@
   }
 }
 
-.event-notes {
+.event-notes.esper-panel-section {
   textarea {
     min-height: 5em;
-  }
-
-  .modal-footer {
-    border-top: 0;
-  }
-
-  textarea {
     background: @body-bg;
+  }
+
+  .esper-section + .modal-footer {
+    border-top: 0;
+    margin-top: 0;
   }
 }
 

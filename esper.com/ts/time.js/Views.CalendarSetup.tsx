@@ -65,13 +65,14 @@ module Esper.Views {
           available: available, selected: selected
         })
       ).match({
-        none: () => <div className="esper-spinner esper-centered" />,
+        none: () => <div className="esper-spinner" />,
         some: ({available, selected}) =>
           <Components.CalendarList
             ref={(c) => this._teamForms[team.teamid] = c}
             team={team}
             availableCalendars={available}
             selectedCalendars={selected}
+            className="esper-section esper-full-width"
             listClasses="esper-select-menu"
             itemClasses="esper-selectable"
             selectedItemClasses="active"
