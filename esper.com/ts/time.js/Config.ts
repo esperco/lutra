@@ -6,6 +6,18 @@ module Esper.Config {
 
   /* Config for period selectors */
 
+  export const MIN_DATE = moment()
+    .subtract(2, 'quarter')
+    .startOf('quarter')
+    .toDate();
+  export const MAX_DATE = moment()
+    .add(1, 'quarter')
+    .endOf('quarter')
+    .toDate();
+
+
+  // Deprecated config options below
+
   /*
     0 is current period. Min and max determine how far forward and back we
     can go back or advance in relative time

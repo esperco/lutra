@@ -95,6 +95,12 @@ module Esper.Text {
   export const WeekHours = `Time of Day`;
   export const IncUnscheduled = `Show Unscheduled Time`;
 
+  // Period selector text
+  export const Week = `Week`;
+  export const Month = `Month`;
+  export const Quarter = `Quarter`;
+  export const Custom = `Custom`;
+
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
   export const ConfirmationDescription = `Hi there! We've made some guesses ` +

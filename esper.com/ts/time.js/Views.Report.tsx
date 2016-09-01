@@ -51,7 +51,12 @@ module Esper.Views {
         </Components.Sidebar>
 
         <div className="esper-content">
-          { this.renderPeriodSelector() }
+          <div className="esper-content-header">
+            <Components.PeriodSelector
+              period={this.props.period}
+              updateFn={(p) => this.update({ period: p })}
+            />
+          </div>
           <div className="esper-expanded">
             <ReportMain
               calendars={
@@ -71,24 +76,6 @@ module Esper.Views {
           </div>
         </div>
 
-      </div>;
-    }
-
-    renderPeriodSelector() {
-      return <div className="esper-content-header container-fluid">
-        <div className="row period-selector">
-          <Components.IntervalOrCustomSelector
-            className="col-sm-6"
-            period={this.props.period}
-            updateFn={(p) => this.update({period: p})}
-          />
-          <div className="col-sm-6">
-            <Components.SingleOrCustomPeriodSelector
-              period={this.props.period}
-              updateFn={(p) => this.update({period: p})}
-            />
-          </div>
-        </div>
       </div>;
     }
 

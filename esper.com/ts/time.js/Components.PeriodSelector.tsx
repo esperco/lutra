@@ -1,39 +1,166 @@
 /*
-  Component for selecting a single period give an interval type
+  Component for selecting interval + period
 */
 
 module Esper.Components {
-  export class SingleOrCustomPeriodSelector extends ReactHelpers.Component<{
-    id?: string;
+  export class PeriodSelector extends ReactHelpers.Component<{
     period: Period.Single|Period.Custom;
     updateFn: (period: Period.Single|Period.Custom) => void;
+    show?: Period.IntervalOrCustom[]; // Limit which intervals are available
   }, {}> {
+    _dropdown: Dropdown;
+
     render() {
       var period = this.props.period;
-      var minDate = moment().startOf('day')
-        .add(Config.MIN_CUSTOM_INCR, 'days').toDate();
-      var maxDate = moment().endOf('day')
-        .add(Config.MAX_CUSTOM_INCR, 'days').toDate();
-      if (Period.isCustom(period)) {
-        return <CalendarRangeSelectorDropdown
-          onRangeSelect={(start, end) =>
-            this.props.updateFn(Period.customFromDates(start, end))
-          }
-          selected={Period.boundsFromPeriod(period)}
-          min={minDate}
-          max={maxDate}
-        />;
-      } else {
-        return <PeriodSelector
-          id={this.props.id}
-          period={period}
-          updateFn={(p) => this.props.updateFn(p)}
-        />;
+      var selector = ((interval: Period.IntervalOrCustom) => {
+        switch (interval) {
+          case "quarter":
+            return <PeriodMenu
+              min={Config.MIN_DATE}
+              max={Config.MAX_DATE}
+              interval="quarter"
+              selected={this.props.period}
+              onUpdate={(p) => this.updateAndClose(p)}
+            />
+
+          case "month":
+            return <PeriodMenu
+              min={Config.MIN_DATE}
+              max={Config.MAX_DATE}
+              interval="month"
+              selected={this.props.period}
+              onUpdate={(p) => this.updateAndClose(p)}
+            />
+
+          case "week":
+            return <CalendarWeekSelector
+              min={Config.MIN_DATE}
+              max={Config.MAX_DATE}
+              selected={Period.boundsFromPeriod(period)}
+              onWeekSelect={(start, end) =>
+                this.updateAndClose(Period.singleFromDate("week", start))
+              }
+            />
+
+          default: // Custom
+            return <CalendarRangeSelector
+              min={Config.MIN_DATE}
+              max={Config.MAX_DATE}
+              selected={Period.boundsFromPeriod(period)}
+              onRangeSelect={(start, end) =>
+                this.updateAndClose(Period.customFromDates(start, end))
+              }
+            />
+        }
+      })(period.interval);
+
+      // Disable left/right arrows?
+      var disableLeft = (
+        Period.boundsFromPeriod(Period.incr(period, -1))[0].getTime() <
+        Config.MIN_DATE.getTime()
+      );
+      var disableRight = (
+        Period.boundsFromPeriod(Period.incr(period, -1))[0].getTime() >
+        Config.MAX_DATE.getTime()
+      );
+
+      // Intervals to show in selector
+      var intervals = this.props.show ||
+        ["week", "month", "quarter", "custom"];
+
+      return <div className="period-selector">
+        { disableLeft ? <span /> :
+          <span className="action period-incr-action"
+                onClick={() => this.props.updateFn(Period.incr(period, -1))}>
+            <i className="fa fa-fw fa-caret-left" />
+          </span> }
+        <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
+          <div className="dropdown-toggle">
+            { Text.fmtPeriod(period) }
+            <i className="fa fa-fw fa-right fa-caret-down" />
+          </div>
+          <div className="dropdown-menu">
+            { intervals.length > 1 ?
+              <IntervalSelector
+                selected={period.interval}
+                intervals={intervals}
+                onUpdate={(i) => this.props.updateFn(Period.current(i))}
+              /> : null }
+            <div className="esper-select-menu">
+              { selector }
+            </div>
+          </div>
+        </Dropdown>
+        { disableRight ? <span /> :
+          <span className="action period-incr-action"
+                onClick={() => this.props.updateFn(Period.incr(period, -1))}>
+            <i className="fa fa-fw fa-caret-right" />
+          </span> }
+      </div>;
+    }
+
+    // Update period and close menu
+    updateAndClose(period: Period.Single|Period.Custom) {
+      this.props.updateFn(period);
+      if (this._dropdown) {
+        this._dropdown.close();
       }
     }
   }
 
-  export class PeriodSelector extends ReactHelpers.Component<{
+  // List of links to change interval
+  function IntervalSelector({selected, intervals, onUpdate} : {
+    selected?: Period.IntervalOrCustom;
+    intervals: Period.IntervalOrCustom[];
+    onUpdate: (period: Period.IntervalOrCustom) => void;
+  }) {
+    return <div className="esper-select-menu esper-flex-list">
+      { _.map(intervals, (i) =>
+        <a key={i} className={classNames("esper-selectable text-center", {
+          active: selected === i
+        })} onClick={() => onUpdate(i)}>
+          { textForInterval(i) }
+        </a>
+      )}
+    </div>;
+  }
+
+  function textForInterval(interval: Period.IntervalOrCustom) {
+    switch(interval) {
+      case "week": return Text.Week;
+      case "month": return Text.Month;
+      case "quarter": return Text.Quarter;
+      default: return Text.Custom;
+    }
+  }
+
+  // List of links to specific periods between min and max
+  function PeriodMenu({min, max, interval, selected, onUpdate} : {
+    min: Date;
+    max: Date;
+    interval: Period.Interval;
+    selected?: Period.Single|Period.Custom;
+    onUpdate: (period: Period.Single) => void;
+  }) {
+    var periods: Period.Single[] = [];
+    var m = moment(min);
+    while (m.diff(max) < 0) {
+      periods.push(Period.singleFromDate(interval, m.toDate()));
+      m.add(1, interval);
+    }
+    return <ul className="esper-select-menu">{_.map( periods, (p) =>
+      <li key={p.index} onClick={() => onUpdate(p)}>
+        <a className={_.isEqual(selected, p) ? "active" : "" }>
+          { Text.fmtPeriod(p) }
+        </a>
+      </li>
+    )}</ul>;
+  }
+
+
+  /* Below components are deprecated */
+
+  class OldPeriodSelector extends ReactHelpers.Component<{
     id?: string;
     period: Period.Single;
     updateFn: (period: Period.Single) => void;
@@ -120,7 +247,7 @@ module Esper.Components {
     }
   }
 
-  export class PeriodSelectorWithIcon extends PeriodSelector {
+  export class PeriodSelectorWithIcon extends OldPeriodSelector {
     render() {
       return this.renderBase(true);
     }

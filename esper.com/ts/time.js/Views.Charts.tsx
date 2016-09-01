@@ -67,7 +67,15 @@ module Esper.Views {
           </div>
         </Components.Sidebar>
         <div className="esper-content">
-          { this.renderPeriodSelector() }
+          <div id="chart-header" className="esper-content-header">
+            <Components.PeriodSelector
+              period={this.props.period}
+              show={
+                this.props.extra.type === "calendar" ? ["month"] : undefined
+              }
+              updateFn={(p) => this.updatePeriod(p)}
+            />
+          </div>
           <div id="chart-expanded" className="esper-expanded">
             { this.props.chart }
           </div>
@@ -279,25 +287,6 @@ module Esper.Views {
           <i style={{width: "100%"}} className={"fa fa-fw " + icon} />
         </Components.Tooltip>
       </button>
-    }
-
-    renderPeriodSelector() {
-      return <div className="esper-content-header container-fluid">
-        <div className="row period-selector">
-          <Components.IntervalOrCustomSelector
-            className="col-sm-6"
-            period={this.props.period}
-            show={this.props.extra.type === "calendar" ? ["month"] : undefined}
-            updateFn={(p) => this.updatePeriod(p)}
-          />
-          <div className="col-sm-6">
-            <Components.SingleOrCustomPeriodSelector
-              period={this.props.period}
-              updateFn={(p) => this.updatePeriod(p)}
-            />
-          </div>
-        </div>
-      </div>;
     }
 
     updatePeriod(period: Period.Single|Period.Custom) {
