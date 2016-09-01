@@ -28,6 +28,7 @@ module Esper.Views {
 
   interface State {
     sidebar: string;
+    showFilterMenu?: boolean;
   }
 
   export class Charts extends Component<Props, State> {
@@ -75,8 +76,17 @@ module Esper.Views {
               }
               updateFn={(p) => this.updatePeriod(p)}
             />
+            <div className="actions">
+              <span className="action"
+                    onClick={() => this.toggleFilterMenu()}>
+                <i className={"fa fa-fw " + (
+                  this.state.showFilterMenu ? "fa-close active" : "fa-filter"
+                )} />
+              </span>
+            </div>
           </div>
           <div id="chart-expanded" className="esper-expanded">
+            { this.state.showFilterMenu ? this.renderFilterMenu() : null }
             { this.props.chart }
           </div>
         </div>
@@ -287,6 +297,16 @@ module Esper.Views {
           <i style={{width: "100%"}} className={"fa fa-fw " + icon} />
         </Components.Tooltip>
       </button>
+    }
+
+    renderFilterMenu() {
+      return <div className="filter-menu esper-shade esper-section">
+        Hello
+      </div>;
+    }
+
+    toggleFilterMenu() {
+      this.mutateState((s) => s.showFilterMenu = !s.showFilterMenu);
     }
 
     updatePeriod(period: Period.Single|Period.Custom) {

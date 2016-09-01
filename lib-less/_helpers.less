@@ -4,6 +4,7 @@
 
 // Custom Esper variables
 @min-fullscreen-height: 350px;
+@content-header-height: 42px;
 @sidebar-xs-width: 90%; // When open
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 25%;
@@ -234,8 +235,10 @@
     esper-expanded)
   */
   > .esper-content-header {
-    line-height: @input-height-base;
-    padding: @esper-base-padding;
+    height: @content-header-height;
+    line-height: @content-header-height;
+    vertical-align: middle;
+    padding: 0 @esper-base-padding;
     overflow: auto;
 
     @media screen and (min-width: @screen-sm-min) {
@@ -243,7 +246,7 @@
       top: 0; left: 0; right: 0;
 
       + * {
-        margin-top: @input-height-base + @esper-base-padding * 2;
+        margin-top: @content-header-height;
       }
     }
   }
@@ -336,8 +339,7 @@
 .esper-header {
   line-height: @input-height-base;
   vertical-align: middle;
-  margin-top: @padding-large-vertical - @padding-base-vertical;
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
 
 

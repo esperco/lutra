@@ -1,19 +1,27 @@
 @import "../lib/_helpers";
+@import "../lib/_animations";
 
-#charts-page {
-  @media (max-width: @screen-xs-max) {
-    .period-selector {
+// Header for chart
+#chart-header {
+  padding: 0 @input-height-base;
+
+  > .actions {
+    position: absolute;
+    right: 0; top: 0;
+    max-width: 100%;
+
+    .action {
+      min-width: @input-height-base;
       text-align: center;
-
-      .esper-subheader-link {
-        display: inline-block;
-        text-align: center;
-        padding: 0 @padding-xs-horizontal;
-        min-width: 20%;
-        box-sizing: border-box;
-      }
+      display: inline-block;
     }
   }
+}
+
+.filter-menu {
+  animation: slidedown 0.6s;
+  border-radius: @border-radius-base;
+  margin-bottom: @esper-base-padding;
 }
 
 // Single full-page chart
@@ -37,8 +45,7 @@
         screen height minus navbar, height of period selector, height
         of totals bar, and padding at bottom of #chart-expanded)
       */
-      min-height: calc(~"100vh - "(@navbar-height +
-        @input-height-base + (@esper-base-padding * 2) +
+      min-height: calc(~"100vh - "(@navbar-height + @content-header-height +
         @input-height-base + @esper-base-padding));
     }
   }
@@ -48,8 +55,7 @@
 .esper-release-notes + .navbar-fixed-top + * {
   #chart-expanded .chart-holder {
     @media screen and (min-width: @screen-sm-min) {
-      min-height: calc(~"100vh - "(@navbar-height +
-        @input-height-base + (@esper-base-padding * 2) +
+      min-height: calc(~"100vh - "(@navbar-height + @content-header-height +
         @input-height-base + @esper-base-padding + @release-notes-height));
     }
   }
