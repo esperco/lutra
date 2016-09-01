@@ -4,7 +4,6 @@
 
 module Esper.Charting {
   export type ChartType = Types.ChartType;
-  export type ChartGroup = Types.ChartGroup;
   export type BaseOpts<T> = Types.ChartBaseOpts<T>;
   export type ExtraOptsMaybe = Types.ChartExtraOptsMaybe;
   export type ExtraOpts = Types.ChartExtraOpts;
@@ -15,9 +14,6 @@ module Esper.Charting {
 
   /* Routing helpers */
 
-  // Current pathFn for charts (set by Route.routeChart)
-  export var currentPathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
-
   export function updateChart<T>(o: BaseOpts<T>, p: {
     pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
     teamId?: string;
@@ -27,31 +23,45 @@ module Esper.Charting {
     opts?: Route.nav.Opts;
   }) {
     var opts = p.opts || {};
-    var pathFn = p.pathFn || currentPathFn;
+    var pathFn = p.pathFn || o.pathFn;
     var teamId = p.teamId || o.teamId;
     var calIds = p.calIds || o.calIds;
     var period = p.period || o.period;
+    var newExtras: (ExtraOptsMaybe & T)|{} = {}
 
     // Chart change => blank out filter params unless provided
-    if (pathFn !== Charting.currentPathFn && p.extra) {
-      opts.jsonQuery = p.extra;
+    if (pathFn !== o.pathFn && p.extra) {
+      newExtras = p.extra;
     }
 
-    // Preserve params only if same team change. Also switch cals.
+    // Team change => Don't preserve filter params, reset cals
     else if (teamId !== o.teamId) {
       calIds = [Params.defaultCalIds];
-      opts.jsonQuery = {};
     }
 
     // Else merge old extra with new params
     else {
-      opts.jsonQuery = _.extend({}, o.extra, p.extra);
-      if (opts.jsonQuery.weekHours) {
-        opts.jsonQuery.weekHours =
-          Params.weekHoursJSON(opts.jsonQuery.weekHours);
-      }
+      newExtras = _.extend({}, o.extra, p.extra);
     }
 
+    // Remove params from querystring if identical to default
+    let keys = _.keys(newExtras);
+    if (keys.length) {
+      let defaults: any = cleanExtra({}, pathFn);
+      _.each(keys, (key) => {
+        if (_.isEqual((newExtras as any)[key], defaults[key])) {
+          delete (newExtras as any)[key];
+        }
+      });
+    }
+
+    // Convert weekHours object to serialized JSON
+    opts.jsonQuery = newExtras;
+    if (opts.jsonQuery.weekHours) {
+      opts.jsonQuery.weekHours = Params.weekHoursJSON(opts.jsonQuery.weekHours);
+    }
+
+    // Convert period object to string
     var periodStr = Period.isCustom(period) ?
       [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
       period.index.toString();
@@ -62,6 +72,43 @@ module Esper.Charting {
       interval: period.interval[0],
       period: periodStr
     }), opts);
+  }
+
+  /*
+    Clean up different query params that could be passed
+  */
+  export function cleanExtra(
+    e: any,
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path
+  ): ExtraOpts {
+    e = e || {};
+    var typedQ: ExtraOpts = e;
+    typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
+    if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
+      typedQ.type = "percent";
+    }
+    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
+    typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
+
+    /* Don't initially include none in selector if grouping by attr */
+    typedQ.labels = Params.cleanListSelectJSON(typedQ.labels, {
+      none: pathFn !== Paths.Time.labelsChart
+    });
+    typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings, {
+      none: pathFn !== Paths.Time.ratingsChart
+    });
+
+    // Domain selector none and guest count none should match.
+    typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts, {
+      none: pathFn !== Paths.Time.guestsChart &&
+            pathFn !== Paths.Time.guestsCountChart
+    });
+    typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
+    typedQ.domains.none = typedQ.guestCounts.none;
+
+    typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
+    typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
+    return typedQ;
   }
 
 
