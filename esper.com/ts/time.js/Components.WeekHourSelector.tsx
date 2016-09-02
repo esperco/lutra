@@ -3,8 +3,6 @@
   hours for all selected days
 */
 
-/// <reference path="./Components.SidebarSelector.tsx" />
-
 module Esper.Components {
 
   // Default = 9 to 5;
@@ -29,7 +27,24 @@ module Esper.Components {
     dayHours: Types.DayHours;
   }
 
-  class WeekHoursUI extends ReactHelpers.Component<Props, State> {
+  export function WeekHourDropdownSelector(props: Props & {
+    id?: string;
+  }) {
+    // Dropdown input text
+    let selectedText = _.isEqual(props.hours, Params.weekHoursAll()) ?
+      Text.AllWeekHours : Text.SomeWeekHours;
+
+    return <Dropdown keepOpen={true}>
+      <Selector id={props.id} className="dropdown-toggle">
+        { selectedText }
+      </Selector>
+      <div className="dropdown-menu">
+        <WeekHoursSelector {...props} />
+      </div>
+    </Dropdown>;
+  }
+
+  export class WeekHoursSelector extends ReactHelpers.Component<Props, State> {
     constructor(props: Props) {
       super(props);
       this.state = {
@@ -76,8 +91,8 @@ module Esper.Components {
       });
 
       return <div>
-        <div className="day-selector">
-          <div className="days">
+        <div className="day-selector esper-select-menu">
+          <div className="days esper-select-menu">
             <ListSelectorSimple
               choices={choices}
               listClasses="esper-select-menu esper-flex-list"
@@ -88,7 +103,7 @@ module Esper.Components {
               updateFn={(ids) => this.update({selectedIds: ids})}
             />
           </div>
-          <div className="times">
+          <div className="times esper-select-menu">
             <span className="hour-minute">
               <TimeOfDayMenu
                 onChange={(x) => this.update({ start: x })}
@@ -105,7 +120,7 @@ module Esper.Components {
           </div>
         </div>
         { this.props.showUnscheduled ?
-          <div className="unscheduled-selector">
+          <div className="unscheduled-selector esper-select-menu">
             <SimpleToggle
               title={Text.IncUnscheduled}
               active={this.props.unscheduled}
@@ -122,14 +137,34 @@ module Esper.Components {
     }) {
       let newStart = Util.some(start, this.state.dayHours.start);
       let newEnd = Util.some(end, this.state.dayHours.end);
-      if (newStart.hour * 60 + newStart.minute >
+
+      // 12am at end should be interpreted as end of day
+      if (newEnd.hour === 0 && newEnd.minute === 0) {
+        newEnd = { hour: 24, minute: 0 };
+      }
+
+      // Invalid date
+      if (newStart.hour * 60 + newStart.minute >=
           newEnd.hour * 60 + newEnd.minute) {
+
+        // Start provided, so end must be off
         if (start) {
-          newEnd = newStart;
-        } else {
-          newStart = newEnd;
+          newEnd = { hour: 24, minute: 0 };
+        }
+
+        // Check if AM/PM off
+        else if (newEnd.hour < 12 &&
+          (newEnd.hour + 12) * 60 + newEnd.minute >
+           newEnd.hour * 60 + newEnd.minute) {
+          newEnd.hour += 12;
+        }
+
+        // Early end, start at midnight
+        else {
+          newStart = { hour: 0, minute: 0 };
         }
       }
+
       let dayHours = { start: newStart, end: newEnd };
       selectedIds = selectedIds || _.filter([
         this.props.hours.sun.isSome() ? "sun" : null,
@@ -158,51 +193,58 @@ module Esper.Components {
     }
   }
 
-  function TimeOfDayMenu({selected, onChange}: {
+
+  interface TimeOfDayProps {
     selected: ApiT.HourMinute;
     onChange: (x: ApiT.HourMinute) => void;
-  }) {
+  }
 
-    return <SelectMenu
-      options={makeOptions()}
-      onChange={(x) => onChange(parseStrHourMinute(x))}
-      selected={selected.hour.toString() + ":" + selected.minute.toString()}
-    />;
+  class TimeOfDayMenu extends ReactHelpers.Component<TimeOfDayProps, {
+    value: string;
+  }> {
+    _input: HTMLInputElement;
+
+    constructor(props: TimeOfDayProps) {
+      super(props);
+      this.state = { value: moment(this.props.selected).format("LT") };
+    }
+
+    componentWillReceiveProps(newProps: TimeOfDayProps) {
+      this.setState({
+        value: moment(newProps.selected).format("LT")
+      });
+    }
+
+    render() {
+      // Format to local time
+      return <input ref={(c) => this._input = c}
+        className="form-control"
+        value={this.state.value}
+        onChange={(x) => this.setState({
+          value: (x.target as HTMLInputElement).value
+        })}
+        onBlur={() => this.onBlur()}
+      />;
+    }
+
+    onBlur() {
+      if (this._input) {
+        this.props.onChange(parseStrHourMinute(this._input.value));
+      }
+    }
   }
 
   // Converts "1:23" to { hour: 1, minute: 23 }
   function parseStrHourMinute(s: string): ApiT.HourMinute {
-    let hour = parseInt(s.split(":")[0]);
-    let minute = parseInt(s.split(":")[1]);
+    let hour = parseInt(s.split(":")[0]) % 12;
+    let minute = parseInt(s.split(":")[1]) % 60;
+    if (_.includes(s.toLowerCase(), "p")) { // PM
+      hour += 12;
+    }
+
+    hour = isNaN(hour) ? 0 : hour;
+    minute = isNaN(minute) ? 0 : minute;
+
     return Params.cleanHourMinute({ hour: hour, minute: minute });
   }
-
-  // Every 30 min
-  function makeOptions() {
-    var hm: ApiT.HourMinute[] = [];
-    _.times(24, (i) => {
-      hm.push({ hour: i, minute: 0 });
-      hm.push({ hour: i, minute: 30 });
-    });
-    hm.push({ hour: 24, minute: 0 });
-    return _.map(hm, (m) => ({
-      val: m.hour.toString() + ":" + m.minute.toString(),
-      display: moment(m).format("LT") // Format to local time
-    }));
-  }
-
-  export class WeekHourSelector extends SidebarSelector<Props> {
-    renderHeader() {
-      return <span>
-        <i className="fa fa-fw fa-clock-o" />{" "}
-        { Text.WeekHours }
-      </span>;
-    }
-
-    renderContent() {
-      return React.createElement(WeekHoursUI, this.props);
-    }
-  }
-
-
 }

@@ -406,6 +406,12 @@
     }
   }
 
+  // More negative padding for full-width items
+  .esper-full-width  {
+    margin-left: -@esper-base-padding;
+    margin-right: -@esper-base-padding;
+  }
+
   // For normal sections, collapse padding of following element
   & + .esper-section {
     margin-top: -@esper-base-padding;
@@ -911,6 +917,10 @@ a.action {
 
 .fa.fa-left {
   margin-right: @padding-small-horizontal;
+}
+
+.fa.fa-right {
+  margin-left: @padding-small-horizontal;
 }
 
 /* Misc formatting for "shaded" elements */

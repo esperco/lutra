@@ -81,25 +81,38 @@ module Esper.Text {
 
   // Selector text
   export const SelectAll = `Select All`;
-  export const AllLabels = `All ` + _.capitalize(Labels);
+  export const AllLabels = `Show All`;
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
+  export const HideUnlabled = `Only ${_.capitalize(Labeled)} Events`;
   export const Unconfirmed = `New Events`;
   export const SearchEventsPlaceholder = `Filter Events`;
 
   export const GuestDomains = `Organizations`;
+  export const AllGuests = `Show All`;
   export const NoGuests = `No Guests`;
+  export const HideNoGuests = `Only Events with Guests`;
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
+  export const AllRatings = `Show All`;
   export const NoRating = `No Rating`;
+  export const HideNoRating = `Only Rated Events`;
+
+  export const AllDurations = `Show All`;
   export const WeekHours = `Time of Day`;
+  export const AllWeekHours = `Show All`;
+  export const SomeWeekHours = `Limited Times of Week`;
   export const IncUnscheduled = `Show Unscheduled Time`;
+
 
   // Period selector text
   export const Week = `Week`;
   export const Month = `Month`;
   export const Quarter = `Quarter`;
   export const Custom = `Custom`;
+
+  // Same as ChartCalculating, but for CalcUI elements
+  export const UICalculating = `Crunching numbers`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;

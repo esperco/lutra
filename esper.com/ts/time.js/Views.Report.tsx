@@ -32,13 +32,20 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <Components.LabelCalcSelector
-            primary={true}
-            team={team}
-            selected={this.props.labels}
-            calculation={labelCountCalc}
-            updateFn={(x) => Route.nav.query({ labels: x })}
-          />
+          <div className="esper-panel-section">
+            <div className="esper-header">
+              <i className="fa fa-fw fa-left fa-tags" />
+              { Text.ChartLabels }
+            </div>
+            <div className="esper-full-width">
+              <Components.LabelCalcSelector
+                team={team}
+                selected={this.props.labels}
+                calculation={labelCountCalc}
+                updateFn={(x) => Route.nav.query({ labels: x })}
+              />
+            </div>
+          </div>
 
           <div className="sidebar-bottom-menu">
             <Components.TeamSelector

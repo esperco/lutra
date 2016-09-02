@@ -1,11 +1,21 @@
 @import "./_bootstrap-variables";
 
-// Use flexbox style to make list horizontal on wide dispalys
-.esper-select-menu.esper-flex-list {
+// Use flexbox style to make list horizontal on wide displays
+.esper-flex-list {
   display: flex;
   flex-wrap: wrap;
 
-  .esper-selectable, li > a {
+  > * {
     flex-grow: 1;
+  }
+
+  // Special spacing rules for sections
+  &.esper-section, &.esper-panel-section {
+    padding: @esper-base-padding / 2;
+
+    > .esper-section, > .esper-panel-section {
+      padding: @esper-base-padding / 2;
+      margin: 0;
+    }
   }
 }

@@ -2,8 +2,6 @@
   Component for selecting a bunch of labels. Extract labels from
 */
 
-/// <reference path="./Components.SidebarSelector.tsx" />
-
 module Esper.Components {
   interface Props {
     period: Period.Single|Period.Custom;
@@ -53,21 +51,38 @@ module Esper.Components {
 
   //////
 
-  export class RelativePeriodSidebarSelector extends SidebarSelector<Props> {
-    renderHeader() {
-      return <span>
-        <i className="fa fa-fw fa-flip-horizontal fa-tasks" />{" "}
-        Compare With
-      </span>;
-    }
+  export function RelativePeriodDropdownSelector(props: Props & {
+    id?: string;
+  }) {
+    /*
+      This is going to be removed in favor of a proper time series graph at
+      some point in the future, so not going to worry about properly
+      refactoring text.
+    */
+    let selectedText = ((incrs: number[]) => {
+      let interval = Period.isCustomInterval(props.period.interval) ?
+        "Period" : _.capitalize(props.period.interval);
+      if (_.isEmpty(incrs) || _.isEqual(incrs, [0])) {
+        return `Current ${interval} Only`;
+      }
 
-    renderContent() {
-      return <RelativePeriodSelector
-        period={this.props.period}
-        allowedIncrs={[-1, 1]}
-        selectedIncrs={this.props.selectedIncrs}
-        updateFn={this.props.updateFn}
-      />;
-    }
+      let items: string[] = [];
+      if (_.includes(incrs, -1)) {
+        items.push(`Last ${interval}`);
+      }
+      if (_.includes(incrs, 1)) {
+        items.push(`Next ${interval}`);
+      }
+      return items.join(", ");
+    })(props.selectedIncrs)
+
+    return <Dropdown keepOpen={true}>
+      <Selector id={props.id} className="dropdown-toggle">
+        { selectedText }
+      </Selector>
+      <div className="dropdown-menu">
+        <RelativePeriodSelector {...props} />
+      </div>
+    </Dropdown>;
   }
 }

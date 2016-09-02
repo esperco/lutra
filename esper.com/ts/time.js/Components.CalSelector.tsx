@@ -2,23 +2,19 @@
   Component for selecting a calendar for a given team
 */
 
-/// <reference path="./Components.SidebarSelector.tsx" />
+/// <reference path="./Components.CalcUI.tsx" />
 
 module Esper.Components {
-  export class CalCalcSelector extends DefaultSidebarSelector<{
-    calculation: EventStats.CalendarCountCalc;
-    calendars: ApiT.GenericCalendar[];
-    selectedIds: string[];
-    updateFn: (ids: string[]) => void;
-  }> {
-    renderHeader() {
-      return <span>
-        <i className="fa fa-fw fa-calendar-o" />{" "}
-        { Text.ChartCalendars }
-      </span>;
-    }
-
-    renderContent() {
+  export class CalCalcDropdownSelector
+    extends CalcUI<Types.EventOptGrouping, {
+      id?: string;
+      calculation: EventStats.CalendarCountCalc;
+      calendars: ApiT.GenericCalendar[];
+      selectedIds: string[];
+      updateFn: (ids: string[]) => void;
+    }>
+  {
+    render() {
       var grouping = this.state.result.match({
         none: (): EventStats.Grouping => ({}),
         some: (result) => result.some
@@ -31,21 +27,31 @@ module Esper.Components {
           displayAs: this.getDisplayName(c.id),
           badgeText: count ? count.toString() : undefined,
           badgeHoverText: count ? Text.events(count) : undefined,
-          badgeColor: this.props.primary ?
-            Colors.getColorForCal(c.id) : undefined
+          badgeColor: Colors.getColorForCal(c.id)
         };
       });
 
-      return <Components.ListSelectorSimple
-        choices={choices}
-        selectedIds={this.props.selectedIds}
-        selectOption={Components.ListSelectOptions.MULTI_SELECT}
-        selectedItemClasses="active"
-        className="esper-select-menu"
-        listClasses="esper-select-menu"
-        itemClasses="esper-selectable"
-        updateFn={this.props.updateFn}
-      />;
+      var selectedText = _.map(
+        this.props.selectedIds, (calId) => this.getDisplayName(calId)
+      ).join(", ");
+
+      return <Dropdown keepOpen={true}>
+        <Selector id={this.props.id} className="dropdown-toggle">
+          { selectedText }
+        </Selector>
+        <div className="dropdown-menu">
+          <Components.ListSelectorSimple
+            choices={choices}
+            selectedIds={this.props.selectedIds}
+            selectOption={Components.ListSelectOptions.MULTI_SELECT}
+            selectedItemClasses="active"
+            className="esper-select-menu"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+            updateFn={this.props.updateFn}
+          />
+        </div>
+      </Dropdown>;
     }
 
     getDisplayName(calId: string) {

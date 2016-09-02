@@ -146,89 +146,10 @@ module Esper.Actions.Charts {
       }
     };
 
-    var team = Stores.Teams.require(o.teamId);
-    if (! team) { return <span />; }
-
-    var cals = Option.matchList(Stores.Calendars.list(o.teamId));
-    var selectors = [
-      cals.length <= 1 ? null :
-      <Components.CalCalcSelector key="calendars"
-        primary={o.pathFn === Paths.Time.calendarsChart}
-        calendars={cals}
-        selectedIds={o.calIds}
-        calculation={new EventStats.CalendarCountCalc(p.events, o.extra)}
-        updateFn={(calIds) => Charting.updateChart(o, { calIds: calIds })}
-      />,
-
-      <Components.LabelCalcSelector key="labels"
-        primary={o.pathFn === Paths.Time.labelsChart}
-        team={team}
-        selected={o.extra.labels}
-        calculation={labelCalc}
-        updateFn={(x) => Charting.updateChart(o, { extra: {labels: x} })}
-      />,
-
-      <Components.DomainSelector key="guests"
-        primary={o.pathFn === Paths.Time.guestsChart}
-        selected={o.extra.domains}
-        calculation={new EventStats.DomainCountCalc(p.events, o.extra)}
-        updateFn={(domains) => Charting.updateChart(o, {
-          extra: {
-            domains: domains,
-
-            // Guest count none and domain none should be the same
-            guestCounts: _.extend({}, o.extra.guestCounts, {
-              none: domains.none
-            }) as Params.ListSelectJSON
-          }
-        })}
-      />,
-
-      <Components.RatingSelector key="ratings"
-        primary={o.pathFn === Paths.Time.ratingsChart}
-        selected={o.extra.ratings}
-        calculation={new EventStats.RatingCountCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: {ratings: x} })}
-      />,
-
-      <Components.DurationSelector key="durations"
-        primary={o.pathFn === Paths.Time.durationsChart}
-        selected={o.extra.durations}
-        calculation={new EventStats.DurationBucketCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: { durations: x }})}
-      />,
-
-      <Components.GuestCountSelector key="guest-counts"
-        primary={o.pathFn === Paths.Time.guestsCountChart}
-        selected={o.extra.guestCounts}
-        calculation={new EventStats.GuestCountBucketCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: { guestCounts: x }})}
-      />,
-
-      <Components.WeekHourSelector key="weekHours"
-        hours={o.extra.weekHours}
-        updateHours={
-          (x) => Charting.updateChart(o, { extra: { weekHours: x }})
-        }
-        showUnscheduled={o.extra.type === "percent"}
-        unscheduled={o.extra.incUnscheduled}
-        updateUnscheduled={
-          (x) => Charting.updateChart(o, { extra: { incUnscheduled: x }})
-        }
-      />,
-
-      o.extra.type === "calendar" ? null :
-      <Components.RelativePeriodSidebarSelector key="incrs"
-        period={o.period}
-        allowedIncrs={[-1, 1]}
-        selectedIncrs={o.extra.incrs}
-        updateFn={(x) => Charting.updateChart(o, { extra: { incrs: x }})}
-      />
-    ];
-
     return <Views.Charts
       chart={p.chart}
-      selectors={selectors.concat(p.selectors || [])}
+      events={p.events}
+      selectors={p.selectors || []}
       menus={[confirmationMenu].concat(p.menus || [])}
       { ...o }
     />;

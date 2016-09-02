@@ -2,78 +2,124 @@
   Component for selecting a bunch of labels.
 */
 
-/// <reference path="./Components.SidebarSelector.tsx" />
+/// <reference path="./Components.CalcUI.tsx" />
 
 module Esper.Components {
+  export class LabelCalcDropdownSelector
+    extends CalcUI<Types.EventOptGrouping, {
+      id?: string;
+      calculation: EventStats.LabelCountCalc;
+      team: ApiT.Team;
+      selected: Params.ListSelectJSON;
+      updateFn: (x: Params.ListSelectJSON) => void;
+    }>
+  {
+    render() {
+      // Dropdown input text
+      let selectedText = (() => {
+        if (this.props.selected.all) {
+          return this.props.selected.none ?
+            Text.AllLabels :
+            Text.HideUnlabled
+        }
 
-  export class LabelCalcSelector extends DefaultSidebarSelector<{
+        let labels = _.map(this.props.selected.some, Labels.getDisplayAs);
+        if (this.props.selected.none) {
+          labels.push(Text.Unlabeled);
+        }
+        return labels.join(", ");
+      })();
+
+      return <Dropdown keepOpen={true}>
+        <Selector id={this.props.id} className="dropdown-toggle">
+          { selectedText }
+        </Selector>
+        <div className="dropdown-menu">
+          <LabelListSelector
+            result={this.state.result}
+            team={this.props.team}
+            selected={this.props.selected}
+            updateFn={this.props.updateFn}
+          />
+        </div>
+      </Dropdown>;
+    }
+  }
+
+  export class LabelCalcSelector extends CalcUI<Types.EventOptGrouping, {
     calculation: EventStats.LabelCountCalc;
     team: ApiT.Team;
     selected: Params.ListSelectJSON;
     updateFn: (x: Params.ListSelectJSON) => void;
   }> {
-    renderHeader() {
-      return <span>
-        <i className="fa fa-fw fa-tags" />{" "}
-        { Text.ChartLabels }
-      </span>;
-    }
-
-    renderContent() {
-      return this.state.result.match({
-        none: () => <span />,
-        some: (result) => {
-          // Labels from events
-          var choices = _.map(result.some, (v, k) => ({
-            id: k,
-            displayAs: Labels.getDisplayAs(k),
-            badgeText: v.totalUnique.toString(),
-            badgeHoverText: Text.events(v.totalUnique),
-            badgeColor: this.props.primary ?
-              Colors.getColorForLabel(k) : undefined
-          }));
-
-          // Get team labels too
-          _.each(this.props.team.team_labels_norm, (norm, i) => {
-            choices.push({
-              id: norm,
-              displayAs: this.props.team.team_labels[i],
-              badgeText: undefined,
-              badgeHoverText: undefined,
-              badgeColor: this.props.primary ?
-                Colors.getColorForLabel(norm) : undefined
-            })
-          });
-          choices = _(choices)
-            .uniqBy((c) => c.id)
-            .sortBy((c) => Labels.normalizeForSort(c.displayAs))
-            .value();
-
-          return <Components.ListSelectorASN
-            choices={choices}
-            selected={this.props.selected}
-            updateFn={this.props.updateFn}
-            allChoice={{
-              displayAs: Text.AllLabels,
-              badgeText: result.totalUnique.toString(),
-              badgeHoverText: Text.events(result.totalUnique),
-            }}
-            noneChoice={{
-              displayAs: Text.Unlabeled,
-              badgeText: result.none ?
-                result.none.totalUnique.toString() : undefined,
-              badgeHoverText: result.none ?
-                Text.events(result.none.totalUnique) : undefined,
-            }}
-            selectedItemClasses="active"
-            className="esper-select-menu"
-            listClasses="esper-select-menu"
-            itemClasses="esper-selectable"
-          />;
-        }
-      });
+    render() {
+      return <LabelListSelector
+        result={this.state.result}
+        team={this.props.team}
+        selected={this.props.selected}
+        updateFn={this.props.updateFn}
+      />;
     }
   }
+
+  // Labels from events
+  function LabelListSelector({result, team, selected, updateFn} : {
+    result: Option.T<Types.EventOptGrouping>;
+    team: ApiT.Team;
+    selected: Params.ListSelectJSON;
+    updateFn: (x: Params.ListSelectJSON) => void;
+  }) {
+    return result.match({
+      none: () => <span>{ Text.UICalculating }</span>,
+      some: (optGroups) => {
+        var choices = _.map(optGroups.some, (v, k) => ({
+          id: k,
+          displayAs: Labels.getDisplayAs(k),
+          badgeText: v.totalUnique.toString(),
+          badgeHoverText: Text.events(v.totalUnique),
+          badgeColor: Colors.getColorForLabel(k)
+        }));
+
+        // Get team labels too
+        _.each(team.team_labels_norm, (norm, i) => {
+          choices.push({
+            id: norm,
+            displayAs: team.team_labels[i],
+            badgeText: undefined,
+            badgeHoverText: undefined,
+            badgeColor: Colors.getColorForLabel(norm)
+          })
+        });
+        choices = _(choices)
+          .uniqBy((c) => c.id)
+          .sortBy((c) => Labels.normalizeForSort(c.displayAs))
+          .value();
+
+        return <Components.ListSelectorASN
+          choices={choices}
+          selected={selected}
+          updateFn={updateFn}
+          allChoice={{
+            displayAs: Text.AllLabels,
+            badgeText: optGroups.totalUnique.toString(),
+            badgeHoverText: Text.events(optGroups.totalUnique),
+          }}
+          noneChoice={{
+            displayAs: Text.Unlabeled,
+            badgeText: optGroups.none ?
+              optGroups.none.totalUnique.toString() : undefined,
+            badgeHoverText: optGroups.none ?
+              Text.events(optGroups.none.totalUnique) : undefined,
+          }}
+          selectedItemClasses="active"
+          className="esper-select-menu"
+          listClasses="esper-select-menu"
+          itemClasses="esper-selectable"
+        />;
+      }
+    })
+  }
+
 
   /*
     NB: LabelSelector is deprecated. Plan is switch over to LabelCalcSelector

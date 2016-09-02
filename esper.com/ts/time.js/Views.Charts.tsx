@@ -17,6 +17,9 @@ module Esper.Views {
 
   interface Props extends Charting.BaseOpts<{}> {
     chart: JSX.Element;
+
+    // Used to render selectors
+    events: Types.TeamEvent[];
     selectors?: JSX.Element|JSX.Element[];
 
     // Other sidebar menus
@@ -300,8 +303,125 @@ module Esper.Views {
     }
 
     renderFilterMenu() {
-      return <div className="filter-menu esper-shade esper-section">
-        Hello
+      let events = this.props.events;
+      let extra = this.props.extra;
+      let cals = Option.matchList(Stores.Calendars.list(this.props.teamId));
+      let team = Stores.Teams.require(this.props.teamId);
+
+      return <div className="filter-menu esper-section esper-shade">
+        <div className="esper-section esper-flex-list">
+          <FilterItem id={this.getId("labels")}
+                      title={Text.ChartLabels}
+                      icon="fa-tags">
+            <Components.LabelCalcDropdownSelector
+              id={this.getId("labels")}
+              team={team}
+              selected={this.props.extra.labels}
+              calculation={new EventStats.LabelCountCalc(events, extra)}
+              updateFn={(x) => this.updateExtra({labels: x})}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("calendars")}
+                      title={Text.ChartCalendars}
+                      icon="fa-calendar-o">
+            <Components.CalCalcDropdownSelector
+              id={this.getId("calendars")}
+              calendars={cals}
+              selectedIds={this.props.calIds}
+              calculation={new EventStats.CalendarCountCalc(events, extra)}
+              updateFn={(calIds) => Charting.updateChart(this.props, {
+                calIds: calIds
+              })}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("domains")}
+                      title={Text.GuestDomains}
+                      icon="fa-at">
+            <Components.DomainCalcDropdownSelector
+              id={this.getId("domains")}
+              selected={extra.domains}
+              calculation={new EventStats.DomainCountCalc(events, extra)}
+              updateFn={(x) => this.updateExtra({
+                domains: x,
+
+                // Guest count none and domain none should be the same
+                guestCounts: _.extend({}, extra.guestCounts, {
+                  none: x.none
+                }) as Params.ListSelectJSON
+              })}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("ratings")}
+                      title={Text.ChartRatings}
+                      icon="fa-star">
+            <Components.RatingCalcDropdownSelector
+              id={this.getId("ratings")}
+              selected={extra.ratings}
+              calculation={new EventStats.RatingCountCalc(events, extra)}
+              updateFn={(x) => this.updateExtra({ratings: x})}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("durations")}
+                      title={Text.ChartDuration}
+                      icon="fa-hourglass">
+            <Components.DurationDropdownSelector
+              id={this.getId("durations")}
+              selected={extra.durations}
+              calculation={new EventStats.DurationBucketCalc(events, extra)}
+              updateFn={(x) => this.updateExtra({durations: x})}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("guest-counts")}
+                      title={Text.ChartGuestsCount}
+                      icon="fa-users">
+            <Components.GuestCountDropdownSelector
+              id={this.getId("guest-counts")}
+              selected={extra.guestCounts}
+              calculation={new EventStats.GuestCountBucketCalc(events, extra)}
+              updateFn={(x) => this.updateExtra({
+                guestCounts: x,
+
+                // Guest count none and domain none should be the same
+                domains: _.extend({}, extra.domains, {
+                  none: x.none
+                }) as Params.ListSelectJSON
+              })}
+            />
+          </FilterItem>
+
+          <FilterItem id={this.getId("weekHours")}
+                      title={Text.WeekHours}
+                      icon="fa-clock-o">
+            <Components.WeekHourDropdownSelector
+              id={this.getId("weekHours")}
+              hours={extra.weekHours}
+              updateHours={(x) => this.updateExtra({ weekHours: x })}
+              showUnscheduled={extra.type === "percent"}
+              unscheduled={extra.incUnscheduled}
+              updateUnscheduled={(x) => this.updateExtra({ incUnscheduled: x })}
+            />
+          </FilterItem>
+
+          {
+            extra.type === "calendar" ? null :
+            <FilterItem id={this.getId("incrs")}
+                        title="Compare With"
+                        icon="fa-flip-horizontal fa-tasks">
+              <Components.RelativePeriodDropdownSelector
+                id={this.getId("incrs")}
+                period={this.props.period}
+                allowedIncrs={[-1, 1]}
+                selectedIncrs={extra.incrs}
+                updateFn={(x) => this.updateExtra({incrs: x })}
+              />
+            </FilterItem>
+          }
+        </div>
       </div>;
     }
 
@@ -320,5 +440,21 @@ module Esper.Views {
         extra: extra
       });
     }
+  }
+
+  // Helper component for filter list items
+  function FilterItem({ id, icon, title, children } : {
+    id?: string;
+    icon?: string;
+    title: string;
+    children?: JSX.Element;
+  }) {
+    return <div className="filter-item esper-section">
+      <label htmlFor={id}>
+        { icon ? <i className={"fa fa-fw fa-left " + icon}  /> : null }
+        { title }
+      </label>
+      { children }
+    </div>;
   }
 }
