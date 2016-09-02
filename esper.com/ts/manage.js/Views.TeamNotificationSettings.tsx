@@ -129,27 +129,29 @@ module Esper.Views {
         </div>
 
         { execTeam ? null :
-          <div>
-            <div className="esper-select-menu esper-panel-section">
-              <div className="esper-selectable"
-                   onClick={() => toggleEmailFeedback(prefs)}>
-                <i className={classNames("fa fa-fw", {
-                  "fa-check-square-o": sendEmail,
-                  "fa-square-o": !sendEmail
-                })} />{" "}
-                { Text.SendFeedbackEmail }
-              </div>
+          <div className="esper-panel-section">
+            <div className="esper-panel-section">
+              <div className="esper-select-menu">
+                <div className="esper-selectable"
+                     onClick={() => toggleEmailFeedback(prefs)}>
+                  <i className={classNames("fa fa-fw", {
+                    "fa-check-square-o": sendEmail,
+                    "fa-square-o": !sendEmail
+                  })} />{" "}
+                  { Text.SendFeedbackEmail }
+                </div>
 
-              <div className="esper-selectable"
-                   onClick={() => toggleSlackFeedback(prefs)}>
-                <i className={classNames("fa fa-fw", {
-                  "fa-check-square-o": sendSlack,
-                  "fa-square-o": !sendSlack
-                })} />{" "}
-                { Text.SendFeedbackSlack }
-              </div>
+                <div className="esper-selectable"
+                     onClick={() => toggleSlackFeedback(prefs)}>
+                  <i className={classNames("fa fa-fw", {
+                    "fa-check-square-o": sendSlack,
+                    "fa-square-o": !sendSlack
+                  })} />{" "}
+                  { Text.SendFeedbackSlack }
+                </div>
 
-              { showSlackError ? <SlackError teamId={team.teamid} /> : null }
+                { showSlackError ? <SlackError teamId={team.teamid} /> : null }
+              </div>
             </div>
             <div className="esper-panel-section">
               <FeedbackTiming prefs={prefs} />
