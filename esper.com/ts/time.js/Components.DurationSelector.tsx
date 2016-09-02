@@ -8,7 +8,7 @@ module Esper.Components {
   export class DurationDropdownSelector
     extends CalcUI<Types.EventOptGrouping, {
       id?: string;
-      calculation: EventStats.DurationBucketCalc;
+      calculation: EventStats.DurationBucketCountCalc;
       selected: Params.ListSelectJSON;
       updateFn: (x: Params.ListSelectJSON) => void;
     }>

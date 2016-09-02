@@ -397,7 +397,9 @@ module Esper.Views {
             <Components.DurationDropdownSelector
               id={this.getId("durations")}
               selected={extra.durations}
-              calculation={new EventStats.DurationBucketCalc(events, extra)}
+              calculation={
+                new EventStats.DurationBucketCountCalc(events, extra)
+              }
               updateFn={(x) => this.updateExtra({durations: x})}
             />
           </FilterItem>
