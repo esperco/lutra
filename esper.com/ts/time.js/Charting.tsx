@@ -21,6 +21,7 @@ module Esper.Charting {
     period?: Period.Single|Period.Custom;
     extra?: ExtraOptsMaybe & T;
     opts?: Route.nav.Opts;
+    reset?: boolean;
   }) {
     var opts = p.opts || {};
     var pathFn = p.pathFn || o.pathFn;
@@ -37,6 +38,14 @@ module Esper.Charting {
     // Team change => Don't preserve filter params, reset cals
     else if (teamId !== o.teamId) {
       calIds = [Params.defaultCalIds];
+    }
+
+    // Reset => clear out everything except type
+    else if (p.reset) {
+      calIds = [Params.defaultCalIds];
+      newExtras = {
+        type: o.extra.type
+      }
     }
 
     // Else merge old extra with new params

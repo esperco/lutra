@@ -16,6 +16,10 @@
       display: inline-block;
     }
   }
+
+  .filter-action .active {
+    color: @brand-success;
+  }
 }
 
 .filter-menu {
@@ -24,6 +28,10 @@
 
   .filter-item {
     label { white-space: nowrap; }
+    &.active label {
+      color: @brand-success;
+    }
+
     min-width: 100%;
     max-width: 100%;
 

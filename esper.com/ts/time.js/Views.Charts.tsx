@@ -34,6 +34,20 @@ module Esper.Views {
     showFilterMenu?: boolean;
   }
 
+  // Which filters are active?
+  interface ActiveFilters {
+    calendars: boolean;
+    incUnscheduled: boolean;
+    incrs: boolean;
+    filterStr: boolean;
+    domains: boolean;
+    durations: boolean;
+    labels: boolean;
+    ratings: boolean;
+    guestCounts: boolean;
+    weekHours: boolean;
+  }
+
   export class Charts extends Component<Props, State> {
     constructor(props: Props) {
       super(props);
@@ -43,6 +57,8 @@ module Esper.Views {
     }
 
     renderWithData() {
+      let filterState = this.getFilterState();
+
       return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-top-menu">
@@ -80,16 +96,20 @@ module Esper.Views {
               updateFn={(p) => this.updatePeriod(p)}
             />
             <div className="actions">
-              <span className="action"
+              <span className="action filter-action"
                     onClick={() => this.toggleFilterMenu()}>
-                <i className={"fa fa-fw " + (
-                  this.state.showFilterMenu ? "fa-close active" : "fa-filter"
-                )} />
+                <i className={classNames("fa fa-fw", {
+                  "fa-close": this.state.showFilterMenu,
+                  "fa-filter": !this.state.showFilterMenu,
+                  "active": _.some(_.values(filterState)) &&
+                            !this.state.showFilterMenu
+                })} />
               </span>
             </div>
           </div>
           <div id="chart-expanded" className="esper-expanded">
-            { this.state.showFilterMenu ? this.renderFilterMenu() : null }
+            { this.state.showFilterMenu ?
+              this.renderFilterMenu(filterState) : null }
             { this.props.chart }
           </div>
         </div>
@@ -302,15 +322,17 @@ module Esper.Views {
       </button>
     }
 
-    renderFilterMenu() {
+    renderFilterMenu(active: ActiveFilters) {
       let events = this.props.events;
       let extra = this.props.extra;
       let cals = Option.matchList(Stores.Calendars.list(this.props.teamId));
       let team = Stores.Teams.require(this.props.teamId);
+      let anyActive = _.some(_.values(active));
 
       return <div className="filter-menu esper-section esper-shade">
         <div className="esper-section esper-flex-list">
           <FilterItem id={this.getId("labels")}
+                      active={active.labels}
                       title={Text.ChartLabels}
                       icon="fa-tags">
             <Components.LabelCalcDropdownSelector
@@ -323,6 +345,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("calendars")}
+                      active={active.calendars}
                       title={Text.ChartCalendars}
                       icon="fa-calendar-o">
             <Components.CalCalcDropdownSelector
@@ -337,6 +360,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("domains")}
+                      active={active.domains}
                       title={Text.GuestDomains}
                       icon="fa-at">
             <Components.DomainCalcDropdownSelector
@@ -355,6 +379,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("ratings")}
+                      active={active.ratings}
                       title={Text.ChartRatings}
                       icon="fa-star">
             <Components.RatingCalcDropdownSelector
@@ -366,6 +391,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("durations")}
+                      active={active.durations}
                       title={Text.ChartDuration}
                       icon="fa-hourglass">
             <Components.DurationDropdownSelector
@@ -377,6 +403,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("guest-counts")}
+                      active={active.guestCounts}
                       title={Text.ChartGuestsCount}
                       icon="fa-users">
             <Components.GuestCountDropdownSelector
@@ -395,6 +422,7 @@ module Esper.Views {
           </FilterItem>
 
           <FilterItem id={this.getId("weekHours")}
+                      active={active.weekHours || active.incUnscheduled}
                       title={Text.WeekHours}
                       icon="fa-clock-o">
             <Components.WeekHourDropdownSelector
@@ -410,6 +438,7 @@ module Esper.Views {
           {
             extra.type === "calendar" ? null :
             <FilterItem id={this.getId("incrs")}
+                        active={active.incrs}
                         title="Compare With"
                         icon="fa-flip-horizontal fa-tasks">
               <Components.RelativePeriodDropdownSelector
@@ -422,6 +451,12 @@ module Esper.Views {
             </FilterItem>
           }
         </div>
+
+        { anyActive ? <div className="esper-section text-center action"
+             onClick={() => this.resetFilters()}>
+          <i className="fa fa-fw fa-left fa-refresh" />
+          { Text.ResetFilters }
+        </div> : null }
       </div>;
     }
 
@@ -429,10 +464,37 @@ module Esper.Views {
       this.mutateState((s) => s.showFilterMenu = !s.showFilterMenu);
     }
 
+    // Returns which filters are active / not-active
+    getFilterState(): ActiveFilters {
+      let defaults = Charting.cleanExtra({}, this.props.pathFn);
+      let current = this.props.extra;
+      let team = Stores.Teams.require(this.props.teamId);
+      return {
+        calendars: !_.isEqual(this.props.calIds.length,
+          team.team_timestats_calendars.length),
+        incUnscheduled: !_.isEqual(
+          defaults.incUnscheduled,
+          current.incUnscheduled
+        ),
+        incrs: !_.isEqual(defaults.incrs, current.incrs),
+        filterStr: !_.isEqual(defaults.filterStr, current.filterStr),
+        domains: !_.isEqual(defaults.domains, current.domains),
+        durations: !_.isEqual(defaults.durations, current.durations),
+        labels: !_.isEqual(defaults.labels, current.labels),
+        ratings: !_.isEqual(defaults.ratings, current.ratings),
+        guestCounts: !_.isEqual(defaults.guestCounts, current.guestCounts),
+        weekHours: !_.isEqual(defaults.weekHours, current.weekHours)
+      };
+    }
+
     updatePeriod(period: Period.Single|Period.Custom) {
       Charting.updateChart(this.props, {
         period: period
       });
+    }
+
+    resetFilters() {
+      Charting.updateChart(this.props, { reset: true });
     }
 
     updateExtra(extra: Charting.ExtraOptsMaybe) {
@@ -443,13 +505,16 @@ module Esper.Views {
   }
 
   // Helper component for filter list items
-  function FilterItem({ id, icon, title, children } : {
+  function FilterItem({ id, icon, active, title, children } : {
     id?: string;
     icon?: string;
+    active?: boolean;
     title: string;
     children?: JSX.Element;
   }) {
-    return <div className="filter-item esper-section">
+    return <div className={classNames("filter-item esper-section", {
+      active: active
+    })}>
       <label htmlFor={id}>
         { icon ? <i className={"fa fa-fw fa-left " + icon}  /> : null }
         { title }

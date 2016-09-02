@@ -104,6 +104,7 @@ module Esper.Text {
   export const SomeWeekHours = `Limited Times of Week`;
   export const IncUnscheduled = `Show Unscheduled Time`;
 
+  export const ResetFilters = `Reset Filters`;
 
   // Period selector text
   export const Week = `Week`;
