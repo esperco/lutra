@@ -20,7 +20,7 @@ module Esper.Views {
         addPermission = true;
       return <div className="panel panel-default">
         <div className="panel-body">
-          <Components.LabelManager getLabels={this.getLabels(group)}
+          <Components.LabelManager getLabelInfos={this.getLabelInfos(group)}
             addLabel={this.addLabel(group)} archiveFn={this.archive(group)}
             removeLabel={this.removeLabel(group)} renameLabel={this.renameLabel(group)}
             addPermission={addPermission} />
@@ -28,9 +28,9 @@ module Esper.Views {
       </div>;
     }
 
-    getLabels(group: ApiT.Group): () => string[] {
+    getLabelInfos(group: ApiT.Group): () => ApiT.LabelInfo[] {
       return function() {
-        return Labels.sortLabelStrs(group.group_labels);
+        return Labels.sortLabelInfos(group.group_labels);
       };
     }
 

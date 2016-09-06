@@ -31,11 +31,9 @@ module Esper.Stores.Events {
       it("should convert hashtags to labels", function() {
         let event = TestFixtures.makeGenericCalendarEvent({
           hashtags: [{
-            hashtag: "#Floats",
-            hashtag_norm: "#floats"
+            hashtag: { original: "#Floats", normalized: "#floats" }
           }, {
-            hashtag: "#Sinks",
-            hashtag_norm: "#sinks"
+            hashtag: { original: "#Sinks", normalized: "#sinks"}
           }]
         });
         let teamEvent = asTeamEvent("team-id", event);
@@ -59,19 +57,13 @@ module Esper.Stores.Events {
          function() {
         let event = TestFixtures.makeGenericCalendarEvent({
           predicted_labels: [{
-            label: TestFixtures.team1Labels[0],
-            label_norm: TestFixtures
-              .normalizeLabel(TestFixtures.team1Labels[0]),
+            label: TestFixtures.team1LabelInfos[0],
             score: 0.8
           }, {
-            label: TestFixtures.team1Labels[1],
-            label_norm: TestFixtures
-              .normalizeLabel(TestFixtures.team1Labels[1]),
+            label: TestFixtures.team1LabelInfos[1],
             score: 0.4
           }, {
-            label: TestFixtures.team1Labels[2],
-            label_norm: TestFixtures
-              .normalizeLabel(TestFixtures.team1Labels[2]),
+            label: TestFixtures.team1LabelInfos[2],
             score: 0.5
           }]
         });
@@ -82,14 +74,14 @@ module Esper.Stores.Events {
         let labelScores = teamEvent.labelScores.unwrap();
         expect(labelScores.length).toEqual(2);
         expect(labelScores).toContain({
-          id: TestFixtures.normalizeLabel(TestFixtures.team1Labels[0]),
-          displayAs: TestFixtures.team1Labels[0],
+          id: TestFixtures.team1LabelInfos[0].normalized,
+          displayAs: TestFixtures.team1LabelInfos[0].original,
           // 0.8 * 0.95 (PREDICTED_LABEL_MODIFIER)
           score: 0.76
         });
         expect(labelScores).toContain({
-          id: TestFixtures.normalizeLabel(TestFixtures.team1Labels[2]),
-          displayAs: TestFixtures.team1Labels[2],
+          id: TestFixtures.team1LabelInfos[2].normalized,
+          displayAs: TestFixtures.team1LabelInfos[2].original,
           // 0.5 * 0.95 (PREDICTED_LABEL_MODIFIER)
           score: 0.475
         });
@@ -119,8 +111,7 @@ module Esper.Stores.Events {
           TestFixtures.makeGenericCalendarEvent({
             predicted_attended: 0.4,
             predicted_labels: [{ // Label gets ignored
-              label: "Label",
-              label_norm: "label",
+              label: { original: "Label" },
               score: 0.9
             }]
           })
@@ -158,10 +149,8 @@ module Esper.Stores.Events {
             predicted_attended: 0.4,
             transparent: true,
             hashtags: [{
-              hashtag: "#Label",
-              hashtag_norm: "#label",
-              label: "Label",
-              label_norm: "label"
+              hashtag: { original: "#Label", normalized: "#label" },
+              label: { original: "Label" }
             }]
           })
         );
@@ -175,8 +164,7 @@ module Esper.Stores.Events {
             predicted_attended: 0.4,
             transparent: true,
             hashtags: [{
-              hashtag: "#Label",
-              hashtag_norm: "#label"
+              hashtag: { original: "#Label", normalized: "#label" }
             }]
           })
         );
@@ -189,8 +177,7 @@ module Esper.Stores.Events {
             predicted_attended: 0.4,
             transparent: true,
             hashtags: [{
-              hashtag: "#Label",
-              hashtag_norm: "#label",
+              hashtag: { original: "#Label", normalized: "#label" },
               approved: true
             }]
           })
@@ -221,10 +208,8 @@ module Esper.Stores.Events {
             predicted_attended: 0.01,
             transparent: true,
             labels: ["Label"],
-            labels_norm: ["label"],
             hashtags: [{
-              hashtag: "#Label2",
-              hashtag_norm: "#label2",
+              hashtag: { original: "#Label2", normalized: "#label2" },
               approved: true
             }],
             feedback: {
@@ -244,8 +229,7 @@ module Esper.Stores.Events {
         var e = asTeamEvent(TestFixtures.teamId1,
           TestFixtures.makeGenericCalendarEvent({
             predicted_labels: [{ // Label gets ignored
-              label: "Label",
-              label_norm: "label",
+              label: { original: "Label" },
               score: 0.9
             }],
             feedback: {
@@ -292,8 +276,7 @@ module Esper.Stores.Events {
             labels: ["Label"],
             labels_norm: ["label"],
             hashtags: [{
-              hashtag: "#Label2",
-              hashtag_norm: "#label2"
+              hashtag: { original: "#Label2", normalized: "#label2" }
             }],
             feedback: {
               teamid: TestFixtures.teamId1,
@@ -313,8 +296,7 @@ module Esper.Stores.Events {
             labels: ["Label"],
             labels_norm: ["label"],
             hashtags: [{
-              hashtag: "#Label2",
-              hashtag_norm: "#label2",
+              hashtag: { original: "#Label2", normalized: "#label2" },
               approved: true
             }],
             feedback: {

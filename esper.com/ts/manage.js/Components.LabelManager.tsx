@@ -6,7 +6,7 @@ module Esper.Components {
   /* Label manager component used in above view */
 
   interface Props {
-    getLabels: () => string[];
+    getLabelInfos: () => ApiT.LabelInfo[];
     addLabel: (label: string) => any;
     archiveFn: (label: string) => any;
     removeLabel: (label: string) => any;
@@ -30,7 +30,7 @@ module Esper.Components {
     }
 
     render() {
-      var labels = this.props.getLabels();
+      var labels = this.props.getLabelInfos();
       return <div>
         { this.renderLabelInput() }
         {
@@ -121,14 +121,14 @@ module Esper.Components {
       }
     }
 
-    renderLabel(label: string) {
+    renderLabel(label: ApiT.LabelInfo) {
       var rmLabel = this.state.rmLabelPrompt &&
                     this.state.rmLabelPrompt.toLowerCase();
-      if (label.toLowerCase() === rmLabel) {
-        return <div className="list-group-item" key={label}>
+      if (label.original.toLowerCase() === rmLabel) {
+        return <div className="list-group-item" key={label.original}>
           <div className="form-group">
             Are you sure you want to remove the
-            {" "}<strong>{label}</strong>{" "}
+            {" "}<strong>{label.original}</strong>{" "}
             {Text.Label.toLowerCase()} from all events? This cannot be undone.
           </div>
           <div className="row">
@@ -140,7 +140,7 @@ module Esper.Components {
             </div>
             <div className="col-xs-6">
               <button className="btn btn-danger form-control" type="button"
-                      onClick={() => this.rmLabel(label)}>
+                      onClick={() => this.rmLabel(label.original)}>
                 Remove
               </button>
             </div>
@@ -150,12 +150,12 @@ module Esper.Components {
 
       var editLabel = this.state.editLabel &&
                       this.state.editLabel.toLowerCase();
-      if (label.toLowerCase() === editLabel) {
-        return <div className="list-group-item one-line" key={label}>
+      if (label.original.toLowerCase() === editLabel) {
+        return <div className="list-group-item one-line" key={label.original}>
           <div className="form-group">
             <input ref={ (c) => this._editInput = c }
                    onKeyDown={this.editInputKeydown.bind(this)}
-                   className="form-control" defaultValue={label}/>
+                   className="form-control" defaultValue={label.original}/>
           </div>
           <div className="row">
             <div className="col-xs-6">
@@ -175,26 +175,26 @@ module Esper.Components {
       }
 
       if (this.state.labelFilter &&
-          ! _.includes(label.toLowerCase(),
+          ! _.includes(label.original.toLowerCase(),
                        this.state.labelFilter.toLowerCase())) {
         return null;
       }
 
-      return <div className="list-group-item one-line" key={label}>
+      return <div className="list-group-item one-line" key={label.original}>
         <i className="fa fa-fw fa-tag" />
-        {" "}{label}{" "}
+        {" "}{label.original}{" "}
         { this.props.addPermission ?
           <span>
             <a className="pull-right text-danger" title="Delete"
-               onClick={(e) => this.promptRmFor(label)}>
+               onClick={(e) => this.promptRmFor(label.original)}>
               <i className="fa fa-fw fa-trash list-group-item-text" />
             </a>
             <a className="pull-right text-info" title="Archive"
-               onClick={(e) => this.archive(label)}>
+               onClick={(e) => this.archive(label.original)}>
               <i className="fa fa-fw fa-archive list-group-item-text" />
             </a>
             <a className="pull-right text-info" title="Edit"
-               onClick={(e) => this.showEditFor(label)}>
+               onClick={(e) => this.showEditFor(label.original)}>
               <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
           </span> : null

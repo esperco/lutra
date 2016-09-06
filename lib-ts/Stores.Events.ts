@@ -31,20 +31,19 @@ module Esper.Stores.Events {
         _(e.hashtags)
           .filter((h) => h.approved !== false)
           .map((h) => ({
-            id: h.label_norm || h.hashtag_norm,
-            displayAs: h.label || h.hashtag,
+            id: h.label ? h.label.normalized : h.hashtag.normalized,
+            displayAs: h.label ? h.label.original : h.hashtag.original,
             score: 1
           }))
           .value();
 
-      if (e.labels_norm) {
-        let labels = _(e.labels_norm)
-          .map((n, i) => {
-            let [norm, display] = [n, e.labels[i]];
-            Labels.storeMapping({ norm: norm, display: display });
+      if (e.labels) {
+        let labels = _(e.labels)
+          .map((l) => {
+            Labels.storeMapping({ norm: l.normalized, display: l.original });
             return {
-              id: norm,
-              displayAs: display,
+              id: l.normalized,
+              displayAs: l.original,
               score: 1
             };
           })
@@ -57,13 +56,13 @@ module Esper.Stores.Events {
         let team = Teams.require(teamId);
         if (team) {
           let labels = _.filter(e.predicted_labels,
-            (l) => _.includes(team.team_labels_norm, l.label_norm));
+            (l) => _.includes(team.team_api.team_labels, l.label));
           if (labels.length) {
             let labelsAboveThreshold = _(labels)
               .filter((l) => l.score >= PREDICTED_LABEL_PERCENT_CUTOFF)
               .map((l) => ({
-                id: l.label_norm,
-                displayAs: l.label,
+                id: l.label.normalized,
+                displayAs: l.label.original,
                 score: l.score * PREDICTED_LABEL_MODIFIER
               })).value();
 
@@ -88,7 +87,7 @@ module Esper.Stores.Events {
     */
     let attendScore = _.isNumber(e.predicted_attended) ?
       e.predicted_attended : (e.transparent ? 0.1 : 0.9);
-    if (e.labels || _.some(e.hashtags, (h) => h.approved || !!h.label_norm)) {
+    if (e.labels || _.some(e.hashtags, (h) => h.approved || !!h.label)) {
       attendScore = 1;
     }
     if (e.feedback && _.isBoolean(e.feedback.attended)) {

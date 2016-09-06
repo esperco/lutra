@@ -165,9 +165,11 @@ module Esper.Actions.Teams {
     var team = Stores.Teams.require(_id);
     if (! team) return;
 
-    var newLabels = _.filter(team.team_labels,
-      (l) => !_.includes(rmLabels, l)
-    );
+    var newLabels = _(team.team_api.team_labels)
+      .map((labelInfo) => labelInfo.original)
+      .filter(
+        (l) => !_.includes(rmLabels, l)
+      ).value();
     newLabels = newLabels.concat(addLabels);
 
     // Remove duplicates based on normalization
@@ -202,13 +204,15 @@ module Esper.Actions.Teams {
     */
     labels = _.sortBy(labels, Labels.normalizeForSort);
 
+    var teamLabels = _.map(team.team_api.team_labels, (i) => i.normalized);
     // Don't do anything if no change
-    if (_.isEqual(team.team_labels, labels)) {
+    if (_.isEqual(teamLabels, labels)) {
       return $.Deferred<void>().resolve().promise();
     }
 
-    teamCopy.team_labels = labels;
-    teamCopy.team_labels_norm = _.map(labels, Labels.getNorm);
+    teamCopy.team_api.team_labels = _.map(labels, (l) => ({
+      original: l
+    }));
 
     var p = LabelUpdateQueue.enqueue(_id, {
       teamId: _id,

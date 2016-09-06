@@ -347,9 +347,11 @@ module Esper.Actions.Groups {
     var group = Stores.Groups.require(_id);
     if (! group) return;
 
-    var newLabels = _.filter(group.group_labels,
-      (l) => !_.includes(rmLabels, l)
-    );
+    var newLabels = _(group.group_labels)
+      .map((labelInfo) => labelInfo.original)
+      .filter(
+        (l) => !_.includes(rmLabels, l)
+      ).value();
     newLabels = newLabels.concat(addLabels);
 
     // Remove duplicates based on normalization
@@ -379,8 +381,9 @@ module Esper.Actions.Groups {
     */
     labels = _.sortBy(labels, Labels.normalizeForSort);
 
-    groupCopy.group_labels = labels;
-    groupCopy.group_labels_norm = _.map(labels, Stores.Groups.getNormLabel);
+    groupCopy.group_labels = _.map(labels, (l) => ({
+      original: l
+    }));
 
     var p = LabelUpdateQueue.enqueue(_id, {
       groupId: _id,

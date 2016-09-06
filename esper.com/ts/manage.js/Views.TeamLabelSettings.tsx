@@ -13,7 +13,7 @@ module Esper.Views {
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">
         <div className="panel-body">
-          <Components.LabelManager getLabels={this.getLabels(team)}
+          <Components.LabelManager getLabelInfos={this.getLabelInfos(team)}
             addLabel={this.addLabel(team)} archiveFn={this.archive(team)}
             removeLabel={this.removeLabel(team)} renameLabel={this.renameLabel(team)}
             addPermission={true} />
@@ -21,9 +21,9 @@ module Esper.Views {
       </div>;
     }
 
-    getLabels(team: ApiT.Team): () => string[] {
+    getLabelInfos(team: ApiT.Team): () => ApiT.LabelInfo[] {
       return function() {
-        return Labels.sortLabelStrs(team.team_labels);
+        return Labels.sortLabelInfos(team.team_api.team_labels);
       };
     }
 
