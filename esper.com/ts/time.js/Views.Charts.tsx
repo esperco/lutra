@@ -305,8 +305,40 @@ module Esper.Views {
           />
         </div>
 
-        { this.props.selectors }
+        <div className="esper-panel-section">
+          { this.renderPrimarySelector() }
+        </div>
       </div>;
+    }
+
+    renderPrimarySelector() {
+      let events = this.props.events;
+      let extra = this.props.extra;
+      return Charting.matchPrimary(this.props.pathFn, {
+        labels: () => <Components.LabelCalcSelector
+          { ...this.labelSelectorProps() }
+        />,
+
+        calendars: () => <Components.CalCalcSelector
+          { ...this.calSelectorProps() }
+        />,
+
+        domains: () => <Components.DomainCalcSelector
+          { ...this.domainSelectorProps() }
+        />,
+
+        durations: () => <Components.DurationSelector
+          { ...this.durationProps() }
+        />,
+
+        guestCounts: () => <Components.GuestCountSelector
+           { ...this.guestCountProps() }
+        />,
+
+        ratings: () => <Components.RatingCalcSelector
+          { ...this.ratingProps() }
+        />
+      });
     }
 
     renderTypeButton(
@@ -325,103 +357,78 @@ module Esper.Views {
     renderFilterMenu(active: ActiveFilters) {
       let events = this.props.events;
       let extra = this.props.extra;
-      let cals = Option.matchList(Stores.Calendars.list(this.props.teamId));
-      let team = Stores.Teams.require(this.props.teamId);
       let anyActive = _.some(_.values(active));
+
+      let groupSelectors = Charting.minusPrimary(this.props.pathFn, {
+        labels: () => <FilterItem id={this.getId("labels")}
+                    active={active.labels}
+                    title={Text.ChartLabels}
+                    icon="fa-tags">
+          <Components.LabelCalcDropdownSelector
+            id={this.getId("labels")}
+            { ...this.labelSelectorProps() }
+          />
+        </FilterItem>,
+
+        calendars: () => <FilterItem id={this.getId("calendars")}
+                    active={active.calendars}
+                    title={Text.ChartCalendars}
+                    icon="fa-calendar-o">
+          <Components.CalCalcDropdownSelector
+            id={this.getId("calendars")}
+            { ...this.calSelectorProps() }
+          />
+        </FilterItem>,
+
+        domains: () => <FilterItem id={this.getId("domains")}
+                    active={active.domains}
+                    title={Text.GuestDomains}
+                    icon="fa-at">
+          <Components.DomainCalcDropdownSelector
+            id={this.getId("domains")}
+            { ...this.domainSelectorProps() }
+          />
+        </FilterItem>,
+
+        durations: () => <FilterItem id={this.getId("durations")}
+                    active={active.durations}
+                    title={Text.ChartDuration}
+                    icon="fa-hourglass">
+          <Components.DurationDropdownSelector
+            id={this.getId("durations")}
+            { ...this.durationProps() }
+          />
+        </FilterItem>,
+
+        guestCounts: () => <FilterItem id={this.getId("guest-counts")}
+                    active={active.guestCounts}
+                    title={Text.ChartGuestsCount}
+                    icon="fa-users">
+          <Components.GuestCountDropdownSelector
+            id={this.getId("guest-counts")}
+            { ...this.guestCountProps() }
+          />
+        </FilterItem>,
+
+        ratings: () => <FilterItem id={this.getId("ratings")}
+                    active={active.ratings}
+                    title={Text.ChartRatings}
+                    icon="fa-star">
+          <Components.RatingCalcDropdownSelector
+            id={this.getId("ratings")}
+            { ...this.ratingProps() }
+          />
+        </FilterItem>
+      });
 
       return <div className="filter-menu esper-section esper-shade">
         <div className="esper-section esper-flex-list">
-          <FilterItem id={this.getId("labels")}
-                      active={active.labels}
-                      title={Text.ChartLabels}
-                      icon="fa-tags">
-            <Components.LabelCalcDropdownSelector
-              id={this.getId("labels")}
-              team={team}
-              selected={this.props.extra.labels}
-              calculation={new EventStats.LabelCountCalc(events, extra)}
-              updateFn={(x) => this.updateExtra({labels: x})}
-            />
-          </FilterItem>
-
-          <FilterItem id={this.getId("calendars")}
-                      active={active.calendars}
-                      title={Text.ChartCalendars}
-                      icon="fa-calendar-o">
-            <Components.CalCalcDropdownSelector
-              id={this.getId("calendars")}
-              calendars={cals}
-              selectedIds={this.props.calIds}
-              calculation={new EventStats.CalendarCountCalc(events, extra)}
-              updateFn={(calIds) => Charting.updateChart(this.props, {
-                calIds: calIds
-              })}
-            />
-          </FilterItem>
-
-          <FilterItem id={this.getId("domains")}
-                      active={active.domains}
-                      title={Text.GuestDomains}
-                      icon="fa-at">
-            <Components.DomainCalcDropdownSelector
-              id={this.getId("domains")}
-              selected={extra.domains}
-              calculation={new EventStats.DomainCountCalc(events, extra)}
-              updateFn={(x) => this.updateExtra({
-                domains: x,
-
-                // Guest count none and domain none should be the same
-                guestCounts: _.extend({}, extra.guestCounts, {
-                  none: x.none
-                }) as Params.ListSelectJSON
-              })}
-            />
-          </FilterItem>
-
-          <FilterItem id={this.getId("ratings")}
-                      active={active.ratings}
-                      title={Text.ChartRatings}
-                      icon="fa-star">
-            <Components.RatingCalcDropdownSelector
-              id={this.getId("ratings")}
-              selected={extra.ratings}
-              calculation={new EventStats.RatingCountCalc(events, extra)}
-              updateFn={(x) => this.updateExtra({ratings: x})}
-            />
-          </FilterItem>
-
-          <FilterItem id={this.getId("durations")}
-                      active={active.durations}
-                      title={Text.ChartDuration}
-                      icon="fa-hourglass">
-            <Components.DurationDropdownSelector
-              id={this.getId("durations")}
-              selected={extra.durations}
-              calculation={
-                new EventStats.DurationBucketCountCalc(events, extra)
-              }
-              updateFn={(x) => this.updateExtra({durations: x})}
-            />
-          </FilterItem>
-
-          <FilterItem id={this.getId("guest-counts")}
-                      active={active.guestCounts}
-                      title={Text.ChartGuestsCount}
-                      icon="fa-users">
-            <Components.GuestCountDropdownSelector
-              id={this.getId("guest-counts")}
-              selected={extra.guestCounts}
-              calculation={new EventStats.GuestCountBucketCalc(events, extra)}
-              updateFn={(x) => this.updateExtra({
-                guestCounts: x,
-
-                // Guest count none and domain none should be the same
-                domains: _.extend({}, extra.domains, {
-                  none: x.none
-                }) as Params.ListSelectJSON
-              })}
-            />
-          </FilterItem>
+          { groupSelectors.labels.unwrapNull() }
+          { groupSelectors.calendars.unwrapNull() }
+          { groupSelectors.domains.unwrapNull() }
+          { groupSelectors.ratings.unwrapNull() }
+          { groupSelectors.durations.unwrapNull() }
+          { groupSelectors.guestCounts.unwrapNull() }
 
           <FilterItem id={this.getId("weekHours")}
                       active={active.weekHours || active.incUnscheduled}
@@ -471,9 +478,9 @@ module Esper.Views {
       let defaults = Charting.cleanExtra({}, this.props.pathFn);
       let current = this.props.extra;
       let team = Stores.Teams.require(this.props.teamId);
-      return {
-        calendars: !_.isEqual(this.props.calIds.length,
-          team.team_timestats_calendars.length),
+      let ret = {
+        calendars: !_.isEqual(
+          this.props.calIds.length, team.team_timestats_calendars.length),
         incUnscheduled: !_.isEqual(
           defaults.incUnscheduled,
           current.incUnscheduled
@@ -487,7 +494,104 @@ module Esper.Views {
         guestCounts: !_.isEqual(defaults.guestCounts, current.guestCounts),
         weekHours: !_.isEqual(defaults.weekHours, current.weekHours)
       };
+
+      // Ignore filter for primary group
+      Charting.matchPrimary(this.props.pathFn, {
+        labels: () => delete ret.labels,
+        calendars: () => delete ret.calendars,
+        domains: () => delete ret.domains,
+        guestCounts: () => delete ret.guestCounts,
+        ratings: () => delete ret.ratings,
+        durations: () => delete ret.durations
+      });
+
+      return ret;
     }
+
+
+    /* Returns properties for selectors */
+
+    labelSelectorProps() {
+      return {
+        team: Stores.Teams.require(this.props.teamId),
+        selected: this.props.extra.labels,
+        calculation: new EventStats.LabelCountCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({labels: x})
+      };
+    }
+
+    calSelectorProps() {
+      let cals = Option.matchList(Stores.Calendars.list(this.props.teamId));
+      return {
+        calendars: cals,
+        selectedIds: this.props.calIds,
+        calculation: new EventStats.CalendarCountCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (calIds: string[]) => Charting.updateChart(this.props, {
+          calIds: calIds
+        })
+      };
+    }
+
+    domainSelectorProps() {
+      return {
+        selected: this.props.extra.domains,
+        calculation: new EventStats.DomainCountCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({
+          domains: x,
+
+          // Guest count none and domain none should be the same
+          guestCounts: _.extend({}, this.props.extra.guestCounts, {
+            none: x.none
+          }) as Params.ListSelectJSON
+        })
+      };
+    }
+
+    ratingProps() {
+      return {
+        selected: this.props.extra.ratings,
+        calculation: new EventStats.RatingCountCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({ratings: x})
+      };
+    }
+
+    durationProps() {
+      return {
+        selected: this.props.extra.durations,
+        calculation: new EventStats.DurationBucketCountCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({durations: x})
+      };
+    }
+
+    guestCountProps() {
+      return {
+        selected: this.props.extra.guestCounts,
+        calculation: new EventStats.GuestCountBucketCalc(
+          this.props.events, this.props.extra
+        ),
+        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({
+          guestCounts: x,
+
+          // Guest count none and domain none should be the same
+          domains: _.extend({}, this.props.extra.domains, {
+            none: x.none
+          }) as Params.ListSelectJSON
+        })
+      };
+    }
+
+
+    /* Action functions */
 
     updatePeriod(period: Period.Single|Period.Custom) {
       Charting.updateChart(this.props, {
@@ -495,8 +599,29 @@ module Esper.Views {
       });
     }
 
+    /*
+      NB: Resetting filters should reset actual props used as filters,
+      not the primary grouping attribute
+    */
     resetFilters() {
-      Charting.updateChart(this.props, { reset: true });
+      Charting.updateChart(this.props, {
+        reset: true,
+        calIds: this.props.pathFn === Paths.Time.calendarsChart ?
+          this.props.calIds : undefined,
+        extra: {
+          type: this.props.extra.type,
+          labels: this.props.pathFn === Paths.Time.labelsChart ?
+            this.props.extra.labels : undefined,
+          domains: this.props.pathFn === Paths.Time.guestsChart ?
+            this.props.extra.domains : undefined,
+          guestCounts: this.props.pathFn === Paths.Time.guestsCountChart ?
+            this.props.extra.labels : undefined,
+          ratings: this.props.pathFn === Paths.Time.ratingsChart ?
+            this.props.extra.labels : undefined,
+          durations: this.props.pathFn === Paths.Time.durationsChart ?
+            this.props.extra.durations : undefined
+        }
+      });
     }
 
     updateExtra(extra: Charting.ExtraOptsMaybe) {

@@ -5,7 +5,8 @@
 /// <reference path="./Components.CalcUI.tsx" />
 
 module Esper.Components {
-  export class DomainCalcDropdownSelector
+
+  export class DomainCalcSelector
     extends CalcUI<Types.EventOptGrouping, {
       id?: string;
       calculation: EventStats.DomainCountCalc;
@@ -13,6 +14,45 @@ module Esper.Components {
       updateFn: (x: Params.ListSelectJSON) => void;
     }>
   {
+    render() {
+      return this.state.result.match({
+        none: () => <span>{ Text.UICalculating }</span>,
+        some: (optGroups) => {
+          var choices = _.map(optGroups.some, (v, k) => ({
+            id: k,
+            displayAs: k,
+            badgeText: v.totalUnique.toString(),
+            badgeHoverText: Text.events(v.totalUnique),
+            badgeColor: Colors.getColorForDomain(k)
+          }));
+
+          return <Components.ListSelectorASN
+            choices={choices}
+            selected={this.props.selected}
+            updateFn={this.props.updateFn}
+            allChoice={{
+              displayAs: Text.SelectAll,
+              badgeText: optGroups.totalUnique.toString(),
+              badgeHoverText: Text.events(optGroups.totalUnique),
+            }}
+            noneChoice={{
+              displayAs: Text.NoGuests,
+              badgeText: optGroups.none ?
+                optGroups.none.totalUnique.toString() : undefined,
+              badgeHoverText: optGroups.none ?
+                Text.events(optGroups.none.totalUnique) : undefined,
+            }}
+            selectedItemClasses="active"
+            className="esper-select-menu"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+          />;
+        }
+      });
+    }
+  }
+
+  export class DomainCalcDropdownSelector extends DomainCalcSelector {
     render() {
       // Dropdown input text
       let selectedText = (() => {
@@ -34,54 +74,9 @@ module Esper.Components {
           { selectedText }
         </Selector>
         <div className="dropdown-menu">
-          <DomainListSelector
-            result={this.state.result}
-            selected={this.props.selected}
-            updateFn={this.props.updateFn}
-          />
+          { super.render() }
         </div>
       </Dropdown>;
     }
-  }
-
-  function DomainListSelector({result, selected, updateFn} : {
-    result: Option.T<Types.EventOptGrouping>;
-    selected: Params.ListSelectJSON;
-    updateFn: (x: Params.ListSelectJSON) => void;
-  }) {
-    return result.match({
-      none: () => <span>{ Text.UICalculating }</span>,
-      some: (optGroups) => {
-        var choices = _.map(optGroups.some, (v, k) => ({
-          id: k,
-          displayAs: k,
-          badgeText: v.totalUnique.toString(),
-          badgeHoverText: Text.events(v.totalUnique),
-          badgeColor: Colors.getColorForDomain(k)
-        }));
-
-        return <Components.ListSelectorASN
-          choices={choices}
-          selected={selected}
-          updateFn={updateFn}
-          allChoice={{
-            displayAs: Text.SelectAll,
-            badgeText: optGroups.totalUnique.toString(),
-            badgeHoverText: Text.events(optGroups.totalUnique),
-          }}
-          noneChoice={{
-            displayAs: Text.NoGuests,
-            badgeText: optGroups.none ?
-              optGroups.none.totalUnique.toString() : undefined,
-            badgeHoverText: optGroups.none ?
-              Text.events(optGroups.none.totalUnique) : undefined,
-          }}
-          selectedItemClasses="active"
-          className="esper-select-menu"
-          listClasses="esper-select-menu"
-          itemClasses="esper-selectable"
-        />;
-      }
-    });
   }
 }

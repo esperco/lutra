@@ -5,15 +5,67 @@
 /// <reference path="./Components.CalcUI.tsx" />
 
 module Esper.Components {
-  export class LabelCalcDropdownSelector
-    extends CalcUI<Types.EventOptGrouping, {
-      id?: string;
-      calculation: EventStats.LabelCountCalc;
-      team: ApiT.Team;
-      selected: Params.ListSelectJSON;
-      updateFn: (x: Params.ListSelectJSON) => void;
-    }>
-  {
+  export class LabelCalcSelector extends CalcUI<Types.EventOptGrouping, {
+    id?: string;
+    calculation: EventStats.LabelCountCalc;
+    team: ApiT.Team;
+    selected: Params.ListSelectJSON;
+    updateFn: (x: Params.ListSelectJSON) => void;
+  }> {
+    render() {
+      return this.state.result.match({
+        none: () => <span>{ Text.UICalculating }</span>,
+        some: (optGroups) => {
+          var choices = _.map(optGroups.some, (v, k) => ({
+            id: k,
+            displayAs: Labels.getDisplayAs(k),
+            badgeText: v.totalUnique.toString(),
+            badgeHoverText: Text.events(v.totalUnique),
+            badgeColor: Colors.getColorForLabel(k)
+          }));
+
+          // Get team labels too
+          _.each(this.props.team.team_labels_norm, (norm, i) => {
+            choices.push({
+              id: norm,
+              displayAs: this.props.team.team_labels[i],
+              badgeText: undefined,
+              badgeHoverText: undefined,
+              badgeColor: Colors.getColorForLabel(norm)
+            })
+          });
+          choices = _(choices)
+            .uniqBy((c) => c.id)
+            .sortBy((c) => Labels.normalizeForSort(c.displayAs))
+            .value();
+
+          return <Components.ListSelectorASN
+            choices={choices}
+            selected={this.props.selected}
+            updateFn={this.props.updateFn}
+            allChoice={{
+              displayAs: Text.AllLabels,
+              badgeText: optGroups.totalUnique.toString(),
+              badgeHoverText: Text.events(optGroups.totalUnique),
+            }}
+            noneChoice={{
+              displayAs: Text.Unlabeled,
+              badgeText: optGroups.none ?
+                optGroups.none.totalUnique.toString() : undefined,
+              badgeHoverText: optGroups.none ?
+                Text.events(optGroups.none.totalUnique) : undefined,
+            }}
+            selectedItemClasses="active"
+            className="esper-select-menu"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+          />;
+        }
+      });
+    }
+  }
+
+  export class LabelCalcDropdownSelector extends LabelCalcSelector {
     render() {
       // Dropdown input text
       let selectedText = (() => {
@@ -35,32 +87,13 @@ module Esper.Components {
           { selectedText }
         </Selector>
         <div className="dropdown-menu">
-          <LabelListSelector
-            result={this.state.result}
-            team={this.props.team}
-            selected={this.props.selected}
-            updateFn={this.props.updateFn}
-          />
+          { super.render() }
         </div>
       </Dropdown>;
     }
   }
 
-  export class LabelCalcSelector extends CalcUI<Types.EventOptGrouping, {
-    calculation: EventStats.LabelCountCalc;
-    team: ApiT.Team;
-    selected: Params.ListSelectJSON;
-    updateFn: (x: Params.ListSelectJSON) => void;
-  }> {
-    render() {
-      return <LabelListSelector
-        result={this.state.result}
-        team={this.props.team}
-        selected={this.props.selected}
-        updateFn={this.props.updateFn}
-      />;
-    }
-  }
+
 
   // Labels from events
   function LabelListSelector({result, team, selected, updateFn} : {
@@ -69,55 +102,7 @@ module Esper.Components {
     selected: Params.ListSelectJSON;
     updateFn: (x: Params.ListSelectJSON) => void;
   }) {
-    return result.match({
-      none: () => <span>{ Text.UICalculating }</span>,
-      some: (optGroups) => {
-        var choices = _.map(optGroups.some, (v, k) => ({
-          id: k,
-          displayAs: Labels.getDisplayAs(k),
-          badgeText: v.totalUnique.toString(),
-          badgeHoverText: Text.events(v.totalUnique),
-          badgeColor: Colors.getColorForLabel(k)
-        }));
 
-        // Get team labels too
-        _.each(team.team_labels_norm, (norm, i) => {
-          choices.push({
-            id: norm,
-            displayAs: team.team_labels[i],
-            badgeText: undefined,
-            badgeHoverText: undefined,
-            badgeColor: Colors.getColorForLabel(norm)
-          })
-        });
-        choices = _(choices)
-          .uniqBy((c) => c.id)
-          .sortBy((c) => Labels.normalizeForSort(c.displayAs))
-          .value();
-
-        return <Components.ListSelectorASN
-          choices={choices}
-          selected={selected}
-          updateFn={updateFn}
-          allChoice={{
-            displayAs: Text.AllLabels,
-            badgeText: optGroups.totalUnique.toString(),
-            badgeHoverText: Text.events(optGroups.totalUnique),
-          }}
-          noneChoice={{
-            displayAs: Text.Unlabeled,
-            badgeText: optGroups.none ?
-              optGroups.none.totalUnique.toString() : undefined,
-            badgeHoverText: optGroups.none ?
-              Text.events(optGroups.none.totalUnique) : undefined,
-          }}
-          selectedItemClasses="active"
-          className="esper-select-menu"
-          listClasses="esper-select-menu"
-          itemClasses="esper-selectable"
-        />;
-      }
-    })
   }
 
 
@@ -289,21 +274,6 @@ module Esper.Components {
         </a>
       </div>
     </div>;
-  }
-
-
-  /*
-    LabelCalcSelector takes a calculation and updates label counts based on
-    events present in a non-blocking (ish) fashion.
-  */
-
-  interface LabelCalcSelectorProps {
-    teams: ApiT.Team[];
-    events: Stores.Events.TeamEvent[];
-    calculation: EventStats.LabelCountCalc;
-    selected: Params.ListSelectJSON;
-    updateFn: (x: Params.ListSelectJSON) => void;
-    showColor?: boolean;
   }
 
   export function LabelSelectorDropdown(props: LabelSelectorProps) {

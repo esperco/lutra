@@ -231,6 +231,16 @@ module Esper.Types {
 
   export type ChartType = "percent"|"absolute"|"calendar";
 
+  // Respond differently based on which event attribute we're grouping by
+  export interface ChartGroups<T> {
+    labels: T;
+    calendars: T;
+    domains: T;
+    durations: T;
+    guestCounts: T;
+    ratings: T;
+  }
+
   // Base options needed to fetch and get events
   export interface ChartBaseOpts<T> {
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
