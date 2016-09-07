@@ -3,18 +3,17 @@
 
 // Header for chart
 #chart-header {
-  padding: 0 @input-height-base;
+  // Override default esper-content-header settings since the spacing looks off
+  @media screen and (max-width: @screen-xs-max) {
+    > .actions { margin-right: -@esper-base-padding; }
+  }
 
-  > .actions {
-    position: absolute;
-    right: 0; top: 0;
-    max-width: 100%;
-
-    .action {
-      min-width: @input-height-base;
-      text-align: center;
-      display: inline-block;
-    }
+  @media screen and (min-width: @screen-sm-min) {
+    display: flex;
+    align-items: center;
+    > * { flex: 1 1 auto; }
+    > .period-selector { flex-basis: 60%; }
+    > .actions { flex-basis: 40%; }
   }
 
   .filter-action .active {

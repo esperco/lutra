@@ -4,7 +4,7 @@
 
 // Custom Esper variables
 @min-fullscreen-height: 350px;
-@content-header-height: 42px;
+@content-header-height: @input-height-base + 2 * @padding-base-vertical;
 @sidebar-xs-width: 90%; // When open
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 25%;
@@ -235,15 +235,24 @@
     esper-expanded)
   */
   > .esper-content-header {
-    height: @content-header-height;
-    line-height: @content-header-height;
-    vertical-align: middle;
     padding: 0 @esper-base-padding;
-    overflow: auto;
+    line-height: @input-height-base;
+    vertical-align: middle;
+
+    > div {
+      padding: (@esper-base-padding / 2) 0;
+    }
 
     @media screen and (min-width: @screen-sm-min) {
+      line-height: @content-header-height;
       position: absolute;
       top: 0; left: 0; right: 0;
+      height: @content-header-height;
+      overflow: auto;
+
+      > div {
+        padding: 0;
+      }
 
       + * {
         margin-top: @content-header-height;

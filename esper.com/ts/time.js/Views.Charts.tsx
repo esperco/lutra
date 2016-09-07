@@ -96,15 +96,26 @@ module Esper.Views {
               updateFn={(p) => this.updatePeriod(p)}
             />
             <div className="actions">
-              <span className="action filter-action"
-                    onClick={() => this.toggleFilterMenu()}>
-                <i className={classNames("fa fa-fw", {
-                  "fa-close": this.state.showFilterMenu,
-                  "fa-filter": !this.state.showFilterMenu,
-                  "active": _.some(_.values(filterState)) &&
-                            !this.state.showFilterMenu
-                })} />
-              </span>
+              <div className="esper-flex-list">
+                <div className="search-box-container">
+                  <Components.SearchBox
+                    icon="fa-search"
+                    className="form-control"
+                    placeholder={Text.SearchEventsPlaceholder}
+                    value={this.props.extra.filterStr}
+                    onUpdate={(val) => this.updateExtra({ filterStr: val })}
+                  />
+                </div>
+                <span className="action filter-action"
+                      onClick={() => this.toggleFilterMenu()}>
+                  <i className={classNames("fa fa-fw", {
+                    "fa-close": this.state.showFilterMenu,
+                    "fa-ellipsis-v": !this.state.showFilterMenu,
+                    "active": _.some(_.values(filterState)) &&
+                              !this.state.showFilterMenu
+                  })} />
+                </span>
+              </div>
             </div>
           </div>
           <div id="chart-expanded" className="esper-expanded">
@@ -293,16 +304,6 @@ module Esper.Views {
                                       "fa-calendar") }
             </div>
           </div>
-        </div>
-
-        <div className="esper-panel-section">
-          <Components.SearchBox
-            icon="fa-search"
-            className="form-control"
-            placeholder={Text.SearchEventsPlaceholder}
-            value={this.props.extra.filterStr}
-            onUpdate={(val) => this.updateExtra({ filterStr: val })}
-          />
         </div>
 
         <div className="esper-panel-section">

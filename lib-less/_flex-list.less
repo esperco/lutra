@@ -5,8 +5,18 @@
   display: flex;
   flex-wrap: wrap;
 
+  // Set to 1000 so we can assign numeric bases on a one-off basis
   > * {
+    flex: 1000 1000 auto;
+  }
+
+  // Actions should expand comparatively slowly relative to other elements
+  > .action {
     flex-grow: 1;
+    line-height: @input-height-base;
+    vertical-align: middle;
+    min-width: @input-height-base;
+    text-align: center;
   }
 
   // Special spacing rules for sections
