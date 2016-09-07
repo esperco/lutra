@@ -13,7 +13,7 @@ module Esper.Onboarding {
 
   export function needsLabels() {
     return needsTeam() || !!_.find(Stores.Teams.all(), (t) =>
-      t.team_labels.length === 0
+      t.team_api.team_labels.length === 0
     );
   }
 

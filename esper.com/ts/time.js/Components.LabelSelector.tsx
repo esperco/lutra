@@ -25,13 +25,13 @@ module Esper.Components {
           }));
 
           // Get team labels too
-          _.each(this.props.team.team_labels_norm, (norm, i) => {
+          _.each(this.props.team.team_api.team_labels, (label, i) => {
             choices.push({
-              id: norm,
-              displayAs: this.props.team.team_labels[i],
+              id: label.normalized,
+              displayAs: label.original,
               badgeText: undefined,
               badgeHoverText: undefined,
-              badgeColor: Colors.getColorForLabel(norm)
+              badgeColor: Colors.getColorForLabel(label.normalized)
             })
           });
           choices = _(choices)

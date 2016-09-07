@@ -16,8 +16,17 @@ module Esper.Actions.Teams {
 
       // Sanity check
       this.teamId = TestFixtures.teamId1;
-      expect(Stores.Teams.require(this.teamId).team_labels).toEqual(
-        ["Label 1", "Label 2", "Label 3"]
+      expect(Stores.Teams.require(this.teamId).team_api.team_labels).toEqual(
+        [{
+          original: "Label 1",
+          normalized: "label 1"
+        }, {
+          original: "Label 2",
+          normalized: "label 2"
+        }, {
+          original: "Label 3",
+          normalized: "label 3"
+        }]
       );
     });
 
@@ -30,8 +39,14 @@ module Esper.Actions.Teams {
 
     it("should de-duplicate similar labels when adding", function() {
       addLabel(this.teamId, "label 3");
-      expect(Stores.Teams.require(this.teamId).team_labels).toEqual(
-        ["Label 1", "Label 2", "Label 3"]
+      expect(Stores.Teams.require(this.teamId).team_api.team_labels).toEqual(
+        [{
+          original: "Label 1"
+        }, {
+          original: "Label 2"
+        }, {
+          original: "Label 3"
+        }]
       );
       expect(Api.putSyncedLabels).not.toHaveBeenCalledWith();
     });

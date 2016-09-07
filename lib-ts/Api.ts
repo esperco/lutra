@@ -444,7 +444,7 @@ module Esper.Api {
   /***** Team label syncing *****/
 
   export function getSyncedLabels(teamid: string):
-    JsonPromise<ApiT.Labels> {
+    JsonPromise<ApiT.LabelInfos> {
     var url = prefix + "/api/team/labels/" + string(Login.me()) +
       "/" + string(teamid);
     return JsonHttp.get(url);

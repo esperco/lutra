@@ -32,15 +32,15 @@ module Esper.Components {
   export class NewLabelsForm extends ReactHelpers.Component<Props, State> {
     constructor(props: Props) {
       super(props);
-      var labels = _.map(props.team.team_labels, (l) => ({
+      var labels = _.map(props.team.team_api.team_labels, (l) => ({
         id: Util.randomString(),
-        display: l
+        display: l.original
       }));
       labels = this.addMinLabels(labels);
 
       this.state = {
         labels: labels,
-        showProfiles: _.isEmpty(props.team.team_labels) &&
+        showProfiles: _.isEmpty(props.team.team_api.team_labels) &&
                       !_.isEmpty(props.profiles)
       };
     }
@@ -103,7 +103,7 @@ module Esper.Components {
 
     renderLabelInterface() {
       return <div>
-        { _.isEmpty(this.props.team.team_labels) ?
+        { _.isEmpty(this.props.team.team_api.team_labels) ?
             <div className="esper-section">
               <a className="btn btn-default form-control"
                    onClick={() => this.mutateState((s) => s.showProfiles = true)}>

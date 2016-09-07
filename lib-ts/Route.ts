@@ -218,17 +218,28 @@ module Esper.Route {
       var fn: (x: string) => void;
       var arg: string;
 
+      // Determine querystring and save in case query string doesn't work
+      let queryStr = getQueryStr(opts);
+      if (queryStr) {
+        lastQuery = queryStr.slice(1); // Ignore "?" when saving
+      }
+
       if (isPath(dest)) {
         if (dest.base !== base) {
           fn = (p: string) => location.href = p;
-          arg = dest.href + getQueryStr(opts);
+          arg = dest.href + queryStr;
         } else {
           fn = opts.replace ? pageJs.redirect : pageJs;
-          arg = normalize(dest.hash) + getQueryStr(opts);
+          arg = normalize(dest.hash) + queryStr;
         }
       } else {
         fn = opts.replace ? pageJs.redirect : pageJs;
-        arg = normalize(dest) + getQueryStr(opts);
+        arg = normalize(dest) + queryStr;
+      }
+
+      // If URL is too long because of query string, get rid of it
+      if (arg.length > 2000) {
+        arg = arg.split('?')[0];
       }
 
       if (opts.delay) {
@@ -248,17 +259,11 @@ module Esper.Route {
     // Alias for old code
     export var path = go;
 
-    // Get hash as string
-    function getHash(frag: string|string[], opts?: Opts) {
-      return normalize(frag) + getQueryStr(opts);
-    }
-
     function getQueryStr(opts?: Opts) {
       opts = opts || {};
       var query = opts.queryStr || (opts.jsonQuery ?
         (jsonParam + "=" + encodeURIComponent(JSON.stringify(opts.jsonQuery)))
         : null);
-      if (query) { lastQuery = query; }
       return (query ? "?" + query : "");
     }
 

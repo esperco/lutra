@@ -79,8 +79,14 @@ module Esper.ApiT {
     team_email_aliases?: string[];
   }
 
+  export interface TeamApi {
+    team_exec_email: string;
+    team_labels: LabelInfo[];
+  }
+
   export interface Team {
     teamid: string;
+    team_api: TeamApi;
     team_name: string;
     team_approved: boolean;
     team_active_until?: string; // timestamp
@@ -88,8 +94,6 @@ module Esper.ApiT {
     team_assistants: string[];
     team_owner: string;
     team_cal_user: string;
-    team_labels: string[];
-    team_labels_norm: string[];
     team_timestats_calendars?: string[];
     team_email_aliases: string[];
     team_calendar_accounts: string[];
@@ -107,8 +111,7 @@ module Esper.ApiT {
 
   export interface Group extends GroupUpdate {
     groupid: string;
-    group_labels?: string[];
-    group_labels_norm?: string[];
+    group_labels?: LabelInfo[];
     group_member_role?: GroupRole;
     group_teams?: GroupMember[];
     group_individuals?: GroupIndividual[];
@@ -157,16 +160,18 @@ module Esper.ApiT {
   export type EventFeedbackAction = string;
 
   export interface PredictedLabel {
-    label: string;
-    label_norm: string;
+    label: LabelInfo;
     score: number; // Float between 0 and 1
   }
 
+  export interface HashtagApi {
+    original: string;
+    normalized: string;
+  }
+
   export interface HashtagState {
-    hashtag: string;
-    hashtag_norm: string;
-    label?: string;
-    label_norm?: string;
+    hashtag: HashtagApi;
+    label?: LabelInfo;
     approved?: boolean;
   }
 
@@ -188,8 +193,7 @@ module Esper.ApiT {
     title?: string;
     description?: string;
     description_messageids: string[];
-    labels?: string[];
-    labels_norm?: string[];
+    labels?: LabelInfo[];
     predicted_attended?: number;         // Floating score
     predicted_labels?: PredictedLabel[]; // Sorted by score desc
     hashtags: HashtagState[];
@@ -401,8 +405,7 @@ module Esper.ApiT {
   }
 
   export interface CalendarStatEntry {
-    event_labels: string[];       // Display versions
-    event_labels_norm: string[];  // Normalized versions
+    event_labels: LabelInfo[];
     event_count: number;    // integer
     event_duration: number; // seconds
   }
@@ -452,8 +455,14 @@ module Esper.ApiT {
     url: string;
   }
 
-  export interface Labels {
-    labels: string[];
+  export interface LabelInfo {
+    original: string;
+    normalized?: string;
+    color?: string;
+  }
+
+  export interface LabelInfos {
+    label_infos: LabelInfo[];
   }
 
   type EventSelection = ["Eventids", string[]] | ["Label", string];
