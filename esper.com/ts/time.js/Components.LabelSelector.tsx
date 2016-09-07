@@ -261,7 +261,7 @@ module Esper.Components {
               { props.unconfirmedCount }
             </span> : null
           }
-          <i className="fa fa-fw fa-question-circle" />{" "}
+          <i className="fa fa-fw fa-flash" />{" "}
           { Text.Unconfirmed }
         </a>
       </div> : null }

@@ -32,6 +32,7 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
+          <UnconfirmedLink calculation={labelCountCalc} />
           <div className="esper-panel-section">
             <div className="esper-header">
               <i className="fa fa-fw fa-left fa-tags" />
@@ -426,5 +427,65 @@ module Esper.Views {
         { Text.SeeMoreLinkText }
       </a>
     </p>;
+  }
+
+  // Has auto-label confirmation modal been launched before?
+  var confirmationLaunched = false;
+
+  // Link to launch auto-confirm modal
+  interface UnconfirmedLinkProps {
+    calculation: EventStats.LabelCountCalc;
+  }
+
+  class UnconfirmedLink extends
+    Components.CalcUI<EventStats.LabelCalcCount, UnconfirmedLinkProps>
+  {
+    constructor(props: UnconfirmedLinkProps) {
+      super(props);
+      this.autoLaunch(props.calculation);
+    }
+
+    componentWillReceiveProps(props: UnconfirmedLinkProps) {
+      this.autoLaunch(props.calculation)
+    }
+
+    // Autolaunch confirmation modal unless already launched
+    autoLaunch(calculation: EventStats.LabelCountCalc) {
+      calculation.onceChange((result) => {
+        if (!confirmationLaunched && result.unconfirmedCount > 0) {
+          this.launchModal(result.unconfirmed);
+        }
+      });
+    }
+
+    // Button to manually launch
+    render() {
+      return this.state.result.match({
+        none: () => null,
+        some: (optGroups) => {
+          if (optGroups.unconfirmedCount > 0) {
+            return <div className="esper-panel-section">
+              <div className="esper-select-menu esper-full-width">
+                <div className="esper-selectable unconfirmed-link" onClick={
+                  () => this.launchModal(optGroups.unconfirmed)
+                }>
+                  <i className="fa fa-fw fa-left fa-flash" />
+                  { Text.Unconfirmed }
+                  <Components.Badge
+                    text={optGroups.unconfirmedCount.toString()}
+                  />
+                </div>
+              </div>
+            </div>;
+          }
+          return null;
+        }
+      });
+    }
+
+    launchModal(events: Types.TeamEvent[]) {
+      confirmationLaunched = true;
+      Layout.renderModal(Containers.confirmListModal(events));
+    }
   }
 }
