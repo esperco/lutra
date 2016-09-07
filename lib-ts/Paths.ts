@@ -68,27 +68,24 @@ module Esper.Paths {
   export module Time {
     export const prefix = "/time";
 
+    // Doubles as nav for all the charts
     export function report({ teamId, interval, period } : {
       teamId?: string;
       interval?: string;
       period?: string;
     } = {}) {
-      return optPath(prefix, "report", teamId, interval, period);
+      return optPath(prefix, "charts", teamId, interval, period);
     }
 
+    // Alias
+    export var charts = report;
+
+    // Props for specific charts
     export interface chartPathOpts {
       teamId?: string;
       calIds?: string;
       interval?: string;
       period?: string;
-    }
-
-    // Default chart path
-    export function charts({
-      teamId, calIds, interval, period
-    } : chartPathOpts = {}) {
-      return optPath(prefix, "charts",
-                     teamId, calIds, interval, period);
     }
 
     export function calendarsChart({
