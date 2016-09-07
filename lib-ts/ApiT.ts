@@ -176,7 +176,7 @@ module Esper.ApiT {
   }
 
   export interface HashtagRequestItem {
-    hashtag: HashtagApi;
+    hashtag: string;
     approved: boolean;
   }
 

@@ -219,7 +219,7 @@ module Esper.Actions.EventLabels {
                 e.recurringEventId || e.id,
                 {
                   hashtag_states: _.map(e.hashtags, (h) => ({
-                    hashtag: h.hashtag,
+                    hashtag: h.hashtag.original,
                     approved: h.approved
                   }))
                 }
