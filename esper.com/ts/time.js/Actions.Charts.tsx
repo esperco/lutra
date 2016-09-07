@@ -114,57 +114,6 @@ module Esper.Actions.Charts {
   }
 
 
-  /* Puts together our basic chart view and standard selectors */
-
-  function getChartView(o: BaseOpts<{}>, p: {
-    chart: JSX.Element;
-    events: Stores.Events.TeamEvent[];
-    selectors?: JSX.Element[];
-    menus?: Types.ChartViewMenu[];
-  }) {
-    let labelCalc = new EventStats.LabelCountCalc(p.events, o.extra);
-
-    // Automatically open the confirmation modal the first time
-    labelCalc.onceChange(function(r) {
-      if (autoLaunchConfirm && r.unconfirmedCount) {
-        launchConfirmModal(r.unconfirmed);
-      }
-    });
-
-    var confirmationMenu: Types.ChartViewMenu = {
-      id: "confirm",
-      tab: <Components.ConfirmBadge
-        events={p.events}
-        calculation={labelCalc}
-      />,
-      onClick: () => {
-        labelCalc.getResults().match({
-          none: () => null,
-          some: (r) => launchConfirmModal(r.unconfirmed)
-        });
-        return false;
-      }
-    };
-
-    return <Views.Charts
-      chart={p.chart}
-      events={p.events}
-      selectors={p.selectors || []}
-      menus={[confirmationMenu].concat(p.menus || [])}
-      { ...o }
-    />;
-  }
-
-  var autoLaunchConfirm = true; // This gets set to false after first launch.
-
-  function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
-    autoLaunchConfirm = false;
-    Layout.renderModal(
-      Containers.confirmListModal(events)
-    );
-  }
-
-
   /* Misc helpers */
 
   function getChart<T>(o: BaseOpts<T>, p: {
@@ -232,10 +181,7 @@ module Esper.Actions.Charts {
           <Components.DurationHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {
-        chart,
-        events: events
-      });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -267,10 +213,7 @@ module Esper.Actions.Charts {
         />,
       });
 
-      return getChartView(o, {
-        chart,
-        events: events
-      });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -301,7 +244,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.GuestHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, { chart, events });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -330,7 +273,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)}
         />,
       });
-      return getChartView(o, { chart, events });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -356,7 +299,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.LabelHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events});
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -385,7 +328,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events});
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 }

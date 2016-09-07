@@ -91,8 +91,8 @@ module Esper.Charting {
     var newExtras: (ExtraOptsMaybe & T)|{} = {}
 
     // Chart change => blank out filter params unless provided
-    if (pathFn !== o.pathFn && p.extra) {
-      newExtras = p.extra;
+    if (pathFn !== o.pathFn) {
+      newExtras = p.extra || {};
     }
 
     // Team change => Don't preserve filter params, reset cals
@@ -103,7 +103,7 @@ module Esper.Charting {
     // Reset => clear out everything except specified vars
     else if (p.reset) {
       calIds = [Params.defaultCalIds];
-      newExtras = p.extra;
+      newExtras = p.extra || {};
     }
 
     // Else merge old extra with new params
