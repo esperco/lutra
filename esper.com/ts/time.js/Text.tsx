@@ -117,9 +117,9 @@ module Esper.Text {
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
-  export const ConfirmationDescription = `Hi there! We've made some guesses ` +
-    `about which ${Labels} to apply to your events. Help us out by ` +
-    `confirming changing those guesses below.`;
+  export const ConfirmationDescription = `Hi there! We've tried to guess ` +
+    `which ${Labels} we should apply to your events. Help us out by ` +
+    `confirming or changing those guesses below.`;
   export const PredictionsLoading = `Updating ` + _.capitalize(Labels);
   export const ConfirmAllLabels = `Confirm ${_.capitalize(Labels)}`;
 
