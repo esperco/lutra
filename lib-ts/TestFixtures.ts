@@ -16,19 +16,40 @@ module Esper.TestFixtures {
   export var teamId0 = "team-id-0";
   export var team0Exec = uid;
   export var team0Email = email;
-  export var team0Labels = ["Label"];
+  export var team0LabelInfos = [{
+    original: "Label",
+    normalized: normalizeLabel("Label")
+  }];
   export var team0Calendars = ["lois@esper.com"];
 
   export var teamId1 = "team-id-1";
   export var team1Exec = "O-w_peter____________w";
   export var team1Email = "peter@esper.com";
-  export var team1Labels = ["Label 1", "Label 2", "Label 3"];
+  export var team1LabelInfos = [{
+    original: "Label 1",
+    normalized: normalizeLabel("Label 1"),
+  }, {
+    original: "Label 2",
+    normalized: normalizeLabel("Label 2")
+  }, {
+    original: "Label 3",
+    normalized: normalizeLabel("Label 3")
+  }];
   export var team1Calendars = ["peter@esper.com"];
 
   export var teamId2 = "team-id-2";
   export var team2Exec = "O-w_stewie____________w";
   export var team2Email = "stewie@esper.com";
-  export var team2Labels = ["Label A", "Label B", "Label C"];
+  export var team2LabelInfos = [{
+    original: "Label A",
+    normalized: normalizeLabel("Label A")
+  }, {
+    original: "Label B",
+    normalized: normalizeLabel("Label B")
+  }, {
+    original: "Label C",
+    normalized: normalizeLabel("Label C")
+  }];
   export var team2Calendars = ["stewie@esper.com", "rupert@esper.com"];
 
   export var groupId = "group-id";
@@ -90,7 +111,7 @@ module Esper.TestFixtures {
           teamid: teamId0,
           team_name: email,
           team_executive: team0Exec,
-          team_labels: team0Labels,
+          team_labels: team0LabelInfos,
           team_timestats_calendars: team0Calendars
         }),
 
@@ -99,7 +120,7 @@ module Esper.TestFixtures {
           team_name: "Peter Griffin",
           team_approved: true,
           team_executive: team1Exec,
-          team_labels: team1Labels,
+          team_labels: team1LabelInfos,
           team_timestats_calendars: team1Calendars
         }),
 
@@ -108,7 +129,7 @@ module Esper.TestFixtures {
           team_name: "Stewie Griffin",
           team_approved: true,
           team_executive: team2Exec,
-          team_labels: team2Labels,
+          team_labels: team2LabelInfos,
           team_timestats_calendars: team2Calendars
         })
       ],
@@ -150,11 +171,16 @@ module Esper.TestFixtures {
     team_calendar_accounts?: string[];
     team_email_aliases?: string[];
     team_executive?: string;
-    team_labels?: string[];
+    team_executive_email?: string;
+    team_labels?: ApiT.LabelInfo[];
     team_timestats_calendars?: string[];
   } = {}): ApiT.Team {
     return {
       teamid: props.teamid || "team-id",
+      team_api: {
+        team_labels: props.team_labels || [],
+        team_exec_email: props.team_executive_email || ""
+      },
       team_name: props.team_name || "Team Name",
       team_approved: _.isUndefined(props.team_approved) ?
         true : props.team_approved,
@@ -164,8 +190,6 @@ module Esper.TestFixtures {
       team_calendar_accounts: props.team_calendar_accounts || [],
       team_email_aliases: props.team_email_aliases || [],
       team_executive: props.team_executive || uid,
-      team_labels: props.team_labels || [],
-      team_labels_norm: _.map(props.team_labels, normalizeLabel),
       team_timestats_calendars: props.team_timestats_calendars || ["calId"]
     }
   }

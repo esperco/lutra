@@ -105,18 +105,6 @@ module Esper.Stores.Groups {
 
   // Find the normalized form of a group label
   export function getNormLabel(label: string) {
-    var groups = all();
-    for (let i in groups) {
-      var group = groups[i];
-
-      for (let j in group.group_labels) {
-        if (group.group_labels[j] === label) {
-          return group.group_labels_norm[j];
-        }
-      }
-    }
-
-    // No match, default to lowercase and trimming
     return label.toLowerCase().trim();
   }
 

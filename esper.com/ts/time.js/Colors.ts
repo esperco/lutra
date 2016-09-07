@@ -8,7 +8,7 @@ module Esper.Colors {
     // We assume this is called after Teams.init
     Login.promise.done(() => {
       var labels = _(Stores.Teams.all())
-        .map((t) => t.team_labels_norm)
+        .map((t) => _.map(t.team_api.team_labels, (t) => t.normalized))
         .flatten<string>()
         .uniq()
         .value();

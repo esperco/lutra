@@ -68,9 +68,9 @@ module Esper.Labels {
     var labels: LabelCount[] = [];
 
     _.each(teams, (t) => {
-      _.each(t.team_labels_norm, (id, i) => labels.push({
-        id: id,
-        displayAs: t.team_labels[i],
+      _.each(t.team_api.team_labels, (lbl) => labels.push({
+        id: lbl.normalized,
+        displayAs: lbl.original,
         count: 0
       }));
     });
@@ -95,9 +95,9 @@ module Esper.Labels {
   }
 
   export function fromTeam(team: ApiT.Team) {
-    return _.map(team.team_labels_norm, (n, i) => ({
-      id: n,
-      displayAs: team.team_labels[i],
+    return _.map(team.team_api.team_labels, (lbl) => ({
+      id: lbl.normalized,
+      displayAs: lbl.original,
       score: 0
     }));
   }
@@ -123,14 +123,18 @@ module Esper.Labels {
     return _.sortBy(labels, normalizeForSort);
   }
 
+  export function sortLabelInfos(labels: ApiT.LabelInfo[]) {
+    return _.sortBy(labels, (l) => normalizeForSort(l.original));
+  }
+
   export function init() {
     // Set initial norm/display label mappings based on teams
     Login.promise.done(() => {
       _.each(Stores.Teams.all(), (team) => {
-        _.each(team.team_labels_norm, (norm, index) => {
+        _.each(team.team_api.team_labels, (lbl) => {
           storeMapping({
-            norm: norm,
-            display: team.team_labels[index]
+            norm: lbl.normalized,
+            display: lbl.original
           });
         });
       });

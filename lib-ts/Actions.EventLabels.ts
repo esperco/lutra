@@ -186,13 +186,11 @@ module Esper.Actions.EventLabels {
   function getNewHashtags(event: Stores.Events.TeamEvent): ApiT.HashtagState[] {
     return _.map(event.hashtags, (h) => ({
       hashtag: h.hashtag,
-      hashtag_norm: h.hashtag_norm,
       label: h.label,
-      label_norm: h.label_norm,
       approved: event.labelScores.match({
         none: () => false,
         some: (labels) => _.some(labels,
-          (l) => h.label_norm == l.id || h.hashtag_norm == l.id
+          (l) => h.label.normalized == l.id || h.hashtag.normalized == l.id
         )
       })
     }));
@@ -240,8 +238,8 @@ module Esper.Actions.EventLabels {
                 _(scores)
                   .filter(
                     (s) => !_.some(e.hashtags,
-                      (h) => h.label_norm === s.id ||
-                             h.hashtag_norm === s.id))
+                      (h) => h.label.normalized === s.id ||
+                             h.hashtag.normalized === s.id))
                   .map((s) => s.displayAs)
                   .value()
             }),
