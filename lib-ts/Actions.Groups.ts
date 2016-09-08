@@ -382,7 +382,8 @@ module Esper.Actions.Groups {
     labels = _.sortBy(labels, Labels.normalizeForSort);
 
     groupCopy.group_labels = _.map(labels, (l) => ({
-      original: l
+      original: l,
+      normalized: Labels.getNorm(l)
     }));
 
     var p = LabelUpdateQueue.enqueue(_id, {

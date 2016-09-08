@@ -111,7 +111,7 @@ module Esper.Stores.Events {
           TestFixtures.makeGenericCalendarEvent({
             predicted_attended: 0.4,
             predicted_labels: [{ // Label gets ignored
-              label: { original: "Label" },
+              label: { original: "Label", normalized: "label" },
               score: 0.9
             }]
           })
@@ -150,7 +150,7 @@ module Esper.Stores.Events {
             transparent: true,
             hashtags: [{
               hashtag: { original: "#Label", normalized: "#label" },
-              label: { original: "Label" }
+              label: { original: "Label", normalized: "label" }
             }]
           })
         );
@@ -229,7 +229,7 @@ module Esper.Stores.Events {
         var e = asTeamEvent(TestFixtures.teamId1,
           TestFixtures.makeGenericCalendarEvent({
             predicted_labels: [{ // Label gets ignored
-              label: { original: "Label" },
+              label: { original: "Label", normalized: "label" },
               score: 0.9
             }],
             feedback: {
