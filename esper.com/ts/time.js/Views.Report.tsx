@@ -38,14 +38,12 @@ module Esper.Views {
               <i className="fa fa-fw fa-left fa-tags" />
               { Text.ChartLabels }
             </div>
-            <div className="esper-full-width">
-              <Components.LabelCalcSelector
-                team={team}
-                selected={this.props.labels}
-                calculation={labelCountCalc}
-                updateFn={(x) => Route.nav.query({ labels: x })}
-              />
-            </div>
+            <Components.LabelCalcSelector
+              team={team}
+              selected={this.props.labels}
+              calculation={labelCountCalc}
+              updateFn={(x) => Route.nav.query({ labels: x })}
+            />
           </div>
 
           <div className="sidebar-bottom-menu">
@@ -465,7 +463,7 @@ module Esper.Views {
         some: (optGroups) => {
           if (optGroups.unconfirmedCount > 0) {
             return <div className="esper-panel-section">
-              <div className="esper-select-menu esper-full-width">
+              <div className="esper-select-menu">
                 <div className="esper-selectable unconfirmed-link" onClick={
                   () => this.launchModal(optGroups.unconfirmed)
                 }>

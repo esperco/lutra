@@ -5,6 +5,7 @@
 // Custom Esper variables
 @min-fullscreen-height: 350px;
 @content-header-height: @input-height-base + 2 * @padding-base-vertical;
+@menu-minwidth: 250px;
 @sidebar-xs-width: 90%; // When open
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 25%;
@@ -388,13 +389,23 @@
 
   Use .esper-panel-section to add borders between consecutive sections.
 
-  Use .esper-full-width inside a section or after a section to extend past
-  padding. Or use on the section element itself to remove side padding.
+  Use .esper-full-width with a section to extend or remove side padding.
 */
 .esper-section, .esper-panel-section {
   padding: @esper-base-padding;
 
-  &.esper-full-width { padding-left: 0; padding-right: 0; }
+  &.esper-select-menu {
+    padding: @esper-base-padding;
+  }
+
+  &.esper-full-width {
+    padding-left: 0; padding-right: 0;
+
+    // Retain padding for certain elements
+    .esper-no-content {
+      margin: 0 @esper-base-padding;
+    }
+  }
 
   // Resets for panel + modal body
   .panel-body > & {
@@ -413,12 +424,6 @@
     & + .esper-panel-section, & + .modal-footer {
       margin-top: @esper-base-padding;
     }
-  }
-
-  // More negative padding for full-width items
-  .esper-full-width  {
-    margin-left: -@esper-base-padding;
-    margin-right: -@esper-base-padding;
   }
 
   // For normal sections, collapse padding of following element
@@ -445,6 +450,11 @@
   }
 }
 
+.esper-panel-section > .esper-select-menu {
+  margin-left: -@esper-base-padding;
+  margin-right: -@esper-base-padding;
+}
+
 .esper-subheader {
   text-transform: capitalize;
   margin: 0 0 @padding-base-vertical;
@@ -469,7 +479,7 @@
 .esper-no-content {
   text-align: center;
   padding: @panel-body-padding;
-  font-size: @font-size-large;
+  font-size: @font-size-h5;
   color: @text-muted;
   border: 1px solid @brand-border;
   border-radius: @panel-border-radius;
@@ -630,6 +640,7 @@ flexibility with non-UL elements */
   list-style: none;
   font-size: @font-size-base;
   text-align: left; // Ensures proper alignment if parent has it changed
+  min-width: @menu-minwidth;
 
   + .esper-select-menu {
     border-top: 1px solid @brand-divider;
@@ -837,19 +848,16 @@ flexibility with non-UL elements */
     width: @input-height-base;
     height: @input-height-base;
     line-height: @input-height-base;
-    margin-right: @grid-gutter-width / 2;
     vertical-align: middle;
     text-align: center;
   }
 
   .esper-left-icon {
     left: 0;
-    margin-left: @grid-gutter-width / 2;
   }
 
   .esper-right-icon {
     right: 0;
-    margin-right: @grid-gutter-width / 2;
   }
 }
 

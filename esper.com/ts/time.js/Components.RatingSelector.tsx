@@ -17,7 +17,9 @@ module Esper.Components {
   {
     render() {
       return this.state.result.match({
-        none: () => <span>{ Text.UICalculating }</span>,
+        none: () => <div className="esper-no-content">
+          { Text.UICalculating }
+        </div>,
         some: (optGroups) => {
           let choices = _.times(MAX_RATING, (i) => {
             let strCount = (i + 1).toString();

@@ -16,7 +16,9 @@ module Esper.Components {
   {
     render() {
       return this.state.result.match({
-        none: () => <span>{ Text.UICalculating }</span>,
+        none: () => <div className="esper-no-content">
+          { Text.UICalculating }
+        </div>,
         some: (optGroups) => {
           var choices = _.map(EventStats.GUEST_COUNT_BUCKETS, (b) => {
             let value = optGroups.some[b.label]

@@ -45,7 +45,7 @@ module Esper.Components {
               <i className="fa fa-fw fa-plus" />
               { labels.length ? "" : " " + Text.AddLabel }
             </span>
-            <div className="dropdown-menu">
+            <div className="dropdown-menu esper-section">
               { this.renderEditor() }
             </div>
           </Components.Dropdown>
