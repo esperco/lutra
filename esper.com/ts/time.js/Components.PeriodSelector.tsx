@@ -114,7 +114,7 @@ module Esper.Components {
     intervals: Period.IntervalOrCustom[];
     onUpdate: (period: Period.IntervalOrCustom) => void;
   }) {
-    return <div className="esper-select-menu esper-flex-list">
+    return <div className="esper-select-menu esper-flex-list interval-selector">
       { _.map(intervals, (i) =>
         <a key={i} className={classNames("esper-selectable text-center", {
           active: selected === i
