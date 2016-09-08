@@ -27,7 +27,6 @@
 
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Components.Overlay.tsx" />
-/// <reference path="./Components.IfXS.tsx" />
 
 module Esper.Components {
   const dropdownContainerId = "esper-dropdown";
@@ -45,9 +44,7 @@ module Esper.Components {
   }
 
   export class Dropdown extends ReactHelpers.Component<Props, State> {
-    // Attributes set after initial render of toggle
-    _align: Align;
-    _width: number;
+    _toggle: HTMLElement;
 
     constructor(props: Props) {
       super(props);
@@ -105,17 +102,10 @@ module Esper.Components {
         Log.e("No dropdown menu found");
         return null;
       }
-
-      // Wrap with .dropdown class
-      return <div className={classNames(this.props.className, {
-        dropdown: _.isUndefined(this.props.className),
-        open: true
-      })} onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
-        { menu }
-      </div>;
+      return menu;
     }
 
-    /* If dropdown open => update position of toggle to align menu */
+    /* If dropdown open => update reference of toggle to pass to overlay */
     componentWillUpdate(nextProps: Props, nextState: State) {
       if (nextState.open) {
         this.updateTogglePosition();
@@ -129,39 +119,13 @@ module Esper.Components {
         Log.e("Dropdown mounted without active toggle");
         return;
       }
-
-      var offset = toggle.offset() || { left: 0, top: 0 };
-      var height = toggle.outerHeight();
-      this._width = toggle.outerWidth();
-
-      var top = offset.top - $(window).scrollTop() + toggle.outerHeight();
-      var bottom = $(window).height() - offset.top;
-      var left = offset.left - $(window).scrollLeft();
-      var right = $(window).width() - (offset.left + this._width);
-
-      // Align right if if right edge is pretty far over
-      var alignRight = (right / $(window).width()) <= 0.3;
-
-      // Drop-up if top is too low
-      var alignTop = (top / $(window).height()) > 0.7;
-
-      this._align = alignTop ?
-
-        // Dropup
-        ( alignRight ?
-          { bottom: bottom, right: right } :
-          { bottom: bottom, left: left } ) :
-
-        // Dropdown
-        ( alignRight ?
-          { top: top, right: right } :
-          { top: top, left: left } );
+      this._toggle = toggle.get(0);
     }
 
     getOverlay() {
       // Actual toggle should have been rendered in DOM -- we need this
       // to calculate menu position
-      if (!this._align || !this._width) {
+      if (!this._toggle) {
         Log.e("getMenu called without active toggle");
         return;
       }
@@ -171,19 +135,9 @@ module Esper.Components {
 
       return <Overlay id={dropdownContainerId}>
         <div className="dropdown-backdrop" onClick={() => this.close()}>
-          {ifXS({
-
-            // Mobile, no positioning
-            xs: <DropdownWrapper>
-              { menu }
-            </DropdownWrapper>,
-
-            // Desktop, align
-            other: <DropdownWrapper align={this._align} width={this._width}>
-              {menu}
-            </DropdownWrapper>
-
-          })}
+          <DropdownWrapper anchor={this._toggle}>
+            { menu }
+          </DropdownWrapper>
         </div>
       </Overlay>;
     }
@@ -194,80 +148,92 @@ module Esper.Components {
     Above component is just the trigger -- this is the acutal menu that gets
     rendered
   */
-  type Align =
-    { top: number; left: number; }|
-    { top: number; right: number; }|
-    { bottom: number; left: number; }|
-    { bottom: number; right: number; }
-
   interface MenuProps {
+    anchor: HTMLElement;
     children?: JSX.Element[];
-    width?: number|string;
-    align?: Align;
-  }
-
-  function hasTop(x: {top: number}|{bottom: number}): x is {top: number} {
-    return x.hasOwnProperty('top');
   }
 
   // Desktop only -- mobile is simpler
   class DropdownWrapper extends ReactHelpers.Component<MenuProps, {}> {
     render() {
-      var style = this.props.align ?
+      if (! this.props.anchor) {
+        Log.e("DropdownWrapper called without anchor");
+        return null;
+      }
+      let anchor = $(this.props.anchor);
+      let offset = anchor.offset() || { left: 0, top: 0 };
+      let style = {
+        left: offset.left - $(window).scrollLeft(),
+        top: offset.top - $(window).scrollTop(),
+        height: anchor.outerHeight(),
+        width: anchor.outerWidth()
+      };
 
-        // Desktop
-        _.extend({
-          minWidth: this.props.width,
-          position: "absolute"
-        }, this.props.align) :
+      // Adjust horizontal alignment based on position
+      let hAlign = (() => {
+        let width = $(window).width();
 
-        // Mobile
-        {
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0
-        };
+        // Near left edge of screen
+        if (style.left / width < 0.15) {
+          return "left";
+        }
 
-      return <div className="dropdown-wrapper" style={style}>
+        // Near right edge of screen
+        if ((style.left + style.width) / width > 0.85) {
+          return "right";
+        }
+
+        // In the middle
+        return "center"
+      })();
+
+      // Drop-up if top is too low
+      let vAlign = (style.top + style.height) / $(window).height() > 0.7 ?
+        "up" : "down";
+
+      let classes = classNames("dropdown-wrapper", "open", vAlign, hAlign);
+      return <div className={classes} style={style}>
         { this.props.children }
       </div>;
     }
 
-    // Apply maxHeight after rendering if actual height breaks window edge
+    // Apply CSS corrections after rendering to prevent breaking window edge
     componentDidMount() {
-      this.applyMax();
+      this.adjust();
     }
 
     componentDidUpdate() {
       super.componentDidUpdate();
-      this.applyMax();
+      this.adjust();
     }
 
-    applyMax() {
-      let align = this.props.align;
-      let maxHeight = align ?
+    adjust() {
+      let menu = this.find('.dropdown-menu');
+      if (_.isEmpty(menu)) { return; }
 
-        // Has align => desktop
-        ( hasTop(align) ?
-
-          // Dropdown
-          $(window).height() - align.top :
-
-          // Dropup
-          $(window).height() - align.bottom ) :
-
-        // No align => mobile
-        $(window).height();
-
-      // Buffer slightly
-      maxHeight = maxHeight * 0.9;
-
-      this.find('.dropdown-menu').css({
-        "max-height": maxHeight,
+      // Apply max-height
+      let maxHeight = $(window).height() - menu.offset().top;
+      menu.css({
+        "max-height": maxHeight * 0.9, // Buffer slightly
         "overflow": "auto"
       });
+
+      // Too far left?
+      let hPos = menu.offset().left - $(window).scrollLeft();
+      if (hPos < 0) {
+        this.find('.dropdown-wrapper')
+          .removeClass("right")
+          .removeClass("center")
+          .addClass("left");
+      }
+
+      // Too far right?
+      else if (hPos + menu.outerWidth() > $(window).width()) {
+        this.find('.dropdown-wrapper')
+          .removeClass("left")
+          .removeClass("center")
+          .addClass("right");
+      }
     }
   }
 }

@@ -10,19 +10,51 @@
   background: rgba(0, 0, 0, 0.2);
   animation: fadein 0.3s ease-in-out;
   overflow: auto;
+}
 
-  // Styling done via JS normally
-  @media screen and (max-width: @screen-xs-max) {
-    .dropdown-wrapper {
-      padding: @esper-base-padding;
+/*
+  Top, left, right, etc. should be set by JS -- this should correspond to
+  the positions of the anchor or dropdown trigger element
+*/
+.dropdown-wrapper {
+  position: absolute;
+}
+
+.dropdown-menu {
+  float: none; // Unset Bootstrap
+
+  // Desktop -> relative to wrapper (anchor)
+  @media screen and (min-width: @screen-sm-min) {
+    position: absolute;
+    min-width: 100%;
+    top: 100%;   // By default, is below anchor
+    left: 0;     // By default, left-aligned
+    right: auto;
+
+    // Right aligned
+    .right & {
+      left: auto;
+      right: 0;
+    }
+
+    // Centered
+    .center & {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .up & {
+      top: auto;
+      bottom: 100%;
     }
   }
 
-  .dropdown-menu {
-    // Get rid of position absolute because .dropdown-wrapper
-    // should apply position. Float is also unnecessary.
-    position: static;
-    float: none;
+  // Mobile -> full screen
+  @media screen and (max-width: @screen-xs-max) {
+    position: fixed;
+    top: @esper-base-padding;
+    left: @esper-base-padding;
+    right: @esper-base-padding;
   }
 }
 

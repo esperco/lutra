@@ -506,18 +506,14 @@ a {
 
 //////
 
-.dropdown {
-  .dropdown-menu {
-    width: 100%;
+.dropdown-menu {
+  @media screen and (min-width: @screen-sm-min) {
+    max-width: 400px;
+  }
 
-    @media screen and (min-width: @screen-sm-min) {
-      max-width: 400px;
-    }
-
-    > li > a {
-      &:hover, &:focus {
-        opacity: 1.0;
-      }
+  > li > a {
+    &:hover, &:focus {
+      opacity: 1.0;
     }
   }
 }
