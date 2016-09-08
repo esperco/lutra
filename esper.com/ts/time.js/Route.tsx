@@ -42,7 +42,7 @@ module Esper.Route {
     teamId: ":teamId?",
     interval: ":interval?",
     period: ":period?"
-  }).hash, function(ctx) {
+  }).hash, checkOnboarding, function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
                                                 "week");
