@@ -449,11 +449,13 @@ module Esper.Views {
 
     // Autolaunch confirmation modal unless already launched
     autoLaunch(calculation: EventStats.LabelCountCalc) {
-      calculation.onceChange((result) => {
-        if (!confirmationLaunched && result.unconfirmedCount > 0) {
-          this.launchModal(result.unconfirmed);
-        }
-      });
+      if (! Login.data.is_sandbox_user) { // No autolaunch in sandbox mode
+        calculation.onceChange((result) => {
+          if (!confirmationLaunched && result.unconfirmedCount > 0) {
+            this.launchModal(result.unconfirmed);
+          }
+        });
+      }
     }
 
     // Button to manually launch
