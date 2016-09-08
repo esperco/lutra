@@ -41,6 +41,14 @@ module Esper.Components {
             .sortBy((c) => Labels.normalizeForSort(c.displayAs))
             .value();
 
+          if (_.isEmpty(choices)) {
+            return <div className="esper-no-content">
+              <a href={Paths.Time.labelSetup().href}>
+               { Text.NoLabelsMessage }
+              </a>
+            </div>;
+          }
+
           return <Components.ListSelectorASN
             choices={choices}
             selected={this.props.selected}

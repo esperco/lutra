@@ -79,6 +79,9 @@ module Esper.Text {
   export const CalendarSetupExecDescription = "Pick which calendars Esper " +
     "should use for each person you're supporting.";
 
+  export const NoLabelsMessage = `Create ${Labels} to categorize your ` +
+    `events`
+
   // Selector text
   export const SelectAll = `Select All`;
   export const AllLabels = `Show All`;
@@ -156,9 +159,14 @@ module Esper.Text {
     `We've grouped your events by how long they are. If you need to touch ` +
     `base with many different ${Guests}, it may help to schedule shorter ` +
     `meetings.`;
-  export const ChartLabelsDescription =
-    `You can add ${Labels} to your events to ` +
-    `categorize them and see what you're spending the most time on.`;
+  export const ChartLabelsDescription = <span>
+    You can add {" "}{Labels}{" "} to your events to categorize them and see
+    what you're spending the most time on. You can also {" "}{Label}{" "}
+    events by adding a{" "}
+    <a href="https://blog.esper.com/2016/08/05/track-olympics-time-with-hashtags">
+      #hashtag
+    </a>{" "} to the event title or description.
+  </span>;
   export const ChartGuestsDescription =
     `These are the people whom you spend the most time in meetings with.`;
   export const ChartDomainsDescription =
