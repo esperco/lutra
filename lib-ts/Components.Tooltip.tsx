@@ -72,9 +72,7 @@ module Esper.Components {
         Log.e("TooltipFloat called without anchor");
         return null;
       }
-
       let elm = $(this.props.anchor);
-      elm.offset();
 
       // Default -> render centered above anchor
       let offset = elm.offset() || { left: 0, top: 0 };
