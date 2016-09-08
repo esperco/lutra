@@ -55,13 +55,8 @@ module Esper.Components {
   export class DurationDropdownSelector extends DurationSelector {
     render() {
       // Dropdown input text
-      let selectedText = (() => {
-        if (this.props.selected.all) {
-          return Text.AllDurations;
-        }
-        let vals = this.props.selected.some;
-        return vals.join(", ");
-      })();
+      let selectedText = this.props.selected.all ?
+        Text.AllDurations : this.props.selected.some.join(", ");
 
       return <Dropdown keepOpen={true}>
         <Selector id={this.props.id} className="dropdown-toggle">
