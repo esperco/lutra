@@ -121,10 +121,13 @@ module Esper.Stores.Calendars {
       return p;
     });
 
-    var p = Api.getGenericCalendarListOfUser().then(
-      (r) => Option.wrap(r.calendars));
-    UserStore.pushFetch(userId, p);
-    promises = _.concat(promises, [p]);
+    // Load all calendars for current user so user has option to add them
+    if (! Login.data.is_sandbox_user) {
+      var p = Api.getGenericCalendarListOfUser().then(
+        (r) => Option.wrap(r.calendars));
+      UserStore.pushFetch(userId, p);
+      promises = _.concat(promises, [p]);
+    }
 
     calendarLoadPromise = $.when.apply($, promises)
       .done(() => calendarLoadDfd.resolve());
