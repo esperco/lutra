@@ -211,7 +211,8 @@ module Esper.Actions.Teams {
     }
 
     teamCopy.team_api.team_labels = _.map(labels, (l) => ({
-      original: l
+      original: l,
+      normalized: Labels.getNorm(l)
     }));
 
     var p = LabelUpdateQueue.enqueue(_id, {

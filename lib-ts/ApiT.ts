@@ -457,7 +457,7 @@ module Esper.ApiT {
 
   export interface LabelInfo {
     original: string;
-    normalized?: string;
+    normalized: string;
     color?: string;
   }
 
