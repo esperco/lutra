@@ -1,11 +1,31 @@
 @import "./_bootstrap-variables";
 
-// Use flexbox style to make list horizontal on wide dispalys
-.esper-select-menu.esper-flex-list {
+// Use flexbox style to make list horizontal on wide displays
+.esper-flex-list {
   display: flex;
   flex-wrap: wrap;
 
-  .esper-selectable, li > a {
+  // Set to 1000 so we can assign numeric bases on a one-off basis
+  > * {
+    flex: 1000 1000 auto;
+  }
+
+  // Actions should expand comparatively slowly relative to other elements
+  > .action {
     flex-grow: 1;
+    line-height: @input-height-base;
+    vertical-align: middle;
+    min-width: @input-height-base;
+    text-align: center;
+  }
+
+  // Special spacing rules for sections
+  &.esper-section, &.esper-panel-section {
+    padding: @esper-base-padding / 2;
+
+    > .esper-section, > .esper-panel-section {
+      padding: @esper-base-padding / 2;
+      margin: 0;
+    }
   }
 }

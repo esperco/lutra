@@ -18,7 +18,11 @@ module Esper.Components {
       return <div>
         {
           Insights.matchScenario(periodGroup.data, {
-            allNone: () => <p>None of your events are {Text.Labeled}.</p>,
+            allNone: () => <p>
+              None of your events are{" "}{Text.Labeled}. Click on the
+              {" "}<span className="text-muted">"{Text.Unlabeled}"</span>{" "}
+              portion of the chart to assign {" "}{Text.Labels} to your events.
+            </p>,
 
             allOne: (label) => <p>
               All of your {" " + Text.Labeled + " "} time is being spent on

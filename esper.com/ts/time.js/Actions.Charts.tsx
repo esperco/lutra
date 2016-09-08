@@ -114,136 +114,6 @@ module Esper.Actions.Charts {
   }
 
 
-  /* Puts together our basic chart view and standard selectors */
-
-  function getChartView(o: BaseOpts<{}>, p: {
-    chart: JSX.Element;
-    events: Stores.Events.TeamEvent[];
-    selectors?: JSX.Element[];
-    menus?: Types.ChartViewMenu[];
-  }) {
-    let labelCalc = new EventStats.LabelCountCalc(p.events, o.extra);
-
-    // Automatically open the confirmation modal the first time
-    labelCalc.onceChange(function(r) {
-      if (autoLaunchConfirm && r.unconfirmedCount) {
-        launchConfirmModal(r.unconfirmed);
-      }
-    });
-
-    var confirmationMenu: Types.ChartViewMenu = {
-      id: "confirm",
-      tab: <Components.ConfirmBadge
-        events={p.events}
-        calculation={labelCalc}
-      />,
-      onClick: () => {
-        labelCalc.getResults().match({
-          none: () => null,
-          some: (r) => launchConfirmModal(r.unconfirmed)
-        });
-        return false;
-      }
-    };
-
-    var team = Stores.Teams.require(o.teamId);
-    if (! team) { return <span />; }
-
-    var cals = Option.matchList(Stores.Calendars.list(o.teamId));
-    var selectors = [
-      cals.length <= 1 ? null :
-      <Components.CalCalcSelector key="calendars"
-        primary={o.pathFn === Paths.Time.calendarsChart}
-        calendars={cals}
-        selectedIds={o.calIds}
-        calculation={new EventStats.CalendarCountCalc(p.events, o.extra)}
-        updateFn={(calIds) => Charting.updateChart(o, { calIds: calIds })}
-      />,
-
-      <Components.LabelCalcSelector key="labels"
-        primary={o.pathFn === Paths.Time.labelsChart}
-        team={team}
-        selected={o.extra.labels}
-        calculation={labelCalc}
-        updateFn={(x) => Charting.updateChart(o, { extra: {labels: x} })}
-      />,
-
-      <Components.DomainSelector key="guests"
-        primary={o.pathFn === Paths.Time.guestsChart}
-        selected={o.extra.domains}
-        calculation={new EventStats.DomainCountCalc(p.events, o.extra)}
-        updateFn={(domains) => Charting.updateChart(o, {
-          extra: {
-            domains: domains,
-
-            // Guest count none and domain none should be the same
-            guestCounts: _.extend({}, o.extra.guestCounts, {
-              none: domains.none
-            }) as Params.ListSelectJSON
-          }
-        })}
-      />,
-
-      <Components.RatingSelector key="ratings"
-        primary={o.pathFn === Paths.Time.ratingsChart}
-        selected={o.extra.ratings}
-        calculation={new EventStats.RatingCountCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: {ratings: x} })}
-      />,
-
-      <Components.DurationSelector key="durations"
-        primary={o.pathFn === Paths.Time.durationsChart}
-        selected={o.extra.durations}
-        calculation={new EventStats.DurationBucketCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: { durations: x }})}
-      />,
-
-      <Components.GuestCountSelector key="guest-counts"
-        primary={o.pathFn === Paths.Time.guestsCountChart}
-        selected={o.extra.guestCounts}
-        calculation={new EventStats.GuestCountBucketCalc(p.events, o.extra)}
-        updateFn={(x) => Charting.updateChart(o, { extra: { guestCounts: x }})}
-      />,
-
-      <Components.WeekHourSelector key="weekHours"
-        hours={o.extra.weekHours}
-        updateHours={
-          (x) => Charting.updateChart(o, { extra: { weekHours: x }})
-        }
-        showUnscheduled={o.extra.type === "percent"}
-        unscheduled={o.extra.incUnscheduled}
-        updateUnscheduled={
-          (x) => Charting.updateChart(o, { extra: { incUnscheduled: x }})
-        }
-      />,
-
-      o.extra.type === "calendar" ? null :
-      <Components.RelativePeriodSidebarSelector key="incrs"
-        period={o.period}
-        allowedIncrs={[-1, 1]}
-        selectedIncrs={o.extra.incrs}
-        updateFn={(x) => Charting.updateChart(o, { extra: { incrs: x }})}
-      />
-    ];
-
-    return <Views.Charts
-      chart={p.chart}
-      selectors={selectors.concat(p.selectors || [])}
-      menus={[confirmationMenu].concat(p.menus || [])}
-      { ...o }
-    />;
-  }
-
-  var autoLaunchConfirm = true; // This gets set to false after first launch.
-
-  function launchConfirmModal(events: Stores.Events.TeamEvent[]) {
-    autoLaunchConfirm = false;
-    Layout.renderModal(
-      Containers.confirmListModal(events)
-    );
-  }
-
-
   /* Misc helpers */
 
   function getChart<T>(o: BaseOpts<T>, p: {
@@ -311,10 +181,7 @@ module Esper.Actions.Charts {
           <Components.DurationHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {
-        chart,
-        events: events
-      });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -346,10 +213,7 @@ module Esper.Actions.Charts {
         />,
       });
 
-      return getChartView(o, {
-        chart,
-        events: events
-      });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -380,7 +244,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.GuestHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, { chart, events });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -409,7 +273,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)}
         />,
       });
-      return getChartView(o, { chart, events });
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -435,7 +299,7 @@ module Esper.Actions.Charts {
         abs: (data) => <Components.LabelHoursChart periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events});
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 
@@ -464,7 +328,7 @@ module Esper.Actions.Charts {
           periods={getCalc(data)} />,
       });
 
-      return getChartView(o, {chart, events});
+      return <Views.Charts chart={chart} events={events} { ...o } />;
     }));
   }
 }

@@ -2,56 +2,71 @@
   Component for selecting a calendar for a given team
 */
 
-/// <reference path="./Components.SidebarSelector.tsx" />
+/// <reference path="./Components.CalcUI.tsx" />
 
 module Esper.Components {
-  export class CalCalcSelector extends DefaultSidebarSelector<{
-    calculation: EventStats.CalendarCountCalc;
-    calendars: ApiT.GenericCalendar[];
-    selectedIds: string[];
-    updateFn: (ids: string[]) => void;
-  }> {
-    renderHeader() {
-      return <span>
-        <i className="fa fa-fw fa-calendar-o" />{" "}
-        { Text.ChartCalendars }
-      </span>;
-    }
+  export class CalCalcSelector
+    extends CalcUI<Types.EventOptGrouping, {
+      id?: string;
+      calculation: EventStats.CalendarCountCalc;
+      calendars: ApiT.GenericCalendar[];
+      selectedIds: string[];
+      updateFn: (ids: string[]) => void;
+    }>
+  {
+    render() {
+      return this.state.result.match({
+        none: () => <div className="esper-no-content">
+          { Text.UICalculating }
+        </div>,
+        some: (optGroups) => {
+          let grouping = optGroups.some;
+          let choices = _.map(this.props.calendars, (c) => {
+            let count = grouping[c.id] && grouping[c.id].totalUnique;
+            return {
+              id: c.id,
+              displayAs: this.getDisplayName(c.id),
+              badgeText: count ? count.toString() : undefined,
+              badgeHoverText: count ? Text.events(count) : undefined,
+              badgeColor: Colors.getColorForCal(c.id)
+            };
+          });
 
-    renderContent() {
-      var grouping = this.state.result.match({
-        none: (): EventStats.Grouping => ({}),
-        some: (result) => result.some
-      });
-
-      var choices = _.map(this.props.calendars, (c) => {
-        let count = grouping[c.id] && grouping[c.id].totalUnique;
-        return {
-          id: c.id,
-          displayAs: this.getDisplayName(c.id),
-          badgeText: count ? count.toString() : undefined,
-          badgeHoverText: count ? Text.events(count) : undefined,
-          badgeColor: this.props.primary ?
-            Colors.getColorForCal(c.id) : undefined
-        };
-      });
-
-      return <Components.ListSelectorSimple
-        choices={choices}
-        selectedIds={this.props.selectedIds}
-        selectOption={Components.ListSelectOptions.MULTI_SELECT}
-        selectedItemClasses="active"
-        className="esper-select-menu"
-        listClasses="esper-select-menu"
-        itemClasses="esper-selectable"
-        updateFn={this.props.updateFn}
-      />;
+          return <Components.ListSelectorSimple
+            choices={choices}
+            selectedIds={this.props.selectedIds}
+            selectOption={Components.ListSelectOptions.MULTI_SELECT}
+            selectedItemClasses="active"
+            className="esper-select-menu"
+            listClasses="esper-select-menu"
+            itemClasses="esper-selectable"
+            updateFn={this.props.updateFn}
+          />
+        }
+      })
     }
 
     getDisplayName(calId: string) {
       var cal = _.find(this.props.calendars, (c) => c.id === calId);
       if (cal) return cal.title;
       return calId;
+    }
+  }
+
+  export class CalCalcDropdownSelector extends CalCalcSelector {
+    render() {
+      var selectedText = _.map(this.props.selectedIds,
+        (calId) => this.getDisplayName(calId)
+      ).join(", ");
+
+      return <Dropdown keepOpen={true}>
+        <Selector id={this.props.id} className="dropdown-toggle">
+          { selectedText }
+        </Selector>
+        <div className="dropdown-menu">
+          { super.render() }
+        </div>
+      </Dropdown>;
     }
   }
 

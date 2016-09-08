@@ -98,15 +98,16 @@ module Esper.Components {
       choices.sort();
 
       return <div className="label-selector esper-section">
-        <FilterInput
-          ref={(c) => this._input = c}
-          id={this.props.inputId}
-          className="esper-section"
-          placeholder={_.capitalize(Text.FindAddLabels)}
-          getList={() => this._list}
-          onEsc={this.props.onEsc}
-          onSubmit={(label) => this.toggle(label)}
-        />
+        <div className="esper-section">
+          <FilterInput
+            ref={(c) => this._input = c}
+            id={this.props.inputId}
+            placeholder={_.capitalize(Text.FindAddLabels)}
+            getList={() => this._list}
+            onEsc={this.props.onEsc}
+            onSubmit={(label) => this.toggle(label)}
+          />
+        </div>
 
         <div className="esper-section esper-full-width">
           <FilterList

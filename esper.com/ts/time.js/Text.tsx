@@ -79,27 +79,50 @@ module Esper.Text {
   export const CalendarSetupExecDescription = "Pick which calendars Esper " +
     "should use for each person you're supporting.";
 
+  export const NoLabelsMessage = `Create ${Labels} to categorize your ` +
+    `events`
+
   // Selector text
   export const SelectAll = `Select All`;
-  export const AllLabels = `All ` + _.capitalize(Labels);
+  export const AllLabels = `Show All`;
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
+  export const HideUnlabled = `Only ${_.capitalize(Labeled)} Events`;
   export const Unconfirmed = `New Events`;
   export const SearchEventsPlaceholder = `Filter Events`;
 
   export const GuestDomains = `Organizations`;
+  export const AllGuests = `Show All`;
   export const NoGuests = `No Guests`;
+  export const HideNoGuests = `Only Events with Guests`;
   export const NoTeam = `Select ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
+  export const AllRatings = `Show All`;
   export const NoRating = `No Rating`;
+  export const HideNoRating = `Only Rated Events`;
+
+  export const AllDurations = `Show All`;
   export const WeekHours = `Time of Day`;
+  export const AllWeekHours = `Show All`;
+  export const SomeWeekHours = `Limited Times of Week`;
   export const IncUnscheduled = `Show Unscheduled Time`;
+
+  export const ResetFilters = `Reset Filters`;
+
+  // Period selector text
+  export const Week = `Week`;
+  export const Month = `Month`;
+  export const Quarter = `Quarter`;
+  export const Custom = `Custom`;
+
+  // Same as ChartCalculating, but for CalcUI elements
+  export const UICalculating = `Crunching numbers`;
 
   // Paginated Predictions
   export const ConfirmLabelsHeading = Unconfirmed;
-  export const ConfirmationDescription = `Hi there! We've made some guesses ` +
-    `about which ${Labels} to apply to your events. Help us out by ` +
-    `confirming changing those guesses below.`;
+  export const ConfirmationDescription = `Hi there! We've tried to guess ` +
+    `which ${Labels} we should apply to your events. Help us out by ` +
+    `confirming or changing those guesses below.`;
   export const PredictionsLoading = `Updating ` + _.capitalize(Labels);
   export const ConfirmAllLabels = `Confirm ${_.capitalize(Labels)}`;
 
@@ -136,9 +159,14 @@ module Esper.Text {
     `We've grouped your events by how long they are. If you need to touch ` +
     `base with many different ${Guests}, it may help to schedule shorter ` +
     `meetings.`;
-  export const ChartLabelsDescription =
-    `You can add ${Labels} to your events to ` +
-    `categorize them and see what you're spending the most time on.`;
+  export const ChartLabelsDescription = <span>
+    You can add {" "}{Labels}{" "} to your events to categorize them and see
+    what you're spending the most time on. You can also {" "}{Label}{" "}
+    events by adding a{" "}
+    <a href="https://blog.esper.com/2016/08/05/track-olympics-time-with-hashtags">
+      #hashtag
+    </a>{" "} to the event title or description.
+  </span>;
   export const ChartGuestsDescription =
     `These are the people whom you spend the most time in meetings with.`;
   export const ChartDomainsDescription =

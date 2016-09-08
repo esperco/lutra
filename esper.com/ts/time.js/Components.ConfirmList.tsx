@@ -142,7 +142,7 @@ module Esper.Components {
     render() {
       var events = this.getEvents();
       return <ModalBase onHidden={() => this.updateRemainder()}>
-        <ModalHeader icon="fa-question-circle"
+        <ModalHeader icon="fa-flash"
                      title={Text.ConfirmLabelsHeading} />
         <div className="modal-body">
           { this.renderMain(events) }

@@ -14,6 +14,66 @@ module Esper.Charting {
 
   /* Routing helpers */
 
+  // PathFn -- passed function from routing
+  type PathFn = (o: Paths.Time.chartPathOpts) => Paths.Path;
+
+  // Calls a given function for a charting group
+  export function matchPrimary<T>(
+    pathFn: PathFn,
+    group: Types.ChartGroups<() => T>
+  ): T {
+    switch(pathFn) {
+      case Paths.Time.labelsChart:
+        return group.labels();
+
+      case Paths.Time.calendarsChart:
+        return group.calendars();
+
+      case Paths.Time.guestsChart:
+        return group.domains();
+
+      case Paths.Time.ratingsChart:
+        return group.ratings();
+
+      case Paths.Time.durationsChart:
+        return group.durations();
+
+      case Paths.Time.guestsCountChart:
+        return group.guestCounts();
+    }
+    throw new Error("Unknown chart path");
+  }
+
+  /*
+    Inverse of matchPrimary. Calls all functions *except* the one that
+    matches. Returns options.none if not called.
+  */
+  export function minusPrimary<T>(
+    pathFn: PathFn,
+    group: Types.ChartGroups<() => T>
+  ) : Types.ChartGroups<Option.T<T>> {
+    return {
+      labels: pathFn === Paths.Time.labelsChart ?
+        Option.none<T>() :
+        Option.some(group.labels()),
+      calendars: pathFn === Paths.Time.calendarsChart ?
+        Option.none<T>() :
+        Option.some(group.calendars()),
+      domains: pathFn === Paths.Time.guestsChart ?
+        Option.none<T>() :
+        Option.some(group.domains()),
+      durations: pathFn === Paths.Time.durationsChart ?
+        Option.none<T>() :
+        Option.some(group.durations()),
+      guestCounts: pathFn === Paths.Time.guestsCountChart ?
+        Option.none<T>() :
+        Option.some(group.guestCounts()),
+      ratings: pathFn === Paths.Time.ratingsChart ?
+        Option.none<T>() :
+        Option.some(group.ratings())
+    };
+  }
+
   export function updateChart<T>(o: BaseOpts<T>, p: {
     pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
     teamId?: string;
@@ -21,6 +81,7 @@ module Esper.Charting {
     period?: Period.Single|Period.Custom;
     extra?: ExtraOptsMaybe & T;
     opts?: Route.nav.Opts;
+    reset?: boolean;
   }) {
     var opts = p.opts || {};
     var pathFn = p.pathFn || o.pathFn;
@@ -30,13 +91,19 @@ module Esper.Charting {
     var newExtras: (ExtraOptsMaybe & T)|{} = {}
 
     // Chart change => blank out filter params unless provided
-    if (pathFn !== o.pathFn && p.extra) {
-      newExtras = p.extra;
+    if (pathFn !== o.pathFn) {
+      newExtras = p.extra || {};
     }
 
     // Team change => Don't preserve filter params, reset cals
     else if (teamId !== o.teamId) {
       calIds = [Params.defaultCalIds];
+    }
+
+    // Reset => clear out everything except specified vars
+    else if (p.reset) {
+      calIds = [Params.defaultCalIds];
+      newExtras = p.extra || {};
     }
 
     // Else merge old extra with new params

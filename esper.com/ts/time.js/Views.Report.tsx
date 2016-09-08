@@ -32,13 +32,19 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <Components.LabelCalcSelector
-            primary={true}
-            team={team}
-            selected={this.props.labels}
-            calculation={labelCountCalc}
-            updateFn={(x) => Route.nav.query({ labels: x })}
-          />
+          <UnconfirmedLink calculation={labelCountCalc} />
+          <div className="esper-panel-section">
+            <div className="esper-header">
+              <i className="fa fa-fw fa-left fa-tags" />
+              { Text.ChartLabels }
+            </div>
+            <Components.LabelCalcSelector
+              team={team}
+              selected={this.props.labels}
+              calculation={labelCountCalc}
+              updateFn={(x) => Route.nav.query({ labels: x })}
+            />
+          </div>
 
           <div className="sidebar-bottom-menu">
             <Components.TeamSelector
@@ -51,7 +57,12 @@ module Esper.Views {
         </Components.Sidebar>
 
         <div className="esper-content">
-          { this.renderPeriodSelector() }
+          <div className="esper-content-header">
+            <Components.PeriodSelector
+              period={this.props.period}
+              updateFn={(p) => this.update({ period: p })}
+            />
+          </div>
           <div className="esper-expanded">
             <ReportMain
               calendars={
@@ -71,24 +82,6 @@ module Esper.Views {
           </div>
         </div>
 
-      </div>;
-    }
-
-    renderPeriodSelector() {
-      return <div className="esper-content-header container-fluid">
-        <div className="row period-selector">
-          <Components.IntervalOrCustomSelector
-            className="col-sm-6"
-            period={this.props.period}
-            updateFn={(p) => this.update({period: p})}
-          />
-          <div className="col-sm-6">
-            <Components.SingleOrCustomPeriodSelector
-              period={this.props.period}
-              updateFn={(p) => this.update({period: p})}
-            />
-          </div>
-        </div>
       </div>;
     }
 
@@ -432,5 +425,65 @@ module Esper.Views {
         { Text.SeeMoreLinkText }
       </a>
     </p>;
+  }
+
+  // Has auto-label confirmation modal been launched before?
+  var confirmationLaunched = false;
+
+  // Link to launch auto-confirm modal
+  interface UnconfirmedLinkProps {
+    calculation: EventStats.LabelCountCalc;
+  }
+
+  class UnconfirmedLink extends
+    Components.CalcUI<EventStats.LabelCalcCount, UnconfirmedLinkProps>
+  {
+    constructor(props: UnconfirmedLinkProps) {
+      super(props);
+      this.autoLaunch(props.calculation);
+    }
+
+    componentWillReceiveProps(props: UnconfirmedLinkProps) {
+      this.autoLaunch(props.calculation)
+    }
+
+    // Autolaunch confirmation modal unless already launched
+    autoLaunch(calculation: EventStats.LabelCountCalc) {
+      calculation.onceChange((result) => {
+        if (!confirmationLaunched && result.unconfirmedCount > 0) {
+          this.launchModal(result.unconfirmed);
+        }
+      });
+    }
+
+    // Button to manually launch
+    render() {
+      return this.state.result.match({
+        none: () => null,
+        some: (optGroups) => {
+          if (optGroups.unconfirmedCount > 0) {
+            return <div className="esper-panel-section">
+              <div className="esper-select-menu">
+                <div className="esper-selectable unconfirmed-link" onClick={
+                  () => this.launchModal(optGroups.unconfirmed)
+                }>
+                  <i className="fa fa-fw fa-left fa-flash" />
+                  { Text.Unconfirmed }
+                  <Components.Badge
+                    text={optGroups.unconfirmedCount.toString()}
+                  />
+                </div>
+              </div>
+            </div>;
+          }
+          return null;
+        }
+      });
+    }
+
+    launchModal(events: Types.TeamEvent[]) {
+      confirmationLaunched = true;
+      Layout.renderModal(Containers.confirmListModal(events));
+    }
   }
 }

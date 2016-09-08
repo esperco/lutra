@@ -1,17 +1,47 @@
 @import "../lib/_helpers";
+@import "../lib/_animations";
 
-#charts-page {
-  @media (max-width: @screen-xs-max) {
-    .period-selector {
-      text-align: center;
+// Header for chart
+#chart-header {
+  // Override default esper-content-header settings since the spacing looks off
+  @media screen and (max-width: @screen-xs-max) {
+    > .actions { margin-right: -@esper-base-padding; }
+  }
 
-      .esper-subheader-link {
-        display: inline-block;
-        text-align: center;
-        padding: 0 @padding-xs-horizontal;
-        min-width: 20%;
-        box-sizing: border-box;
-      }
+  @media screen and (min-width: @screen-sm-min) {
+    display: flex;
+    align-items: center;
+    > * { flex: 1 1 auto; }
+    > .period-selector { flex-basis: 60%; }
+    > .actions { flex-basis: 40%; }
+  }
+
+  .filter-action .active {
+    color: @brand-success;
+  }
+}
+
+.filter-menu {
+  animation: slidedown 0.6s;
+  border-radius: @border-radius-base;
+
+  .filter-item {
+    label { white-space: nowrap; }
+    &.active label {
+      color: @brand-success;
+    }
+
+    min-width: 100%;
+    max-width: 100%;
+
+    @media screen and (min-width: @screen-sm-min) {
+      min-width: 25%;
+      max-width: 33%;
+      box-sizing: border-box;
+    }
+
+    @media screen and (min-width: @screen-md-min) {
+      max-width: 25%;
     }
   }
 }
@@ -37,8 +67,7 @@
         screen height minus navbar, height of period selector, height
         of totals bar, and padding at bottom of #chart-expanded)
       */
-      min-height: calc(~"100vh - "(@navbar-height +
-        @input-height-base + (@esper-base-padding * 2) +
+      min-height: calc(~"100vh - "(@navbar-height + @content-header-height +
         @input-height-base + @esper-base-padding));
     }
   }
@@ -48,8 +77,7 @@
 .esper-release-notes + .navbar-fixed-top + * {
   #chart-expanded .chart-holder {
     @media screen and (min-width: @screen-sm-min) {
-      min-height: calc(~"100vh - "(@navbar-height +
-        @input-height-base + (@esper-base-padding * 2) +
+      min-height: calc(~"100vh - "(@navbar-height + @content-header-height +
         @input-height-base + @esper-base-padding + @release-notes-height));
     }
   }

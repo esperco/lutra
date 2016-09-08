@@ -34,7 +34,7 @@ module Esper.Route {
   */
 
   routeHome(
-    redirectPath(Paths.Time.charts())
+    redirectPath(Paths.Time.report())
   );
 
   // Reports / All-the-Charts page
@@ -59,7 +59,7 @@ module Esper.Route {
   // Charts
 
   /*
-    Generic cleaning + routing functino for our chart functions
+    Generic cleaning + routing function for our chart functions
   */
   function routeChart<T>(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
@@ -94,24 +94,6 @@ module Esper.Route {
   routeChart(Paths.Time.guestsCountChart, Actions.Charts.renderGuestsCount);
   routeChart(Paths.Time.labelsChart, Actions.Charts.renderLabels);
   routeChart(Paths.Time.ratingsChart, Actions.Charts.renderRatings);
-
-  // Default routing => redirect to labels
-  route(Paths.Time.charts({
-    teamId: ":teamId?",
-    calIds: ":calIds?",
-    interval: ":interval?",
-    period: ":period?"
-  }).hash, function(ctx) {
-    nav.go(Paths.Time.labelsChart({
-      teamId: ctx.params["teamId"],
-      calIds: ctx.params["calIds"],
-      interval: ctx.params["interval"],
-      period: ctx.params["interval"]
-    }), {
-      queryStr: ctx.querystring,
-      replace: true
-    });
-  });
 
   // Calendar labeling page
   route(Paths.Time.calendarLabeling({

@@ -1,6 +1,6 @@
 @import "../lib/_bootstrap-variables.less";
 
-.day-selector .esper-select-menu {
+.day-selector .days .esper-select-menu {
   display: flex;
 
   .esper-selectable, li > a {
@@ -8,20 +8,19 @@
     text-align: center;
     display: inline-block;
 
-    &.active { font-weight: bold; }
+    &.active {
+      font-weight: bold;
+      color: @brand-primary;
+    }
 
     i.fa { display: none; }
   }
 }
 
-.esper-sidebar .esper-expando .day-selector .esper-select-menu {
-  .esper-selectable, li > a {
-    &.active { font-weight: bold; }
-  }
-}
-
 .day-selector .times {
   display: flex;
+  padding-left: @padding-small-horizontal;
+  padding-right: @padding-small-horizontal;
 
   .hour-minute {
     flex-grow: 1

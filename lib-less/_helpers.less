@@ -4,6 +4,8 @@
 
 // Custom Esper variables
 @min-fullscreen-height: 350px;
+@content-header-height: @input-height-base + 2 * @padding-base-vertical;
+@menu-minwidth: 250px;
 @sidebar-xs-width: 90%; // When open
 @sidebar-sm-width: 33%;
 @sidebar-md-width: 25%;
@@ -234,16 +236,27 @@
     esper-expanded)
   */
   > .esper-content-header {
+    padding: 0 @esper-base-padding;
     line-height: @input-height-base;
-    padding: @esper-base-padding;
-    overflow: auto;
+    vertical-align: middle;
+
+    > div {
+      padding: (@esper-base-padding / 2) 0;
+    }
 
     @media screen and (min-width: @screen-sm-min) {
+      line-height: @content-header-height;
       position: absolute;
       top: 0; left: 0; right: 0;
+      height: @content-header-height;
+      overflow: auto;
+
+      > div {
+        padding: 0;
+      }
 
       + * {
-        margin-top: @input-height-base + @esper-base-padding * 2;
+        margin-top: @content-header-height;
       }
     }
   }
@@ -336,8 +349,7 @@
 .esper-header {
   line-height: @input-height-base;
   vertical-align: middle;
-  margin-top: @padding-large-vertical - @padding-base-vertical;
-  text-transform: capitalize;
+  text-transform: uppercase;
 }
 
 
@@ -377,13 +389,23 @@
 
   Use .esper-panel-section to add borders between consecutive sections.
 
-  Use .esper-full-width inside a section or after a section to extend past
-  padding. Or use on the section element itself to remove side padding.
+  Use .esper-full-width with a section to extend or remove side padding.
 */
 .esper-section, .esper-panel-section {
   padding: @esper-base-padding;
 
-  &.esper-full-width { padding-left: 0; padding-right: 0; }
+  &.esper-select-menu {
+    padding: @esper-base-padding;
+  }
+
+  &.esper-full-width {
+    padding-left: 0; padding-right: 0;
+
+    // Retain padding for certain elements
+    .esper-no-content {
+      margin: 0 @esper-base-padding;
+    }
+  }
 
   // Resets for panel + modal body
   .panel-body > & {
@@ -428,6 +450,11 @@
   }
 }
 
+.esper-panel-section > .esper-select-menu {
+  margin-left: -@esper-base-padding;
+  margin-right: -@esper-base-padding;
+}
+
 .esper-subheader {
   text-transform: capitalize;
   margin: 0 0 @padding-base-vertical;
@@ -452,7 +479,7 @@
 .esper-no-content {
   text-align: center;
   padding: @panel-body-padding;
-  font-size: @font-size-large;
+  font-size: @font-size-h5;
   color: @text-muted;
   border: 1px solid @brand-border;
   border-radius: @panel-border-radius;
@@ -613,6 +640,7 @@ flexibility with non-UL elements */
   list-style: none;
   font-size: @font-size-base;
   text-align: left; // Ensures proper alignment if parent has it changed
+  min-width: @menu-minwidth;
 
   + .esper-select-menu {
     border-top: 1px solid @brand-divider;
@@ -642,6 +670,10 @@ flexibility with non-UL elements */
 
     .dropdown-menu & {
       padding: @padding-xs-vertical @padding-base-horizontal;
+
+      @media screen and (min-width: @screen-sm-min) {
+        .description { min-width: 250px; }
+      }
     }
 
     &.active {
@@ -656,16 +688,15 @@ flexibility with non-UL elements */
       &:hover, &:focus, &:active { color: @brand-danger; }
     }
 
-    > .fa + div {
-      display: inline-block;
-      vertical-align: top;
+    > .fa {
+      line-height: @line-height-computed;
+      width: @line-height-computed;
+      float: left;
+      margin-right: @padding-small-horizontal;
+    }
 
-      /*
-        TODO: Using fixed px is a little hacky. Revisit with flexbox later.
-      */
-      .dropdown .dropdown-menu & {
-        max-width: 360px;
-      }
+    > .fa + div {
+      margin-left: @line-height-computed + @padding-small-horizontal;
     }
 
     .description {
@@ -694,6 +725,7 @@ flexibility with non-UL elements */
 
     .badge {
       float: right;
+      margin-top: 1px;
     }
   }
 
@@ -816,19 +848,16 @@ flexibility with non-UL elements */
     width: @input-height-base;
     height: @input-height-base;
     line-height: @input-height-base;
-    margin-right: @grid-gutter-width / 2;
     vertical-align: middle;
     text-align: center;
   }
 
   .esper-left-icon {
     left: 0;
-    margin-left: @grid-gutter-width / 2;
   }
 
   .esper-right-icon {
     right: 0;
-    margin-right: @grid-gutter-width / 2;
   }
 }
 
@@ -909,6 +938,10 @@ a.action {
 
 .fa.fa-left {
   margin-right: @padding-small-horizontal;
+}
+
+.fa.fa-right {
+  margin-left: @padding-small-horizontal;
 }
 
 /* Misc formatting for "shaded" elements */

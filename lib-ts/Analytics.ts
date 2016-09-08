@@ -69,13 +69,13 @@ module Esper.Analytics {
 
     // esper.com/time
     TimeStats,             // /#!/
-    TimeStatsCharts,       // /#!/charts
+    Report,                // /#!/charts
+    TimeStatsCharts,       // /#!/charts/<something>
     CalendarLabeling,      // /#!/calendar-labeling
     CalendarSetup,         // /#!/calendar-setup
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
     LabelSetup,            // /#!/label-setup
-    Report,                // /#!/report
     TeamSetup              // /#!/team-setup
   }
 
