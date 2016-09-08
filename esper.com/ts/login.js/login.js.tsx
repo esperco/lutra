@@ -312,6 +312,17 @@ module Esper {
       Esper.redirect();
     }
   }
+
+
+  /* Sandbox helpers */
+
+  export function signupForSandbox() {
+    handleLoginInfo(Api.sandboxSignup());
+  }
+
+   export function loginToSandbox(email: string) {
+    handleLoginInfo(Api.sandboxLogin(email));
+  }
 }
 
 Esper.init();
