@@ -34,8 +34,8 @@ module Esper.Option {
       Normally don't use this since this defeats the whole point of using
       options, but React is null-safe, so fine there.
     */
-    unwrapNull(): E {
-      return this.value || null;
+    unwrapOr(e: E): E {
+      return this.some ? this.value : e;
     }
 
     /** Monadic bind for Option.T, but `bind' is already used in the

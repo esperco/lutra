@@ -306,12 +306,12 @@ module Esper.Views {
 
       return <div className="filter-menu esper-section esper-shade">
         <div className="esper-section esper-flex-list">
-          { groupSelectors.labels.unwrapNull() }
-          { groupSelectors.calendars.unwrapNull() }
-          { groupSelectors.domains.unwrapNull() }
-          { groupSelectors.ratings.unwrapNull() }
-          { groupSelectors.durations.unwrapNull() }
-          { groupSelectors.guestCounts.unwrapNull() }
+          { groupSelectors.labels.unwrapOr(null) }
+          { groupSelectors.calendars.unwrapOr(null) }
+          { groupSelectors.domains.unwrapOr(null) }
+          { groupSelectors.ratings.unwrapOr(null) }
+          { groupSelectors.durations.unwrapOr(null) }
+          { groupSelectors.guestCounts.unwrapOr(null) }
 
           <FilterItem id={this.getId("weekHours")}
                       active={active.weekHours || active.incUnscheduled}
