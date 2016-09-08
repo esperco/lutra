@@ -659,6 +659,10 @@ flexibility with non-UL elements */
 
     .dropdown-menu & {
       padding: @padding-xs-vertical @padding-base-horizontal;
+
+      @media screen and (min-width: @screen-sm-min) {
+        .description { min-width: 250px; }
+      }
     }
 
     &.active {
@@ -673,16 +677,15 @@ flexibility with non-UL elements */
       &:hover, &:focus, &:active { color: @brand-danger; }
     }
 
-    > .fa + div {
-      display: inline-block;
-      vertical-align: top;
+    > .fa {
+      line-height: @line-height-computed;
+      width: @line-height-computed;
+      float: left;
+      margin-right: @padding-small-horizontal;
+    }
 
-      /*
-        TODO: Using fixed px is a little hacky. Revisit with flexbox later.
-      */
-      .dropdown .dropdown-menu & {
-        max-width: 360px;
-      }
+    > .fa + div {
+      margin-left: @line-height-computed + @padding-small-horizontal;
     }
 
     .description {
