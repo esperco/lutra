@@ -190,7 +190,8 @@ module Esper.Actions.EventLabels {
       approved: event.labelScores.match({
         none: () => false,
         some: (labels) => _.some(labels,
-          (l) => h.label.normalized == l.id || h.hashtag.normalized == l.id
+          (l) => h.label ? h.label.normalized == l.id
+                         : h.hashtag.normalized == l.id
         )
       })
     }));
@@ -238,8 +239,8 @@ module Esper.Actions.EventLabels {
                 _(scores)
                   .filter(
                     (s) => !_.some(e.hashtags,
-                      (h) => h.label.normalized === s.id ||
-                             h.hashtag.normalized === s.id))
+                      (h) => h.label ? h.label.normalized === s.id
+                                     : h.hashtag.normalized === s.id))
                   .map((s) => s.displayAs)
                   .value()
             }),
