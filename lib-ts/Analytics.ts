@@ -11,6 +11,7 @@ module Esper.Analytics {
 
     ///////////* Login *////////////////////
     AttemptLogin = 1,         // Login was initiated
+    SandboxSignup,            // User entered sandbox mode
 
     ///////////* Time Stats *///////////////
 

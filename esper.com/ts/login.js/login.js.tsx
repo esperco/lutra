@@ -318,6 +318,7 @@ module Esper {
 
   export function signupForSandbox() {
     handleLoginInfo(Api.sandboxSignup());
+    Analytics.track(Analytics.Trackable.SandboxSignup);
   }
 
    export function loginToSandbox(email: string) {
