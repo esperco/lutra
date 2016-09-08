@@ -60,7 +60,7 @@ module Esper.Components {
         Config.MIN_DATE.getTime()
       );
       var disableRight = (
-        Period.boundsFromPeriod(Period.incr(period, -1))[0].getTime() >
+        Period.boundsFromPeriod(Period.incr(period, 1))[1].getTime() >
         Config.MAX_DATE.getTime()
       );
 
@@ -93,7 +93,7 @@ module Esper.Components {
         </Dropdown>
         { disableRight ? <span /> :
           <span className="action period-incr-action"
-                onClick={() => this.props.updateFn(Period.incr(period, -1))}>
+                onClick={() => this.props.updateFn(Period.incr(period, 1))}>
             <i className="fa fa-fw fa-caret-right" />
           </span> }
       </div>;
