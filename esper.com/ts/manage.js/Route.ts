@@ -5,63 +5,81 @@
 module Esper.Route {
   declare var pageJs: PageJS.Static;
 
-  var onboardingCheck: PageJS.Callback = function(ctx, next) {
-    if (Stores.Teams.all().length) {
-      next();
+  var demoCheck: PageJS.Callback = function(ctx, next) {
+    if (Login.data.is_sandbox_user) {
+      Route.nav.go(Paths.Manage.sandbox());
     } else {
-      Route.nav.go(Paths.Manage.newTeam());
+      next();
     }
   }
 
+  // Check if we have a team -- implies demo check
+  var onboardingCheck: PageJS.Callback = function(ctx, next) {
+    demoCheck(ctx, function() {
+      if (Stores.Teams.all().length) {
+        next();
+      } else {
+        Route.nav.go(Paths.Manage.newTeam());
+      }
+    });
+  }
+
+  // Check if we have a group -- implies demo check
   var groupCheck: PageJS.Callback = function(ctx, next) {
-    if (Stores.Groups.all().length) {
-      next();
-    } else {
-      Route.nav.go(Paths.Manage.newGroup());
-    }
+    demoCheck(ctx, function() {
+      if (Stores.Groups.all().length) {
+        next();
+      } else {
+        Route.nav.go(Paths.Manage.newGroup());
+      }
+    });
   }
 
   routeHome(
     redirectPath(Paths.Manage.Team.general())
   );
 
-  route(Paths.Manage.newTeam().hash, function() {
+  route(Paths.Manage.newTeam().hash, demoCheck, function() {
     Actions.renderNewTeam();
   });
 
-  route(Paths.Manage.newGroup().hash, function() {
+  route(Paths.Manage.newGroup().hash, demoCheck, function() {
     Actions.renderNewGroup();
   });
 
-  route(Paths.Manage.Team.general({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.general({teamId: ":teamId?"}).hash,
+    onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderTeamGeneralSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.Team.calendars({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.calendars({teamId: ":teamId?"}).hash,
+    onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderCalendarSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.Team.labels({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.labels({teamId: ":teamId?"}).hash,
+    onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderTeamLabelSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash, onboardingCheck,
+  route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash,
+    onboardingCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderTeamNotificationSettings(ctx.params["teamId"], msg, err);
     });
 
-  route(Paths.Manage.personal().hash, function(ctx) {
+  route(Paths.Manage.personal().hash, demoCheck, function(ctx) {
     Actions.renderPersonalSettings();
   });
 
@@ -79,12 +97,15 @@ module Esper.Route {
       Actions.renderGroupLabelSettings(ctx.params["groupId"], msg, err);
   });
 
-  route(Paths.Manage.Group.notifications({groupId: ":groupId?"}).hash, groupCheck,
+  route(Paths.Manage.Group.notifications({groupId: ":groupId?"}).hash,
+    groupCheck,
     function(ctx) {
       var msg = Util.getParamByName("msg", ctx.querystring);
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderGroupNotificationSettings(ctx.params["groupId"], msg, err);
   });
+
+  route(Paths.Manage.sandbox().hash, Actions.renderSandbox);
 
   routeNotFound(function(ctx) {
     Actions.render(React.createElement(Views.NotFound, {}));

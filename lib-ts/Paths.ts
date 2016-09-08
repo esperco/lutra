@@ -192,6 +192,10 @@ module Esper.Paths {
       return optPath(prefix, "new-group");
     }
 
+    export function sandbox() {
+      return optPath(prefix, "sandbox");
+    }
+
     export module Team {
       export const subprefix = "team";
 

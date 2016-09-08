@@ -54,6 +54,7 @@ module Esper.Analytics {
     PersonalSettings,      // /#!/personal
     GroupManage,           // /#!/group/general/...
     NewGroup,              // /#!/new-group/...
+    Sandbox,               // /#!/sandbox
 
     // esper.com/now
     Now,                    // /#!/
