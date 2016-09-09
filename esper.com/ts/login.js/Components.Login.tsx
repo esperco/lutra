@@ -78,26 +78,14 @@ module Esper.Components {
           <a href="https://esper.com/terms-of-use">Terms of Use.</a>
         </p></div>
 
+        {/*
+          Temporary sandbox link -- will figure out something nicer and more
+          obvious looking later
+        */}
         <div className="sign-in-footer esper-note">
-          <div className="esper-copyright">
-            &copy; {" "}{ (new Date()).getFullYear() }{" "}
-            Esper Technologies, Inc.{" "}
-            <span className="esper-one-line">All rights reserved.</span>
-          </div>
-          <div>
-            <a href="https://esper.com/contact"
-               className="esper-link">Contact</a>
-            <div className="esper-inline-divider" />
-            <a href="https://esper.com/privacypolicy.html"
-               target="blank"
-               className="esper-link">Privacy</a>
-            <div className="esper-inline-divider" />
-            <a href="https://esper.com/termsofuse.html"
-               target="blank"
-               className="esper-link">
-                 Terms
-            </a>
-          </div>
+          <a onClick={signupForSandbox}>
+            Demo
+          </a>
         </div>
       </div>;
     }
