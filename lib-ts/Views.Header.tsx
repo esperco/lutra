@@ -96,7 +96,10 @@ module Esper.Views {
         <NavLink path={Paths.Time.list({})}>
           <i className="fa fa-fw fa-th-list"></i>{" "}Event List
         </NavLink>
-        { Login.data.is_sandbox_user ? null :
+        { Login.data.is_sandbox_user ?
+          <NavLink path={Paths.Login.home()}>
+            <i className="fa fa-fw fa-arrow-right"></i>{" "}Sign Up
+          </NavLink> :
           <NavLink path={Paths.Manage.home()}>
             <i className="fa fa-fw fa-cog"></i>{" "}Settings
           </NavLink> }

@@ -13,7 +13,8 @@ module Esper.Views {
             in demo mode.
           </p>
           <p>
-            <a className="btn btn-primary" href="/login">
+            <a className="btn btn-primary" href={Paths.Login.home().href}>
+              <i className="fa fa-fw fa-left fa-arrow-right" />
               Please sign up to get started!
             </a>
           </p>
