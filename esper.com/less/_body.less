@@ -1,0 +1,22 @@
+/*
+  Basic CSS for all esper.com pages
+*/
+
+/*
+  This causes #esper-main to expand to push the footer down so that it always
+  sticks to the bottom of the page, regardless of screen size
+*/
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#esper-main {
+  flex: 1 0 auto;
+}
+
+#esper-main + * { // Footer
+  flex: 0 0 auto;
+}
+
