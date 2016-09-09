@@ -28,7 +28,7 @@ module Esper.Actions {
 
     // Delay tracking by 2 seconds to ensure user is actually looking at list
     Util.delayOne(analyticsId, function() {
-      Analytics.page(Analytics.Page.EventList, {
+      Analytics.page(Analytics.Page.Report, {
         interval: period.interval
       });
     }, 2000);
