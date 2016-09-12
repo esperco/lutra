@@ -106,4 +106,9 @@ module Esper.Actions {
     render(<Views.NewGroup />);
     Analytics.page(Analytics.Page.NewGroup);
   }
+
+  export function renderSandbox() {
+    render(<Views.Sandbox />);
+    Analytics.page(Analytics.Page.Sandbox);
+  }
 }

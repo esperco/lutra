@@ -11,6 +11,7 @@ module Esper.Analytics {
 
     ///////////* Login *////////////////////
     AttemptLogin = 1,         // Login was initiated
+    SandboxSignup,            // User entered sandbox mode
 
     ///////////* Time Stats *///////////////
 
@@ -54,6 +55,7 @@ module Esper.Analytics {
     PersonalSettings,      // /#!/personal
     GroupManage,           // /#!/group/general/...
     NewGroup,              // /#!/new-group/...
+    Sandbox,               // /#!/sandbox
 
     // esper.com/now
     Now,                    // /#!/

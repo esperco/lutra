@@ -105,6 +105,7 @@ module Esper.TestFixtures {
       is_admin: false,
       is_alias: false,
       platform: "Google",
+      is_sandbox_user: false,
       email: email,
       teams: [
         makeTeam({

@@ -249,6 +249,7 @@ module Esper.ApiT {
     is_admin: boolean;
     is_alias: boolean;
     platform?: string; // Google | Nylas
+    is_sandbox_user: boolean;
     email: string;
     teams: Team[];
     groups: string[];

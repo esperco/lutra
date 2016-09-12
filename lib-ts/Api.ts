@@ -61,6 +61,16 @@ module Esper.Api {
 
   /* Esper login and password management */
 
+  export function sandboxSignup(): JsonPromise<ApiT.LoginResponse> {
+    var url = prefix + "/api/sandbox/signup";
+    return JsonHttp.post(url, "");
+  }
+
+  export function sandboxLogin(email: string): JsonPromise<ApiT.LoginResponse> {
+    var url = prefix + "/api/sandbox/login/" + string(email);
+    return JsonHttp.get(url);
+  }
+
   export function getLoginInfo():
   JsonPromise<ApiT.LoginResponse> {
     var url = prefix + "/api/login/" + string(Login.myUid()) + "/info";

@@ -33,22 +33,33 @@ module Esper.Analytics {
   export function identify(loginInfo?: ApiT.LoginResponse, cb?: () => void) {
     analytics.ready(function() {
       if (loginInfo && Login.myUid()) {
-        if (analytics.user().id() !== Login.myUid() && loginInfo) {
+        if (analytics.user().id() !== Login.myUid()) {
+          if (loginInfo.is_sandbox_user) {
+            analytics.identify({
+              sandbox: true
+            }, cb);
 
-          // Alias user if new account
-          if (loginInfo.account_created &&
-              moment().diff(moment(loginInfo.account_created)) < 300000)
-          {
-            analytics.alias(Login.myUid());
+          } else {
+
+            // Alias user if new account
+            if (loginInfo.account_created &&
+                moment().diff(moment(loginInfo.account_created)) < 300000)
+            {
+              analytics.alias(Login.myUid());
+            }
+
+            // Identify user regardless of previous login status
+            analytics.identify(Login.myUid(), {
+              email: loginInfo.email,
+              platform: loginInfo.platform,
+              sandbox: false
+            }, cb);
           }
-
-          // Identify user regardless of previous login status
-          analytics.identify(Login.myUid(), {
-            email: loginInfo.email,
-            platform: loginInfo.platform
-          }, cb);
         }
-      } else {
+      }
+
+      // Don't reset if sandbox user -- persist until we can identify
+      else if (!(Login.data && Login.data.is_sandbox_user)) {
         reset();
       }
     });

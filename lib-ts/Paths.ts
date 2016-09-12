@@ -64,6 +64,14 @@ module Esper.Paths {
   }
 
 
+  // Login page
+  export module Login {
+    export function home() {
+      return optPath("login");
+    }
+  }
+
+
   // Paths for /time
   export module Time {
     export const prefix = "/time";
@@ -171,7 +179,6 @@ module Esper.Paths {
     }
   }
 
-
   // Paths for /manage
   export module Manage {
     export const prefix = "/manage";
@@ -190,6 +197,10 @@ module Esper.Paths {
 
     export function newGroup() {
       return optPath(prefix, "new-group");
+    }
+
+    export function sandbox() {
+      return optPath(prefix, "sandbox");
     }
 
     export module Team {
