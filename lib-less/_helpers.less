@@ -5,11 +5,17 @@
 // Custom Esper variables
 @min-fullscreen-height: 350px;
 @content-header-height: @input-height-base + 2 * @padding-base-vertical;
-@menu-minwidth: 250px;
+@menu-minwidth: 225px;
 @sidebar-xs-width: 90%; // When open
-@sidebar-sm-width: 33%;
-@sidebar-md-width: 25%;
-@sidebar-lg-width: 20%;
+
+/*
+  Ensure sidebar is at least large enough to accomodate a menu + padding +
+  a single px border
+*/
+@menu-actual: @menu-minwidth + 2 * @esper-base-padding + 1;
+@sidebar-sm-width: max(100% * (@menu-actual / @screen-sm-min), 30%);
+@sidebar-md-width: max(100% * (@menu-actual / @screen-md-min), 25%);
+@sidebar-lg-width: max(100% * (@menu-actual / @screen-lg-min), 20%);
 
 /*
   Helper classes -- NB: Use esper- prefix here in case we want to move these
