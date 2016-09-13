@@ -11,6 +11,7 @@
 
   "devOnly": [
     "../lib/JasmineStub.ts",
+    "Calc.Test.ts",
     "EventStats.Test.ts",
     "Insights.Test.ts"
   ],
