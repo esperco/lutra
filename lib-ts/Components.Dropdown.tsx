@@ -135,7 +135,7 @@ module Esper.Components {
 
       return <Overlay id={dropdownContainerId}>
         <div className="dropdown-backdrop" onClick={() => this.close()}>
-          <DropdownWrapper anchor={this._toggle}>
+          <DropdownWrapper anchor={this._toggle} keepOpen={this.props.keepOpen}>
             { menu }
           </DropdownWrapper>
         </div>
@@ -150,6 +150,7 @@ module Esper.Components {
   */
   interface MenuProps {
     anchor: HTMLElement;
+    keepOpen?: boolean;
     children?: JSX.Element[];
   }
 
@@ -192,7 +193,8 @@ module Esper.Components {
         "up" : "down";
 
       let classes = classNames("dropdown-wrapper", "open", vAlign, hAlign);
-      return <div className={classes} style={style}>
+      return <div className={classes} style={style}
+                  onClick={(e) => this.props.keepOpen && e.stopPropagation()}>
         { this.props.children }
       </div>;
     }
