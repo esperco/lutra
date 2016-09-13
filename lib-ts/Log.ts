@@ -92,11 +92,9 @@ module Esper.Log {
   export var w = warn;
 
   /* error - all errors are also logged with Raven */
-  export function error(...a: any[]) {
-    let error = a[0];
-    let details = a.length > 2 ? a.slice(1) : a[1];
+  export function error(error: string|Error, details?: any) {
     logToRaven(error, details);
-    logBase(console.error, Level.ERROR, "E", a);
+    logBase(console.error, Level.ERROR, "E", [error, details]);
   }
   export var e = error;
 

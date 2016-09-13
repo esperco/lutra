@@ -271,11 +271,10 @@ module Esper.Actions {
           initAction={!!action}
         />);
       } else {
-        Log.e(e);
+        Log.e("Event not found", {teamId, calId, eventId});
         Route.nav.go("/not-found");
       }
-    }).fail(function(err) {
-      Log.e(err);
+    }).fail(function() {
       Route.nav.go("/not-found");
     })
 

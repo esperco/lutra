@@ -41,7 +41,7 @@ module Esper.Route {
       if (ctx.path.slice(0,2) === "//") {
         nav.path(ctx.path.slice(1));
       } else {
-        Log.e(ctx);
+        Log.e("Route not found", ctx);
         next();
       }
     }, ...callbacks);
