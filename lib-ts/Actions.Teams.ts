@@ -185,6 +185,27 @@ module Esper.Actions.Teams {
     return setTeamLabels(_id, team, labels);
   }
 
+  export function setLabelColor(_id: string,
+                                labelInfo: ApiT.LabelInfo,
+                                newColor: string) {
+    var team = Stores.Teams.require(_id);
+    if (! team) return;
+    var oldLabelInfo = _.find(team.team_api.team_labels, labelInfo);
+    if (!oldLabelInfo || oldLabelInfo.color == newColor) return;
+
+    var teamCopy = _.cloneDeep(team);
+    _.find(teamCopy.team_api.team_labels, labelInfo).color = newColor;
+
+    var request = {
+      label: labelInfo.original,
+      color: newColor
+    };
+
+    var p = Api.setLabelColor(team.teamid, request);
+    Stores.Teams.TeamStore.push(_id, p, Option.some(teamCopy));
+    return p;
+  }
+
   // Cleans labels before submission to server
   export function cleanLabel(label: string) {
     return (label
