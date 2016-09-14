@@ -41,11 +41,14 @@ module Esper.Actions.Teams {
       addLabel(this.teamId, "label 3");
       expect(Stores.Teams.require(this.teamId).team_api.team_labels).toEqual(
         [{
-          original: "Label 1"
+          original: "Label 1",
+          normalized: "label 1"
         }, {
-          original: "Label 2"
+          original: "Label 2",
+          normalized: "label 2"
         }, {
-          original: "Label 3"
+          original: "Label 3",
+          normalized: "label 3"
         }]
       );
       expect(Api.putSyncedLabels).not.toHaveBeenCalledWith();
