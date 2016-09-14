@@ -192,6 +192,12 @@ module Esper.Components {
       };
     }
 
+    componentWillReceiveProps(newProps: OneEventProps) {
+      if (this.props.event.id !== newProps.event.id) {
+        this.setState({ notes: newProps.event.feedback.notes });
+      }
+    }
+
     render() {
       var event = this.props.event;
       var status = this.props.status;
@@ -241,7 +247,7 @@ module Esper.Components {
           <TextArea id={this.getId("notes")} placeholder="Notes"
             ref={(ref) => this.inputNotes = ref}
             className="form-control esper-modal-focus"
-            initValue={this.state.notes}
+            value={this.state.notes}
             onChange={(v) => this.notesChange(v)}
           />
         </div>
