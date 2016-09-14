@@ -10,27 +10,18 @@ module Esper.Components {
     id?: string;
     placeholder?: string;
     className?: string;
-    initValue?: string;
+    value?: string;
     onChange?: (value: string) => void;
   }
 
-  interface State {
-    value: string;
-  }
-
-  export class TextArea extends ReactHelpers.Component<Props, State> {
+  export class TextArea extends ReactHelpers.Component<Props, {}> {
     _ref: HTMLTextAreaElement;
-
-    constructor(props: Props) {
-      super(props);
-      this.state = { value: props.initValue || "" };
-    }
 
     render() {
       return <textarea id={this.props.id}
         ref={(ref) => this._ref = ref}
         className={ this.props.className }
-        value={this.state.value}
+        value={this.props.value}
         onChange={this.onChange}
         placeholder={this.props.placeholder}
       />
@@ -38,7 +29,6 @@ module Esper.Components {
 
     onChange = (e: React.FormEvent) => {
       var value = (e.target as HTMLTextAreaElement).value;
-      this.setState({value: value});
       this.props.onChange && this.props.onChange(value);
     }
 
