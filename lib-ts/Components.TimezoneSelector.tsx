@@ -70,7 +70,7 @@ module Esper.Components {
     renderList() {
       var zones = this.state.zones;
       return <div className="esper-timezone-filter-container">
-        <div className="esper-section">
+        <div className="esper-panel-section">
             <input ref={(c) => this._input = c}
                    className="form-control timezone-filter"
                    placeholder="Pacific Time"
@@ -78,7 +78,8 @@ module Esper.Components {
                    onKeyDown={(e) => this.inputKeydown(e)}
                    onChange={(e) => this.onChange(e)} />
           </div>
-          <div className="esper-select-menu esper-section">
+          <div className={"esper-select-menu esper-full-width " +
+                          "esper-panel-section"}>
             { _.map(zones, (z, i) =>
               <div key={z.id} className={classNames("esper-selectable", {
                 highlight: this.state.highlightIndex === i
