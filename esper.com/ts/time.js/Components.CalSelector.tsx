@@ -55,9 +55,11 @@ module Esper.Components {
 
   export class CalCalcDropdownSelector extends CalCalcSelector {
     render() {
-      var selectedText = _.map(this.props.selectedIds,
-        (calId) => this.getDisplayName(calId)
-      ).join(", ");
+      var selectedText =
+        this.props.selectedIds.length >= this.props.calendars.length ?
+        Text.AllCalendars : _.map(this.props.selectedIds,
+          (calId) => this.getDisplayName(calId)
+        ).join(", ");
 
       return <Dropdown keepOpen={true}>
         <Selector id={this.props.id} className="dropdown-toggle">

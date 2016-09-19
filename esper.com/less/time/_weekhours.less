@@ -1,12 +1,12 @@
 @import "../lib/_bootstrap-variables.less";
 
-.day-selector .days .esper-select-menu {
-  display: flex;
+.day-selector {
+  min-width: @min-width;
+}
 
-  .esper-selectable, li > a {
-    flex-grow: 1;
+.day-selector .days .esper-flex-list {
+  .esper-selectable {
     text-align: center;
-    display: inline-block;
 
     &.active {
       font-weight: bold;

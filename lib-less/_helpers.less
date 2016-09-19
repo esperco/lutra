@@ -504,7 +504,13 @@
 
   .esper-expanded > & {
     border: 0;
+    margin: 0;
     .esper-center;
+  }
+
+  .dropdown-menu > & {
+    border: 0;
+    margin: 0;
   }
 }
 
@@ -674,7 +680,7 @@ flexibility with non-UL elements */
     overflow-x: hidden;
     text-overflow: ellipsis;
 
-    .dropdown-menu & {
+    .dropdown-menu > & {
       padding: @padding-xs-vertical @padding-base-horizontal;
 
       @media screen and (min-width: @screen-sm-min) {
