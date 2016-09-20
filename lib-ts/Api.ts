@@ -104,12 +104,6 @@ module Esper.Api {
 
   /*** Esper team management ***/
 
-  export function getTeamForExec(email: string):
-    JsonPromise<ApiT.TeamOption> {
-    return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
-      + "/email/" + string(email));
-  }
-
   export function getTeam(teamId: string): JsonPromise<ApiT.Team> {
     return JsonHttp.get(prefix + "/api/team/" + string(Login.myUid())
       + "/" + string(teamId));
