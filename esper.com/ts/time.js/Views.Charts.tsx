@@ -151,7 +151,7 @@ module Esper.Views {
 
         guestCounts: () => <span>
           <i className="fa fa-fw fa-left fa-users" />
-          { Text.ChartGuests }
+          { Text.ChartGuestsCount }
         </span>,
 
         ratings: () => <span>
@@ -183,7 +183,7 @@ module Esper.Views {
               Paths.Time.guestsChart,
               Paths.Time.ratingsChart,
               Paths.Time.durationsChart,
-              Paths.Time.guestsChart
+              Paths.Time.guestsCountChart
             ], (p, i) => <li key={i}>
               <a onClick={() => this.updatePath(p)}>
                 { this.displayPathFn(p) }
