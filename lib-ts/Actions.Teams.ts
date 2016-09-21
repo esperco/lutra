@@ -124,15 +124,15 @@ module Esper.Actions.Teams {
   /* Team label management */
 
   // Add and remove exact, display versions of labels
-  export function addLabel(_id: string, label: string) {
+  export function addLabel(_id: string, label: Types.LabelBase) {
     return applyLabels(_id, [], [label]);
   }
 
-  export function rmLabel(_id: string, label: string) {
+  export function rmLabel(_id: string, label: Types.LabelBase) {
     return applyLabels(_id, [label], []);
   }
 
-  export function renameLabel(_id: string, oldLabel: string, newLabel: string)
+  export function renameLabel(_id: string, oldLabel: Types.LabelBase, newLabel: Types.LabelBase)
   {
     return applyLabels(_id, [oldLabel], [newLabel]);
   }
@@ -142,7 +142,7 @@ module Esper.Actions.Teams {
 
   interface LabelUpdate {
     teamId: string;
-    labels: string[];
+    labels: ApiT.LabelInfo[];
   }
 
   export var LabelUpdateQueue = new Queue2.Processor(
@@ -150,10 +150,18 @@ module Esper.Actions.Teams {
       Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
         numLabels: update.labels.length,
         _id: update.teamId,
-        labels: update.labels
+        labels: _.map(update.labels, (l) => l.original)
       });
 
-      return Api.putSyncedLabels(update.teamId, { labels: update.labels });
+      return Api.putSyncedLabels(update.teamId, {
+        labels: _.map(update.labels, (l) => l.original)
+      }).then(() => Api.batch(function() {
+        return Util.when(_.map(update.labels, (l) => 
+          Api.setLabelColor(update.teamId, {
+            label: l.original,
+            color: l.color
+          })));
+      }));
     },
 
     // Always use last update (put operation)
@@ -161,28 +169,35 @@ module Esper.Actions.Teams {
       return [updates[updates.length - 1]];
     });
 
-  function applyLabels(_id: string, rmLabels: string[], addLabels: string[]) {
+  function applyLabels(_id: string, rmLabels: Types.LabelBase[], addLabels: Types.LabelBase[]) {
     var team = Stores.Teams.require(_id);
     if (! team) return;
 
-    var newLabels = _(team.team_api.team_labels)
-      .map((labelInfo) => labelInfo.original)
-      .filter(
-        (l) => !_.includes(rmLabels, l)
-      ).value();
-    newLabels = newLabels.concat(addLabels);
+    var newLabels = _.filter(team.team_api.team_labels, (l) =>
+      !_.some(rmLabels, (label) => label.displayAs === l.original));
+    newLabels = newLabels.concat(_.map(addLabels, (l) => ({
+      original: cleanLabel(l.displayAs),
+      normalized: l.id,
+      color: l.color
+    })));
 
     // Remove duplicates based on normalization
-    newLabels = _.uniqBy(newLabels, Labels.getNorm);
+    newLabels = _.uniqBy(newLabels, (l) => l.normalized);
 
     return setTeamLabels(_id, team, newLabels);
   }
 
-  export function putLabels(_id: string, labels: string[]) {
+  export function putLabels(_id: string, labels: Types.LabelBase[]) {
     var team = Stores.Teams.require(_id);
     if (! team) return;
 
-    return setTeamLabels(_id, team, labels);
+    var labelInfos = _.map(labels, (l) => ({
+      original: l.displayAs,
+      normalized: l.id,
+      color: l.color
+    }));
+
+    return setTeamLabels(_id, team, labelInfos);
   }
 
   export function setLabelColor(_id: string,
@@ -213,28 +228,22 @@ module Esper.Actions.Teams {
       .trim());
   }
 
-  function setTeamLabels(_id: string, team: ApiT.Team, labels: string[]) {
+  function setTeamLabels(_id: string, team: ApiT.Team, labels: ApiT.LabelInfo[]) {
     // Store values immutable so clone
     var teamCopy = _.cloneDeep(team);
-
-    labels = _.map(labels, cleanLabel);
 
     /*
       Alphabetize when setting labels (better performance to sort now
       than in the gajillion places where we pull a list of team labels)
     */
-    labels = _.sortBy(labels, Labels.normalizeForSort);
+    labels = _.sortBy(labels, (l) => l.normalized);
 
-    var teamLabels = _.map(team.team_api.team_labels, (i) => i.normalized);
     // Don't do anything if no change
-    if (_.isEqual(teamLabels, labels)) {
-      return $.Deferred<void>().resolve().promise();
+    if (_.isEqual(team.team_api.team_labels, labels)) {
+      return $.Deferred<any>().resolve().promise();
     }
 
-    teamCopy.team_api.team_labels = _.map(labels, (l) => ({
-      original: l,
-      normalized: Labels.getNorm(l)
-    }));
+    teamCopy.team_api.team_labels = labels;
 
     var p = LabelUpdateQueue.enqueue(_id, {
       teamId: _id,

@@ -204,11 +204,12 @@ module Esper.Components {
           var classNames = ["time-segment"];
           b.event.match({
             none: () => null,
-            some: () => {
+            some: (ev) => {
               classNames.push("active");
-              style.background = this.colorFn(
-                b.event.flatMap(() => Option.some(b.groups))
-              );
+              style.background = ev.labelScores.match({
+                none: () => Colors.gray,
+                some: (labels) => labels[0].color
+              })
             }
           });
           segments.push(<span key={j++}
@@ -235,8 +236,6 @@ module Esper.Components {
         { blockElms }
       </div>;
     }
-
-    abstract colorFn(groups: Option.T<string[]>): string;
 
     abstract categoryFn(groups: Option.T<string[]>): string;
   }

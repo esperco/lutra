@@ -7,16 +7,17 @@ module Esper.Components {
 
   interface Props {
     getLabelInfos: () => ApiT.LabelInfo[];
-    addLabel: (label: string) => any;
-    archiveFn: (label: string) => any;
-    removeLabel: (label: string) => any;
-    renameLabel: (orig: string, val: string) => any;
+    addLabel: (label: Types.LabelBase) => any;
+    archiveFn: (label: Types.LabelBase) => any;
+    removeLabel: (label: Types.LabelBase) => any;
+    renameLabel: (orig: Types.LabelBase, val: Types.LabelBase) => any;
+    setLabelColor: (oldInfo: ApiT.LabelInfo, newColor: string) => any;
     addPermission: boolean;
   }
 
   interface State {
     // Show edit interface or remove prompt for a given label
-    editLabel?: string;
+    editLabel?: ApiT.LabelInfo;
     rmLabelPrompt?: string;
     labelFilter?: string;
   }
@@ -116,7 +117,12 @@ module Esper.Components {
     addLabel() {
       var val = this.state.labelFilter;
       if (val) {
-        this.props.addLabel(val);
+        let norm = Labels.getNorm(val);
+        this.props.addLabel({
+          id: norm,
+          displayAs: val,
+          color: Colors.getNewColorForLabel()
+        });
         this.resetState();
       }
     }
@@ -140,7 +146,7 @@ module Esper.Components {
             </div>
             <div className="col-xs-6">
               <button className="btn btn-danger form-control" type="button"
-                      onClick={() => this.rmLabel(label.original)}>
+                      onClick={() => this.rmLabel(label)}>
                 Remove
               </button>
             </div>
@@ -149,7 +155,7 @@ module Esper.Components {
       }
 
       var editLabel = this.state.editLabel &&
-                      this.state.editLabel.toLowerCase();
+                      this.state.editLabel.original.toLowerCase();
       if (label.original.toLowerCase() === editLabel) {
         return <div className="list-group-item one-line" key={label.original}>
           <div className="form-group">
@@ -190,15 +196,22 @@ module Esper.Components {
               <i className="fa fa-fw fa-trash list-group-item-text" />
             </a>
             <a className="pull-right text-info" title="Archive"
-               onClick={(e) => this.archive(label.original)}>
+               onClick={(e) => this.archive(label)}>
               <i className="fa fa-fw fa-archive list-group-item-text" />
             </a>
             <a className="pull-right text-info" title="Edit"
-               onClick={(e) => this.showEditFor(label.original)}>
+               onClick={(e) => this.showEditFor(label)}>
               <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
           </span> : null
         }
+        <Dropdown className="pull-right label-color-dropdown">
+          <span className="label-color-box dropdown-toggle"
+                style={{background: label.color || "#FFFFFF"}} />
+          <ColorGrid className="dropdown-menu color-grid" oldInfo={label}
+                     onClick={this.props.setLabelColor}>
+          </ColorGrid>
+        </Dropdown>
       </div>;
     }
 
@@ -210,7 +223,12 @@ module Esper.Components {
       });
     }
 
-    archive(label: string) {
+    archive(labelInfo: ApiT.LabelInfo) {
+      var label = {
+        id: labelInfo.normalized,
+        displayAs: labelInfo.original,
+        color: labelInfo.color
+      };
       this.resetState();
       this.props.archiveFn(label);
     }
@@ -222,13 +240,18 @@ module Esper.Components {
       });
     }
 
-    rmLabel(label: string) {
+    rmLabel(labelInfo: ApiT.LabelInfo) {
+      var label = {
+        id: labelInfo.normalized,
+        displayAs: labelInfo.original,
+        color: labelInfo.color
+      };
       this.props.removeLabel(label);
     }
 
-    showEditFor(label: string) {
+    showEditFor(labelInfo: ApiT.LabelInfo) {
       this.setState({
-        editLabel: label,
+        editLabel: labelInfo,
         rmLabelPrompt: null
       });
     }
@@ -244,9 +267,17 @@ module Esper.Components {
     submitEditInput() {
       var input = $(this._editInput);
       var val = input.val().trim();
-      var orig = this.state.editLabel.trim();
-      if (val && val !== orig) {
-        this.props.renameLabel(orig, val);
+      var orig = this.state.editLabel;
+      if (val && val !== orig.original.trim()) {
+        this.props.renameLabel({
+          id: orig.normalized,
+          displayAs: orig.original,
+          color: orig.color
+        }, {
+          id: Labels.getNorm(val),
+          displayAs: val,
+          color: orig.color
+        });
       }
       this.resetState();
     }
@@ -258,5 +289,23 @@ module Esper.Components {
         $(this._editInput).select();
       }
     }
+  }
+
+  function ColorGrid({className, oldInfo, onClick}: {
+    className?: string,
+    oldInfo: ApiT.LabelInfo,
+    onClick: (oldInfo: ApiT.LabelInfo, newColor: string) => any
+  }) {
+    return <div className={className}>
+      { Colors.presets.map((color) => {
+          return <div className={classNames("color-cell", {
+                        selected: oldInfo.color == color
+                      })} key={color}
+                      onClick={(e) => onClick(oldInfo, color)}
+                      style={{background: color}}>
+          </div>;
+        })
+      }
+    </div>;
   }
 }

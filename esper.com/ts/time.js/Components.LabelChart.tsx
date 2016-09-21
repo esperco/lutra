@@ -9,7 +9,7 @@ module Esper.Components {
     renderMain(groups: Charting.PeriodOptGroup[]) {
       var keys = Charting.sortOptGroupKeys(groups);
       var series = Charting.eventSeries(groups, {
-        colorFn: Colors.getColorForLabel,
+        colorFn: getLabelColor,
         displayName: Labels.getDisplayAs,
         sortedKeys: keys,
         yFn: EventStats.toHours
@@ -32,7 +32,7 @@ module Esper.Components {
     renderMain(groups: Charting.PeriodOptGroup[]) {
       var keys = Charting.sortOptGroupKeys(groups);
       var series = Charting.eventGroupSeries(groups, {
-        colorFn: Colors.getColorForLabel,
+        colorFn: getLabelColor,
         displayName: Labels.getDisplayAs,
         noneName: Text.Unlabeled,
         sortedKeys: keys,
@@ -50,14 +50,22 @@ module Esper.Components {
     }
   }
 
-  export class LabelEventGrid extends EventGrid<{}> {
-    colorFn(groups: Option.T<string[]>) {
-      return groups.match({
-        none: () => Colors.lightGray,
-        some: (g) => g[0] ? Colors.getColorForLabel(g[0]) : Colors.gray,
-      });
-    }
+  function getLabelColor(key: string, extra : {
+    index: number;
+    total: number;
+    event: Types.TeamEvent;
+  }) {
+    return extra.event ? extra.event.labelScores.match({
+      none: () => Colors.lightGray,
+      some: (labels) => {
+        let label = _.find(labels, {id: key});
+        if (!label) return Colors.lightGray;
+        return label.color;
+      }
+    }) : Colors.lightGray;
+  }
 
+  export class LabelEventGrid extends EventGrid<{}> {
     categoryFn(groups: Option.T<string[]>) {
       return groups.match({
         none: () => "",

@@ -93,7 +93,9 @@ module Esper.Components {
       </div>;
     }
 
-    colorFn(emailOrDomain: string, pos?: {index: number, total: number}) {
+    colorFn(emailOrDomain: string, pos?: {
+      index: number, total: number, event: Types.TeamEvent
+    }) {
       var domain = emailOrDomain.split('@')[1] || emailOrDomain;
       var color = Colors.getColorForDomain(domain);
       if (pos.total > 1) {

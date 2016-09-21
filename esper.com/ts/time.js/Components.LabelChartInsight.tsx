@@ -5,7 +5,9 @@
 /// <reference path="./Components.ChartInsight.tsx" />
 
 module Esper.Components {
-  export class LabelChartInsight extends ChartGroupingInsight<{}> {
+  export class LabelChartInsight extends ChartGroupingInsight<{
+    labelInfos: ApiT.LabelInfo[]
+  }> {
     renderMain(groups: Charting.PeriodOptGroup[]) {
       // Current group only
       let periodGroup = _.find(groups, (g) => g.current);
@@ -26,31 +28,36 @@ module Esper.Components {
 
             allOne: (label) => <p>
               All of your {" " + Text.Labeled + " "} time is being spent on
-              {" "}<InlineLabel id={label} />.
+              {" "}<InlineLabel id={label} labelInfos={this.props.labelInfos} />.
             </p>,
 
             allEqual: (pairs) => <p>
               Your time is being spent roughly equally between{" "}
-              <InlineLabelList pairs={pairs} />.
+              <InlineLabelList pairs={pairs} labelInfos={this.props.labelInfos}/>.
             </p>,
 
             tiersMajority: (tier1, tier2) => <p>
               You're spending the majority of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2} />.
+              <InlineLabelList pairs={tier1}
+                labelInfos={this.props.labelInfos}/>, {" "}followed by{" "}
+              <InlineLabelList pairs={tier2}
+                labelInfos={this.props.labelInfos} />.
             </p>,
 
             tiersPlurality: (tier1, tier2) => <p>
               You're spending the bulk of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2} />.
+              <InlineLabelList pairs={tier1}
+                labelInfos={this.props.labelInfos} />, {" "}followed by{" "}
+              <InlineLabelList pairs={tier2}
+                labelInfos={this.props.labelInfos} />.
             </p>,
 
             fallback: (pairs) => <p>
               Your top {Text.Labels} are{" "}
-              <InlineLabelList pairs={pairs.slice(0, 3)} />.
+              <InlineLabelList pairs={pairs.slice(0, 3)}
+                labelInfos={this.props.labelInfos} />.
             </p>
           })
         }
@@ -58,15 +65,25 @@ module Esper.Components {
     }
   }
 
-  function InlineLabelList({pairs} : {pairs: [string, number][]}) {
+  function InlineLabelList({pairs, labelInfos} : {
+    pairs: [string, number][],
+    labelInfos: ApiT.LabelInfo[]
+  }) {
     return <CommaList>
-      { _.map(pairs, (p) => <InlineLabel key={p[0]} id={p[0]} />) }
-    </CommaList>
+      { _.map(pairs, (p) => <InlineLabel key={p[0]} id={p[0]}
+          labelInfos={labelInfos} />) }
+    </CommaList>;
   }
 
-  function InlineLabel({id}: {id: string}) {
-    let bg = Colors.getColorForLabel(id);
-    let displayAs = Labels.getDisplayAs(id);
+  function InlineLabel({id, labelInfos}: {
+    id: string,
+    labelInfos: ApiT.LabelInfo[]
+  }) {
+    let labelInfo = _.find(labelInfos, {normalized: id});
+    let bg = labelInfo ? labelInfo.color : (
+      id.charAt(0) === '#' ? Colors.getColorForHashtag(id) : Colors.lightGray
+    );
+    let displayAs = labelInfo ? labelInfo.original : id;
     return <Components.Badge color={bg} text={displayAs} />;
   }
 }

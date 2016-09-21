@@ -204,12 +204,16 @@ module Esper.Colors {
 
   //////
 
-  var labelColorMap: ColorMap = {};
+  var hashtagColorMap: ColorMap = {};
   var domainColorMap: ColorMap = {};
   var calColorMap: ColorMap = {};
 
-  export function getColorForLabel(labelNorm: string): string {
-    return getColorForMap(labelNorm, labelColorMap);
+  export function getNewColorForLabel(): string {
+    return presets[Math.floor(Math.random() * presets.length)];
+  }
+
+  export function getColorForHashtag(hashtagNorm: string): string {
+    return getColorForMap(hashtagNorm, hashtagColorMap);
   }
 
   export function getColorForDomain(domain: string): string {
@@ -222,7 +226,6 @@ module Esper.Colors {
 
   // Reset remembered colors
   export function resetColorMaps(): void {
-    labelColorMap = {};
     domainColorMap = {};
   }
 }

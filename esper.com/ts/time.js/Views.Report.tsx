@@ -209,7 +209,8 @@ module Esper.Views {
       <div className="description">
         <h3>{ Text.ChartLabels }</h3>
         <p>{ Text.ChartLabelsDescription }</p>
-        <Components.LabelChartInsight periods={periods} />
+        <Components.LabelChartInsight periods={periods}
+          labelInfos={team.team_api.team_labels} />
         <SeeMoreLink
           fn={Paths.Time.labelsChart} type="percent"
           period={period} teamId={team.teamid} labels={labels}
