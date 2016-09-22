@@ -203,15 +203,15 @@ module Esper.Components {
                onClick={(e) => this.showEditFor(label)}>
               <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
+            <Dropdown className="pull-right label-color-dropdown">
+              <span className="label-color-box dropdown-toggle"
+                    style={{background: label.color || "#FFFFFF"}} />
+              <ColorGrid className="dropdown-menu color-grid" oldInfo={label}
+                         onClick={this.props.setLabelColor}>
+              </ColorGrid>
+            </Dropdown>
           </span> : null
         }
-        <Dropdown className="pull-right label-color-dropdown">
-          <span className="label-color-box dropdown-toggle"
-                style={{background: label.color || "#FFFFFF"}} />
-          <ColorGrid className="dropdown-menu color-grid" oldInfo={label}
-                     onClick={this.props.setLabelColor}>
-          </ColorGrid>
-        </Dropdown>
       </div>;
     }
 
