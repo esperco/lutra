@@ -8,13 +8,13 @@
 
 module Esper.Actions.EventLabels {
 
-  export function add(events: Stores.Events.TeamEvent[], label: string) {
+  export function add(events: Stores.Events.TeamEvent[], label: Types.LabelBase) {
     apply(events, {
       addLabels: [label]
     });
   }
 
-  export function remove(events: Stores.Events.TeamEvent[], label: string) {
+  export function remove(events: Stores.Events.TeamEvent[], label: Types.LabelBase) {
     apply(events, {
       removeLabels: [label],
     });
@@ -35,8 +35,8 @@ module Esper.Actions.EventLabels {
   // For paginated prediction, confirm and fetch new
 
   function apply(events: Stores.Events.TeamEvent[], opts: {
-    addLabels?: string[];
-    removeLabels?: string[];
+    addLabels?: Types.LabelBase[];
+    removeLabels?: Types.LabelBase[];
     fetchEvents?: Types.TeamEvent[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
@@ -73,8 +73,8 @@ module Esper.Actions.EventLabels {
 
   function applyForTeam(teamId: string, events: Stores.Events.TeamEvent[],
     opts: {
-      addLabels?: string[];
-      removeLabels?: string[];
+      addLabels?: Types.LabelBase[];
+      removeLabels?: Types.LabelBase[];
       fetchEvents?: Types.TeamEvent[];
     })
   {
@@ -155,24 +155,24 @@ module Esper.Actions.EventLabels {
   }
 
   function getNewLabels(event: Stores.Events.TeamEvent, opts: {
-    addLabels?: string[];
-    removeLabels?: string[];
+    addLabels?: Types.LabelBase[];
+    removeLabels?: Types.LabelBase[];
   }) {
     var labels = _.cloneDeep(Stores.Events.getLabels(event));
+    var team = Stores.Teams.require(event.teamId);
     _.each(opts.addLabels, (label) => {
-      let cleaned = Actions.Teams.cleanLabel(label);
-      let normalized = Labels.getNorm(cleaned);
-      if (! _.find(labels, (l) => l.id === normalized)) {
+      if (! _.find(labels, (l) => l.id === label.id)) {
         labels.push({
-          id: normalized,
-          displayAs: cleaned,
+          id: label.id,
+          displayAs: label.displayAs,
+          color: label.color,
           score: 1
         });
       }
     });
 
     _.each(opts.removeLabels, (l) => {
-      let normalized = Labels.getNorm(l);
+      let normalized = l.id;
       _.remove(labels, (l) => l.id === normalized);
     });
 

@@ -325,6 +325,7 @@ module Esper.Types {
   export interface LabelBase {
     id: string;        // Normalized form
     displayAs: string; // Display form
+    color: string;     // Color associated with this label
   }
 
   // Either a predicted or user-predicted label

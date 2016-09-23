@@ -17,9 +17,25 @@ module Esper.Charting {
       props.extra.labels
     ),
 
-    colorMapFn: (keys) => _.map(keys, Colors.getColorForLabel),
+    colorMapFn: (keys, props) => _.map(keys, (k) => {
+      // TODO: Use a hash map instead of iterating for faster lookup
+      let teamLabel = _.find(props.team.team_api.team_labels,
+        (l) => l.normalized === k
+      );
+      if (teamLabel && teamLabel.color) return teamLabel.color;
 
-    displayFn: Labels.getDisplayAs,
+      // No team label, pretend it's a hashtag?
+      return Colors.getColorForHashtag(k);
+    }),
+
+    displayFn: (key, props) => {
+      // TODO: Use a hash map instead of iterating for faster lookup
+      let teamLabel = _.find(props.team.team_api.team_labels,
+        (l) => l.normalized === key
+      );
+      return teamLabel.original;
+    },
+
     selectorKeysFn: (group, props) => {
       let groupKeys = _.keys(group.some);
       let teamKeys = _.map(props.team.team_api.team_labels,
@@ -850,7 +866,6 @@ module Esper.Charting {
         name: groupBy.noneText,
         cursor: "pointer",
         color: Colors.lightGray,
-
         data: _.map(group.none.values, (v, vIndex) => ({
           name: groupBy.noneText,
           count: v.totalUnique,

@@ -38,7 +38,7 @@ module Esper.Components {
         badgeText: l.count ? l.count && l.count.toString() : "",
         badgeHoverText: l.count ? (l.count && l.count.toString() +
           " Event" + (l.count == 1 ? "" : "s")) : "",
-        badgeColor: Colors.getColorForLabel(l.id)
+        badgeColor: l.color
       }))
     }];
 

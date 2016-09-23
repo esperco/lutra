@@ -306,15 +306,15 @@ module Esper.Actions.Groups {
   /* Group label management */
 
   // Add and remove exact, display versions of labels
-  export function addLabel(_id: string, label: string) {
+  export function addLabel(_id: string, label: Types.LabelBase) {
     return applyLabels(_id, [], [label]);
   }
 
-  export function rmLabel(_id: string, label: string) {
+  export function rmLabel(_id: string, label: Types.LabelBase) {
     return applyLabels(_id, [label], []);
   }
 
-  export function renameLabel(_id: string, oldLabel: string, newLabel: string)
+  export function renameLabel(_id: string, oldLabel: Types.LabelBase, newLabel: Types.LabelBase)
   {
     return applyLabels(_id, [oldLabel], [newLabel]);
   }
@@ -324,7 +324,7 @@ module Esper.Actions.Groups {
 
   interface LabelUpdate {
     groupId: string;
-    labels: string[];
+    labels: ApiT.LabelInfo[];
   }
 
   export var LabelUpdateQueue = new Queue2.Processor(
@@ -332,10 +332,12 @@ module Esper.Actions.Groups {
       Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
         numLabels: update.labels.length,
         _id: update.groupId,
-        labels: update.labels
+        labels: _.map(update.labels, (l) => l.original)
       });
 
-      return Api.putGroupLabels(update.groupId, { items: update.labels });
+      return Api.putGroupLabels(update.groupId, {
+        items: _.map(update.labels, (l) => l.original)
+      });
     },
 
     // Always use last update (put operation)
@@ -343,24 +345,25 @@ module Esper.Actions.Groups {
       return [updates[updates.length - 1]];
     });
 
-  function applyLabels(_id: string, rmLabels: string[], addLabels: string[]) {
+  function applyLabels(_id: string, rmLabels: Types.LabelBase[], addLabels: Types.LabelBase[]) {
     var group = Stores.Groups.require(_id);
     if (! group) return;
 
-    var newLabels = _(group.group_labels)
-      .map((labelInfo) => labelInfo.original)
-      .filter(
-        (l) => !_.includes(rmLabels, l)
-      ).value();
-    newLabels = newLabels.concat(addLabels);
+    var newLabels = _.filter(group.group_labels, (l) =>
+      !_.some(rmLabels, (label) => label.displayAs === l.original));
+    newLabels = newLabels.concat(_.map(addLabels, (l) => ({
+      original: l.displayAs,
+      normalized: l.id,
+      color: l.color
+    })));
 
     // Remove duplicates based on normalization
-    newLabels = _.uniqBy(newLabels, Stores.Groups.getNormLabel);
+    newLabels = _.uniqBy(newLabels, (l) => l.normalized);
 
     return setGroupLabels(_id, group, newLabels);
   }
 
-  export function putLabels(_id: string, labels: string[]) {
+  export function putLabels(_id: string, labels: Types.LabelBase[]) {
     var group = Stores.Groups.require(_id);
     if (! group) return;
 
@@ -368,10 +371,16 @@ module Esper.Actions.Groups {
       return $.Deferred<void>().resolve().promise();
     }
 
-    return setGroupLabels(_id, group, labels);
+    var labelInfos = _.map(labels, (l) => ({
+      original: l.displayAs,
+      normalized: l.id,
+      color: l.color
+    }));
+
+    return setGroupLabels(_id, group, labelInfos);
   }
 
-  function setGroupLabels(_id: string, group: ApiT.Group, labels: string[]) {
+  function setGroupLabels(_id: string, group: ApiT.Group, labels: ApiT.LabelInfo[]) {
     // Store values immutable so clone
     var groupCopy = _.cloneDeep(group);
 
@@ -379,12 +388,9 @@ module Esper.Actions.Groups {
       Alphabetize when setting labels (better performance to sort now
       than in the gajillion places where we pull a list of group labels)
     */
-    labels = _.sortBy(labels, Labels.normalizeForSort);
+    labels = _.sortBy(labels, (l) => l.normalized);
 
-    groupCopy.group_labels = _.map(labels, (l) => ({
-      original: l,
-      normalized: Labels.getNorm(l)
-    }));
+    groupCopy.group_labels = labels;
 
     var p = LabelUpdateQueue.enqueue(_id, {
       groupId: _id,

@@ -71,7 +71,12 @@ module Esper.Views {
             none: () => {
               badTeamIds.push(teamId)
             },
-            some: (labels) => {
+            some: (lbls) => {
+              let labels = _.map(lbls, (l) => ({
+                id: Labels.getNorm(l),
+                displayAs: l,
+                color: Colors.getNewColorForLabel()
+              }));
               promises.push(Actions.Teams.putLabels(teamId, labels))
             }
           })

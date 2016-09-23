@@ -27,9 +27,10 @@ module Esper.Labels {
   // Global map of known display labels to normalized form
   var normMap: {[index: string]: string} = {};
 
-  export function storeMapping({norm, display, force}: {
+  export function storeMapping({norm, display, color, force}: {
     norm: string;
     display: string;
+    color: string;
     force?: boolean;
   }) {
     if (force || !displayAsMap[norm]) {
@@ -71,6 +72,7 @@ module Esper.Labels {
       _.each(t.team_api.team_labels, (lbl) => labels.push({
         id: lbl.normalized,
         displayAs: lbl.original,
+        color: lbl.color,
         count: 0
       }));
     });
@@ -84,6 +86,7 @@ module Esper.Labels {
         labels.push({
           id: s.id,
           displayAs: s.displayAs,
+          color: s.color,
           count: 0
         });
       })
@@ -98,6 +101,7 @@ module Esper.Labels {
     return _.map(team.team_api.team_labels, (lbl) => ({
       id: lbl.normalized,
       displayAs: lbl.original,
+      color: lbl.color,
       score: 0
     }));
   }
@@ -134,7 +138,8 @@ module Esper.Labels {
         _.each(team.team_api.team_labels, (lbl) => {
           storeMapping({
             norm: lbl.normalized,
-            display: lbl.original
+            display: lbl.original,
+            color: lbl.color
           });
         });
       });

@@ -23,9 +23,15 @@ module Esper.Views {
           <Components.LabelManager getLabelInfos={this.getLabelInfos(group)}
             addLabel={this.addLabel(group)} archiveFn={this.archive(group)}
             removeLabel={this.removeLabel(group)} renameLabel={this.renameLabel(group)}
-            addPermission={addPermission} />
+            setLabelColor={this.setLabelColor(group)} addPermission={addPermission} />
         </div>
       </div>;
+    }
+
+    setLabelColor(group: ApiT.Group) {
+      return function(oldInfo: ApiT.LabelInfo, newColor: string) {
+        // TODO: Add in functionality to change group label colors
+      };
     }
 
     getLabelInfos(group: ApiT.Group): () => ApiT.LabelInfo[] {
@@ -35,20 +41,20 @@ module Esper.Views {
     }
 
     addLabel(group: ApiT.Group) {
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         Actions.Groups.addLabel(group.groupid, label);
       };
     }
 
     archive(group: ApiT.Group) {
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         Actions.Groups.rmLabel(group.groupid, label);
       };
     }
 
     removeLabel(group: ApiT.Group) {
       var archive = this.archive(group);
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         archive(label);
         // FIXME: Disable batch labelling until we properly figure this out
         // Actions.BatchLabels.remove(this.props.group.groupid, label);
@@ -56,7 +62,7 @@ module Esper.Views {
     }
 
     renameLabel(group: ApiT.Group) {
-      return function(orig: string, val: string) {
+      return function(orig: Types.LabelBase, val: Types.LabelBase) {
         Actions.Groups.renameLabel(group.groupid, orig, val);
         // FIXME: Disable batch labelling until we properly figure this out
         // Actions.BatchLabels.rename(this.props.group.groupid, orig, val);

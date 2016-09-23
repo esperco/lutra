@@ -26,31 +26,33 @@ module Esper.Components {
 
             allOne: (label) => <p>
               All of your {" " + Text.Labeled + " "} time is being spent on
-              {" "}<InlineLabel id={label} />.
+              {" "}<InlineLabelList pairs={[[label, 1]]} props={this.props}  />.
             </p>,
 
             allEqual: (pairs) => <p>
               Your time is being spent roughly equally between{" "}
-              <InlineLabelList pairs={pairs} />.
+              <InlineLabelList pairs={pairs} props={this.props} />.
             </p>,
 
             tiersMajority: (tier1, tier2) => <p>
               You're spending the majority of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2} />.
+              <InlineLabelList pairs={tier1} props={this.props} />,
+              {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} props={this.props} />.
             </p>,
 
             tiersPlurality: (tier1, tier2) => <p>
               You're spending the bulk of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1} />, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2} />.
+              <InlineLabelList pairs={tier1} props={this.props} />,
+              {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} props={this.props} />.
             </p>,
 
             fallback: (pairs) => <p>
               Your top {Text.Labels} are{" "}
-              <InlineLabelList pairs={pairs.slice(0, 3)} />.
+              <InlineLabelList pairs={pairs.slice(0, 3)} props={this.props} />.
             </p>
           })
         }</div>
@@ -58,15 +60,26 @@ module Esper.Components {
     }
   }
 
-  function InlineLabelList({pairs} : {pairs: [string, number][]}) {
-    return <CommaList>
-      { _.map(pairs, (p) => <InlineLabel key={p[0]} id={p[0]} />) }
-    </CommaList>
+  function InlineLabelList({pairs, props} : {
+    pairs: [string, number][];
+    props: Types.ChartProps;
+  }) {
+    let keys = _.map(pairs, (p) => p[0]);
+    let colors = props.groupBy.colorMapFn(keys, props);
+    return <CommaList>{ _.map(pairs, (p, i) =>
+      <InlineLabel
+        key={p[0]} id={p[0]}
+        color={colors[i]}
+        displayAs={props.groupBy.displayFn(p[0], props)}
+      />
+    )}</CommaList>;
   }
 
-  function InlineLabel({id}: {id: string}) {
-    let bg = Colors.getColorForLabel(id);
-    let displayAs = Labels.getDisplayAs(id);
-    return <Components.Badge color={bg} text={displayAs} />;
+  function InlineLabel({id, color, displayAs}: {
+    id: string;
+    color: string;
+    displayAs: string;
+  }) {
+    return <Components.Badge color={color} text={displayAs} />;
   }
 }

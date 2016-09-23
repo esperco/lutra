@@ -14,7 +14,7 @@ module Esper.Components {
     inputId?: string;
     events: Types.TeamEvent[];
     teams: ApiT.Team[];
-    onSelect: (label: string, active: boolean) => void;
+    onSelect: (label: Types.LabelBase, active: boolean) => void;
     onEsc?: () => void;
     autoFocus?: boolean;
   }
@@ -68,6 +68,7 @@ module Esper.Components {
           _.map(teamLabels, (t) => ({
             id: t.id,
             displayAs: t.displayAs,
+            color: t.color,
             count: 0
           }))
         );
@@ -77,6 +78,7 @@ module Esper.Components {
       labels = labels.concat(_.map(current, (c) => ({
         id: c.id,
         displayAs: c.displayAs,
+        color: c.color,
         count: 0
       })));
 
@@ -105,7 +107,7 @@ module Esper.Components {
             placeholder={_.capitalize(Text.FindAddLabels)}
             getList={() => this._list}
             onEsc={this.props.onEsc}
-            onSubmit={(label) => this.toggle(label)}
+            onSubmit={this.toggle.bind(this)}
           />
         </div>
 
@@ -126,31 +128,41 @@ module Esper.Components {
     }
 
     renderNewLabel(label: string, highlight: boolean) {
-      let norm = Labels.getNorm(label);
+      let newLabel = {
+        id: Labels.getNorm(label),
+        displayAs: label,
+        color: Colors.getNewColorForLabel()
+      };
       return <NewLabel
-        key={norm}
-        label={label}
+        key={newLabel.id}
+        label={newLabel}
         highlight={highlight}
-        onClick={() => this.toggle(label)}
+        onClick={() => this.toggle(newLabel.displayAs, newLabel)}
       />;
     }
 
     renderLabel(label: string, highlight: boolean) {
-      let norm = Labels.getNorm(label);
+      let labelCount = _.find(this.state.labels, {displayAs: label});
       return <Label
-        key={norm}
-        displayAs={label}
-        color={Colors.getColorForLabel(norm)}
-        selected={this.isSelected(norm)}
+        key={labelCount.id}
+        label={labelCount}
+        selected={this.isSelected(labelCount.id)}
         highlight={highlight}
-        onClick={() => this.toggle(label)}
+        onClick={() => this.toggle(labelCount.displayAs, labelCount)}
       />;
     }
 
     // New label
-    toggle(label: string) {
-      let norm = Labels.getNorm(label);
-      let isSelected = this.isSelected(norm);
+    toggle(labelStr: string, label?: Types.LabelBase) {
+      if (!label) {
+        label = {
+          id: Labels.getNorm(labelStr),
+          displayAs: labelStr,
+          color: Colors.getNewColorForLabel()
+        };
+      }
+      console.info(label);
+      let isSelected = this.isSelected(label.id);
       this.props.onSelect(label, isSelected === "some" || !isSelected);
       this._input.reset();
     }
@@ -175,9 +187,8 @@ module Esper.Components {
 
   ///////
 
-  function Label({displayAs, color, selected, highlight, onClick}: {
-    displayAs: string;
-    color: string;
+  function Label({label, selected, highlight, onClick}: {
+    label: Types.LabelBase;
     selected: Types.Fuzzy;
     highlight?: boolean;
     onClick?: () => void;
@@ -193,16 +204,16 @@ module Esper.Components {
       ["some", "fa-minus-square"]
     ], "fa-square")
 
-    var iconStyle = { color: color };
+    var iconStyle = { color: label.color };
 
     return <a className={className} onClick={onClick}>
       <i style={iconStyle} className={"fa fa-fw " + icon} />{" "}
-      {displayAs}
+      {label.displayAs}
     </a>;
   }
 
   function NewLabel({label, highlight, onClick}: {
-    label: string;
+    label: Types.LabelBase;
     highlight?: boolean;
     onClick?: () => void;
   }) {
@@ -210,7 +221,7 @@ module Esper.Components {
       "highlight": highlight
     });
     return <a className={className} onClick={onClick}>
-      <i className="fa fa-fw fa-plus" />{" "}{ label }
+      <i className="fa fa-fw fa-plus" />{" "}{ label.displayAs }
     </a>;
   }
 }

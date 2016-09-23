@@ -1,0 +1,35 @@
+@import "./lib/_bootstrap-variables";
+@import "./lib/_flex-list";
+
+.label-color-dropdown {
+  margin-right: 4px;
+
+  .label-color-box {
+    display: inline-block;
+    vertical-align: middle;
+    width: 15px;
+    height: 15px;
+    border: 1px solid black;
+  }
+}
+
+.color-grid.dropdown-menu {
+  .esper-flex-list;
+  padding: 5px;
+  min-width: @min-width;
+
+  .color-cell {
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    margin: 3px;
+
+    &.selected {
+      border: 2px solid black;
+    }
+
+    &:hover {
+      box-shadow: 0 0 1em @brand-primary;
+    }
+  }
+}

@@ -231,7 +231,7 @@ module Esper.Components {
         var labels = Stores.Events.getLabels(event);
         if (!_.isEmpty(labels)) {
           var label = labels[0];
-          var baseColor = Colors.getColorForLabel(label.id);
+          var baseColor = label.color;
           ret.backgroundColor = baseColor;
           ret.textColor = Colors.colorForText(baseColor);
           ret.tooltip = label.displayAs;

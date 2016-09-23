@@ -32,7 +32,7 @@ module Esper.Components {
           { _.map(labels, (l) =>
             <Label key={l.id} label={l}
               onRemove={() => Actions.EventLabels.remove(
-                [this.props.event], l.displayAs
+                [this.props.event], l
               )}
             />)
           }
@@ -63,7 +63,7 @@ module Esper.Components {
       />;
     }
 
-    editEventLabel(label: string, active: boolean) {
+    editEventLabel(label: Types.LabelBase, active: boolean) {
       if (active) {
         Actions.EventLabels.add([this.props.event], label);
         Actions.Teams.addLabel(this.props.team.teamid, label);
@@ -72,7 +72,7 @@ module Esper.Components {
       }
     }
 
-    rmEventLabel(label: string) {
+    rmEventLabel(label: Types.LabelBase) {
       Actions.EventLabels.remove([this.props.event], label)
     }
   }
@@ -84,12 +84,11 @@ module Esper.Components {
     label: Types.Label;
     onRemove?: () => void;
   }) {
-    var labelColor = Colors.getColorForLabel(label.id);
     var style = {
       borderStyle: "solid",
-      borderColor: labelColor,
-      background: labelColor,
-      color: Colors.colorForText(labelColor)
+      borderColor: label.color,
+      background: label.color,
+      color: Colors.colorForText(label.color)
     };
 
     // Title isn't for real tooltip, just debugging predictions really
