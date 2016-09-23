@@ -7,53 +7,60 @@
 module Esper.Components {
 
   export class GuestCountChartInsight
-    extends ChartInsight<[Types.TeamEvent, number][], {}>
-  {
-    renderMain(data: Charting.PeriodData<[Types.TeamEvent, number][]>[]) {
-      // Current group only
-      let periodGroup = _.find(data, (g) => g.current);
-      if (! periodGroup) return <span />;
+         extends Chart<Types.AnnotationState, Types.ChartProps> {
+    getCalc(props: Types.ChartProps): Calc<Types.AnnotationState> {
+      return EventStats.annotationCalc(
+        props.eventsForRanges,
+        (e) => Stores.Events.getGuests(e).length + 1 // +1 for exec
+      )
+    }
 
-      // Get median count -- ignore empty events
-      let sorted = _(periodGroup.data)
-        .filter((d) => d[1] > 1)
-        .sortBy((d) => d[1])
-        .value();
+    render() {
+      return this.getResult().match({
+        none: () => null,
+        some: (s) => {
+          // Get median count -- ignore empty events
+          let sorted = _(s.values)
+            .filter((d) => d[1] > 1)
+            .sortBy((d) => d[1])
+            .value();
 
-      let median = sorted[Math.floor(sorted.length / 2)];
-      let medianBucket = median && EventStats.getGuestCountBucket(median[0]);
-      let medianCount = median && median[1];
+          let median = sorted[Math.floor(sorted.length / 2)];
+          let medianBucket = median && Charting.getGuestCountBucket(median[0]);
+          let medianCount = median && median[1];
 
-      let max = sorted[sorted.length - 1];
-      let maxBucket = max && EventStats.getGuestCountBucket(max[0]);
-      let maxCount = max && max[1];
+          let max = sorted[sorted.length - 1];
+          let maxBucket = max && Charting.getGuestCountBucket(max[0]);
+          let maxCount = max && max[1];
 
-      // Sanity check
-      if (sorted.length && (!medianBucket || !maxBucket)) {
-        if (! medianBucket) {
-          Log.e(`Missing bucket for ${medianCount} guests`);
+          // Sanity check
+          if (sorted.length && (!medianBucket || !maxBucket)) {
+            if (! medianBucket) {
+              Log.e(`Missing bucket for ${medianCount} guests`);
+            }
+            if (! maxBucket) {
+              Log.e(`Missing bucket for ${maxCount} guests`);
+            }
+          }
+
+          return <div>
+            <p>{ sorted.length && medianBucket && maxBucket ?
+              <span>
+                Your median event has{" "}<Components.Badge
+                  color={medianBucket.color}
+                  text={ medianCount + " " + Text.Guests } /> invited.
+
+                Your largest event { maxCount == medianCount ? " also " : " "}
+                has{" "} <Components.Badge
+                  color={maxBucket.color}
+                  text={ maxCount + " " + Text.Guests }
+                /> invited.
+              </span> :
+              Text.ChartNoGuests
+            }</p>
+          </div>;
         }
-        if (! maxBucket) {
-          Log.e(`Missing bucket for ${maxCount} guests`);
-        }
-      }
-
-      return <div>
-        <p>{ sorted.length && medianBucket && maxBucket ?
-          <span>
-            Your median event has{" "}<Components.Badge
-              color={medianBucket.color}
-              text={ medianCount + " " + Text.Guests } /> invited.
-
-            Your largest event { maxCount == medianCount ? " also " : " "}
-            has{" "} <Components.Badge
-              color={maxBucket.color}
-              text={ maxCount + " " + Text.Guests }
-            /> invited.
-          </span> :
-          Text.ChartNoGuests
-        }</p>
-      </div>;
+      });
     }
   }
 }

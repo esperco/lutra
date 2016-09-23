@@ -1,19 +1,33 @@
 /*
-  Base class for a blob of text that depends on some calculation
+  Base class for a blob of text that depends on group calc
 */
 
 /// <reference path="./Components.Chart.tsx" />
 
 module Esper.Components {
-  export abstract class ChartInsight<T, U> extends Chart<T, U> {
-    // For insights, OK to leave blank if error, busy (there should be some
-    // accompanying other chart to flash messages)
-    renderMsg() { return <span />; }
+  export abstract class GroupChartInsight
+         extends Chart<Types.GroupState, Types.ChartProps> {
 
-    // Always return false -- let renderMain handle no data scenario
-    noData(data: T) { return false; }
+    abstract getGroupBy(): Types.GroupBy;
+
+    getCalc(props: Types.ChartProps): Calc<Types.GroupState> {
+      // Swap out GroupBy for class designated one
+      props = _.clone(props);
+      props.groupBy = this.getGroupBy();
+
+      return EventStats.defaultGroupDurationCalc(
+        props.eventsForRanges,
+        Charting.getFilterFns(props),
+        (e) => props.groupBy.keyFn(e, props)
+      )
+    }
+
+    /*
+      Don't update if props are mostly the same. This should be by-passed if
+      calc is firing because it calls forceUpdate
+    */
+    shouldComponentUpdate(newProps: Types.ChartProps) {
+      return !Charting.eqProps(newProps, this.props);
+    }
   }
-
-  export abstract class ChartGroupingInsight<U>
-    extends ChartInsight<Types.EventOptGrouping, U> { }
 }
