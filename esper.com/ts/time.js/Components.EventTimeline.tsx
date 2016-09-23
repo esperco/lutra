@@ -5,13 +5,13 @@
 module Esper.Components {
   const MAX_TICKS = 10;
 
-  export function EventTimeline({period, events}: {
-    period: Types.SinglePeriod|Types.CustomPeriod;
-    events: Types.TeamEvent[];
+  export function EventTimeline({group, props} : {
+    group: Types.RangesGroup;
+    props: Types.ChartProps;
   }) {
-    var bounds = Period.boundsFromPeriod(period)
+    var bounds = Period.bounds(props.period)
     var start = bounds[0].getTime() / 1000;
-    var total = WeekHours.totalForPeriod(period);
+    var total = WeekHours.totalForRange(bounds);
 
     // Day blocks solely to demarcate day boundaries - inline
     var dates = Period.datesFromBounds(bounds[0], bounds[1]);
@@ -33,11 +33,17 @@ module Esper.Components {
       >{ moment(date).format("M/D") }</span>
     );
 
+    var keys = _.keys(group.some);
+    var colors = props.groupBy.colorMapFn(keys, props);
+    var colorMap = _.zipObject<string, Colors.ColorMap>(keys, colors);
+
     // Absolutely positioned on top of dayBlocks
-    var eventBlocks = _(events)
-      .filter((e) => Stores.Events.isActive(e))
-      .map((e) => <EventBlock key={Stores.Events.strId(e)}
-        event={e}
+    var eventBlocks = _(group.all.weights)
+      .filter((w) => Stores.Events.isActive(w.event))
+      .map((w) => <EventBlock key={Stores.Events.strId(w.event) + w.group}
+        event={w.event}
+        duration={w.value}
+        color={colorMap[w.group as string]}
         start={start}
         total={total}
       />)
@@ -54,28 +60,27 @@ module Esper.Components {
   }
 
   // A floating absolutely-positioned time for an event block
-  function EventBlock({event, start, total}: {
+  function EventBlock({event, duration, color, start, total}: {
     event: Types.TeamEvent;
-    start: number; // Seconds
-    total: number; // Seconds
+    duration: number; // Seconds
+    color?: string;
+    start: number;    // Start of entire timeline, seconds
+    total: number;    // Total for entire timeline, seconds
   }) {
     let eventStart = Math.max((event.start.getTime() / 1000) - start, 0);
 
     // Clip so event duration doesn't go past total
-    let eventDuration = Math.min(
-      (event.end.getTime() - event.start.getTime()) / 1000,
-      total - eventStart
-    );
+    let eventDuration = Math.min(duration, total - eventStart);
 
     let style = {
       left: (eventStart / total) * 100 + "%",
-      width: (eventDuration / total) * 100 + "%"
+      width: (eventDuration / total) * 100 + "%",
     };
 
     return <Tooltip style={style} className="time-block"
             title={event.title || Text.NoEventTitle}
             onClick={() => Charting.onEventClick(event)}>
-      <span />
+      <span style={{background: color || Colors.lightGray}} />
     </Tooltip>;
   }
 }
