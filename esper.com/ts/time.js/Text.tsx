@@ -130,8 +130,10 @@ module Esper.Text {
   export const ConfirmAllLabels = `Confirm ${_.capitalize(Labels)}`;
 
   // Chart Types
-  export const ChartPercentage = `Percent`;
-  export const ChartAbsolute = `Absolute Time`;
+  export const ChartPercentage = `Pie Chart`;
+  export const ChartAbsolute = `Bar Chart`;
+  export const ChartPercentageSeries = `Stacked Bar Chart`;
+  export const ChartAbsoluteSeries = `Line Chart`;
 
   // Chart Units
   export const ChartPercentUnit = `Percent`;
@@ -279,6 +281,7 @@ module Esper.Text {
     return moment(d).format("h:mm a");
   }
 
+  // Format a period as a single string
   export function fmtPeriod(p: Types.Period, short=false) {
     let bounds = Period.bounds(p);
     let start = fmtPeriodDate(p.interval, bounds[0], short);
