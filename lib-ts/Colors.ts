@@ -9,21 +9,6 @@ module Esper.Colors {
     https://www.google.com/design/spec/style/color.html#color-color-palette
   */
   export var presets: string[] = [
-    // 300
-    // "#BA68C8", // Too close to Esper purple
-    "#64B5F6",
-    "#4DB6AC",
-    "#FFB74D",
-    "#E57373",
-    // "#9575CD", // Too close to Esper purple
-    "#4FC3F7",
-    "#81C784",
-    "#FF8A65",
-    "#7986CB",
-    "#4DD0E1",
-    "#AED581",
-    "#FFD54F",
-
     // 200
     // "#CE93D8", // Too close to Esper purple
     "#90CAF9",
@@ -41,6 +26,21 @@ module Esper.Colors {
     "#80DEEA",
     "#C5E1A5",
     "#FFE082",
+
+    // 300
+    // "#BA68C8", // Too close to Esper purple
+    "#64B5F6",
+    "#4DB6AC",
+    "#FFB74D",
+    "#E57373",
+    // "#9575CD", // Too close to Esper purple
+    "#4FC3F7",
+    "#81C784",
+    "#FF8A65",
+    "#7986CB",
+    "#4DD0E1",
+    "#AED581",
+    "#FFD54F",
 
     // 400
     // "#AB47BC", // Too close to Esper purple
