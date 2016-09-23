@@ -87,6 +87,7 @@ module Esper.Route {
   }
 
   routeChart(Paths.Time.calendarsChart, Actions.Charts.renderCalendars);
+  routeChart(Paths.Time.domainChart, Actions.Charts.renderDomains);
   routeChart(Paths.Time.durationsChart, Actions.Charts.renderDurations);
   routeChart(Paths.Time.guestsChart, Actions.Charts.renderGuests);
   routeChart(Paths.Time.guestsCountChart, Actions.Charts.renderGuestsCount);
