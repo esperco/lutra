@@ -33,7 +33,7 @@ module Esper.Charting {
       let teamLabel = _.find(props.team.team_api.team_labels,
         (l) => l.normalized === key
       );
-      return teamLabel.original;
+      return teamLabel ? teamLabel.original : key;
     },
 
     selectorKeysFn: (group, props) => {
@@ -579,7 +579,9 @@ module Esper.Charting {
   export function cleanExtra(e: any): Types.ChartExtra {
     e = e || {};
     var typedQ: Types.ChartExtra = e;
-    if (! _.includes(["percent", "absolute"], typedQ.type)) {
+    if (! _.includes([
+      "percent", "absolute", "percent-series", "absolute-series"
+    ], typedQ.type)) {
       typedQ.type = "percent";
     }
 
@@ -835,6 +837,8 @@ module Esper.Charting {
     let colors = groupBy.colorMapFn ?
       groupBy.colorMapFn(keys, props) : Colors.presets;
 
+    let periodNames = Text.fmtPeriodList(props.period, true);
+
     let series: EventGroupSeries[] = _.map(keys, (key, index) => {
       let groupSeries = group.some[key];
       let name = Util.escapeBrackets((
@@ -849,10 +853,10 @@ module Esper.Charting {
         color: colors[index],
 
         data: _.map(groupSeries.values, (v, vIndex) => ({
-          name,
+          name: `${name} (${periodNames[vIndex]})`,
           count: v.totalUnique,
           x: vIndex,
-          y: v.totalValue,
+          y: (opts.yFn || _.identity)(v.totalValue),
           events: {
             click: () => onSeriesClick(v.events)
           }
@@ -862,15 +866,16 @@ module Esper.Charting {
 
     // Handle none series
     if (groupBy.noneText) {
+      let name = groupBy.noneText;
       let s: EventGroupSeries = {
-        name: groupBy.noneText,
+        name,
         cursor: "pointer",
         color: Colors.lightGray,
         data: _.map(group.none.values, (v, vIndex) => ({
-          name: groupBy.noneText,
+          name: `${name} (${periodNames[vIndex]})`,
           count: v.totalUnique,
           x: vIndex,
-          y: v.totalValue,
+          y: (opts.yFn || _.identity)(v.totalValue),
           events: {
             click: () => onSeriesClick(v.events)
           }
@@ -880,16 +885,19 @@ module Esper.Charting {
 
     // Handle remainders
     if (opts.totals) {
+      let name = Text.ChartRemainder;
       let s: EventGroupSeries = {
-        name: Text.ChartRemainder,
+        name,
         cursor: "pointer",
         color: Colors.lighterGray,
         data: _.map(group.all.values, (v, vIndex) => ({
-          name: Text.ChartRemainder,
+          name: `${name} (${periodNames[vIndex]})`,
           count: 0,
           x: vIndex,
-          y: opts.totals[vIndex] ?
-            Math.max(opts.totals[vIndex] - v.totalValue, 0) : 0,
+          y: (opts.yFn || _.identity)(
+            opts.totals[vIndex] ?
+            Math.max(opts.totals[vIndex] - v.totalValue, 0) : 0
+          ),
           events: { click: () => false }
         }))
       };
