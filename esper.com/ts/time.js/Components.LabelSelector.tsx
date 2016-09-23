@@ -18,22 +18,28 @@ module Esper.Components {
           { Text.UICalculating }
         </div>,
         some: (optGroups) => {
-          var choices = _.map(optGroups.some, (v, k) => ({
-            id: k,
-            displayAs: Labels.getDisplayAs(k),
-            badgeText: v.totalUnique.toString(),
-            badgeHoverText: Text.events(v.totalUnique),
-            badgeColor: Colors.getColorForLabel(k)
-          }));
+          var labelInfos = this.props.team.team_api.team_labels;
+          var choices = _.map(optGroups.some, (v, k) => {
+            var labelInfo = _.find(labelInfos, {normalized: k});
+            return {
+              id: k,
+              displayAs: labelInfo ? labelInfo.original : k,
+              badgeText: v.totalUnique.toString(),
+              badgeHoverText: Text.events(v.totalUnique),
+              badgeColor: labelInfo ? labelInfo.color : (
+                k.charAt(0) === '#' ? Colors.getColorForHashtag(k) : Colors.lightGray
+              )
+            };
+          });
 
           // Get team labels too
-          _.each(this.props.team.team_api.team_labels, (label, i) => {
+          _.each(labelInfos, (label, i) => {
             choices.push({
               id: label.normalized,
               displayAs: label.original,
               badgeText: undefined,
               badgeHoverText: undefined,
-              badgeColor: Colors.getColorForLabel(label.normalized)
+              badgeColor: label.color
             })
           });
           choices = _(choices)
@@ -151,7 +157,7 @@ module Esper.Components {
         badgeText: l.count ? l.count && l.count.toString() : "",
         badgeHoverText: l.count ? (l.count && l.count.toString() +
           " Event" + (l.count == 1 ? "" : "s")) : "",
-        badgeColor: Colors.getColorForLabel(l.id)
+        badgeColor: l.color
       }))
     }];
 

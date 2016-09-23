@@ -3,6 +3,7 @@
 */
 
 /// <reference path="./Api.ts" />
+/// <reference path="./Colors.ts" />
 /// <reference path="./Labels.ts" />
 /// <reference path="./Log.ts" />
 /// <reference path="./Model2.Batch.ts" />
@@ -33,6 +34,9 @@ module Esper.Stores.Events {
           .map((h) => ({
             id: h.label ? h.label.normalized : h.hashtag.normalized,
             displayAs: h.label ? h.label.original : h.hashtag.original,
+            color: h.label ?
+              (h.label.color || Colors.getColorForHashtag(h.hashtag.normalized))
+              : Colors.getColorForHashtag(h.hashtag.normalized),
             score: 1
           }))
           .value();
@@ -40,10 +44,15 @@ module Esper.Stores.Events {
       if (e.labels) {
         let labels = _(e.labels)
           .map((l) => {
-            Labels.storeMapping({ norm: l.normalized, display: l.original });
+            Labels.storeMapping({
+              norm: l.normalized,
+              display: l.original,
+              color: l.color
+            });
             return {
               id: l.normalized,
               displayAs: l.original,
+              color: l.color,
               score: 1
             };
           })
@@ -63,6 +72,7 @@ module Esper.Stores.Events {
               .map((l) => ({
                 id: l.label.normalized,
                 displayAs: l.label.original,
+                color: l.label.color,
                 score: l.score * PREDICTED_LABEL_MODIFIER
               })).value();
 
@@ -738,6 +748,7 @@ module Esper.Stores.Events {
       (scores) => Option.some(_.map(scores, (s) => ({
         id: s.id,
         displayAs: s.displayAs,
+        color: s.color,
         score: 1
       })))
     );

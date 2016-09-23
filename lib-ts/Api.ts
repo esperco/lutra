@@ -461,6 +461,13 @@ module Esper.Api {
     return JsonHttp.put(url, labels);
   }
 
+  export function setLabelColor(teamid: string, req: ApiT.SetLabelColorRequest):
+    JsonPromise<ApiT.LabelInfo> {
+    var url = `${prefix}/api/team-label/set-color/${string(Login.me())}`
+      + `/${string(teamid)}`;
+    return JsonHttp.post(url, req);
+  }
+
   /***** Google profile information *****/
 
   export function getGoogleEmail(myUID: string, theirUID: string,

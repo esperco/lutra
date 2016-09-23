@@ -16,7 +16,7 @@ module Esper.Views {
           <Components.LabelManager getLabelInfos={this.getLabelInfos(team)}
             addLabel={this.addLabel(team)} archiveFn={this.archive(team)}
             removeLabel={this.removeLabel(team)} renameLabel={this.renameLabel(team)}
-            addPermission={true} />
+            setLabelColor={this.setLabelColor(team)} addPermission={true} />
         </div>
       </div>;
     }
@@ -27,36 +27,37 @@ module Esper.Views {
       };
     }
 
+    setLabelColor(team: ApiT.Team) {
+      return function(oldInfo: ApiT.LabelInfo, newColor: string) {
+        return Actions.Teams.setLabelColor(team.teamid, oldInfo, newColor);
+      }
+    }
+
     addLabel(team: ApiT.Team) {
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         Actions.Teams.addLabel(team.teamid, label);
       };
     }
 
     archive(team: ApiT.Team) {
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         Actions.Teams.rmLabel(team.teamid, label);
       };
     }
 
     removeLabel(team: ApiT.Team) {
       var archive = this.archive(team);
-      return function(label: string) {
+      return function(label: Types.LabelBase) {
         archive(label);
-        Actions.BatchLabels.remove(team.teamid, label);
+        Actions.BatchLabels.remove(team.teamid, label.displayAs);
       };
     }
 
     renameLabel(team: ApiT.Team) {
-      return function(orig: string, val: string) {
+      return function(orig: Types.LabelBase, val: Types.LabelBase) {
           Actions.Teams.renameLabel(team.teamid, orig, val);
-          Actions.BatchLabels.rename(team.teamid, orig, val);
+          Actions.BatchLabels.rename(team.teamid, orig.displayAs, val.displayAs);
       };
     }
   }
 }
-
-
-
-
-

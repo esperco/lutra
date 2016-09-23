@@ -31,14 +31,22 @@ module Esper.Actions.Teams {
     });
 
     it("should add labels", function() {
-      addLabel(this.teamId, "Label 4");
+      addLabel(this.teamId, {
+        id: "label 4",
+        displayAs: "Label 4",
+        color: "#123456"
+      });
       expect(Api.putSyncedLabels).toHaveBeenCalledWith(this.teamId, {
         labels: ["Label 1", "Label 2", "Label 3", "Label 4"]
       })
     });
 
     it("should de-duplicate similar labels when adding", function() {
-      addLabel(this.teamId, "label 3");
+      addLabel(this.teamId, {
+        id: "label 3",
+        displayAs: "Label 3",
+        color: "#654321"
+      });
       expect(Stores.Teams.require(this.teamId).team_api.team_labels).toEqual(
         [{
           original: "Label 1",

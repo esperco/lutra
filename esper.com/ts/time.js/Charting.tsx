@@ -188,7 +188,6 @@ module Esper.Charting {
   export interface EventSeries {
     name: string,
     cursor: string,
-    color: string,
     stack: number,
     index: number,
     data: HighchartsDataPoint[]
@@ -223,6 +222,7 @@ module Esper.Charting {
       // In case color is based on position in sort order
       index: number;
       total: number;
+      event: Types.TeamEvent;
     }) => string;
     yFn?: (v: number) => number;           // Display version of values
   }
@@ -251,12 +251,6 @@ module Esper.Charting {
         series.push({
           name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
           cursor: "pointer",
-          color: g.current ?
-            (opts.colorFn ? opts.colorFn(key, {
-              index: index,
-              total: total
-            }) : Colors.presets[index]) :
-            Colors.lightGray,
           stack: Period.asNumber(g.period),
           index: Period.asNumber(g.period),
           data: value && value.annotations.length ?
@@ -264,6 +258,13 @@ module Esper.Charting {
               name: Text.eventTitleForChart(a.event),
               x: index + (opts.noneStart ? 1 : 0),
               y: opts.yFn ? opts.yFn(a.value) : a.value,
+              color: g.current ?
+                (opts.colorFn ? opts.colorFn(key, {
+                  index: index,
+                  total: total,
+                  event: a.event
+                }) : Colors.presets[index]) :
+                Colors.lightGray,
               events: {
                 click: () => onEventClick(a.event)
               }
@@ -277,6 +278,7 @@ module Esper.Charting {
               name: Text.ChartEmptyEvent,
               x: index + (opts.noneStart ? 1 : 0),
               y: opts.yFn ? opts.yFn(0) : 0,
+              color: Colors.lightGray,
               events: { click: () => false }
             }]
         });
@@ -287,13 +289,13 @@ module Esper.Charting {
         series.push({
           name: opts.noneName,
           cursor: "pointer",
-          color: Colors.lightGray,
           stack: Period.asNumber(g.period),
           index: Period.asNumber(g.period),
           data: _.map(g.data.none.annotations, (a) => ({
             name: Text.eventTitleForChart(a.event),
             x: opts.noneStart ? 0 : keys.length, // None @ end
             y: opts.yFn ? opts.yFn(a.value) : a.value,
+            color: Colors.lightGray,
             events: {
               click: () => onEventClick(a.event)
             }
@@ -421,11 +423,14 @@ module Esper.Charting {
           group ? _.map(group.annotations, (a) => a.event) : []
         );
 
+      let firstEvent = group ? group.annotations[0].event : null;
+
       return {
         name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
         color: opts.colorFn ? opts.colorFn(key, {
           index: index,
-          total: keys.length
+          total: keys.length,
+          event: firstEvent
         }) : Colors.presets[index],
         count: group ? group.annotations.length : 0,
         x: periodIndex,

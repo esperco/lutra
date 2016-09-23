@@ -466,6 +466,11 @@ module Esper.ApiT {
     label_infos: LabelInfo[];
   }
 
+  export interface SetLabelColorRequest {
+    label: string;
+    color: string;
+  }
+
   type EventSelection = ["Eventids", string[]] | ["Label", string];
 
   export interface LabelChangeRequest {

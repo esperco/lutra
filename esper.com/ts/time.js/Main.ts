@@ -20,7 +20,6 @@ module Esper.Main {
   export function initAll() {
     Stores.Teams.init();
     Stores.Calendars.init();
-    Colors.init();
     Labels.init();
     Login.init();
     Login.promise.done(function() {
