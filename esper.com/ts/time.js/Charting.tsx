@@ -1,15 +1,454 @@
 /*
-  Misc helper function for Highcharts
+  Generalized approach to charting + helper functions for Highcharts
 */
 
+/// <reference path="./Text.tsx" />
+
 module Esper.Charting {
-  export type ChartType = Types.ChartType;
-  export type BaseOpts<T> = Types.ChartBaseOpts<T>;
-  export type ExtraOptsMaybe = Types.ChartExtraOptsMaybe;
-  export type ExtraOpts = Types.ChartExtraOpts;
-  export type PeriodData<T> = Types.PeriodData<T>;
-  export type PeriodOptGroup = Types.PeriodOptGroup;
-  export type PeriodGrouping = Types.PeriodGrouping;
+
+  /* Attributes to group by */
+
+  // Group by (predicted) labels assigned to event
+  export const GroupByLabel: Types.GroupBy = {
+    name: Text.ChartLabels,
+    icon: "fa-tags",
+    keyFn: (event, props) => Params.applyListSelectJSON(
+      Stores.Events.getLabelIds(event),
+      props.extra.labels
+    ),
+
+    colorMapFn: (keys) => _.map(keys, Colors.getColorForLabel),
+
+    displayFn: Labels.getDisplayAs,
+    selectorKeysFn: (group, props) => {
+      let groupKeys = _.keys(group.some);
+      let teamKeys = _.map(props.team.team_api.team_labels,
+        (l) => l.normalized
+      );
+      return _(groupKeys)
+        .concat(teamKeys)
+        .uniq()
+        .sort()
+        .value()
+    },
+
+    allText: Text.AllLabels,
+    noneText: Text.Unlabeled,
+    showAllText: Text.AllLabels,
+    hideNoneText: Text.HideUnlabled,
+
+    getListSelectJSONFn: (extra) => extra.labels,
+    updateExtraFn: (x, props) => ({ labels: x }),
+
+    selectorNoDataFn: () => <a href={Paths.Time.labelSetup().href}>
+     { Text.NoLabelsMessage }
+    </a>
+  }
+
+
+  // Group by meeting attendees
+  export const GroupByGuest: Types.GroupBy = {
+    name: Text.ChartGuests,
+    icon: "fa-user",
+    keyFn: (event, props) => Params.applyListSelectJSON(
+      _.isEmpty(props.extra.domains.some) ?
+        Stores.Events.getGuestEmails(event) :
+        Stores.Events.getGuestEmails(event, props.extra.domains.some),
+      props.extra.guests
+    ),
+
+    colorMapFn: (keys) => {
+      let totalCounts: {[index: string]: number} = {};
+      let indexCounts: {[index: string]: number} = {};
+
+      _.each(keys, (key) => {
+        let domain = key.split('@')[1] || key;
+        totalCounts[domain] = (totalCounts[domain] || 0) + 1;
+      });
+
+      return _.map(keys, (key) => {
+        let domain = key.split('@')[1] || key;
+        let index = indexCounts[domain] = (indexCounts[domain] || 0) + 1;
+        let base = Colors.getColorForDomain(domain);
+        return step(base, index - 1, totalCounts[domain])
+      });
+    },
+
+    allText: Text.AllGuests,
+    noneText: Text.NoGuests,
+    showAllText: Text.AllGuests,
+    hideNoneText: Text.HideNoGuests,
+
+    getListSelectJSONFn: (extra) => extra.guests,
+    updateExtraFn: (x, props) => ({
+      guests: x,
+
+      // Guest count none, guest none, and domain none should be the same
+      guestCounts: _.extend({}, props.extra.guestCounts, {
+        none: x.none
+      }) as Params.ListSelectJSON,
+      domains: _.extend({}, props.extra.domains, {
+        none: x.none
+      }) as Params.ListSelectJSON
+    })
+
+  }
+
+  // Group by e-mail domain names of meeting attendees
+  export const GroupByDomain: Types.GroupBy = {
+    name: Text.GuestDomains,
+    icon: "fa-at",
+    keyFn: (event, props) => Params.applyListSelectJSON(
+      Stores.Events.getGuestDomains(event),
+      props.extra.domains
+    ),
+    colorMapFn: (keys) => _.map(keys, Colors.getColorForDomain),
+
+    allText: Text.AllGuests,
+    noneText: Text.NoGuests,
+    showAllText: Text.AllGuests,
+    hideNoneText: Text.HideNoGuests,
+
+    getListSelectJSONFn: (extra) => extra.domains,
+    updateExtraFn: (x, props) => ({
+      domains: x,
+
+      // Guest count none, guest none, and domain none should be the same
+      guests: _.extend({}, props.extra.guests, {
+        none: x.none
+      }) as Params.ListSelectJSON,
+      guestCounts: _.extend({}, props.extra.guestCounts, {
+        none: x.none
+      }) as Params.ListSelectJSON
+    })
+  }
+
+
+  // Group by calendar of event
+  export const GroupByCalendar: Types.GroupBy = {
+    name: Text.ChartCalendars,
+    icon: "fa-calendar-o",
+    keyFn: (event, props) => _.includes(props.extra.calIds, event.calendarId) ?
+      Option.some([event.calendarId]) : Option.none<string[]>(),
+    colorMapFn: (keys) => _.map(keys, Colors.getColorForCal),
+    displayFn: (key, prop) => {
+      let cal = _.find(prop.calendars, (c) => c.id === key);
+      return cal ? cal.title : key;
+    },
+    selectorKeysFn: (group, props) => props.team.team_timestats_calendars,
+
+    allText: Text.AllCalendars,
+    showAllText: Text.AllCalendars,
+
+    getListSelectJSONFn: (extra) => ({
+      all: false, some: extra.calIds, none: false
+    }),
+    updateExtraFn: (x, props) => ({ calIds: x.all ?
+      props.team.team_timestats_calendars : x.some })
+  }
+
+
+  // Group by duration of event
+  export const DURATION_BUCKETS = [{
+    label: "< 30m",
+    gte: 0,   // Greater than, seconds
+    color: Colors.level0
+  }, {
+    label: "30m +",
+    gte: 30 * 60,
+    color: Colors.level1
+  }, {
+    label: "1h +",
+    gte: 60 * 60,
+    color: Colors.level2
+  }, {
+    label: "2h +",
+    gte: 2 * 60 * 60,
+    color: Colors.level3
+  }, {
+    label: "4h +",
+    gte: 4 * 60 * 60,
+    color: Colors.level4
+  }, {
+    label: "8h +",
+    gte: 8 * 60 * 60,
+    color: Colors.level5
+  }];
+
+  /*
+    For duration calc, use nominal duration (ignore overlapping events
+    because this can be un-intutive, also more annoying to abstract)
+  */
+  export function getDurationBucket(event: Stores.Events.TeamEvent) {
+    let duration = (event.end.getTime() - event.start.getTime()) / 1000;
+    return _.findLast(DURATION_BUCKETS,
+      (b) => duration >= b.gte
+    );
+  }
+
+  export const GroupByDuration: Types.GroupBy = {
+    name: Text.ChartDuration,
+    icon: "fa-hourglass",
+    keyFn: (event, props) => Params.applyListSelectJSON(
+      [getDurationBucket(event).label],
+      props.extra.durations
+    ),
+
+    colorMapFn: (keys) => {
+      return _.map(keys, (k) => {
+        let bucket = _.find(DURATION_BUCKETS, (b) => b.label === k);
+        return bucket ? bucket.color : Colors.lightGray;
+      });
+    },
+
+    displayFn: (key) => key,
+    selectorKeysFn: () => _.map(DURATION_BUCKETS, (b) => b.label),
+    chartKeysFn: () => _.map(DURATION_BUCKETS, (b) => b.label),
+
+    allText: Text.AllDurations,
+    showAllText: Text.AllDurations,
+
+    getListSelectJSONFn: (extra) => extra.durations,
+    updateExtraFn: (x, props) => ({ durations: x })
+  }
+
+
+  // Group by number of attendees at event
+  export const GUEST_COUNT_BUCKETS = [{
+    label: "2 " + Text.Guests,
+    gte: 2,   // Greater than, guests
+    color: Colors.level1
+  }, {
+    label: "3 - 4 " + Text.Guests,
+    gte: 3,
+    color: Colors.level2
+  }, {
+    label: "5 - 8 " + Text.Guests,
+    gte: 5,
+    color: Colors.level3
+  }, {
+    label: "9 - 18 " + Text.Guests,
+    gte: 9,
+    color: Colors.level4
+  }, {
+    label: "19+ " + Text.Guests,
+    gte: 19,
+    color: Colors.level5
+  }];
+
+  export function getGuestCountBucket(event: Types.TeamEvent,
+                               domains?: string[])
+  {
+    let emails = Stores.Events.getGuestEmails(event, domains);
+    let count = emails.length + 1; // +1 for exec
+    return _.findLast(GUEST_COUNT_BUCKETS, (b) => count >= b.gte);
+  }
+
+  export const GroupByGuestCount: Types.GroupBy = {
+    name: Text.ChartGuestsCount,
+    icon: "fa-users",
+    keyFn: (event, props) => {
+      let bucket = getGuestCountBucket(event);
+      return Params.applyListSelectJSON(
+        bucket ? [bucket.label] : [],
+        props.extra.guestCounts
+      )
+    },
+
+    colorMapFn: (keys) => {
+      return _.map(keys, (k) => {
+        let bucket = _.find(GUEST_COUNT_BUCKETS, (b) => b.label === k);
+        return bucket ? bucket.color : Colors.lightGray;
+      });
+    },
+
+    displayFn: (key) => key,
+    selectorKeysFn: () => _.map(GUEST_COUNT_BUCKETS, (b) => b.label),
+    chartKeysFn: () => _.map(GUEST_COUNT_BUCKETS, (b) => b.label),
+
+    allText: Text.AllGuests,
+    noneText: Text.NoGuests,
+    showAllText: Text.AllGuests,
+    hideNoneText: Text.HideNoGuests,
+
+    getListSelectJSONFn: (extra) => extra.guestCounts,
+    updateExtraFn: (x, props) => ({
+      guestCounts: x,
+
+      // Guest count none, guest none, and domain none should be the same
+      guests: _.extend({}, props.extra.guests, {
+        none: x.none
+      }) as Params.ListSelectJSON,
+      domains: _.extend({}, props.extra.domains, {
+        none: x.none
+      }) as Params.ListSelectJSON
+    })
+  }
+
+
+  // Group by user-provided event rating
+  function getStrRatings(event: Types.TeamEvent) {
+    return event.feedback && _.isNumber(event.feedback.rating) ?
+           [event.feedback.rating.toString()] : [];
+  }
+
+  const MAX_RATING = 5;
+
+  export const GroupByRating: Types.GroupBy = {
+    name: Text.ChartRatings,
+    icon: "fa-star",
+    keyFn: (event, props) => Params.applyListSelectJSON(
+      getStrRatings(event),
+      props.extra.ratings
+    ),
+
+    colorMapFn: (keys) => _.map(keys,
+      (k) => Colors.level(MAX_RATING - parseInt(k) + 1)
+    ),
+
+    displayFn: (key) => Text.stars(parseInt(key)),
+    selectorKeysFn: () => _.times(MAX_RATING, (i) => (i + 1).toString()),
+    chartKeysFn: () => _.times(MAX_RATING, (i) => (i + 1).toString()),
+
+    allText: Text.AllRatings,
+    noneText: Text.NoRating,
+    showAllText: Text.AllRatings,
+    hideNoneText: Text.HideNoRating,
+
+    getListSelectJSONFn: (extra) => extra.ratings,
+    updateExtraFn: (x, props) => ({ ratings: x })
+  }
+
+
+  /* Color helpers */ /////////////////////
+
+  /*
+    Colors in pie chart can be lightened versions of a base color. This
+    value is the maximum percentage to lighten any given slice.
+  */
+  const MAX_COLOR_CHANGE = 0.7;
+
+  // This is the maximum to lighten any slice relative to the previous one
+  const MAX_COLOR_DELTA = 0.3;
+
+  /*
+    For chart coloring, we may want to lighten a particular color if there are
+    multiple things nested under it.
+  */
+  function step(base: string, index: number, total: number) {
+    if (total > 1) {
+      let colorStep = Math.min(
+        MAX_COLOR_CHANGE / (total - 1),
+        MAX_COLOR_DELTA);
+      base = Colors.lighten(base, index * colorStep);
+    }
+    return base;
+  }
+
+
+  /* Compare props, used to minimize excessive chart updates */
+  export function eqProps(p1: Types.ChartProps, p2: Types.ChartProps) {
+    // Do shallow comparison of all keys with some exceptions
+    for (let key in p1) {
+      switch(key) {
+        case "eventsForRanges":
+          if (! Stores.Events.eqRanges(
+            p1.eventsForRanges,
+            p2.eventsForRanges, {
+              deepCompare: true,
+              ignoreLabelScores: true
+            }
+          )) {
+            return false;
+          }
+          break;
+
+        case "extra":
+          if (! _.isEqual(p1.extra, p2.extra)) {
+            return false;
+          }
+          break;
+
+        case "period":
+          if (! _.isEqual(p1.period, p2.period)) {
+            return false;
+          }
+          break;
+
+        default:
+          if ((p1 as any)[key] !== (p2 as any)[key]) {
+            return false;
+          }
+          break;
+      }
+    }
+    return true;
+  }
+
+
+  /* Filtering helpers */
+
+  // Get the "standard" set of filters for our charts
+  export function getFilterFns(props: Types.ChartProps) {
+    let filters: Types.FilterFn[] = [];
+
+    // Removed specifically ignored events
+    filters.push(Stores.Events.isActive);
+
+    // Filter by string
+    if (props.extra.filterStr) {
+      filters.push(function filterStr(e) {
+        return Stores.Events.filterOne(e, props.extra.filterStr);
+      });
+    }
+
+    // Filter by group functions
+    if (props.groupBy !== Charting.GroupByLabel) {
+      filters.push(function filterLabel(e) {
+        return Charting.GroupByLabel.keyFn(e, props).isSome()
+      });
+    }
+
+    if (props.groupBy !== Charting.GroupByDomain &&
+        props.groupBy !== Charting.GroupByGuest) {
+      filters.push(function filterDomain(e) {
+        return Charting.GroupByDomain.keyFn(e, props).isSome()
+      });
+    }
+
+    if (props.groupBy !== Charting.GroupByCalendar) {
+      filters.push(function filterCalendar(e) {
+        return Charting.GroupByCalendar.keyFn(e, props).isSome()
+      });
+    }
+
+    if (props.groupBy !== Charting.GroupByDuration) {
+      filters.push(function filterDuration(e) {
+        return Charting.GroupByDuration.keyFn(e, props).isSome()
+      });
+    }
+
+    if (props.groupBy !== Charting.GroupByGuestCount) {
+      filters.push(function filterGuestCount(e) {
+        return Charting.GroupByGuestCount.keyFn(e, props).isSome()
+      });
+    }
+
+    if (props.groupBy !== Charting.GroupByRating) {
+      filters.push(function filterRating(e) {
+        return Charting.GroupByRating.keyFn(e, props).isSome()
+      });
+    }
+
+    // Filter by weekHour
+    if (props.extra.weekHours) {
+      filters.push(function filterWeekHours(e) {
+        return WeekHours.overlap(e, props.extra.weekHours)
+      });
+    }
+
+    return filters;
+  }
 
 
   /* Routing helpers */
@@ -17,165 +456,156 @@ module Esper.Charting {
   // PathFn -- passed function from routing
   type PathFn = (o: Paths.Time.chartPathOpts) => Paths.Path;
 
-  // Calls a given function for a charting group
-  export function matchPrimary<T>(
-    pathFn: PathFn,
-    group: Types.ChartGroups<() => T>
-  ): T {
-    switch(pathFn) {
-      case Paths.Time.labelsChart:
-        return group.labels();
-
-      case Paths.Time.calendarsChart:
-        return group.calendars();
-
-      case Paths.Time.guestsChart:
-        return group.domains();
-
-      case Paths.Time.ratingsChart:
-        return group.ratings();
-
-      case Paths.Time.durationsChart:
-        return group.durations();
-
-      case Paths.Time.guestsCountChart:
-        return group.guestCounts();
+  export function pathFnForGroup(group: Types.GroupBy): PathFn {
+    switch (group) {
+      case Charting.GroupByCalendar:
+        return Paths.Time.calendarsChart;
+      case Charting.GroupByDomain:
+        return Paths.Time.domainChart;
+      case Charting.GroupByGuest:
+        return Paths.Time.guestsChart;
+      case Charting.GroupByDuration:
+        return Paths.Time.durationsChart;
+      case Charting.GroupByRating:
+        return Paths.Time.ratingsChart;
+      case Charting.GroupByGuestCount:
+        return Paths.Time.guestsCountChart;
     }
-    throw new Error("Unknown chart path");
+    return Paths.Time.labelsChart; // Default
   }
 
-  /*
-    Inverse of matchPrimary. Calls all functions *except* the one that
-    matches. Returns options.none if not called.
-  */
-  export function minusPrimary<T>(
-    pathFn: PathFn,
-    group: Types.ChartGroups<() => T>
-  ) : Types.ChartGroups<Option.T<T>> {
-    return {
-      labels: pathFn === Paths.Time.labelsChart ?
-        Option.none<T>() :
-        Option.some(group.labels()),
-      calendars: pathFn === Paths.Time.calendarsChart ?
-        Option.none<T>() :
-        Option.some(group.calendars()),
-      domains: pathFn === Paths.Time.guestsChart ?
-        Option.none<T>() :
-        Option.some(group.domains()),
-      durations: pathFn === Paths.Time.durationsChart ?
-        Option.none<T>() :
-        Option.some(group.durations()),
-      guestCounts: pathFn === Paths.Time.guestsCountChart ?
-        Option.none<T>() :
-        Option.some(group.guestCounts()),
-      ratings: pathFn === Paths.Time.ratingsChart ?
-        Option.none<T>() :
-        Option.some(group.ratings())
-    };
+  export function updateChart(
+    props: Types.ChartProps,
+    next: {
+      groupBy?: Types.GroupBy;
+      teamId?: string;
+      period?: Types.Period;
+      extra?: Types.ChartExtraOpt;
+      navOpts?: Route.nav.Opts;
+      reset?: boolean;
+    })
+  {
+    let {path, opts} = updateChartPath(props, next);
+    Route.nav.go(path, opts);
   }
 
-  export function updateChart<T>(o: BaseOpts<T>, p: {
-    pathFn?: (o: Paths.Time.chartPathOpts) => Paths.Path;
-    teamId?: string;
-    calIds?: string[];
-    period?: Period.Single|Period.Custom;
-    extra?: ExtraOptsMaybe & T;
-    opts?: Route.nav.Opts;
-    reset?: boolean;
-  }) {
-    var opts = p.opts || {};
-    var pathFn = p.pathFn || o.pathFn;
-    var teamId = p.teamId || o.teamId;
-    var calIds = p.calIds || o.calIds;
-    var period = p.period || o.period;
-    var newExtras: (ExtraOptsMaybe & T)|{} = {}
+  export function updateChartPath(
+    props: Types.ChartProps,
+    next: {
+      groupBy?: Types.GroupBy;
+      teamId?: string;
+      period?: Types.Period;
+      extra?: Types.ChartExtraOpt;
+      navOpts?: Route.nav.Opts;
+      reset?: boolean;
+    })
+  {
+    let navOpts = next.navOpts || {};
+    let groupBy = next.groupBy || props.groupBy;
+    let teamId = next.teamId || props.team.teamid;
+    let period = next.period || props.period;
+    let extras: Types.ChartExtraOpt = {}
 
-    // Chart change => blank out filter params unless provided
-    if (pathFn !== o.pathFn) {
-      newExtras = p.extra || {};
-    }
+    /*
+      Blank out filter params unless provided if:
 
-    // Team change => Don't preserve filter params, reset cals
-    else if (teamId !== o.teamId) {
-      calIds = [Params.defaultCalIds];
-    }
-
-    // Reset => clear out everything except specified vars
-    else if (p.reset) {
-      calIds = [Params.defaultCalIds];
-      newExtras = p.extra || {};
+      * Chart group changed
+      * Team changed
+      * Explicit reset
+    */
+    if (groupBy !== props.groupBy ||
+        teamId !== props.team.teamid ||
+        next.reset)
+    {
+      extras = next.extra || {};
     }
 
     // Else merge old extra with new params
     else {
-      newExtras = _.extend({}, o.extra, p.extra);
+      extras = _.extend({}, props.extra, next.extra);
     }
 
     // Remove params from querystring if identical to default
-    let keys = _.keys(newExtras);
+    let keys = _.keys(extras);
     if (keys.length) {
-      let defaults: any = cleanExtra({}, pathFn);
+      let defaults: any = defaultExtras(teamId, groupBy);
       _.each(keys, (key) => {
-        if (_.isEqual((newExtras as any)[key], defaults[key])) {
-          delete (newExtras as any)[key];
+        if (_.isEqual((extras as any)[key], defaults[key])) {
+          delete (extras as any)[key];
         }
       });
     }
 
     // Convert weekHours object to serialized JSON
-    opts.jsonQuery = newExtras;
-    if (opts.jsonQuery.weekHours) {
-      opts.jsonQuery.weekHours = Params.weekHoursJSON(opts.jsonQuery.weekHours);
+    navOpts.jsonQuery = extras;
+    if (navOpts.jsonQuery.weekHours) {
+      navOpts.jsonQuery.weekHours = Params.weekHoursJSON(
+        navOpts.jsonQuery.weekHours
+      );
     }
 
-    // Convert period object to string
-    var periodStr = Period.isCustom(period) ?
-      [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
-      period.index.toString();
-
-    Route.nav.path(pathFn({
-      teamId: teamId,
-      calIds: Params.pathForCalIds(calIds),
+    let pathFn = pathFnForGroup(next.groupBy || groupBy);
+    let path = pathFn({
+      teamId,
+      calIds: extras.calIds ?
+        Params.pathForCalIds(extras.calIds) : Params.defaultCalIds,
       interval: period.interval[0],
-      period: periodStr
-    }), opts);
+      period: [period.start, period.end].join(Params.PERIOD_SEPARATOR),
+    });
+
+    return { path, opts: navOpts };
   }
+
 
   /*
     Clean up different query params that could be passed
   */
-  export function cleanExtra(
-    e: any,
-    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path
-  ): ExtraOpts {
+  export function cleanExtra(e: any): Types.ChartExtra {
     e = e || {};
-    var typedQ: ExtraOpts = e;
-    typedQ.incrs = Params.cleanRelativePeriodJSON(typedQ).incrs;
-    if (! _.includes(["percent", "absolute", "calendar"], typedQ.type)) {
+    var typedQ: Types.ChartExtra = e;
+    if (! _.includes(["percent", "absolute"], typedQ.type)) {
       typedQ.type = "percent";
     }
-    typedQ.filterStr = Params.cleanString(typedQ.filterStr);
-    typedQ.durations = Params.cleanListSelectJSON(typedQ.durations);
-
-    /* Don't initially include none in selector if grouping by attr */
-    typedQ.labels = Params.cleanListSelectJSON(typedQ.labels, {
-      none: pathFn !== Paths.Time.labelsChart
-    });
-    typedQ.ratings = Params.cleanListSelectJSON(typedQ.ratings, {
-      none: pathFn !== Paths.Time.ratingsChart
-    });
-
-    // Domain selector none and guest count none should match.
-    typedQ.guestCounts = Params.cleanListSelectJSON(typedQ.guestCounts, {
-      none: pathFn !== Paths.Time.guestsChart &&
-            pathFn !== Paths.Time.guestsCountChart
-    });
-    typedQ.domains = Params.cleanListSelectJSON(typedQ.domains);
-    typedQ.domains.none = typedQ.guestCounts.none;
 
     typedQ.weekHours = Params.cleanWeekHours(typedQ.weekHours);
     typedQ.incUnscheduled = Params.cleanBoolean(typedQ.incUnscheduled);
     return typedQ;
+  }
+
+  // Group-specific cleaning -- call after cleanExtra
+  export function cleanGroups(extra: Types.ChartExtra,
+                              teamId: string,
+                              groupBy?: Types.GroupBy) {
+    extra.calIds = Params.cleanCalIds(teamId, extra.calIds);
+    extra.filterStr = Params.cleanString(extra.filterStr);
+    extra.durations = Params.cleanListSelectJSON(extra.durations);
+
+    /* Don't initially include none in selector if grouping by attr */
+    extra.labels = Params.cleanListSelectJSON(extra.labels, {
+      none: groupBy !== Charting.GroupByLabel
+    });
+    extra.ratings = Params.cleanListSelectJSON(extra.ratings, {
+      none: groupBy !== Charting.GroupByRating
+    });
+
+    // Domain selector none, guest none, guest count none should match.
+    extra.guestCounts = Params.cleanListSelectJSON(extra.guestCounts, {
+      none: groupBy !== Charting.GroupByGuest &&
+            groupBy !== Charting.GroupByDomain &&
+            groupBy !== Charting.GroupByGuestCount
+    });
+    extra.guests = Params.cleanListSelectJSON(extra.guests);
+    extra.domains = Params.cleanListSelectJSON(extra.domains);
+    extra.guests.none = extra.domains.none = extra.guestCounts.none;
+    return extra;
+  }
+
+  // Return default "select all" extras
+  export function defaultExtras(teamId: string,
+                                groupBy?: Types.GroupBy): Types.ChartExtra {
+    let extra = cleanExtra({});
+    extra = cleanGroups(extra, teamId, groupBy);
+    return extra;
   }
 
 
@@ -189,8 +619,8 @@ module Esper.Charting {
     name: string,
     cursor: string,
     color: string,
-    stack: number,
-    index: number,
+    stack?: number,
+    index?: number,
     data: HighchartsDataPoint[]
   };
 
@@ -200,11 +630,11 @@ module Esper.Charting {
   */
   export interface EventGroupSeries {
     name: string;
+    color: string;
     cursor: string;
-    index: number;
+    index?: number;
     data: {
       name: string;
-      color: string;
       count: number; /* Not part of Highcharts -- our own attribute for
                         passing data to tooltip on how many events make
                         up this single datapoint */
@@ -214,266 +644,256 @@ module Esper.Charting {
     }[]
   }
 
-  interface EventSeriesOpts {
-    displayName?: (key: string) => string; // Map key to value
-    noneName?: string;                     // If null, will not display none
-    noneStart?: boolean;                   // Displays none at start if true
-    sortedKeys?: string[];                 // Pre-sorted keys for this chart
-    colorFn?: (key: string, pos: {         // Color of key
-      // In case color is based on position in sort order
-      index: number;
-      total: number;
-    }) => string;
+  export interface SingleEventGroupSeries {
+    cursor: string;
+    data: {
+      name: string;
+      color: string;
+      count: number; /* Not part of Highcharts -- our own attribute for
+                        passing data to tooltip on how many events make
+                        up this single datapoint */
+      y: number;
+      events: HighchartsPointEvents;
+    }[]
+  }
+
+  export interface SeriesOpts {
     yFn?: (v: number) => number;           // Display version of values
+
+    // Total values should add up to (used to add a remainder value to chart)
+    totals?: number[];
+  }
+
+
+  /*
+    Generate event series data from range series group. Uses RangesGroup but
+    looks at series data and not individual range values. Returns actual
+    series plus categories.
+  */
+  export function eventSeries(
+    group: Types.RangesGroup,
+    props: Types.ChartProps,
+    opts: SeriesOpts = {}
+  ) : { categories: string[], series: EventSeries[] } {
+    let groupBy = props.groupBy;
+    let keys = groupBy.chartKeysFn ?
+      groupBy.chartKeysFn(group, props) :
+      sortGroupKeys(group);
+    let colors = groupBy.colorMapFn ?
+      groupBy.colorMapFn(keys, props) : Colors.presets;
+
+    // Generate actual series
+    let series: EventSeries[] = []
+    _.each(keys, (key, index) => {
+      let value = group.some[key];
+      series.push({
+        name: Util.escapeBrackets((
+          groupBy.displayFn ?
+          (key: string) => groupBy.displayFn(key, props) :
+          _.identity
+        )(key)),
+        cursor: "pointer",
+        color: colors[index],
+        data: value && !_.isEmpty(value.weights) ?
+          _.map(value.weights, (w) => ({
+            name: Text.eventTitleForChart(w.event),
+            x: index,
+            y: (opts.yFn || _.identity)(w.value),
+            events: {
+              click: () => onEventClick(w.event)
+            }
+          })) :
+
+          /*
+            We need to create an explicit zero-value data point to explicitly
+            single to user that there is no data
+          */
+          [{
+            name: Text.ChartEmptyEvent,
+            x: index,
+            y: opts.yFn ? opts.yFn(0) : 0,
+            events: { click: () => false }
+          }]
+      });
+    });
+
+    // Handle none
+    if (groupBy.noneText) {
+      series.push({
+        name: groupBy.noneText,
+        cursor: "pointer",
+        color: Colors.lightGray,
+        data: _.map(group.none.weights, (w) => ({
+          name: Text.eventTitleForChart(w.event),
+          x: keys.length,
+          y: (opts.yFn || _.identity)(w.value),
+          events: {
+            click: () => onEventClick(w.event)
+          }
+        }))
+      });
+    }
+
+    return { categories: keys, series };
   }
 
   /*
-    Generate event series data from period groups. Each group is one series
-    with periods being assigned to different stacks.
+    Generate event group series data for a single period -- there is only
+    one series and each data point represents the events for a key
   */
-  export function eventSeries(
-    groups: PeriodOptGroup[],
-    opts: EventSeriesOpts = {}
-  ) : EventSeries[] {
-    var keys = opts.sortedKeys || sortOptGroupKeys(groups);
+  export function singleGroupSeries(
+    group: Types.RangesGroup,
+    props: Types.ChartProps,
+    opts: SeriesOpts = {}
+  ) : SingleEventGroupSeries {
+    let groupBy = props.groupBy;
+    let keys = groupBy.chartKeysFn ?
+      groupBy.chartKeysFn(group, props) :
+      sortGroupKeys(group);
+    let colors = groupBy.colorMapFn ?
+      groupBy.colorMapFn(keys, props) : Colors.presets;
 
-    // Hash indices for quick loopup
-    var keyMap: {[index: string]: number} = {};
-    _.each(keys, (k, i) => keyMap[k] = i);
+    let series: SingleEventGroupSeries = {
+      cursor: "pointer",
+      data: _.map(keys, (key, kIndex) => {
+        let value = group.some[key];
+        return {
+          name: Util.escapeBrackets((
+            groupBy.displayFn ?
+            (key: string) => groupBy.displayFn(key, props) :
+            _.identity
+          )(key)),
+          color: colors[kIndex],
+          count: value ? value.totalUnique : 0,
+          y: (opts.yFn || _.identity)(value ? value.totalValue : 0),
+          events: {
+            click: () => onSeriesClick(value ? value.events : [])
+          }
+        };
+      })
+    };
 
-    // Generate actual series
-    var series: EventSeries[] = []
-    _.each(groups, (g) => {
-      var total = _.keys(g.data.some).length;
-
-      _.each(keys, (key, index) => {
-        let value = g.data.some[key];
-        series.push({
-          name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
-          cursor: "pointer",
-          color: g.current ?
-            (opts.colorFn ? opts.colorFn(key, {
-              index: index,
-              total: total
-            }) : Colors.presets[index]) :
-            Colors.lightGray,
-          stack: Period.asNumber(g.period),
-          index: Period.asNumber(g.period),
-          data: value && value.annotations.length ?
-            _.map(value.annotations, (a) => ({
-              name: Text.eventTitleForChart(a.event),
-              x: index + (opts.noneStart ? 1 : 0),
-              y: opts.yFn ? opts.yFn(a.value) : a.value,
-              events: {
-                click: () => onEventClick(a.event)
-              }
-            })) :
-
-            /*
-              We need to create an explicit zero-value data point to explicitly
-              single to user that there is no data
-            */
-            [{
-              name: Text.ChartEmptyEvent,
-              x: index + (opts.noneStart ? 1 : 0),
-              y: opts.yFn ? opts.yFn(0) : 0,
-              events: { click: () => false }
-            }]
-        });
+    // Handle none series
+    if (groupBy.noneText) {
+      series.data.push({
+        name: groupBy.noneText,
+        color: Colors.lightGray,
+        count: group.none.totalUnique,
+        y: (opts.yFn || _.identity)(group.none.totalValue),
+        events: {
+          click: () => onSeriesClick(group.none.events)
+        }
       });
+    }
 
-      // Handle none
-      if (opts.noneName) {
-        series.push({
-          name: opts.noneName,
-          cursor: "pointer",
-          color: Colors.lightGray,
-          stack: Period.asNumber(g.period),
-          index: Period.asNumber(g.period),
-          data: _.map(g.data.none.annotations, (a) => ({
-            name: Text.eventTitleForChart(a.event),
-            x: opts.noneStart ? 0 : keys.length, // None @ end
-            y: opts.yFn ? opts.yFn(a.value) : a.value,
-            events: {
-              click: () => onEventClick(a.event)
-            }
-          }))
-        });
-      }
-    });
+    // Handle remainders
+    if (opts.totals) {
+      series.data.push({
+        name: Text.ChartRemainder,
+        color: Colors.lighterGray,
+        count: 0,
+        y: (opts.yFn || _.identity)(
+          Math.max(_.sum(opts.totals) - group.all.totalValue, 0)
+        ),
+        events: { click: () => false }
+      });
+    }
 
     return series;
   }
 
-
-  interface EventGroupSeriesOpts extends EventSeriesOpts {
-    subgroup?: string[]; // Drilldown to this subgroup path
-    onDrilldown?: (path: string[]) => void;
-  }
-
   /*
-    Generate event group series data from period groups -- each period is
-    one series and each group is a data point
+    Generate event group series data from period groups -- each series is a
+    key we're grouping events by and each data point are the events grouped
+    by that key for a particular date range
   */
   export function eventGroupSeries(
-    groups: PeriodOptGroup[],
-    opts: EventGroupSeriesOpts = {}
-  ): EventGroupSeries[] {
-    let groupings: PeriodGrouping[] = _.map(groups, (g) => ({
-      period: g.period,
-      current: g.current,
-      data: g.data.some,
-      total: g.data.totalValue
-    }));
+    group: Types.RangesGroup,
+    props: Types.ChartProps,
+    opts: SeriesOpts = {}
+  ) : EventGroupSeries[] {
+    let groupBy = props.groupBy;
+    let keys = groupBy.chartKeysFn ?
+      groupBy.chartKeysFn(group, props) :
+      sortGroupKeys(group);
+    let colors = groupBy.colorMapFn ?
+      groupBy.colorMapFn(keys, props) : Colors.presets;
 
-    // Filter down to subgroups as appropriate
-    if (! _.isEmpty(opts.subgroup)) {
-      _.each(groupings, (g) => {
-        _.each(opts.subgroup, (key) => {
-          let sub = g.data[key];
-          if (g.data[key]) {
-            g.data = sub.subgroups;
-            g.total = sub.totalValue;
-          } else {
-            g.data = {};
-            g.total = 0;
-          }
-        });
-      });
-    }
-
-    // Establish keys based on subgroups
-    let keys = opts.sortedKeys || sortGroupingKeys(groupings);
-
-    var ret = _.map(groupings, (g, periodIndex) => {
-      let data = eventSubgroupData({
-        grouping: g.data,
-        keys: keys,
-        periodIndex: periodIndex,
-        opts: opts
-      });
-
-      // Handle none
-      if (opts.noneName && _.isEmpty(opts.subgroup)) {
-        let none = groups[periodIndex].data.none;
-        let s = {
-          name: opts.noneName,
-          color: Colors.lightGray,
-          count: none.annotations.length,
-          x: periodIndex,
-          y: (opts.yFn || _.identity)(none.totalValue),
-          events: {
-            click: () => onSeriesClick(
-              _.map(none.annotations, (a) => a.event)
-            )
-          }
-        };
-
-        if (opts.noneStart) {
-          data.unshift(s);
-        } else {
-          data.push(s);
-        }
-      }
-
-      // Handle remainder
-      let remainder = groups[periodIndex].total - g.total;
-      if (remainder > 0) {
-        let s = {
-          name: Text.ChartRemainder,
-          color: Colors.lighterGray,
-          count: 0,
-          x: periodIndex,
-          y: (opts.yFn || _.identity)(remainder),
-          events: { click: () => false }
-        };
-
-        if (opts.noneStart) {
-          data.unshift(s);
-        } else {
-          data.push(s);
-        }
-      }
+    let series: EventGroupSeries[] = _.map(keys, (key, index) => {
+      let groupSeries = group.some[key];
+      let name = Util.escapeBrackets((
+        groupBy.displayFn ?
+        (key: string) => groupBy.displayFn(key, props) :
+        _.identity
+      )(key));
 
       return {
-        name: Text.fmtPeriod(g.period),
+        name,
         cursor: "pointer",
-        index: Period.asNumber(g.period),
-        data: data
+        color: colors[index],
+
+        data: _.map(groupSeries.values, (v, vIndex) => ({
+          name,
+          count: v.totalUnique,
+          x: vIndex,
+          y: v.totalValue,
+          events: {
+            click: () => onSeriesClick(v.events)
+          }
+        }))
       };
     });
 
-    return ret;
+    // Handle none series
+    if (groupBy.noneText) {
+      let s: EventGroupSeries = {
+        name: groupBy.noneText,
+        cursor: "pointer",
+        color: Colors.lightGray,
+
+        data: _.map(group.none.values, (v, vIndex) => ({
+          name: groupBy.noneText,
+          count: v.totalUnique,
+          x: vIndex,
+          y: v.totalValue,
+          events: {
+            click: () => onSeriesClick(v.events)
+          }
+        }))
+      };
+    }
+
+    // Handle remainders
+    if (opts.totals) {
+      let s: EventGroupSeries = {
+        name: Text.ChartRemainder,
+        cursor: "pointer",
+        color: Colors.lighterGray,
+        data: _.map(group.all.values, (v, vIndex) => ({
+          name: Text.ChartRemainder,
+          count: 0,
+          x: vIndex,
+          y: opts.totals[vIndex] ?
+            Math.max(opts.totals[vIndex] - v.totalValue, 0) : 0,
+          events: { click: () => false }
+        }))
+      };
+      series.push(s);
+    }
+
+    return series;
   }
 
-  function eventSubgroupData({grouping, keys, periodIndex, opts = {}}: {
-    grouping: EventStats.Grouping;
-    keys: string[];
-    periodIndex: number;
-    opts: EventGroupSeriesOpts;
-  }) {
-    return _.map(keys, (key, index) => {
-      let group = grouping[key];
-      let hasSubgroups = group && !!_.keys(group.subgroups).length
-      let onClick = hasSubgroups && opts.onDrilldown ?
-        () => opts.onDrilldown((opts.subgroup || []).concat([key])) && false :
-        () => onSeriesClick(
-          group ? _.map(group.annotations, (a) => a.event) : []
-        );
-
-      return {
-        name: Util.escapeBrackets((opts.displayName || _.identity)(key)),
-        color: opts.colorFn ? opts.colorFn(key, {
-          index: index,
-          total: keys.length
-        }) : Colors.presets[index],
-        count: group ? group.annotations.length : 0,
-        x: periodIndex,
-        y: (opts.yFn || _.identity)(group ? group.totalValue : 0),
-        events: { click: onClick }
-      }
-    });
-  }
-
-
-  // Get all keys across multiple groups, then sort
-  export function sortOptGroupKeys(groups: PeriodOptGroup[]) {
-    var groupings = _.map(groups, (g) => ({
-      period: g.period,
-      current: g.current,
-      total: g.total,
-      data: g.data.some
-    }));
-    return sortGroupingKeys(groupings);
-  }
-
-  export function sortGroupingKeys(groups: PeriodGrouping[]) {
-    /*
-      Get all keys across all groups -- needed to properly chart where key
-      might be present in one group but not another. Also calculate totals.
-    */
-    var currentTotals: {[index: string]: number} = {};
-    var aggregateTotals: {[index: string]: number} = {};
-    _.each(groups, (g) => _.each(g.data, (v, k) => {
-      aggregateTotals[k] = (aggregateTotals[k] || 0) + v.totalValue;
-      if (g.current) {
-        currentTotals[k] = (currentTotals[k] || 0) + v.totalValue;
-      }
-    }));
-    var keys = _.keys(aggregateTotals);
-
-    /*
-      Sort by totals descending of current periodGroup, if any, then
-      aggregate total.
-    */
-    return _.sortBy(keys,
-      (k) => -currentTotals[k] || 0,
-      (k) => -aggregateTotals[k] || 0
-    );
+  // Sort group keys, descending
+  export function sortGroupKeys(group: Types.RangesGroup): string[] {
+    return _(group.some)
+      .keys()
+      .sortBy((k) => -group.some[k].totalValue)
+      .value();
   }
 
 
-  /* Helper functions for Highcharts */
+  /* Helper functions for Highchart events */
 
   export function onEventClick(event: Stores.Events.TeamEvent) {
     // Confirm predicted labels when opening single event
