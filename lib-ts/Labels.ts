@@ -24,9 +24,6 @@ module Esper.Labels {
   // Global map of normalized labels to display forms
   var displayAsMap: {[index: string]: string} = {};
 
-  // Global map of normalized labels to its color
-  var colorMap: {[index: string]: string} = {};
-
   // Global map of known display labels to normalized form
   var normMap: {[index: string]: string} = {};
 
@@ -38,9 +35,6 @@ module Esper.Labels {
   }) {
     if (force || !displayAsMap[norm]) {
       displayAsMap[norm] = display;
-    }
-    if (force || !colorMap[norm]) {
-      colorMap[norm] = color;
     }
     if (force || !normMap[display]) {
       normMap[display] = norm;

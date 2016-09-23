@@ -12,6 +12,7 @@
 @import "./_body";
 @import "./_header";
 @import "./_footer";
+@import "./_color-picker";
 
 .esper-content {
   @media screen and (min-width: @screen-sm-min) {
@@ -35,40 +36,6 @@
 
     & + .esper-expanded {
       padding-top: 0;
-    }
-  }
-}
-
-.label-color-dropdown {
-  margin-right: 4px;
-
-  .label-color-box {
-    display: inline-block;
-    vertical-align: middle;
-    width: 15px;
-    height: 15px;
-    border: 1px solid black;
-  }
-}
-
-.color-grid.dropdown-menu {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 5px;
-  min-width: 300px;
-
-  .color-cell {
-    cursor: pointer;
-    width: 24px;
-    height: 24px;
-    margin: 3px;
-
-    &.selected {
-      border: 2px solid black;
-    }
-
-    &:hover {
-      box-shadow: 0 0 1em @brand-primary;
     }
   }
 }

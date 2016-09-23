@@ -218,7 +218,6 @@ module Esper.Actions.Teams {
 
     var p = Api.setLabelColor(team.teamid, request);
     Stores.Teams.TeamStore.push(_id, p, Option.some(teamCopy));
-    return p;
   }
 
   // Cleans labels before submission to server

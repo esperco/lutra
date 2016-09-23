@@ -206,8 +206,9 @@ module Esper.Components {
             <Dropdown className="pull-right label-color-dropdown">
               <span className="label-color-box dropdown-toggle"
                     style={{background: label.color || "#FFFFFF"}} />
-              <ColorGrid className="dropdown-menu color-grid" oldInfo={label}
-                         onClick={this.props.setLabelColor}>
+              <ColorGrid className="dropdown-menu color-grid"
+                         onClick={this.props.setLabelColor}
+                         oldInfo={label}>
               </ColorGrid>
             </Dropdown>
           </span> : null
