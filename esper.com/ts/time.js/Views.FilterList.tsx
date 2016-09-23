@@ -7,7 +7,7 @@ module Esper.Views {
 
   interface FilterListProps extends Params.FilterListJSON {
     cals: Stores.Calendars.CalSelection[];
-    period: Period.Single;
+    period: Types.Period;
     unconfirmed: boolean;
   }
 
@@ -118,7 +118,7 @@ module Esper.Views {
     renderWithData() {
       this.updateModal();
       var eventData = this.getEventData();
-      var events = eventData.events;
+      var events = Stores.Events.uniqueEvents(eventData.eventsForRanges);
 
       // Don't trigger .filterEvents until we're done fetching (otherwise
       // new incoming events won't be shown)
@@ -306,8 +306,8 @@ module Esper.Views {
     // Scroll to today (or next day if no event today) -- only if we haven't
     // scrolled once for this day
     goToToday() {
-      var current = Period.current(this.props.period.interval);
-      if (this.props.period.index === current.index) {
+      var current = Period.now(this.props.period.interval);
+      if (this.props.period.start === current.start) {
         var target = this.find(".today, .future").first().offset();
         if (!target || !target.top) {
           target = this.find(".day").last().offset();
@@ -473,18 +473,18 @@ module Esper.Views {
 
     updateRoute(newProps: {
       cals?: Stores.Calendars.CalSelection[];
-      period?: Period.Single;
+      period?: Types.Period;
       filterStr?: string;
       labels?: Params.ListSelectJSON;
       unconfirmed?: boolean;
     }, opts: Route.nav.Opts = {}) {
       var pathForCals = Params.pathForCals(newProps.cals || this.props.cals);
       var period = newProps.period || this.props.period;
+      var { interval, period: periodStr } = Params.periodStr(period);
       var path = "/list/" + (_.map([
         pathForCals[0],
         pathForCals[1],
-        period.interval[0],
-        period.index.toString()
+        interval, periodStr
       ], encodeURIComponent)).join("/");
       opts.jsonQuery = {
         filterStr: Util.some(newProps.filterStr, this.props.filterStr),

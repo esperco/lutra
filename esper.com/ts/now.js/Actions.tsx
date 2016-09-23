@@ -33,8 +33,11 @@ module Esper.Actions {
     var mDate = moment(date).startOf('day');
     return Stores.Events.fetchPredictions({
       teamId: team.teamid,
-      start: mDate.clone().subtract(1, 'day').toDate(),
-      end: mDate.clone().add(1, 'day').toDate()
+      period: Period.fromDates(
+        "day",
+        mDate.clone().subtract(1, 'day').toDate(),
+        mDate.clone().add(1, 'day').toDate()
+      )
     });
   }
 
@@ -52,12 +55,14 @@ module Esper.Actions {
         teamId: team.teamid,
         calId: c
       })),
-      start: mDate.clone().subtract(1, 'day').toDate(),
-      end: mDate.clone().add(1, 'day').toDate()
-    }).match<Stores.Events.TeamEvent[]>({
-      none: () => [],
-      some: (e) => e.events
-    });
+      period: Period.fromDates(
+        "day",
+        mDate.clone().subtract(1, 'day').toDate(),
+        mDate.clone().add(1, 'day').toDate()
+      )
+    }).flatMap(
+      (x) => Option.some(Stores.Events.uniqueEvents(x.eventsForRanges))
+    ).unwrapOr([]);
 
     return _.sortBy(events, (e) => [
       e.start && e.start.getTime(),

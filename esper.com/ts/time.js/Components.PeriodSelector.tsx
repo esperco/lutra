@@ -4,15 +4,15 @@
 
 module Esper.Components {
   export class PeriodSelector extends ReactHelpers.Component<{
-    period: Period.Single|Period.Custom;
-    updateFn: (period: Period.Single|Period.Custom) => void;
-    show?: Period.IntervalOrCustom[]; // Limit which intervals are available
+    period: Types.Period;
+    updateFn: (period: Types.Period) => void;
+    show?: Period.Interval[]; // Limit which intervals are available
   }, {}> {
     _dropdown: Dropdown;
 
     render() {
       var period = this.props.period;
-      var selector = ((interval: Period.IntervalOrCustom) => {
+      var selector = ((interval: Period.Interval) => {
         switch (interval) {
           case "quarter":
             return <PeriodMenu
@@ -36,19 +36,19 @@ module Esper.Components {
             return <CalendarWeekSelector
               min={Config.MIN_DATE}
               max={Config.MAX_DATE}
-              selected={Period.boundsFromPeriod(period)}
+              selected={Period.bounds(period)}
               onWeekSelect={(start, end) =>
-                this.updateAndClose(Period.singleFromDate("week", start))
+                this.updateAndClose(Period.fromDates("week", start, end))
               }
             />
 
-          default: // Custom
+          default: // Custom or day
             return <CalendarRangeSelector
               min={Config.MIN_DATE}
               max={Config.MAX_DATE}
-              selected={Period.boundsFromPeriod(period)}
+              selected={Period.bounds(period)}
               onRangeSelect={(start, end) =>
-                this.updateAndClose(Period.customFromDates(start, end))
+                this.updateAndClose(Period.fromDates("day", start, end))
               }
             />
         }
@@ -56,22 +56,21 @@ module Esper.Components {
 
       // Disable left/right arrows?
       var disableLeft = (
-        Period.boundsFromPeriod(Period.incr(period, -1))[0].getTime() <
+        Period.bounds(Period.add(period, -1))[0].getTime() <
         Config.MIN_DATE.getTime()
       );
       var disableRight = (
-        Period.boundsFromPeriod(Period.incr(period, 1))[1].getTime() >
+        Period.bounds(Period.add(period, 1))[1].getTime() >
         Config.MAX_DATE.getTime()
       );
 
       // Intervals to show in selector
-      var intervals = this.props.show ||
-        ["week", "month", "quarter", "custom"];
+      var intervals = this.props.show || ["day", "week", "month", "quarter"];
 
       return <div className="period-selector">
         { disableLeft ? <span /> :
           <span className="action period-incr-action"
-                onClick={() => this.props.updateFn(Period.incr(period, -1))}>
+                onClick={() => this.props.updateFn(Period.add(period, -1))}>
             <i className="fa fa-fw fa-caret-left" />
           </span> }
         <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
@@ -84,7 +83,7 @@ module Esper.Components {
               <IntervalSelector
                 selected={period.interval}
                 intervals={intervals}
-                onUpdate={(i) => this.props.updateFn(Period.current(i))}
+                onUpdate={(i) => this.props.updateFn(Period.now(i))}
               /> : null }
             <div className="esper-select-menu">
               { selector }
@@ -93,14 +92,14 @@ module Esper.Components {
         </Dropdown>
         { disableRight ? <span /> :
           <span className="action period-incr-action"
-                onClick={() => this.props.updateFn(Period.incr(period, 1))}>
+                onClick={() => this.props.updateFn(Period.add(period, 1))}>
             <i className="fa fa-fw fa-caret-right" />
           </span> }
       </div>;
     }
 
     // Update period and close menu
-    updateAndClose(period: Period.Single|Period.Custom) {
+    updateAndClose(period: Types.Period) {
       this.props.updateFn(period);
       if (this._dropdown) {
         this._dropdown.close();
@@ -110,9 +109,9 @@ module Esper.Components {
 
   // List of links to change interval
   function IntervalSelector({selected, intervals, onUpdate} : {
-    selected?: Period.IntervalOrCustom;
-    intervals: Period.IntervalOrCustom[];
-    onUpdate: (period: Period.IntervalOrCustom) => void;
+    selected?: Period.Interval;
+    intervals: Period.Interval[];
+    onUpdate: (period: Period.Interval) => void;
   }) {
     return <div className="esper-select-menu esper-flex-list interval-selector">
       { _.map(intervals, (i) =>
@@ -125,12 +124,12 @@ module Esper.Components {
     </div>;
   }
 
-  function textForInterval(interval: Period.IntervalOrCustom) {
+  function textForInterval(interval: Period.Interval) {
     switch(interval) {
       case "week": return Text.Week;
       case "month": return Text.Month;
       case "quarter": return Text.Quarter;
-      default: return Text.Custom;
+      default: return Text.Day;
     }
   }
 
@@ -138,18 +137,18 @@ module Esper.Components {
   function PeriodMenu({min, max, interval, selected, onUpdate} : {
     min: Date;
     max: Date;
-    interval: Period.Interval;
-    selected?: Period.Single|Period.Custom;
-    onUpdate: (period: Period.Single) => void;
+    interval: Types.Interval;
+    selected?: Types.Period;
+    onUpdate: (period: Types.Period) => void;
   }) {
-    var periods: Period.Single[] = [];
+    var periods: Types.Period[] = [];
     var m = moment(min);
     while (m.diff(max) < 0) {
-      periods.push(Period.singleFromDate(interval, m.toDate()));
+      periods.push(Period.fromDates(interval, m.toDate(), m.toDate()));
       m.add(1, interval);
     }
     return <ul className="esper-select-menu">{_.map( periods, (p) =>
-      <li key={p.index} onClick={() => onUpdate(p)}>
+      <li key={p.start} onClick={() => onUpdate(p)}>
         <a className={_.isEqual(selected, p) ? "active" : "" }>
           { Text.fmtPeriod(p) }
         </a>
@@ -162,8 +161,8 @@ module Esper.Components {
 
   class OldPeriodSelector extends ReactHelpers.Component<{
     id?: string;
-    period: Period.Single;
-    updateFn: (period: Period.Single) => void;
+    period: Types.Period;
+    updateFn: (period: Types.Period) => void;
   }, {}> {
 
     render() {
@@ -183,7 +182,7 @@ module Esper.Components {
         }
       })(interval);
 
-      var current = Period.current(interval).index;
+      var current = Period.now(interval).start;
       var minIndex = current + minMax[0];
       var maxIndex = current + minMax[1];
 
@@ -191,13 +190,14 @@ module Esper.Components {
         _.range(minIndex, maxIndex + 1),
         (index) => Text.fmtPeriod({
           interval: interval,
-          index: index
+          start: index,
+          end: index
         })
       );
 
-      var selectedIndex = this.props.period.index - minIndex;
-      var disableLeft = this.props.period.index <= minIndex;
-      var disableRight = this.props.period.index >= maxIndex;
+      var selectedIndex = this.props.period.start - minIndex;
+      var disableLeft = this.props.period.start <= minIndex;
+      var disableRight = this.props.period.start >= maxIndex;
 
       return <div className="input-group month-selector">
         { showIcon ?
@@ -217,7 +217,8 @@ module Esper.Components {
                 <li key={p}
                     onClick={() => this.props.updateFn({
                       interval: this.props.period.interval,
-                      index: minIndex + i
+                      start: minIndex + i,
+                      end: minIndex + i
                     })}>
                   <a>{ p }</a>
                 </li>
@@ -230,7 +231,8 @@ module Esper.Components {
               disabled={disableLeft}
               onClick={() => this.props.updateFn({
                 interval: this.props.period.interval,
-                index: this.props.period.index - 1
+                start: this.props.period.start - 1,
+                end: this.props.period.end - 1
               })}>
             <i className="fa fa-fw fa-caret-left" />
           </button>
@@ -238,7 +240,8 @@ module Esper.Components {
               disabled={disableRight}
               onClick={() => this.props.updateFn({
                 interval: this.props.period.interval,
-                index: this.props.period.index + 1
+                start: this.props.period.start + 1,
+                end: this.props.period.end + 1
               })}>
             <i className="fa fa-fw fa-caret-right" />
           </button>

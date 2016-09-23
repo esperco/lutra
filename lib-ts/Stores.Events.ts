@@ -125,9 +125,6 @@ module Esper.Stores.Events {
 
   export type FullEventId = Types.FullEventId;
   export type EventData = Model2.StoreData<FullEventId, TeamEvent>;
-  export type EventListData = Types.EventListData;
-  export type EventsForDate = Types.EventsForDate;
-  export type EventDateData = Types.EventDateData;
 
 
   /* Stores */
@@ -218,109 +215,101 @@ module Esper.Stores.Events {
   }
 
 
-  /* Helpers for switching between period and start/end forms */
-
-  interface PeriodQ {
-    period: Period.Single|Period.Custom,
-  }
-  interface StartEndQ {
-    start: Date;
-    end: Date;
-  }
-  type TimeQ = PeriodQ|StartEndQ;
-
-  function withBounds<T, U>(q: T & TimeQ,
-                            fn: (t: T & StartEndQ) => U): U {
-    if (q.hasOwnProperty('period')) {
-      var typedQ = <T & PeriodQ> q;
-      var bounds = Period.boundsFromPeriod(typedQ.period);
-      let p = <T & StartEndQ>
-        _.extend({}, q, { start: bounds[0], end: bounds[1] })
-      return fn(p);
-    } else {
-      let p = <T & StartEndQ> q;
-      return fn(p);
-    }
-  }
-
-
-  /* Predictions-based API */
+  /* Interfaces for querying store data */
 
   interface TeamQ {
     teamId: string;
     force?: boolean;
   }
 
+  interface CalsQ {
+    cals: Stores.Calendars.CalSelection[];
+  }
+
+  interface PeriodQ {
+    period: Types.Period;
+  }
+
+
+  /* Predictions-based API */
+
   // Fetch predicts for team, return null promise when done
-  export function fetchPredictions(q: TeamQ & TimeQ) {
-    return withBounds(q, ({teamId, start, end, force=false}) => {
+  export function fetchPredictions({teamId, period, force}: TeamQ & PeriodQ) {
+    let [start, end] = Period.bounds(period);
 
-      // We store events by day, so make sure we fetch entire start / end
-      start = moment(start).startOf('day').toDate();
-      end = moment(end).endOf('day').toDate();
+    // We store events by day, so make sure we fetch entire start / end
+    start = moment(start).startOf('day').toDate();
+    end = moment(end).endOf('day').toDate();
 
-      var dates = datesFromBounds(start, end);
-      var team = Stores.Teams.require(teamId);
-      if (! team) return;
+    var dates = datesFromBounds(start, end);
+    var team = Stores.Teams.require(teamId);
+    if (! team) return;
 
-      var calIds = team.team_timestats_calendars;
-      var doFetch = force || !!_.find(calIds, (calId) =>
-        _.find(dates, (date) =>
-          EventsForDateStore.get({
-            calId: calId, teamId: teamId, date: date
-          }).isNone()
+    var calIds = team.team_timestats_calendars;
+    var doFetch = force || !!_.find(calIds, (calId) =>
+      _.find(dates, (date) =>
+        EventsForDateStore.get({
+          calId: calId, teamId: teamId, date: date
+        }).isNone()
+      )
+    );
+
+    if (doFetch) {
+      var apiP = fetchTeamEvents(teamId, {
+        window_start: XDate.toString(start),
+        window_end: XDate.toString(end)
+      });
+
+      EventsForDateStore.transact(() =>
+        EventsForDateStore.transactP(apiP, (apiP2) =>
+          EventStore.transactP(apiP2, (apiP3) => {
+            _.each(calIds, (calId) => _.each(dates, (d) => {
+              var dateP = apiP3.then((eventMap) => {
+                let calMap = eventMap[calId] || {};
+                let events = calMap[d.getTime().toString()] || [];
+                return Option.wrap(_.map(events,
+                  (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
+                    itemKey: {
+                      teamId: teamId,
+                      calId: e.calendarId,
+                      eventId: e.id
+                    },
+                    data: Option.some(e)
+                  })));
+              });
+
+              EventsForDateStore.batchFetch({
+                teamId: teamId, calId: calId, date: d
+              }, dateP);
+            }))
+          })
         )
       );
 
-      if (doFetch) {
-        var apiP = fetchTeamEvents(teamId, {
-          window_start: XDate.toString(start),
-          window_end: XDate.toString(end)
-        });
+      return apiP.then(() => null);
+    }
 
-        EventsForDateStore.transact(() =>
-          EventsForDateStore.transactP(apiP, (apiP2) =>
-            EventStore.transactP(apiP2, (apiP3) => {
-              _.each(calIds, (calId) => _.each(dates, (d) => {
-                var dateP = apiP3.then((eventMap) => {
-                  let calMap = eventMap[calId] || {};
-                  let events = calMap[d.getTime().toString()] || [];
-                  return Option.wrap(_.map(events,
-                    (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
-                      itemKey: {
-                        teamId: teamId,
-                        calId: e.calendarId,
-                        eventId: e.id
-                      },
-                      data: Option.some(e)
-                    })));
-                });
-
-                EventsForDateStore.batchFetch({
-                  teamId: teamId, calId: calId, date: d
-                }, dateP);
-              }))
-            })
-          )
-        );
-
-        return apiP.then(() => null);
-      }
-
-      return $.Deferred().resolve().progress();
-    });
+    return $.Deferred().resolve().progress();
   }
 
 
   /* Get from store */
 
-  interface CalsQ {
-    cals: Stores.Calendars.CalSelection[];
-  }
+  export function get({period, cals}: PeriodQ & CalsQ)
+    : Option.T<Types.EventsForRangesData>
+  {
+    let range = _.range(period.start, period.end + 1); // +1 for inclusive
+    let isBusy = false;
+    let hasError = false;
+    let eventsForRanges: Types.EventsForRange[] = [];
 
-  export function get(q: CalsQ & TimeQ): Option.T<EventListData> {
-    return withBounds(q, ({start, end, cals}) => {
-      var dates = datesFromBounds(start, end);
+    for (let i in range) {
+      let index = range[i];
+      let [start, end] = Period.bounds({
+        interval: period.interval,
+        start: index, end: index
+      });
+      let dates = Period.datesFromBounds(start, end);
       var eventsByDate = _.flatten(
         _.map(cals, (c) =>
           _.map(dates, (d) =>
@@ -335,14 +324,10 @@ module Esper.Stores.Events {
 
       // If any none, then all none
       if (_.find(eventsByDate, (e) => e.isNone())) {
-        return Option.none<EventListData>();
+        return Option.none<Types.EventsForRangesData>();
       }
 
-      // Events ready, de-deuplicate
-      var events: TeamEvent[] = [];
-      var eventExists: {[calIdEventId: string]: boolean} = {}; // De-dupe map
-      var isBusy = false;
-      var hasError = false;
+      let events: Types.TeamEvent[] = [];
       _.each(Option.flatten(eventsByDate), (e) => {
         // If date is busy or error, then entire list is busy or error
         if (e.dataStatus === Model2.DataStatus.FETCHING) {
@@ -361,135 +346,68 @@ module Esper.Stores.Events {
             else if (eventOpt.dataStatus === Model2.DataStatus.FETCH_ERROR) {
               hasError = true;
             }
+
+            // Add to list (finally)
             eventOpt.data.match({
               none: () => null,
-              some: (event) => {
-                let key = event.calendarId + event.id;
-                if (! eventExists[key]) {
-                  events.push(event);
-                  eventExists[key] = true;
-                }
-              }
+              some: (event) => events.push(event)
             });
           })
         });
       });
 
-      return Option.some({
-        start: start,
-        end: end,
-        events: events,
-        isBusy: isBusy,
-        hasError: hasError
+      // Sort by start, then end
+      events.sort(sortFn);
+
+      // List of events for start/end dates
+      eventsForRanges.push({
+        range: [start, end], events
       });
-    });
+    }
+
+    return Option.some({ eventsForRanges, hasError, isBusy });
   }
 
-  // Overload require to take either period or start/end form
-  export function require(q: CalsQ & TimeQ): EventListData {
-    return withBounds(q, ({ start, end, cals }) => {
-      // Assume start and end exist
-      return get(q).match({
-        some: (d) => d,
+  export function require(q: {period: Types.Period} & CalsQ)
+    : Types.EventsForRangesData
+  {
+    // Assume start and end exist
+    return get(q).match({
+      some: (d) => d,
 
-        // None => forgot to call fetch. Error.
-        none: () => {
-          Log.e("Requested events but did not call fetch first", q);
-          return {
-            start: start,
-            end: end,
-            events: <TeamEvent[]> [],
-            isBusy: false,
-            hasError: true
-          };
-        }
-      });
-    });
-  }
-
-
-  /////
-
-  export function getByDate(q: CalsQ & TimeQ): Option.T<EventDateData> {
-    return withBounds(q, ({ start, end, cals }) => {
-      var dates = datesFromBounds(start, end);
-      var isBusy = false;
-      var hasError = false;
-      var eventDates: {
-        date: Date;
-        events: TeamEvent[]
-      }[] = [];
-
-      for (let i in dates) {
-        let date = dates[i];
-        let events = Option.flatOpt(
-          _.map(cals, (c) => EventsForDateStore.batchGet({
-            teamId: c.teamId,
-            calId: c.calId,
-            date: date
-          }))
-        );
-
-        if (events.isNone()) {
-          return Option.none<EventDateData>();
-        } else {
-          let eventsForThisDay: TeamEvent[] = [];
-          _.each(Option.matchList(events), (e) => {
-            // If date is busy or error, then entire list is busy or error
-            if (e.dataStatus === Model2.DataStatus.FETCHING) {
-              isBusy = true;
-            } else if (e.dataStatus === Model2.DataStatus.FETCH_ERROR) {
-              hasError = true;
-            }
-
-            _.each(Option.matchList(e.data), (eventOpt) => {
-              // If event is busy or error, then entire list is busy or error
-              if (eventOpt.dataStatus === Model2.DataStatus.FETCHING) {
-                isBusy = true;
-              }
-              else if (eventOpt.dataStatus ===
-                       Model2.DataStatus.FETCH_ERROR) {
-                hasError = true;
-              }
-              eventOpt.data.match({
-                none: () => null,
-                some: (event) => eventsForThisDay.push(event)
-              })
-            });
-          });
-
-          eventDates.push({
-            date: date,
-            events: eventsForThisDay
-          });
-        }
+      // None => forgot to call fetch. Error.
+      none: () => {
+        Log.e("Requested events but did not call fetch first", q);
+        return {
+          eventsForRanges: [],
+          isBusy: false,
+          hasError: true
+        };
       }
-
-      return Option.some({
-        hasError: hasError,
-        isBusy: isBusy,
-        dates: eventDates
-      });
     });
   }
 
-  export function requireByDate(q: CalsQ & TimeQ): EventDateData {
-    return withBounds(q, ({ start, end, cals }) => {
-      // Assume start and end exist
-      return getByDate(q).match({
-        some: (d) => d,
+  // Use in sorting function to sort based on start, then end times
+  export function sortFn(e1: Types.TeamEvent, e2: Types.TeamEvent) {
+    let startDiff = e1.start.getTime() - e2.start.getTime();
+    return startDiff != 0 ? startDiff :
+           e1.end.getTime() - e2.end.getTime();
+  }
 
-        // None => forgot to call fetch. Error.
-        none: () => {
-          Log.e("Requested events by date but did not call fetch first");
-          return {
-            dates: [],
-            isBusy: false,
-            hasError: true
-          };
-        }
-      });
-    });
+  // Convert events for range to a single (sorted) list of unique events
+  export function uniqueEvents(eventsForRanges: Types.EventsForRange[]) {
+    let eventMap: {[index: string]: boolean} = {};
+    let events: Types.TeamEvent[] = [];
+    _.each(eventsForRanges, (range) => _.each(range.events, (event) => {
+      let id = strId(event);
+      if (! eventMap.hasOwnProperty(id)) {
+        eventMap[id] = true;
+        events.push(event);
+      }
+    }));
+
+    events.sort(sortFn);
+    return events;
   }
 
 
@@ -546,8 +464,9 @@ module Esper.Stores.Events {
     }
   }
 
-  export function strId(event: TeamEvent): string {
-    return [event.teamId, event.calendarId, event.id].join("|");
+  export function strId(event: TeamEvent, useRecurring = false): string {
+    let id = useRecurring ? event.recurringEventId || event.id : event.id;
+    return [event.teamId, event.calendarId, id].join("|");
   }
 
   export function matchId(event: TeamEvent, storeId: FullEventId) {
@@ -701,8 +620,8 @@ module Esper.Stores.Events {
       * ignoreLabelScores = false - Ignore different scores between labels.
         This can be used to avoid reacting to an event confirmation.
   */
-  export function eqList(list1: Stores.Events.TeamEvent[],
-                         list2: Stores.Events.TeamEvent[],
+  export function eqList(list1: Types.TeamEvent[],
+                         list2: Types.TeamEvent[],
                          opts?: EqOpts)
   {
     // Extend defaults
@@ -743,18 +662,21 @@ module Esper.Stores.Events {
     );
   }
 
-  export function eqEventsForDate(list1: EventsForDate[],
-                                  list2: EventsForDate[],
-                                  opts?: EqOpts) {
-    if (list1.length !== list2.length) return false;
-    for (var i in list1) {
-      let d1 = list1[i];
-      let d2 = list2[i];
-      if (d1.date.getTime() !== d2.date.getTime() ||
-          !eqList(d1.events, d2.events, opts)) {
-        return false;
-      }
+  export function eqRanges(range1: Types.EventsForRange[],
+                           range2: Types.EventsForRange[],
+                           opts?: EqOpts) {
+    if (range1.length !== range2.length) return false;
+    for (let i in range1) {
+      let r1 = range1[i];
+      let r2 = range2[i];
+      if (! eqRange(r1.range, r2.range)) return false;
+      if (! eqList(r1.events, r2.events, opts)) return false;
     }
     return true;
+  }
+
+  function eqRange(r1: [Date, Date], r2: [Date, Date]) {
+    return r1[0].getTime() === r2[0].getTime() &&
+           r1[1].getTime() === r2[1].getTime();
   }
 }

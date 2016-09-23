@@ -13,11 +13,11 @@ module Esper.Components {
   var Component = ReactHelpers.Component;
 
   interface CalendarProps {
-    period: Period.Single;
+    period: Types.Period;
     events: Stores.Events.TeamEvent[];
     selectedEvents: Stores.Events.TeamEvent[];
     onEventClick: (event: Stores.Events.TeamEvent, add: boolean) => void;
-    onViewChange: (period: Period.Single) => void;
+    onViewChange: (period: Types.Period) => void;
     busy?: boolean;
     error?: boolean;
   }
@@ -104,7 +104,7 @@ module Esper.Components {
               return 'month';
           }
         })(),
-        defaultDate: Period.boundsFromPeriod(this.props.period)[0],
+        defaultDate: Period.bounds(this.props.period)[0],
         events: this.getEvents.bind(this),
         viewRender: this.onViewChange.bind(this),
         eventClick: this.toggleEvent.bind(this),
@@ -169,7 +169,7 @@ module Esper.Components {
             ! _.isEqual(this.props.period, prevProps.period))
         {
           $(this._fcDiv).fullCalendar('gotoDate',
-            Period.boundsFromPeriod(this.props.period)[0]
+            Period.bounds(this.props.period)[0]
           );
         }
         $(this._fcDiv).fullCalendar('refetchEvents');
@@ -190,7 +190,7 @@ module Esper.Components {
       // Advance by one day to correct for timezone issues
       var startDate = moment(view.intervalStart)
         .clone().add(1, 'day').toDate();
-      var p = Period.singleFromDate(interval, startDate);
+      var p = Period.fromDates(interval, startDate, startDate);
       if (! _.isEqual(p, this.props.period)) {
         this.props.onViewChange(p);
       }

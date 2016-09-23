@@ -112,6 +112,7 @@ module Esper.Text {
   export const ResetFilters = `Reset Filters`;
 
   // Period selector text
+  export const Day = `Day`;
   export const Week = `Week`;
   export const Month = `Month`;
   export const Quarter = `Quarter`;
@@ -131,7 +132,6 @@ module Esper.Text {
   // Chart Types
   export const ChartPercentage = `Percent`;
   export const ChartAbsolute = `Absolute Time`;
-  export const ChartGrid = `Calendar Grid`;
 
   // Chart Units
   export const ChartPercentUnit = `Percent`;
@@ -279,34 +279,27 @@ module Esper.Text {
     return moment(d).format("h:mm a");
   }
 
-  export function fmtPeriod(p: Period.Single|Period.Custom, short?: boolean) {
-    var bounds = Period.boundsFromPeriod(p);
-    var start = bounds[0];
-    switch(p.interval) {
-      case "quarter":
-        return moment(start).format(short ? "[Q]Q 'YY" : "[Q]Q YYYY");
-      case "month":
-        return moment(start).format(short ? "MMM" : "MMMM YYYY");
-      case "week":
-        return moment(start).format(short ? "MMM D" : "[Week of] MMM D");
-      default: // Custom
-        var end = bounds[1];
-        return `${date(start)} - ${date(end)}`;
+  export function fmtPeriod(p: Types.Period, short=false) {
+    let bounds = Period.bounds(p);
+    let start = fmtPeriodDate(p.interval, bounds[0], short);
+    if (p.start === p.end && p.interval !== 'day') {
+      return start;
     }
+    let end = fmtPeriodDate(p.interval, bounds[1], short);
+    return `${start} - ${end}`;
   }
 
-  export function fmtRelPeriod(interval: Period.Interval, incr: number) {
-    var capInterval = _.capitalize(interval);
-    if (incr === 0) {
-      return "This " + capInterval;
-    } else if (incr === -1) {
-      return "Last " + capInterval;
-    } else if (incr === 1) {
-      return "Next " + capInterval;
-    } else if (incr < -1) {
-      return `In ${incr.toString()} ${capInterval}s`;
-    } else { // Incr > 1
-      return `${(-incr).toString()} ${capInterval}s Ago`;
+  function fmtPeriodDate(interval: string, d: Date, short=false) {
+    let m = moment(d).startOf(interval);
+    switch(interval) {
+      case "quarter":
+        return m.format(short ? "[Q]Q 'YY" : "[Q]Q YYYY");
+      case "month":
+        return m.format(short ? "MMM" : "MMMM YYYY");
+      case "week":
+        return m.format(short ? "MMM D" : "[Week of] MMM D");
+      default:
+        return date(d);
     }
   }
 }

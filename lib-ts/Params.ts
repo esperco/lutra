@@ -83,30 +83,37 @@ module Esper.Params {
   export const defaultCalIds = "default";
 
   // Cleans a list of calendar ids separated by CAL_ID_SEPARATOR
-  export function cleanCalIds(teamId: string, calIdsStr: string) {
+  export function cleanCalIds(teamId: string, calIdsStr: string|string[]) {
     var team = Stores.Teams.require(teamId);
-    /*
-      Allow emptyCalIds only if explicitly specified (don't return empty
-      if inferred by lastCalIds or LocalStore
-    */
-    if (calIdsStr === emptyCalIds) {
-      LocalStore.set(lastCalIdsKey, defaultCalIds);
-      lastCalIds = defaultCalIds;
+    var calIds = _.isString(calIdsStr) ? (() => {
+      /*
+        Allow emptyCalIds only if explicitly specified (don't return empty
+        if inferred by lastCalIds or LocalStore
+      */
+      if (calIdsStr === emptyCalIds) {
+        LocalStore.set(lastCalIdsKey, defaultCalIds);
+        lastCalIds = defaultCalIds;
+        return [];
+      }
+
+      if (calIdsStr) {
+        LocalStore.set(lastCalIdsKey, calIdsStr);
+      }
+
+      lastCalIds = calIdsStr || lastCalIds || LocalStore.get(lastCalIdsKey);
+      if (typeof lastCalIds === "string" &&
+          lastCalIds !== defaultCalIds) {
+        return _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
+      }
+
       return [];
-    }
+    })() : calIdsStr;
 
-    if (calIdsStr) {
-      LocalStore.set(lastCalIdsKey, calIdsStr);
-    }
-
-    lastCalIds = calIdsStr || lastCalIds || LocalStore.get(lastCalIdsKey);
-    if (typeof lastCalIds === "string" &&
-        lastCalIds !== defaultCalIds) {
-      let calIds = _.filter(Util.some(lastCalIds, "").split(CAL_ID_SEPARATOR));
-      let ret = _.intersection(team.team_timestats_calendars, calIds);
-      if (ret.length) return ret;
-    }
-    return team.team_timestats_calendars;
+    let ret = _.intersection(team.team_timestats_calendars, calIds);
+    if (ret.length)
+      return ret;
+    else
+      return team.team_timestats_calendars;
   }
 
   // Like cleanCalIds, but returns team/cal objects
@@ -152,6 +159,10 @@ module Esper.Params {
     : Period.Interval
   {
     switch(Util.some(intervalStr, "")[0]) {
+      case "c": // Backwards compat with former "custom" interval
+        return "day";
+      case "d":
+        return "day";
       case "q":
         return "quarter";
       case "m":
@@ -163,95 +174,39 @@ module Esper.Params {
     }
   }
 
-  export function cleanIntervalOrCustom(
-      intervalStr: string,
-      defaultInterval: Period.IntervalOrCustom = "week")
-    : Period.IntervalOrCustom
-  {
-    if (intervalStr && intervalStr[0] === "c") {
-      return "custom";
-    }
-    if (Period.isCustomInterval(defaultInterval)) {
-      return "custom";
-    } else {
-      return cleanInterval(intervalStr, defaultInterval);
-    }
-  }
-
   export const PERIOD_SEPARATOR = ",";
 
-  export function cleanPeriodRange(interval: Period.Interval,
-                                   periodStr: string,
-                                   defaultIndices?: [number, number])
-    : Period.Range
+  export function cleanPeriod(interval: Types.Interval,
+                              periodStr: string,
+                              defaultIndices?: [number, number])
+    : Types.Period
   {
-    var defaultIndex = Period.current(interval).index;
-    var defaultIndices = defaultIndices || [defaultIndex, defaultIndex];
+    var defaultPeriod = Period.now(interval);
+    var defaultIndices = defaultIndices ||
+      [defaultPeriod.start, defaultPeriod.end];
     var periods = _.filter(Util.some(periodStr, "").split(PERIOD_SEPARATOR));
-    var first = cleanSinglePeriod(interval, periods[0], defaultIndices[0]);
-    var second = cleanSinglePeriod(interval, periods[1], first.index);
+    var first = parseInt(periods[0]);
+    if (isNaN(first)) {
+      return Period.now(interval);
+    }
+
+    var second = parseInt(periods[1]);
+    if (isNaN(second)) {
+      second = first;
+    }
+
     return {
       interval: interval,
-      start: first.index,
-      end: second.index
+      start: first,
+      end: second
     };
   }
 
-  export function cleanSinglePeriod(interval: Period.Interval,
-                                    periodStr: string,
-                                    defaultIndex?: number): Period.Single
-  {
-    var num = parseInt(periodStr);
-    if (isNaN(num)) {
-      num = Util.some(defaultIndex, Period.current(interval).index);
-    }
-    return {
-      interval: interval,
-      index: num
-    }
-  }
-
-  export function cleanCustomPeriod(periodStr: string): Period.Custom {
-    var split = periodStr.split(PERIOD_SEPARATOR);
-    var start = parseInt(split[0]);
-    var end = parseInt(split[1]);
-    if (!isNaN(start) && !isNaN(end) && end > start) {
-      return {
-        interval: "custom",
-        start: start,
-        end: end
-      };
-    }
-    return Period.current('custom');
-  }
-
-  export function cleanSingleOrCustomPeriod(
-    interval: Period.Interval, periodStr: string): Period.Single;
-  export function cleanSingleOrCustomPeriod(
-    interval: Period.CustomInterval, periodStr: string): Period.Custom;
-  export function cleanSingleOrCustomPeriod(
-    interval: Period.IntervalOrCustom,
-    periodStr: string
-  ): Period.Single|Period.Custom;
-  export function cleanSingleOrCustomPeriod(
-    interval: Period.IntervalOrCustom,
-    periodStr: string
-  ): Period.Single|Period.Custom {
-    if (Period.isCustomInterval(interval)) {
-      return cleanCustomPeriod(periodStr);
-    } else {
-      return cleanSinglePeriod(interval, periodStr);
-    }
-  }
-
-  // Spits out strings to use for period in URL
-  export function periodStr(period: Types.SinglePeriod|Types.CustomPeriod) {
-    var str = Period.isCustom(period) ?
-      [period.start, period.end].join(Params.PERIOD_SEPARATOR) :
-      period.index.toString();
+  // Spits out strings to use for period in URL - Deprecated
+  export function periodStr(period: Types.Period) {
     return {
       interval: period.interval[0],
-      period: str
+      period: [period.start, period.end].join(Params.PERIOD_SEPARATOR)
     };
   }
 

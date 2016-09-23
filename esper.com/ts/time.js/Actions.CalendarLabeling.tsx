@@ -6,7 +6,7 @@ module Esper.Actions {
 
   export function renderCalendarLabeling(
     cals: Stores.Calendars.CalSelection[],
-    period: Period.Single
+    period: Types.Period
   ) {
 
     // Fetch

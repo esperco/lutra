@@ -8,7 +8,7 @@ module Esper.Views {
       teamId: string;
       calId: string;
     }[];
-    period: Period.Single;
+    period: Types.Period;
   }
 
   export class CalendarLabeling extends ReactHelpers.Component<Props, {
@@ -66,10 +66,11 @@ module Esper.Views {
         </span>);
       }
 
-      var { isBusy, hasError, events} = Stores.Events.require({
+      var { isBusy, hasError, eventsForRanges } = Stores.Events.require({
         cals: this.props.cals,
         period: this.props.period
       });
+      var events = Stores.Events.uniqueEvents(eventsForRanges);
       var selectedEvents = _.filter(events, (e) =>
         !!_.find(this.state.selected, (s) =>
           s.teamId === e.teamId &&
@@ -162,7 +163,7 @@ module Esper.Views {
       });
     }
 
-    updatePeriod(period: Period.Single) {
+    updatePeriod(period: Types.Period) {
       this.updateRoute({
         cals: this.props.cals,
         period: period
@@ -170,13 +171,14 @@ module Esper.Views {
     }
 
     updateRoute(props: Props) {
-      var pathForCals = Params.pathForCals(props.cals);
+      let pathForCals = Params.pathForCals(props.cals);
+      let { interval, period } = Params.periodStr(props.period);
       Route.nav.path([
         "calendar-labeling",
         pathForCals[0],
         pathForCals[1],
-        props.period.interval[0],
-        props.period.index.toString()
+        interval,
+        period
       ]);
     }
 

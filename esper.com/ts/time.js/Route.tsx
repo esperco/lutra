@@ -44,10 +44,8 @@ module Esper.Route {
     period: ":period?"
   }).hash, checkOnboarding, function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
-    var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
-                                                "week");
-    var period = Params.cleanSingleOrCustomPeriod(interval,
-                                                  ctx.params["period"]);
+    var interval = Params.cleanInterval(ctx.params["interval"], "week");
+    var period = Params.cleanPeriod(interval, ctx.params["period"]);
     Actions.renderReport({
       teamId: teamId,
       period: period,
@@ -63,7 +61,7 @@ module Esper.Route {
   */
   function routeChart<T>(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
-    cbFn: (o: Charting.BaseOpts<T>) => void
+    cbFn: (o: Types.ChartParams) => void
   ) {
     route(pathFn({
       teamId: ":teamId?",
@@ -73,17 +71,17 @@ module Esper.Route {
     }).hash, checkOnboarding, function(ctx) {
       var teamId = Params.cleanTeamId(ctx.params["teamId"]);
       var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
-      var interval = Params.cleanIntervalOrCustom(ctx.params["interval"],
-                                                  "week");
-      var period = Params.cleanSingleOrCustomPeriod(interval,
-                                                    ctx.params["period"]);
-      var incrs = Params.cleanRelativePeriodJSON(getJSONQuery(ctx)).incrs;
+      var interval = Params.cleanInterval(ctx.params["interval"], "week");
+      var period = Params.cleanPeriod(interval, ctx.params["period"]);
+
+      // CalIds not in querystring but actual path (for now)
+      var extra =  getJSONQuery(ctx) || {};
+      extra.calIds = ctx.params["calIds"];
+
       cbFn({
-        pathFn: pathFn,
         teamId: teamId,
-        calIds: calIds,
         period: period,
-        extra: getJSONQuery(ctx)
+        extra: Charting.cleanExtra(extra)
       });
     });
   }
@@ -105,7 +103,7 @@ module Esper.Route {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "month");
-    var period = Params.cleanSinglePeriod(interval, ctx.params["period"]);
+    var period = Params.cleanPeriod(interval, ctx.params["period"]);
     Actions.renderCalendarLabeling(_.map(calIds, (calId) => ({
       teamId: teamId,
       calId: calId
@@ -126,7 +124,7 @@ module Esper.Route {
 
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "month");
-    var period = Params.cleanSinglePeriod(interval, ctx.params["period"]);
+    var period = Params.cleanPeriod(interval, ctx.params["period"]);
     Actions.renderFilterList({
       cals: Params.cleanCalSelections(teamId, ctx.params["calIds"]),
       period: period
