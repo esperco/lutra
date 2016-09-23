@@ -19,21 +19,8 @@ module Esper.Types {
 
   /* Periods */ ///////////
 
-  export type Interval = 'week'|'month'|'quarter';
-  export interface SinglePeriod {
-    interval: Interval;
-    index: number;
-  }
-
-  export type CustomInterval = 'custom';
-  export type IntervalOrCustom = Interval|CustomInterval;
-  export interface CustomPeriod {
-    interval: CustomInterval;
-    start: number;    // Days since epoch (inclusive)
-    end: number;      // Days since epoch (inclusive)
-  }
-
-  export interface PeriodRange {
+  export type Interval = 'day'|'week'|'month'|'quarter';
+  export interface Period {
     interval: Interval;
     start: number;
     end: number;
@@ -82,37 +69,32 @@ module Esper.Types {
     date: Date;  // Start of date
   }
 
+  export type Range = [Date, Date];
+
   /*
     Convenience interface for grouping together merged event list for multiple
-    days
+    sets of days
   */
-  export interface EventListData extends HasStatus {
-    start: Date;
-    end: Date;
+  export interface EventsForRange {
+    range: Range;
     events: TeamEvent[];
   }
 
-  /*
-    Convenience interface for grouping together events still separated by
-    date
-  */
-  export interface EventsForDate {
-    date: Date;
-    events: TeamEvent[];
-  };
-
-  export interface EventDateData {
-    dates: EventsForDate[];
-    isBusy: boolean;
-    hasError: boolean;
+  // Multiple ranges with store status
+  export interface EventsForRangesData extends HasStatus {
+    eventsForRanges: EventsForRange[];
   }
 
 
   /* Filtering, selection */ //////////////////////////
 
+  export interface FilterFn {
+    (e: Types.TeamEvent): boolean;
+  }
+
   // Filter events by some attribute in a list
   export interface ListSelectJSON {
-    // Show all items
+    // Show items with any label, domain, etc.
     all: boolean;
 
     // Show items with no label, domain, etc.
@@ -154,11 +136,69 @@ module Esper.Types {
 
   /* Event Calcs */ ///////////////////////
 
+  export interface EventWeights {
+    weights: Types.Weight[];
+    totalValue: number;
+    totalUnique: number;
+
+    // For quick lookup purposes
+    eventMap: { [index: string]: Types.TeamEvent };
+
+    // For enumeration purposes (can't use Weight because may be more than
+    // one weight per event)
+    events: TeamEvent[];
+  }
+
+  export interface RangeValue extends EventWeights {
+    range: Range;
+  }
+
+  export interface RangeSeries extends EventWeights {
+    values: RangeValue[];
+  }
+
+  export interface RangesGrouping {
+    [key: string]: RangeSeries;
+  }
+
+  export interface RangesGroup {
+    some: RangesGrouping;
+    none: RangeSeries;
+    all: RangeSeries;
+  }
+
+  // Events for range with an index position
+  export interface RangesState {
+    eventsForRanges: Types.EventsForRange[];
+
+    // Index of position in eventsForRanges Array
+    rangeIndex: number;
+
+    // Index of next event to process for current eventRange
+    eventIndex: number;
+  }
+
+  // Intermediate state for translating data from RangeState into RangeGroup
+  export interface GroupState extends RangesState
+  {
+    group: RangesGroup; // Accumulator
+  }
+
+  export interface CounterState extends RangesState {
+    eventMap: { [index: string]: TeamEvent };
+    events: TeamEvent[];
+    total: number;
+  }
+
+  export interface AnnotationState extends RangesState {
+    values: [TeamEvent, number][];
+  }
+
   /*
     Wrapper around event with relative weight for an event as well as how we
-    should categorize or group this event
+    should categorize or group this event.
   */
-  export interface Annotation {
+  export interface Weight {
     event: TeamEvent;
 
     /*
@@ -168,94 +208,35 @@ module Esper.Types {
     */
     value: number;
 
-    // Heirarchical list of tags to group this event by
-    groups: string[];
-  }
-
-  export interface IdMap {
-    [index: string]: boolean;
-  }
-
-  /*
-    Heirarchal maps of grouping strings to annotations
-  */
-  export interface EventGroup {
-    /*
-      Separate annotation + event lists, b/c maybe more than one annotation
-      per event
-    */
-    annotations: Annotation[];
-    events: TeamEvent[];
-    totalValue: number;   // Sum of all annotation values
-    totalUnique: number;  // Total unique events
-    eventMap: IdMap;      /* Map used to quickly test whether event exists
-                             in group */
-  }
-
-  /*
-    Collection of annotated events for a given date
-  */
-  export interface EventDateGroup extends EventGroup {
-    date: Date;
-  }
-
-  export interface EventSubgroup extends EventGroup {
-    subgroups: EventGrouping;
-  }
-
-  export interface EventGrouping {
-    [index: string]: EventSubgroup;
-  }
-
-  export interface EventOptGrouping extends EventGroup {
-    some: EventGrouping;
-    none: EventGroup;
-  }
-
-  export interface EventCalcOpts { // Standard calc opts for all charts
-    filterStr: string;
-    labels: ListSelectJSON;
-    domains: ListSelectJSON;
-    durations: ListSelectJSON;
-    guestCounts: ListSelectJSON;
-    ratings: ListSelectJSON;
-    weekHours: WeekHours;
-  }
-
-  export interface DomainNestOpts extends EventCalcOpts {
-    nestByDomain: boolean; // Used to nest domain => email in duration calc
+    // Actual tag corresponding to value
+    group: string|void;
   }
 
 
   /* Charting */ //////////////////////////
 
-  export type ChartType = "percent"|"absolute"|"calendar";
+  export type ChartType = (
+    "percent"
+    |"absolute"
+    |"percent-series"
+    |"absolute-series"
+  );
 
-  // Respond differently based on which event attribute we're grouping by
-  export interface ChartGroups<T> {
-    labels: T;
-    calendars: T;
-    domains: T;
-    durations: T;
-    guestCounts: T;
-    ratings: T;
-  }
-
-  // Base options needed to fetch and get events
-  export interface ChartBaseOpts<T> {
-    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path;
+  // Base params passed via querystring, needed to fetch and get events
+  export interface ChartParams {
     teamId: string;
-    calIds: string[];
-    period: SinglePeriod|CustomPeriod;
-    extra: ChartExtraOpts & T;
+    period: Period;
+    extra: ChartExtra;
   }
 
-  export interface ChartExtraOptsMaybe {
+  // Extra filter options -- maybe is the optional variant of ChartExtras
+  export interface ChartExtraOpt {
     type?: ChartType;
     incUnscheduled?: boolean;
-    incrs?: number[];
     filterStr?: string;
+    calIds?: string[];
     domains?: ListSelectJSON;
+    guests?: ListSelectJSON;
     durations?: ListSelectJSON;
     labels?: ListSelectJSON;
     ratings?: ListSelectJSON;
@@ -263,12 +244,13 @@ module Esper.Types {
     weekHours?: WeekHours;
   }
 
-  export interface ChartExtraOpts extends ChartExtraOptsMaybe, EventCalcOpts {
+  export interface ChartExtra extends ChartExtraOpt {
     type: ChartType;
     incUnscheduled: boolean;
-    incrs: number[];
     filterStr: string;
+    calIds: string[];
     domains: ListSelectJSON;
+    guests: ListSelectJSON;
     durations: ListSelectJSON;
     labels: ListSelectJSON;
     ratings: ListSelectJSON;
@@ -276,15 +258,66 @@ module Esper.Types {
     weekHours: WeekHours;
   }
 
-  // Data tied to a particular period of time
-  export interface PeriodData<T> {
-    period: SinglePeriod|CustomPeriod;
-    current: boolean; // Is this the "current" or active group?
-    total: number; // Optional total for period (for unscheduled time)
-    data: T;
+
+  /*
+    A set of functions and attributes used to describe something we're grouping
+    events by (e.g. labels or guests or duration, etc.). For now, assume that
+    we're always grouping by some set of strings (keys).
+  */
+  export interface GroupBy {
+    // Textual description of what this is
+    name: string;
+
+    // Icon to represent this group
+    icon?: string;
+
+    /*
+      Get applicable keys from event -- returns an option because we may want
+      to display the empty key as Option.some([]) vs. Option.none (which means
+      don't display this key at all)
+    */
+    keyFn: (event: TeamEvent, props: ChartProps) => Option.T<string[]>;
+
+    // Given a sorted list of keys, output a list of colors
+    colorMapFn?: (keys: string[], props: ChartProps) => string[];
+
+    // Display name for key
+    displayFn?: (key: string, props: ChartProps) => string;
+
+    /*
+      Pre-sorted keys (if we want them to display in a particular order).
+      Otherwise defaults to max to min for charts and alphabetical for
+      selector.
+    */
+    selectorKeysFn?: (group: RangesGroup, props: ChartProps) => string[];
+    chartKeysFn?: (group: RangesGroup, props: ChartProps) => string[];
+
+    // Selector text for all of the above / none of the above options
+    allText?: string;
+    noneText?: string;
+
+    // Selector text for display all / hide all options
+    showAllText?: string;
+    hideNoneText?: string;
+
+    // Functions for selector update
+    getListSelectJSONFn: (extra: ChartExtra) => Types.ListSelectJSON;
+    updateExtraFn:
+      (x: Types.ListSelectJSON, props: ChartProps) => ChartExtraOpt;
+
+    // Content to show if no keys for selector
+    selectorNoDataFn?: (props: ChartProps) => string|JSX.Element|JSX.Element[];
   }
-  export type PeriodOptGroup = PeriodData<EventOptGrouping>;
-  export type PeriodGrouping = PeriodData<EventGrouping>;
+
+   // Complete set of data we need to render a single chart
+  export interface ChartProps extends EventsForRangesData {
+    period: Period;
+    team: ApiT.Team;
+    calendars: ApiT.GenericCalendar[];
+    groupBy: GroupBy;
+    extra: ChartExtra;
+    simplified?: boolean;
+  }
 
 
   /* Labels */
