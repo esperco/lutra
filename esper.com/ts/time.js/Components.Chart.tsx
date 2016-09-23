@@ -144,4 +144,52 @@ module Esper.Components {
       </div>;
     }
   }
+
+  export class StackedBarDurationChart extends GroupDurationChart {
+    renderResult(result: Types.GroupState) {
+      if (result.group.all.totalUnique === 0) {
+        return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
+      }
+
+      let { groupBy, simplified } = this.props;
+      let series = Charting.eventGroupSeries(result.group, this.props, {
+        yFn: EventStats.toHours,
+        totals: this.props.extra.incUnscheduled ?
+          _.map(result.group.all.values,
+            (v) => WeekHours.totalForRange(v.range, this.props.extra.weekHours)
+          ) : undefined
+      });
+      let categories = Text.fmtPeriodList(this.props.period);
+
+      return <div className="chart-content">
+        <StackedBarChart
+          { ... { simplified, series, categories }}
+          yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
+        />
+      </div>;
+    }
+  }
+
+  export class LineDurationChart extends GroupDurationChart {
+    renderResult(result: Types.GroupState) {
+      if (result.group.all.totalUnique === 0) {
+        return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
+      }
+
+      let { groupBy, simplified } = this.props;
+      let series = Charting.eventGroupSeries(result.group, this.props, {
+        yFn: EventStats.toHours
+      });
+      let categories = Text.fmtPeriodList(this.props.period);
+
+      return <div className="chart-content">
+        <LineChart
+          { ... { simplified, series, categories }}
+          yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
+        />
+      </div>;
+    }
+  }
 }
+
+
