@@ -304,6 +304,11 @@
       line-height: @line-height-computed;
       vertical-align: middle;
       margin: 0 @padding-xs-horizontal;
+
+      // Inline -> add some padding if followed by text
+      + span {
+        padding-left: @padding-small-horizontal;
+      }
     }
   }
 
