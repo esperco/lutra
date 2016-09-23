@@ -1,10 +1,33 @@
 /*
-  Client-side time stat calculations
+  Client-side time stat calculations.
+
+  All chart calculations generally consist of converting a EventsForRange
+  object to a RangeGroup. We do this with the following steps:
+
+  - BATCH events for processing. Only one batch at a time is (synchronously)
+    processed. The remainder are scheduled for async processing so as not to
+    block the thread from updating the UI.
+
+  - FILTER events by some preset group of filters.
+
+  - WEIGH or annotate events -- i.e. assign some value (such as the event's
+    duration) to each event for a given attribute (like a label or guest).
+
+  - GROUP or reduce the weights to the RangeGroup object (which can used in
+    actual charting with minimal computation).
+
+  We used to use inherited calc classes to reuse code between different chart
+  calculations but this got pretty unwieldy. So now we define a whole bunch
+  of helper functions for each step that can easily be composed for the calc
+  for any given chart.
 */
 
+/// <reference path="./Calc.ts" />
 /// <reference path="./Params.ts" />
 
 module Esper.EventStats {
+
+  /* Duration calculations */
 
   export interface DurationOpts {
     // Truncate duration if start is before this date/time
@@ -15,6 +38,19 @@ module Esper.EventStats {
 
     // Segemnt based on overlap with working hours
     weekHours?: Types.WeekHours;
+  }
+
+  /*
+    Calculate durations of events after adjusting for overlapping
+  */
+  interface DurationWrapper {
+    event: Stores.Events.TeamEvent;
+    duration: number;
+  }
+
+  interface DurationSegment {
+    start: number; // Javascript time (milliseconds)
+    end: number;   // Javascript time (milliseconds)
   }
 
   // Simple aggregate duration of events, avoids double-counting overlaps
@@ -36,137 +72,6 @@ module Esper.EventStats {
     });
 
     return agg;
-  }
-
-
-  /////
-
-  /*
-    Time stat durations are normally seconds. This normalizes to hours and
-    rounds to nearest .05 hour -- rounding may be slightly off because of
-    floating point arithmetic but that should be OK in most cases.
-  */
-  export function toHours(seconds: number) {
-    return Number((Math.round((seconds / 3600) / 0.05) * 0.05).toFixed(2));
-  }
-
-
-  /////
-
-  export type Annotation = Types.Annotation;
-  export type Group = Types.EventGroup;
-  export type Grouping = Types.EventGrouping;
-  export type DateGroup = Types.EventDateGroup;
-  export type Subgroup = Types.EventSubgroup;
-  export type OptGrouping = Types.EventOptGrouping;
-
-  function emptyGroup(): Group {
-    return {
-      annotations: [],
-      events: [],
-      totalValue: 0,
-      totalUnique: 0,
-      eventMap: {}
-    }
-  }
-
-  function emptyDateGroup(date: Date): DateGroup {
-    var group = emptyGroup();
-    return {
-      date: date,
-      annotations: group.annotations,
-      events: group.events,
-      totalValue: group.totalValue,
-      totalUnique: group.totalUnique,
-      eventMap: group.eventMap
-    };
-  }
-
-  function emptySubgroup(): Subgroup {
-    return {
-      annotations: [],
-      events: [],
-      totalValue: 0,
-      totalUnique: 0,
-      subgroups: {},
-      eventMap: {}
-    }
-  }
-
-  function emptyOptGrouping(): OptGrouping {
-    return {
-      some: {},
-      none: emptyGroup(),
-      totalValue: 0,
-      totalUnique: 0,
-      eventMap: {},
-      annotations: [],
-      events: []
-    }
-  }
-
-
-  /*
-    Convert annotations to grouping -- optionally takes an existing grouping
-    to add to
-  */
-  export function groupAnnotations(annotations: Annotation[],
-                                   grouping?: OptGrouping) {
-    grouping = grouping || emptyOptGrouping();
-
-    _.each(annotations, (a) => {
-      var eventKey = Stores.Events.strId(a.event);
-
-      if (a.groups.length) {
-        let currentGrouping = grouping.some;
-        _.each(a.groups, (g) => {
-          let currentGroup = currentGrouping[g] =
-            currentGrouping[g] || emptySubgroup();
-          currentGroup.annotations.push(a);
-          currentGroup.totalValue += a.value;
-
-          if (! currentGroup.eventMap[eventKey]) {
-            currentGroup.eventMap[eventKey] = true;
-            currentGroup.totalUnique += 1;
-          }
-
-          currentGrouping = currentGroup.subgroups;
-        });
-      }
-      else {
-        grouping.none.annotations.push(a);
-        grouping.none.totalValue += a.value;
-
-        if (! grouping.none.eventMap[eventKey]) {
-          grouping.none.eventMap[eventKey] = true;
-          grouping.none.totalUnique += 1;
-        }
-      }
-
-      grouping.totalValue += a.value;
-      grouping.annotations.push(a);
-      if (! grouping.eventMap[eventKey]) {
-        grouping.eventMap[eventKey] = true;
-        grouping.events.push(a.event);
-        grouping.totalUnique += 1;
-      }
-    });
-
-    return grouping;
-  }
-
-
-  /*
-    Calculate durations of events after adjusting for overlapping
-  */
-  interface DurationWrapper {
-    event: Stores.Events.TeamEvent;
-    duration: number;
-  }
-
-  interface DurationSegment {
-    start: number; // Javascript time (milliseconds)
-    end: number;   // Javascript time (milliseconds)
   }
 
   export function durationWrappers(events: Stores.Events.TeamEvent[],
@@ -321,933 +226,374 @@ module Esper.EventStats {
 
   /////
 
-  /* Settings for Calculation */
-
-  export type CalcOpts = Types.EventCalcOpts;
-  export type DomainNestOpts = Types.DomainNestOpts;
-
-  export function defaultCalcOpts(opts: {
-    filterStr?: string;
-    labels?: Types.ListSelectJSON;
-    domains?: Types.ListSelectJSON;
-    durations?: Types.ListSelectJSON;
-    ratings?: Types.ListSelectJSON;
-    guestCounts?: Types.ListSelectJSON;
-    weekHours?: Types.WeekHours;
-  } = {}): CalcOpts {
-    return {
-      filterStr: opts.filterStr || "",
-      labels: opts.labels || Params.cleanListSelectJSON(),
-      domains: opts.domains || Params.cleanListSelectJSON(),
-      durations: opts.durations || Params.cleanListSelectJSON(),
-      ratings: opts.ratings || Params.cleanListSelectJSON(),
-      guestCounts: opts.guestCounts || Params.cleanListSelectJSON(),
-      weekHours: opts.weekHours || Params.weekHoursAll()
-    };
-  }
-
-  // How many events to annotate or group at any given time
-  const DEFAULT_MAX_PROCESS_EVENTS = 10;
-
   /*
-    Asynchronous, non-blocking annotation and grouping of a series of events,
-    with emission of change event at end of calculation.
+    Time stat durations are normally seconds. This normalizes to hours and
+    rounds to nearest .05 hour -- rounding may be slightly off because of
+    floating point arithmetic but that should be OK in most cases.
   */
-  export abstract class CalcBase<T, U> extends Emit.EmitBase {
-    // Are we there yet?
-    ready = false;
-    running = true;
-
-    // Intermediate state for use with progressive calculation
-    _results: T;
-    _events: Stores.Events.TeamEvent[] = [];
-    _opts: U & CalcOpts;
-
-    MAX_PROCESS_EVENTS = DEFAULT_MAX_PROCESS_EVENTS;
-
-    constructor(events: Stores.Events.TeamEvent[], opts: U & CalcOpts) {
-      super();
-      this._results = this.initResult();
-      this.ready = false;
-      this.running = false;
-      this._events = events;
-      this._opts = opts;
-    }
-
-    // Returns some grouping if done, none if not complete
-    getResults(): Option.T<T> {
-      return this.ready ?
-        Option.some(this._results) :
-        Option.none<T>();
-    }
-
-    /*
-      Compare two Calcs to see if they would yield the equivalent results
-      without actually having to run the calculations. This can be done
-      by seeing if the event lists are essentially equivalent and if
-      the opts are identical.
-    */
-    eq(other: CalcBase<T,U>) {
-      return other &&
-        other.constructor === this.constructor &&
-        _.isEqual(other._opts, this._opts) &&
-        this.eqList(other._events, this._events);
-    }
-
-    protected eqList(other: Stores.Events.TeamEvent[],
-                     this_: Stores.Events.TeamEvent[]) {
-      return Stores.Events.eqList(other, this_);
-    }
-
-    // Start calulations based on passed events
-    start() {
-      this.running = true;
-      this.next();
-    }
-
-    stop() {
-      this.running = false;
-    }
-
-    /* Start-stop based on presence of listeners */
-
-    // Register a callback to handle changes
-    addChangeListener(callback: (...args: any[]) => void): void {
-      super.addChangeListener(callback);
-      if (! this.running) this.start();
-    }
-
-    // De-register a callback to handle changes
-    removeChangeListener(callback: (...args: any[]) => void): void {
-      super.removeChangeListener(callback);
-      if (! this.changeListeners().length) {
-        this.stop();
-      }
-    }
-
-    // Remove all callbacks
-    removeAllChangeListeners(): void {
-      super.removeAllChangeListeners();
-      this.stop();
-    }
-
-    /*
-      Recursive "loop" that calls processBatch until we're done. Auto-bind so
-      we can easily reference function by name and avoid recursion limits
-    */
-    runLoop = () => {
-      if (! this.running) return;
-
-      this.getBatch().match({
-        some: (events) => {
-          events = _.filter(events, (e) => this.filterEvent(e));
-          this._results = this.processBatch(events, this._results);
-          this.next();
-        },
-
-        none: () => {
-          // No more events, we're done. Emit to signal result.
-          this.ready = true;
-          this.running = false;
-          this.emitChange();
-        }
-      });
-    }
-
-    next() {
-      window.requestAnimationFrame(this.runLoop);
-    }
-
-    onceChange(fn: (result: T) => void) {
-      super.once(this.CHANGE_EVENT, () => fn(this._results));
-    }
-
-    // Override as appropriate -- return false for events to ignore
-    filterEvent(event: Stores.Events.TeamEvent) {
-      // Remove specifically ignored events
-      if (! Stores.Events.isActive(event)) return false;
-
-      // Filter by string
-      if (this._opts.filterStr &&
-          ! Stores.Events.filterOne(event, this._opts.filterStr)) {
-        return false;
-      }
-
-      // Filter by domain
-      var domains = Stores.Events.getGuestDomains(event);
-      if (this._opts.domains && Params.applyListSelectJSON(domains,
-          this._opts.domains).isNone())
-      {
-        return false;
-      }
-
-      // Filter by labels
-      var labels = Stores.Events.getLabelIds(event);
-      if (this._opts.labels && Params.applyListSelectJSON(labels,
-          this._opts.labels).isNone())
-      {
-        return false;
-      }
-
-      // Filter by duration
-      var durationBucket = getDurationBucket(event);
-      var durationBucketId = durationBucket ?
-        [durationBucket.label] : [];
-      if (this._opts.durations &&
-        Params.applyListSelectJSON(
-          durationBucketId,
-          this._opts.durations
-        ).isNone())
-      {
-        return false;
-      }
-
-      // Filter by number of guests
-      var guestCountBucket = getGuestCountBucket(event);
-      var guestCountBucketId = guestCountBucket ?
-        [guestCountBucket.label] : [];
-      if (this._opts.guestCounts &&
-        Params.applyListSelectJSON(
-          guestCountBucketId,
-          this._opts.guestCounts
-        ).isNone())
-      {
-        return false;
-      }
-
-      // Filter by rating
-      var strRating = event.feedback && event.feedback.rating ?
-        [event.feedback.rating.toString()] : [];
-      if (this._opts.ratings && Params.applyListSelectJSON(strRating,
-          this._opts.ratings).isNone())
-      {
-        return false;
-      }
-
-      // Filter by weekHour
-      if (this._opts.weekHours &&
-          !WeekHours.overlap(event, this._opts.weekHours)) {
-        return false;
-      }
-
-      return true;
-    }
-
-    // Empty initial result object
-    abstract initResult(): T;
-
-    // Get next set of events to process
-    abstract getBatch(): Option.T<Stores.Events.TeamEvent[]>;
-
-    /*
-      Handle events from queue -- takes events plus current intermediate
-      result state
-    */
-    abstract processBatch(events: Stores.Events.TeamEvent[],
-                          results: T): T;
+  export function toHours(seconds: number) {
+    return Number((Math.round((seconds / 3600) / 0.05) * 0.05).toFixed(2));
   }
 
 
-  /*
-    Calc which processes a list of events
-  */
-  export abstract class EventListCalc<T, U> extends CalcBase<T, U> {
-    _index = 0;
+  // Filter helpers ///////////////////////////
 
-    // Returns some events from the head of the queue
-    getBatch() {
-      if (this._index >= this._events.length) {
-        return Option.none<Stores.Events.TeamEvent[]>();
-      }
-
-      var events = this._events.slice(
-        this._index,
-        this._index + this.MAX_PROCESS_EVENTS);
-      this._index += events.length;
-      return Option.some(events);
-    }
-  }
-
-  /*
-    Base calc for counting objects for selectors. This does very minimal
-    filtering so toggling things doesn't change the calc numbers.
-  */
-  export abstract class EventCountCalc<T, U> extends EventListCalc<T, U> {
-    filterEvent(event: Stores.Events.TeamEvent) {
-      return Stores.Events.isActive(event);
-    }
-  }
-
-  export abstract class DefaultCountCalc
-         extends EventCountCalc<OptGrouping, {}> {
-    initResult() { return emptyOptGrouping(); }
-
-    processBatch(events: Stores.Events.TeamEvent[], results: OptGrouping) {
-      _.each(events, (e) => {
-        var groupSets = this.processOne(e);
-        var annotations = _.map(groupSets, (groups) => ({
-          event: e,
-          value: 1,
-          groups: groups
-        }));
-        results = groupAnnotations(annotations, results);
-      });
-      return results;
-    }
-
-    // Return list of nested groups
-    abstract processOne(event: Stores.Events.TeamEvent): string[][];
-  }
-
-
-  /*
-    Calc which processes durations for a list of events, truncated by day
-  */
-  export abstract class DateDurationCalc<U> extends CalcBase<DateGroup[], U>
-  {
-    _eventDates: Stores.Events.EventsForDate[];
-    _dateIndex = 0;
-    _eventIndex = 0;
-    _date: Date;
-
-    constructor(eventDates: Stores.Events.EventsForDate[],
-                opts?: U & CalcOpts) {
-      super(
-        _.flatten( _.map(eventDates, (d) => d.events) ),
-        opts
-      );
-      this._eventDates = eventDates;
-    }
-
-    initResult(): DateGroup[] {
-      return [];
-    }
-
-    /*
-      Checks if two date calcs are equal. Check dates are equal.
-    */
-    eq(other: DateDurationCalc<U>): boolean {
-      return super.eq(other) &&
-        _.isEqual(
-          _.map(other._eventDates, (d) => d.date.getTime()),
-          _.map(this._eventDates, (d) => d.date.getTime()));
-    }
-
-    // Ignore label confirmation
-    protected eqList(other: Stores.Events.TeamEvent[],
-                     this_: Stores.Events.TeamEvent[]) {
-      return Stores.Events.eqList(other, this_, {
-        deepCompare: true,
-        ignoreLabelScores: true
-      });
-    }
-
-    getBatch(): Option.T<Stores.Events.TeamEvent[]> {
-      if (this._dateIndex >= this._eventDates.length) {
-        return Option.none<Stores.Events.TeamEvent[]>();
-      }
-
-      else {
-        // Move index until we land on a non-empty date
-        var eventDate = this._eventDates[this._dateIndex];
-        if (this._eventIndex >= eventDate.events.length) {
-          this._eventIndex = 0;
-          this._dateIndex += 1;
-          return this.getBatch();
-        }
-
-        this._date = eventDate.date;
-        var events = eventDate.events.slice(
-          this._eventIndex,
-          this._eventIndex + this.MAX_PROCESS_EVENTS);
-        this._eventIndex += events.length;
-
-        // Include overlapping
-        let ends = _.map(events, (e) => e.end.getTime());
-        let max = _.max(ends);
-        while (this._eventIndex < eventDate.events.length) {
-          let next = eventDate.events[this._eventIndex];
-          if (next.start.getTime() < max) {
-            max = Math.max(max, next.end.getTime());
-            events.push(next);
-            this._eventIndex += 1;
-          } else {
-            break;
-          }
-        }
-
-        return Option.some(events);
-      }
-    }
-
-    processBatch(events: Stores.Events.TeamEvent[], results: DateGroup[]) {
-      var durations = durationWrappers(events, {
-        truncateStart: moment(this._date).clone().startOf('day').toDate(),
-        truncateEnd: moment(this._date).clone().endOf('day').toDate(),
-        weekHours: this._opts.weekHours
-      });
-      var dateGroup = _.last(results);
-      if (!(dateGroup && dateGroup.date === this._date)) {
-        dateGroup = emptyDateGroup(this._date);
-        results.push(dateGroup);
-      }
-
-      _.each(durations,
-        (d) => {
-          var eventKey = Stores.Events.strId(d.event);
-          if (! dateGroup.eventMap[eventKey]) {
-            dateGroup.eventMap[eventKey] = true;
-            this.getGroups(d.event, d.duration).match({
-              none: () => null,
-              some: (groups) => {
-                dateGroup.annotations.push({
-                  event: d.event,
-                  value: d.duration,
-                  groups: groups
-                });
-                dateGroup.totalUnique += 1;
-                dateGroup.totalValue += d.duration;
-              }
-            });
-          }
-        }
-      );
-
-      return results;
-    }
-
-    abstract getGroups(event: Stores.Events.TeamEvent,
-                       duration: number): Option.T<string[]>;
-  }
-
-
-  /*
-    Variant of calculation for doing duration-based calculations. When looking
-    at a single batch of events for duration calc purposes, we need to consider
-    any overlapping events as well (since we split time between overlapping
-    events).
-
-    MAX_PROCESS_EVENTS in this case is treated as a suggestion, rather than
-    a hard rule.
-  */
-  export abstract class DurationCalc<T, U> extends EventListCalc<T, U> {
-    // Ignore label confirmation for duration calc
-    protected eqList(other: Stores.Events.TeamEvent[],
-                     this_: Stores.Events.TeamEvent[]) {
-      return Stores.Events.eqList(other, this_, {
-        deepCompare: true,
-        ignoreLabelScores: true
-      });
-    }
-
-    getBatch() {
-      return super.getBatch().flatMap((events) => {
-        let ends = _.map(events, (e) => e.end.getTime());
-        let max = _.max(ends);
-
-        while (this._index < this._events.length) {
-          let next = this._events[this._index];
-          if (next.start.getTime() < max) {
-            max = Math.max(max, next.end.getTime());
-            events.push(next);
-            this._index += 1;
-          } else {
-            break;
-          }
-        }
-        return Option.some(events);
-      });
-    }
-
-    processBatch(events: Stores.Events.TeamEvent[], results: T) {
-      var durations = durationWrappers(events, {
-        weekHours: this._opts.weekHours
-      });
-      _.each(durations,
-        (d) => results = this.processOne(d.event, d.duration, results)
-      );
-      return results;
-    }
-
-    abstract processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: T): T;
-  }
-
-
-  /* Misc calculation classes we're using for charts */
-
-  export const DURATION_BUCKETS = [{
-    label: "< 30m",
-    gte: 0,   // Greater than, seconds
-    color: Colors.level0
-  }, {
-    label: "30m +",
-    gte: 30 * 60,
-    color: Colors.level1
-  }, {
-    label: "1h +",
-    gte: 60 * 60,
-    color: Colors.level2
-  }, {
-    label: "2h +",
-    gte: 2 * 60 * 60,
-    color: Colors.level3
-  }, {
-    label: "4h +",
-    gte: 4 * 60 * 60,
-    color: Colors.level4
-  }, {
-    label: "8h +",
-    gte: 8 * 60 * 60,
-    color: Colors.level5
-  }];
-
-  /*
-    For duration calc, use nominal duration (ignore overlapping events
-    because this can be un-intutive, also more annoying to abstract)
-  */
-  export function getDurationBucket(event: Stores.Events.TeamEvent) {
-    let duration = (event.end.getTime() - event.start.getTime()) / 1000;
-    return _.findLast(DurationBucketCalc.BUCKETS,
-      (b) => duration >= b.gte
+  export function filterEvents(
+    events: Types.TeamEvent[],
+    filters: Types.FilterFn[]
+  ) {
+    return _.filter(events,
+      (e) => _.every(filters, (fn) => fn(e))
     );
   }
 
-  /* Group events by how long they are */
-  export class DurationBucketCalc extends DurationCalc<OptGrouping, {}> {
-    static BUCKETS = DURATION_BUCKETS;
 
-    initResult() { return emptyOptGrouping(); }
+  // Batch Helpers ///////////////////////////
 
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      var bucket = getDurationBucket(event);
-      return groupAnnotations([{
-        event: event,
-        value: duration,
-        groups: [bucket.label]
-      }], results);
-    }
-  }
+  // A single batch of events to process
+  interface RangeBatch {
+    events: Types.TeamEvent[];
 
-  export class DurationBucketCountCalc extends DefaultCountCalc {
-    processOne(e: Stores.Events.TeamEvent) {
-      let bucket = getDurationBucket(e);
-      return [ bucket ? [bucket.label] : [] ];
-    }
-  }
-
-  export class DateDurationBucketCalc extends DateDurationCalc<{}> {
-    getGroups(event: Stores.Events.TeamEvent, duration: number) {
-      var bucket = getDurationBucket(event);
-      return Option.some([bucket.label]);
-    }
-  }
-
-  export class DurationAnnotationCalc
-    extends DurationCalc<[Types.TeamEvent, number][], {}>
-  {
-    initResult(): [Types.TeamEvent, number][] {return []; }
-
-    processOne(
-      event: Types.TeamEvent,
-      duration: number,
-      results: [Types.TeamEvent, number][]
-    ) {
-      results.push([event, duration]);
-      return results;
-    }
-  }
-
-
-  /* Calc for sorting events by calendar */
-
-  export class CalendarDurationCalc extends DurationCalc<OptGrouping, {}> {
-    initResult() { return emptyOptGrouping(); }
-
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      return groupAnnotations([{
-        event: event,
-        value: duration,
-        groups: [event.calendarId]
-      }], results);
-    }
-  }
-
-  export class CalendarCountCalc extends DefaultCountCalc {
-    processOne(e: Stores.Events.TeamEvent) {
-      return [[e.calendarId]];
-    }
-  }
-
-  export class CalendarDateDurationCalc extends DateDurationCalc<{}> {
-    getGroups(event: Stores.Events.TeamEvent) {
-      return Option.some([event.calendarId]);
-    }
-  }
-
-
-  // Count unique events by label type
-  export interface LabelCalcCount extends OptGrouping {
-    unconfirmed: Stores.Events.TeamEvent[];
-    unconfirmedCount: number;
-  }
-
-  // Count unique events by label
-  export class LabelCountCalc extends EventCountCalc<LabelCalcCount, {}> {
-    initResult() {
-      return _.extend({
-        unconfirmed: [],
-        unconfirmedCount: 0
-      }, emptyOptGrouping()) as LabelCalcCount;
-    }
-
-    /*
-      Because we use label count calc to look for unconfirmed events, don't
-      filter out inactive events here.
-    */
-    filterEvent(event: Stores.Events.TeamEvent) {
-      return true;
-    }
-
-    processBatch(events: Stores.Events.TeamEvent[], results: LabelCalcCount) {
-      _.each(events, (e) => {
-        var annotations: Annotation[] = [];
-        var eventKey = Stores.Events.strId(e);
-        var newEvent = !(results && results.eventMap[eventKey]);
-
-        if (Stores.Events.isActive(e)) {
-          let labelIds = Stores.Events.getLabelIds(e);
-          annotations = labelIds.length ?
-            // Create annotation for each label
-            _.map(labelIds, (labelId) => ({
-              event: e,
-              value: 1,
-              groups: [labelId]
-            })) :
-
-            // Empty label => no labels
-            [{
-              event: e,
-              value: 1,
-              groups: []
-            }];
-        }
-
-        results = _.extend({
-          unconfirmed: [],
-          unconfirmedCount: 0
-        }, results, groupAnnotations(annotations, results)) as LabelCalcCount;
-
-        if (newEvent && Stores.Events.needsConfirmation(e)) {
-          results.unconfirmed.push(e);
-          results.unconfirmedCount += 1;
-        }
-      });
-
-      return results;
-    }
-  }
-
-  // Count event durations by selected labels
-  export class LabelDurationCalc
-      extends DurationCalc<OptGrouping, CalcOpts> {
-    initResult() { return emptyOptGrouping(); }
-
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      var labelIds = Stores.Events.getLabelIds(event);
-      var annotations = Params.applyListSelectJSON(labelIds, this._opts.labels)
-        .match({
-          none: (): Annotation[] => [],
-          some: (matchedLabelIds) => matchedLabelIds.length ?
-
-            // Create annotation for each label
-            _.map(matchedLabelIds, (labelId) => ({
-              event: event,
-              value: duration / matchedLabelIds.length, // Split among matching
-              groups: [labelId]
-            })) :
-
-            // Empty label => no labels
-            [{
-              event: event,
-              value: duration,
-              groups: []
-            }]
-        });
-
-      return groupAnnotations(annotations, results);
-    }
-  }
-
-  export class LabelDurationByDateCalc extends DateDurationCalc<CalcOpts> {
-    getGroups(event: Stores.Events.TeamEvent) {
-      var labelIds = Stores.Events.getLabelIds(event);
-      return Params.applyListSelectJSON(labelIds, this._opts.labels);
-    }
-  }
-
-
-  /* Guest-related calculations */
-
-  export class DomainCountCalc extends DefaultCountCalc {
-    processOne(e: Stores.Events.TeamEvent) {
-      var domains = Stores.Events.getGuestDomains(e);
-      if (domains.length) {
-        return _.map(domains, (d) => [d]);
-      }
-
-      // Double brackets to indicate empty set
-      return [[]];
-    }
+    // Replace indices on RangeState
+    rangeIndex: number;
+    eventIndex: number;
   }
 
   /*
-    Calc for meeting guests, filtered by e-mail. Pass nestByDomain=true to
-    the constructor to group by domains first, then drilldown to individual
-    e-mails. Else will calc for a flat list.
+    Takes an EventsForRange object plus a batching function and returns a set
+    of events plus new indices. The batching function should take a set
+    of events and return of subset of those events to include in the batch.
   */
-  export class GuestDurationCalc
-      extends DurationCalc<OptGrouping, DomainNestOpts> {
+  function batchRange(
+    state: Types.RangesState,
+    batchFn: (events: Types.TeamEvent[]) => Types.TeamEvent[]
+  ): RangeBatch {
+    let events: Types.TeamEvent[] = [];
+    let rangeIndex = state.rangeIndex;
+    let eventIndex = state.eventIndex;
 
-    initResult() { return emptyOptGrouping(); }
+    /*
+      Get current range and return a subset of events in this range for
+      this batch. Multiple ranges should not be in same batch.
+    */
+    let eventsForRange = state.eventsForRanges[rangeIndex];
+    if (eventsForRange) {
+      let eventsInRange = eventsForRange.events.slice(eventIndex);
+      events = batchFn(eventsInRange);
+      eventIndex += events.length;
 
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      var domains = Stores.Events.getGuestDomains(event);
-      var annotations = Params.applyListSelectJSON(domains,
-                                                   this._opts.domains)
-        .match({
-          none: (): Annotation[] => [],
-          some: (matchedDomains) => {
-            let emails = Stores.Events.getGuestEmails(event, matchedDomains);
-            return matchedDomains.length ?
-
-              /*
-                Create annotation for each guest. If no emails, this will be
-                empty and nothing will be counted
-              */
-              _.map(emails, (email) => ({
-                event: event,
-                value: duration / emails.length, // Split among matching guests
-                groups: this._opts.nestByDomain ?
-                  [email.split('@')[1], email] : [email]
-              })) :
-
-              // No matched domains => no guests
-              [{
-                event: event,
-                value: duration,
-                groups: []
-              }]
-          }
-        });
-
-      return groupAnnotations(annotations, results);
+      // At end of range, go to start of next range.
+      if (eventIndex >= eventsForRange.events.length) {
+        rangeIndex += 1;
+        eventIndex = 0;
+      }
     }
+
+    return { events, rangeIndex, eventIndex };
   }
 
-  export class DomainDurationByDateCalc extends DateDurationCalc<CalcOpts> {
-    getGroups(event: Stores.Events.TeamEvent) {
-      var domains = Stores.Events.getGuestDomains(event);
-      return Params.applyListSelectJSON(domains, this._opts.domains);
-    }
-  }
-
-
-  /* Group meetings by how many guests there are */
-
-  export const GUEST_COUNT_BUCKETS = [{
-    label: "2 " + Text.Guests,
-    gte: 2,   // Greater than, guests
-    color: Colors.level1
-  }, {
-    label: "3 - 4 " + Text.Guests,
-    gte: 3,
-    color: Colors.level2
-  }, {
-    label: "5 - 8 " + Text.Guests,
-    gte: 5,
-    color: Colors.level3
-  }, {
-    label: "9 - 18 " + Text.Guests,
-    gte: 9,
-    color: Colors.level4
-  }, {
-    label: "19+ " + Text.Guests,
-    gte: 19,
-    color: Colors.level5
-  }];
-
-  export function getGuestCountBucket(event: Stores.Events.TeamEvent,
-                                      domains?: string[])
+  // Batches at least minEvents + overlapping events (for duration calc)
+  export function batchOverlap(state: Types.RangesState, minEvents = 5)
+    : RangeBatch
   {
-    let emails = Stores.Events.getGuestEmails(event, domains);
-    let count = emails.length + 1; // +1 for exec
-    return _.findLast(GUEST_COUNT_BUCKETS, (b) => count >= b.gte);
+    return batchRange(state, (events) => {
+      let batch = events.slice(0, minEvents);
+      let max = _(batch).map((e) => e.end.getTime()).max();
+      let remainder = events.slice(minEvents);
+      for (let i in remainder) {
+        let next = remainder[i];
+        if (next.start.getTime() < max) {
+          max = Math.max(max, next.end.getTime());
+          batch.push(next)
+        } else {
+          break;
+        }
+      }
+      return batch;
+    });
   }
 
-  export class GuestCountAnnotationCalc
-    extends EventListCalc<[Types.TeamEvent, number][], {}>
+  // Batches a fixed number of events
+  export function batchFixed(state: Types.RangesState, minEvents = 5)
+    : RangeBatch
   {
-    initResult(): [Types.TeamEvent, number][] {return []; }
-
-    processBatch(events: Stores.Events.TeamEvent[],
-                 results: [Types.TeamEvent, number][])
-    {
-      return results.concat(
-        _.map(events, (e): [Types.TeamEvent, number] =>
-          [e, Stores.Events.getGuests(e).length + 1] // +1 for exec
-        )
-      );
-    }
-  }
-
-  export class GuestCountDurationCalc
-      extends DurationCalc<OptGrouping, CalcOpts> {
-    static BUCKETS = GUEST_COUNT_BUCKETS;
-
-    initResult() { return emptyOptGrouping(); }
-
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      var domains = Stores.Events.getGuestDomains(event);
-      var annotations = Params.applyListSelectJSON(domains, this._opts.domains)
-        .match({
-          none: (): Annotation[] => [],
-          some: (matchedDomains) => {
-            // No matched domains => no guests
-            if (! matchedDomains.length) {
-              return [{
-                event: event,
-                value: duration,
-                groups: []
-              }];
-            }
-
-            var bucket = getGuestCountBucket(event, matchedDomains);
-
-            // No guests -> don't count, we've filtered these folks out
-            if (! bucket) {
-              return [];
-            }
-
-            return [{
-              event: event,
-              value: duration,
-              groups: [bucket.label]
-            }];
-          }
-        });
-
-      return groupAnnotations(annotations, results);
-    }
-  }
-
-  export class GuestCountBucketCalc extends DefaultCountCalc {
-    processOne(e: Stores.Events.TeamEvent) {
-      var domains = Stores.Events.getGuestDomains(e);
-      return Params.applyListSelectJSON(domains, this._opts.domains)
-        .match({
-          none: () => [],
-          some: (domains) => {
-            let bucket = getGuestCountBucket(e, domains);
-            return [bucket ? [bucket.label] : []];
-          }
-        })
-    }
-  }
-
-  export class GuestCountDurationByDateCalc extends DateDurationCalc<CalcOpts> {
-
-    getGroups(event: Stores.Events.TeamEvent, duration: number) {
-      var domains = Stores.Events.getGuestDomains(event);
-      return Params.applyListSelectJSON(domains, this._opts.domains)
-        .flatMap((matchedDomains): Option.T<string[]> => {
-          let emails = Stores.Events.getGuestEmails(event, matchedDomains);
-
-          // No matched domains => no guests
-          if (! matchedDomains.length) {
-            return Option.some([]);
-          }
-
-          // No emails -> don't count, we've filtered these folks out
-          if (! emails.length) {
-            return Option.none<string[]>();
-          }
-
-          // Else - count is number of matching guests
-          var count = emails.length + 1; // +1 for exec
-          var bucket = _.findLast(GuestCountDurationCalc.BUCKETS,
-            (b) => count >= b.gte
-          );
-          return Option.some([bucket.label]);
-        });
-    }
+    return batchRange(state, (events) => events.slice(0, minEvents));
   }
 
 
-  /* Calcs for post-meeting feedback rating */
+  // Weight helpers ///////////////////////////
 
-  export class RatingDurationCalc
-      extends DurationCalc<OptGrouping, {}> {
+  /*
+    Returns annotated events weighed by duration, split among each tag
+    we're grouping by.
+  */
+  export function weighDuration(
+    events: Types.TeamEvent[],
+    groupFn: (event: Types.TeamEvent) => Option.T<string[]>,
+    opts: EventStats.DurationOpts = {}
+  ): Types.Weight[] {
+    let wrappers = durationWrappers(events, opts);
+    let weights = _.map(wrappers,
+      (wrapper) => groupFn(wrapper.event).match({
+        none: (): Types.Weight[] => [],
+        some: (matches) => matches.length ?
 
-    initResult() { return emptyOptGrouping(); }
+          // Create annotation for each match
+          _.map(matches, (match) => ({
+            event: wrapper.event,
+            value: wrapper.duration / matches.length, // Split evenly
+            group: match
+          })) :
 
-    processOne(
-      event: Stores.Events.TeamEvent,
-      duration: number,
-      results: OptGrouping
-    ) {
-      let ratings  = event.feedback && event.feedback.rating ?
-        [event.feedback.rating.toString()] : [];
-      let annotations = Params.applyListSelectJSON(ratings, this._opts.ratings)
-        .match({
-          none: (): Annotation[] => [],
-          some: (groups) => [{
-            event: event,
-            value: duration,
-            groups: groups
+          // Empty => empty group
+          [{
+            event: wrapper.event,
+            value: wrapper.duration,
+            group: null
           }]
-        });
-      return groupAnnotations(annotations, results);
+      }));
+    return _.flatten(weights);
+  }
+
+  // Simpler annotation -> each event counts as 1
+  export function weighCount(
+    events: Types.TeamEvent[],
+    groupFn: (event: Types.TeamEvent) => Option.T<string[]>
+  ): Types.Weight[] {
+    let weights = _.map(events, (event) => groupFn(event).match({
+      none: (): Types.Weight[] => [],
+      some: (matches) => matches.length ?
+
+        // Create annotation for each match
+        _.map(matches, (match) => ({
+          event: event,
+          value: 1,
+          group: match
+        })) :
+
+        // Empty => empty group
+        [{
+          event: event,
+          value: 1,
+          group: null
+        }]
+    }));
+    return _.flatten(weights);
+  }
+
+
+  // Grouping Helpers ///////////////////////////
+
+  export function emptyRangeGroup(ranges: [Date, Date][]): Types.RangesGroup {
+    return {
+      some: {},
+      none: emptyRangeSeries(ranges),
+      all: emptyRangeSeries(ranges)
+    };
+  }
+
+  export function emptyRangeSeries(ranges: [Date, Date][]): Types.RangeSeries {
+    return {
+      values: _.map(ranges, emptyRangeValue),
+      weights: [],
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {},
+      events: []
+    };
+  }
+
+  function emptyRangeValue(range: [Date, Date]): Types.RangeValue {
+    return {
+      range: range,
+      weights: [],
+      totalValue: 0,
+      totalUnique: 0,
+      eventMap: {},
+      events: []
     }
   }
 
-  export class RatingCountCalc extends DefaultCountCalc {
-    processOne(e: Stores.Events.TeamEvent) {
-      return [
-        e.feedback && e.feedback.rating ?
-        [e.feedback.rating.toString()] : []
-      ];
-    }
+  // Adds weights to range group
+  export function groupWeights(weights: Types.Weight[],
+                               rangeState: Types.RangesState,
+                               rangeGroup: Types.RangesGroup) {
+    _.each(weights, (w) => {
+
+      // Make sure we have a group + series to add to
+      let groupSeries = (() => {
+        let groupKey = w.group;
+        if (_.isString(groupKey)) {
+          if (! rangeGroup.some.hasOwnProperty(groupKey)) {
+            let ranges = _.map(rangeState.eventsForRanges, (e) => e.range);
+            rangeGroup.some[groupKey] = emptyRangeSeries(ranges);
+          }
+          return rangeGroup.some[groupKey];
+        }
+        return rangeGroup.none;
+      })();
+
+      // Should be value at index if we used emptyRangeSeries propertly.
+      let groupValue = groupSeries.values[rangeState.rangeIndex];
+      Log.assert(!!groupValue,
+        "Missing value at range index " + rangeState.rangeIndex);
+
+      // Only add to group if unique
+      let eventKey = Stores.Events.strId(w.event);
+      if (! groupValue.eventMap.hasOwnProperty(eventKey)) {
+        groupValue.eventMap[eventKey] = w.event;
+        groupValue.events.push(w.event);
+        groupValue.totalUnique += 1;
+        groupValue.totalValue += w.value;
+        groupValue.weights.push(w);
+
+        // Update series totals
+        groupSeries.totalValue += w.value;
+        groupSeries.weights.push(w);
+        if (! groupSeries.eventMap.hasOwnProperty(eventKey)) {
+          groupSeries.eventMap[eventKey] = w.event;
+          groupSeries.events.push(w.event);
+          groupSeries.totalUnique += 1;
+        }
+
+        // Update totals across groups as well
+        rangeGroup.all.totalValue += w.value;
+        rangeGroup.all.weights.push(w);
+        if (! rangeGroup.all.eventMap.hasOwnProperty(eventKey)) {
+          rangeGroup.all.eventMap[eventKey] = w.event;
+          rangeGroup.all.events.push(w.event);
+          rangeGroup.all.totalUnique += 1;
+        }
+      }
+    });
+
+    return rangeGroup;
   }
 
-  export class RatingDateDurationCalc extends DateDurationCalc<{}> {
-    getGroups(event: Stores.Events.TeamEvent) {
-      let ratings  = event.feedback && event.feedback.rating ?
-        [event.feedback.rating.toString()] : [];
-      return Params.applyListSelectJSON(ratings, this._opts.ratings);
-    }
+
+  // Misc Helpers /////////////
+
+  /*
+    Checks state to see whether we should keep going or return result.
+    Returns appropriate return value for calc function
+  */
+  function endLoop<O extends Types.RangesState>(state: O) {
+    return {
+      next: state,
+      done: state.rangeIndex >= state.eventsForRanges.length
+    };
   }
 
+
+  // Default range calc helpers
+  export function defaultGroupCalc(
+    eventsForRanges: Types.EventsForRange[],
+    processor: (s: Types.GroupState) => Types.GroupState
+  ) {
+    return new Calc({
+      eventsForRanges,
+      rangeIndex: 0,
+      eventIndex: 0,
+      group: emptyRangeGroup(_.map(eventsForRanges, (e) => e.range))
+    }, (s) => endLoop(processor(s)));
+  }
+
+  /*
+    Default processing pipeline for selectors that just need to count each
+    unique event under a key
+  */
+  export function defaultGroupCounterCalc(
+    eventsForRanges: Types.EventsForRange[],
+    groupFn: (event: Types.TeamEvent) => Option.T<string[]>
+  ) {
+    return defaultGroupCalc(eventsForRanges, (s) => {
+      let { events, rangeIndex, eventIndex } = batchFixed(s);
+      events = filterEvents(events, [Stores.Events.isActive]);
+      let weights = weighCount(events, groupFn);
+      let group = groupWeights(weights, s, s.group);
+      return { eventsForRanges, rangeIndex, eventIndex, group };
+    });
+  }
+
+  /*
+    Count durations for each calc
+  */
+  export function defaultGroupDurationCalc(
+    eventsForRanges: Types.EventsForRange[],
+    filterFns: Types.FilterFn[],
+    groupFn: (event: Types.TeamEvent) => Option.T<string[]>
+  ) {
+    return defaultGroupCalc(eventsForRanges, (s) => {
+      let { events, rangeIndex, eventIndex } = batchOverlap(s);
+      events = filterEvents(events, filterFns);
+      let weights = weighDuration(events, groupFn);
+      let group = groupWeights(weights, s, s.group);
+      return { eventsForRanges, rangeIndex, eventIndex, group };
+    });
+  }
+
+  /*
+    Takes a list of events and returns it with some numeric values
+  */
+  export function annotationCalc(
+    eventsForRanges: Types.EventsForRange[],
+    valueFn: (e: Types.TeamEvent) => number
+  ) {
+    return new Calc<Types.AnnotationState>({
+      eventsForRanges,
+      rangeIndex: 0,
+      eventIndex: 0,
+      values: []
+    }, (s) => {
+      let { events, rangeIndex, eventIndex } = batchFixed(s);
+      let values = s.values.concat(
+        _.map(events, (e): [Types.TeamEvent, number] => [e, valueFn(e)])
+      );
+      return endLoop({
+        eventsForRanges,
+        rangeIndex,
+        eventIndex,
+        values: s.values
+      });
+    });
+  }
+
+  /*
+    Returns a filtered lsit of events
+  */
+  export function simpleCounterCalc(
+    eventsForRanges: Types.EventsForRange[],
+    filterFns: Types.FilterFn[]
+  ) {
+    return new Calc<Types.CounterState>({
+      eventsForRanges,
+      rangeIndex: 0,
+      eventIndex: 0,
+      eventMap: {},
+      events: [],
+      total: 0
+    }, (s) => {
+      let { events, rangeIndex, eventIndex } = batchFixed(s);
+      events = filterEvents(events, filterFns.concat([
+
+        // Uniqueness check function takes into accont recurring events
+        (e) => {
+          let strId = Stores.Events.strId(e, true);
+          if (s.eventMap.hasOwnProperty(strId)) {
+            return false;
+          }
+          s.eventMap[strId] = e;
+          return true;
+        }]));
+
+      return endLoop({
+        eventsForRanges,
+        rangeIndex,
+        eventIndex,
+        eventMap: s.eventMap,
+        events: s.events.concat(events),
+        total: s.total += events.length
+      });
+    });
+  }
 }
