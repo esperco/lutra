@@ -46,8 +46,7 @@ module Esper.Stores.Events {
           .map((l) => {
             Labels.storeMapping({
               norm: l.normalized,
-              display: l.original,
-              color: l.color
+              display: l.original
             });
             return {
               id: l.normalized,
