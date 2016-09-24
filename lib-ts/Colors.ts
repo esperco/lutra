@@ -191,6 +191,7 @@ module Esper.Colors {
   // Get a good text color given a certain background color
   // See https://24ways.org/2010/calculating-color-contrast/
   export function colorForText(hexcolor: string) {
+    if (! hexcolor) return black;
     if (hexcolor[0] === "#") {
       hexcolor = hexcolor.slice(1);
     }
