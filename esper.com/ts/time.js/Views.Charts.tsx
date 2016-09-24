@@ -51,6 +51,9 @@ module Esper.Views {
           <div id="chart-header" className="esper-content-header">
             <Components.PeriodSelector
               period={this.props.period}
+              range={_.includes([
+                "absolute-series", "percent-series"
+              ], this.props.extra.type)}
               updateFn={(p) => this.updatePeriod(p)}
             />
             <div className="actions">
