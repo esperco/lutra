@@ -21,6 +21,16 @@ module Esper.Actions.Charts {
 
   // Called before each chart path funciton
   function initChart(o: Types.ChartParams) {
+    // Modify period based on series vs. single period
+    if (_.includes(["percent-series", "absolute-series"], o.extra.type)) {
+      o.period = Period.toRange(o.period);
+    }
+
+    // Else, ensure this is a single period
+    else if (o.period.interval !== "day") {
+      o.period = Period.toSingle(o.period);
+    }
+
     fetchEvents(o);
     trackChart(o);
   }

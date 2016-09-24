@@ -22,6 +22,9 @@ module Esper.Actions {
     extra = extra || {};
     var labels = Params.cleanListSelectJSON(extra.labels);
 
+    // Single period only
+    period = Period.toSingle(period);
+
     // Render view
     render(<Views.Report teamId={teamId} period={period} labels={labels} />);
 
