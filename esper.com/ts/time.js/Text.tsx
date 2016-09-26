@@ -302,4 +302,13 @@ module Esper.Text {
         return date(d);
     }
   }
+
+  // Format a period as a list of strings
+  export function fmtPeriodList(period: Types.Period, short=false) {
+    let { interval, start, end } = period;
+    let indices = _.range(start, end + 1);
+    return _.map(indices,
+      (i) => Text.fmtPeriod({ interval, start: i, end: i }, short)
+    );
+  }
 }
