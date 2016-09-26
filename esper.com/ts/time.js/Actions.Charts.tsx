@@ -4,13 +4,13 @@
 
 module Esper.Actions.Charts {
   // Fetch events from server
-  function fetchEvents(o: Types.ChartParams) {
+  function fetchEvents(o: Types.ChartParams): JQueryPromise<any> {
     let { teamId, period } = o;
     return Stores.Events.fetchPredictions({ teamId, period });
   }
 
   // Get events from store
-  function getEvents(o: Types.ChartParams) {
+  function getEvents(o: Types.ChartParams): Types.EventsForRangesData {
     return Stores.Events.require({
       period: o.period,
       cals: _.map(o.extra.calIds, (calId) => ({
