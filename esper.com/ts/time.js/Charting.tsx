@@ -195,7 +195,11 @@ module Esper.Charting {
     For duration calc, use nominal duration (ignore overlapping events
     because this can be un-intutive, also more annoying to abstract)
   */
-  export function getDurationBucket(event: Stores.Events.TeamEvent) {
+  export function getDurationBucket(event: Stores.Events.TeamEvent): {
+    label: string;
+    gte: number;
+    color: string;
+  } {
     let duration = (event.end.getTime() - event.start.getTime()) / 1000;
     return _.findLast(DURATION_BUCKETS,
       (b) => duration >= b.gte
@@ -253,7 +257,11 @@ module Esper.Charting {
   }];
 
   export function getGuestCountBucket(event: Types.TeamEvent,
-                               domains?: string[])
+                                      domains?: string[]): {
+    label: string;
+    gte: number;
+    color: string;
+  }
   {
     let emails = Stores.Events.getGuestEmails(event, domains);
     let count = emails.length + 1; // +1 for exec
@@ -303,7 +311,7 @@ module Esper.Charting {
 
 
   // Group by user-provided event rating
-  function getStrRatings(event: Types.TeamEvent) {
+  function getStrRatings(event: Types.TeamEvent): string[] {
     return event.feedback && _.isNumber(event.feedback.rating) ?
            [event.feedback.rating.toString()] : [];
   }
@@ -351,7 +359,7 @@ module Esper.Charting {
     For chart coloring, we may want to lighten a particular color if there are
     multiple things nested under it.
   */
-  function step(base: string, index: number, total: number) {
+  function step(base: string, index: number, total: number): string {
     if (total > 1) {
       let colorStep = Math.min(
         MAX_COLOR_CHANGE / (total - 1),
@@ -363,7 +371,7 @@ module Esper.Charting {
 
 
   /* Compare props, used to minimize excessive chart updates */
-  export function eqProps(p1: Types.ChartProps, p2: Types.ChartProps) {
+  export function eqProps(p1: Types.ChartProps, p2: Types.ChartProps): boolean {
     // Do shallow comparison of all keys with some exceptions
     for (let key in p1) {
       switch(key) {
@@ -405,7 +413,7 @@ module Esper.Charting {
   /* Filtering helpers */
 
   // Get the "standard" set of filters for our charts
-  export function getFilterFns(props: Types.ChartProps) {
+  export function getFilterFns(props: Types.ChartProps): Types.FilterFn[] {
     let filters: Types.FilterFn[] = [];
 
     // Removed specifically ignored events
@@ -514,7 +522,7 @@ module Esper.Charting {
       extra?: Types.ChartExtraOpt;
       navOpts?: Route.nav.Opts;
       reset?: boolean;
-    })
+    }) : { path: Paths.Path; opts: Route.nav.Opts; }
   {
     let navOpts = next.navOpts || {};
     let groupBy = next.groupBy || props.groupBy;
@@ -593,7 +601,7 @@ module Esper.Charting {
   // Group-specific cleaning -- call after cleanExtra
   export function cleanGroups(extra: Types.ChartExtra,
                               teamId: string,
-                              groupBy?: Types.GroupBy) {
+                              groupBy?: Types.GroupBy): Types.ChartExtra {
     extra.calIds = Params.cleanCalIds(teamId, extra.calIds);
     extra.filterStr = Params.cleanString(extra.filterStr);
     extra.durations = Params.cleanListSelectJSON(extra.durations);
