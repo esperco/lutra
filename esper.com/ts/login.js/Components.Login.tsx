@@ -77,16 +77,6 @@ module Esper.Components {
           By signing in, you agree to Esper&apos;s{" "}
           <a href="https://esper.com/terms-of-use">Terms of Use.</a>
         </p></div>
-
-        {/*
-          Temporary sandbox link -- will figure out something nicer and more
-          obvious looking later
-        */}
-        <div className="sign-in-footer esper-note">
-          <a onClick={signupForSandbox}>
-            Demo
-          </a>
-        </div>
       </div>;
     }
 

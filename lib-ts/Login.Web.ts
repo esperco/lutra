@@ -18,11 +18,7 @@ module Esper.Login {
     email: string;
   }
 
-  interface CredentialsObj {
-    uid: string;
-    api_secret: string;
-    email: string;
-  }
+  type CredentialsObj = StoredCredentials;
 
   export function storeCredentials(data: ApiT.LoginResponse|CredentialsObj) {
     var stored: StoredCredentials = {
