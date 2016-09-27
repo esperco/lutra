@@ -9,7 +9,7 @@ module Esper.Actions {
   /* List action => render a list of events */
   export function renderFilterList(params: {
     cals: Stores.Calendars.CalSelection[];
-    period: Period.Single;
+    period: Types.Period;
   }, queryJSON: Params.FilterListJSON) {
 
     // Async load of events
@@ -35,7 +35,8 @@ module Esper.Actions {
       Analytics.page(Analytics.Page.EventList, {
         calendars: params.cals.length,
         interval: params.period.interval,
-        relativePeriod: Period.relativeIndex(params.period),
+        relativePeriod: params.period.start -
+          Period.now(params.period.interval).start,
         hasFilterStr: !!queryJSON.filterStr,
         hasLabelFilter: !queryJSON.labels.all
       });

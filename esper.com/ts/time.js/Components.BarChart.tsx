@@ -1,10 +1,9 @@
 /*
-  Base class for a chart that shows absolute values by different groups.
-  Shows up as either a horizontal or verticl stacked bar chart depending
-  on options.
+  Base class for a chart that shows absolute values as a bar chart -- takes
+  the form of a stacked bar with each event equal to one stack segement
 */
 module Esper.Components {
-  export function AbsoluteChart({
+  export function BarChart({
     series, categories, simplified, orientation, yAxis
   } : {
     series: Charting.EventSeries[],
@@ -15,7 +14,7 @@ module Esper.Components {
   }) {
     orientation = orientation || 'horizontal';
 
-    return <Components.Highchart showExport={!simplified} opts={{
+    return <Highchart showExport={!simplified} opts={{
       chart: orientation === 'vertical' ? {
         type: 'column'
       } : {

@@ -9,16 +9,15 @@ module Esper.Actions {
 
   export function renderReport({teamId, period, extra}: {
     teamId: string;
-    period: Types.SinglePeriod|Types.CustomPeriod;
+    period: Types.Period;
     extra?: any;
   }) {
     // Fetch events
     var team = Stores.Teams.require(teamId);
     var calIds = team.team_timestats_calendars;
-    _.each(calIds, (_id) => Stores.Events.fetchPredictions({
-      teamId: teamId,
-      period: period
-    }));
+    _.each(calIds,
+      (_id) => Stores.Events.fetchPredictions({ teamId, period })
+    );
 
     extra = extra || {};
     var labels = Params.cleanListSelectJSON(extra.labels);

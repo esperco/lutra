@@ -5,54 +5,58 @@
   result so that event changes don't cause checkboxes to disappear, etc.
 */
 module Esper.Components {
-  interface Props<R> {
-    calculation: EventStats.CalcBase<R, {}>;
-  }
-
   interface State<R> {
     result: Option.T<R>;
   }
 
-  // Generic Types: R - Calculation result type, P - extra props
+  // Generic Types: R - Calculation result type, P -  props
   export abstract class CalcUI<R, P>
-    extends ReactHelpers.Component<Props<R> & P, State<R>>
+         extends ReactHelpers.Component<P, State<R>>
   {
-    _calculation: EventStats.CalcBase<R, {}>;
+    _calc: Calc<R>;
 
-    constructor(props: Props<R> & P) {
+    constructor(props: P) {
       super(props);
-      this.state = {
-        result: this.getResults()
+      this.state = { result: Option.none<R>() }
+    }
+
+    abstract getCalc(props: P): Calc<R>;
+
+    updateCalculation(props: P) {
+      if (this._calc) {
+        this._calc.removeChangeListener(this.setResult);
       }
+      this._calc = this.getCalc(props);
+      this._calc.addChangeListener(this.setResult);
     }
 
     componentDidMount() {
-      this.props.calculation.addChangeListener(this.setResults);
+      this.updateCalculation(this.props);
     }
 
-    componentDidUpdate(oldProps: Props<R> & P) {
-      if (oldProps.calculation !== this.props.calculation) {
-        oldProps.calculation.removeChangeListener(this.setResults);
-        this.props.calculation.addChangeListener(this.setResults);
+    componentDidUpdate(prevProps: P) {
+      if (prevProps !== this.props) {
+        this.updateCalculation(this.props);
       }
     }
 
     componentWillUnmount() {
       super.componentWillUnmount();
-      this.props.calculation.removeChangeListener(this.setResults);
+      if (this._calc) {
+        this._calc.removeChangeListener(this.setResult);
+      }
     }
 
     /*
       getResult is a private helper function. Subclasses should use
       this.state.result (which pulls last known result option)
     */
-    private getResults(props?: Props<R> & P) {
-      props = props || this.props;
-      return props.calculation.getResults();
+    private getResults() {
+      return this._calc.getOutput();
     }
 
     // Use arrow syntax so we can reference for listener
-    private setResults = () => {
+    private setResult = () => {
       this.getResults().match({
         none: () => null,
         some: (result) => this.setState({ result: Option.some(result) })

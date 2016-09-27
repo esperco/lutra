@@ -5,21 +5,19 @@
 /// <reference path="./Components.ChartInsight.tsx" />
 
 module Esper.Components {
-  export class LabelChartInsight extends ChartGroupingInsight<{
-    labelInfos: ApiT.LabelInfo[]
-  }> {
-    renderMain(groups: Charting.PeriodOptGroup[]) {
-      // Current group only
-      let periodGroup = _.find(groups, (g) => g.current);
-      if (! periodGroup) return <span />;
+  export class LabelChartInsight extends GroupChartInsight {
+    getGroupBy() { return Charting.GroupByLabel; }
 
-      /*
-        NB: We'd move more of this to Text namespace but given the complexity
-        of the scenarios, leave alone for the time being
-      */
-      return <div>
-        {
-          Insights.matchScenario(periodGroup.data, {
+    render() {
+      return this.getResult().match({
+        none: () => null,
+
+        /*
+          NB: We'd move more of this to Text namespace but given the complexity
+          of the scenarios, leave alone for the time being
+        */
+        some: (s) => <div>{
+          Insights.matchScenario(s.group, {
             allNone: () => <p>
               None of your events are{" "}{Text.Labeled}. Click on the
               {" "}<span className="text-muted">"{Text.Unlabeled}"</span>{" "}
@@ -28,62 +26,60 @@ module Esper.Components {
 
             allOne: (label) => <p>
               All of your {" " + Text.Labeled + " "} time is being spent on
-              {" "}<InlineLabel id={label} labelInfos={this.props.labelInfos} />.
+              {" "}<InlineLabelList pairs={[[label, 1]]} props={this.props}  />.
             </p>,
 
             allEqual: (pairs) => <p>
               Your time is being spent roughly equally between{" "}
-              <InlineLabelList pairs={pairs} labelInfos={this.props.labelInfos}/>.
+              <InlineLabelList pairs={pairs} props={this.props} />.
             </p>,
 
             tiersMajority: (tier1, tier2) => <p>
               You're spending the majority of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1}
-                labelInfos={this.props.labelInfos}/>, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2}
-                labelInfos={this.props.labelInfos} />.
+              <InlineLabelList pairs={tier1} props={this.props} />,
+              {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} props={this.props} />.
             </p>,
 
             tiersPlurality: (tier1, tier2) => <p>
               You're spending the bulk of your time on events
               {" " + Text.Labeled + " "}
-              <InlineLabelList pairs={tier1}
-                labelInfos={this.props.labelInfos} />, {" "}followed by{" "}
-              <InlineLabelList pairs={tier2}
-                labelInfos={this.props.labelInfos} />.
+              <InlineLabelList pairs={tier1} props={this.props} />,
+              {" "}followed by{" "}
+              <InlineLabelList pairs={tier2} props={this.props} />.
             </p>,
 
             fallback: (pairs) => <p>
               Your top {Text.Labels} are{" "}
-              <InlineLabelList pairs={pairs.slice(0, 3)}
-                labelInfos={this.props.labelInfos} />.
+              <InlineLabelList pairs={pairs.slice(0, 3)} props={this.props} />.
             </p>
           })
-        }
-      </div>;
+        }</div>
+      });
     }
   }
 
-  function InlineLabelList({pairs, labelInfos} : {
-    pairs: [string, number][],
-    labelInfos: ApiT.LabelInfo[]
+  function InlineLabelList({pairs, props} : {
+    pairs: [string, number][];
+    props: Types.ChartProps;
   }) {
-    return <CommaList>
-      { _.map(pairs, (p) => <InlineLabel key={p[0]} id={p[0]}
-          labelInfos={labelInfos} />) }
-    </CommaList>;
+    let keys = _.map(pairs, (p) => p[0]);
+    let colors = props.groupBy.colorMapFn(keys, props);
+    return <CommaList>{ _.map(pairs, (p, i) =>
+      <InlineLabel
+        key={p[0]} id={p[0]}
+        color={colors[i]}
+        displayAs={props.groupBy.displayFn(p[0], props)}
+      />
+    )}</CommaList>;
   }
 
-  function InlineLabel({id, labelInfos}: {
-    id: string,
-    labelInfos: ApiT.LabelInfo[]
+  function InlineLabel({id, color, displayAs}: {
+    id: string;
+    color: string;
+    displayAs: string;
   }) {
-    let labelInfo = _.find(labelInfos, {normalized: id});
-    let bg = labelInfo ? labelInfo.color : (
-      id.charAt(0) === '#' ? Colors.getColorForHashtag(id) : Colors.lightGray
-    );
-    let displayAs = labelInfo ? labelInfo.original : id;
-    return <Components.Badge color={bg} text={displayAs} />;
+    return <Components.Badge color={color} text={displayAs} />;
   }
 }

@@ -5,19 +5,19 @@
 /// <reference path="./Components.ChartInsight.tsx" />
 
 module Esper.Components {
-  export class DomainChartInsight extends ChartGroupingInsight<{}> {
-    renderMain(groups: Charting.PeriodOptGroup[]) {
-      // Current group only
-      let periodGroup = _.find(groups, (g) => g.current);
-      if (! periodGroup) return <span />;
+  export class DomainChartInsight extends GroupChartInsight {
+    getGroupBy() { return Charting.GroupByDomain; }
 
-      /*
-        NB: We'd move more of this to Text namespace but given the complexity
-        of the scenarios, leave alone for the time being
-      */
-      return <div>
-        {
-          Insights.matchScenario(periodGroup.data, {
+    render() {
+      return this.getResult().match({
+        none: () => null,
+
+        /*
+          NB: We'd move more of this to Text namespace but given the complexity
+          of the scenarios, leave alone for the time being
+        */
+        some: (s) => <div>{
+          Insights.matchScenario(s.group, {
             allNone: () => <p>{ Text.ChartNoGuests }</p>,
 
             allOne: (domain) => <p>
@@ -43,8 +43,8 @@ module Esper.Components {
               <InlineDomainList pairs={pairs.slice(0, 3)} />.
             </p>
           })
-        }
-      </div>;
+        }</div>
+      });
     }
   }
 

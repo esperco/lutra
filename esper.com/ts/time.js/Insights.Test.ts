@@ -11,36 +11,40 @@ module Esper.Insights {
     function makeScenario(
       some: {[index: string]: number} = {},
       none = 0
-    ): Types.EventOptGrouping {
-      let someGroups: {[index: string]: Types.EventSubgroup} = {};
+    ): Types.RangesGroup {
+      let someGroups: {[index: string]: Types.RangeSeries} = {};
       _.each(some, (v, k) => {
         someGroups[k] = {
-          annotations: [],
+          weights: [],
           events: [],
           eventMap: {},
           totalUnique: v,
           totalValue: v,
-          subgroups: {}
+          values: []
         };
       });
 
       let total = _.sum(_.values(some)) + none;
 
       return {
-        // Empty map + annotations not accurate, but shouldn't matter if
+        // Empty map + weights not accurate, but shouldn't matter if
         // we're looking at total values
-        annotations: [],
-        events: [],
-        eventMap: {},
-        totalValue: total,
-        totalUnique: total,
         some: someGroups,
         none: {
-          annotations: [],
+          weights: [],
           events: [],
           eventMap: {},
+          values: [],
           totalValue: none,
           totalUnique: none
+        },
+        all: {
+          weights: [],
+          events: [],
+          eventMap: {},
+          values: [],
+          totalValue: total,
+          totalUnique: total,
         }
       };
     }

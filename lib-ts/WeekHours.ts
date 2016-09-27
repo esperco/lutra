@@ -44,16 +44,11 @@ module Esper.WeekHours {
     }
   }
 
-  /*
-    Total amount of time in period, with option for filtering against only
-    certain times of day / days of week
-  */
-  export function totalForPeriod(
-    period: Period.Single|Period.Custom,
+  export function totalForRange(
+    range: [Date, Date],
     weekHours?: Types.WeekHours
   ) {
-    let bounds = Period.boundsFromPeriod(period);
-    let dates = Period.datesFromBounds(bounds[0], bounds[1]);
+    let dates = Period.datesFromBounds(range[0], range[1]);
     return _.sumBy(dates, (date) => {
       let m = moment(date);
       if (weekHours) {

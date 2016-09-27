@@ -404,29 +404,6 @@ module Esper.Stores.Events {
       id: eventId4
     });
 
-    describe("fetchPredictions", function() {
-      var apiSpy: jasmine.Spy;
-      var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
-
-      beforeEach(function() {
-        apiSpy = Test.spySafe(Api, "postForTeamEvents");
-        dfd = $.Deferred();
-        apiSpy.and.returnValue(dfd.promise());
-      });
-
-      it("should round fetches to start / end of day", function() {
-        fetchPredictions({ teamId: teamId,
-          start: new Date(2016, 1, 1, 12),
-          end: new Date(2016, 1, 1, 13)
-        });
-
-        expect(apiSpy).toHaveBeenCalledWith(teamId, {
-          window_start: XDate.toString(new Date(2016, 1, 1)),
-          window_end: XDate.toString(new Date(2016, 1, 1, 23, 59, 59, 999))
-        });
-      });
-    });
-
     describe("fetchPredictions (period)", function() {
       var apiSpy: jasmine.Spy;
       var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
@@ -445,9 +422,10 @@ module Esper.Stores.Events {
       });
 
       function testFetch() {
-        var period: Period.Single = {
+        var period: Types.Period = {
           interval: "month",
-          index: 552 // Jan 2016
+          start: 552,
+          end: 552 // Jan 2016
         };
         fetchPredictions({ teamId: teamId, period: period });
       }
@@ -596,20 +574,25 @@ module Esper.Stores.Events {
             teamId: teamId,
             calId: calId
           }],
-          period: <Period.Single> {
-            interval: "month",
-            index: 552 // Jan 2016
-          }
+          period: Period.fromDates("day",
+            new Date(2016, 0, 1),
+            new Date(2016, 0, 2)
+          )
         }).unwrap();
       }
 
-      it("should return values within period, de-duped", function() {
+      it("should return values within period", function() {
         var val = getVal();
-        expect(_.map(val.events, (e) => e.id)).toEqual([
+        var rangeEvents = _.map(val.eventsForRanges,
+          (r) => _.map(r.events, (e) => e.id)
+        );
+        expect(rangeEvents).toEqual([[
           eventId1,
           eventId2,
+        ], [
+          eventId2,
           eventId3
-        ]);
+        ]]);
         expect(val.hasError).toBeFalsy();
         expect(val.isBusy).toBeFalsy();
       });
@@ -637,7 +620,6 @@ module Esper.Stores.Events {
         expect(getVal().isBusy).toBeTruthy();
       });
     });
-
 
     /////
 

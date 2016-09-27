@@ -6,12 +6,7 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  interface Props extends Charting.BaseOpts<{}> {
-    chart: JSX.Element;
-
-    // Used to render selectors
-    events: Types.TeamEvent[];
-  }
+  type Props = Types.ChartProps;
 
   interface State {
     showFilterMenu?: boolean;
@@ -21,7 +16,6 @@ module Esper.Views {
   interface ActiveFilters {
     calendars: boolean;
     incUnscheduled: boolean;
-    incrs: boolean;
     filterStr: boolean;
     domains: boolean;
     durations: boolean;
@@ -38,7 +32,7 @@ module Esper.Views {
     }
 
     renderWithData() {
-      let filterState = this.getFilterState();
+      let filterState = getFilterState(this.props);
 
       return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
@@ -47,10 +41,9 @@ module Esper.Views {
           <div className="sidebar-bottom-menu">
             <Components.TeamSelector
               teams={Stores.Teams.all()}
-              selectedId={this.props.teamId}
-              onUpdate={(teamId) => Charting.updateChart(this.props, {
-                teamId: teamId
-              })} />
+              selectedId={this.props.team.teamid}
+              onUpdate={(teamId) => this.updateTeamId(teamId)}
+            />
           </div>
         </Components.Sidebar>
 
@@ -58,9 +51,6 @@ module Esper.Views {
           <div id="chart-header" className="esper-content-header">
             <Components.PeriodSelector
               period={this.props.period}
-              show={
-                this.props.extra.type === "calendar" ? ["month"] : undefined
-              }
               updateFn={(p) => this.updatePeriod(p)}
             />
             <div className="actions">
@@ -88,8 +78,8 @@ module Esper.Views {
           </div>
           <div id="chart-expanded" className="esper-expanded">
             { this.state.showFilterMenu ?
-              this.renderFilterMenu(filterState) : null }
-            { this.props.chart }
+              <FilterMenu props={this.props} active={filterState} /> : null }
+            <ChartContent {...this.props} />
           </div>
         </div>
       </div>;
@@ -113,59 +103,31 @@ module Esper.Views {
                                       Text.ChartAbsolute,
                                       "fa-bar-chart") }
             </div>
-            <div className="btn-group">
-              { this.renderTypeButton("calendar",
-                                      Text.ChartGrid,
-                                      "fa-calendar") }
-            </div>
           </div>
         </div>
 
         <div className="esper-panel-section">
-          { this.renderPrimarySelector() }
+          <Components.ChartSelector
+            {...this.props}
+            updateFn={(extra) => this.updateExtra(extra)}
+          />
         </div>
       </div>;
     }
 
-    displayPathFn(pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path) {
-      return Charting.matchPrimary(pathFn, {
-        labels: () => <span>
-          <i className="fa fa-fw fa-left fa-tags" />
-          { Text.ChartLabels }
-        </span>,
-
-        calendars: () => <span>
-          <i className="fa fa-fw fa-left fa-calendar-o" />
-          { Text.ChartCalendars }
-        </span>,
-
-        domains: () => <span>
-          <i className="fa fa-fw fa-left fa-at" />
-          { Text.ChartGuests }
-        </span>,
-
-        durations: () => <span>
-          <i className="fa fa-fw fa-left fa-hourglass" />
-          { Text.ChartDuration }
-        </span>,
-
-        guestCounts: () => <span>
-          <i className="fa fa-fw fa-left fa-users" />
-          { Text.ChartGuestsCount }
-        </span>,
-
-        ratings: () => <span>
-          <i className="fa fa-fw fa-left fa-star" />
-          { Text.ChartRatings }
-        </span>
-      });
+    displayGroupBy(groupBy: Types.GroupBy) {
+      return <span>
+        { groupBy.icon ?
+          <i className={"fa fa-fw fa-left " + groupBy.icon} /> : null }
+        { groupBy.name }
+      </span>
     }
 
     renderChartSelector() {
       let periodStr = Params.periodStr(this.props.period);
       return <div className="esper-flex-list">
         <a className="action" href={Paths.Time.report({
-          teamId: this.props.teamId,
+          teamId: this.props.team.teamid,
           period: periodStr.period,
           interval: periodStr.interval
         }).href}>
@@ -174,19 +136,20 @@ module Esper.Views {
 
         <Components.Dropdown>
           <Components.Selector className="dropdown-toggle">
-            { this.displayPathFn(this.props.pathFn) }
+            { this.displayGroupBy(this.props.groupBy) }
           </Components.Selector>
           <ul className="dropdown-menu">
             { _.map([
-              Paths.Time.labelsChart,
-              Paths.Time.calendarsChart,
-              Paths.Time.guestsChart,
-              Paths.Time.ratingsChart,
-              Paths.Time.durationsChart,
-              Paths.Time.guestsCountChart
-            ], (p, i) => <li key={i}>
-              <a onClick={() => this.updatePath(p)}>
-                { this.displayPathFn(p) }
+              Charting.GroupByLabel,
+              Charting.GroupByCalendar,
+              Charting.GroupByDomain,
+              Charting.GroupByGuest,
+              Charting.GroupByRating,
+              Charting.GroupByDuration,
+              Charting.GroupByGuestCount
+            ], (g, i) => <li key={i}>
+              <a onClick={() => this.updateGroupBy(g)}>
+                { this.displayGroupBy(g) }
               </a>
             </li>)}
           </ul>
@@ -194,40 +157,9 @@ module Esper.Views {
       </div>
     }
 
-    renderPrimarySelector() {
-      let events = this.props.events;
-      let extra = this.props.extra;
-      return Charting.matchPrimary(this.props.pathFn, {
-        labels: () => <Components.LabelCalcSelector
-          { ...this.labelSelectorProps() }
-        />,
-
-        calendars: () => <Components.CalCalcSelector
-          { ...this.calSelectorProps() }
-        />,
-
-        domains: () => <Components.DomainCalcSelector
-          { ...this.domainSelectorProps() }
-        />,
-
-        durations: () => <Components.DurationSelector
-          { ...this.durationProps() }
-        />,
-
-        guestCounts: () => <Components.GuestCountSelector
-           { ...this.guestCountProps() }
-        />,
-
-        ratings: () => <Components.RatingCalcSelector
-          { ...this.ratingProps() }
-        />
-      });
-    }
-
     renderTypeButton(
-        type: Charting.ChartType,
+        type: Types.ChartType,
         title: string, icon: string) {
-
       return <button className={classNames("btn btn-default", {
         active: type === this.props.extra.type
       })} onClick={() => this.updateExtra({ type: type })}>
@@ -237,288 +169,170 @@ module Esper.Views {
       </button>
     }
 
-    renderFilterMenu(active: ActiveFilters) {
-      let events = this.props.events;
-      let extra = this.props.extra;
-      let anyActive = _.some(_.values(active));
-
-      let groupSelectors = Charting.minusPrimary(this.props.pathFn, {
-        labels: () => <FilterItem id={this.getId("labels")}
-                    active={active.labels}
-                    title={Text.ChartLabels}
-                    icon="fa-tags">
-          <Components.LabelCalcDropdownSelector
-            id={this.getId("labels")}
-            { ...this.labelSelectorProps() }
-          />
-        </FilterItem>,
-
-        calendars: () => <FilterItem id={this.getId("calendars")}
-                    active={active.calendars}
-                    title={Text.ChartCalendars}
-                    icon="fa-calendar-o">
-          <Components.CalCalcDropdownSelector
-            id={this.getId("calendars")}
-            { ...this.calSelectorProps() }
-          />
-        </FilterItem>,
-
-        domains: () => <FilterItem id={this.getId("domains")}
-                    active={active.domains}
-                    title={Text.GuestDomains}
-                    icon="fa-at">
-          <Components.DomainCalcDropdownSelector
-            id={this.getId("domains")}
-            { ...this.domainSelectorProps() }
-          />
-        </FilterItem>,
-
-        durations: () => <FilterItem id={this.getId("durations")}
-                    active={active.durations}
-                    title={Text.ChartDuration}
-                    icon="fa-hourglass">
-          <Components.DurationDropdownSelector
-            id={this.getId("durations")}
-            { ...this.durationProps() }
-          />
-        </FilterItem>,
-
-        guestCounts: () => <FilterItem id={this.getId("guest-counts")}
-                    active={active.guestCounts}
-                    title={Text.ChartGuestsCount}
-                    icon="fa-users">
-          <Components.GuestCountDropdownSelector
-            id={this.getId("guest-counts")}
-            { ...this.guestCountProps() }
-          />
-        </FilterItem>,
-
-        ratings: () => <FilterItem id={this.getId("ratings")}
-                    active={active.ratings}
-                    title={Text.ChartRatings}
-                    icon="fa-star">
-          <Components.RatingCalcDropdownSelector
-            id={this.getId("ratings")}
-            { ...this.ratingProps() }
-          />
-        </FilterItem>
-      });
-
-      return <div className="filter-menu esper-section esper-shade">
-        <div className="esper-section esper-flex-list">
-          { groupSelectors.labels.unwrapOr(null) }
-          { groupSelectors.calendars.unwrapOr(null) }
-          { groupSelectors.domains.unwrapOr(null) }
-          { groupSelectors.ratings.unwrapOr(null) }
-          { groupSelectors.durations.unwrapOr(null) }
-          { groupSelectors.guestCounts.unwrapOr(null) }
-
-          <FilterItem id={this.getId("weekHours")}
-                      active={active.weekHours || active.incUnscheduled}
-                      title={Text.WeekHours}
-                      icon="fa-clock-o">
-            <Components.WeekHourDropdownSelector
-              id={this.getId("weekHours")}
-              hours={extra.weekHours}
-              updateHours={(x) => this.updateExtra({ weekHours: x })}
-              showUnscheduled={extra.type === "percent"}
-              unscheduled={extra.incUnscheduled}
-              updateUnscheduled={(x) => this.updateExtra({ incUnscheduled: x })}
-            />
-          </FilterItem>
-
-          {
-            extra.type === "calendar" ? null :
-            <FilterItem id={this.getId("incrs")}
-                        active={active.incrs}
-                        title="Compare With"
-                        icon="fa-flip-horizontal fa-tasks">
-              <Components.RelativePeriodDropdownSelector
-                id={this.getId("incrs")}
-                period={this.props.period}
-                allowedIncrs={[-1, 1]}
-                selectedIncrs={extra.incrs}
-                updateFn={(x) => this.updateExtra({incrs: x })}
-              />
-            </FilterItem>
-          }
-        </div>
-
-        { anyActive ? <div className="esper-section text-center action"
-             onClick={() => this.resetFilters()}>
-          <i className="fa fa-fw fa-left fa-refresh" />
-          { Text.ResetFilters }
-        </div> : null }
-      </div>;
-    }
-
     toggleFilterMenu() {
       this.mutateState((s) => s.showFilterMenu = !s.showFilterMenu);
     }
 
-    // Returns which filters are active / not-active
-    getFilterState(): ActiveFilters {
-      let defaults = Charting.cleanExtra({}, this.props.pathFn);
-      let current = this.props.extra;
-      let team = Stores.Teams.require(this.props.teamId);
-      let ret = {
-        calendars: !_.isEqual(
-          this.props.calIds.length, team.team_timestats_calendars.length),
-        incUnscheduled: !_.isEqual(
-          defaults.incUnscheduled,
-          current.incUnscheduled
-        ),
-        incrs: !_.isEqual(defaults.incrs, current.incrs),
-        filterStr: !_.isEqual(defaults.filterStr, current.filterStr),
-        domains: !_.isEqual(defaults.domains, current.domains),
-        durations: !_.isEqual(defaults.durations, current.durations),
-        labels: !_.isEqual(defaults.labels, current.labels),
-        ratings: !_.isEqual(defaults.ratings, current.ratings),
-        guestCounts: !_.isEqual(defaults.guestCounts, current.guestCounts),
-        weekHours: !_.isEqual(defaults.weekHours, current.weekHours)
-      };
-
-      // Ignore filter for primary group
-      Charting.matchPrimary(this.props.pathFn, {
-        labels: () => delete ret.labels,
-        calendars: () => delete ret.calendars,
-        domains: () => delete ret.domains,
-        guestCounts: () => delete ret.guestCounts,
-        ratings: () => delete ret.ratings,
-        durations: () => delete ret.durations
-      });
-
-      return ret;
-    }
-
-
-    /* Returns properties for selectors */
-
-    labelSelectorProps() {
-      return {
-        team: Stores.Teams.require(this.props.teamId),
-        selected: this.props.extra.labels,
-        calculation: new EventStats.LabelCountCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({labels: x})
-      };
-    }
-
-    calSelectorProps() {
-      let cals = Option.matchList(Stores.Calendars.list(this.props.teamId));
-      return {
-        calendars: cals,
-        selectedIds: this.props.calIds,
-        calculation: new EventStats.CalendarCountCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (calIds: string[]) => Charting.updateChart(this.props, {
-          calIds: calIds
-        })
-      };
-    }
-
-    domainSelectorProps() {
-      return {
-        selected: this.props.extra.domains,
-        calculation: new EventStats.DomainCountCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({
-          domains: x,
-
-          // Guest count none and domain none should be the same
-          guestCounts: _.extend({}, this.props.extra.guestCounts, {
-            none: x.none
-          }) as Params.ListSelectJSON
-        })
-      };
-    }
-
-    ratingProps() {
-      return {
-        selected: this.props.extra.ratings,
-        calculation: new EventStats.RatingCountCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({ratings: x})
-      };
-    }
-
-    durationProps() {
-      return {
-        selected: this.props.extra.durations,
-        calculation: new EventStats.DurationBucketCountCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({durations: x})
-      };
-    }
-
-    guestCountProps() {
-      return {
-        selected: this.props.extra.guestCounts,
-        calculation: new EventStats.GuestCountBucketCalc(
-          this.props.events, this.props.extra
-        ),
-        updateFn: (x: Types.ListSelectJSON) => this.updateExtra({
-          guestCounts: x,
-
-          // Guest count none and domain none should be the same
-          domains: _.extend({}, this.props.extra.domains, {
-            none: x.none
-          }) as Params.ListSelectJSON
-        })
-      };
-    }
-
-
     /* Action functions */
 
-    updatePath(pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path) {
-      Charting.updateChart(this.props, {
-        pathFn: pathFn
-      });
+    updateGroupBy(groupBy: Types.GroupBy) {
+      Charting.updateChart(this.props, { groupBy });
     }
 
-    updatePeriod(period: Period.Single|Period.Custom) {
-      Charting.updateChart(this.props, {
-        period: period
-      });
+    updatePeriod(period: Types.Period) {
+      Charting.updateChart(this.props, { period });
     }
 
-    /*
-      NB: Resetting filters should reset actual props used as filters,
-      not the primary grouping attribute
-    */
-    resetFilters() {
-      Charting.updateChart(this.props, {
-        reset: true,
-        calIds: this.props.pathFn === Paths.Time.calendarsChart ?
-          this.props.calIds : undefined,
-        extra: {
-          type: this.props.extra.type,
-          labels: this.props.pathFn === Paths.Time.labelsChart ?
-            this.props.extra.labels : undefined,
-          domains: this.props.pathFn === Paths.Time.guestsChart ?
-            this.props.extra.domains : undefined,
-          guestCounts: this.props.pathFn === Paths.Time.guestsCountChart ?
-            this.props.extra.labels : undefined,
-          ratings: this.props.pathFn === Paths.Time.ratingsChart ?
-            this.props.extra.labels : undefined,
-          durations: this.props.pathFn === Paths.Time.durationsChart ?
-            this.props.extra.durations : undefined
-        }
-      });
+    updateTeamId(teamId: string) {
+      Charting.updateChart(this.props, { teamId });
     }
 
-    updateExtra(extra: Charting.ExtraOptsMaybe) {
-      Charting.updateChart(this.props, {
-        extra: extra
-      });
+    updateExtra(extra: Types.ChartExtraOpt) {
+      Charting.updateChart(this.props, { extra });
     }
   }
+
+
+  // Actual chart
+  function ChartContent(props: Props) {
+    switch(props.extra.type) {
+      case "percent":     // Pie
+        return <Components.PieDurationChart {...props} />;
+      default:            // Bar
+        return <Components.BarDurationChart {...props} />;
+    }
+  }
+
+
+  // Filters
+  function FilterMenu({ props, active }: {
+    props: Props,
+    active: ActiveFilters
+  }) {
+    let idPrefix = Util.randomString();
+    let anyActive = _.some(_.values(active));
+
+    return <div className="filter-menu esper-section esper-shade">
+      <div className="esper-section esper-flex-list">
+        <FilterGroupBy
+          props={props}
+          active={active.labels}
+          groupBy={Charting.GroupByLabel}
+        />
+        <FilterGroupBy
+          props={props}
+          active={active.calendars}
+          groupBy={Charting.GroupByCalendar}
+        />
+        <FilterGroupBy
+          props={props}
+          active={active.domains}
+          groupBy={Charting.GroupByDomain}
+        />
+        <FilterGroupBy
+          props={props}
+          active={active.durations}
+          groupBy={Charting.GroupByDuration}
+        />
+        <FilterGroupBy
+          props={props}
+          active={active.guestCounts}
+          groupBy={Charting.GroupByGuestCount}
+        />
+        <FilterGroupBy
+          props={props}
+          active={active.ratings}
+          groupBy={Charting.GroupByRating}
+        />
+
+        <FilterItem id={idPrefix + "weekHours"}
+                    active={active.weekHours || active.incUnscheduled}
+                      title={Text.WeekHours}
+                      icon="fa-clock-o">
+          <Components.WeekHourDropdownSelector
+            id={idPrefix + "weekHours"}
+            hours={props.extra.weekHours}
+            updateHours={(x) => Charting.updateChart(props, {
+              extra: { weekHours: x }
+            })}
+            showUnscheduled={props.extra.type === "percent"}
+            unscheduled={props.extra.incUnscheduled}
+            updateUnscheduled={(x) => Charting.updateChart(props, {
+              extra: { incUnscheduled: x }
+            })}
+          />
+        </FilterItem>
+      </div>
+
+      { anyActive ? <div className="esper-section text-center action"
+           onClick={() => resetFilters(props)}>
+        <i className="fa fa-fw fa-left fa-refresh" />
+        { Text.ResetFilters }
+      </div> : null }
+    </div>;
+  }
+
+  /*
+    NB: Resetting filters should reset actual props used as filters,
+    not the primary grouping attribute
+  */
+  function resetFilters(props: Props) {
+    // Get current group by value
+    let current = props.groupBy.getListSelectJSONFn(props.extra);
+
+    // Get reset version of props
+    let resetProps = _.extend({}, props, {
+      extra: Charting.defaultExtras(props.team.teamid, props.groupBy)
+    }) as Props;
+
+    // Apply current groupBy + type to resets
+    let extra = props.groupBy.updateExtraFn(current, resetProps);
+    extra.type = props.extra.type;
+
+    Charting.updateChart(props, {
+      reset: true,
+      extra: {
+        type: props.extra.type
+      }
+    });
+  }
+
+  // Returns mapping of whether filters are active or not
+  function getFilterState(props: Props): ActiveFilters {
+    let defaults = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    let current = props.extra;
+
+    // Diff, but ignore for primary group
+    return {
+      calendars: !_.isEqual(
+        props.extra.calIds.length,
+        props.team.team_timestats_calendars.length
+      ) && props.groupBy !== Charting.GroupByCalendar,
+
+      domains: !_.isEqual(defaults.domains, current.domains)
+         && props.groupBy !== Charting.GroupByDomain,
+
+      durations: !_.isEqual(defaults.durations, current.durations)
+         && props.groupBy !== Charting.GroupByDuration,
+
+      labels: !_.isEqual(defaults.labels, current.labels)
+         && props.groupBy !== Charting.GroupByLabel,
+
+      ratings: !_.isEqual(defaults.ratings, current.ratings)
+         && props.groupBy !== Charting.GroupByRating,
+
+      guestCounts: !_.isEqual(defaults.guestCounts, current.guestCounts)
+         && props.groupBy !== Charting.GroupByGuestCount,
+
+      filterStr: !_.isEqual(defaults.filterStr, current.filterStr),
+      weekHours: !_.isEqual(defaults.weekHours, current.weekHours),
+      incUnscheduled: !_.isEqual(
+        defaults.incUnscheduled,
+        current.incUnscheduled
+      )
+    };
+  }
+
 
   // Helper component for filter list items
   function FilterItem({ id, icon, active, title, children } : {
@@ -537,5 +351,28 @@ module Esper.Views {
       </label>
       { children }
     </div>;
+  }
+
+  // Filter item for a GroupBy element
+  function FilterGroupBy({ groupBy, active, props }: {
+    groupBy: Types.GroupBy;
+    active?: boolean;
+    props: Props;
+  }) {
+    if (props.groupBy === groupBy) return null;
+
+    let id = Util.randomString + groupBy.name;
+    return <FilterItem id={id}
+      icon={groupBy.icon}
+      title={groupBy.name}
+      active={active}
+    >
+      <Components.ChartSelectorDropdown
+        {...props}
+        id={id}
+        groupBy={groupBy}
+        updateFn={(extra) => Charting.updateChart(props, { extra })}
+      />
+    </FilterItem>
   }
 }

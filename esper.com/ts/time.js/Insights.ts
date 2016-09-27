@@ -8,7 +8,7 @@ module Esper.Insights {
     Looks at opt grouping data and makes callback based on whether data falls
     within one of our predefined insight scenarios
   */
-  export function matchScenario<T>(data: Types.EventOptGrouping, cbs: {
+  export function matchScenario<T>(data: Types.RangesGroup, cbs: {
     // The "none" field accounts for all of our data
     allNone?: () => T;
 
@@ -38,12 +38,12 @@ module Esper.Insights {
   }) {
 
     // Everything is none.
-    if (data.none.totalUnique === data.totalUnique) {
+    if (data.none.totalUnique === data.all.totalUnique) {
       return cbs.allNone ? cbs.allNone() : cbs.fallback([]);
     }
 
     // Sorted key, pct rankings
-    let total = data.totalValue - data.none.totalValue;
+    let total = data.all.totalValue - data.none.totalValue;
     let pairs = _.map(data.some,
       (v, k): Pair => [k, v.totalValue / total]
     );

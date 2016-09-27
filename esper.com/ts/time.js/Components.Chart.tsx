@@ -4,127 +4,144 @@
 */
 module Esper.Components {
 
-  interface Props<T> {
-    simplified?: boolean; // Simplified version of chart for report
+  export abstract class Chart<R, P> extends ReactHelpers.Component<P, {}> {
+    _calc: Calc<R>;
 
-    // Data is a list because we have calculation for each period
-    periods: (
-      Types.PeriodData<EventStats.CalcBase<T, any>> & Types.HasStatus
-    )[];
+    abstract getCalc(props: P): Calc<R>;
+
+    // Wrap in case this._calc is not set yet
+    getResult(): Option.T<R> {
+      return Option.wrap(this._calc).flatMap((r) => r.getOutput());
+    }
+
+    componentWillMount() {
+      this.setCalcSources(this.props);
+    }
+
+    componentWillUpdate(nextProps: P) {
+      if (this.props !== nextProps) {
+        this.setCalcSources(nextProps);
+      }
+    }
+
+    setCalcSources(props: P) {
+      this._calc = this.getCalc(props);
+
+      /*
+        We normally do this sort of thing after mounting / updating to avoid
+        issues with emitter firing prior or during rendering, but calc
+        shouldn't start until next frame at least, so probably OK.
+      */
+      this.setSources([this._calc]);
+    }
   }
 
-  export abstract class Chart<T, U>
-         extends ReactHelpers.Component<Props<T> & U, {}> {
+
+  /* Variant of Chart that shows data state */
+  export abstract class DataChart<R, P> extends Chart<R, P & Types.HasStatus> {
+    render() {
+      if (this.props.hasError) {
+        return <ChartMsg>
+          <i className="fa fa-fw fa-left fa-warning"></i>
+          <span>{ Text.ChartFetchError }</span>
+        </ChartMsg>;
+      }
+
+      if (this.props.isBusy) {
+        return <ChartMsg>
+          <span className="esper-spinner" />
+          <span>{ Text.ChartFetching }</span>
+        </ChartMsg>;
+      }
+
+      return this.getResult().match({
+        none: () => <ChartMsg>
+          <span className="esper-spinner" />
+          <span>{ Text.ChartCalculating }</span>
+        </ChartMsg>,
+
+        some: (r) => this.renderResult(r)
+      });
+    }
+
+    abstract renderResult(r: R): JSX.Element;
+  }
+
+  export function ChartMsg({children}: {
+    children?: string|JSX.Element|JSX.Element[]
+  }) {
+    return <div className="esper-no-content">
+      <span>{children}</span>
+    </div>;
+  }
+
+
+  /* Variant of chart for actual chart attributes in charting library */
+  export abstract class GroupDurationChart
+         extends DataChart<Types.GroupState, Types.ChartProps> {
+    getCalc(props: Types.ChartProps): Calc<Types.GroupState> {
+      return EventStats.defaultGroupDurationCalc(
+        props.eventsForRanges,
+        Charting.getFilterFns(props),
+        (e) => props.groupBy.keyFn(e, props)
+      )
+    }
 
     /*
-      Only update if props or underlying events changed. This is a relatively
-      expensive check to do but is less annoying than rendering the chart
-      multiple times.
+      Don't update if props are mostly the same. This should be by-passed if
+      calc is firing because it calls forceUpdate
     */
-    shouldComponentUpdate(newProps: Props<T> & U) {
-      // Different periods => update
-      if (newProps.periods.length !== this.props.periods.length) {
-        return true;
-      }
-
-      // Else compare each period, and make sure calculations don't
-      for (let i in newProps.periods) {
-        let newPeriod = newProps.periods[i];
-        let oldPeriod = this.props.periods[i];
-        let isEqual = _.isEqual(newPeriod.period, oldPeriod.period) &&
-          newPeriod.current === oldPeriod.current &&
-          newPeriod.isBusy === oldPeriod.isBusy &&
-          newPeriod.hasError === oldPeriod.hasError &&
-          newPeriod.data.eq(oldPeriod.data);
-        if (! isEqual) {
-          return true;
-        }
-      }
-
-      return false;
+    shouldComponentUpdate(newProps: Types.ChartProps) {
+      return !Charting.eqProps(newProps, this.props);
     }
+  }
 
-    componentDidMount() {
-      this.setCalcSources();
-    }
-
-    componentDidUpdate() {
-      this.setCalcSources();
-    }
-
-    setCalcSources() {
-      var calculations = _.map(this.props.periods, (d) => d.data);
-      if (_.every(calculations, (c) => c.ready)) {
-        this.setSources([]);
-      } else {
-        this.setSources(calculations);
-      }
-    }
-
-    render() {
-      if (_.find(this.props.periods, (p) => p.hasError)) {
-        return this.renderMsg(<span>
-          <i className="fa fa-fw fa-warning"></i>{" "}
-          { Text.ChartFetchError }
-        </span>);
+  // Shows duration percentages by group for a single time period
+  export class PieDurationChart extends GroupDurationChart {
+    renderResult(result: Types.GroupState) {
+      if (result.group.all.totalUnique === 0) {
+        return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
       }
 
-      if (_.find(this.props.periods, (p) => p.isBusy)) {
-        return this.renderMsg(<span>
-          <span className="esper-spinner" />{" "}
-          { Text.ChartFetching }
-        </span>);
-      }
+      let { groupBy, simplified } = this.props;
+      let series = Charting.singleGroupSeries(result.group, this.props, {
+        yFn: EventStats.toHours,
+        totals: this.props.extra.incUnscheduled ?
+          _.map(result.group.all.values,
+            (v) => WeekHours.totalForRange(v.range, this.props.extra.weekHours)
+          ) : undefined
+      });
 
-      var results = _.map(this.props.periods, (p) =>
-       p.data
-        .getResults()
-        .flatMap((r) => Option.wrap({
-          period: p.period,
-          current: p.current,
-          total: p.total,
-          isBusy: p.isBusy,
-          hasError: p.hasError,
-          data: r
-        })));
-      if (_.find(results, (r) => r.isNone())) {
-        return this.renderMsg(<span>
-          <span className="esper-spinner" />{" "}
-          { Text.ChartCalculating }
-        </span>);
-      }
-
-      var data = Option.flatten(results);
-      if (_.every(data, (d) => this.noData(d.data))) {
-        return this.props.simplified ?
-          <span /> : this.renderMsg(Text.ChartNoData)
-      }
-
-      return this.renderMain(data);
-    }
-
-    renderMsg(elm: JSX.Element|string) {
-      return <div className="esper-no-content">
-        {elm}
+      return <div className="chart-content">
+        { simplified ? null : <TotalsBar {...result.group.all} /> }
+        <PieChart
+          { ... { simplified, series } }
+          yAxis={`${groupBy.name} (${Text.ChartPercentUnit})`}
+        />
       </div>;
     }
-
-    abstract noData(data: T): boolean;
-
-    abstract renderMain(data: Charting.PeriodData<T>[])
-      : JSX.Element;
   }
 
-  /*
-    Default chart option for group data
-  */
-  export abstract class DefaultGroupingChart<T>
-    extends Chart<Types.EventOptGrouping, T> {
+  // Shows duration with each event segmented out
+  export class BarDurationChart extends GroupDurationChart {
+    renderResult(result: Types.GroupState) {
+      if (result.group.all.totalUnique === 0) {
+        return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
+      }
 
-    noData(data: Types.EventOptGrouping) {
-      return _.isEmpty(data.none.annotations) && _.isEmpty(data.some);
+      let { groupBy, simplified } = this.props;
+      let { categories, series } = Charting.eventSeries(
+        result.group, this.props, {
+          yFn: EventStats.toHours
+        });
+
+      return <div className="chart-content">
+        { simplified ? null : <TotalsBar {...result.group.all} /> }
+        <BarChart
+          { ... { simplified, categories, series }}
+          yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
+        />
+      </div>;
     }
   }
-
-  export abstract class DefaultChart extends DefaultGroupingChart<{}> {}
 }
