@@ -156,7 +156,7 @@ module Esper.Actions.Teams {
       return Api.putSyncedLabels(update.teamId, {
         labels: _.map(update.labels, (l) => l.original)
       }).then(() => Api.batch(function() {
-        return Util.when(_.map(update.labels, (l) => 
+        return $.when.apply($, _.map(update.labels, (l) =>
           Api.setLabelColor(update.teamId, {
             label: l.original,
             color: l.color
