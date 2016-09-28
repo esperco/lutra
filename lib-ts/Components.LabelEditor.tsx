@@ -155,13 +155,12 @@ module Esper.Components {
     // New label
     toggle(labelStr: string, label?: Types.LabelBase) {
       if (!label) {
-        label = {
+        label = _.find(this.state.labels, {id: Labels.getNorm(labelStr)}) || {
           id: Labels.getNorm(labelStr),
           displayAs: labelStr,
           color: Colors.getNewColorForLabel()
         };
       }
-      console.info(label);
       let isSelected = this.isSelected(label.id);
       this.props.onSelect(label, isSelected === "some" || !isSelected);
       this._input.reset();
