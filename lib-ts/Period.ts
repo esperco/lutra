@@ -56,4 +56,49 @@ module Esper.Period {
     }
     return ret;
   }
+
+  // Converts single period to range version (adds some intervals)
+  export function toRange(period: Types.Period, maxDate?: Date): Types.Period {
+    if (period.interval === "day") { // No day ranges allowed, make week
+      let [start, end] = bounds(period);
+      period = fromDates("week", start, end);
+    } else {
+      period = _.clone(period);
+    }
+
+    if (period.start === period.end) {
+      switch (period.interval) {
+        case "quarter":
+          period.end += 1;
+          break;
+        case "month":
+          period.end += 2;
+          break;
+        default: // Week
+          period.end += 4;
+          break;
+      }
+
+      // Don't go past max
+      if (maxDate) {
+        let [start, end] = Period.bounds(period);
+        if (end.getTime() > maxDate.getTime()) {
+          period.end = Period.fromDates(period.interval,
+            maxDate, maxDate
+          ).end;
+        }
+      }
+    }
+
+    return period;
+  }
+
+  // Converts range period to single version (just uses the first interval)
+  export function toSingle(period: Types.Period): Types.Period {
+    return {
+      interval: period.interval,
+      start: period.start,
+      end: period.start
+    };
+  }
 }

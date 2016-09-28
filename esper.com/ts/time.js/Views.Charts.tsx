@@ -51,6 +51,9 @@ module Esper.Views {
           <div id="chart-header" className="esper-content-header">
             <Components.PeriodSelector
               period={this.props.period}
+              range={_.includes([
+                "absolute-series", "percent-series"
+              ], this.props.extra.type)}
               updateFn={(p) => this.updatePeriod(p)}
             />
             <div className="actions">
@@ -101,7 +104,17 @@ module Esper.Views {
             <div className="btn-group">
               { this.renderTypeButton("absolute",
                                       Text.ChartAbsolute,
-                                      "fa-bar-chart") }
+                                      "fa-align-left") }
+            </div>
+            <div className="btn-group">
+              { this.renderTypeButton("percent-series",
+                                      Text.ChartPercentageSeries,
+                                      "fa-tasks fa-rotate-90") }
+            </div>
+            <div className="btn-group">
+              { this.renderTypeButton("absolute-series",
+                                      Text.ChartAbsoluteSeries,
+                                      "fa-line-chart") }
             </div>
           </div>
         </div>
@@ -196,9 +209,13 @@ module Esper.Views {
   // Actual chart
   function ChartContent(props: Props) {
     switch(props.extra.type) {
-      case "percent":     // Pie
+      case "percent-series":
+        return <Components.StackedBarDurationChart {...props} />;
+      case "absolute-series":
+        return <Components.LineDurationChart {...props} />;
+      case "percent":
         return <Components.PieDurationChart {...props} />;
-      default:            // Bar
+      default: // Absolute
         return <Components.BarDurationChart {...props} />;
     }
   }
@@ -255,7 +272,8 @@ module Esper.Views {
             updateHours={(x) => Charting.updateChart(props, {
               extra: { weekHours: x }
             })}
-            showUnscheduled={props.extra.type === "percent"}
+            showUnscheduled={props.extra.type === "percent" ||
+                             props.extra.type === "percent-series"}
             unscheduled={props.extra.incUnscheduled}
             updateUnscheduled={(x) => Charting.updateChart(props, {
               extra: { incUnscheduled: x }

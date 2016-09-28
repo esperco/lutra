@@ -6,6 +6,7 @@ module Esper.Components {
   export class PeriodSelector extends ReactHelpers.Component<{
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
+    range?: boolean;          // Range mode -> select more than one instance
     show?: Period.Interval[]; // Limit which intervals are available
   }, {}> {
     _dropdown: Dropdown;
@@ -19,6 +20,7 @@ module Esper.Components {
               min={Config.MIN_DATE}
               max={Config.MAX_DATE}
               interval="quarter"
+              range={this.props.range}
               selected={this.props.period}
               onUpdate={(p) => this.updateAndClose(p)}
             />
@@ -28,6 +30,7 @@ module Esper.Components {
               min={Config.MIN_DATE}
               max={Config.MAX_DATE}
               interval="month"
+              range={this.props.range}
               selected={this.props.period}
               onUpdate={(p) => this.updateAndClose(p)}
             />
@@ -36,6 +39,7 @@ module Esper.Components {
             return <CalendarWeekSelector
               min={Config.MIN_DATE}
               max={Config.MAX_DATE}
+              range={this.props.range}
               selected={Period.bounds(period)}
               onWeekSelect={(start, end) =>
                 this.updateAndClose(Period.fromDates("week", start, end))
@@ -55,17 +59,21 @@ module Esper.Components {
       })(period.interval);
 
       // Disable left/right arrows?
-      var disableLeft = (
+      var disableLeft = this.props.range || (
         Period.bounds(Period.add(period, -1))[0].getTime() <
         Config.MIN_DATE.getTime()
       );
-      var disableRight = (
+      var disableRight = this.props.range || (
         Period.bounds(Period.add(period, 1))[1].getTime() >
         Config.MAX_DATE.getTime()
       );
 
       // Intervals to show in selector
-      var intervals = this.props.show || ["day", "week", "month", "quarter"];
+      var intervals = this.props.show || (
+        this.props.range ?
+        ["week", "month", "quarter"] :      // No day for time series
+        ["week", "month", "quarter", "day"] // "Day" = custom
+      );
 
       return <div className="period-selector">
         { disableLeft ? <span /> :
@@ -129,31 +137,99 @@ module Esper.Components {
       case "week": return Text.Week;
       case "month": return Text.Month;
       case "quarter": return Text.Quarter;
-      default: return Text.Day;
+      default: return Text.Custom;
     }
   }
 
   // List of links to specific periods between min and max
-  function PeriodMenu({min, max, interval, selected, onUpdate} : {
+  interface PeriodMenuProps {
     min: Date;
     max: Date;
     interval: Types.Interval;
     selected?: Types.Period;
+    range?: boolean;
     onUpdate: (period: Types.Period) => void;
-  }) {
-    var periods: Types.Period[] = [];
-    var m = moment(min);
-    while (m.diff(max) < 0) {
-      periods.push(Period.fromDates(interval, m.toDate(), m.toDate()));
-      m.add(1, interval);
+  }
+
+  class PeriodMenu extends ReactHelpers.Component<PeriodMenuProps, {
+    lastSelected?: number;
+    hover?: number;
+  }> {
+    constructor(props: PeriodMenuProps) {
+      super(props);
+      this.state = {};
     }
-    return <ul className="esper-select-menu">{_.map( periods, (p) =>
-      <li key={p.start} onClick={() => onUpdate(p)}>
-        <a className={_.isEqual(selected, p) ? "active" : "" }>
-          { Text.fmtPeriod(p) }
-        </a>
-      </li>
-    )}</ul>;
+
+    render() {
+      let { min, max, interval, selected, onUpdate } = this.props;
+      let { start, end } = Period.fromDates(interval, min, max);
+      let range = _.range(start, end + 1);
+
+      return <ul className="esper-select-menu">{_.map( range, (r) =>
+        <li key={r} onClick={() => this.select(r)}
+            onMouseOver={() => this.updateHover(r, true)}
+            onMouseOut={() => this.updateHover(r, false)}>
+          <a className={classNames({ active: this.isHighlighted(r) })}>
+            { Text.fmtPeriod({
+              interval: this.props.interval,
+              start: r, end: r
+            }) }
+          </a>
+        </li>
+      )}</ul>;
+    }
+
+    select(index: number) {
+      if (this.props.range) {
+        if (_.isNumber(this.state.lastSelected) &&
+            index > this.state.lastSelected) {
+          this.props.onUpdate({
+            interval: this.props.interval,
+            start: this.state.lastSelected,
+            end: index
+          });
+        } else {
+          this.setState({
+            lastSelected: index,
+            hover: this.state.hover
+          });
+        }
+      } else {
+        this.props.onUpdate({
+          interval: this.props.interval,
+          start: index,
+          end: index
+        });
+      }
+    }
+
+    isHighlighted(index: number) {
+      // There's a previous selection, highlight if greater than last and less
+      // than hover
+      if (_.isNumber(this.state.lastSelected)) {
+        if (_.isNumber(this.state.hover)) {
+          return index >= this.state.lastSelected && index <= this.state.hover;
+        }
+        return index === this.state.lastSelected;
+      }
+
+      // No selection -- highlight if currently selected
+      return index === this.state.lastSelected ||
+             (index >= this.props.selected.start &&
+              index <= this.props.selected.end);
+    }
+
+    updateHover(index: number, hoverState: boolean) {
+      // Don't unset hover if not what you think it is
+      if (!hoverState && this.state.hover !== index) {
+        return;
+      }
+
+      this.setState({
+        lastSelected: this.state.lastSelected,
+        hover: hoverState ? index : null
+      });
+    }
   }
 
 
