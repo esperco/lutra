@@ -16,6 +16,12 @@ module Esper.Views {
     render() {
       return <div>
         <ReleaseNotes lastDismiss={Stores.ReleaseNotes.get()} />
+        { Login.data.is_sandbox_user ?
+          <div className="esper-release-notes esper-inverse pinned">
+            { Text.SandboxNotice }
+          </div>
+          : null
+        }
         <Views.Header />
         { this.props.children }
       </div>

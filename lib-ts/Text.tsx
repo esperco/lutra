@@ -16,6 +16,13 @@ module Esper.Text {
   export const ReleaseNotes = ReleaseNotesAugust2016;
   export const DismissNotes = "Click to Dismiss";
 
+  // Sandbox notice
+  export const SandboxNotice =
+    <a href="/login">
+      This is a demo account.
+      Click here to login with a regular account.
+    </a>
+
   // Basics
   export const Label = "tag";
   export const Labels = "tags";
