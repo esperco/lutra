@@ -97,7 +97,7 @@ module Esper.Views {
           <i className="fa fa-fw fa-th-list"></i>{" "}Event List
         </NavLink>
         { Login.data.is_sandbox_user ?
-          <NavLink path={Paths.Login.home()}>
+          <NavLink path={Paths.Login.home()} className="sandbox-sign-up">
             <i className="fa fa-fw fa-arrow-right"></i>{" "}Sign Up
           </NavLink> :
           <NavLink path={Paths.Manage.home()}>
@@ -138,6 +138,7 @@ module Esper.Views {
 
   interface NavLinkProps {
     path: Paths.Path;
+    className?: string;
     children?: JSX.Element[];
     hiddenXs?: boolean;
   }
@@ -148,7 +149,7 @@ module Esper.Views {
         active: Route.nav.isActive(this.props.path),
         "hidden-xs": this.props.hiddenXs
       })}>
-        <a href={this.props.path.href}>
+        <a href={this.props.path.href} className={this.props.className}>
           {this.props.children}
         </a>
       </li>;
