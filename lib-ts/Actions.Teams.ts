@@ -153,15 +153,20 @@ module Esper.Actions.Teams {
         labels: _.map(update.labels, (l) => l.original)
       });
 
-      return Api.putSyncedLabels(update.teamId, {
+      // FIXME: Batching does not seem to work
+      // return Api.batch(function() {
+      var p = Api.putSyncedLabels(update.teamId, {
         labels: _.map(update.labels, (l) => l.original)
-      }).then(() => Api.batch(function() {
-        return $.when.apply($, _.map(update.labels, (l) =>
-          Api.setLabelColor(update.teamId, {
-            label: l.original,
-            color: l.color
-          })));
-      }));
+      });
+
+      var promises = _.map(update.labels, (l) =>
+        Api.setLabelColor(update.teamId, {
+          label: l.original,
+          color: l.color
+        }));
+
+      return p.then(() => Util.when(promises));
+      // });
     },
 
     // Always use last update (put operation)
