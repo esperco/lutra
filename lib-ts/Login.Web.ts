@@ -169,15 +169,17 @@ module Esper.Login {
 
     // Intercom -> pass settings manually in case Segment is blocked. Wait
     // 10 seconds so as not to interfere with normal Segment loading process
-    setTimeout(() => {
-      window.intercomSettings = window.intercomSettings || {}
-      window.intercomSettings.user_id = loginInfo.uid;
-      window.intercomSettings.user_hash = loginInfo.uid_hash;
-      window.intercomSettings.email = loginInfo.email;
-      if ((<any> window).Intercom) { // Make sure intercom is loaded
-        Intercom("update", window.intercomSettings);
-      }
-    }, 10000);
+    if (! loginInfo.is_sandbox_user) {
+      setTimeout(() => {
+        window.intercomSettings = window.intercomSettings || {};
+        window.intercomSettings.user_id = loginInfo.uid;
+        window.intercomSettings.user_hash = loginInfo.uid_hash;
+        window.intercomSettings.email = loginInfo.email;
+        if ((<any> window).Intercom) { // Make sure intercom is loaded
+          Intercom("update", window.intercomSettings);
+        }
+      }, 10000);
+    }
 
     InfoStore.set("", Option.wrap(loginInfo), {
       dataStatus: Model2.DataStatus.READY
