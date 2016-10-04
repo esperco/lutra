@@ -39,12 +39,14 @@
   top: 0;
   left: 0;
   right: 0;
+  z-index: @zindex-navbar-fixed;
   text-align: center;
   font-size: @font-size-h5;
   height: @release-notes-height;
   line-height: @release-notes-height;
   vertical-align: middle;
-  padding-right: 10px;
+  padding: 0 @esper-base-padding 0 @esper-base-padding;
+  overflow: auto;
 }
 
 .esper-release-notes + * {
