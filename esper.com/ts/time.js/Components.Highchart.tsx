@@ -101,7 +101,8 @@ module Esper.Components {
 
         // Non-transparent background
         var exportOpts: HighchartsChartOptions = {
-          backgroundColor: '#FFFFFF'
+          backgroundColor: '#FFFFFF',
+          spacing: [25, 25, 50, 25]
         };
 
         // Make pie charts wider (to correct for label cut off)
@@ -117,7 +118,20 @@ module Esper.Components {
           type: "image/png",
           fallbackToExportServer: false
         }, {
-          chart: exportOpts
+          chart: exportOpts,
+          credits: {
+            enabled: true,
+            text: "Powered by Esper.com",
+            href: "https://esper.com", /* Probably doesn't matter for export
+                                          but override default Highcharts href
+                                          just in case */
+            position: {
+              x: -20, y: -20,
+              align: "right",
+              verticalAlign: "bottom"
+            },
+            style: { fontSize: "1.5em" }
+          }
         });
       }
     }
