@@ -95,6 +95,11 @@ module Esper.Period {
 
   // Converts range period to single version (just uses the first interval)
   export function toSingle(period: Types.Period): Types.Period {
+    // Day period -> treat as "custom"
+    if (period.interval === 'day') {
+      return period;
+    }
+
     return {
       interval: period.interval,
       start: period.start,
