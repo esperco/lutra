@@ -27,7 +27,7 @@ module Esper.Actions.Charts {
     }
 
     // Else, ensure this is a single period
-    else if (o.period.interval !== "day") {
+    else {
       o.period = Period.toSingle(o.period);
     }
 
