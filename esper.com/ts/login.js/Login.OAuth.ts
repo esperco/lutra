@@ -155,7 +155,7 @@ module Esper.Login {
     return path;
   }
 
-  export var MISSING_NONCE = "Loging nonce missing";
+  export var MISSING_NONCE = "Login nonce missing";
 
   /*
     This should be triggered after callback from OAuth -- returns promise
@@ -164,7 +164,6 @@ module Esper.Login {
   export function loginOnce(uid: string) {
     var loginNonce = getLoginNonce();
     if (! loginNonce) {
-      Log.e("Login nonce missing");
       throw new Error(MISSING_NONCE);
     }
 
