@@ -18,10 +18,20 @@ module Esper.Views {
       let cust = Stores.Customers.require(this.props.cusId);
       if (! cust) return <span />;
 
-      let subMenu = <Components.CustomerSettingsMenu
-        cust={cust}
-        pathFn={this.pathFn}
-      />;
+      let subMenu = <Components.SettingsMenu>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Customer.general}>
+          { Text.CustomerGeneral }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Customer.accounts}>
+          { Text.CustomerAccounts }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Customer.pay}>
+          { Text.CustomerPay }
+        </Components.SettingsMenuLink>
+      </Components.SettingsMenu>;
 
       return <Views.Settings {...this.props} subMenu={subMenu}>
         { this.renderMain(cust) }

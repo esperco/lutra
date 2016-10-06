@@ -18,10 +18,24 @@ module Esper.Views {
       let team = Stores.Teams.require(this.props.teamId);
       if (! team) return <span />;
 
-      let subMenu = <Components.TeamSettingsMenu
-        teamId={this.props.teamId}
-        pathFn={this.pathFn}
-      />;
+      let subMenu = <Components.SettingsMenu>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Team.general}>
+          { Text.GeneralSettings }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Team.calendars}>
+          { Text.Calendar }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Team.labels}>
+          { Text.Labels }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Team.notifications}>
+          { Text.NotificationSettings }
+        </Components.SettingsMenuLink>
+      </Components.SettingsMenu>;
 
       return <Views.Settings {...this.props} subMenu={subMenu}>
         { this.renderMain(team) }

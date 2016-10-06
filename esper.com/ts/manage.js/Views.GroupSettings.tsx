@@ -18,10 +18,25 @@ module Esper.Views {
       let group = Stores.Groups.require(this.props.groupId);
       if (! group) return <span />;
 
-      let subMenu = <Components.GroupSettingsMenu
-        group={group}
-        pathFn={this.pathFn}
-      />;
+      let me = _.find(group.group_individuals,
+        (gim) => gim.uid === Login.myUid()
+      );
+
+      let subMenu = <Components.SettingsMenu>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Group.general}>
+          { Text.GeneralSettings }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Group.labels}>
+          { Text.Labels }
+        </Components.SettingsMenuLink>
+        { me && me.role !== "Member" ?
+          <Components.SettingsMenuLink {...this.props}
+              href={Paths.Manage.Group.notifications}>
+            { Text.NotificationSettings }
+          </Components.SettingsMenuLink> : null }
+      </Components.SettingsMenu>;
 
       return <Views.Settings {...this.props} subMenu={subMenu}>
         { this.renderMain(group) }
