@@ -16,62 +16,43 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.PersonalSettings);
   }
 
-  export function renderTeamGeneralSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
+
+  /* Team Settings */
+
+  interface SettingProps {
+    err?: string;
+    msg?: string;
+  }
+
+  interface TeamSettingProps extends SettingProps {
+    teamId: string;
+  }
+
+  export function renderTeamGeneralSettings(props: TeamSettingProps)
   {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.TeamGeneralSettings teamId={teamId}
-            msg={msg} err={err} />);
+    render(<Views.TeamGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderCalendarSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-
-    Stores.Calendars.fetchAvailable(teamId);
-    render(<Views.CalendarSettings teamId={teamId}
-            msg={msg} err={err}  />);
+  export function renderCalendarSettings(props: TeamSettingProps) {
+    Stores.Calendars.fetchAvailable(props.teamId);
+    render(<Views.CalendarSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderTeamLabelSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.TeamLabelSettings teamId={teamId}
-            msg={msg} err={err}  />);
+  export function renderTeamLabelSettings(props: TeamSettingProps) {
+    render(<Views.TeamLabelSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderTeamNotificationSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-
-    Stores.TeamPreferences.checkSlack(teamId);
-    render(<Views.TeamNotificationSettings teamId={teamId}
-            msg={msg} err={err} />);
+  export function renderTeamNotificationSettings(props: TeamSettingProps) {
+    Stores.TeamPreferences.checkSlack(props.teamId);
+    render(<Views.TeamNotificationSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderTeamPaySettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.TeamPaySettings teamId={teamId}
-            msg={msg} err={err} />);
+  export function renderTeamPaySettings(props: TeamSettingProps) {
+    render(<Views.TeamPaySettings {...props} />);
     Analytics.page(Analytics.Page.TeamPay);
   }
 
@@ -80,36 +61,25 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.NewTeam);
   }
 
-  export function renderGroupGeneralSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupGeneralSettings groupId={groupId}
-            msg={msg} err={err} />);
+
+  /* Group Settings */
+
+  interface GroupSettingProps extends SettingProps {
+    groupId: string;
+  }
+
+  export function renderGroupGeneralSettings(props: GroupSettingProps) {
+    render(<Views.GroupGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderGroupLabelSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupLabelSettings groupId={groupId}
-            msg={msg} err={err} />);
+  export function renderGroupLabelSettings(props: GroupSettingProps) {
+    render(<Views.GroupLabelSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderGroupNotificationSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupNotificationSettings groupId={groupId}
-            msg={msg} err={err} />);
+  export function renderGroupNotificationSettings(props: GroupSettingProps) {
+    render(<Views.GroupNotificationSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
@@ -118,33 +88,25 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.NewGroup);
   }
 
-  export function renderCustomerGeneralSettings(custId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    custId = Params.cleanCustomerId(custId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.CustomerGeneralSettings {...{custId, msg, err}}/>);
+
+  /* Customer Settings*/
+
+  interface CustomerSettingProps extends SettingProps {
+    custId: string;
+  }
+
+  export function renderCustomerGeneralSettings(props: CustomerSettingProps) {
+    render(<Views.CustomerGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.CustomerManage);
   }
 
-  export function renderCustomerAccountsSettings(custId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    custId = Params.cleanCustomerId(custId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.CustomerAccountsSettings {...{custId, msg, err}}/>);
+  export function renderCustomerAccountsSettings(props: CustomerSettingProps) {
+    render(<Views.CustomerAccountsSettings {...props} />);
     Analytics.page(Analytics.Page.CustomerAccounts);
   }
 
-  export function renderCustomerPaySettings(custId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    custId = Params.cleanCustomerId(custId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.CustomerPaySettings {...{custId, msg, err}}/>);
+  export function renderCustomerPaySettings(props: CustomerSettingProps) {
+    render(<Views.CustomerPaySettings {...props} />);
     Analytics.page(Analytics.Page.CustomerPay);
   }
 
@@ -152,6 +114,9 @@ module Esper.Actions {
     render(<Views.NewCustomer />);
     Analytics.page(Analytics.Page.NewCustomer);
   }
+
+
+  /* Misc */
 
   export function renderSandbox() {
     render(<Views.Sandbox />);
