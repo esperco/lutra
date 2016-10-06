@@ -39,21 +39,40 @@ module Esper.Route {
     redirectPath(Paths.Manage.Team.general())
   );
 
-  route(Paths.Manage.newTeam().hash, demoCheck, function() {
-    Actions.renderNewTeam();
-  });
+  /* Render pages that require pathFn to be passed to it */
 
-  route(Paths.Manage.newGroup().hash, demoCheck, function() {
-    Actions.renderNewGroup();
-  });
+  function routeSettings(pathFn: () => Paths.Path,
+                         cb: (x: {
+                           msg?: string;
+                           err?: string;
+                           pathFn: () => Paths.Path;
+                         }) => void)
+  {
+    route(pathFn().hash, demoCheck, function(ctx) {
+      let msgCode = Util.getParamByName("msg", ctx.querystring);
+      let msg = ManageMsg.get(msgCode);
+      let errCode = Util.getParamByName("err", ctx.querystring);
+      let err = ManageMsg.get(errCode);
+      cb({ pathFn, msg, err });
+    });
+  }
 
-  route(Paths.Manage.newCustomer().hash, demoCheck, function(ctx) {
-    Actions.renderNewCustomer();
-  });
+  routeSettings(Paths.Manage.newTeam, Actions.renderNewTeam);
+  routeSettings(Paths.Manage.newGroup, Actions.renderNewGroup);
+  routeSettings(Paths.Manage.newCustomer, Actions.renderNewCustomer);
+  routeSettings(Paths.Manage.personal, Actions.renderPersonalSettings);
+
+
+  /* Render team-specific setting pages */
 
   function routeTeam(
     pathFn: (x: {teamId?: string}) => Paths.Path,
-    cb: (x: {teamId: string, msg?: string, err?: string}) => void
+    cb: (x: {
+      teamId: string,
+      pathFn: (x: {teamId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
   ) {
     route(pathFn({teamId: ":teamId?"}).hash,
       onboardingCheck,
@@ -63,7 +82,7 @@ module Esper.Route {
         let msg = ManageMsg.get(msgCode);
         let errCode = Util.getParamByName("err", ctx.querystring);
         let err = ManageMsg.get(errCode);
-        cb({teamId, msg, err});
+        cb({teamId, pathFn, msg, err});
       }
     )
   }
@@ -75,14 +94,17 @@ module Esper.Route {
             Actions.renderTeamNotificationSettings);
   routeTeam(Paths.Manage.Team.pay, Actions.renderTeamPaySettings);
 
-  route(Paths.Manage.personal().hash, demoCheck, function(ctx) {
-    Actions.renderPersonalSettings();
-  });
 
+  /* Render group-specifi settings pages */
 
   function routeGroup(
     pathFn: (x: {groupId?: string}) => Paths.Path,
-    cb: (x: {groupId: string, msg?: string, err?: string}) => void
+    cb: (x: {
+      groupId: string,
+      pathFn: (x: {groupId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
   ) {
     route(pathFn({groupId: ":groupId?"}).hash,
       groupCheck,
@@ -92,7 +114,7 @@ module Esper.Route {
         let msg = ManageMsg.get(msgCode);
         let errCode = Util.getParamByName("err", ctx.querystring);
         let err = ManageMsg.get(errCode);
-        cb({groupId, msg, err});
+        cb({groupId, pathFn, msg, err});
       }
     )
   }
@@ -103,9 +125,16 @@ module Esper.Route {
              Actions.renderGroupNotificationSettings);
 
 
+  /* Render customer-specific settings pages */
+
   function routeCustomer(
     pathFn: (x: {cusId?: string}) => Paths.Path,
-    cb: (x: {cusId: string, msg?: string, err?: string}) => void
+    cb: (x: {
+      cusId: string,
+      pathFn: (x: {cusId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
   ) {
     route(pathFn({cusId: ":cusId?"}).hash,
       demoCheck,
@@ -115,7 +144,7 @@ module Esper.Route {
         let msg = ManageMsg.get(msgCode);
         let errCode = Util.getParamByName("err", ctx.querystring);
         let err = ManageMsg.get(errCode);
-        cb({cusId, msg, err});
+        cb({cusId, pathFn, msg, err});
       }
     )
   }
@@ -127,6 +156,8 @@ module Esper.Route {
   routeCustomer(Paths.Manage.Customer.pay,
                 Actions.renderCustomerPaySettings);
 
+
+  /* Misc */
 
   route(Paths.Manage.sandbox().hash, Actions.renderSandbox);
 

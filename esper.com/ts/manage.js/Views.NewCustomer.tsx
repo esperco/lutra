@@ -3,25 +3,14 @@
 */
 
 module Esper.Views {
-  interface Props {
-  }
+  interface Props extends Types.SettingsPageProps {}
 
+  // TODO
   export class NewCustomer extends ReactHelpers.Component<Props, {}> {
     renderWithData() {
-      return <div className="team-settings-page esper-expanded">
-        <Components.ManageSidebar
-          teams={Stores.Teams.all()}
-          customers={Stores.Customers.all()}
-          groups={Stores.Groups.all()}
-          newCustomer={true}
-        />
-
-        <div className="esper-content padded">
-          <div id="new-customer-page" className="esper-expanded">
-            Hello world
-          </div>
-        </div>
-      </div>;
+      return <Views.Settings {...this.props}>
+        New Customer Page
+      </Views.Settings>;
     }
   }
 }

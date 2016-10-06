@@ -5,23 +5,10 @@
 */
 
 module Esper.Views {
-  export class PersonalSettings extends ReactHelpers.Component<{}, {}> {
-    renderWithData() {
-      return <div className="esper-expanded">
-        <Components.ManageSidebar
-          teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}
-          customers={Stores.Customers.all()}
-          activePersonal={true}
-        />
-
-        <div className="esper-content">
-          <div className="esper-expanded">
-            <Deactivate />
-          </div>
-        </div>
-      </div>;
-    }
+  export function PersonalSettings(props: Types.SettingsPageProps) {
+    return <Views.Settings {...props}>
+      <Deactivate />
+    </Views.Settings>;
   }
 
   /* Deactivate Account = really just remove calendars */

@@ -3,7 +3,7 @@
 */
 
 module Esper.Views {
-  interface Props {
+  interface Props extends Types.SettingsPageProps {
     isAdmin?: boolean;
   }
 
@@ -12,44 +12,34 @@ module Esper.Views {
   }> {
     _groupForm: Components.NewGroupForm;
 
-    constructor(props: {}) {
+    constructor(props: Props) {
       super(props);
       this.state = { busy: false }
     }
 
     renderWithData() {
-      return <div className="team-settings-page esper-expanded">
-        <Components.ManageSidebar
-          teams={Stores.Teams.all()}
-          customers={Stores.Customers.all()}
-          groups={Stores.Groups.all()}
-          newGroup={true} />
-
-        <div className="esper-content padded">
-          <div id="new-group-page" className="esper-expanded">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                { Text.AddGroupHeading }
-              </div>
-              <div className="panel-body">
-                <div className="alert alert-info text-center">
-                  { Text.GroupDescription }
-                </div>
-                <Components.NewGroupForm isAdmin={this.props.isAdmin}
-                  ref={(c) => this._groupForm = c}
-                  teams={Stores.Teams.all()}
-                  userCalendars={Stores.Calendars.listAllForUser()}
-                  onSubmit={() => this.save()}
-                />
-              </div>
-              <Components.ModalPanelFooter
-                busy={this.state.busy} disableOK={this.state.busy}
-                okText="Save" onOK={() => this.save()}
-              />
-            </div>
+      return <Views.Settings {...this.props}>
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            { Text.AddGroupHeading }
           </div>
+          <div className="panel-body">
+            <div className="alert alert-info text-center">
+              { Text.GroupDescription }
+            </div>
+            <Components.NewGroupForm isAdmin={this.props.isAdmin}
+              ref={(c) => this._groupForm = c}
+              teams={Stores.Teams.all()}
+              userCalendars={Stores.Calendars.listAllForUser()}
+              onSubmit={() => this.save()}
+            />
+          </div>
+          <Components.ModalPanelFooter
+            busy={this.state.busy} disableOK={this.state.busy}
+            okText="Save" onOK={() => this.save()}
+          />
         </div>
-      </div>;
+      </Views.Settings>;
     }
 
     save() {

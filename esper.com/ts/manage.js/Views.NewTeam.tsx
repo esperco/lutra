@@ -3,45 +3,35 @@
 */
 
 module Esper.Views {
+  interface Props extends Types.SettingsPageProps {}
 
-  export class NewTeam extends ReactHelpers.Component<{}, {
+  export class NewTeam extends ReactHelpers.Component<Props, {
     busy?: boolean;
   }> {
     _teamForm: Components.NewTeamForm;
 
-    constructor(props: {}) {
+    constructor(props: Props) {
       super(props);
       this.state = { busy: false }
     }
 
     renderWithData() {
-      return <div className="team-settings-page esper-expanded">
-        <Components.ManageSidebar
-          teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}
-          customers={Stores.Customers.all()}
-          newTeam={true}
-        />
-
-        <div className="esper-content">
-          <div id="new-team-page" className="esper-expanded">
-            <div className="panel panel-default">
-              <div className="panel-heading">
-                { Text.AddTeamHeading }
-              </div>
-              <div className="panel-body">
-                <Components.NewTeamForm supportsExec={true}
-                  ref={(c) => this._teamForm = c}
-                />
-              </div>
-              <Components.ModalPanelFooter
-                busy={this.state.busy} disableOK={this.state.busy}
-                okText="Save" onOK={() => this.save()}
-              />
-            </div>
+      return <Views.Settings {...this.props}>
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            { Text.AddTeamHeading }
           </div>
+          <div className="panel-body">
+            <Components.NewTeamForm supportsExec={true}
+              ref={(c) => this._teamForm = c}
+            />
+          </div>
+          <Components.ModalPanelFooter
+            busy={this.state.busy} disableOK={this.state.busy}
+            okText="Save" onOK={() => this.save()}
+          />
         </div>
-      </div>;
+      </Views.Settings>;
     }
 
     save() {

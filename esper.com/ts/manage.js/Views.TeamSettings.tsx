@@ -5,49 +5,27 @@
 */
 
 module Esper.Views {
-  interface Props {
+  // TeamID required
+  interface Props extends Types.SettingsPageProps {
     teamId: string;
-    msg?: string;
-    err?: string;
   }
 
-  export abstract class TeamSettings extends ReactHelpers.Component<Props, {}> {
+  export abstract class TeamSettings
+         extends ReactHelpers.Component<Props, {}> {
     pathFn: (p: {teamId: string}) => Paths.Path;
 
     renderWithData() {
-      var team = Stores.Teams.require(this.props.teamId);
+      let team = Stores.Teams.require(this.props.teamId);
       if (! team) return <span />;
 
-      return <div className="team-settings-page esper-expanded">
-        <Components.ManageSidebar
-          activeTeamId={this.props.teamId}
-          teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}
-          customers={Stores.Customers.all()}
-          pathFn={this.pathFn}
-        />
+      let subMenu = <Components.TeamSettingsMenu
+        teamId={this.props.teamId}
+        pathFn={this.pathFn}
+      />;
 
-        <div className="esper-content">
-          <Components.TeamSettingsMenu
-            teamId={this.props.teamId}
-            pathFn={this.pathFn}
-          />
-
-          <div className="esper-expanded">
-            {
-              this.props.msg ?
-              <div className="alert msg alert-info">{ this.props.msg }</div> :
-              null
-            }
-            {
-              this.props.err ?
-              <div className="alert msg alert-danger">{ this.props.err }</div> :
-              null
-            }
-            { this.renderMain(team) }
-          </div>
-        </div>
-      </div>;
+      return <Views.Settings {...this.props} subMenu={subMenu}>
+        { this.renderMain(team) }
+      </Views.Settings>
     }
 
     abstract renderMain(team: ApiT.Team): JSX.Element;

@@ -1,53 +1,31 @@
 /*
   Base class for a group settings view
 
-  Override renderMain funciton
+  Override renderMain function
 */
 
 module Esper.Views {
-  interface Props {
+  // GroupID required
+  interface Props extends Types.SettingsPageProps {
     groupId: string;
-    msg?: string;
-    err?: string;
   }
 
-  export abstract class GroupSettings extends ReactHelpers.Component<Props, {}> {
+  export abstract class GroupSettings
+         extends ReactHelpers.Component<Props, {}> {
     pathFn: (p: {groupId: string}) => Paths.Path;
 
     renderWithData() {
-      var group = Stores.Groups.require(this.props.groupId);
+      let group = Stores.Groups.require(this.props.groupId);
       if (! group) return <span />;
 
-      return <div className="group-settings-page esper-expanded">
-        <Components.ManageSidebar
-          activeGroupId={this.props.groupId}
-          teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}
-          customers={Stores.Customers.all()}
-          pathFn={this.pathFn}
-        />
+      let subMenu = <Components.GroupSettingsMenu
+        group={group}
+        pathFn={this.pathFn}
+      />;
 
-        <div className="esper-content padded">
-          <Components.GroupSettingsMenu
-            group={group}
-            pathFn={this.pathFn}
-          />
-
-          <div className="esper-expanded">
-            {
-              this.props.msg ?
-              <div className="alert msg alert-info">{ this.props.msg }</div> :
-              null
-            }
-            {
-              this.props.err ?
-              <div className="alert msg alert-danger">{ this.props.err }</div> :
-              null
-            }
-            { this.renderMain(group) }
-          </div>
-        </div>
-      </div>;
+      return <Views.Settings {...this.props} subMenu={subMenu}>
+        { this.renderMain(group) }
+      </Views.Settings>
     }
 
     abstract renderMain(group: ApiT.Group): JSX.Element;

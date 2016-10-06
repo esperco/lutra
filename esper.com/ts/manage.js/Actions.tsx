@@ -11,8 +11,10 @@ module Esper.Actions {
     </Views.App>);
   }
 
-  export function renderPersonalSettings() {
-    render(<Views.PersonalSettings />);
+  export function renderPersonalSettings(props: {
+    pathFn?: () => Paths.Path
+  }) {
+    render(<Views.PersonalSettings {...props} />);
     Analytics.page(Analytics.Page.PersonalSettings);
   }
 
@@ -26,6 +28,7 @@ module Esper.Actions {
 
   interface TeamSettingProps extends SettingProps {
     teamId: string;
+    pathFn: (x: {teamId?: string}) => Paths.Path;
   }
 
   export function renderTeamGeneralSettings(props: TeamSettingProps)
@@ -56,8 +59,8 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamPay);
   }
 
-  export function renderNewTeam() {
-    render(<Views.NewTeam />);
+  export function renderNewTeam(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewTeam {...props} />);
     Analytics.page(Analytics.Page.NewTeam);
   }
 
@@ -66,6 +69,7 @@ module Esper.Actions {
 
   interface GroupSettingProps extends SettingProps {
     groupId: string;
+    pathFn: (x: {groupId?: string}) => Paths.Path;
   }
 
   export function renderGroupGeneralSettings(props: GroupSettingProps) {
@@ -83,8 +87,8 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderNewGroup() {
-    render(<Views.NewGroup />);
+  export function renderNewGroup(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewGroup {...props} />);
     Analytics.page(Analytics.Page.NewGroup);
   }
 
@@ -93,6 +97,7 @@ module Esper.Actions {
 
   interface CustomerSettingProps extends SettingProps {
     cusId: string;
+    pathFn: (x: {cusId?: string}) => Paths.Path;
   }
 
   export function renderCustomerGeneralSettings(props: CustomerSettingProps) {
@@ -110,8 +115,8 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.CustomerPay);
   }
 
-  export function renderNewCustomer() {
-    render(<Views.NewCustomer />);
+  export function renderNewCustomer(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewCustomer {...props} />);
     Analytics.page(Analytics.Page.NewCustomer);
   }
 
