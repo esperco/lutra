@@ -206,6 +206,10 @@ module Esper.Paths {
       return optPath(prefix, "new-group");
     }
 
+    export function newCustomer() {
+      return optPath(prefix, "new-customer");
+    }
+
     export function sandbox() {
       return optPath(prefix, "sandbox");
     }
@@ -228,10 +232,14 @@ module Esper.Paths {
       export function notifications({teamId} : {teamId?: string} = {}) {
         return optPath(prefix, subprefix, "notifications", teamId);
       }
+
+      export function pay({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix, "pay", teamId);
+      }
     }
 
     export module Group {
-      export const subprefix = "group"
+      export const subprefix = "group";
 
       export function general({groupId} : {groupId?: string} = {}) {
         return optPath(prefix, subprefix, "general", groupId);
@@ -243,6 +251,23 @@ module Esper.Paths {
 
       export function notifications({groupId} : {groupId?: string} = {}) {
         return optPath(prefix, subprefix, "notifications", groupId);
+      }
+    }
+
+    // For "enterprise" customers
+    export module Customer {
+      export const subprefix = "customer";
+
+      export function general({custId}: {custId?: string} = {}) {
+        return optPath(prefix, subprefix, "general", custId);
+      }
+
+      export function accounts({custId}: {custId?: string} = {}) {
+        return optPath(prefix, subprefix, "accounts", custId);
+      }
+
+      export function pay({custId} : {custId?: string} = {}) {
+        return optPath(prefix, subprefix, "pay", custId);
       }
     }
   }
