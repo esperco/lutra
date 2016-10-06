@@ -162,7 +162,7 @@ module Esper.Actions.Teams {
       var promises = _.map(update.labels, (l) =>
         Api.setLabelColor(update.teamId, {
           label: l.original,
-          color: l.color
+          color: l.color || Colors.getNewColorForLabel()
         }));
 
       return p.then(() => Util.when(promises));

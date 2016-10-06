@@ -547,7 +547,7 @@ module Esper.Stores.Events {
     Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
-    return event.labelScores.match({
+    return event.attendScore > 0 && (event.labelScores.match({
 
       // None => no label or user action, so can confirm  empty
       none: () => true,
@@ -561,7 +561,7 @@ module Esper.Stores.Events {
       */
       some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
                         _.some(event.hashtags, (h) => !_.isBoolean(h.approved))
-    }) || (event.attendScore > 0 && event.attendScore < 1);
+    }) || (event.attendScore < 1));
   }
 
   export function getTeams(events: TeamEvent[]) {
