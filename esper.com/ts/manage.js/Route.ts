@@ -104,18 +104,18 @@ module Esper.Route {
 
 
   function routeCustomer(
-    pathFn: (x: {custId?: string}) => Paths.Path,
-    cb: (x: {custId: string, msg?: string, err?: string}) => void
+    pathFn: (x: {cusId?: string}) => Paths.Path,
+    cb: (x: {cusId: string, msg?: string, err?: string}) => void
   ) {
-    route(pathFn({custId: ":custId?"}).hash,
+    route(pathFn({cusId: ":cusId?"}).hash,
       demoCheck,
       function(ctx) {
-        let custId = Params.cleanCustomerId(ctx.params["custId"])
+        let cusId = Params.cleanCustomerId(ctx.params["cusId"])
         let msgCode = Util.getParamByName("msg", ctx.querystring);
         let msg = ManageMsg.get(msgCode);
         let errCode = Util.getParamByName("err", ctx.querystring);
         let err = ManageMsg.get(errCode);
-        cb({custId, msg, err});
+        cb({cusId, msg, err});
       }
     )
   }

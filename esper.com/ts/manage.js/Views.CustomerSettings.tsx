@@ -6,22 +6,22 @@
 
 module Esper.Views {
   interface Props {
-    custId: string;
+    cusId: string;
     msg?: string;
     err?: string;
   }
 
   export abstract class CustomerSettings
          extends ReactHelpers.Component<Props, {}> {
-    pathFn: (p: {custId: string}) => Paths.Path;
+    pathFn: (p: {cusId: string}) => Paths.Path;
 
     renderWithData() {
-      var cust = Stores.Customers.require(this.props.custId);
+      var cust = Stores.Customers.require(this.props.cusId);
       if (! cust) return <span />;
 
       return <div className="customer-settings-page esper-expanded">
         <Components.ManageSidebar
-          activeCustId={this.props.custId}
+          activeCustId={this.props.cusId}
           teams={Stores.Teams.all()}
           groups={Stores.Groups.all()}
           customers={Stores.Customers.all()}

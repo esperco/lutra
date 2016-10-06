@@ -258,16 +258,16 @@ module Esper.Paths {
     export module Customer {
       export const subprefix = "customer";
 
-      export function general({custId}: {custId?: string} = {}) {
-        return optPath(prefix, subprefix, "general", custId);
+      export function general({cusId}: {cusId?: string} = {}) {
+        return optPath(prefix, subprefix, "general", cusId);
       }
 
-      export function accounts({custId}: {custId?: string} = {}) {
-        return optPath(prefix, subprefix, "accounts", custId);
+      export function accounts({cusId}: {cusId?: string} = {}) {
+        return optPath(prefix, subprefix, "accounts", cusId);
       }
 
-      export function pay({custId} : {custId?: string} = {}) {
-        return optPath(prefix, subprefix, "pay", custId);
+      export function pay({cusId} : {cusId?: string} = {}) {
+        return optPath(prefix, subprefix, "pay", cusId);
       }
     }
   }

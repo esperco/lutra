@@ -5,26 +5,26 @@
 module Esper.Components {
   export function CustomerSettingsMenu({cust, pathFn}: {
     cust: ApiT.Customer;
-    pathFn?: (p: {custId: string}) => Paths.Path;
+    pathFn?: (p: {cusId: string}) => Paths.Path;
   }) {
-    var custId = cust.id;
+    var cusId = cust.id;
     return <div className="esper-content-header settings-menu fixed padded">
-      <SettingsMenuLink custId={custId} text={Text.CustomerGeneral}
+      <SettingsMenuLink cusId={cusId} text={Text.CustomerGeneral}
         pathFn={Paths.Manage.Customer.general} activePathFn={pathFn} />
-      <SettingsMenuLink custId={custId} text={Text.CustomerAccounts}
+      <SettingsMenuLink cusId={cusId} text={Text.CustomerAccounts}
         pathFn={Paths.Manage.Customer.accounts} activePathFn={pathFn} />
-      <SettingsMenuLink custId={custId} text={Text.CustomerPay}
+      <SettingsMenuLink cusId={cusId} text={Text.CustomerPay}
         pathFn={Paths.Manage.Customer.pay} activePathFn={pathFn} />
     </div>;
   }
 
-  function SettingsMenuLink({custId, text, pathFn, activePathFn}: {
-    custId: string;
+  function SettingsMenuLink({cusId, text, pathFn, activePathFn}: {
+    cusId: string;
     text: string|JSX.Element;
-    pathFn: (p: {custId: string}) => Paths.Path;
-    activePathFn?: (p: {custId: string}) => Paths.Path;
+    pathFn: (p: {cusId: string}) => Paths.Path;
+    activePathFn?: (p: {cusId: string}) => Paths.Path;
   }) {
-    return <a href={pathFn({custId: custId}).href}
+    return <a href={pathFn({cusId: cusId}).href}
               className={classNames("esper-subheader-link", {
                 active: activePathFn === pathFn
               })}>

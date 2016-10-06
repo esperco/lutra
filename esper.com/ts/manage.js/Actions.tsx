@@ -92,7 +92,7 @@ module Esper.Actions {
   /* Customer Settings*/
 
   interface CustomerSettingProps extends SettingProps {
-    custId: string;
+    cusId: string;
   }
 
   export function renderCustomerGeneralSettings(props: CustomerSettingProps) {
