@@ -79,6 +79,14 @@ module Esper.Route {
       Actions.renderTeamNotificationSettings(ctx.params["teamId"], msg, err);
     });
 
+  route(Paths.Manage.Team.pay({teamId: ":teamId?"}).hash,
+    onboardingCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderTeamPaySettings(ctx.params["teamId"], msg, err);
+    });
+
   route(Paths.Manage.personal().hash, demoCheck, function(ctx) {
     Actions.renderPersonalSettings();
   });
@@ -104,6 +112,36 @@ module Esper.Route {
       var err = Util.getParamByName("err", ctx.querystring);
       Actions.renderGroupNotificationSettings(ctx.params["groupId"], msg, err);
   });
+
+  route(Paths.Manage.newCustomer().hash,
+    demoCheck,
+    function(ctx) {
+      Actions.renderNewCustomer();
+    });
+
+  route(Paths.Manage.Customer.general({custId: ":custId?"}).hash,
+    demoCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderCustomerGeneralSettings(ctx.params["custId"], msg, err);
+    });
+
+  route(Paths.Manage.Customer.accounts({custId: ":custId?"}).hash,
+    demoCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderCustomerAccountsSettings(ctx.params["custId"], msg, err);
+    });
+
+  route(Paths.Manage.Customer.pay({custId: ":custId?"}).hash,
+    demoCheck,
+    function(ctx) {
+      var msg = Util.getParamByName("msg", ctx.querystring);
+      var err = Util.getParamByName("err", ctx.querystring);
+      Actions.renderCustomerPaySettings(ctx.params["custId"], msg, err);
+    });
 
   route(Paths.Manage.sandbox().hash, Actions.renderSandbox);
 

@@ -6,12 +6,15 @@ module Esper.Components {
   interface Props {
     activeTeamId?: string;
     activeGroupId?: string;
+    activeCustId?: string;
     pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
     teams: ApiT.Team[];
     activePersonal?: boolean;
     newTeam?: boolean;
     newGroup?: boolean;
+    newCustomer?: boolean;
     groups: ApiT.Group[];
+    customers: ApiT.Customer[];
   }
 
   export class ManageSidebar extends ReactHelpers.Component<Props, {}> {

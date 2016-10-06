@@ -28,6 +28,9 @@ module Esper.Text {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Payments
+  export const PaySettings = "Billing";
+
   // Groups
   export const Group = "group";
   export const Groups = "groups";
@@ -167,4 +170,9 @@ module Esper.Text {
 
   export const SlackAuthError = `We were unable to connect to Slack. ` +
     `Click here to try reconnecting.`;
+
+  // Customer page
+  export const CustomerGeneral = GeneralSettings;
+  export const CustomerPay = PaySettings;
+  export const CustomerAccounts = `Accounts`;
 }

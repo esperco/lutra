@@ -16,9 +16,12 @@ module Esper.Views {
 
     renderWithData() {
       return <div className="team-settings-page esper-expanded">
-        <Components.ManageSidebar teams={Stores.Teams.all()}
+        <Components.ManageSidebar
+          teams={Stores.Teams.all()}
+          groups={Stores.Groups.all()}
+          customers={Stores.Customers.all()}
           newTeam={true}
-          groups={Stores.Groups.all()} />
+        />
 
         <div className="esper-content">
           <div id="new-team-page" className="esper-expanded">

@@ -64,6 +64,17 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamManage);
   }
 
+  export function renderTeamPaySettings(teamId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    var teamId = Params.cleanTeamId(teamId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.TeamPaySettings teamId={teamId}
+            msg={msg} err={err} />);
+    Analytics.page(Analytics.Page.TeamPay);
+  }
+
   export function renderNewTeam() {
     render(<Views.NewTeam />);
     Analytics.page(Analytics.Page.NewTeam);
@@ -105,6 +116,41 @@ module Esper.Actions {
   export function renderNewGroup() {
     render(<Views.NewGroup />);
     Analytics.page(Analytics.Page.NewGroup);
+  }
+
+  export function renderCustomerGeneralSettings(custId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    custId = Params.cleanCustomerId(custId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.CustomerGeneralSettings {...{custId, msg, err}}/>);
+    Analytics.page(Analytics.Page.CustomerManage);
+  }
+
+  export function renderCustomerAccountsSettings(custId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    custId = Params.cleanCustomerId(custId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.CustomerAccountsSettings {...{custId, msg, err}}/>);
+    Analytics.page(Analytics.Page.CustomerAccounts);
+  }
+
+  export function renderCustomerPaySettings(custId?: string,
+    msgCode?: string, errCode?: string)
+  {
+    custId = Params.cleanCustomerId(custId);
+    var msg = ManageMsg.get(msgCode);
+    var err = ManageMsg.get(errCode);
+    render(<Views.CustomerPaySettings {...{custId, msg, err}}/>);
+    Analytics.page(Analytics.Page.CustomerPay);
+  }
+
+  export function renderNewCustomer() {
+    render(<Views.NewCustomer />);
+    Analytics.page(Analytics.Page.NewCustomer);
   }
 
   export function renderSandbox() {

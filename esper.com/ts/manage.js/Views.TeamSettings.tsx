@@ -23,6 +23,7 @@ module Esper.Views {
           activeTeamId={this.props.teamId}
           teams={Stores.Teams.all()}
           groups={Stores.Groups.all()}
+          customers={Stores.Customers.all()}
           pathFn={this.pathFn}
         />
 

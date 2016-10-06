@@ -11,6 +11,7 @@ module Esper.Views {
         <Components.ManageSidebar
           teams={Stores.Teams.all()}
           groups={Stores.Groups.all()}
+          customers={Stores.Customers.all()}
           activePersonal={true}
         />
 
