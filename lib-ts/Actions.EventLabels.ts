@@ -8,13 +8,15 @@
 
 module Esper.Actions.EventLabels {
 
-  export function add(events: Stores.Events.TeamEvent[], label: Types.LabelBase) {
+  export function add(events: Stores.Events.TeamEvent[],
+                      label: Types.LabelBase) {
     apply(events, {
       addLabels: [label]
     });
   }
 
-  export function remove(events: Stores.Events.TeamEvent[], label: Types.LabelBase) {
+  export function remove(events: Stores.Events.TeamEvent[],
+                         label: Types.LabelBase) {
     apply(events, {
       removeLabels: [label],
     });
@@ -103,16 +105,28 @@ module Esper.Actions.EventLabels {
     // Modify events
     var newEvents = _.map(events, (e) => {
       var newEvent = _.cloneDeep(e);
-      newEvent.labelScores = Option.some(getNewLabels(e, opts));
-      newEvent.hashtags = getNewHashtags(newEvent);
 
       // Event labeling of any kind implies attendance
-      newEvent.attendScore = 1;
-      newEvent.feedback = newEvent.feedback || {
-        eventid: e.id,
-        teamid: e.teamId
-      };
-      newEvent.feedback.attended = true;
+      if (Stores.Events.isActive(e) || opts.addLabels || opts.removeLabels) {
+        newEvent.labelScores = Option.some(getNewLabels(e, opts));
+        newEvent.hashtags = getNewHashtags(newEvent);
+        newEvent.attendScore = 1;
+        newEvent.feedback = newEvent.feedback || {
+          eventid: e.id,
+          teamid: e.teamId
+        };
+        newEvent.feedback.attended = true;
+      }
+
+      // Not active -> confirm not attended
+      else {
+        newEvent.attendScore = 0;
+        newEvent.feedback = newEvent.feedback || {
+          eventid: e.id,
+          teamid: e.teamId
+        };
+        newEvent.feedback.attended = false;
+      }
 
       return newEvent;
     });
@@ -210,6 +224,7 @@ module Esper.Actions.EventLabels {
       return Api.batch(function() {
         var promises =
         _(r.events)
+          .filter(Stores.Events.isActive)
           .map((e) => e.labelScores.match({
             none: () => null,
             some: (labels) => {
@@ -231,21 +246,25 @@ module Esper.Actions.EventLabels {
           .value();
 
         var p = Api.setPredictLabels(r.teamId, {
-          set_labels: _.map(r.events, (e) => ({
-            id: e.recurringEventId || e.id,
-            labels: e.labelScores.match({
-              none: (): string[] => [],
-              some: (scores) =>
-                _(scores)
-                  .filter(
-                    (s) => !_.some(e.hashtags,
-                      (h) => h.label ? h.label.normalized === s.id
-                                     : h.hashtag.normalized === s.id))
-                  .map((s) => s.displayAs)
-                  .value()
+          set_labels: _.map(r.events, (e) => Stores.Events.isActive(e) ?
+            {
+              id: e.recurringEventId || e.id,
+              labels: e.labelScores.match({
+                none: (): string[] => [],
+                some: (scores) =>
+                  _(scores)
+                    .filter(
+                      (s) => !_.some(e.hashtags,
+                        (h) => h.label ? h.label.normalized === s.id
+                                       : h.hashtag.normalized === s.id))
+                    .map((s) => s.displayAs)
+                    .value()
+              }),
+              attended: true
+            } : {
+              id: e.recurringEventId || e.id,
+              attended: false
             }),
-            attended: true // EventLabels change implies attended is true
-          })),
           predict_labels: r.fetchEventIds
         });
 
