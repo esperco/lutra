@@ -37,9 +37,9 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderCalendarSettings(props: TeamSettingProps) {
+  export function renderTeamCalendarSettings(props: TeamSettingProps) {
     Stores.Calendars.fetchAvailable(props.teamId);
-    render(<Views.CalendarSettings {...props} />);
+    render(<Views.TeamCalendarSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 

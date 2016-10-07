@@ -6,7 +6,7 @@
 
 module Esper.Views {
 
-  export class CalendarSettings extends TeamSettings {
+  export class TeamCalendarSettings extends TeamSettings {
     pathFn = Paths.Manage.Team.calendars;
 
     renderMain(team: ApiT.Team) {

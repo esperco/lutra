@@ -88,7 +88,7 @@ module Esper.Route {
   }
 
   routeTeam(Paths.Manage.Team.general, Actions.renderTeamGeneralSettings);
-  routeTeam(Paths.Manage.Team.calendars, Actions.renderCalendarSettings);
+  routeTeam(Paths.Manage.Team.calendars, Actions.renderTeamCalendarSettings);
   routeTeam(Paths.Manage.Team.labels, Actions.renderTeamLabelSettings);
   routeTeam(Paths.Manage.Team.notifications,
             Actions.renderTeamNotificationSettings);
