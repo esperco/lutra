@@ -135,6 +135,37 @@ module Esper.ApiT {
     invite_sent?: string;
   }
 
+  export interface Customer {
+    id: string;
+    name?: string;
+    primary_contact: CustomerContact;
+    secondary_contacts: CustomerContact[];
+    seats: CustomerSeat[];
+    seat_requests: CustomerSeat[];
+    filter: CustomerTeamFilter;
+  }
+
+  export interface CustomerContact {
+    uid: string;
+    email: string;
+  }
+
+  export interface CustomerSeat {
+    teamid: string;
+    email: string;
+  }
+
+  export interface CustomerTeamFilter {
+    cusid: string;
+    blacklist: EmailFilter;
+    whitelist: EmailFilter;
+  }
+
+  export interface EmailFilter {
+    addresses: string[];
+    domains: string[];
+  }
+
   export interface GenericCalendar {
     id: string;
     title: string;

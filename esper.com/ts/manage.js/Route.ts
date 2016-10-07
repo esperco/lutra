@@ -39,71 +39,125 @@ module Esper.Route {
     redirectPath(Paths.Manage.Team.general())
   );
 
-  route(Paths.Manage.newTeam().hash, demoCheck, function() {
-    Actions.renderNewTeam();
-  });
+  /* Render pages that require pathFn to be passed to it */
 
-  route(Paths.Manage.newGroup().hash, demoCheck, function() {
-    Actions.renderNewGroup();
-  });
-
-  route(Paths.Manage.Team.general({teamId: ":teamId?"}).hash,
-    onboardingCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderTeamGeneralSettings(ctx.params["teamId"], msg, err);
+  function routeSettings(pathFn: () => Paths.Path,
+                         cb: (x: {
+                           msg?: string;
+                           err?: string;
+                           pathFn: () => Paths.Path;
+                         }) => void)
+  {
+    route(pathFn().hash, demoCheck, function(ctx) {
+      let msgCode = Util.getParamByName("msg", ctx.querystring);
+      let msg = ManageMsg.get(msgCode);
+      let errCode = Util.getParamByName("err", ctx.querystring);
+      let err = ManageMsg.get(errCode);
+      cb({ pathFn, msg, err });
     });
+  }
 
-  route(Paths.Manage.Team.calendars({teamId: ":teamId?"}).hash,
-    onboardingCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderCalendarSettings(ctx.params["teamId"], msg, err);
-    });
+  routeSettings(Paths.Manage.newTeam, Actions.renderNewTeam);
+  routeSettings(Paths.Manage.newGroup, Actions.renderNewGroup);
+  routeSettings(Paths.Manage.newCustomer, Actions.renderNewCustomer);
+  routeSettings(Paths.Manage.personal, Actions.renderPersonalSettings);
 
-  route(Paths.Manage.Team.labels({teamId: ":teamId?"}).hash,
-    onboardingCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderTeamLabelSettings(ctx.params["teamId"], msg, err);
-    });
 
-  route(Paths.Manage.Team.notifications({teamId: ":teamId?"}).hash,
-    onboardingCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderTeamNotificationSettings(ctx.params["teamId"], msg, err);
-    });
+  /* Render team-specific setting pages */
 
-  route(Paths.Manage.personal().hash, demoCheck, function(ctx) {
-    Actions.renderPersonalSettings();
-  });
+  function routeTeam(
+    pathFn: (x: {teamId?: string}) => Paths.Path,
+    cb: (x: {
+      teamId: string,
+      pathFn: (x: {teamId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
+  ) {
+    route(pathFn({teamId: ":teamId?"}).hash,
+      onboardingCheck,
+      function(ctx) {
+        let teamId = Params.cleanTeamId(ctx.params["teamId"])
+        let msgCode = Util.getParamByName("msg", ctx.querystring);
+        let msg = ManageMsg.get(msgCode);
+        let errCode = Util.getParamByName("err", ctx.querystring);
+        let err = ManageMsg.get(errCode);
+        cb({teamId, pathFn, msg, err});
+      }
+    )
+  }
 
-  route(Paths.Manage.Group.general({groupId: ":groupId?"}).hash, groupCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderGroupGeneralSettings(ctx.params["groupId"], msg, err);
-  });
+  routeTeam(Paths.Manage.Team.general, Actions.renderTeamGeneralSettings);
+  routeTeam(Paths.Manage.Team.calendars, Actions.renderCalendarSettings);
+  routeTeam(Paths.Manage.Team.labels, Actions.renderTeamLabelSettings);
+  routeTeam(Paths.Manage.Team.notifications,
+            Actions.renderTeamNotificationSettings);
+  routeTeam(Paths.Manage.Team.pay, Actions.renderTeamPaySettings);
 
-  route(Paths.Manage.Group.labels({groupId: ":groupId?"}).hash, groupCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderGroupLabelSettings(ctx.params["groupId"], msg, err);
-  });
 
-  route(Paths.Manage.Group.notifications({groupId: ":groupId?"}).hash,
-    groupCheck,
-    function(ctx) {
-      var msg = Util.getParamByName("msg", ctx.querystring);
-      var err = Util.getParamByName("err", ctx.querystring);
-      Actions.renderGroupNotificationSettings(ctx.params["groupId"], msg, err);
-  });
+  /* Render group-specifi settings pages */
+
+  function routeGroup(
+    pathFn: (x: {groupId?: string}) => Paths.Path,
+    cb: (x: {
+      groupId: string,
+      pathFn: (x: {groupId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
+  ) {
+    route(pathFn({groupId: ":groupId?"}).hash,
+      groupCheck,
+      function(ctx) {
+        let groupId = Params.cleanGroupId(ctx.params["groupId"])
+        let msgCode = Util.getParamByName("msg", ctx.querystring);
+        let msg = ManageMsg.get(msgCode);
+        let errCode = Util.getParamByName("err", ctx.querystring);
+        let err = ManageMsg.get(errCode);
+        cb({groupId, pathFn, msg, err});
+      }
+    )
+  }
+
+  routeGroup(Paths.Manage.Group.general, Actions.renderGroupGeneralSettings);
+  routeGroup(Paths.Manage.Group.labels, Actions.renderGroupLabelSettings);
+  routeGroup(Paths.Manage.Group.notifications,
+             Actions.renderGroupNotificationSettings);
+
+
+  /* Render customer-specific settings pages */
+
+  function routeCustomer(
+    pathFn: (x: {cusId?: string}) => Paths.Path,
+    cb: (x: {
+      cusId: string,
+      pathFn: (x: {cusId?: string}) => Paths.Path,
+      msg?: string,
+      err?: string
+    }) => void
+  ) {
+    route(pathFn({cusId: ":cusId?"}).hash,
+      demoCheck,
+      function(ctx) {
+        let cusId = Params.cleanCustomerId(ctx.params["cusId"])
+        let msgCode = Util.getParamByName("msg", ctx.querystring);
+        let msg = ManageMsg.get(msgCode);
+        let errCode = Util.getParamByName("err", ctx.querystring);
+        let err = ManageMsg.get(errCode);
+        cb({cusId, pathFn, msg, err});
+      }
+    )
+  }
+
+  routeCustomer(Paths.Manage.Customer.general,
+                Actions.renderCustomerGeneralSettings);
+  routeCustomer(Paths.Manage.Customer.accounts,
+                Actions.renderCustomerAccountsSettings);
+  routeCustomer(Paths.Manage.Customer.pay,
+                Actions.renderCustomerPaySettings);
+
+
+  /* Misc */
 
   route(Paths.Manage.sandbox().hash, Actions.renderSandbox);
 

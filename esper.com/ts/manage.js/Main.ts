@@ -16,6 +16,7 @@ module Esper.Main {
     Stores.Teams.init();
     Stores.Calendars.init();
     Stores.Groups.init();
+    Stores.Customers.init();
     Labels.init();
     Login.init();
     Login.promise.done(function() {

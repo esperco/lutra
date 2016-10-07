@@ -4,14 +4,20 @@
 module Esper.Components {
 
   interface Props {
-    activeTeamId?: string;
-    activeGroupId?: string;
-    pathFn?: (p: {teamId?: string, groupId?: string}) => Paths.Path;
+    // Active team, group, or customer
+    teamId?: string;
+    groupId?: string;
+    cusId?: string;
+
+    // Current path
+    pathFn: (p: {
+      teamId?: string,
+      groupId?: string,
+      cusId?: string
+    }) => Paths.Path;
     teams: ApiT.Team[];
-    activePersonal?: boolean;
-    newTeam?: boolean;
-    newGroup?: boolean;
     groups: ApiT.Group[];
+    customers: ApiT.Customer[];
   }
 
   export class ManageSidebar extends ReactHelpers.Component<Props, {}> {
@@ -28,10 +34,10 @@ module Esper.Components {
           <ul className="esper-select-menu">
             <li>
               <a className={classNames({
-                active: this.props.newTeam
+                active: this.props.pathFn === Paths.Manage.newTeam
               })}
               href={Paths.Manage.newTeam().href}>
-                <i className="fa fa-fw fa-user-plus" />{" "}
+                <i className="fa fa-fw fa-left fa-user-plus" />
                 { Text.AddTeamLink }
               </a>
             </li>
@@ -48,10 +54,10 @@ module Esper.Components {
           <ul className="esper-select-menu">
             <li>
               <a className={classNames({
-                active: this.props.newGroup
+                active: this.props.pathFn === Paths.Manage.newGroup
               })}
               href={Paths.Manage.newGroup().href}>
-                <i className="fa fa-fw fa-user-plus" />{" "}
+                <i className="fa fa-fw fa-left fa-user-plus" />
                 { Text.AddGroupLink }
               </a>
             </li>
@@ -61,9 +67,9 @@ module Esper.Components {
         <div className="esper-panel-section">
           <ul className="esper-select-menu"><li>
             <a className={classNames({
-              active: this.props.activePersonal
+              active: this.props.pathFn === Paths.Manage.personal
             })} href={Paths.Manage.personal().href}>
-              <i className="fa fa-fw fa-cog" />{" "}
+              <i className="fa fa-fw fa-left fa-cog" />
               { Text.PersonalSettings }
             </a>
           </li></ul>
@@ -73,31 +79,46 @@ module Esper.Components {
 
     renderTeam(team: ApiT.Team) {
       // Use pathFn to preserve current settings "tab" when switching teams
-      var pathFn = this.props.activeTeamId ? this.props.pathFn
-                                           : Paths.Manage.Team.general;
-
+      var pathFn = this.props.teamId ? this.props.pathFn
+                                     : Paths.Manage.Team.general;
       return <li key={team.teamid}>
         <a className={classNames({
-          active: team.teamid === this.props.activeTeamId
+          active: team.teamid === this.props.teamId
         })}
         href={pathFn({teamId: team.teamid}).href}>
-          <i className="fa fa-fw fa-user" />{" "}
+          <i className="fa fa-fw fa-left fa-user" />
           { team.team_name }
         </a>
       </li>;
     }
 
     renderGroup(group: ApiT.Group) {
-      var pathFn = this.props.activeGroupId ? this.props.pathFn
-                                            : Paths.Manage.Group.general;
+      var pathFn = this.props.groupId ? this.props.pathFn
+                                      : Paths.Manage.Group.general;
 
       return <li key={group.groupid}>
         <a className={classNames({
-          active: group.groupid === this.props.activeGroupId
+          active: group.groupid === this.props.groupId
         })}
         href={pathFn({groupId: group.groupid}).href}>
-          <i className="fa fa-fw fa-users" />{" "}
+          <i className="fa fa-fw fa-left fa-users" />
           { group.group_name }
+        </a>
+      </li>;
+    }
+
+    // TODO: Actually insert function into sidebar when ready
+    renderCustomer(customer: ApiT.Customer) {
+      var pathFn = this.props.cusId ? this.props.pathFn
+                                    : Paths.Manage.Customer.general;
+
+      return <li key={customer.id}>
+        <a className={classNames({
+          active: customer.id === this.props.cusId
+        })}
+        href={pathFn({cusId: customer.id}).href}>
+          <i className="fa fa-fw fa-left fa-building" />
+          { Stores.Customers.getDisplayName(customer) }
         </a>
       </li>;
     }

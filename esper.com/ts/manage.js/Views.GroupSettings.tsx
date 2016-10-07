@@ -1,52 +1,46 @@
 /*
   Base class for a group settings view
 
-  Override renderMain funciton
+  Override renderMain function
 */
 
 module Esper.Views {
-  interface Props {
+  // GroupID required
+  interface Props extends Types.SettingsPageProps {
     groupId: string;
-    msg?: string;
-    err?: string;
   }
 
-  export abstract class GroupSettings extends ReactHelpers.Component<Props, {}> {
+  export abstract class GroupSettings
+         extends ReactHelpers.Component<Props, {}> {
     pathFn: (p: {groupId: string}) => Paths.Path;
 
     renderWithData() {
-      var group = Stores.Groups.require(this.props.groupId);
+      let group = Stores.Groups.require(this.props.groupId);
       if (! group) return <span />;
 
-      return <div className="group-settings-page esper-expanded">
-        <Components.ManageSidebar
-          activeGroupId={this.props.groupId}
-          teams={Stores.Teams.all()}
-          groups={Stores.Groups.all()}
-          pathFn={this.pathFn}
-        />
+      let me = _.find(group.group_individuals,
+        (gim) => gim.uid === Login.myUid()
+      );
 
-        <div className="esper-content padded">
-          <Components.GroupSettingsMenu
-            group={group}
-            pathFn={this.pathFn}
-          />
+      let subMenu = <Components.SettingsMenu>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Group.general}>
+          { Text.GeneralSettings }
+        </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Group.labels}>
+          { Text.Labels }
+        </Components.SettingsMenuLink>
+        { me && me.role !== "Member" ?
+          <Components.SettingsMenuLink {...this.props}
+              href={Paths.Manage.Group.notifications}>
+            { Text.NotificationSettings }
+          </Components.SettingsMenuLink> : null }
+      </Components.SettingsMenu>;
 
-          <div className="esper-expanded">
-            {
-              this.props.msg ?
-              <div className="alert msg alert-info">{ this.props.msg }</div> :
-              null
-            }
-            {
-              this.props.err ?
-              <div className="alert msg alert-danger">{ this.props.err }</div> :
-              null
-            }
-            { this.renderMain(group) }
-          </div>
-        </div>
-      </div>;
+      return <Views.Settings {...this.props} subMenu={subMenu}>
+        { this.renderMain(group) }
+      </Views.Settings>
     }
 
     abstract renderMain(group: ApiT.Group): JSX.Element;

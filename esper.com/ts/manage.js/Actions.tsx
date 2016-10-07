@@ -11,101 +11,117 @@ module Esper.Actions {
     </Views.App>);
   }
 
-  export function renderPersonalSettings() {
-    render(<Views.PersonalSettings />);
+  export function renderPersonalSettings(props: {
+    pathFn?: () => Paths.Path
+  }) {
+    render(<Views.PersonalSettings {...props} />);
     Analytics.page(Analytics.Page.PersonalSettings);
   }
 
-  export function renderTeamGeneralSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
+
+  /* Team Settings */
+
+  interface SettingProps {
+    err?: string;
+    msg?: string;
+  }
+
+  interface TeamSettingProps extends SettingProps {
+    teamId: string;
+    pathFn: (x: {teamId?: string}) => Paths.Path;
+  }
+
+  export function renderTeamGeneralSettings(props: TeamSettingProps)
   {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.TeamGeneralSettings teamId={teamId}
-            msg={msg} err={err} />);
+    render(<Views.TeamGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderCalendarSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-
-    Stores.Calendars.fetchAvailable(teamId);
-    render(<Views.CalendarSettings teamId={teamId}
-            msg={msg} err={err}  />);
+  export function renderCalendarSettings(props: TeamSettingProps) {
+    Stores.Calendars.fetchAvailable(props.teamId);
+    render(<Views.CalendarSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderTeamLabelSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.TeamLabelSettings teamId={teamId}
-            msg={msg} err={err}  />);
+  export function renderTeamLabelSettings(props: TeamSettingProps) {
+    render(<Views.TeamLabelSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderTeamNotificationSettings(teamId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var teamId = Params.cleanTeamId(teamId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-
-    Stores.TeamPreferences.checkSlack(teamId);
-    render(<Views.TeamNotificationSettings teamId={teamId}
-            msg={msg} err={err} />);
+  export function renderTeamNotificationSettings(props: TeamSettingProps) {
+    Stores.TeamPreferences.checkSlack(props.teamId);
+    render(<Views.TeamNotificationSettings {...props} />);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderNewTeam() {
-    render(<Views.NewTeam />);
+  export function renderTeamPaySettings(props: TeamSettingProps) {
+    render(<Views.TeamPaySettings {...props} />);
+    Analytics.page(Analytics.Page.TeamPay);
+  }
+
+  export function renderNewTeam(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewTeam {...props} />);
     Analytics.page(Analytics.Page.NewTeam);
   }
 
-  export function renderGroupGeneralSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupGeneralSettings groupId={groupId}
-            msg={msg} err={err} />);
+
+  /* Group Settings */
+
+  interface GroupSettingProps extends SettingProps {
+    groupId: string;
+    pathFn: (x: {groupId?: string}) => Paths.Path;
+  }
+
+  export function renderGroupGeneralSettings(props: GroupSettingProps) {
+    render(<Views.GroupGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderGroupLabelSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupLabelSettings groupId={groupId}
-            msg={msg} err={err} />);
+  export function renderGroupLabelSettings(props: GroupSettingProps) {
+    render(<Views.GroupLabelSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderGroupNotificationSettings(groupId?: string,
-    msgCode?: string, errCode?: string)
-  {
-    var groupId = Params.cleanGroupId(groupId);
-    var msg = ManageMsg.get(msgCode);
-    var err = ManageMsg.get(errCode);
-    render(<Views.GroupNotificationSettings groupId={groupId}
-            msg={msg} err={err} />);
+  export function renderGroupNotificationSettings(props: GroupSettingProps) {
+    render(<Views.GroupNotificationSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }
 
-  export function renderNewGroup() {
-    render(<Views.NewGroup />);
+  export function renderNewGroup(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewGroup {...props} />);
     Analytics.page(Analytics.Page.NewGroup);
   }
+
+
+  /* Customer Settings*/
+
+  interface CustomerSettingProps extends SettingProps {
+    cusId: string;
+    pathFn: (x: {cusId?: string}) => Paths.Path;
+  }
+
+  export function renderCustomerGeneralSettings(props: CustomerSettingProps) {
+    render(<Views.CustomerGeneralSettings {...props} />);
+    Analytics.page(Analytics.Page.CustomerManage);
+  }
+
+  export function renderCustomerAccountsSettings(props: CustomerSettingProps) {
+    render(<Views.CustomerAccountsSettings {...props} />);
+    Analytics.page(Analytics.Page.CustomerAccounts);
+  }
+
+  export function renderCustomerPaySettings(props: CustomerSettingProps) {
+    render(<Views.CustomerPaySettings {...props} />);
+    Analytics.page(Analytics.Page.CustomerPay);
+  }
+
+  export function renderNewCustomer(props: {pathFn?: () => Paths.Path}) {
+    render(<Views.NewCustomer {...props} />);
+    Analytics.page(Analytics.Page.NewCustomer);
+  }
+
+
+  /* Misc */
 
   export function renderSandbox() {
     render(<Views.Sandbox />);
