@@ -37,21 +37,21 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamManage);
   }
 
-  export function renderCalendarSettings(props: TeamSettingProps) {
+  export function renderTeamCalendarSettings(props: TeamSettingProps) {
     Stores.Calendars.fetchAvailable(props.teamId);
-    render(<Views.CalendarSettings {...props} />);
-    Analytics.page(Analytics.Page.TeamManage);
+    render(<Views.TeamCalendarSettings {...props} />);
+    Analytics.page(Analytics.Page.TeamCalendars);
   }
 
   export function renderTeamLabelSettings(props: TeamSettingProps) {
     render(<Views.TeamLabelSettings {...props} />);
-    Analytics.page(Analytics.Page.TeamManage);
+    Analytics.page(Analytics.Page.TeamLabels);
   }
 
   export function renderTeamNotificationSettings(props: TeamSettingProps) {
     Stores.TeamPreferences.checkSlack(props.teamId);
     render(<Views.TeamNotificationSettings {...props} />);
-    Analytics.page(Analytics.Page.TeamManage);
+    Analytics.page(Analytics.Page.TeamNotifications);
   }
 
   export function renderTeamPaySettings(props: TeamSettingProps) {
@@ -79,12 +79,12 @@ module Esper.Actions {
 
   export function renderGroupLabelSettings(props: GroupSettingProps) {
     render(<Views.GroupLabelSettings {...props} />);
-    Analytics.page(Analytics.Page.GroupManage);
+    Analytics.page(Analytics.Page.GroupLabels);
   }
 
   export function renderGroupNotificationSettings(props: GroupSettingProps) {
     render(<Views.GroupNotificationSettings {...props} />);
-    Analytics.page(Analytics.Page.GroupManage);
+    Analytics.page(Analytics.Page.GroupNotifications);
   }
 
   export function renderNewGroup(props: {pathFn?: () => Paths.Path}) {
