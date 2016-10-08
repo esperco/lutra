@@ -10,10 +10,11 @@
   },
 
   "devOnly": [
-    "../lib/JasmineStub.ts"
+    "../lib/JasmineStub.ts",
+    "./Config.Dev.ts"
   ],
 
   "prodOnly": [
-
+    "./Config.Prod.ts"
   ]
 }
