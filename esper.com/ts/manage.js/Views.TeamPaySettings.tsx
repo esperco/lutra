@@ -13,7 +13,18 @@ module Esper.Views {
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">
         <div className="panel-body">
-          Hello world
+          Hello world.
+
+          <Components.Stripe
+            amount={9900} description="Pro Plan"
+            onToken={(token) => {
+              // TODO: Should pass token.id to server
+              console.info(token.id);
+
+              // Or do something with the error
+              if (token.error) { console.error(token.error); }
+            }}
+          />
         </div>
       </div>;
     }
