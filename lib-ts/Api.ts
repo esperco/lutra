@@ -811,10 +811,10 @@ module Esper.Api {
     return JsonHttp.post(url);
   }
 
-  export function addNewCard(teamid: string, cardToken: string):
+  export function addNewCard(cusid: string, cardToken: string):
     JsonPromise<ApiT.PaymentCard> {
     var url = prefix + "/api/pay/new-card/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(cusid)
       + "/" + encodeURIComponent(string(cardToken));
     return JsonHttp.post(url);
   }

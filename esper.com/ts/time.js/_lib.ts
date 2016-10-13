@@ -7,6 +7,7 @@
 /// <reference path="../lib/Actions.Feedback.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
+/// <reference path="../lib/Actions.Payment.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Colors.ts" />
@@ -44,6 +45,7 @@
 /// <reference path="../lib/Components.SignalStrength.tsx" />
 /// <reference path="../lib/Components.SimpleToggle.tsx" />
 /// <reference path="../lib/Components.StarRating.tsx" />
+/// <reference path="../lib/Components.Stripe.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
 /// <reference path="../lib/Views.App.tsx" />

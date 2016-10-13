@@ -16,6 +16,7 @@ module Esper.Views {
           Hello world.
 
           <Components.Stripe
+            stripeKey={Config.STRIPE_KEY}
             amount={9900} description="Pro Plan"
             onToken={(token) => {
               // TODO: Should pass token.id to server

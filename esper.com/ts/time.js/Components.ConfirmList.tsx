@@ -10,6 +10,7 @@ module Esper.Components {
     events: Stores.Events.TeamEvent[];
     teams: ApiT.Team[];
     onEventClick?: (event: Stores.Events.TeamEvent) => void;
+    onClose?: () => void;
     perPage?: number;
     initPageStart?: number;
   }
@@ -141,7 +142,7 @@ module Esper.Components {
   export class ConfirmListModal extends ConfirmList {
     render() {
       var events = this.getEvents();
-      return <ModalBase onHidden={() => this.updateRemainder()}>
+      return <ModalBase onHidden={() => this.onHidden()}>
         <ModalHeader icon="fa-flash"
                      title={Text.ConfirmLabelsHeading} />
         <div className="modal-body">
@@ -150,6 +151,12 @@ module Esper.Components {
         { this.renderProgress(events) }
         { this.renderFooter(events) }
       </ModalBase>;
+    }
+
+    onHidden() {
+      this.updateRemainder();
+      if (this.props.onClose)
+        this.props.onClose();
     }
 
     /*

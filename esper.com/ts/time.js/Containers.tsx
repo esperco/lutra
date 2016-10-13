@@ -3,6 +3,12 @@
 */
 
 module Esper.Containers {
+  export function paymentModal(subscription: ApiT.TeamSubscription) {
+    return ReactHelpers.contain(function() {
+      return <Components.PaymentModal subscription={subscription} />;
+    });
+  }
+
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
     onHidden?: () => void;
@@ -74,7 +80,8 @@ module Esper.Containers {
   }
 
   export function confirmListModal(events: Stores.Events.TeamEvent[],
-                                   initPageStart=0) {
+                                   initPageStart=0,
+                                   onClose?: () => void) {
     return ReactHelpers.contain(function() {
       // Refresh store data before sending to modal, get opts
       var fetching = false;
@@ -133,6 +140,7 @@ module Esper.Containers {
         events={events}
         teams={teams}
         onEventClick={labelFn}
+        onClose={onClose}
       />;
     });
   }
