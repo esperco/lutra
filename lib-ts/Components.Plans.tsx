@@ -4,7 +4,7 @@
 
 module Esper.Components {
   interface Props {
-    subscription: ApiT.SubscriptionDetails;
+    subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
   }
 
   export class Plans extends ReactHelpers.Component<Props, {}> {
@@ -23,7 +23,7 @@ module Esper.Components {
 
 
   interface PlanInfoProps {
-    subscription: ApiT.SubscriptionDetails;
+    subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
     planid: ApiT.PlanId;
   }
 
@@ -73,7 +73,7 @@ module Esper.Components {
         }
       })();
 
-      if (_.isEmpty(this.props.subscription.cards)) {
+      if (_.isEmpty((this.props.subscription as ApiT.SubscriptionDetails).cards)) {
         return <Components.Stripe stripeKey={Config.STRIPE_KEY}
           description={description} label="Submit"
           onToken={(token) => this.onToken(token)}>
