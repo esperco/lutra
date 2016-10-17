@@ -63,8 +63,12 @@ module Esper.Stores.Events {
       } else if (!_.isEmpty(e.predicted_labels)) {
         let team = Teams.require(teamId);
         if (team) {
+          let teamLabels = _.map(team.team_api.team_labels,
+            (l) => l.normalized
+          );
           let labels = _.filter(e.predicted_labels,
-            (l) => _.includes(team.team_api.team_labels, l.label));
+            (l) => _.includes(teamLabels, l.label.normalized)
+          );
           if (labels.length) {
             let labelsAboveThreshold = _(labels)
               .filter((l) => l.score >= PREDICTED_LABEL_PERCENT_CUTOFF)
