@@ -34,7 +34,7 @@
     "react-global": "github:esperco/DefinitelyTyped/react/react-global.d.ts#e3a7583dc379d3b178216fcd444b0ea64aed66e0",
     "segment-analytics": "github:esperco/DefinitelyTyped/segment-analytics/segment-analytics.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "stripe": "registry:dt/stripe#0.0.0+20160811213059",
-    "stripe-checkout": "registry:dt/stripe-checkout#0.0.0+20160316155526",
+    "stripe-checkout": "github:esperco/DefinitelyTyped/stripe-checkout/stripe-checkout.d.ts#fdf69dbc0c20d42f639bc6e432ba1fe80d0aeba3",
     "typeahead": "github:esperco/DefinitelyTyped/typeahead/typeahead.d.ts#48f20e97bfaf70fc1a9537b38aed98e9749be0ae"
   },
   "resolution": {
