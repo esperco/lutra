@@ -7,7 +7,7 @@ module Esper.Components {
   interface Props {
     stripeKey: string;
     description: string;
-    amount: number;
+    label: string;
     onToken: (token: StripeTokenResponse) => void;
   }
 
@@ -55,7 +55,7 @@ module Esper.Components {
         description: this.props.description,
         billingAddress: true,
         zipCode: true,
-        amount: this.props.amount
+        panelLabel: this.props.label
       });
     }
   }

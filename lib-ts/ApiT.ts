@@ -567,9 +567,12 @@ module Esper.ApiT {
     cards: PaymentCard[];
   }
 
+  export type CardBrand =
+    "Visa"|"American_express"|"Mastercard"|"Discover"|"Jcb"|"Diners_club";
+
   export interface PaymentCard {
     id: string;
-    brand?: string;  // card_brand option
+    brand?: CardBrand;
     exp_month: number;
     exp_year: number;
     last4: string;

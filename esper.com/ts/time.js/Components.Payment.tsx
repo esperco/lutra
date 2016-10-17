@@ -9,30 +9,9 @@ module Esper.Components {
   }
 
   export class PaymentModal extends ReactHelpers.Component<Props, {}> {
-    getPlan() {
-      if (this.props.subscription.plan === "Basic_20160923") {
-        return "Basic Plan";
-      } else if (this.props.subscription.plan === "Advanced_20160923") {
-        return "Executive Plan";
-      } else {
-        return "Enterprise Plan";
-      }
-    }
-
-    getPrice() {
-      if (this.props.subscription.plan === "Basic_20160923") {
-        return 15000;
-      } else if (this.props.subscription.plan === "Advanced_20160923") {
-        return 23000;
-      } else {
-        // FIXME: This isn't correct, an enterprise plan does not have a team.
-        let team = Stores.Teams.require(this.props.subscription.teamid);
-        return 200 * team.team_assistants.length;
-      }
-    }
-
     onToken(token: StripeTokenResponse) {
       Actions.Payment.addNewCard(this.props.subscription.cusid, token.id);
+      Actions.Payment.subscribe(this.props.subscription.cusid, "Advanced_20160923");
       Layout.closeModal();
     }
 
@@ -47,17 +26,11 @@ module Esper.Components {
             { this.props.error ? <ErrorMsg /> : null }
           </div>
           <div className="esper-section">
-            <div>
-              Your selected plan is: {this.getPlan()}
-            </div>
             <Components.Stripe
-              amount={this.getPrice()} description={this.getPlan()}
-              onToken={this.onToken}
-              stripeKey={function() {
-                if (Esper.PRODUCTION)
-                  return Config.STRIPE_KEY_PROD;
-                return Config.STRIPE_KEY_DEV;
-              }()}
+              label={"Submit"}
+              description={"Executive Plan"}
+              onToken={this.onToken.bind(this)}
+              stripeKey={Config.STRIPE_KEY}
             />
           </div>
         </div>

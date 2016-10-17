@@ -796,7 +796,7 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function setSubscription(cusid: string, planid: string):
+  export function setSubscription(cusid: string, planid: ApiT.PlanId):
     JsonPromise<void> {
     var url = prefix + "/api/pay/subscribe/" + string(Login.me())
       + "/" + string(cusid)
