@@ -714,21 +714,6 @@ module Esper.Api {
     return JsonHttp.post(url, req);
   }
 
-  export function getCustomerStatus(teamid: string):
-  JsonPromise<ApiT.CustomerStatus> {
-    var url =
-      prefix + "/api/pay/status/short/" + string(Login.myUid())
-      + "/" + string(teamid);
-    return JsonHttp.get(url);
-  }
-
-  export function getCustomerDetails(teamid: string):
-  JsonPromise<ApiT.CustomerDetails> {
-    var url =
-      prefix + "/api/pay/status/long/" + string(Login.myUid())
-      + "/" + string(teamid);
-    return JsonHttp.get(url);
-  }
 
   /* Team creation */
   export function createTeam(body: ApiT.TeamCreationRequest)
@@ -781,15 +766,15 @@ module Esper.Api {
 
   /*** Payments ***/
 
-  export function getSubscriptionStatus(teamid: string):
-    JsonPromise<ApiT.CustomerStatus> {
-    var url = prefix + "/api/pay/status/long/" + string(Login.me())
-      + "/" + string(teamid);
+  export function getSubscriptionStatus(cusid: string):
+    JsonPromise<ApiT.TeamSubscription> {
+    var url = prefix + "/api/pay/status/short/" + string(Login.me())
+      + "/" + string(cusid);
     return JsonHttp.get(url);
   }
 
   export function getSubscriptionStatusLong(cusid: string):
-    JsonPromise<ApiT.CustomerDetails> {
+    JsonPromise<ApiT.SubscriptionDetails> {
     var url = prefix + "/api/pay/status/long/" + string(Login.me())
       + "/" + string(cusid);
 
