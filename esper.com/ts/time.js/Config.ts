@@ -3,6 +3,9 @@
 */
 
 module Esper.Config {
+  export const STRIPE_KEY = Esper.PRODUCTION ?
+    'pk_live_ntMF09YuECJYPD6A9c4sfdHG' :
+    'pk_test_tDzGbpaybyFQ3A7XGF6ctE3f';
 
   /* Config for period selectors */
 

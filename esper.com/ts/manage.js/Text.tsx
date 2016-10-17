@@ -1,4 +1,6 @@
 module Esper.Text {
+  // Payments
+  export const PaymentSettings = "Payments";
 
   // Personal (non-team) settings
   export const PersonalSettings = "Other Settings";
@@ -30,6 +32,13 @@ module Esper.Text {
 
   // Payments
   export const PaySettings = "Billing";
+  export function getPlanName(planid: ApiT.PlanId) {
+    if (planid === "Basic_20160923")
+      return "Basic Plan";
+    if (planid === "Advanced_20160923")
+      return "Executive Plan";
+    return "Enterprise Plan";
+  }
 
   // Groups
   export const Group = "group";
