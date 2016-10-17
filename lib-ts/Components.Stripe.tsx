@@ -5,8 +5,9 @@
 
 module Esper.Components {
   interface Props {
+    stripeKey: string;
     description: string;
-    amount: number;
+    label: string;
     onToken: (token: StripeTokenResponse) => void;
   }
 
@@ -28,7 +29,7 @@ module Esper.Components {
     initStripe() {
       // From https://stripe.com/docs/checkout#integration-custom
       this._handler = StripeCheckout.configure({
-        key: Config.STRIPE_KEY,
+        key: this.props.stripeKey,
         email: Login.myEmail(),
 
         // Esper logo
@@ -44,7 +45,7 @@ module Esper.Components {
     render() {
       return <button className="btn btn-primary"
                      onClick={() => this.onClick()}>
-        Pay
+        Enter Payment Info
       </button>
     }
 
@@ -52,8 +53,9 @@ module Esper.Components {
       this._handler.open({
         name: 'Esper',
         description: this.props.description,
+        billingAddress: true,
         zipCode: true,
-        amount: this.props.amount
+        panelLabel: this.props.label
       });
     }
   }

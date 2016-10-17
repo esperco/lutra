@@ -79,9 +79,21 @@ module Esper.ApiT {
     team_email_aliases?: string[];
   }
 
+  export type PlanId = "Basic_20160923"|"Advanced_20160923"
+    |"Enterprise_20160923"|"Employee_20150304";
+
+  export interface TeamSubscription {
+    teamid: string;
+    cusid: string;
+    active: boolean;
+    plan: PlanId;
+    subscription_status: "Trialing"|"Active"|"Past_due"|"Canceled"|"Unpaid";
+  }
+
   export interface TeamApi {
     team_exec_email: string;
     team_labels: LabelInfo[];
+    team_subscription: TeamSubscription;
   }
 
   export interface Team {
@@ -555,9 +567,12 @@ module Esper.ApiT {
     cards: PaymentCard[];
   }
 
+  export type CardBrand =
+    "Visa"|"American_express"|"Mastercard"|"Discover"|"Jcb"|"Diners_club";
+
   export interface PaymentCard {
     id: string;
-    brand?: string;  // card_brand option
+    brand?: CardBrand;
     exp_month: number;
     exp_year: number;
     last4: string;

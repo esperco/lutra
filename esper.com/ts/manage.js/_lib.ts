@@ -7,6 +7,7 @@
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
 /// <reference path="../lib/Actions.Groups.ts" />
 /// <reference path="../lib/Actions.GroupPreferences.ts" />
+/// <reference path="../lib/Actions.Payment.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Params.ts" />
@@ -34,6 +35,7 @@
 /// <reference path="../lib/Components.RadioList.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
+/// <reference path="../lib/Components.Stripe.tsx" />
 /// <reference path="../lib/Components.TeamForm.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 

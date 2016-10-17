@@ -41,7 +41,8 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <UnconfirmedLink eventsForRanges={eventsForRanges} />
+          <UnconfirmedLink eventsForRanges={eventsForRanges}
+            teamSubscription={team.team_api.team_subscription} />
           <div className="esper-panel-section">
             <div className="esper-header">
               <i className="fa fa-fw fa-left fa-tags" />
@@ -337,10 +338,13 @@ module Esper.Views {
 
   // Has auto-label confirmation modal been launched before?
   var confirmationLaunched = false;
+  // Has payment modal been launched before?
+  var paymentLaunched = false;
 
   // Link to launch auto-confirm modal
   interface UnconfirmedLinkProps {
     eventsForRanges: Types.EventsForRange[];
+    teamSubscription: ApiT.TeamSubscription;
   }
 
   class UnconfirmedLink extends
@@ -370,6 +374,12 @@ module Esper.Views {
           this._calc.onceChange((result) => {
             if (!confirmationLaunched && result.total > 0) {
               this.launchModal(result.events);
+            } else if (confirmationLaunched &&
+                       !paymentLaunched &&
+                       !this.props.teamSubscription.active) {
+              paymentLaunched = true;
+              Layout.renderModal(
+                Containers.paymentModal(this.props.teamSubscription));
             }
           });
         }
@@ -402,8 +412,14 @@ module Esper.Views {
     }
 
     launchModal(events: Types.TeamEvent[]) {
+      var teamSubscription = this.props.teamSubscription;
       confirmationLaunched = true;
-      Layout.renderModal(Containers.confirmListModal(events));
+      Layout.renderModal(Containers.confirmListModal(events, 0, () => {
+        if (!paymentLaunched && !teamSubscription.active) {
+          paymentLaunched = true;
+          Layout.renderModal(Containers.paymentModal(teamSubscription));
+        }
+      }));
     }
   }
 }
