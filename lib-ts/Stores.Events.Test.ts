@@ -41,16 +41,14 @@ module Esper.Stores.Events {
 
         let labelScores = teamEvent.labelScores.unwrap();
         expect(labelScores.length).toEqual(2);
-        expect(labelScores).toContain({
-          id: "#floats",
-          displayAs: "#Floats",
-          score: 1
-        });
-        expect(labelScores).toContain({
-          id: "#sinks",
-          displayAs: "#Sinks",
-          score: 1
-        });
+
+        let floats = _.find(labelScores, (l) => l.id === "#floats");
+        expect(floats.displayAs).toBe("#Floats");
+        expect(floats.score).toBe(1);
+
+        let sinks = _.find(labelScores, (l) => l.id === "#sinks");
+        expect(sinks.displayAs).toBe("#Sinks");
+        expect(sinks.score).toBe(1);
       });
 
       it("should filter out predictions that are above the score of 0.5",
@@ -73,18 +71,22 @@ module Esper.Stores.Events {
 
         let labelScores = teamEvent.labelScores.unwrap();
         expect(labelScores.length).toEqual(2);
-        expect(labelScores).toContain({
-          id: TestFixtures.team1LabelInfos[0].normalized,
-          displayAs: TestFixtures.team1LabelInfos[0].original,
-          // 0.8 * 0.95 (PREDICTED_LABEL_MODIFIER)
-          score: 0.76
-        });
-        expect(labelScores).toContain({
-          id: TestFixtures.team1LabelInfos[2].normalized,
-          displayAs: TestFixtures.team1LabelInfos[2].original,
-          // 0.5 * 0.95 (PREDICTED_LABEL_MODIFIER)
-          score: 0.475
-        });
+
+        let l0 = _.find(labelScores,
+          (l) => l.id === TestFixtures.team1LabelInfos[0].normalized
+        );
+        expect(l0.displayAs).toBe(TestFixtures.team1LabelInfos[0].original);
+
+        // 0.8 * 0.95 (PREDICTED_LABEL_MODIFIER)
+        expect(l0.score).toEqual(0.76);
+
+        let l2 = _.find(labelScores,
+          (l) => l.id === TestFixtures.team1LabelInfos[2].normalized
+        );
+        expect(l2.displayAs).toBe(TestFixtures.team1LabelInfos[2].original);
+
+        // 0.5 * 0.95 (PREDICTED_LABEL_MODIFIER)
+        expect(l2.score).toEqual(0.475);
       });
     });
 
