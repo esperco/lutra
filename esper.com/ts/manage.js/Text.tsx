@@ -168,6 +168,7 @@ module Esper.Text {
     `Click here to try reconnecting.`;
 
   // Customer page
+  export const CustomerHeading = `Enterprise Billing`;
   export const CustomerGeneral = GeneralSettings;
   export const CustomerPay = PaySettings;
   export const CustomerAccounts = `Accounts`;

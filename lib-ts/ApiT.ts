@@ -153,6 +153,7 @@ module Esper.ApiT {
   export interface Customer {
     id: string;
     name?: string;
+    teamid?: string;
     primary_contact: CustomerContact;
     secondary_contacts: CustomerContact[];
     subscription: SubscriptionSummary;

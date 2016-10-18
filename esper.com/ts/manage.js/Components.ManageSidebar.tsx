@@ -64,8 +64,10 @@ module Esper.Components {
           </ul>
         </div>
 
+        { this.renderCustomerList() }
+
         <div className="esper-panel-section">
-          <ul className="esper-select-menu"><li>
+          <ul className="esper-header esper-select-menu"><li>
             <a className={classNames({
               active: this.props.pathFn === Paths.Manage.personal
             })} href={Paths.Manage.personal().href}>
@@ -74,6 +76,7 @@ module Esper.Components {
             </a>
           </li></ul>
         </div>
+
       </Components.Sidebar>;
     }
 
@@ -107,8 +110,30 @@ module Esper.Components {
       </li>;
     }
 
-    // TODO: Actually insert function into sidebar when ready
-    renderCustomer(customer: ApiT.Customer) {
+    renderCustomerList() {
+      let customers = _.filter(this.props.customers, (c) => !c.teamid);
+      if (_.isEmpty(customers)) { return null; }
+
+      // Only one customer, don't force user to pick
+      if (customers.length === 1) {
+        return <div className="esper-panel-section">
+          <ul className="esper-header esper-select-menu">
+            { this.renderCustomer(customers[0], Text.CustomerHeading) }
+          </ul>
+        </div>;
+      }
+
+      return <div className="esper-panel-section">
+        <label className="esper-header">
+          { Text.CustomerHeading }
+        </label>
+        <ul className="esper-select-menu">
+          { _.map(customers, (c) => this.renderCustomer(c))}
+        </ul>
+      </div>;
+    }
+
+    renderCustomer(customer: ApiT.Customer, altName?: string) {
       var pathFn = this.props.cusId ? this.props.pathFn
                                     : Paths.Manage.Customer.general;
 
@@ -118,7 +143,7 @@ module Esper.Components {
         })}
         href={pathFn({cusId: customer.id}).href}>
           <i className="fa fa-fw fa-left fa-building" />
-          { Stores.Customers.getDisplayName(customer) }
+          { altName || Stores.Customers.getDisplayName(customer) }
         </a>
       </li>;
     }
