@@ -37,7 +37,7 @@ module Esper.Views {
         </Components.SettingsMenuLink>
         <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Team.pay}>
-          { Text.PaymentSettings }
+          { Text.PaySettings }
         </Components.SettingsMenuLink>
       </Components.SettingsMenu>;
 

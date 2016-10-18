@@ -1,7 +1,4 @@
 module Esper.Text {
-  // Payments
-  export const PaymentSettings = "Payments";
-
   // Personal (non-team) settings
   export const PersonalSettings = "Other Settings";
 

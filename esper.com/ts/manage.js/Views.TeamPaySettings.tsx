@@ -10,7 +10,7 @@ module Esper.Views {
     pathFn = Paths.Manage.Team.pay;
 
     getPlan() {
-      return "Executive Plan";
+      return "Executive Plan"; // TODO - Add other plans
     }
 
     onToken(cusid: string, token: StripeTokenResponse) {
@@ -25,18 +25,18 @@ module Esper.Views {
         { subscription.active ?
           <div className="panel-body">
             <div className="alert alert-info">
-              Your selected plan is {Text.getPlanName(subscription.plan)}.
+              You are subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
           </div>
           :
           <div className="panel-body">
             { subscription.status !== "Past_due" &&
               subscription.status !== "Unpaid" ?
-              <div className="alert alert-info">
+              <div className="alert alert-warning">
                 You have not subscribed to any plan.
               </div>
               :
-              <div className="alert alert-info">
+              <div className="alert alert-danger">
                 Your subscription has expired.
               </div>
             }
