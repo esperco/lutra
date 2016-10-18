@@ -172,5 +172,10 @@ module Esper.Text {
   export const CustomerGeneral = GeneralSettings;
   export const CustomerPay = PaySettings;
   export const CustomerAccounts = `Accounts`;
+  export const CustomerSeatHeading = CustomerAccounts;
   export const CustomerPendingSeatHeading = `Pending Accounts`;
+  export const CustomerDomainHeading = `Domain Names`;
+  export const CustomerDomainDescription = `Add a comma-separated list of ` +
+    `domain names (e.g. example.com) to automatically approve any accounts ` +
+    `from that domain (e.g. name@example.com)`;
 }
