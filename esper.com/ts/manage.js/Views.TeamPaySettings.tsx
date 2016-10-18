@@ -49,8 +49,8 @@ module Esper.Views {
                 Your subscription has expired.
               </div>
             }
-            <Components.Stripe label={"Submit"}
-              description={this.getPlan()}
+            <Components.Stripe stripeKey={Config.STRIPE_KEY}
+              label="Submit" description={this.getPlan()}
               onToken={(token) => this.onToken(subscription.cusid, token)} />
           </div>
         }
@@ -165,8 +165,8 @@ module Esper.Views {
             <div className="esper-no-content">
               No credit cards found
             </div>
-            <Components.Stripe description="Executive Plan"
-              label="Submit"
+            <Components.Stripe stripeKey={Config.STRIPE_KEY}
+              label="Submit" description="Executive Plan"
               onToken={(token) => Actions.Subscriptions.addCard(this.props.cusid, token.id)} />
           </div>;
       }

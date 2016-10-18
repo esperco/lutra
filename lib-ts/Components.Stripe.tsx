@@ -5,6 +5,7 @@
 
 module Esper.Components {
   interface Props {
+    stripeKey: string;
     description: string;
     label: string;
     onToken: (token: StripeTokenResponse) => void;
@@ -28,7 +29,7 @@ module Esper.Components {
     initStripe() {
       // From https://stripe.com/docs/checkout#integration-custom
       this._handler = StripeCheckout.configure({
-        key: Config.STRIPE_KEY,
+        key: this.props.stripeKey,
         email: Login.myEmail(),
 
         // Esper logo

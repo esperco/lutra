@@ -36,6 +36,7 @@
 /// <reference path="../lib/Components.RadioList.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
+/// <reference path="../lib/Components.Stripe.tsx" />
 /// <reference path="../lib/Components.TeamForm.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
