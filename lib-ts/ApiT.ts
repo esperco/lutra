@@ -161,6 +161,8 @@ module Esper.ApiT {
     filter: CustomerTeamFilter;
   }
 
+  export type CustomerList = ListResponse<Customer>;
+
   export interface CustomerContact {
     uid: string;
     email: string;
@@ -171,8 +173,17 @@ module Esper.ApiT {
     email: string;
   }
 
+  export interface CustomerRequestSeatResponse {
+    seat_request_status: "Accepted"|"Pending"|"Rejected";
+  }
+
   export interface CustomerTeamFilter {
     cusid: string;
+    blacklist: EmailFilter;
+    whitelist: EmailFilter;
+  }
+
+  export interface CustomerTeamFilterReq {
     blacklist: EmailFilter;
     whitelist: EmailFilter;
   }
