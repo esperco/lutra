@@ -714,21 +714,6 @@ module Esper.Api {
     return JsonHttp.post(url, req);
   }
 
-  export function getCustomerStatus(teamid: string):
-  JsonPromise<ApiT.CustomerStatus> {
-    var url =
-      prefix + "/api/pay/status/short/" + string(Login.myUid())
-      + "/" + string(teamid);
-    return JsonHttp.get(url);
-  }
-
-  export function getCustomerDetails(teamid: string):
-  JsonPromise<ApiT.CustomerDetails> {
-    var url =
-      prefix + "/api/pay/status/long/" + string(Login.myUid())
-      + "/" + string(teamid);
-    return JsonHttp.get(url);
-  }
 
   /* Team creation */
   export function createTeam(body: ApiT.TeamCreationRequest)
@@ -781,56 +766,56 @@ module Esper.Api {
 
   /*** Payments ***/
 
-  export function getSubscriptionStatus(teamid: string):
-    JsonPromise<ApiT.CustomerStatus> {
-    var url = prefix + "/api/pay/status/long/" + string(Login.me())
-      + "/" + string(teamid);
+  export function getSubscriptionStatus(cusid: string):
+    JsonPromise<ApiT.TeamSubscription> {
+    var url = prefix + "/api/pay/status/short/" + string(Login.me())
+      + "/" + string(cusid);
     return JsonHttp.get(url);
   }
 
-  export function getSubscriptionStatusLong(teamid: string):
-    JsonPromise<ApiT.CustomerDetails> {
+  export function getSubscriptionStatusLong(cusid: string):
+    JsonPromise<ApiT.SubscriptionDetails> {
     var url = prefix + "/api/pay/status/long/" + string(Login.me())
-      + "/" + string(teamid);
+      + "/" + string(cusid);
 
     return JsonHttp.get(url);
   }
 
-  export function setSubscription(teamid: string, planid: string):
+  export function setSubscription(cusid: string, planid: ApiT.PlanId):
     JsonPromise<void> {
     var url = prefix + "/api/pay/subscribe/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(cusid)
       + "/" + string(planid);
     return JsonHttp.post(url);
   }
 
-  export function cancelSubscription(teamid: string):
+  export function cancelSubscription(cusid: string):
     JsonPromise<void> {
     var url = prefix + "/api/pay/unsubscribe/" + string(Login.me())
-      + "/" + string(teamid);
+      + "/" + string(cusid);
     return JsonHttp.post(url);
   }
 
-  export function addNewCard(teamid: string, cardToken: string):
+  export function addNewCard(cusid: string, cardToken: string):
     JsonPromise<ApiT.PaymentCard> {
     var url = prefix + "/api/pay/new-card/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(cusid)
       + "/" + encodeURIComponent(string(cardToken));
     return JsonHttp.post(url);
   }
 
-  export function deleteCard(teamid: string, cardid: string):
+  export function deleteCard(cusid: string, cardid: string):
     JsonPromise<void> {
     var url = prefix + "/api/pay/card/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(cusid)
       + "/" + string(cardid);
     return JsonHttp.delete_(url);
   }
 
-  export function setDefaultCard(teamid: string, cardid: string):
+  export function setDefaultCard(cusid: string, cardid: string):
     JsonPromise<void> {
     var url = prefix + "/api/pay/card/" + string(Login.me())
-      + "/" + string(teamid)
+      + "/" + string(cusid)
       + "/" + string(cardid);
     return JsonHttp.put(url);
   }

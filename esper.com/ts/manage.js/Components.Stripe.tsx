@@ -6,7 +6,7 @@
 module Esper.Components {
   interface Props {
     description: string;
-    amount: number;
+    label: string;
     onToken: (token: StripeTokenResponse) => void;
   }
 
@@ -44,7 +44,7 @@ module Esper.Components {
     render() {
       return <button className="btn btn-primary"
                      onClick={() => this.onClick()}>
-        Pay
+        Enter Payment Info
       </button>
     }
 
@@ -52,8 +52,9 @@ module Esper.Components {
       this._handler.open({
         name: 'Esper',
         description: this.props.description,
+        billingAddress: true,
         zipCode: true,
-        amount: this.props.amount
+        panelLabel: this.props.label
       });
     }
   }

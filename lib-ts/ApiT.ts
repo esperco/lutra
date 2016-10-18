@@ -79,9 +79,24 @@ module Esper.ApiT {
     team_email_aliases?: string[];
   }
 
+  export type PlanId =
+    "Basic_20160923"|"Advanced_20160923"|"Enterprise_20160923";
+
+  export type SubscriptionStatus =
+    "Trialing"|"Active"|"Past_due"|"Canceled"|"Unpaid";
+
+  export interface TeamSubscription {
+    teamid: string;
+    cusid: string;
+    active: boolean;
+    plan: PlanId;
+    status: SubscriptionStatus;
+  }
+
   export interface TeamApi {
     team_exec_email: string;
     team_labels: LabelInfo[];
+    team_subscription: TeamSubscription;
   }
 
   export interface Team {
@@ -140,6 +155,7 @@ module Esper.ApiT {
     name?: string;
     primary_contact: CustomerContact;
     secondary_contacts: CustomerContact[];
+    subscription: SubscriptionSummary;
     seats: CustomerSeat[];
     seat_requests: CustomerSeat[];
     filter: CustomerTeamFilter;
@@ -537,14 +553,16 @@ module Esper.ApiT {
     description_text: string;
   }
 
-  export interface CustomerStatus {
-    teamid: string;
+  export interface SubscriptionSummary {
+    cusid: string;
     active: boolean;
-    plan?: string;
-    status?: string; // subscription_status
+    plan?: PlanId;
+    status?: SubscriptionStatus;
   }
 
-  export interface CustomerDetails extends CustomerStatus {
+  export interface SubscriptionDetails extends SubscriptionSummary {
+    quantity?: number;
+
     /* timestamps */
     trial_end?: string;
     trial_start?: string;
@@ -552,12 +570,16 @@ module Esper.ApiT {
     current_period_start?: string;
     canceled_at?: string;
     ended_at?: string;
+
     cards: PaymentCard[];
   }
 
+  export type CardBrand =
+    "Visa"|"American_express"|"Mastercard"|"Discover"|"Jcb"|"Diners_club";
+
   export interface PaymentCard {
     id: string;
-    brand?: string;  // card_brand option
+    brand?: CardBrand;
     exp_month: number;
     exp_year: number;
     last4: string;

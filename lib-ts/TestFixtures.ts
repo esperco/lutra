@@ -164,6 +164,7 @@ module Esper.TestFixtures {
 
   export function makeTeam(props: {
     teamid?: string;
+    cusid?: string;
     team_name?: string;
     team_approved?: boolean;
     team_owner?: string;
@@ -180,7 +181,14 @@ module Esper.TestFixtures {
       teamid: props.teamid || "team-id",
       team_api: {
         team_labels: props.team_labels || [],
-        team_exec_email: props.team_executive_email || ""
+        team_exec_email: props.team_executive_email || "",
+        team_subscription: {
+          teamid: props.teamid || "team-id",
+          cusid: props.cusid || "customer-id",
+          active: true,
+          plan: "Basic_20160923",
+          status: "Active"
+        }
       },
       team_name: props.team_name || "Team Name",
       team_approved: _.isUndefined(props.team_approved) ?

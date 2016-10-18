@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../../../typings/browser/index.d.ts" />
+/// <reference path="../lib/Actions.Subscriptions.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
 /// <reference path="../lib/Actions.Groups.ts" />
@@ -16,6 +17,7 @@
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />
 /// <reference path="../lib/Stores.Customers.ts" />
+/// <reference path="../lib/Stores.Subscriptions.ts" />
 /// <reference path="../lib/Stores.TeamPreferences.ts" />
 /// <reference path="../lib/Stores.GroupPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
