@@ -44,7 +44,7 @@ module Esper.Components {
     render() {
       return <button className="btn btn-primary"
                      onClick={() => this.onClick()}>
-        Enter Payment Information
+        Enter Payment Info
       </button>
     }
 

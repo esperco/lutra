@@ -8,7 +8,6 @@
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
 /// <reference path="../lib/Actions.Groups.ts" />
 /// <reference path="../lib/Actions.GroupPreferences.ts" />
-/// <reference path="../lib/Actions.Payment.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />
 /// <reference path="../lib/Params.ts" />
