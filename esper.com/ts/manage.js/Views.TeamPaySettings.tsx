@@ -104,8 +104,6 @@ module Esper.Views {
     }
 
     getCardIcon(brand: ApiT.CardBrand) {
-      if (!brand)
-        return "fa-credit-card-alt";
       if (brand === "Visa")
         return "fa-cc-visa";
       if (brand === "American_express")
@@ -118,6 +116,7 @@ module Esper.Views {
         return "fa-cc-jcb";
       if (brand === "Diners_club")
         return "fa-cc-diners-club";
+      return "fa-credit-card-alt";
     }
 
     removeCard(cardid: string) {
