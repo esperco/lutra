@@ -58,3 +58,34 @@
 .esper-sidebar-section {
   padding-bottom: 20px;
 }
+
+.sub-plan-box {
+  background-color: @btn-primary-bg;
+  color: @btn-primary-color;
+  min-height: 250px;
+  border: 1px solid @btn-primary-border;
+  border-radius: 6px;
+  margin: 8px;
+  cursor: pointer;
+  transition: color 0.5s, border 0.5s, background-color 0.5s, transform 0.5s;
+
+  &:hover {
+               color: @brand-contrast;
+    background-color: lighten(@btn-primary-border, 12%);
+        border-color: lighten(@btn-primary-border, 12%);
+  }
+
+  .sub-plan-heading {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid @btn-primary-border;
+  }
+
+  ul > li {
+    margin-top: 6px;
+    font-weight: bold;
+  }
+}

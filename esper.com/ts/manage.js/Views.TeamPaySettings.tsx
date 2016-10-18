@@ -14,8 +14,9 @@ module Esper.Views {
     }
 
     onToken(cusid: string, token: StripeTokenResponse) {
-      Actions.Subscriptions.addCard(cusid, token.id);
-      Actions.Subscriptions.set(cusid, "Advanced_20160923");
+      Actions.Subscriptions.addCard(cusid, token.id).then(() =>
+        Actions.Subscriptions.set(cusid, "Advanced_20160923")
+      );
     }
 
     renderMain(team: ApiT.Team) {
@@ -34,24 +35,22 @@ module Esper.Views {
             <div className="alert alert-info">
               {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
-            <CreditCardList cusid={team.team_api.team_subscription.cusid}
-              busy={busy} />
+            <CreditCardList cusid={subscription.cusid}
+              planid={subscription.plan} busy={busy} />
           </div>
           :
           <div className="panel-body">
             { subscription.status !== "Past_due" &&
               subscription.status !== "Unpaid" ?
               <div className="alert alert-warning">
-                You have not subscribed to any plan.
+                You have not subscribed to any plan. Please select a plan below.
               </div>
               :
               <div className="alert alert-danger">
                 Your subscription has expired.
               </div>
             }
-            <Components.Stripe stripeKey={Config.STRIPE_KEY}
-              label="Submit" description={this.getPlan()}
-              onToken={(token) => this.onToken(subscription.cusid, token)} />
+            <Components.Plans cusid={subscription.cusid} />
           </div>
         }
       </div>;
@@ -60,6 +59,7 @@ module Esper.Views {
 
   interface Props {
     cusid: string;
+    planid: ApiT.PlanId;
     busy: boolean;
   }
 
@@ -127,7 +127,7 @@ module Esper.Views {
       this.mutateState((s) => s.rmCard = cardid);
       this._handler.open({
         name: 'Esper',
-        description: "Executive Plan",
+        description: Text.getPlanName(this.props.planid),
         billingAddress: true,
         zipCode: true,
         panelLabel: "Submit"
@@ -167,7 +167,11 @@ module Esper.Views {
             </div>
             <Components.Stripe stripeKey={Config.STRIPE_KEY}
               label="Submit" description="Executive Plan"
-              onToken={(token) => Actions.Subscriptions.addCard(this.props.cusid, token.id)} />
+              onToken={(token) => Actions.Subscriptions.addCard(this.props.cusid, token.id)}>
+              <button className="btn btn-primary">
+                Enter Payment Info
+              </button>
+            </Components.Stripe>
           </div>;
       }
     }

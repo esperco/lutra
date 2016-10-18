@@ -12,7 +12,7 @@ module Esper.Actions.Subscriptions {
   */
 
   export function set(cusId: string, planId: ApiT.PlanId) {
-    Api.setSubscription(cusId, planId).then(() => location.reload(false))
+    Api.setSubscription(cusId, planId).then(() => location.reload(false));
   }
 
   export function cancel(cusId: string) {
@@ -32,6 +32,7 @@ module Esper.Actions.Subscriptions {
       })
     );
     Stores.Subscriptions.SubscriptionStore.pushFetch(cusId, p);
+    return p;
   }
 
   export function deleteCard(cusId: string, cardId: string) {

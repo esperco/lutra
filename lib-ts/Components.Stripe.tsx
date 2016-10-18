@@ -9,6 +9,7 @@ module Esper.Components {
     description: string;
     label: string;
     onToken: (token: StripeTokenResponse) => void;
+    children?: JSX.Element|JSX.Element[];
   }
 
   export class Stripe extends ReactHelpers.Component<Props, {}> {
@@ -43,10 +44,9 @@ module Esper.Components {
     }
 
     render() {
-      return <button className="btn btn-primary"
-                     onClick={() => this.onClick()}>
-        Enter Payment Info
-      </button>
+      return <span onClick={this.onClick.bind(this)}>
+        { this.props.children }
+      </span>;
     }
 
     onClick() {
