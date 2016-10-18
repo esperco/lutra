@@ -34,8 +34,9 @@ module Esper.Views {
         </Components.SettingsMenuLink>
       </Components.SettingsMenu>;
 
+      let ready = Stores.Customers.ready();
       return <Views.Settings {...this.props} subMenu={subMenu}>
-        { this.renderMain(cust) }
+        { ready ? this.renderMain(cust) : <div className="esper-spinner" /> }
       </Views.Settings>
     }
 

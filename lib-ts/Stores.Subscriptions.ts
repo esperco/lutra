@@ -55,7 +55,20 @@ module Esper.Stores.Subscriptions {
     });
 
     if (shouldFetch) {
-      let p = Api.getSubscriptionStatusLong(cusId).then((c) => Option.wrap(c));
+      let p = Api.getSubscriptionStatusLong(cusId).then(
+        (c) => Option.wrap(c),
+        (err) => {
+          /*
+            This error happens because this team belongs to a Customer that
+            the current user is not a contact for. Don't throw or log error.
+
+            We can use status + get function above to determine whether
+            we don't have access to Customer.
+          */
+          if (err.errorDetails === "User_not_customer_contact") {
+            err.handled = true;
+          }
+        });
       SubscriptionStore.fetch(cusId, p);
     }
   }
