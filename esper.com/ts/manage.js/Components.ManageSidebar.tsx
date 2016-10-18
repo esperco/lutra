@@ -134,8 +134,10 @@ module Esper.Components {
     }
 
     renderCustomer(customer: ApiT.Customer, altName?: string) {
+      // NB: Change Paths.Manage.Customer.accounts to general page when
+      // general page actually has useful info
       var pathFn = this.props.cusId ? this.props.pathFn
-                                    : Paths.Manage.Customer.general;
+                                    : Paths.Manage.Customer.accounts;
 
       return <li key={customer.id}>
         <a className={classNames({

@@ -19,10 +19,11 @@ module Esper.Views {
       if (! cust) return <span />;
 
       let subMenu = <Components.SettingsMenu>
-        <Components.SettingsMenuLink {...this.props}
+        { /* Nothing on general page yet -- so remove link */
+          /* <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Customer.general}>
           { Text.CustomerGeneral }
-        </Components.SettingsMenuLink>
+        </Components.SettingsMenuLink> */ }
         <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Customer.accounts}>
           { Text.CustomerAccounts }
