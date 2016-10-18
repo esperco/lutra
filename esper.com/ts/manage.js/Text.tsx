@@ -172,4 +172,5 @@ module Esper.Text {
   export const CustomerGeneral = GeneralSettings;
   export const CustomerPay = PaySettings;
   export const CustomerAccounts = `Accounts`;
+  export const CustomerPendingSeatHeading = `Pending Accounts`;
 }
