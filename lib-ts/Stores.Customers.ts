@@ -1,6 +1,5 @@
 /*
-  Refactored module for storing team data, along with helpers.
-  Helpers for getting and setting current team info
+  Stores Customer object
 */
 
 /// <reference path="./Model2.Batch.ts" />
@@ -26,17 +25,17 @@ module Esper.Stores.Customers {
 
   /* Helper Functions */
 
-  export function get(custId: string): Option.T<ApiT.Customer> {
-    return CustomerStore.get(custId).flatMap((t) => t.data);
+  export function get(cusId: string): Option.T<ApiT.Customer> {
+    return CustomerStore.get(cusId).flatMap((t) => t.data);
   }
 
   // Like get, but logs error if customer doe not exist
-  export function require(custId: string): ApiT.Customer {
-    return get(custId).match({
+  export function require(cusId: string): ApiT.Customer {
+    return get(cusId).match({
       none: (): ApiT.Customer => {
         Log.e("Customers.require called with non-existent customer - " +
-              custId);
-        CustomerStore.setSafe(custId, Option.none<ApiT.Customer>(), {
+              cusId);
+        CustomerStore.setSafe(cusId, Option.none<ApiT.Customer>(), {
           dataStatus: Model2.DataStatus.PUSH_ERROR
         });
         return null;
@@ -45,8 +44,8 @@ module Esper.Stores.Customers {
     })
   }
 
-  export function status(custId: string): Option.T<Model2.DataStatus> {
-    return CustomerStore.get(custId).flatMap((t) => Option.wrap(t.dataStatus));
+  export function status(cusId: string): Option.T<Model2.DataStatus> {
+    return CustomerStore.get(cusId).flatMap((t) => Option.wrap(t.dataStatus));
   }
 
   export function all(): ApiT.Customer[] {
@@ -91,11 +90,11 @@ module Esper.Stores.Customers {
     return cust.id;
   }
 
-  export function remove(custId: string) {
-    CustomerStore.remove(custId);
+  export function remove(cusId: string) {
+    CustomerStore.remove(cusId);
 
     var currentIds = _.clone(allIds());
-    _.pull(currentIds, custId);
+    _.pull(currentIds, cusId);
     CustomerListStore.setSafe(batchKey, Option.some(currentIds));
   }
 
@@ -118,6 +117,10 @@ module Esper.Stores.Customers {
       secondary_contacts: [],
       seats: [],
       seat_requests: [],
+      subscription: {
+        cusid: "cust-id",
+        active: true
+      },
       filter: {
         cusid: "cust-id",
         blacklist: {

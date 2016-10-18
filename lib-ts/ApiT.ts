@@ -155,6 +155,7 @@ module Esper.ApiT {
     name?: string;
     primary_contact: CustomerContact;
     secondary_contacts: CustomerContact[];
+    subscription: SubscriptionSummary;
     seats: CustomerSeat[];
     seat_requests: CustomerSeat[];
     filter: CustomerTeamFilter;
@@ -552,14 +553,16 @@ module Esper.ApiT {
     description_text: string;
   }
 
-  export interface CustomerStatus {
-    teamid: string;
+  export interface SubscriptionSummary {
+    cusid: string;
     active: boolean;
-    plan?: string;
-    status?: string; // subscription_status
+    plan?: PlanId;
+    status?: SubscriptionStatus;
   }
 
-  export interface CustomerDetails extends CustomerStatus {
+  export interface SubscriptionDetails extends SubscriptionSummary {
+    quantity?: number;
+
     /* timestamps */
     trial_end?: string;
     trial_start?: string;
@@ -567,6 +570,7 @@ module Esper.ApiT {
     current_period_start?: string;
     canceled_at?: string;
     ended_at?: string;
+
     cards: PaymentCard[];
   }
 
