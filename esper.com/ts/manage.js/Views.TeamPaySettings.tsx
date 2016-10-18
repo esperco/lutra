@@ -63,46 +63,7 @@ module Esper.Views {
     busy: boolean;
   }
 
-  interface State {
-    rmCard?: string;
-  }
-
-  export class CreditCardList extends ReactHelpers.Component<Props, State> {
-    _handler: StripeCheckoutHandler;
-
-    constructor(props: Props) {
-      super(props);
-      this.initStripe();
-    }
-
-    initStripe() {
-      // From https://stripe.com/docs/checkout#integration-custom
-      this._handler = StripeCheckout.configure({
-        key: Config.STRIPE_KEY,
-        email: Login.myEmail(),
-
-        // Esper logo
-        image: 'https://s3.amazonaws.com/stripe-uploads/' +
-               'acct_14skFFJUNehGQrIumerchant-icon-' +
-               '1425935548640-Logo_symbol.png',
-
-        locale: 'auto',
-        token: this.onToken.bind(this)
-      });
-    }
-
-    onToken(token: StripeTokenResponse) {
-      Actions.Subscriptions.addCard(this.props.cusid, token.id);
-      Actions.Subscriptions.deleteCard(this.props.cusid, this.state.rmCard);
-    }
-
-    componentWillUnmount() {
-      super.componentWillUnmount();
-      if (this._handler) {
-        this._handler.close();
-      }
-    }
-
+  export class CreditCardList extends ReactHelpers.Component<Props, {}> {
     getCardIcon(brand: ApiT.CardBrand) {
       if (brand === "Visa")
         return "fa-cc-visa";
@@ -123,15 +84,9 @@ module Esper.Views {
       Actions.Subscriptions.deleteCard(this.props.cusid, cardid);
     }
 
-    editCard(cardid: string) {
-      this.mutateState((s) => s.rmCard = cardid);
-      this._handler.open({
-        name: 'Esper',
-        description: Text.getPlanName(this.props.planid),
-        billingAddress: true,
-        zipCode: true,
-        panelLabel: "Submit"
-      });
+    onEditCreditCard(token: StripeTokenResponse, cardid: string) {
+      Actions.Subscriptions.addCard(this.props.cusid, token.id);
+      Actions.Subscriptions.deleteCard(this.props.cusid, cardid);
     }
 
     renderCreditCard(card: ApiT.PaymentCard) {
@@ -143,10 +98,13 @@ module Esper.Views {
              onClick={(e) => this.removeCard(card.id)}>
             <i className="fa fa-fw fa-times list-group-item-text" />
           </a>
-          <a className="pull-right text-info" title="Edit Card"
-             onClick={(e) => this.editCard(card.id)}>
-            <i className="fa fa-fw fa-pencil list-group-item-text" />
-          </a>
+          <Components.Stripe description={Text.getPlanName(this.props.planid)}
+            label="Submit" stripeKey={Config.STRIPE_KEY}
+            onToken={(token) => this.onEditCreditCard(token, card.id)}>
+            <a className="pull-right text-info" title="Edit Card">
+              <i className="fa fa-fw fa-pencil list-group-item-text" />
+            </a>
+          </Components.Stripe>
         </span>
       </div>;
     }
