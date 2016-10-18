@@ -32,7 +32,7 @@ module Esper.Views {
         { subscription.active ?
           <div className="panel-body">
             <div className="alert alert-info">
-              You are subscribed to the {Text.getPlanName(subscription.plan)}.
+              {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
             <CreditCardList cusid={team.team_api.team_subscription.cusid}
               busy={busy} />
