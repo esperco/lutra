@@ -36,14 +36,13 @@ module Esper.Views {
           </div>
           :
           <div className="panel-body">
-            { subscription.status !== "Past_due" &&
-              subscription.status !== "Unpaid" ?
+            { subscription.status === "Canceled" ?
               <div className="alert alert-warning">
                 You have not subscribed to any plan. Please select a plan below.
               </div>
               :
               <div className="alert alert-danger">
-                Your subscription has expired.
+                Your subscription has expired. Please select a plan below to renew.
               </div>
             }
             <Components.Plans cusid={subscription.cusid} />
