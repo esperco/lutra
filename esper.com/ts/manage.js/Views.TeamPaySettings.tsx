@@ -35,7 +35,7 @@ module Esper.Views {
             <div className="alert alert-info">
               {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
-            <Components.Plans cusid={subscription.cusid} isDisplay
+            <Components.Plans cusid={subscription.cusid} noStripe
               onClick={(newPlan) => this.changePlan(subscription.cusid, newPlan)}
               selectedPlan={subscription.plan} />
             <CreditCardList cusid={subscription.cusid}

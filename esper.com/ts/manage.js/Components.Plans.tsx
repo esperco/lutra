@@ -5,7 +5,7 @@
 module Esper.Components {
   interface Props {
     cusid: string;
-    isDisplay?: boolean;
+    noStripe?: boolean;
     selectedPlan?: ApiT.PlanId;
     onClick?: (selectedPlan: ApiT.PlanId) => any;
   }
@@ -18,7 +18,7 @@ module Esper.Components {
     }
 
     render() {
-      return this.props.isDisplay ? <div className="esper-flex-list">
+      return this.props.noStripe ? <div className="esper-flex-list">
         <PlanInfo planid="Basic_20160923" onClick={this.props.onClick}
           selectedPlan={this.props.selectedPlan} />
         <PlanInfo planid="Advanced_20160923" onClick={this.props.onClick}
