@@ -15,10 +15,6 @@ module Esper.Views {
       );
     }
 
-    changePlan(cusid: string, newPlan: ApiT.PlanId) {
-      Actions.Subscriptions.set(cusid, newPlan);
-    }
-
     renderMain(team: ApiT.Team) {
       var subscription = team.team_api.team_subscription;
 
@@ -35,11 +31,8 @@ module Esper.Views {
             <div className="alert alert-info">
               {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
-            <Components.Plans cusid={subscription.cusid} noStripe
-              onClick={(newPlan) => this.changePlan(subscription.cusid, newPlan)}
-              selectedPlan={subscription.plan} />
-            <CreditCardList cusid={subscription.cusid}
-              planid={subscription.plan} busy={busy} />
+            <PaymentInfo cusid={subscription.cusid}
+              existingPlan={subscription.plan} busy={busy} />
           </div>
           :
           <div className="panel-body">
@@ -62,11 +55,11 @@ module Esper.Views {
 
   interface Props {
     cusid: string;
-    planid: ApiT.PlanId;
+    existingPlan: ApiT.PlanId;
     busy: boolean;
   }
 
-  export class CreditCardList extends ReactHelpers.Component<Props, {}> {
+  export class PaymentInfo extends ReactHelpers.Component<Props, {}> {
     getCardIcon(brand: ApiT.CardBrand) {
       if (brand === "Visa")
         return "fa-cc-visa";
@@ -92,6 +85,10 @@ module Esper.Views {
       Actions.Subscriptions.deleteCard(this.props.cusid, cardid);
     }
 
+    changePlan(cusid: string, newPlan: ApiT.PlanId) {
+      Actions.Subscriptions.set(cusid, newPlan);
+    }
+
     renderCreditCard(card: ApiT.PaymentCard) {
       return <div className="list-group-item one-line" key={card.id}>
         <i className={"fa fa-fw " + this.getCardIcon(card.brand)} />
@@ -101,7 +98,7 @@ module Esper.Views {
              onClick={(e) => this.removeCard(card.id)}>
             <i className="fa fa-fw fa-times list-group-item-text" />
           </a>
-          <Components.Stripe description={Text.getPlanName(this.props.planid)}
+          <Components.Stripe description={Text.getPlanName(this.props.existingPlan)}
             label="Submit" stripeKey={Config.STRIPE_KEY}
             onToken={(token) => this.onEditCreditCard(token, card.id)}>
             <a className="pull-right text-info" title="Edit Card">
@@ -118,21 +115,20 @@ module Esper.Views {
       else {
         let details = Stores.Subscriptions.require(this.props.cusid);
         return details.cards.length ?
-          <div className="list-group">
-            { _.map(details.cards, this.renderCreditCard.bind(this)) }
+          <div>
+            <Components.Plans cusid={this.props.cusid} noStripe
+              onClick={(newPlan) => this.changePlan(this.props.cusid, newPlan)}
+              selectedPlan={this.props.existingPlan} />
+            <div className="list-group">
+              { _.map(details.cards, this.renderCreditCard.bind(this)) }
+            </div>
           </div>
           :
           <div>
+            <Components.Plans cusid={this.props.cusid} />
             <div className="esper-no-content">
               No credit cards found
             </div>
-            <Components.Stripe stripeKey={Config.STRIPE_KEY}
-              label="Submit" description="Executive Plan"
-              onToken={(token) => Actions.Subscriptions.addCard(this.props.cusid, token.id)}>
-              <button className="btn btn-primary">
-                Enter Payment Info
-              </button>
-            </Components.Stripe>
           </div>;
       }
     }
