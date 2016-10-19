@@ -37,20 +37,27 @@ module Esper.Text {
     return "Enterprise Plan";
   }
   export const BasicPlanFeatures = [
-    "Share up to 2 calendars",
-    "Browse up to 2 months of calendar history",
-    "Use #hashtags to label your events",
-    "Receive weekly label reminder emails"
+    "1 Calendar",
+    "2 months of calendar history",
+    "Slack integration",
+    "#Hashtag event labeling",
+    "Weekly label reminder emails"
   ];
+  export const FreeTrialMsg = `14 Day Free Trial`;
+  export const BasicPlanPrice = `$25 / month`;
   export const AdvancedPlanFeatures = [
-    "Unlimited shared calendars",
-    "Browse up to 5 YEARS of calendar history",
-    "Use #hashtags to label your events",
-    "Receive weekly label reminder emails",
-    "Customizable reports page",
-    "Advanced events filtering",
-    "More insights of your time using Time Series"
+    "Unlimited calendars",
+    "5 YEARS of calendar history",
+    "Slack integration",
+    "#Hashtag event labeling",
+    "Weekly label reminder emails",
+    // "Customizable reports page", // Not supported yet
+    "Advanced reporting",
+    "Time series reports",
+    "Chart export"
   ];
+  export const AdvancedPlanPrice = `$100 / month`;
+  export const StartPlan = "Start Free Trial";
   export const SelectPlan = "Select";
   export const ActivePlan = "Current Plan";
 

@@ -58,16 +58,21 @@ module Esper.Components {
   }, {}> {
     render() {
       var planInfo: JSX.Element;
-      if (this.props.planid === "Basic_20160923")
+      var pricing: string;
+      if (this.props.planid === "Basic_20160923") {
         planInfo = <ul>
           { _.map(Text.BasicPlanFeatures, (feature, i) =>
               <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
         </ul>;
-      else if (this.props.planid === "Advanced_20160923")
+        pricing = Text.BasicPlanPrice;
+      }
+      else if (this.props.planid === "Advanced_20160923") {
         planInfo = <ul>
           { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
               <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
         </ul>;
+        pricing = Text.AdvancedPlanPrice;
+      }
 
       let selected = this.props.selectedPlan === this.props.planid;
 
@@ -81,11 +86,14 @@ module Esper.Components {
           { Text.getPlanName(this.props.planid) }
         </h4>
         <div className="sub-plan-body">
+          <div className="free-trial">{Text.FreeTrialMsg}</div>
+          <div className="pricing">{ pricing }</div>
           { planInfo }
         </div>
         <div className="sub-plan-footer">
           <button className="btn btn-success form-control" disabled={selected}>
-            { selected ? Text.ActivePlan : Text.SelectPlan }
+            { selected ? Text.ActivePlan :
+            ( this.props.selectedPlan ? Text.SelectPlan : Text.StartPlan )}
           </button>
         </div>
       </div>;
