@@ -47,26 +47,18 @@ module Esper.Components {
     selectedPlan?: ApiT.PlanId;
     onClick?: (selectedPlan: ApiT.PlanId) => any;
   }, {}> {
-    basicPlanInfo() {
-      return <ul>
-        { _.map(Text.BasicPlanFeatures, (feature, i) =>
-            <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
-      </ul>;
-    }
-
-    advancedPlanInfo() {
-      return <ul>
-        { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
-            <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
-      </ul>;
-    }
-
     render() {
       var planInfo: JSX.Element;
       if (this.props.planid === "Basic_20160923")
-        planInfo = this.basicPlanInfo();
+        planInfo = <ul>
+          { _.map(Text.BasicPlanFeatures, (feature, i) =>
+              <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
+        </ul>;
       if (this.props.planid === "Advanced_20160923")
-        planInfo = this.advancedPlanInfo();
+        planInfo = <ul>
+          { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
+              <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
+        </ul>;
 
       return <div className={classNames("sub-plan-box", {
         selected: this.props.selectedPlan === this.props.planid
