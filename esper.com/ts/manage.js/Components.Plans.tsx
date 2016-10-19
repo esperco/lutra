@@ -13,7 +13,10 @@ module Esper.Components {
   export class Plans extends ReactHelpers.Component<Props, {}> {
     onToken(token: StripeTokenResponse, planid: ApiT.PlanId) {
       Actions.Subscriptions.addCard(this.props.cusid, token.id).then(() =>
-        Actions.Subscriptions.set(this.props.cusid, planid)
+        Actions.Subscriptions.set(this.props.cusid, planid).then(() =>
+          Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
+            `for ${Text.getPlanName(planid)}`)
+          )
       );
     }
 
