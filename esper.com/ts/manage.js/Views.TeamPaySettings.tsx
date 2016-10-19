@@ -9,12 +9,6 @@ module Esper.Views {
   export class TeamPaySettings extends TeamSettings {
     pathFn = Paths.Manage.Team.pay;
 
-    onToken(cusid: string, token: StripeTokenResponse) {
-      Actions.Subscriptions.addCard(cusid, token.id).then(() =>
-        Actions.Subscriptions.set(cusid, "Advanced_20160923")
-      );
-    }
-
     renderMain(team: ApiT.Team) {
       var subscription = team.team_api.team_subscription;
       var busy = Stores.Subscriptions.status(subscription.cusid).match({

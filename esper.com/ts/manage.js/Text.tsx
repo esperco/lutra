@@ -30,9 +30,9 @@ module Esper.Text {
   // Payments
   export const PaySettings = "Billing";
   export function getPlanName(planid: ApiT.PlanId) {
-    if (planid === "Basic_20160923")
+    if (planid === "Basic_20161019")
       return "Basic Plan";
-    if (planid === "Advanced_20160923")
+    if (planid === "Advanced_20161019")
       return "Executive Plan";
     return "Enterprise Plan";
   }

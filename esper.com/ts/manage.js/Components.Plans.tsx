@@ -24,11 +24,11 @@ module Esper.Components {
       return this.props.noStripe ?
         <div className="esper-flex-list esper-section">
           <div className="esper-section">
-            <PlanInfo planid="Basic_20160923" onClick={this.props.onClick}
+            <PlanInfo planid="Basic_20161019" onClick={this.props.onClick}
               selectedPlan={this.props.selectedPlan} />
           </div>
           <div className="esper-section">
-            <PlanInfo planid="Advanced_20160923" onClick={this.props.onClick}
+            <PlanInfo planid="Advanced_20161019" onClick={this.props.onClick}
               selectedPlan={this.props.selectedPlan} />
           </div>
         </div>
@@ -37,16 +37,16 @@ module Esper.Components {
           <div className="esper-section">
             <Components.Stripe stripeKey={Config.STRIPE_KEY}
               description="Basic Plan" label="Submit"
-              onToken={(token) => this.onToken(token, "Basic_20160923")}>
-              <PlanInfo planid="Basic_20160923"
+              onToken={(token) => this.onToken(token, "Basic_20161019")}>
+              <PlanInfo planid="Basic_20161019"
                 selectedPlan={this.props.selectedPlan} />
             </Components.Stripe>
           </div>
           <div className="esper-section">
             <Components.Stripe stripeKey={Config.STRIPE_KEY}
               description="Executive Plan" label="Submit"
-              onToken={(token) => this.onToken(token, "Advanced_20160923")}>
-              <PlanInfo planid="Advanced_20160923"
+              onToken={(token) => this.onToken(token, "Advanced_20161019")}>
+              <PlanInfo planid="Advanced_20161019"
                 selectedPlan={this.props.selectedPlan} />
             </Components.Stripe>
           </div>
@@ -62,14 +62,14 @@ module Esper.Components {
     render() {
       var planInfo: JSX.Element;
       var pricing: string;
-      if (this.props.planid === "Basic_20160923") {
+      if (this.props.planid === "Basic_20161019") {
         planInfo = <ul>
           { _.map(Text.BasicPlanFeatures, (feature, i) =>
               <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
         </ul>;
         pricing = Text.BasicPlanPrice;
       }
-      else if (this.props.planid === "Advanced_20160923") {
+      else if (this.props.planid === "Advanced_20161019") {
         planInfo = <ul>
           { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
               <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
