@@ -55,6 +55,8 @@ module Esper.Actions {
   }
 
   export function renderTeamPaySettings(props: TeamSettingProps) {
+    let team = Stores.Teams.require(props.teamId);
+    Stores.Subscriptions.fetch(team.team_api.team_subscription.cusid);
     render(<Views.TeamPaySettings {...props} />);
     Analytics.page(Analytics.Page.TeamPay);
   }

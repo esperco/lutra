@@ -51,6 +51,8 @@ module Esper.Text {
     "Advanced events filtering",
     "More insights of your time using Time Series"
   ];
+  export const SelectPlan = "Select";
+  export const ActivePlan = "Current Plan";
 
   // Groups
   export const Group = "group";

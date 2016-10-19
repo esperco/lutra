@@ -18,27 +18,36 @@ module Esper.Components {
     }
 
     render() {
-      return this.props.noStripe ? <div className="esper-flex-list">
-        <PlanInfo planid="Basic_20160923" onClick={this.props.onClick}
-          selectedPlan={this.props.selectedPlan} />
-        <PlanInfo planid="Advanced_20160923" onClick={this.props.onClick}
-          selectedPlan={this.props.selectedPlan} />
-      </div>
-      :
-      <div className="esper-flex-list">
-        <Components.Stripe stripeKey={Config.STRIPE_KEY}
-          description="Basic Plan" label="Submit"
-          onToken={(token) => this.onToken(token, "Basic_20160923")}>
-          <PlanInfo planid="Basic_20160923"
-            selectedPlan={this.props.selectedPlan} />
-        </Components.Stripe>
-        <Components.Stripe stripeKey={Config.STRIPE_KEY}
-          description="Executive Plan" label="Submit"
-          onToken={(token) => this.onToken(token, "Advanced_20160923")}>
-          <PlanInfo planid="Advanced_20160923"
-            selectedPlan={this.props.selectedPlan} />
-        </Components.Stripe>
-      </div>;
+      return this.props.noStripe ?
+        <div className="esper-flex-list esper-section">
+          <div className="esper-section">
+            <PlanInfo planid="Basic_20160923" onClick={this.props.onClick}
+              selectedPlan={this.props.selectedPlan} />
+          </div>
+          <div className="esper-section">
+            <PlanInfo planid="Advanced_20160923" onClick={this.props.onClick}
+              selectedPlan={this.props.selectedPlan} />
+          </div>
+        </div>
+        :
+        <div className="esper-flex-list esper-section">
+          <div className="esper-section">
+            <Components.Stripe stripeKey={Config.STRIPE_KEY}
+              description="Basic Plan" label="Submit"
+              onToken={(token) => this.onToken(token, "Basic_20160923")}>
+              <PlanInfo planid="Basic_20160923"
+                selectedPlan={this.props.selectedPlan} />
+            </Components.Stripe>
+          </div>
+          <div className="esper-section">
+            <Components.Stripe stripeKey={Config.STRIPE_KEY}
+              description="Executive Plan" label="Submit"
+              onToken={(token) => this.onToken(token, "Advanced_20160923")}>
+              <PlanInfo planid="Advanced_20160923"
+                selectedPlan={this.props.selectedPlan} />
+            </Components.Stripe>
+          </div>
+        </div>;
     }
   }
 
@@ -54,22 +63,31 @@ module Esper.Components {
           { _.map(Text.BasicPlanFeatures, (feature, i) =>
               <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
         </ul>;
-      if (this.props.planid === "Advanced_20160923")
+      else if (this.props.planid === "Advanced_20160923")
         planInfo = <ul>
           { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
               <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
         </ul>;
 
+      let selected = this.props.selectedPlan === this.props.planid;
+
       return <div className={classNames("sub-plan-box", {
-        selected: this.props.selectedPlan === this.props.planid
+        selected
       })} onClick={
         (e) => this.props.onClick ? this.props.onClick(this.props.planid)
                                   : null
       }>
-        <div className="sub-plan-heading">
+        <h4 className="sub-plan-heading">
           { Text.getPlanName(this.props.planid) }
+        </h4>
+        <div className="sub-plan-body">
+          { planInfo }
         </div>
-        { planInfo }
+        <div className="sub-plan-footer">
+          <button className="btn btn-success form-control" disabled={selected}>
+            { selected ? Text.ActivePlan : Text.SelectPlan }
+          </button>
+        </div>
       </div>;
     }
   }

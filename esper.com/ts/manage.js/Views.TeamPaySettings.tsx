@@ -17,9 +17,6 @@ module Esper.Views {
 
     renderMain(team: ApiT.Team) {
       var subscription = team.team_api.team_subscription;
-
-      Stores.Subscriptions.fetch(subscription.cusid);
-
       var busy = Stores.Subscriptions.status(subscription.cusid).match({
         none: () => false,
         some: (d) => d === Model2.DataStatus.FETCHING
@@ -29,7 +26,8 @@ module Esper.Views {
         { subscription.active ?
           <div className="panel-body">
             <div className="alert alert-info">
-              {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
+              {team.team_name} is subscribed to
+              the {Text.getPlanName(subscription.plan)}.
             </div>
             <PaymentInfo cusid={subscription.cusid}
               existingPlan={subscription.plan} busy={busy} />
@@ -114,19 +112,21 @@ module Esper.Views {
       else {
         let details = Stores.Subscriptions.require(this.props.cusid);
         return details.cards.length ?
-          <div>
+          <div className="esper-section">
             <Components.Plans cusid={this.props.cusid} noStripe
               onClick={(newPlan) => this.changePlan(this.props.cusid, newPlan)}
               selectedPlan={this.props.existingPlan} />
-            <div className="list-group">
+            <div className="list-group esper-section">
               { _.map(details.cards, this.renderCreditCard.bind(this)) }
             </div>
           </div>
           :
-          <div>
+          <div className="esper-section">
             <Components.Plans cusid={this.props.cusid} />
-            <div className="esper-no-content">
-              No credit cards found
+            <div className="esper-section">
+              <div className="esper-no-content">
+                No credit cards found
+              </div>
             </div>
           </div>;
       }
