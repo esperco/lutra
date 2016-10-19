@@ -49,22 +49,15 @@ module Esper.Components {
   }, {}> {
     basicPlanInfo() {
       return <ul>
-        <li>Share up to 2 calendars</li>
-        <li>Browse up to 2 months of calendar history</li>
-        <li>Use #hashtags to label your events</li>
-        <li>Receive weekly label reminder emails</li>
+        { _.map(Text.BasicPlanFeatures, (feature, i) =>
+            <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
       </ul>;
     }
 
     advancedPlanInfo() {
       return <ul>
-        <li>Unlimited shared calendars</li>
-        <li>Browse up to 5 YEARS of calendar history</li>
-        <li>Use #hashtags to label your events</li>
-        <li>Receive weekly label reminder emails</li>
-        <li>Customizable report page</li>
-        <li>Advanced events filtering</li>
-        <li>Time Series feature</li>
+        { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
+            <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
       </ul>;
     }
 

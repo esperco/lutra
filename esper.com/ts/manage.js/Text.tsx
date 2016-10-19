@@ -36,6 +36,21 @@ module Esper.Text {
       return "Executive Plan";
     return "Enterprise Plan";
   }
+  export const BasicPlanFeatures = [
+    "Share up to 2 calendars",
+    "Browse up to 2 months of calendar history",
+    "Use #hashtags to label your events",
+    "Receive weekly label reminder emails"
+  ];
+  export const AdvancedPlanFeatures = [
+    "Unlimited shared calendars",
+    "Browse up to 5 YEARS of calendar history",
+    "Use #hashtags to label your events",
+    "Receive weekly label reminder emails",
+    "Customizable reports page",
+    "Advanced events filtering",
+    "More insights of your time using Time Series"
+  ];
 
   // Groups
   export const Group = "group";
