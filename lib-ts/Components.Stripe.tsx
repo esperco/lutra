@@ -5,9 +5,11 @@
 
 module Esper.Components {
   interface Props {
+    stripeKey: string;
     description: string;
     label: string;
     onToken: (token: StripeTokenResponse) => void;
+    children?: JSX.Element|JSX.Element[];
   }
 
   export class Stripe extends ReactHelpers.Component<Props, {}> {
@@ -28,7 +30,7 @@ module Esper.Components {
     initStripe() {
       // From https://stripe.com/docs/checkout#integration-custom
       this._handler = StripeCheckout.configure({
-        key: Config.STRIPE_KEY,
+        key: this.props.stripeKey,
         email: Login.myEmail(),
 
         // Esper logo
@@ -42,10 +44,9 @@ module Esper.Components {
     }
 
     render() {
-      return <button className="btn btn-primary"
-                     onClick={() => this.onClick()}>
-        Enter Payment Info
-      </button>
+      return <span onClick={this.onClick.bind(this)}>
+        { this.props.children }
+      </span>;
     }
 
     onClick() {

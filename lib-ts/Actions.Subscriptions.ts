@@ -2,6 +2,7 @@
   Actions for modifying subscription status
 */
 
+/// <reference path="./Save.ts" />
 /// <reference path="./Stores.Subscriptions.ts" />
 
 module Esper.Actions.Subscriptions {
@@ -12,11 +13,17 @@ module Esper.Actions.Subscriptions {
   */
 
   export function set(cusId: string, planId: ApiT.PlanId) {
-    Api.setSubscription(cusId, planId).then(() => location.reload(false))
+    let p = Api.setSubscription(cusId, planId).then(
+      () => location.reload(false));
+    Save.monitorStr(p, "setSubscription");
+    return p;
   }
 
   export function cancel(cusId: string) {
-    Api.cancelSubscription(cusId).then(() => location.reload(false));
+    let p = Api.cancelSubscription(cusId).then(
+      () => location.reload(false));
+    Save.monitorStr(p, "cancelSubscription");
+    return p;
   }
 
 
@@ -32,6 +39,7 @@ module Esper.Actions.Subscriptions {
       })
     );
     Stores.Subscriptions.SubscriptionStore.pushFetch(cusId, p);
+    return p;
   }
 
   export function deleteCard(cusId: string, cardId: string) {
