@@ -32,7 +32,7 @@ module Esper.Text {
   export function getPlanName(planid: ApiT.PlanId) {
     if (planid === "Basic_20161019")
       return "Basic Plan";
-    if (planid === "Advanced_20161019")
+    if (planid === "Executive_20161019")
       return "Executive Plan";
     return "Enterprise Plan";
   }

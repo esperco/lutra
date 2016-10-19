@@ -28,7 +28,7 @@ module Esper.Components {
               selectedPlan={this.props.selectedPlan} />
           </div>
           <div className="esper-section">
-            <PlanInfo planid="Advanced_20161019" onClick={this.props.onClick}
+            <PlanInfo planid="Executive_20161019" onClick={this.props.onClick}
               selectedPlan={this.props.selectedPlan} />
           </div>
         </div>
@@ -45,8 +45,8 @@ module Esper.Components {
           <div className="esper-section">
             <Components.Stripe stripeKey={Config.STRIPE_KEY}
               description="Executive Plan" label="Submit"
-              onToken={(token) => this.onToken(token, "Advanced_20161019")}>
-              <PlanInfo planid="Advanced_20161019"
+              onToken={(token) => this.onToken(token, "Executive_20161019")}>
+              <PlanInfo planid="Executive_20161019"
                 selectedPlan={this.props.selectedPlan} />
             </Components.Stripe>
           </div>
@@ -69,7 +69,7 @@ module Esper.Components {
         </ul>;
         pricing = Text.BasicPlanPrice;
       }
-      else if (this.props.planid === "Advanced_20161019") {
+      else if (this.props.planid === "Executive_20161019") {
         planInfo = <ul>
           { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
               <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}

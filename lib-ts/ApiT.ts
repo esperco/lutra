@@ -80,7 +80,7 @@ module Esper.ApiT {
   }
 
   export type PlanId =
-    "Basic_20161019"|"Advanced_20161019"|"Enterprise_20160923";
+    "Basic_20161019"|"Executive_20161019"|"Enterprise_20160923";
 
   export type SubscriptionStatus =
     "Trialing"|"Active"|"Past_due"|"Canceled"|"Unpaid";
