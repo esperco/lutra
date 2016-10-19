@@ -9,14 +9,14 @@ module Esper.Views {
   export class TeamPaySettings extends TeamSettings {
     pathFn = Paths.Manage.Team.pay;
 
-    getPlan() {
-      return "Executive Plan"; // TODO - Add other plans
-    }
-
     onToken(cusid: string, token: StripeTokenResponse) {
       Actions.Subscriptions.addCard(cusid, token.id).then(() =>
         Actions.Subscriptions.set(cusid, "Advanced_20160923")
       );
+    }
+
+    changePlan(cusid: string, newPlan: ApiT.PlanId) {
+      Actions.Subscriptions.set(cusid, newPlan);
     }
 
     renderMain(team: ApiT.Team) {
@@ -35,6 +35,9 @@ module Esper.Views {
             <div className="alert alert-info">
               {team.team_name} is subscribed to the {Text.getPlanName(subscription.plan)}.
             </div>
+            <Components.Plans cusid={subscription.cusid} isDisplay
+              onClick={(newPlan) => this.changePlan(subscription.cusid, newPlan)}
+              selectedPlan={subscription.plan} />
             <CreditCardList cusid={subscription.cusid}
               planid={subscription.plan} busy={busy} />
           </div>
