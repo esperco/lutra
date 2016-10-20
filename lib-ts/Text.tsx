@@ -16,6 +16,56 @@ module Esper.Text {
   export const ReleaseNotes = ReleaseNotesAugust2016;
   export const DismissNotes = "Click to Dismiss";
 
+  // Payments
+  export const PaySettings = "Billing";
+  export function getPlanName(planid: ApiT.PlanId) {
+    if (planid === "Basic_20161019")
+      return "Basic Plan";
+    if (planid === "Executive_20161019")
+      return "Executive Plan";
+    return "Enterprise Plan";
+  }
+  export const BasicPlanFeatures = [
+    "1 Calendar",
+    "2 months of calendar history",
+    "Slack integration",
+    "#Hashtag event labeling",
+    "Weekly label reminder emails"
+  ];
+  export const FreeTrialMsg = `14 Day Free Trial`;
+  export const BasicPlanPrice = `$25 / month`;
+  export const AdvancedPlanFeatures = [
+    "Unlimited calendars",
+    "5 YEARS of calendar history",
+    "Slack integration",
+    "#Hashtag event labeling",
+    "Weekly label reminder emails",
+    // "Customizable reports page", // Not supported yet
+    "Advanced reporting",
+    "Time series reports",
+    "Chart export"
+  ];
+  export const AdvancedPlanPrice = `$100 / month`;
+  export const AdvancedDiscountPlanPrice = `$50 / month for first six months`;
+  export const StartPlan = "Start Free Trial";
+  export const SelectPlan = "Select";
+  export const ActivePlan = "Current Plan";
+
+  // Content restrictions
+  export function CalendarLimitMsg(limit: number) {
+    if (limit === 0) {
+      return <a href="/manage#!/team/pay">
+        You have not selected a subscription plan yet.
+        Please select your plan in the billings page.
+        </a>;
+    }
+    return <a href="/manage#!/team/pay">
+      Your current plan only allows {limit}{" "}
+      calendar{limit === 1 ? '' : 's'} to be selected.
+      Please upgrade your plan in the billings page to select more.
+      </a>;
+  }
+
   // Sandbox notice
   export const SandboxNotice =
     <a href="/login">

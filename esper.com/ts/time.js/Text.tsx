@@ -3,6 +3,11 @@
 */
 
 module Esper.Text {
+  // Payments
+  export const PaymentDescription = `Congratulations on successfully ` +
+    `labelling your events! Our records indicate that you haven't entered ` +
+    `your payment information yet. Please enter your payment information ` +
+    `now to view your reports!`;
 
   // Onboarding
   export const TeamSetupHeading = "Let's Get Started";

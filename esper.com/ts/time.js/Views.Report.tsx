@@ -66,6 +66,8 @@ module Esper.Views {
         <div className="esper-content">
           <div className="esper-content-header">
             <Components.PeriodSelector
+              minDate={Config.getMinDate(team.team_api.team_subscription.plan)}
+              maxDate={Config.MAX_DATE}
               period={this.props.period}
               updateFn={(p) => this.update({ period: p })}
             />

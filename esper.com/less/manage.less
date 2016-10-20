@@ -5,6 +5,7 @@
 @import "./lib/_new-labels-form";
 @import "./lib/_timezone-selector";
 @import "./lib/_tooltip";
+@import "./lib/_plans";
 @import "./lib/_helpers";
 
 /* Project-specific imports */
@@ -57,85 +58,4 @@
 
 .esper-sidebar-section {
   padding-bottom: 20px;
-}
-
-.sub-plan-box {
-  border: 1px solid @brand-border;
-  border-radius: @border-radius-base;
-  cursor: pointer;
-  transition: border 0.5s;
-
-  > * {
-    padding: @esper-base-padding;
-  }
-
-  .free-trial, .pricing {
-    text-transform: uppercase;
-    text-align: center;
-  }
-
-  .free-trial {
-    font-weight: bold;
-  }
-
-  .pricing {
-    font-size: @font-size-small;
-    color: @brand-text-muted;
-
-    .old-price {
-      display: block;
-      text-decoration: line-through;
-    }
-  }
-
-  .sub-plan-heading {
-    text-align: center;
-    border-bottom: 1px solid @brand-border;
-    background: @panel-default-heading-bg;
-    margin: 0;
-    border-top-right-radius: @border-radius-base;
-    border-top-left-radius: @border-radius-base;
-    transition: border 0.5s, background 0.5s;
-  }
-
-  .sub-plan-body {
-    min-height: 300px;
-  }
-
-  .sub-plan-footer {
-    text-align: center;
-  }
-
-  .btn { text-transform: uppercase; }
-
-  &:hover, &.selected {
-    border-color: @panel-success-border;
-
-    .sub-plan-heading {
-      border-color: @panel-success-border;
-      background: @panel-success-heading-bg;
-      color: @panel-success-text;
-    }
-  }
-
-  ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  ul > li {
-    margin-top: 6px;
-    font-weight: bold;
-
-    &:before {
-      content: '';
-      display: inline-block;
-      height: @font-size-small;
-      width: @font-size-small;
-      vertical-align: middle;
-      margin: 0 @padding-small-horizontal;
-      background-image: url('/img/check.svg');
-    }
-  }
 }

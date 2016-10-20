@@ -89,8 +89,8 @@ module Esper.ApiT {
     teamid: string;
     cusid: string;
     active: boolean;
-    plan: PlanId;
-    status: SubscriptionStatus;
+    plan?: PlanId;
+    status?: SubscriptionStatus;
   }
 
   export interface TeamApi {

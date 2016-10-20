@@ -11,6 +11,8 @@ module Esper.Components {
     selectedCalendars: ApiT.GenericCalendar[];
     availableCalendars: ApiT.GenericCalendar[];
 
+    onCalendarLimit?: () => any;
+    limit?: number;
     className?: string;
     listClasses?: string;
     itemClasses?: string;
@@ -98,6 +100,12 @@ module Esper.Components {
     }
 
     update(ids: string[]) {
+      if (this.props.limit !== undefined &&
+          ids.length > this.props.limit &&
+          this.props.onCalendarLimit) {
+        this.props.onCalendarLimit();
+        return;
+      }
       // Join all cals -> prioritize selected cals over available because
       // there may be settings and things tied to the selected ones
       var cals = _.unionBy(

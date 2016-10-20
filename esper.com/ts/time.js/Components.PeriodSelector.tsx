@@ -4,6 +4,8 @@
 
 module Esper.Components {
   export class PeriodSelector extends ReactHelpers.Component<{
+    minDate: Date;
+    maxDate: Date;
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
     range?: boolean;          // Range mode -> select more than one instance
@@ -17,8 +19,8 @@ module Esper.Components {
         switch (interval) {
           case "quarter":
             return <PeriodMenu
-              min={Config.MIN_DATE}
-              max={Config.MAX_DATE}
+              min={this.props.minDate}
+              max={this.props.maxDate}
               interval="quarter"
               range={this.props.range}
               selected={this.props.period}
@@ -27,8 +29,8 @@ module Esper.Components {
 
           case "month":
             return <PeriodMenu
-              min={Config.MIN_DATE}
-              max={Config.MAX_DATE}
+              min={this.props.minDate}
+              max={this.props.maxDate}
               interval="month"
               range={this.props.range}
               selected={this.props.period}
@@ -37,8 +39,8 @@ module Esper.Components {
 
           case "week":
             return <CalendarWeekSelector
-              min={Config.MIN_DATE}
-              max={Config.MAX_DATE}
+              min={this.props.minDate}
+              max={this.props.maxDate}
               range={this.props.range}
               selected={Period.bounds(period)}
               onWeekSelect={(start, end) =>
@@ -48,8 +50,8 @@ module Esper.Components {
 
           default: // Custom or day
             return <CalendarRangeSelector
-              min={Config.MIN_DATE}
-              max={Config.MAX_DATE}
+              min={this.props.minDate}
+              max={this.props.maxDate}
               selected={Period.bounds(period)}
               onRangeSelect={(start, end) =>
                 this.updateAndClose(Period.fromDates("day", start, end))
@@ -61,11 +63,11 @@ module Esper.Components {
       // Disable left/right arrows?
       var disableLeft = this.props.range || (
         Period.bounds(Period.add(period, -1))[0].getTime() <
-        Config.MIN_DATE.getTime()
+        this.props.minDate.getTime()
       );
       var disableRight = this.props.range || (
         Period.bounds(Period.add(period, 1))[1].getTime() >
-        Config.MAX_DATE.getTime()
+        this.props.maxDate.getTime()
       );
 
       // Intervals to show in selector

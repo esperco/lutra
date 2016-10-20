@@ -7,7 +7,7 @@
 
 module Esper.Views {
 
-  export class TeamLabelSettings extends TeamSettings {
+  export class TeamLabelSettings extends TeamSettings<{}> {
     pathFn = Paths.Manage.Team.labels;
 
     renderMain(team: ApiT.Team) {

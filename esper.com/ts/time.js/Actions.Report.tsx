@@ -48,6 +48,7 @@ module Esper.Actions {
     }
 
     let team = Stores.Teams.require(teamId);
+    let subscription = team.team_api.team_subscription;
     let cals = _.map(team.team_timestats_calendars, (calId) => ({
       calId: calId,
       teamId: teamId
@@ -64,9 +65,13 @@ module Esper.Actions {
       if (!confirmationLaunched && result.total > 0) {
         // Launch confirmation modal
         confirmationLaunched = true;
-        Layout.renderModal(Containers.confirmListModal(result.events));
-      } else {
+        Layout.renderModal(Containers.confirmListModal(result.events, 0, () => {
+          if (!subscription.active)
+            Layout.renderModal(Containers.paymentModal(subscription));
+        }));
+      } else if (!subscription.active) {
         // Launch payments modal
+        Layout.renderModal(Containers.paymentModal(subscription));
       }
     });
 

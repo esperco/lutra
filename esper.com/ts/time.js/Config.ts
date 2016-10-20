@@ -9,10 +9,25 @@ module Esper.Config {
 
   /* Config for period selectors */
 
-  export const MIN_DATE = moment()
-    .subtract(2, 'quarter')
-    .startOf('quarter')
-    .toDate();
+  export function getMinDate(planid: ApiT.PlanId): Date {
+    if (!planid) return moment()
+      .subtract(2, 'month')
+      .startOf('month')
+      .toDate();
+    switch (planid) {
+      case "Basic_20161019":
+        return moment().subtract(2, 'month')
+                       .startOf('month')
+                       .toDate();
+      case "Executive_20161019":
+      case "Enterprise_20160923":
+      case "Employee_20150304":
+      default:
+        return moment().subtract(5, 'year')
+                       .startOf('month')
+                       .toDate();
+    }
+  }
   export const MAX_DATE = moment()
     .add(1, 'quarter')
     .endOf('quarter')
