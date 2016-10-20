@@ -13,11 +13,7 @@ module Esper.Actions {
     extra?: any;
   }) {
     // Fetch events
-    var team = Stores.Teams.require(teamId);
-    var calIds = team.team_timestats_calendars;
-    _.each(calIds,
-      (_id) => Stores.Events.fetchPredictions({ teamId, period })
-    );
+    Stores.Events.fetchPredictions({ teamId, period });
 
     extra = extra || {};
     var labels = Params.cleanListSelectJSON(extra.labels);
