@@ -335,9 +335,6 @@ module Esper.Views {
     </p>;
   }
 
-  // Has auto-label confirmation modal been launched before?
-  var confirmationLaunched = false;
-
   // Link to launch auto-confirm modal
   interface UnconfirmedLinkProps {
     eventsForRanges: Types.EventsForRange[];
@@ -351,29 +348,6 @@ module Esper.Views {
       return EventStats.simpleCounterCalc(eventsForRanges, [
         Stores.Events.needsConfirmation
       ]);
-    }
-
-    componentDidMount() {
-      super.componentDidMount();
-      this.autoLaunch();
-    }
-
-    componentDidUpdate(prevProps: UnconfirmedLinkProps) {
-      super.componentDidUpdate(prevProps);
-      this.autoLaunch();
-    }
-
-    // Autolaunch confirmation modal unless already launched
-    autoLaunch() {
-      if (! Login.data.is_sandbox_user) { // No autolaunch in sandbox mode
-        if (this._calc) {
-          this._calc.onceChange((result) => {
-            if (!confirmationLaunched && result.total > 0) {
-              this.launchModal(result.events);
-            }
-          });
-        }
-      }
     }
 
     // Button to manually launch
@@ -402,7 +376,6 @@ module Esper.Views {
     }
 
     launchModal(events: Types.TeamEvent[]) {
-      confirmationLaunched = true;
       Layout.renderModal(Containers.confirmListModal(events));
     }
   }
