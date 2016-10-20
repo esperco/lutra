@@ -10,8 +10,8 @@ module Esper.Views {
     teamId: string;
   }
 
-  export abstract class TeamSettings
-         extends ReactHelpers.Component<Props, {}> {
+  export abstract class TeamSettings<State>
+         extends ReactHelpers.Component<Props, State> {
     pathFn: (p: {teamId: string}) => Paths.Path;
 
     renderWithData() {

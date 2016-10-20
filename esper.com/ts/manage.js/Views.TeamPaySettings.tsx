@@ -6,7 +6,7 @@
 
 module Esper.Views {
 
-  export class TeamPaySettings extends TeamSettings {
+  export class TeamPaySettings extends TeamSettings<{}> {
     pathFn = Paths.Manage.Team.pay;
 
     renderMain(team: ApiT.Team) {

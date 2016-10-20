@@ -51,6 +51,21 @@ module Esper.Text {
   export const SelectPlan = "Select";
   export const ActivePlan = "Current Plan";
 
+  // Content restrictions
+  export function CalendarLimitMsg(limit: number) {
+    if (limit === 0) {
+      return <a href="/manage#!/team/pay">
+        You have not selected a subscription plan yet.
+        Please select your plan in the billings page.
+        </a>;
+    }
+    return <a href="/manage#!/team/pay">
+      Your current plan only allows {limit}{" "}
+      calendar{limit === 1 ? '' : 's'} to be selected.
+      Please upgrade your plan in the billings page to select more.
+      </a>;
+  }
+
   // Sandbox notice
   export const SandboxNotice =
     <a href="/login">

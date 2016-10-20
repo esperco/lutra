@@ -5,9 +5,22 @@
 /// <reference path="./Views.TeamSettings.tsx" />
 
 module Esper.Views {
+  interface State {
+    isPlanLimited: boolean;
+  }
 
-  export class TeamCalendarSettings extends TeamSettings {
+  export class TeamCalendarSettings extends TeamSettings<State> {
     pathFn = Paths.Manage.Team.calendars;
+
+    componentDidUpdate() {
+      this.state = {
+        isPlanLimited: false
+      };
+    }
+
+    displayPlanLimitedMessage() {
+      this.mutateState((s) => s.isPlanLimited = true);
+    }
 
     renderMain(team: ApiT.Team) {
       return <div className="panel panel-default">
@@ -17,6 +30,13 @@ module Esper.Views {
               Text.CalendarSettingsSelfDescription :
               Text.CalendarSettingsExecDescription }
           </div>
+          { this.state.isPlanLimited ?
+            <div className="alert alert-warning">
+              { Text.CalendarLimitMsg(Config.getCalendarLimit(
+                  team.team_api.team_subscription.plan)) }
+            </div>
+            : null
+          }
 
           { this.renderCalendarList(team) }
 
@@ -40,6 +60,8 @@ module Esper.Views {
         some: ({available, selected}) =>
           <Components.CalendarList
             team={team}
+            onCalendarLimit={this.displayPlanLimitedMessage.bind(this)}
+            limit={Config.getCalendarLimit(team.team_api.team_subscription.plan)}
             availableCalendars={available}
             selectedCalendars={selected}
             listClasses="list-group"

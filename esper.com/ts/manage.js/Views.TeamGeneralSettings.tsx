@@ -6,7 +6,7 @@
 
 module Esper.Views {
 
-  export class TeamGeneralSettings extends TeamSettings {
+  export class TeamGeneralSettings extends TeamSettings<{}> {
     pathFn = Paths.Manage.Team.general;
 
     renderMain(team: ApiT.Team) {
