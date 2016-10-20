@@ -120,4 +120,6 @@ module Esper.Stores.Customers {
     ));
     CustomerListStore.batchFetch("", p)
   }
+
+  export var refresh = init;
 }

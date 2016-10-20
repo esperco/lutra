@@ -40,9 +40,15 @@ module Esper.Views {
         some: (d) => {
           this.mutateState((s) => s.busy = true)
           Actions.Teams.createExecTeam(d)
-            .done((t) => Route.nav.go(Paths.Manage.Team.calendars({
-              teamId: t.teamid
-            })))
+            .done((t) => {
+              // Refresh customer object associated with team
+              Stores.Customers.refresh();
+
+              // Go to calendar selection
+              Route.nav.go(Paths.Manage.Team.calendars({
+                teamId: t.teamid
+              }));
+            })
             .fail(() => this.mutateState((s) => s.busy = false))
         }
       });
