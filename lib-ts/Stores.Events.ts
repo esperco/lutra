@@ -302,7 +302,7 @@ module Esper.Stores.Events {
       return apiP.then(() => null);
     }
 
-    return $.Deferred().resolve().progress();
+    return $.Deferred().resolve().promise();
   }
 
 
