@@ -57,6 +57,7 @@ module Esper.Text {
     "Chart export"
   ];
   export const AdvancedPlanPrice = `$100 / month`;
+  export const AdvancedDiscountPlanPrice = `$50 / month for first six months`;
   export const StartPlan = "Start Free Trial";
   export const SelectPlan = "Select";
   export const ActivePlan = "Current Plan";

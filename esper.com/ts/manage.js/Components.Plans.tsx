@@ -61,7 +61,7 @@ module Esper.Components {
   }, {}> {
     render() {
       var planInfo: JSX.Element;
-      var pricing: string;
+      var pricing: string|JSX.Element;
       if (this.props.planid === "Basic_20161019") {
         planInfo = <ul>
           { _.map(Text.BasicPlanFeatures, (feature, i) =>
@@ -75,6 +75,16 @@ module Esper.Components {
               <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
         </ul>;
         pricing = Text.AdvancedPlanPrice;
+
+        // TODO: This is a hack. We should fix this later and implement
+        // proper coupon-entering.
+        let showDiscount = _.includes(location.href, "coupon");
+        if (showDiscount) {
+          pricing = <span>
+            <span className="old-price">{ Text.AdvancedPlanPrice }</span>
+            <span>{ Text.AdvancedDiscountPlanPrice }</span>
+          </span>
+        }
       }
 
       let selected = this.props.selectedPlan === this.props.planid;
