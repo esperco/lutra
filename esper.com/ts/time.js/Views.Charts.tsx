@@ -50,6 +50,9 @@ module Esper.Views {
         <div className="esper-content">
           <div id="chart-header" className="esper-content-header">
             <Components.PeriodSelector
+              minDate={Config.getMinDate(
+                        this.props.team.team_api.team_subscription.plan)}
+              maxDate={Config.MAX_DATE}
               period={this.props.period}
               range={_.includes([
                 "absolute-series", "percent-series"
