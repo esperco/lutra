@@ -4,62 +4,86 @@
 
 module Esper.Components {
   interface Props {
-    cusid: string;
-    noStripe?: boolean;
-    selectedPlan?: ApiT.PlanId;
-    onClick?: (selectedPlan: ApiT.PlanId) => any;
+    subscription: ApiT.SubscriptionDetails;
   }
 
   export class Plans extends ReactHelpers.Component<Props, {}> {
-    onToken(token: StripeTokenResponse, planid: ApiT.PlanId) {
-      Actions.Subscriptions.addCard(this.props.cusid, token.id).then(() =>
-        Actions.Subscriptions.set(this.props.cusid, planid).then(() =>
-          Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
-            `for ${Text.getPlanName(planid)}`)
-          )
-      );
-    }
-
     render() {
-      return this.props.noStripe ?
-        <div className="esper-flex-list esper-section">
-          <div className="esper-section">
-            <PlanInfo planid="Basic_20161019" onClick={this.props.onClick}
-              selectedPlan={this.props.selectedPlan} />
-          </div>
-          <div className="esper-section">
-            <PlanInfo planid="Executive_20161019" onClick={this.props.onClick}
-              selectedPlan={this.props.selectedPlan} />
-          </div>
+      let subscription = this.props.subscription;
+      return <div className="esper-flex-list esper-section">
+        <div className="esper-section">
+          <PlanInfo planid="Basic_20161019" subscription={subscription} />
         </div>
-        :
-        <div className="esper-flex-list esper-section">
-          <div className="esper-section">
-            <Components.Stripe stripeKey={Config.STRIPE_KEY}
-              description="Basic Plan" label="Submit"
-              onToken={(token) => this.onToken(token, "Basic_20161019")}>
-              <PlanInfo planid="Basic_20161019"
-                selectedPlan={this.props.selectedPlan} />
-            </Components.Stripe>
-          </div>
-          <div className="esper-section">
-            <Components.Stripe stripeKey={Config.STRIPE_KEY}
-              description="Executive Plan" label="Submit"
-              onToken={(token) => this.onToken(token, "Executive_20161019")}>
-              <PlanInfo planid="Executive_20161019"
-                selectedPlan={this.props.selectedPlan} />
-            </Components.Stripe>
-          </div>
-        </div>;
+        <div className="esper-section">
+          <PlanInfo planid="Executive_20161019" subscription={subscription} />
+        </div>
+      </div>;
     }
   }
 
-  class PlanInfo extends ReactHelpers.Component<{
+
+  interface PlanInfoProps {
+    subscription: ApiT.SubscriptionDetails;
     planid: ApiT.PlanId;
-    selectedPlan?: ApiT.PlanId;
-    onClick?: (selectedPlan: ApiT.PlanId) => any;
-  }, {}> {
+  }
+
+  class PlanInfo extends ReactHelpers.Component<PlanInfoProps, {
+    busy: boolean;
+  }> {
+    constructor(props: PlanInfoProps) {
+      super(props);
+      this.state = { busy: false };
+    }
+
+    onToken(token: StripeTokenResponse) {
+      this.setState({ busy: true });
+
+      let cusId = this.props.subscription.cusid;
+      let planId = this.props.planid;
+
+      // Run in parallel with actual actions
+      Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
+        `for ${Text.getPlanName(planId)}`);
+
+      Actions.Subscriptions.addCard(cusId, token.id).then(() =>
+        Actions.Subscriptions.set(cusId, planId)
+      ).always(() => this.setState({ busy: false }));
+    }
+
+    changePlan() {
+      this.setState({ busy: true });
+
+      Actions.Subscriptions.set(
+        this.props.subscription.cusid,
+        this.props.planid
+      ).always(() => this.setState({ busy: false }));
+    }
+
     render() {
+      let description = (() => {
+        switch (this.props.planid) {
+          case "Basic_20161019":
+            return "Basic Plan";
+          case "Executive_20161019":
+            return "Executive Plan";
+          case "Enterprise_20160923":
+            return "Enterprise Plan";
+          default:
+            return "Esper";
+        }
+      })();
+
+      if (_.isEmpty(this.props.subscription.cards)) {
+        return <Components.Stripe stripeKey={Config.STRIPE_KEY}
+          description={description} label="Submit"
+          onToken={(token) => this.onToken(token)}>
+          { this.renderContent(false) }
+        </Components.Stripe>;
+      }
+      return this.renderContent(true);
+    }
+
+    renderContent(useOnClick=false) {
       var planInfo: JSX.Element;
       var pricing: string|JSX.Element;
       if (this.props.planid === "Basic_20161019") {
@@ -87,14 +111,9 @@ module Esper.Components {
         }
       }
 
-      let selected = this.props.selectedPlan === this.props.planid;
-
-      return <div className={classNames("sub-plan-box", {
-        selected
-      })} onClick={
-        (e) => this.props.onClick ? this.props.onClick(this.props.planid)
-                                  : null
-      }>
+      let selected = this.props.subscription.plan === this.props.planid;
+      return <div className={classNames("sub-plan-box", {selected})}
+                  onClick={(e) => useOnClick ? this.changePlan() : null}>
         <h4 className="sub-plan-heading">
           { Text.getPlanName(this.props.planid) }
         </h4>
@@ -104,10 +123,18 @@ module Esper.Components {
           { planInfo }
         </div>
         <div className="sub-plan-footer">
-          <button className="btn btn-success form-control" disabled={selected}>
-            { selected ? Text.ActivePlan :
-            ( this.props.selectedPlan ? Text.SelectPlan : Text.StartPlan )}
-          </button>
+          {
+            this.state.busy ?
+            <span><span className="esper-spinner" /></span> :
+            <button className={classNames("btn form-control", {
+              "btn-success": !selected,
+              "btn-default": selected
+            })} disabled={selected}>
+              { selected ? Text.ActivePlan :
+              ( this.props.subscription.plan ?
+                Text.SelectPlan : Text.StartPlan )}
+            </button>
+          }
         </div>
       </div>;
     }
