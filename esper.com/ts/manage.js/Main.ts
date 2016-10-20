@@ -16,13 +16,13 @@ module Esper.Main {
     Stores.Teams.init();
     Stores.Calendars.init();
     Stores.Groups.init();
-    Stores.Customers.init();
     Labels.init();
     Login.init();
     Login.promise.done(function() {
       Stores.TeamPreferences.init();
       Stores.GroupPreferences.init();
       Stores.Profiles.init();
+      Stores.Customers.init();
     });
   }
 }

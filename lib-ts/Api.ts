@@ -766,6 +766,78 @@ module Esper.Api {
 
   /*** Payments ***/
 
+  export function createCustomer(uid?: string): JsonPromise<ApiT.Customer> {
+    var url = prefix + "/api/pay/customer/create/"
+            + string(Login.me()) + "/" + string(uid || Login.me());
+    return JsonHttp.post(url);
+  }
+
+  export function listCustomers(uid?: string): JsonPromise<ApiT.CustomerList> {
+    var url = prefix + "/api/pay/customer/list/"
+            + string(Login.me()) + "/" + string(uid || Login.me());
+    return JsonHttp.get(url);
+  }
+
+  export function setCustomerFilter(
+    cusId: string,
+    req: ApiT.CustomerTeamFilterReq
+  ) : JQueryPromise<void> {
+    var url = prefix + "/api/pay/customer/filter/"
+            + string(Login.me()) + "/" + string(cusId);
+    return JsonHttp.put(url, req);
+  }
+
+  export function requestCustomerSeat(teamId: string, email: string)
+    : JQueryPromise<ApiT.CustomerRequestSeatResponse>
+  {
+    var url = prefix + "/api/pay/customer/request-seat/"
+            + string(Login.me()) + "/" + string(teamId) + "/" + string(email);
+    return JsonHttp.post(url);
+  }
+
+  export function acceptCustomerSeat(cusId: string, teamId: string)
+    : JQueryPromise<void>
+  {
+    var url = prefix + "/api/pay/customer/accept-seat/"
+            + string(Login.me()) + "/" + string(cusId) + "/" + string(teamId);
+    return JsonHttp.put(url);
+  }
+
+  export function rejectCustomerSeat(cusId: string, teamId: string)
+    : JQueryPromise<void>
+  {
+    var url = prefix + "/api/pay/customer/reject-seat/"
+            + string(Login.me()) + "/" + string(cusId) + "/" + string(teamId);
+    return JsonHttp.put(url);
+  }
+
+  export function setCustomerPrimaryContact(cusId: string, contactId: string)
+    : JQueryPromise<void>
+  {
+    var url = prefix + "/api/pay/customer/primary-contact/"
+            + string(Login.me()) + "/" + string(cusId) + "/"
+            + string(contactId);
+    return JsonHttp.put(url);
+  }
+
+  export function addCustomerSecondaryContact(
+    cusId: string, contactId: string
+  ): JQueryPromise<void> {
+    var url = prefix + "/api/pay/customer/secondary-contact/"
+            + string(Login.me()) + "/" + string(cusId) + "/"
+            + string(contactId);
+    return JsonHttp.put(url);
+  }
+
+  export function removeCustomerSecondaryContact(
+    cusId: string, contactId: string
+  ) {
+    var url = prefix + "/api/pay/customer/secondary-contact/"
+            + string(Login.me()) + "/" + string(cusId) + "/"
+            + string(contactId);
+    return JsonHttp.delete_(url);
+  }
+
   export function getSubscriptionStatus(cusid: string):
     JsonPromise<ApiT.TeamSubscription> {
     var url = prefix + "/api/pay/status/short/" + string(Login.me())

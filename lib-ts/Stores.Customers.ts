@@ -105,37 +105,11 @@ module Esper.Stores.Customers {
 
 
   /* Init helpers */
-
-  export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    // TODO
-
-    // Temp fixture for dev / testing
-    Customers.set({
-      id: "cust-id",
-      name: "Test Customer",
-      primary_contact: { uid: "uid", email: "email@example.com" },
-      secondary_contacts: [],
-      seats: [],
-      seat_requests: [],
-      subscription: {
-        cusid: "cust-id",
-        active: true
-      },
-      filter: {
-        cusid: "cust-id",
-        blacklist: {
-          addresses: [],
-          domains: []
-        },
-        whitelist: {
-          addresses: [],
-          domains: []
-        }
-      }
-    });
-  }
-
   export function init() {
-    Login.promise.done(loadFromLoginInfo);
+    Api.listCustomers().then((list) => {
+      CustomerStore.transact(() => {
+        _.each(list.items, (cust) => set(cust));
+      });
+    });
   }
 }
