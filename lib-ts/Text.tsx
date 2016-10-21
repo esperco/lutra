@@ -17,13 +17,14 @@ module Esper.Text {
   export const DismissNotes = "Click to Dismiss";
 
   // Payments
-  export const PaySettings = "Billing";
   export function getPlanName(planid: ApiT.PlanId) {
     if (planid === "Basic_20161019")
       return "Basic Plan";
     if (planid === "Executive_20161019")
       return "Executive Plan";
-    return "Enterprise Plan";
+    if (planid === "Enterprise_20160923")
+      return "Enterprise Plan";
+    return "Default Plan";
   }
   export const BasicPlanFeatures = [
     "1 Calendar",

@@ -24,18 +24,15 @@ module Esper.Views {
       return <div className="panel panel-default"><div className="panel-body">
         { subscription.active ?
           <div className="alert alert-info">
-            {team.team_name} is subscribed to
-            the {Text.getPlanName(subscription.plan)}.
+            { Text.SubscribedToPlan(team.team_name, subscription.plan) }
           </div>
           : ( subscription.status === "Canceled" ?
           <div className="alert alert-danger">
-            Your subscription has expired.
-            Please select a plan below to renew.
+            { Text.SubscriptionExpired }{" "}{ Text.SelectToRenew }
           </div>
           :
           <div className="alert alert-warning">
-            You have not subscribed to any plan.
-            Please select a plan below.
+            { Text.NoPlan }{" "}{ Text.SelectToRenew }
           </div> )}
         <Components.Plans subscription={details} />
         { subscription.active ?
