@@ -90,6 +90,13 @@ module Esper.Stores.Customers {
     return cust.id;
   }
 
+  export function ready() {
+    return CustomerListStore.batchGet("").match({
+      none: () => false,
+      some: (d) => d.dataStatus === Model2.DataStatus.READY
+    });
+  }
+
   export function remove(cusId: string) {
     CustomerStore.remove(cusId);
 
@@ -103,13 +110,16 @@ module Esper.Stores.Customers {
     return cust.name || cust.primary_contact.email;
   }
 
-
   /* Init helpers */
   export function init() {
-    Api.listCustomers().then((list) => {
-      CustomerStore.transact(() => {
-        _.each(list.items, (cust) => set(cust));
-      });
-    });
+    let p = Api.listCustomers().then((list) => Option.some(
+      _.map(list.items, (cust) => ({
+        itemKey: cust.id,
+        data: Option.some(cust)
+      }))
+    ));
+    CustomerListStore.batchFetch("", p)
   }
+
+  export var refresh = init;
 }

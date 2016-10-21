@@ -27,6 +27,45 @@ module Esper.Text {
     return `Deactivate Esper for ${person || "this " + TeamExec}?`;
   }
 
+  // Payments
+  export const PaySettings = "Billing";
+  export const AddToEnterpriseHeading = `Enterprise Plan`;
+  export const AddToEnterpriseDescription =
+    `To link this account to an Enterprise Plan, provide ` +
+    `the email address of your billing contact below.`;
+  export const AddToExistingEnterpriseDescription =
+    `You can also add this account to your existing plan.`;
+  export const OnlyOneEnterpriseCustomer = `Existing Enterprise Plan`;
+  export function AddToEnterprise(name: string) {
+    return `Add to ${name}`;
+  }
+
+  export const BillingContactLabel = "Billing Contact";
+  export const BillingContactSuccess =
+    `We've asked your billing contact to approve this account.`;
+
+  export const EnterpriseMsg =
+    "This account is managed as an Enterprise Account.";
+  export const GoToEnterpriseBilling =
+    "Click here to go to Enterprise Billing.";
+
+  export const CustomerNoPermission = <span>
+    Billing for this account is managed by someone else. If you
+    need assistance, you can <a href="/contact">contact us here</a>.
+  </span>;
+
+  export const ThisCustomer = "This organization";
+  export function SubscribedToPlan(subject: string, plan: ApiT.PlanId) {
+    return `${subject} is subscribed to the ` +
+      getPlanName(plan);
+  }
+
+  export const SubscriptionExpired = "Your subscription has expired.";
+  export const NoPlan = "You are not subscribed to any plan.";
+  export const SelectToRenew = "Please select a plan below to continue.";
+  export const UpdateCreditCard = "Please provide a credit card to continue.";
+  export const AddCard = "Add Credit Card";
+
   // Groups
   export const Group = "group";
   export const Groups = "groups";
@@ -168,7 +207,14 @@ module Esper.Text {
     `Click here to try reconnecting.`;
 
   // Customer page
+  export const CustomerHeading = `Enterprise Billing`;
   export const CustomerGeneral = GeneralSettings;
   export const CustomerPay = PaySettings;
   export const CustomerAccounts = `Accounts`;
+  export const CustomerSeatHeading = CustomerAccounts;
+  export const CustomerPendingSeatHeading = `Pending Accounts`;
+  export const CustomerDomainHeading = `Domain Names`;
+  export const CustomerDomainDescription = `Add a comma-separated list of ` +
+    `domain names (e.g. example.com) to automatically approve any accounts ` +
+    `from that domain (e.g. name@example.com)`;
 }

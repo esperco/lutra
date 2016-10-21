@@ -113,6 +113,7 @@ module Esper.Actions {
   }
 
   export function renderCustomerPaySettings(props: CustomerSettingProps) {
+    Stores.Subscriptions.fetch(props.cusId);
     render(<Views.CustomerPaySettings {...props} />);
     Analytics.page(Analytics.Page.CustomerPay);
   }

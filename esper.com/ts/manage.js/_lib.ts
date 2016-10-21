@@ -3,6 +3,7 @@
 */
 
 /// <reference path="../../../typings/browser/index.d.ts" />
+/// <reference path="../lib/Actions.Customers.ts" />
 /// <reference path="../lib/Actions.Subscriptions.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
@@ -40,6 +41,7 @@
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.Stripe.tsx" />
 /// <reference path="../lib/Components.TeamForm.tsx" />
+/// <reference path="../lib/Components.TextArea.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
 /// <reference path="../lib/Views.App.tsx" />

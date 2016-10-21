@@ -24,11 +24,15 @@ module Esper.Components {
       return "fa-credit-card-alt";
     }
 
+    addCard(token: StripeTokenResponse) {
+      Actions.Subscriptions.addCard(this.props.subscription.cusid, token.id);
+    }
+
     removeCard(cardid: string) {
       Actions.Subscriptions.deleteCard(this.props.subscription.cusid, cardid);
     }
 
-    onEditCreditCard(token: StripeTokenResponse, cardid: string) {
+    editCreditCard(token: StripeTokenResponse, cardid: string) {
       Actions.Subscriptions.addCard(this.props.subscription.cusid, token.id);
       Actions.Subscriptions.deleteCard(this.props.subscription.cusid, cardid);
     }
@@ -45,7 +49,7 @@ module Esper.Components {
           <Components.Stripe
             description={Text.getPlanName(this.props.subscription.plan)}
             label="Submit" stripeKey={Config.STRIPE_KEY}
-            onToken={(token) => this.onEditCreditCard(token, card.id)}>
+            onToken={(token) => this.editCreditCard(token, card.id)}>
             <a className="pull-right text-info" title="Edit Card">
               <i className="fa fa-fw fa-pencil list-group-item-text" />
             </a>
@@ -58,9 +62,15 @@ module Esper.Components {
       let cards = this.props.subscription.cards;
       if (_.isEmpty(cards)) {
         return <div className="esper-section">
-          <div className="esper-no-content">
-            No credit cards found
-          </div>
+          <Components.Stripe
+            description={Text.getPlanName(this.props.subscription.plan)}
+            label="Submit" stripeKey={Config.STRIPE_KEY}
+            onToken={(token) => this.addCard(token)}>
+            <button className="btn btn-default form-control">
+              <i className="fa fa-fw fa-left fa-plus-circle" />
+              { Text.AddCard }
+            </button>
+          </Components.Stripe>
         </div>;
       }
 
