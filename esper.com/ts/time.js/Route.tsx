@@ -162,6 +162,15 @@ module Esper.Route {
   });
 
 
+  /* Payment */
+
+  route(Paths.Time.paymentInfo({
+    teamId: ":teamId?"
+  }).hash, function(ctx) {
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    Actions.renderPaymentInfo({teamId});
+  });
+
   /////
 
   // Redirect stupid Techcrunch link
