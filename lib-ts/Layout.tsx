@@ -108,6 +108,7 @@ module Esper.Layout {
     if ($(modalSelector).find(".modal").is(":visible")) {
       return _.isUndefined(modalId) || modalId === currentModalId;
     }
+    return false;
   }
 
   /*

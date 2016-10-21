@@ -39,7 +39,7 @@ module Esper.Components {
 
   export function ModalPanelFooter(props: ModalPanelFooterProps) {
     if (!props.busy && !props.error && !props.onCancel && !props.onOK ) {
-      return; // Don't show footer if nothing to show
+      return <div></div>; // Don't show footer if nothing to show
     }
 
     return <div className="clearfix modal-footer">
@@ -65,6 +65,7 @@ module Esper.Components {
               </span> }
             </span>;
           }
+          return <div></div>;
         })()
       }
       {

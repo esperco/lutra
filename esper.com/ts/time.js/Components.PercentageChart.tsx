@@ -32,11 +32,12 @@ module Esper.Components {
             formatter: function() {
               if (this.percentage) {
                 if (simplified && this.percentage < 5) {
-                  return null;
+                  return "";
                 }
                 return `${this.point.name} ` +
                   `(${Util.roundStr(this.percentage, 1)}%)`;
               }
+              return "";
             }
           },
           size: simplified ? '90%' : '80%'

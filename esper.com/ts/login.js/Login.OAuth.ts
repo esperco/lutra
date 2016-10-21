@@ -35,6 +35,7 @@ module Esper.Login {
           LocalStore.set(nonceKey, loginNonce);
           return loginNonce;
         }
+        return "";
       });
   }
 

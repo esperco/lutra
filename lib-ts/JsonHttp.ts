@@ -300,8 +300,8 @@ module Esper.JsonHttp {
       batchDfd = $.Deferred();
     }
 
+    var ret = fn();
     try {
-      let ret = fn();
       if (topLevel) {
         insideBatch = false;
         jsonHttp("POST", batchPath, {
@@ -312,6 +312,8 @@ module Esper.JsonHttp {
         );
       }
       return batchDfd.then(() => ret);
+    } catch(e) {
+      return batchDfd.reject(e).then(() => ret);
     } finally {
       if (topLevel) {
         insideBatch = false;
