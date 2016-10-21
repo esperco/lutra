@@ -19,10 +19,12 @@ module Esper.Views {
 
       let details = Stores.Subscriptions.require(cust.id);
       return <div className="panel panel-default"><div className="panel-body">
-        <div className="alert alert-info">
-          Your organization is subscribed to
-          the {Text.getPlanName(details.plan)}
-        </div>
+        {
+          details.active ?
+          <div className="alert alert-info">
+            { Text.SubscribedToPlan(Text.ThisCustomer, cust.subscription.plan) }
+          </div> : null
+        }
         <Components.CreditCardList subscription={details} />
       </div></div>;
     }
