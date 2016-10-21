@@ -561,11 +561,10 @@ module Esper.Api {
 
   // supports generic calendar
   export function postForCalendarEventsCSV(teamid: string,
-    calid: string,
     q: ApiT.CalendarRequest):
     JsonPromise<string> {
-    var url = prefix + "/api/calendar/events/csv/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
+    var url = prefix + "/api/ts/events-csv/" + string(Login.myUid())
+            + "/" + string(teamid);
     return JsonHttp.httpRequest("POST", url,
       JSON.stringify(q),
       "text",
