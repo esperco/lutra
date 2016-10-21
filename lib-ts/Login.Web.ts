@@ -330,6 +330,7 @@ module Esper.Login {
       if (v) {
         return k + "=" + encodeURIComponent(v)
       }
+      return "";
     });
     paramsStr = _.filter(paramsStr);
 
@@ -337,7 +338,6 @@ module Esper.Login {
       path += "?" + paramsStr.join("&");
     }
     location.href = path;
-    return;
   }
 
 
