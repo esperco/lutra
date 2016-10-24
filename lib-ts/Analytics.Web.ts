@@ -5,7 +5,7 @@
 */
 
 /// <reference path="./Analytics.ts" />
-/// <reference path="./Login.ts" />
+/// <reference path="./Login.Web.ts" />
 /// <reference path="./ApiT.ts" />
 
 module Esper.Analytics {
@@ -24,6 +24,7 @@ module Esper.Analytics {
     before they login.
   */
   export function preIdentify<T extends {}>(props: T, cb?: () => void) {
+    if (Login.asAdmin) return;
     analytics.ready(function() {
       analytics.identify(props, cb);
     });
@@ -31,6 +32,7 @@ module Esper.Analytics {
 
   // Post-login identify
   export function identify(loginInfo?: ApiT.LoginResponse, cb?: () => void) {
+    if (Login.asAdmin) return;
     analytics.ready(function() {
       if (loginInfo && Login.myUid()) {
         if (analytics.user().id() !== Login.myUid()) {
@@ -74,6 +76,7 @@ module Esper.Analytics {
 
   // Track which page you're on
   export function page(page: Page, properties?: any, cb?: () => void) {
+    if (Login.asAdmin) return;
     properties = flatten(properties || {});
     properties['url'] = location.href; // So hash is included
     analytics.ready(function() {
@@ -83,6 +86,7 @@ module Esper.Analytics {
 
   export function track(event: Trackable, properties?: Object,
                         cb?: () => void) {
+    if (Login.asAdmin) return;
     var eventName = Trackable[event];
     analytics.ready(function() {
       analytics.track(eventName, flatten(properties || {}), cb);

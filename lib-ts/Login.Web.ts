@@ -11,20 +11,24 @@
 
 module Esper.Login {
   var storedLoginKey = "login";
+  export var asAdmin = false;
 
   export interface StoredCredentials {
     uid: string;
     api_secret: string;
     email: string;
+    as_admin: boolean;
   }
 
   type CredentialsObj = StoredCredentials;
 
-  export function storeCredentials(data: ApiT.LoginResponse|CredentialsObj) {
+  export function storeCredentials(data: ApiT.LoginResponse|CredentialsObj,
+                                   asAdmin = false) {
     var stored: StoredCredentials = {
       uid: data.uid,
       api_secret: data.api_secret,
-      email: data.email
+      email: data.email,
+      as_admin: asAdmin
     };
     LocalStore.set(storedLoginKey, stored);
   }
@@ -46,6 +50,7 @@ module Esper.Login {
     var stored = getCredentials();
     if (stored && stored.uid && stored.api_secret) {  // sanity check
       setCredentials(stored.uid, stored.api_secret);
+      asAdmin = stored.as_admin;
       return true;
     } else {
       clearCredentials();
@@ -163,7 +168,8 @@ module Esper.Login {
       Raven.setUserContext({
         email: loginInfo.email,
         id: loginInfo.uid,
-        platform: loginInfo.platform
+        platform: loginInfo.platform,
+        as_admin: asAdmin
       });
     }
 
@@ -234,7 +240,7 @@ module Esper.Login {
   export function loginAs(email: string) {
     Api.loginAs(email)
       .done(function(loginResponse) {
-        storeCredentials(loginResponse);
+        storeCredentials(loginResponse, true);
         location.reload();
       });
   }
