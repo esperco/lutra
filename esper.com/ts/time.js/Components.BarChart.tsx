@@ -4,10 +4,11 @@
 */
 module Esper.Components {
   export function BarChart({
-    series, categories, simplified, orientation, yAxis
+    series, categories, altExport, simplified, orientation, yAxis
   } : {
     series: Charting.EventSeries[],
     categories: string[];
+    altExport?: () => boolean;
     simplified?: boolean;
     orientation?: 'vertical'|'horizontal'
     yAxis?: string;
@@ -17,7 +18,7 @@ module Esper.Components {
     // Top 5 only for simplified bar chart
     series = simplified ? series.slice(0, 5) : series;
 
-    return <Highchart showExport={!simplified} opts={{
+    return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: orientation === 'vertical' ? {
         type: 'column'
       } : {

@@ -2,12 +2,13 @@
   Base class for pie chart
 */
 module Esper.Components {
-  export function PieChart({series, simplified, yAxis} : {
+  export function PieChart({series, altExport, simplified, yAxis} : {
     series: Charting.SingleEventGroupSeries;
+    altExport?: () => boolean;
     simplified?: boolean;
     yAxis?: string;
   }) {
-    return <Highchart showExport={!simplified} opts={{
+    return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: {
         type: 'pie'
       },

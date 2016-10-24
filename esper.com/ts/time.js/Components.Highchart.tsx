@@ -13,7 +13,8 @@ module Esper.Components {
 
   export interface HighchartsOpts {
     opts: HighchartsOptions;
-    showExport?: boolean;
+    altExport?: () => boolean;
+    hideExport?: boolean;
     units?: string;
   }
 
@@ -28,11 +29,13 @@ module Esper.Components {
                   className="chart-holder-parent">
         <div ref={(c) => this._target = c}
              className="chart-holder" />
-        { this.props.showExport ? <button type="button"
-                onClick={() => this.exportChart()}
-                className={classNames("btn", "btn-default", EXPORT_ID_CLS)}>
-          <i className="fa fa-fw fa-download" />
-        </button> : null }
+        { this.props.hideExport ? null :
+          <button type="button"
+                  onClick={() => this.exportChart()}
+                  className={classNames("btn", "btn-default", EXPORT_ID_CLS)}>
+            <i className="fa fa-fw fa-download" />
+          </button>
+        }
       </div>;
     }
 
@@ -95,6 +98,10 @@ module Esper.Components {
     }
 
     exportChart() {
+      if (this.props.altExport && !this.props.altExport()) {
+        return;
+      }
+
       if (this._chart) {
         // Modify chart for export
         var chartOpts = this.props.opts.chart;

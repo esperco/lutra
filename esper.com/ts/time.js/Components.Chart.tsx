@@ -103,7 +103,7 @@ module Esper.Components {
         return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
       }
 
-      let { groupBy, simplified } = this.props;
+      let { team, groupBy, simplified } = this.props;
       let series = Charting.singleGroupSeries(result.group, this.props, {
         yFn: EventStats.toHours,
         totals: this.props.extra.incUnscheduled ?
@@ -111,11 +111,19 @@ module Esper.Components {
             (v) => WeekHours.totalForRange(v.range, this.props.extra.weekHours)
           ) : undefined
       });
+      let altExport = function() {
+        var subscription = team.team_api.team_subscription;
+        if (Config.disableAdvancedFeatures(subscription.plan)) {
+          Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+          return false;
+        }
+        return true;
+      };
 
       return <div className="chart-content">
         { simplified ? null : <TotalsBar {...result.group.all} /> }
         <PieChart
-          { ... { simplified, series } }
+          { ... { altExport, simplified, series } }
           yAxis={`${groupBy.name} (${Text.ChartPercentUnit})`}
         />
       </div>;
@@ -129,16 +137,24 @@ module Esper.Components {
         return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
       }
 
-      let { groupBy, simplified } = this.props;
+      let { team, groupBy, simplified } = this.props;
       let { categories, series } = Charting.eventSeries(
         result.group, this.props, {
           yFn: EventStats.toHours
         });
+      let altExport = function() {
+        var subscription = team.team_api.team_subscription;
+        if (Config.disableAdvancedFeatures(subscription.plan)) {
+          Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+          return false;
+        }
+        return true;
+      };
 
       return <div className="chart-content">
         { simplified ? null : <TotalsBar {...result.group.all} /> }
         <BarChart
-          { ... { simplified, categories, series }}
+          { ... { altExport, simplified, categories, series }}
           yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
         />
       </div>;
@@ -151,7 +167,7 @@ module Esper.Components {
         return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
       }
 
-      let { groupBy, simplified } = this.props;
+      let { team, groupBy, simplified } = this.props;
       let series = Charting.eventGroupSeries(result.group, this.props, {
         yFn: EventStats.toHours,
         totals: this.props.extra.incUnscheduled ?
@@ -160,10 +176,18 @@ module Esper.Components {
           ) : undefined
       });
       let categories = Text.fmtPeriodList(this.props.period);
+      let altExport = function() {
+        var subscription = team.team_api.team_subscription;
+        if (Config.disableAdvancedFeatures(subscription.plan)) {
+          Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+          return false;
+        }
+        return true;
+      };
 
       return <div className="chart-content">
         <StackedBarChart
-          { ... { simplified, series, categories }}
+          { ... { altExport, simplified, series, categories }}
           yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
         />
       </div>;
@@ -176,15 +200,23 @@ module Esper.Components {
         return <ChartMsg>{Text.ChartNoData}</ChartMsg>;
       }
 
-      let { groupBy, simplified } = this.props;
+      let { team, groupBy, simplified } = this.props;
       let series = Charting.eventGroupSeries(result.group, this.props, {
         yFn: EventStats.toHours
       });
       let categories = Text.fmtPeriodList(this.props.period);
+      let altExport = function() {
+        var subscription = team.team_api.team_subscription;
+        if (Config.disableAdvancedFeatures(subscription.plan)) {
+          Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+          return false;
+        }
+        return true;
+      };
 
       return <div className="chart-content">
         <LineChart
-          { ... { simplified, series, categories }}
+          { ... { altExport, simplified, series, categories }}
           yAxis={`${groupBy.name} (${Text.ChartHoursUnit})`}
         />
       </div>;

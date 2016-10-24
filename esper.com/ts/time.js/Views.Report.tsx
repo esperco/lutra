@@ -176,6 +176,15 @@ module Esper.Views {
     let series = Charting.singleGroupSeries(group, props, {
       yFn: EventStats.toHours
     });
+    let altExport = function() {
+      var subscription = props.team.team_api.team_subscription;
+      if (Config.disableAdvancedFeatures(subscription.plan)) {
+        Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+        return false;
+      }
+      return true;
+    };
+
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartLabels }</h3>
@@ -188,6 +197,7 @@ module Esper.Views {
           <Components.ChartMsg>{Text.ChartNoData}</Components.ChartMsg> :
           <Components.PieChart
             series={series}
+            altExport={altExport}
             simplified={true}
             yAxis={`${Charting.GroupByLabel.name} (${Text.ChartPercentUnit})`}
           /> }

@@ -4,17 +4,18 @@
 */
 module Esper.Components {
   export function StackedBarChart({
-    series, categories, simplified, orientation, yAxis
+    series, categories, altExport, simplified, orientation, yAxis
   } : {
     series: Charting.EventGroupSeries[],
     categories: string[],
+    altExport: () => boolean;
     simplified?: boolean;
     orientation?: 'vertical'|'horizontal'
     yAxis?: string;
   }) {
     orientation = orientation || 'vertical';
 
-    return <Highchart showExport={!simplified} opts={{
+    return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: orientation === 'vertical' ? {
         type: 'column'
       } : {
