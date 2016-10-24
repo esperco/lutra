@@ -186,6 +186,11 @@ module Esper.Views {
     }
 
     toggleFilterMenu() {
+      var subscription = this.props.team.team_api.team_subscription;
+      if (Config.disableAdvancedFeatures(subscription.plan)) {
+        Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+        return;
+      }
       this.mutateState((s) => s.showFilterMenu = !s.showFilterMenu);
     }
 
