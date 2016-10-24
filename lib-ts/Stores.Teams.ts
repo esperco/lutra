@@ -110,10 +110,21 @@ module Esper.Stores.Teams {
   /* Init helpers */
 
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
-    var data = _.map(loginResponse.teams, (t) => ({
-      itemKey: t.teamid,
-      data: Option.wrap(t)
-    }));
+    var data = _.map(loginResponse.teams, (t) => {
+      if (_.isEmpty(t.team_api.team_subscription)) {
+        t.team_api.team_subscription = {
+          teamid: t.teamid,
+          cusid: "fake-cust-id",
+          active: true,
+          plan: "Executive_20161019",
+          status: "Active"
+        };
+      }
+      return {
+        itemKey: t.teamid,
+        data: Option.wrap(t)
+      };
+    });
     TeamListStore.batchSet(batchKey, Option.some(data))
   }
 

@@ -96,7 +96,7 @@ module Esper.ApiT {
   export interface TeamApi {
     team_exec_email: string;
     team_labels: LabelInfo[];
-    team_subscription: TeamSubscription;
+    team_subscription?: TeamSubscription;
   }
 
   export interface Team {
