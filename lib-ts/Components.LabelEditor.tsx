@@ -14,7 +14,9 @@ module Esper.Components {
     inputId?: string;
     events: Types.TeamEvent[];
     teams: ApiT.Team[];
-    onSelect: (label: Types.LabelBase, active: boolean) => void;
+    onSelect: (label: Types.LabelBase,
+               active: boolean,
+               method: "click"|"type") => void;
     onEsc?: () => void;
     autoFocus?: boolean;
   }
@@ -107,7 +109,7 @@ module Esper.Components {
             placeholder={_.capitalize(Text.FindAddLabels)}
             getList={() => this._list}
             onEsc={this.props.onEsc}
-            onSubmit={this.toggle.bind(this)}
+            onSubmit={(label) => this.toggle(label)}
           />
         </div>
 
@@ -148,12 +150,12 @@ module Esper.Components {
         label={labelCount}
         selected={this.isSelected(labelCount.id)}
         highlight={highlight}
-        onClick={() => this.toggle(labelCount.displayAs, labelCount)}
+        onClick={() => this.toggle(labelCount.displayAs, labelCount, true)}
       />;
     }
 
     // New label
-    toggle(labelStr: string, label?: Types.LabelBase) {
+    toggle(labelStr: string, label?: Types.LabelBase, click=false) {
       if (!label) {
         label = _.find(this.state.labels, {id: Labels.getNorm(labelStr)}) || {
           id: Labels.getNorm(labelStr),
@@ -162,7 +164,10 @@ module Esper.Components {
         };
       }
       let isSelected = this.isSelected(label.id);
-      this.props.onSelect(label, isSelected === "some" || !isSelected);
+      this.props.onSelect(label,
+        isSelected === "some" || !isSelected,
+        click ? "click" : "type"
+      );
       this._input.reset();
     }
 
