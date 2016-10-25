@@ -1,21 +1,34 @@
 
 module Esper.Views {
   interface Props {
-    subscription: ApiT.TeamSubscription;
+    teamId: string;
   }
 
   export class PaymentInfo extends ReactHelpers.Component<Props, {}> {
-    render() {
-      return <div className="esper-section">
-        <div className="esper-section">
-          <div className="alert alert-info">
-            { Text.PaymentDescription }
-          </div>
+    renderWithData() {
+      let team = Stores.Teams.require(this.props.teamId);
+      let subscription = team.team_api.team_subscription;
+      let subBusy = Stores.Subscriptions.status(subscription.cusid).match({
+        none: () => false,
+        some: (d) => d === Model2.DataStatus.FETCHING
+      });
+      let custBusy = !Stores.Customers.ready();
+      if (subBusy || custBusy) {
+        return <div className="esper-spinner" />;
+      }
+
+      let details = Stores.Subscriptions.get(subscription.cusid)
+        .unwrapOr(null);
+
+      return <div className="container">
+        <div className="alert msg alert-info">
+          { Text.PaymentDescription }
         </div>
-        <div className="esper-section">
-          <Components.Plans subscription={this.props.subscription}
-            redirectTarget={Paths.Time.charts()} />
-        </div>
+        <Components.PaymentInfo
+          team={team}
+          customers={Stores.Customers.all()}
+          details={details}
+        />
       </div>;
     }
   }

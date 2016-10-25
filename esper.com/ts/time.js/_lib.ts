@@ -37,6 +37,7 @@
 /// <reference path="../lib/Components.ListSelector.tsx" />
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
+/// <reference path="../lib/Components.PaymentInfo.tsx" />
 /// <reference path="../lib/Components.Plans.tsx" />
 /// <reference path="../lib/Components.ProgressBar.tsx" />
 /// <reference path="../lib/Components.SearchBox.tsx" />
