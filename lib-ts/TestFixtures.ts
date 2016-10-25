@@ -169,7 +169,6 @@ module Esper.TestFixtures {
     team_owner?: string;
     team_cal_user?: string;
     team_assistants?: string[];
-    team_calendar_accounts?: string[];
     team_email_aliases?: string[];
     team_executive?: string;
     team_executive_email?: string;
@@ -188,7 +187,6 @@ module Esper.TestFixtures {
       team_owner: props.team_owner || uid,
       team_cal_user: props.team_cal_user || uid,
       team_assistants: props.team_assistants || [uid],
-      team_calendar_accounts: props.team_calendar_accounts || [],
       team_email_aliases: props.team_email_aliases || [],
       team_executive: props.team_executive || uid,
       team_timestats_calendars: props.team_timestats_calendars || ["calId"]
