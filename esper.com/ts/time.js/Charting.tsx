@@ -860,7 +860,7 @@ module Esper.Charting {
         cursor: "pointer",
         color: colors[index],
 
-        data: _.map(groupSeries.values, (v, vIndex) => ({
+        data: groupSeries ? _.map(groupSeries.values, (v, vIndex) => ({
           name: `${name} (${periodNames[vIndex]})`,
           count: v.totalUnique,
           x: vIndex,
@@ -868,7 +868,7 @@ module Esper.Charting {
           events: {
             click: () => onSeriesClick(v.events)
           }
-        }))
+        })) : []
       };
     });
 

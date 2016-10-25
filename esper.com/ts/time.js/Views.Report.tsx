@@ -41,16 +41,18 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <UnconfirmedLink eventsForRanges={eventsForRanges} />
-          <div className="esper-panel-section">
-            <div className="esper-header">
-              <i className="fa fa-fw fa-left fa-tags" />
-              { Text.ChartLabels }
+          <div className="sidebar-minus-bottom-menu">
+            <UnconfirmedLink eventsForRanges={eventsForRanges} />
+            <div className="esper-panel-section">
+              <div className="esper-header">
+                <i className="fa fa-fw fa-left fa-tags" />
+                { Text.ChartLabels }
+              </div>
+              <Components.ChartSelector
+                { ...chartProps }
+                updateFn={(x) => Route.nav.query({ labels: x.labels })}
+              />
             </div>
-            <Components.ChartSelector
-              { ...chartProps }
-              updateFn={(x) => Route.nav.query({ labels: x.labels })}
-            />
           </div>
 
           <div className="sidebar-bottom-menu">

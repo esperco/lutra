@@ -17,6 +17,9 @@ module Esper.Views {
 
     // List of temporary identifiers that React can use to identify components
     newTeamIds: string[];
+
+    // Which of the above newTeamIds errors because exec has team already
+    execErrorIds: string[];
   }
 
   export class TeamSetup extends ReactHelpers.Component<{}, State> {
@@ -29,6 +32,7 @@ module Esper.Views {
       this._execForms = {};
       this.state = {
         busy: false,
+        execErrorIds: [],
         selfSelected: false,
         execSelected: false,
         newTeamIds: [Util.randomString()]
@@ -77,6 +81,8 @@ module Esper.Views {
               <p>{ Text.TeamExecDescription }</p>
               { _.map(this.state.newTeamIds, (id) =>
                 <div key={id} className="new-team esper-panel-section">
+                  { _.includes(this.state.execErrorIds, id) ?
+                    <Components.ErrorMsg msg={Text.ExecHasTeamErr} /> : null }
                   { this.state.newTeamIds.length > 1 ?
                     <span className="action close-action"
                           onClick={() => this.rmTeam(id)}>
@@ -139,32 +145,43 @@ module Esper.Views {
           some: (d) => promises.push(Actions.Teams.createSelfTeam(d))
         });
       } else { // Assume exec selected
-        var execForms = _.filter(
-          _.values<Components.NewTeamForm>(this._execForms)
-        );
-        var validations = _.map(execForms, (f) => f.validate());
+        var validations: {
+          [index: string]: Option.T<Actions.Teams.ExecTeamData>
+        } = {};
+        _.each(this._execForms, (v, k) => {
+          if (v) { validations[k] = v.validate(); }
+        });
 
         // Only post if all teams valid
+        var failedIds: string[] = [];
         if (_.every(validations, (v) => v.isSome())) {
-          _.each(validations, (v) => v.match({
+          _.each(validations, (v, k) => v.match({
             none: () => null,
-            some: (d) => promises.push(Actions.Teams.createExecTeam(d))
+            some: (d) => promises.push(
+              Actions.Teams.createExecTeam(d).then(
+                (x) => x,
+                (err) => {
+                  if (err.errorDetails ===
+                      "Cannot_create_new_team_for_executive") {
+                    err.handled = true;
+                    this.mutateState((s) => s.execErrorIds.push(k));
+                  }
+                }
+              )
+            )
           }));
         }
       }
 
       if (promises.length) {
-        var newState = _.clone(this.state);
-        newState.busy = true;
-        this.setState(newState);
+        this.mutateState((s) => {
+          s.busy = true;
+          s.execErrorIds = [];
+        });
 
         $.when.apply($, promises)
           .done(() => Route.nav.go(Paths.Time.calendarSetup()))
-          .fail(() => {
-            let newState = _.clone(this.state);
-            newState.busy = false;
-            this.setState(newState);
-          });
+          .fail(() => this.mutateState((s) => s.busy = false));
       }
     }
   }

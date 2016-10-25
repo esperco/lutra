@@ -123,4 +123,14 @@ module Esper.Text {
 
   export const DefaultErrorTooltip = `There was an error connecting to the ` +
     `server. Try refreshing or contacting us at https://esper.com/contact`;
+
+  // User already exists (used in /manage and /time onboarding)
+  export const ExecHasTeamErr = <span>
+    This person already has an account. Please ask that user to log in and
+    share the account with you on the Settings page. If you have
+    any questions, please contact us at <a href="http://esper.com/contact">
+      esper.com/contact.
+    </a>
+  </span>;
+
 }
