@@ -39,6 +39,10 @@ module Esper.Views {
             href={Paths.Manage.Team.pay}>
           { Text.PaySettings }
         </Components.SettingsMenuLink>
+        <Components.SettingsMenuLink {...this.props}
+            href={Paths.Manage.Team.exportCSV}>
+          { Text.ExportCSV }
+        </Components.SettingsMenuLink>
       </Components.SettingsMenu>;
 
       return <Views.Settings {...this.props} subMenu={subMenu}>

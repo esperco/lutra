@@ -16,6 +16,7 @@ module Esper.Text {
   // Team info description
   export const GeneralSettings = "General";
   export const NotificationSettings = "Notifications";
+  export const ExportCSV = "Export";
 
   // Add team
   export const AddTeamLink = `New ${TeamExec}`;

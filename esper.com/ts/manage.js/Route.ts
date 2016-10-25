@@ -93,6 +93,7 @@ module Esper.Route {
   routeTeam(Paths.Manage.Team.notifications,
             Actions.renderTeamNotificationSettings);
   routeTeam(Paths.Manage.Team.pay, Actions.renderTeamPaySettings);
+  routeTeam(Paths.Manage.Team.exportCSV, Actions.renderTeamExport);
 
 
   /* Render group-specifi settings pages */

@@ -242,6 +242,10 @@ module Esper.Paths {
       export function pay({teamId} : {teamId?: string} = {}) {
         return optPath(prefix, subprefix, "pay", teamId);
       }
+
+      export function exportCSV({teamId} : {teamId?: string} = {}) {
+        return optPath(prefix, subprefix, "export", teamId);
+      }
     }
 
     export module Group {
