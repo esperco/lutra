@@ -25,7 +25,12 @@ module Esper.Components {
     }
 
     addCard(token: StripeTokenResponse) {
-      Actions.Subscriptions.addCard(this.props.subscription.cusid, token.id);
+      Actions.Subscriptions.addCard(this.props.subscription.cusid, token.id)
+        .then(() => {
+          if (! this.props.subscription.plan) {
+            Actions.Subscriptions.setDefault(this.props.subscription.cusid);
+          }
+        });
     }
 
     removeCard(cardid: string) {
