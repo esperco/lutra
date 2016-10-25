@@ -6,9 +6,9 @@ module Esper.Views {
 
   export class PaymentInfo extends ReactHelpers.Component<Props, {}> {
     render() {
-      return <div className="esper-section">
+      return <div className="container">
         <div className="esper-section">
-          <div className="alert alert-info">
+          <div className="alert msg alert-info">
             { Text.PaymentDescription }
           </div>
         </div>

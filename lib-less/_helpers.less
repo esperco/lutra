@@ -239,6 +239,9 @@
     min-height: @min-fullscreen-height;
   }
 
+  // Space between content and footer
+  padding-bottom: @esper-lg-padding;
+
   /*
     Header in the content area (fixed in place on desktop if followed by
     esper-expanded)
@@ -267,6 +270,10 @@
         margin-top: @content-header-height;
       }
     }
+  }
+
+  > .esper-expanded {
+    padding-bottom: @esper-lg-padding; // Space between content and footer
   }
 }
 
@@ -900,6 +907,10 @@ flexibility with non-UL elements */
 
 
 /* Generic */
+
+.alert.msg {
+  text-align: center;
+}
 
 .action {
   color: @text-muted;
