@@ -93,7 +93,7 @@ module Esper.Components {
 
             var selected = this.isSelected(group.id, opts.id);
 
-            var badge = opts.badgeText ? <Components.Badge
+            var badge = opts.badgeText ? <Components.BadgeLight
               text={opts.badgeText}
               hoverText={opts.badgeHoverText}
               color={selected && opts.badgeColor}
@@ -292,7 +292,7 @@ module Esper.Components {
       }
     })();
 
-    var badge = choice.badgeText ? <Components.Badge
+    var badge = choice.badgeText ? <Components.BadgeLight
       text={choice.badgeText}
       hoverText={choice.badgeHoverText}
       color={selected && choice.badgeColor}

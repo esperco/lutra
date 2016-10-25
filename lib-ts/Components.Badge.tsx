@@ -11,6 +11,7 @@ module Esper.Components {
     text: string;
     hoverText?: string;
     color?: string;
+    style?: React.CSSProperties;
   }
 
   export class Badge extends ReactHelpers.Component<BadgeProps, {
@@ -22,10 +23,10 @@ module Esper.Components {
     }
 
     render() {
-      var badgeStyle = (this.props.color) ? {
+      var badgeStyle = this.props.style || ((this.props.color) ? {
         background: this.props.color,
         color: Colors.colorForText(this.props.color)
-      } : {};
+      } : {});
       return <span className={"badge " + this.props.className}
               style={badgeStyle}
               onMouseEnter={this.onMouseEnter.bind(this)}
@@ -45,5 +46,14 @@ module Esper.Components {
     onMouseLeave() {
       this.setState({ hover: false })
     }
+  }
+
+  // Variant of badge with less emphasis
+  export function BadgeLight(props: BadgeProps) {
+    // NB: Ignore colors for now -- doesn't quite look right.
+    // let style = props.color ? { color: props.color } : {};
+    let style = {};
+
+    return <Badge {...props} className="light" style={style} />
   }
 }

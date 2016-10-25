@@ -14,6 +14,9 @@ module Esper.Components {
   }) {
     orientation = orientation || 'horizontal';
 
+    // Top 5 only for simplified bar chart
+    series = simplified ? series.slice(0, 5) : series;
+
     return <Highchart showExport={!simplified} opts={{
       chart: orientation === 'vertical' ? {
         type: 'column'
