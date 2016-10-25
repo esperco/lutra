@@ -28,6 +28,7 @@ module Esper.Views {
           team={team}
           customers={Stores.Customers.all()}
           details={details}
+          redirect={Paths.Time.charts()}
         />
       </div>;
     }

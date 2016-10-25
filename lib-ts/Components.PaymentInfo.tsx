@@ -20,6 +20,9 @@ module Esper.Components {
     // Subscription details, if available -- if no details, we assume this
     // is an enterprise customer
     details?: ApiT.SubscriptionDetails;
+
+    // Post plan selection redirect
+    redirect?: string|Paths.Path;
   }
 
   export function PaymentInfo(props: Props) {
@@ -40,7 +43,7 @@ module Esper.Components {
     }
   }
 
-  export function TeamCustomer({team, details}: Props) {
+  export function TeamCustomer({team, redirect, details}: Props) {
     let subscription = team.team_api.team_subscription;
     return <div className="panel panel-default"><div className="panel-body">
       { subscription.active ?
@@ -57,7 +60,7 @@ module Esper.Components {
         </div> )}
 
       <div className="esper-section">
-        <Components.Plans subscription={details} />
+        <Components.Plans subscription={details} redirectTarget={redirect} />
         { details.active ?
           <Components.CreditCardList subscription={details} /> :
           null }
