@@ -82,6 +82,10 @@ module Esper.Views {
                     "active": _.some(_.values(filterState)) &&
                               !this.state.showFilterMenu
                   })} />
+                  { Login.data.is_sandbox_user ?
+                    <Components.Hint nested style={{top: "-40px", right: "5px"}}
+                      text={Text.FilterActionHintText} /> : null
+                  }
                 </span>
               </div>
             </div>

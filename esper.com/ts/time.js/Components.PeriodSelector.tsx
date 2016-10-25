@@ -89,6 +89,10 @@ module Esper.Components {
           <div className="dropdown-toggle">
             { Text.fmtPeriod(period) }
             <i className="fa fa-fw fa-right fa-caret-down" />
+            { Login.data.is_sandbox_user ?
+              <Hint nested style={{top: "-33px", right: "15%"}}
+                text={Text.PeriodSelectorHintText} /> : null
+            }
           </div>
           <div className="dropdown-menu">
             { intervals.length > 1 ?

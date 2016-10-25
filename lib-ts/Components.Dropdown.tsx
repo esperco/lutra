@@ -35,6 +35,7 @@ module Esper.Components {
     children?: JSX.Element[];
     className?: string;
     disabled?: boolean;
+    nested?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
   }
@@ -61,13 +62,15 @@ module Esper.Components {
       return <div className={classNames(this.props.className, {
                     dropdown: _.isUndefined(this.props.className)
                   })}
-                  onClick={() => this.open()}>
+                  onClick={this.open.bind(this)}>
         {toggle}
         { this.state.open ? this.getOverlay() : null }
       </div>;
     }
 
-    open() {
+    open(e: React.MouseEvent) {
+      if (this.props.nested)
+        e.stopPropagation();
       if (! this.props.disabled && !this.state.open) {
         this.setState({ open: true });
         if (this.props.onOpen) {

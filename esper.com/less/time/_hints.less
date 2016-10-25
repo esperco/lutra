@@ -1,0 +1,22 @@
+// For hints
+
+@import "../lib/_bootstrap-variables";
+
+.hint-bubble {
+  height: 20px;
+  width: 20px;
+  position: absolute;
+  border: 5px solid @gray-dark;
+  border-radius: 30px;
+  background-color: @gray;
+  opacity: 0.3;
+  transition: opacity 0.2s ease-out;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.hint-text {
+  min-width: 260px;
+}

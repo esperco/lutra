@@ -16,6 +16,22 @@ module Esper.Text {
   export const ReleaseNotes = ReleaseNotesAugust2016;
   export const DismissNotes = "Click to Dismiss";
 
+  // Hints
+  export const FilterActionHintText = <div>
+    <p>
+      This is the Advanced Filtering feature available only to
+      Executive plan users or Enterprise plan users.
+    </p>
+    <p>
+      Click here to display a menu containing options that you can
+      adjust to more accurately display how you spend your time.
+    </p>
+  </div>;
+  export const PeriodSelectorHintText =
+    "Click here to browse through your calendar history.";
+  export const SeeMoreHintText =
+    "Click here to see more details about how you spend your time.";
+
   // Payments
   export function getPlanName(planid: ApiT.PlanId) {
     if (planid === "Basic_20161019")
