@@ -307,7 +307,8 @@ module Esper {
       Login.storeCredentials({
         email: email,
         uid: uid,
-        api_secret: apiSecret
+        api_secret: apiSecret,
+        as_admin: false
       });
       Esper.redirect();
     }
