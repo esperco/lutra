@@ -112,14 +112,21 @@ module Esper.Stores.Teams {
   export function loadFromLoginInfo(loginResponse: ApiT.LoginResponse) {
     var data = _.map(loginResponse.teams, (t) => {
       if (_.isEmpty(t.team_api.team_subscription)) {
-        t.team_api.team_subscription = {
+        let team = _.cloneDeep(t);
+        team.team_api.team_subscription = {
           teamid: t.teamid,
           cusid: "fake-cust-id",
           active: true,
           plan: "Executive_20161019",
           status: "Active"
         };
+
+        return {
+          itemKey: team.teamid,
+          data: Option.wrap(team)
+        };
       }
+
       return {
         itemKey: t.teamid,
         data: Option.wrap(t)
