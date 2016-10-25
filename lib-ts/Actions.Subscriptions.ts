@@ -25,6 +25,13 @@ module Esper.Actions.Subscriptions {
     return p;
   }
 
+  export function setDefault(cusId: string) {
+    let customer = Stores.Customers.require(cusId);
+    let defaultPlan: ApiT.PlanId = !!customer.teamid ?
+      "Basic_20161019" : "Enterprise_20160923";
+    return set(cusId, defaultPlan);
+  }
+
   export function cancel(cusId: string) {
     let p = Api.cancelSubscription(cusId).then(
       () => location.reload(false));
