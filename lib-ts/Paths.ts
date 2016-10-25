@@ -184,6 +184,12 @@ module Esper.Paths {
     export function teamSetup({} = {}) {
       return optPath(prefix, "team-setup");
     }
+
+    export function paymentInfo({teamId}: {
+      teamId?: string;
+    }) {
+      return optPath(prefix, "payment-info", teamId);
+    }
   }
 
   // Paths for /manage

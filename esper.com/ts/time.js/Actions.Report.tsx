@@ -63,15 +63,14 @@ module Esper.Actions {
     // Show correct modal once calculation is done
     calc.onceChange((result) => {
       if (!confirmationLaunched && result.total > 0) {
-        // Launch confirmation modal
         confirmationLaunched = true;
         Layout.renderModal(Containers.confirmListModal(result.events, 0, () => {
+          // Redirect to payment view
           if (!subscription.active)
-            Layout.renderModal(Containers.paymentModal(subscription));
+            Route.nav.go(Paths.Time.paymentInfo({teamId}));
         }));
       } else if (!subscription.active) {
-        // Launch payments modal
-        Layout.renderModal(Containers.paymentModal(subscription));
+        Route.nav.go(Paths.Time.paymentInfo({teamId}));
       }
     });
 

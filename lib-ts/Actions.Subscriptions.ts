@@ -12,9 +12,15 @@ module Esper.Actions.Subscriptions {
     so let's just refresh everything for now
   */
 
-  export function set(cusId: string, planId: ApiT.PlanId) {
+  export function set(cusId: string, planId: ApiT.PlanId,
+                      redirectTarget?: string|Paths.Path) {
     let p = Api.setSubscription(cusId, planId).then(
-      () => location.reload(false));
+      () => {
+        if (_.isEmpty(redirectTarget))
+          location.reload(false);
+        else
+          Route.nav.go(redirectTarget);
+      });
     Save.monitorStr(p, "setSubscription");
     return p;
   }

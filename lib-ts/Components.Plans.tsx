@@ -5,6 +5,7 @@
 module Esper.Components {
   interface Props {
     subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
+    redirectTarget?: string|Paths.Path;
   }
 
   export class Plans extends ReactHelpers.Component<Props, {}> {
@@ -12,10 +13,12 @@ module Esper.Components {
       let subscription = this.props.subscription;
       return <div className="esper-flex-list esper-section">
         <div className="esper-section">
-          <PlanInfo planid="Basic_20161019" subscription={subscription} />
+          <PlanInfo planid="Basic_20161019" subscription={subscription}
+            redirectTarget={this.props.redirectTarget} />
         </div>
         <div className="esper-section">
-          <PlanInfo planid="Executive_20161019" subscription={subscription} />
+          <PlanInfo planid="Executive_20161019" subscription={subscription}
+            redirectTarget={this.props.redirectTarget} />
         </div>
       </div>;
     }
@@ -25,6 +28,7 @@ module Esper.Components {
   interface PlanInfoProps {
     subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
     planid: ApiT.PlanId;
+    redirectTarget?: string|Paths.Path;
   }
 
   class PlanInfo extends ReactHelpers.Component<PlanInfoProps, {
@@ -46,7 +50,7 @@ module Esper.Components {
         `for ${Text.getPlanName(planId)}`);
 
       Actions.Subscriptions.addCard(cusId, token.id).then(() =>
-        Actions.Subscriptions.set(cusId, planId)
+        Actions.Subscriptions.set(cusId, planId, this.props.redirectTarget)
       ).always(() => this.setState({ busy: false }));
     }
 
@@ -55,7 +59,8 @@ module Esper.Components {
 
       Actions.Subscriptions.set(
         this.props.subscription.cusid,
-        this.props.planid
+        this.props.planid,
+        this.props.redirectTarget
       ).always(() => this.setState({ busy: false }));
     }
 

@@ -3,12 +3,6 @@
 */
 
 module Esper.Containers {
-  export function paymentModal(subscription: ApiT.TeamSubscription) {
-    return ReactHelpers.contain(function() {
-      return <Components.PaymentModal subscription={subscription} />;
-    });
-  }
-
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
     onHidden?: () => void;
