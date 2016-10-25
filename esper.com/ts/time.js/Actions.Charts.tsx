@@ -89,6 +89,12 @@ module Esper.Actions.Charts {
     }));
   }
 
+  /* Plan upgrade modal */
+  export function renderPlanUpgradeModal(cusId: string) {
+    Stores.Subscriptions.fetch(cusId);
+    Layout.renderModal(Containers.planUpgradeModal(cusId));
+  }
+
 
   /* Duration Charts */
   export function renderDurations(o: Types.ChartParams) {
