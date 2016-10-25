@@ -10,7 +10,8 @@ module Esper.Login {
     Login.storeCredentials({
       uid: "O-w_lois_____________w",
       api_secret: "lois_secret",
-      email: "lois@esper.com"
+      email: "lois@esper.com",
+      as_admin: false
     });
   }
 }
