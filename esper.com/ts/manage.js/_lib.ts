@@ -28,6 +28,7 @@
 /// <reference path="../lib/Util.ts" />
 
 /// <reference path="../lib/Components.CalendarList.tsx" />
+/// <reference path="../lib/Components.CreditCardList.tsx" />
 /// <reference path="../lib/Components.Dropdown.tsx" />
 /// <reference path="../lib/Components.ErrorMsg.tsx" />
 /// <reference path="../lib/Components.EmailInput.tsx" />
@@ -35,6 +36,7 @@
 /// <reference path="../lib/Components.Modal.tsx" />
 /// <reference path="../lib/Components.ModalPanel.tsx" />
 /// <reference path="../lib/Components.NewTeamForm.tsx" />
+/// <reference path="../lib/Components.PaymentInfo.tsx" />
 /// <reference path="../lib/Components.Plans.tsx" />
 /// <reference path="../lib/Components.RadioList.tsx" />
 /// <reference path="../lib/Components.Selector.tsx" />

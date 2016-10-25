@@ -52,6 +52,43 @@ module Esper.Text {
   export const SelectPlan = "Select";
   export const ActivePlan = "Current Plan";
 
+  export const AddToEnterpriseHeading = `Enterprise Plan`;
+  export const AddToEnterpriseDescription =
+    `To link this account to an Enterprise Plan, provide ` +
+    `the email address of your billing contact below.`;
+  export const AddToExistingEnterpriseDescription =
+    `You can also add this account to your existing plan.`;
+  export const OnlyOneEnterpriseCustomer = `Existing Enterprise Plan`;
+  export function AddToEnterprise(name: string) {
+    return `Add to ${name}`;
+  }
+
+  export const BillingContactLabel = "Billing Contact";
+  export const BillingContactSuccess =
+    `We've asked your billing contact to approve this account.`;
+
+  export const EnterpriseMsg =
+    "This account is managed as an Enterprise Account.";
+  export const GoToEnterpriseBilling =
+    "Click here to go to Enterprise Billing.";
+
+  export const CustomerNoPermission = <span>
+    Billing for this account is managed by someone else. If you
+    need assistance, you can <a href="/contact">contact us here</a>.
+  </span>;
+
+  export const ThisCustomer = "This organization";
+  export function SubscribedToPlan(subject: string, plan: ApiT.PlanId) {
+    return `${subject} is subscribed to the ` +
+      getPlanName(plan);
+  }
+
+  export const SubscriptionExpired = "Your subscription has expired.";
+  export const NoPlan = "You are not subscribed to any plan.";
+  export const SelectToRenew = "Please select a plan below to continue.";
+  export const UpdateCreditCard = "Please provide a credit card to continue.";
+  export const AddCard = "Add Credit Card";
+
   // Content restrictions
   export function CalendarLimitMsg(limit: number) {
     if (limit === 0) {
