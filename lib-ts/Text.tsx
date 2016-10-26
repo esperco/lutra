@@ -44,7 +44,8 @@ module Esper.Text {
     // "Customizable reports page", // Not supported yet
     "Advanced reporting",
     "Time series reports",
-    "Chart export"
+    "Chart downloading",
+    "CSV exports"
   ];
   export const AdvancedPlanPrice = `$100 / month`;
   export const AdvancedDiscountPlanPrice = `$50 / month for first six months`;
