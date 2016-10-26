@@ -171,7 +171,7 @@ module Esper.Components {
     render() {
       let { min, max, interval, selected, onUpdate } = this.props;
       let { start, end } = Period.fromDates(interval, min, max);
-      let range = _.range(start, end + 1);
+      let range = _.orderBy(_.range(start, end + 1), _.identity, 'desc');
 
       return <ul className="esper-select-menu">{_.map( range, (r) =>
         <li key={r} onClick={() => this.select(r)}
