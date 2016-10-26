@@ -194,6 +194,10 @@ module Esper.Text {
     `sets or add your own custom ${Labels}.`
   export const LabelProfileBackBtn = "Try another preset."
 
+  // Team Selector
+  export const NoTeam = `Select ${TeamExec}`;
+  export const ManageTeams = `Manage ${TeamExecs}`;
+
   // Calendar List
   export const NoCalendarError =
     "Please wait until calendars are available.";

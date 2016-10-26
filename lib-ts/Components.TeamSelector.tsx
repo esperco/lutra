@@ -2,6 +2,10 @@
   Drop-up menu for switching teams from sidebar
 */
 
+/// <reference path="./ApiT.ts" />
+/// <reference path="./Text.tsx" />
+/// <reference path="./Paths.ts" />
+
 module Esper.Components {
 
   export function TeamSelector({teams, selectedId, onUpdate}: {
