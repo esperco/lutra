@@ -33,6 +33,7 @@ module Esper.Views {
 
     renderWithData() {
       let filterState = getFilterState(this.props);
+      let subscription = this.props.team.team_api.team_subscription;
 
       return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
@@ -50,9 +51,12 @@ module Esper.Views {
         <div className="esper-content">
           <div id="chart-header" className="esper-content-header">
             <Components.PeriodSelector
-              minDate={Config.getMinDate(
-                        this.props.team.team_api.team_subscription.plan)}
+              minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
+              isLimited={Config.disableAdvancedFeatures(subscription.plan)}
+              onLimitClick={
+                () => Actions.Charts.renderPlanUpgradeModal(subscription.cusid)
+              }
               period={this.props.period}
               range={_.includes([
                 "absolute-series", "percent-series"

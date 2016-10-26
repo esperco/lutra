@@ -8,6 +8,8 @@ module Esper.Components {
     maxDate: Date;
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
+    isLimited?: boolean;
+    onLimitClick?: () => void;
     range?: boolean;          // Range mode -> select more than one instance
     show?: Period.Interval[]; // Limit which intervals are available
   }, {}> {
@@ -95,6 +97,13 @@ module Esper.Components {
                 intervals={intervals}
                 onUpdate={(i) => this.props.updateFn(Period.now(i))}
               /> : null }
+            { this.props.isLimited ?
+              <div className={classNames("upgrade-alert", {
+                "action-block": !!this.props.onLimitClick
+              })} onClick={() => this.onLimitClick()}>
+                { Text.CalendarPeriodUpgradeMsg }
+              </div> : null
+            }
             <div className="esper-select-menu">
               { selector }
             </div>
@@ -108,12 +117,23 @@ module Esper.Components {
       </div>;
     }
 
-    // Update period and close menu
-    updateAndClose(period: Types.Period) {
-      this.props.updateFn(period);
+    onLimitClick() {
+      if (this.props.onLimitClick) {
+        this.props.onLimitClick();
+        this.close();
+      }
+    }
+
+    close() {
       if (this._dropdown) {
         this._dropdown.close();
       }
+    }
+
+    // Update period and close menu
+    updateAndClose(period: Types.Period) {
+      this.props.updateFn(period);
+      this.close();
     }
   }
 
@@ -165,7 +185,7 @@ module Esper.Components {
     render() {
       let { min, max, interval, selected, onUpdate } = this.props;
       let { start, end } = Period.fromDates(interval, min, max);
-      let range = _.range(start, end + 1);
+      let range = _.orderBy(_.range(start, end + 1), _.identity, 'desc');
 
       return <ul className="esper-select-menu">{_.map( range, (r) =>
         <li key={r} onClick={() => this.select(r)}
