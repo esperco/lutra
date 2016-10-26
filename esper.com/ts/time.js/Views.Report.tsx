@@ -39,6 +39,8 @@ module Esper.Views {
         simplified: true
       }
 
+      let subscription = team.team_api.team_subscription;
+
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-minus-bottom-menu">
@@ -68,8 +70,9 @@ module Esper.Views {
         <div className="esper-content">
           <div className="esper-content-header">
             <Components.PeriodSelector
-              minDate={Config.getMinDate(team.team_api.team_subscription.plan)}
+              minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
+              isLimited={Config.disableAdvancedFeatures(subscription.plan)}
               period={this.props.period}
               updateFn={(p) => this.update({ period: p })}
             />

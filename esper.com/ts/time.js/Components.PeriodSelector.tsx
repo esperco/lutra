@@ -8,6 +8,7 @@ module Esper.Components {
     maxDate: Date;
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
+    isLimited?: boolean;
     range?: boolean;          // Range mode -> select more than one instance
     show?: Period.Interval[]; // Limit which intervals are available
   }, {}> {
@@ -95,6 +96,11 @@ module Esper.Components {
                 intervals={intervals}
                 onUpdate={(i) => this.props.updateFn(Period.now(i))}
               /> : null }
+            { this.props.isLimited ?
+              <div className="upgrade-alert alert-warning">
+                { Text.CalendarPeriodUpgradeMsg }
+              </div> : null
+            }
             <div className="esper-select-menu">
               { selector }
             </div>

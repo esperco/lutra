@@ -104,6 +104,8 @@ module Esper.Text {
       Please upgrade your plan in the billings page to select more.
       </a>;
   }
+  export const CalendarPeriodUpgradeMsg =
+    "Upgrade now to browse further back in history.";
   export const PlanUpgradeText =
     "The feature that you were trying to access is not enabled with your " +
     "current plan. Upgrade your plan now to enable more time-saving features!";
