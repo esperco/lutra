@@ -9,6 +9,7 @@ module Esper.Components {
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
     isLimited?: boolean;
+    onLimitClick?: () => void;
     range?: boolean;          // Range mode -> select more than one instance
     show?: Period.Interval[]; // Limit which intervals are available
   }, {}> {
@@ -97,7 +98,9 @@ module Esper.Components {
                 onUpdate={(i) => this.props.updateFn(Period.now(i))}
               /> : null }
             { this.props.isLimited ?
-              <div className="upgrade-alert">
+              <div className={classNames("upgrade-alert", {
+                "action-block": !!this.props.onLimitClick
+              })} onClick={() => this.onLimitClick()}>
                 { Text.CalendarPeriodUpgradeMsg }
               </div> : null
             }
@@ -114,12 +117,23 @@ module Esper.Components {
       </div>;
     }
 
-    // Update period and close menu
-    updateAndClose(period: Types.Period) {
-      this.props.updateFn(period);
+    onLimitClick() {
+      if (this.props.onLimitClick) {
+        this.props.onLimitClick();
+        this.close();
+      }
+    }
+
+    close() {
       if (this._dropdown) {
         this._dropdown.close();
       }
+    }
+
+    // Update period and close menu
+    updateAndClose(period: Types.Period) {
+      this.props.updateFn(period);
+      this.close();
     }
   }
 

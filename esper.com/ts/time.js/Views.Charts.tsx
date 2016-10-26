@@ -54,6 +54,9 @@ module Esper.Views {
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
               isLimited={Config.disableAdvancedFeatures(subscription.plan)}
+              onLimitClick={
+                () => Actions.Charts.renderPlanUpgradeModal(subscription.cusid)
+              }
               period={this.props.period}
               range={_.includes([
                 "absolute-series", "percent-series"

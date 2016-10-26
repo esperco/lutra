@@ -73,6 +73,9 @@ module Esper.Views {
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
               isLimited={Config.disableAdvancedFeatures(subscription.plan)}
+              onLimitClick={
+                () => Actions.Charts.renderPlanUpgradeModal(subscription.cusid)
+              }
               period={this.props.period}
               updateFn={(p) => this.update({ period: p })}
             />
