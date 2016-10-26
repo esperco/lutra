@@ -112,7 +112,6 @@ module Esper.ApiT {
     team_cal_user: string;
     team_timestats_calendars?: string[];
     team_email_aliases: string[];
-    team_calendar_accounts: string[];
   }
 
   export interface TeamOption {
