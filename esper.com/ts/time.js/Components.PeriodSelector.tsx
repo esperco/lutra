@@ -97,7 +97,7 @@ module Esper.Components {
                 onUpdate={(i) => this.props.updateFn(Period.now(i))}
               /> : null }
             { this.props.isLimited ?
-              <div className="upgrade-alert alert-warning">
+              <div className="upgrade-alert">
                 { Text.CalendarPeriodUpgradeMsg }
               </div> : null
             }
