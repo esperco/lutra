@@ -182,4 +182,11 @@ module Esper.Text {
   export const CustomerDomainDescription = `Add a comma-separated list of ` +
     `domain names (e.g. example.com) to automatically approve any accounts ` +
     `from that domain (e.g. name@example.com)`;
+
+  // Export CSV
+  export const ExportCSVDescription =
+    `Select a time period below to download your data`;
+  export const ExportCSVNotAllowed =
+    `Your plan does not permit exporting Esper data. Click here to upgrade ` +
+    `to a higher-tier plan.`;
 }
