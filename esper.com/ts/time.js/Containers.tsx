@@ -3,6 +3,19 @@
 */
 
 module Esper.Containers {
+  export function planUpgradeModal(cusId: string) {
+    return ReactHelpers.contain(function() {
+      var subscription = Stores.Subscriptions.get(cusId).unwrapOr(null);
+      var busy = Stores.Subscriptions.status(cusId).match({
+        none: () => false,
+        some: (d) => d === Model2.DataStatus.FETCHING
+      });
+
+      return <Components.PlanUpgradeModal
+        subscription={subscription} busy={busy} />;
+    });
+  }
+
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
     minFeedback?: boolean;
     onHidden?: () => void;

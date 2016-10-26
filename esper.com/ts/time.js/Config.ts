@@ -33,6 +33,11 @@ module Esper.Config {
     .endOf('quarter')
     .toDate();
 
+  // Config for disabling features for users subscribed to a limited plan
+  export function disableAdvancedFeatures(planid: ApiT.PlanId): boolean {
+    return planid === "Basic_20161019";
+  }
+
 
   // Deprecated config options below
 

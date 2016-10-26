@@ -4,13 +4,15 @@
   horizontal stacked bar charts
 */
 module Esper.Components {
-  export function PercentageChart({series, simplified, yAxis} : {
+  export function PercentageChart({series, altExport, simplified, yAxis} : {
     series: Charting.EventGroupSeries[];
+    altExport?: () => boolean;
     simplified?: boolean;
     yAxis?: string;
   }) {
     series = _.sortBy(series, (s) => s.index);
-    return <Components.Highchart showExport={!simplified} opts={{
+
+    return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: series.length > 1 ? {
         type: 'bar',
         height: series.length * 100 + 120

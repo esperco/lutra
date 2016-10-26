@@ -4,14 +4,15 @@
 */
 module Esper.Components {
   export function LineChart({
-    series, categories, simplified, yAxis
+    series, categories, altExport, simplified, yAxis
   } : {
     series: Charting.EventGroupSeries[],
     categories: string[];
+    altExport?: () => boolean;
     simplified?: boolean;
     yAxis?: string;
   }) {
-    return <Highchart showExport={!simplified} opts={{
+    return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: {
         type: 'line'
       },

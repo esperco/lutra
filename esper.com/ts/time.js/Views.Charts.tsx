@@ -186,6 +186,11 @@ module Esper.Views {
     }
 
     toggleFilterMenu() {
+      var subscription = this.props.team.team_api.team_subscription;
+      if (Config.disableAdvancedFeatures(subscription.plan)) {
+        Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+        return;
+      }
       this.mutateState((s) => s.showFilterMenu = !s.showFilterMenu);
     }
 
@@ -204,6 +209,12 @@ module Esper.Views {
     }
 
     updateExtra(extra: Types.ChartExtraOpt) {
+      var subscription = this.props.team.team_api.team_subscription;
+      if ((extra.type === "percent-series" || extra.type === "absolute-series")
+          && Config.disableAdvancedFeatures(subscription.plan)) {
+        Actions.Charts.renderPlanUpgradeModal(subscription.cusid);
+        return;
+      }
       Charting.updateChart(this.props, { extra });
     }
   }
