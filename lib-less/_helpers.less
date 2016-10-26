@@ -912,6 +912,16 @@ flexibility with non-UL elements */
   text-align: center;
 }
 
+a.em {
+  font-weight: bold;
+}
+
+a.disabled {
+  cursor: not-allowed;
+  color: @text-muted;
+  text-decoration: none;
+}
+
 .action {
   color: @text-muted;
   cursor: pointer;
@@ -919,6 +929,10 @@ flexibility with non-UL elements */
 
   &.active {
     color: @brand-text;
+  }
+
+  &.disabled {
+    cursor: not-allowed;
   }
 
   &.fa {

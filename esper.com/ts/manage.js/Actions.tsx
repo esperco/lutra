@@ -61,6 +61,11 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamPay);
   }
 
+  export function renderTeamExport(props: TeamSettingProps) {
+    render(<Views.TeamExport {...props} />);
+    Analytics.page(Analytics.Page.TeamExport);
+  }
+
   export function renderNewTeam(props: {pathFn?: () => Paths.Path}) {
     render(<Views.NewTeam {...props} />);
     Analytics.page(Analytics.Page.NewTeam);
