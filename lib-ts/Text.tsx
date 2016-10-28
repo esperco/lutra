@@ -17,42 +17,68 @@ module Esper.Text {
   export const DismissNotes = "Click to Dismiss";
 
   // Payments
+  export const BasicPlan: Types.PlanDetails = {
+    id: "Basic_20161019",
+    name: "Basic Plan",
+    freeTrial: "14 Day Free Trial",
+    price: "$25 / month",
+    features: [
+      "1 Calendar",
+      "2 months of calendar history",
+      "Slack integration",
+      "#Hashtag event labeling",
+      "Weekly label reminder emails"
+    ]
+  };
+
+  export const ExecPlan: Types.PlanDetails = {
+    id: "Executive_20161019",
+    name: "Executive Plan",
+    freeTrial: BasicPlan.freeTrial,
+    price: "$100 / month",
+    discountedPrice: "$50 / month for first 6 months",
+    features: [
+      "Unlimited calendars",
+      "5 YEARS of calendar history",
+      "Slack integration",
+      "#Hashtag event labeling",
+      "Weekly label reminder emails",
+      // "Customizable reports page", // Not supported yet
+      "Advanced reporting",
+      "Time series reports",
+      "Chart downloading",
+      "CSV exports"
+    ]
+  };
+
+  export const EnterprisePlan: Types.PlanDetails = {
+    id: "Enterprise_20160923",
+    name: "Enterprise Plan",
+    price: <span>
+      $20 / user / month<br />
+      10 users minimum
+    </span>,
+    enterprise: true,
+    features: ExecPlan.features
+  };
+
+  export const AllPlans = [
+    BasicPlan,
+    ExecPlan,
+    EnterprisePlan
+  ];
+
   export function getPlanName(planid: ApiT.PlanId) {
-    if (planid === "Basic_20161019")
-      return "Basic Plan";
-    if (planid === "Executive_20161019")
-      return "Executive Plan";
-    if (planid === "Enterprise_20160923")
-      return "Enterprise Plan";
-    return "Default Plan";
+    let plan = _.find(AllPlans, (p) => p.id === planid);
+    return plan ? plan.name : "Default Plan";
   }
-  export const BasicPlanFeatures = [
-    "1 Calendar",
-    "2 months of calendar history",
-    "Slack integration",
-    "#Hashtag event labeling",
-    "Weekly label reminder emails"
-  ];
-  export const FreeTrialMsg = `14 Day Free Trial`;
-  export const BasicPlanPrice = `$25 / month`;
-  export const AdvancedPlanFeatures = [
-    "Unlimited calendars",
-    "5 YEARS of calendar history",
-    "Slack integration",
-    "#Hashtag event labeling",
-    "Weekly label reminder emails",
-    // "Customizable reports page", // Not supported yet
-    "Advanced reporting",
-    "Time series reports",
-    "Chart downloading",
-    "CSV exports"
-  ];
-  export const AdvancedPlanPrice = `$100 / month`;
-  export const AdvancedDiscountPlanPrice = `$50 / month for first six months`;
-  export const StartPlan = "Start Free Trial";
-  export const SelectPlan = "Select";
+  export const StartFreeTrial = "Start Free Trial";
+  export const SelectPlan = "Select Plan";
   export const ActivePlan = "Current Plan";
 
+  export const AddToEnterpriseLink =
+    "Does your company already have an Enterprise Plan? " +
+    "Click here to request that they add you."
   export const AddToEnterpriseHeading = `Enterprise Plan`;
   export const AddToEnterpriseDescription =
     `To link this account to an Enterprise Plan, provide ` +
@@ -84,6 +110,7 @@ module Esper.Text {
       getPlanName(plan);
   }
 
+  export const SelectPlanHeader ="Select a Plan";
   export const SubscriptionExpired = "Your subscription has expired.";
   export const NoPlan = "You are not subscribed to any plan.";
   export const SelectToRenew = "Please select a plan below to continue.";

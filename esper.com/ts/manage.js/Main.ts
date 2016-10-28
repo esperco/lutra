@@ -23,6 +23,7 @@ module Esper.Main {
       Stores.GroupPreferences.init();
       Stores.Profiles.init();
       Stores.Customers.init();
+      Stripe.init(Config.STRIPE_KEY);
     });
   }
 }

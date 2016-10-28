@@ -28,7 +28,7 @@ module Esper.Components {
             <h4 className="description-header">
               { this.props.backPath ?
                 <a className="action back-action" href={this.props.backPath}>
-                  <i className="fa fa-fw fa-arrow-circle-left" />
+                  <i className="fa fa-fw fa-left fa-arrow-circle-left" />
                 </a> : null
               }
               { this.props.heading }

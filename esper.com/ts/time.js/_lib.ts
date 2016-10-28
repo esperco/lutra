@@ -19,6 +19,7 @@
 /// <reference path="../lib/ReactHelpers.ts" />
 /// <reference path="../lib/Route.ts" />
 /// <reference path="../lib/Stores.Calendars.ts" />
+/// <reference path="../lib/Stores.Customers.ts" />
 /// <reference path="../lib/Stores.Events.ts" />
 /// <reference path="../lib/Stores.TeamPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />

@@ -22,12 +22,22 @@ module Esper.Views {
 
       let details = Stores.Subscriptions.get(subscription.cusid)
         .unwrapOr(null);
+      let customer = Stores.Customers.get(subscription.cusid).unwrapOr(null);
 
-      return <Components.PaymentInfo
-        team={team}
-        customers={Stores.Customers.all()}
-        details={details}
-      />;
+      return <div>
+        <Components.PaymentInfo
+          stripeKey={Config.STRIPE_KEY}
+          team={team}
+          customers={Stores.Customers.all()}
+          details={details}
+        />
+        { details && customer && !!customer.teamid ?
+          <div className="panel panel-default">
+            <div className="panel-body">
+              <Components.CreditCardList subscription={details} />
+            </div>
+         </div> : null }
+      </div>;
     }
   }
 }
