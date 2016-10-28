@@ -5,12 +5,12 @@
 /// <reference path="./Components.Dropdown.tsx" />
 
 module Esper.Components {
-  const OVERLAY_PREFIX = "hint-";
-
   interface Props {
+    className?: string;
     text: string|JSX.Element;
-    anchorId: string;
     dismissed?: boolean;
+    children?: string|JSX.Element|JSX.Element[];
+    preserve?: boolean;
   }
 
   interface State {
@@ -18,6 +18,8 @@ module Esper.Components {
   }
 
   export class Hint extends ReactHelpers.Component<Props, State> {
+    _wrapper: HTMLDivElement;
+
     constructor(props: Props) {
       super(props);
       this.state = {
@@ -29,32 +31,33 @@ module Esper.Components {
       this.mutateState((s) => s.dismissed = true);
     }
 
+    autoDismiss() {
+      if (! this.props.preserve) {
+        this.dismissHint();
+      }
+    }
+
     render() {
-      if (this.state.dismissed)
-        return null;
-
-      let anchor = $("#" + this.props.anchorId);
-      let offset = anchor.offset() || { left: 0, top: 0 };
-      let left = offset.left - $(window).scrollLeft() + anchor.width();
-      let top = offset.top - $(window).scrollTop() + (anchor.height()/2);
-      let style = { left, top };
-
-      return <Dropdown>
-        <Overlay id={this.props.anchorId}>
-          <div className="dropdown-toggle hint-bubble"
-               style={style} />
-          <div className="dropdown-menu esper-section">
-            <div className="alert alert-info hint-text compact">
-              { this.props.text }
+      return <span className={classNames("hint-wrapper", this.props.className)}>
+        <span className="hint-children"
+              onClick={() => this.autoDismiss()}>
+          { this.props.children }
+        </span>
+        { this.state.dismissed ? null : <div className="dropdown-hint">
+          <Dropdown onClose={() => this.autoDismiss()}>
+            <div className="dropdown-toggle hint-bubble" />
+            <div className="dropdown-menu esper-section">
+              <div className="alert alert-info hint-text compact">
+                { this.props.text }
+              </div>
+              <button className="btn btn-default form-control"
+                      onClick={() => this.dismissHint()}>
+                Dismiss
+              </button>
             </div>
-
-            <button className="btn btn-default form-control"
-                    onClick={this.dismissHint.bind(this)}>
-              Dismiss
-            </button>
-          </div>
-        </Overlay>
-      </Dropdown>;
+          </Dropdown>
+        </div> }
+      </span>;
     }
   }
 }

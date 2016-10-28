@@ -354,18 +354,15 @@ module Esper.Views {
     let {path, opts} = Charting.updateChartPath(props, {});
     let href = Route.nav.href(path, opts);
 
-    return <div>
+    return <Components.Hint text={Text.SeeMoreHintText}
+            dismissed={!Login.data.is_sandbox_user}>
       <a className="more-link" href={href}
          onClick={() => Route.nav.go(path, opts)}>
         <i id={props.id}
            className="fa fa-fw fa-left fa-caret-right" />
         { Text.SeeMoreLinkText }
       </a>
-      { Login.data.is_sandbox_user ?
-        <Components.Hint anchorId={props.id}
-          text={Text.SeeMoreHintText} /> : null
-      }
-    </div>;
+    </Components.Hint>;
   }
 
   // Link to launch auto-confirm modal

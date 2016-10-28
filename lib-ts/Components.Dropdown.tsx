@@ -37,6 +37,7 @@ module Esper.Components {
     disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
+    onClose?: () => void;
   }
 
   interface State {
@@ -78,6 +79,9 @@ module Esper.Components {
 
     close() {
       this.setState({ open: false });
+      if (this.props.onClose) {
+        this.props.onClose();
+      }
     }
 
     /* Get specific toggle element from children */

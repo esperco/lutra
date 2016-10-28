@@ -74,20 +74,20 @@ module Esper.Views {
                     onUpdate={(val) => this.updateExtra({ filterStr: val })}
                   />
                 </div>
-                <span className="action filter-action"
-                      onClick={() => this.toggleFilterMenu()}>
-                  <i id="filter-menu-toggle"
-                    className={classNames("fa fa-fw", {
-                    "fa-close": this.state.showFilterMenu,
-                    "fa-ellipsis-v": !this.state.showFilterMenu,
-                    "active": _.some(_.values(filterState)) &&
-                              !this.state.showFilterMenu
-                  })} />
-                  { Login.data.is_sandbox_user ?
-                    <Components.Hint anchorId="filter-menu-toggle"
-                      text={Text.FilterActionHintText} /> : null
-                  }
-                </span>
+                <Components.Hint
+                  className="action filter-action"
+                  dismissed={!Login.data.is_sandbox_user}
+                  text={Text.FilterActionHintText}>
+                  <span onClick={() => this.toggleFilterMenu()}>
+                    <i id="filter-menu-toggle"
+                       className={classNames("fa fa-fw", {
+                      "fa-close": this.state.showFilterMenu,
+                      "fa-ellipsis-v": !this.state.showFilterMenu,
+                      "active": _.some(_.values(filterState)) &&
+                                !this.state.showFilterMenu
+                    })} />
+                  </span>
+                </Components.Hint>
               </div>
             </div>
           </div>
