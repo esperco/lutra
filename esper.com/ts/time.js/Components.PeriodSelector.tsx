@@ -88,10 +88,11 @@ module Esper.Components {
         <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
           <div className="dropdown-toggle">
             { Text.fmtPeriod(period) }
-            <i className="fa fa-fw fa-right fa-caret-down" />
+            <i id="period-selector"
+               className="fa fa-fw fa-right fa-caret-down" />
             { Login.data.is_sandbox_user ?
-              <Hint nested style={{top: "-33px", right: "15%"}}
-                text={Text.PeriodSelectorHintText} /> : null
+              <Hint anchorId="period-selector"
+                    text={Text.PeriodSelectorHintText} /> : null
             }
           </div>
           <div className="dropdown-menu">

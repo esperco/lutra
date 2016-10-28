@@ -190,13 +190,14 @@ module Esper.Views {
       }
       return true;
     };
+    _.assign(props, {id: "labels-see-more-link"});
 
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartLabels }</h3>
         <p>{ Text.ChartLabelsDescription }</p>
         <Components.LabelChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <div className="chart-content">
         { group.all.totalUnique === 0 ?
@@ -215,13 +216,14 @@ module Esper.Views {
     props = _.clone(props);
     props.groupBy = Charting.GroupByCalendar;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    _.assign(props, {id: "calendars-see-more-link"});
 
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartCalendars }</h3>
         <p>{ Text.ChartCalendarsDescription }</p>
         <Components.CalendarChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -232,13 +234,14 @@ module Esper.Views {
     props.groupBy = Charting.GroupByGuest;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
     props.extra.type = "absolute";
+    _.assign(props, {id: "guests-see-more-link"});
 
     return <div className="esper-section report-section wide">
       <div className="description">
         <h3>{ Text.ChartGuests }</h3>
         <p>{ Text.ChartGuestsDescription }</p>
         <Components.GuestChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <Components.BarDurationChart {...props} />
     </div>
@@ -248,13 +251,14 @@ module Esper.Views {
     props = _.clone(props);
     props.groupBy = Charting.GroupByDomain;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    _.assign(props, {id: "domains-see-more-link"});
 
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.GuestDomains }</h3>
         <p>{ Text.ChartDomainsDescription }</p>
         <Components.DomainChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -264,13 +268,14 @@ module Esper.Views {
     props = _.clone(props);
     props.groupBy = Charting.GroupByGuestCount;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    _.assign(props, {id: "guest-see-more-link"});
 
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartGuestsCount  }</h3>
         <p>{ Text.ChartGuestsCountDescription }</p>
         <Components.GuestCountChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -280,13 +285,14 @@ module Esper.Views {
     props = _.clone(props);
     props.groupBy = Charting.GroupByDuration;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    _.assign(props, {id: "duration-see-more-link"});
 
     return <div className="esper-section report-section wide">
       <div className="description">
         <h3>{ Text.ChartDuration }</h3>
         <p>{ Text.ChartDurationDescription }</p>
         <Components.DurationChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}} />
       </div>
       <Components.DurationStack {...props}
         eventOnClick={Charting.onEventClick}
@@ -298,13 +304,15 @@ module Esper.Views {
     props = _.clone(props);
     props.groupBy = Charting.GroupByRating;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
+    _.assign(props, {id: "ratings-see-more-link"});
 
     return <div className="esper-section report-section">
       <div className="description">
         <h3>{ Text.ChartRatings }</h3>
         <p>{ Text.ChartRatingsDescription }</p>
         <Components.RatingChartInsight {...props} />
-        <SeeMoreLink {...props} groupBy={Charting.GroupByRating} />
+        <SeeMoreLink {...props as Types.ChartProps & {id: string}}
+                     groupBy={Charting.GroupByRating} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -342,18 +350,19 @@ module Esper.Views {
     }));
   }
 
-  function SeeMoreLink(props: Types.ChartProps) {
+  function SeeMoreLink(props: Types.ChartProps & { id: string; }) {
     let {path, opts} = Charting.updateChartPath(props, {});
     let href = Route.nav.href(path, opts);
 
     return <div>
       <a className="more-link" href={href}
          onClick={() => Route.nav.go(path, opts)}>
-        <i className="fa fa-fw fa-left fa-caret-right" />
+        <i id={props.id}
+           className="fa fa-fw fa-left fa-caret-right" />
         { Text.SeeMoreLinkText }
       </a>
       { Login.data.is_sandbox_user ?
-        <Components.Hint style={{top: "-30px", left: "150px"}}
+        <Components.Hint anchorId={props.id}
           text={Text.SeeMoreHintText} /> : null
       }
     </div>;

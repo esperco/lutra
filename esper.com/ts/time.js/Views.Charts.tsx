@@ -76,14 +76,15 @@ module Esper.Views {
                 </div>
                 <span className="action filter-action"
                       onClick={() => this.toggleFilterMenu()}>
-                  <i className={classNames("fa fa-fw", {
+                  <i id="filter-menu-toggle"
+                    className={classNames("fa fa-fw", {
                     "fa-close": this.state.showFilterMenu,
                     "fa-ellipsis-v": !this.state.showFilterMenu,
                     "active": _.some(_.values(filterState)) &&
                               !this.state.showFilterMenu
                   })} />
                   { Login.data.is_sandbox_user ?
-                    <Components.Hint nested style={{top: "-40px", right: "5px"}}
+                    <Components.Hint anchorId="filter-menu-toggle"
                       text={Text.FilterActionHintText} /> : null
                   }
                 </span>

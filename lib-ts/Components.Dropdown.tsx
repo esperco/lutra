@@ -35,7 +35,6 @@ module Esper.Components {
     children?: JSX.Element[];
     className?: string;
     disabled?: boolean;
-    nested?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
   }
@@ -57,7 +56,7 @@ module Esper.Components {
     render() {
       // Get dropdown toggle handler
       var toggle = this.getToggle();
-      if (! toggle) { return; }
+      if (! toggle) { return null; }
 
       return <div className={classNames(this.props.className, {
                     dropdown: _.isUndefined(this.props.className)
@@ -69,8 +68,6 @@ module Esper.Components {
     }
 
     open(e: React.MouseEvent) {
-      if (this.props.nested)
-        e.stopPropagation();
       if (! this.props.disabled && !this.state.open) {
         this.setState({ open: true });
         if (this.props.onOpen) {

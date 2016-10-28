@@ -5,11 +5,12 @@
 /// <reference path="./Components.Dropdown.tsx" />
 
 module Esper.Components {
+  const OVERLAY_PREFIX = "hint-";
+
   interface Props {
     text: string|JSX.Element;
-    nested?: boolean;
+    anchorId: string;
     dismissed?: boolean;
-    style?: React.CSSProperties;
   }
 
   interface State {
@@ -32,19 +33,27 @@ module Esper.Components {
       if (this.state.dismissed)
         return null;
 
-      return <Dropdown nested={this.props.nested}>
-        <div className="dropdown-toggle hint-bubble"
-             style={this.props.style} />
-        <div className="dropdown-menu esper-section">
-          <div className="alert alert-info hint-text">
-            { this.props.text }
-          </div>
+      let anchor = $("#" + this.props.anchorId);
+      let offset = anchor.offset() || { left: 0, top: 0 };
+      let left = offset.left - $(window).scrollLeft() + anchor.width();
+      let top = offset.top - $(window).scrollTop() + (anchor.height()/2);
+      let style = { left, top };
 
-          <button className="btn btn-primary"
-                  onClick={this.dismissHint.bind(this)}>
-            Dismiss
-          </button>
-        </div>
+      return <Dropdown>
+        <Overlay id={this.props.anchorId}>
+          <div className="dropdown-toggle hint-bubble"
+               style={style} />
+          <div className="dropdown-menu esper-section">
+            <div className="alert alert-info hint-text compact">
+              { this.props.text }
+            </div>
+
+            <button className="btn btn-default form-control"
+                    onClick={this.dismissHint.bind(this)}>
+              Dismiss
+            </button>
+          </div>
+        </Overlay>
       </Dropdown>;
     }
   }
