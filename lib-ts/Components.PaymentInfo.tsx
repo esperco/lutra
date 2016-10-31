@@ -193,7 +193,7 @@ module Esper.Components {
       if (needStripe) {
         let dfd = $.Deferred<void>();
         Esper.Stripe.getHandler().then((handler) => handler.open({
-          label: "Submit",
+          panelLabel: "Submit",
           description: plan.name,
           token: (token) => Actions.Subscriptions.set({
             cusId: this.props.details.cusid,
