@@ -790,7 +790,8 @@ module Esper.Charting {
       cursor: "pointer",
       data: _.map(keys, (key, kIndex) => {
         let value = group.some[key];
-        let pct = value.totalValue / group.all.totalValue;
+        let pct = (value && group.all) ?
+          (value.totalValue / group.all.totalValue) : 0;
         return {
           name: Util.escapeBrackets((
             groupBy.displayFn ?
