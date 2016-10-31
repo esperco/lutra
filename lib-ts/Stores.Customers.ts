@@ -112,6 +112,8 @@ module Esper.Stores.Customers {
 
   /* Init helpers */
   export function init() {
+    if (Login.data && Login.data.is_sandbox_user) return;
+
     let p = Api.listCustomers().then((list) => Option.some(
       _.map(list.items, (cust) => ({
         itemKey: cust.id,
