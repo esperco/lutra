@@ -41,6 +41,8 @@ module Esper.Views {
 
       let subscription = team.team_api.team_subscription;
 
+      let seeMoreHintDismissed = Stores.Hints.get('SeeMoreLinkHint');
+
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-minus-bottom-menu">
@@ -78,10 +80,12 @@ module Esper.Views {
               }
               period={this.props.period}
               updateFn={(p) => this.update({ period: p })}
+              hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
           </div>
           <div className="esper-expanded">
-            <ReportMain { ...chartProps } />
+            <ReportMain
+              { ..._.extend(chartProps, { seeMoreHintDismissed }) as ReportMainProps } />
           </div>
         </div>
 
@@ -103,11 +107,15 @@ module Esper.Views {
   }
 
 
+  interface ReportMainProps extends Types.ChartProps {
+    seeMoreHintDismissed: boolean;
+  }
+
   /*
     Report is a "chart" because it is dependent on label calculation
   */
   class ReportMain extends
-        Components.DataChart<Types.GroupState, Types.ChartProps> {
+        Components.DataChart<Types.GroupState, ReportMainProps> {
     getCalc(props: Types.ChartProps): Calc<Types.GroupState> {
       return EventStats.defaultGroupDurationCalc(
         props.eventsForRanges,
@@ -123,8 +131,9 @@ module Esper.Views {
       Don't update if props are mostly the same. This should be by-passed if
       calc is firing because it calls forceUpdate
     */
-    shouldComponentUpdate(newProps: Types.ChartProps) {
-      return !Charting.eqProps(newProps, this.props);
+    shouldComponentUpdate(newProps: ReportMainProps) {
+      return !Charting.eqProps(newProps, this.props) ||
+        this.props.seeMoreHintDismissed !== newProps.seeMoreHintDismissed;
     }
 
     renderResult({group}: {group: Types.RangesGroup}) {
@@ -197,8 +206,9 @@ module Esper.Views {
         <p>{ Text.ChartLabelsDescription }</p>
         <Components.LabelChartInsight {...props} />
         <Components.Hint text={Text.SeeMoreHintText}
-          dismissed={!Login.data.is_sandbox_user}>
-          <SeeMoreLink {...props as Types.ChartProps} />
+            dismissed={Stores.Hints.get('SeeMoreLinkHint')}
+            onDismiss={() => Stores.Hints.set('SeeMoreLinkHint', true)}>
+          <SeeMoreLink {...props} />
         </Components.Hint>
       </div>
       <div className="chart-content">

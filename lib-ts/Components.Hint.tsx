@@ -6,8 +6,9 @@
 
 module Esper.Components {
   interface Props {
-    className?: string;
     text: string|JSX.Element;
+    onDismiss: () => any;
+    className?: string;
     dismissed?: boolean;
     children?: string|JSX.Element|JSX.Element[];
     preserve?: boolean;
@@ -22,18 +23,16 @@ module Esper.Components {
 
     constructor(props: Props) {
       super(props);
-      this.state = {
-        dismissed: !!this.props.dismissed
-      };
+      this.state = { dismissed: props.dismissed };
     }
 
-    dismissHint() {
-      this.mutateState((s) => s.dismissed = true);
+    componentWillReceiveProps(props: Props) {
+      this.setState({ dismissed: props.dismissed });
     }
 
     autoDismiss() {
       if (! this.props.preserve) {
-        this.dismissHint();
+        this.props.onDismiss();
       }
     }
 
@@ -51,7 +50,7 @@ module Esper.Components {
                 { this.props.text }
               </div>
               <button className="btn btn-default form-control"
-                      onClick={() => this.dismissHint()}>
+                      onClick={() => this.props.onDismiss()}>
                 Dismiss
               </button>
             </div>

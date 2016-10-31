@@ -62,6 +62,7 @@ module Esper.Views {
                 "absolute-series", "percent-series"
               ], this.props.extra.type)}
               updateFn={(p) => this.updatePeriod(p)}
+              hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
             <div className="actions">
               <div className="esper-flex-list">
@@ -76,7 +77,8 @@ module Esper.Views {
                 </div>
                 <Components.Hint
                   className="action filter-action"
-                  dismissed={!Login.data.is_sandbox_user}
+                  dismissed={Stores.Hints.get('FilterMenuHint')}
+                  onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
                   text={Text.FilterActionHintText}>
                   <span onClick={() => this.toggleFilterMenu()}>
                     <i id="filter-menu-toggle"

@@ -8,6 +8,7 @@ module Esper.Components {
     maxDate: Date;
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
+    hintDismissed: boolean;
     isLimited?: boolean;
     onLimitClick?: () => void;
     range?: boolean;          // Range mode -> select more than one instance
@@ -87,7 +88,8 @@ module Esper.Components {
           </span> }
         <Hint className="period-list"
               text={Text.PeriodSelectorHintText}
-              dismissed={!Login.data.is_sandbox_user}>
+              dismissed={this.props.hintDismissed}
+              onDismiss={() => Stores.Hints.set('PeriodSelectorHint', true)}>
           <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
             <div className="dropdown-toggle period-list-toggle">
               { Text.fmtPeriod(period) }
