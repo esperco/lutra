@@ -21,9 +21,6 @@ module Esper.Components {
             enabled: true,
             formatter: function() {
               if (this.percentage) {
-                if (simplified && this.percentage < 5) {
-                  return "";
-                }
                 return `${this.point.name} ` +
                   `(${Util.roundStr(this.percentage, 1)}%)`;
               }
