@@ -91,17 +91,18 @@ module Esper.Actions {
     teamId?: string;
   }) {
     opts = opts || {};
+    let teamId = opts.teamId;
     var start = moment(date).startOf('day').toDate();
     var end = moment(date).endOf('day').toDate();
     var promise = fetchEvents({
-      teamId: opts.teamId, date: start
+      teamId, date: start
     });
 
     render(<Components.PromiseSpinner promise={promise} />);
 
     promise.done(function() {
       var events = getEvents({
-        teamId: opts.teamId, date: date
+        teamId, date: date
       });
       var event = opts.reverse ?
         _.findLast(events, (e) =>
@@ -114,7 +115,7 @@ module Esper.Actions {
       if (event) {
         goToEvent(event);
       } else {
-        goToDatePage(date);
+        goToDatePage(date, teamId);
       }
     });
   }
@@ -188,12 +189,12 @@ module Esper.Actions {
 
   // Render current event (or most recent event today if none ongoing)
   export function renderCurrent(teamId?: string) {
-    var promise = fetchEvents({teamId: teamId});
+    var promise = fetchEvents({teamId});
 
     render(<Components.PromiseSpinner promise={promise} />);
 
     promise.done(function() {
-      var events = getEvents({teamId: teamId});
+      var events = getEvents({teamId});
       var today = new Date();
       var now = today.getTime();
 
@@ -211,7 +212,7 @@ module Esper.Actions {
       }
 
       else {
-        renderDatePage(today);
+        renderDatePage(today, teamId);
       }
     });
   }
@@ -299,12 +300,12 @@ module Esper.Actions {
     reason -- until we find an event but that raises other issues to deal
     with)
   */
-  export function goToDatePage(date: Date) {
-    Route.nav.go(Paths.Now.date({ date: date }));
+  export function goToDatePage(date: Date, teamId?: string) {
+    Route.nav.go(Paths.Now.date({ date, teamId }));
   }
 
   // Render no-content view for a given date if no event on that date
-  export function renderDatePage(date: Date) {
-    render(<Views.DateView date={date} />);
+  export function renderDatePage(date: Date, teamId: string) {
+    render(<Views.DateView date={date} teamId={teamId} />);
   }
 }

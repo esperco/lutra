@@ -32,6 +32,11 @@ module Esper.Views {
             })
           }
         </div></div>
+        <Components.TeamSelector
+          teams={Stores.Teams.all()}
+          selectedId={this.props.teamId}
+          onUpdate={(teamId) => this.updateTeam(teamId)}
+        />
       </div>;
     }
 
@@ -77,6 +82,41 @@ module Esper.Views {
           </div>
         </div>
       });
+    }
+
+    updateTeam(teamId: string) {
+      let eventOrNull = Stores.Events.EventStore.get({
+        teamId,
+        calId: this.props.calId,
+        eventId: this.props.eventId
+      }).match({
+        none: (): Types.TeamEvent => null,
+        some: (d) => d.data.unwrapOr(null)
+      });
+
+      if (eventOrNull) {
+        Actions.goToEvent(eventOrNull);
+      }
+
+      else {
+        let currentEventOrNull = Stores.Events.EventStore.get({
+          teamId: this.props.teamId,
+          calId: this.props.calId,
+          eventId: this.props.eventId
+        }).match({
+          none: (): Types.TeamEvent => null,
+          some: (d) => d.data.unwrapOr(null)
+        });
+
+        if (currentEventOrNull) {
+          // Go to start of event
+          Actions.goToDate(currentEventOrNull.start, { teamId });
+        } else {
+
+          // Go
+          Actions.goToDate(new Date(), { teamId });
+        }
+      }
     }
   }
 }

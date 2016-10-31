@@ -32,9 +32,11 @@ module Esper.Route {
     });
   });
 
-  route(Paths.Now.date({ date: ":date" }).hash, function(ctx) {
+  route(Paths.Now.date({ date: ":date", teamId: ":teamId?" }).hash,
+  function(ctx) {
     var date = moment(ctx.params["date"], "YYYY-MM-DD").toDate();
-    Actions.renderDatePage(date);
+    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+    Actions.renderDatePage(date, teamId);
   });
 
   routeNotFound(function(ctx) {

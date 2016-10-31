@@ -307,10 +307,13 @@ module Esper.Paths {
       return optPath(prefix, "event");
     }
 
-    export function date({date} : { date: Date|string }) {
+    export function date({date, teamId} : {
+      date: Date|string;
+      teamId?: string;
+    }) {
       var dateStr = typeof date === "string" ?
        date : moment(date).format("YYYY-MM-DD");
-      return optPath(prefix, "date", dateStr);
+      return optPath(prefix, "date", dateStr, teamId);
     }
   }
 }
