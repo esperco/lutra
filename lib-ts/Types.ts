@@ -7,6 +7,10 @@
 
 module Esper.Types {
 
+  // List of hints
+  export type Hints =
+    'SeeMoreLinkHint'|'FilterMenuHint'|'PeriodSelectorHint';
+
   // Trinary state
   export type Fuzzy = boolean|"some";
 

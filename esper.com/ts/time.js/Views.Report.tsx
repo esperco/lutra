@@ -41,6 +41,8 @@ module Esper.Views {
 
       let subscription = team.team_api.team_subscription;
 
+      let seeMoreHintDismissed = Stores.Hints.get('SeeMoreLinkHint');
+
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar-minus-bottom-menu">
@@ -78,10 +80,12 @@ module Esper.Views {
               }
               period={this.props.period}
               updateFn={(p) => this.update({ period: p })}
+              hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
           </div>
           <div className="esper-expanded">
-            <ReportMain { ...chartProps } />
+            <ReportMain
+              { ..._.extend(chartProps, { seeMoreHintDismissed }) as ReportMainProps } />
           </div>
         </div>
 
@@ -103,11 +107,15 @@ module Esper.Views {
   }
 
 
+  interface ReportMainProps extends Types.ChartProps {
+    seeMoreHintDismissed: boolean;
+  }
+
   /*
     Report is a "chart" because it is dependent on label calculation
   */
   class ReportMain extends
-        Components.DataChart<Types.GroupState, Types.ChartProps> {
+        Components.DataChart<Types.GroupState, ReportMainProps> {
     getCalc(props: Types.ChartProps): Calc<Types.GroupState> {
       return EventStats.defaultGroupDurationCalc(
         props.eventsForRanges,
@@ -123,8 +131,9 @@ module Esper.Views {
       Don't update if props are mostly the same. This should be by-passed if
       calc is firing because it calls forceUpdate
     */
-    shouldComponentUpdate(newProps: Types.ChartProps) {
-      return !Charting.eqProps(newProps, this.props);
+    shouldComponentUpdate(newProps: ReportMainProps) {
+      return !Charting.eqProps(newProps, this.props) ||
+        this.props.seeMoreHintDismissed !== newProps.seeMoreHintDismissed;
     }
 
     renderResult({group}: {group: Types.RangesGroup}) {
@@ -196,7 +205,11 @@ module Esper.Views {
         <h3>{ Text.ChartLabels }</h3>
         <p>{ Text.ChartLabelsDescription }</p>
         <Components.LabelChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <Components.Hint text={Text.SeeMoreHintText}
+            dismissed={Stores.Hints.get('SeeMoreLinkHint')}
+            onDismiss={() => Stores.Hints.set('SeeMoreLinkHint', true)}>
+          <SeeMoreLink {...props} />
+        </Components.Hint>
       </div>
       <div className="chart-content">
         { group.all.totalUnique === 0 ?
@@ -221,7 +234,7 @@ module Esper.Views {
         <h3>{ Text.ChartCalendars }</h3>
         <p>{ Text.ChartCalendarsDescription }</p>
         <Components.CalendarChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -238,7 +251,7 @@ module Esper.Views {
         <h3>{ Text.ChartGuests }</h3>
         <p>{ Text.ChartGuestsDescription }</p>
         <Components.GuestChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps} />
       </div>
       <Components.BarDurationChart {...props} />
     </div>
@@ -254,7 +267,7 @@ module Esper.Views {
         <h3>{ Text.GuestDomains }</h3>
         <p>{ Text.ChartDomainsDescription }</p>
         <Components.DomainChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -270,7 +283,7 @@ module Esper.Views {
         <h3>{ Text.ChartGuestsCount  }</h3>
         <p>{ Text.ChartGuestsCountDescription }</p>
         <Components.GuestCountChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -286,7 +299,7 @@ module Esper.Views {
         <h3>{ Text.ChartDuration }</h3>
         <p>{ Text.ChartDurationDescription }</p>
         <Components.DurationChartInsight {...props} />
-        <SeeMoreLink {...props} />
+        <SeeMoreLink {...props as Types.ChartProps} />
       </div>
       <Components.DurationStack {...props}
         eventOnClick={Charting.onEventClick}
@@ -304,7 +317,8 @@ module Esper.Views {
         <h3>{ Text.ChartRatings }</h3>
         <p>{ Text.ChartRatingsDescription }</p>
         <Components.RatingChartInsight {...props} />
-        <SeeMoreLink {...props} groupBy={Charting.GroupByRating} />
+        <SeeMoreLink {...props as Types.ChartProps}
+                     groupBy={Charting.GroupByRating} />
       </div>
       <Components.PieDurationChart {...props} />
     </div>
@@ -346,13 +360,11 @@ module Esper.Views {
     let {path, opts} = Charting.updateChartPath(props, {});
     let href = Route.nav.href(path, opts);
 
-    return <p>
-      <a className="more-link" href={href}
-         onClick={() => Route.nav.go(path, opts)}>
-        <i className="fa fa-fw fa-left fa-caret-right" />
-        { Text.SeeMoreLinkText }
-      </a>
-    </p>;
+    return <a className="more-link" href={href}
+      onClick={() => Route.nav.go(path, opts)}>
+      <i className="fa fa-fw fa-left fa-caret-right" />
+      { Text.SeeMoreLinkText }
+    </a>;
   }
 
   // Link to launch auto-confirm modal

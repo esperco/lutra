@@ -8,6 +8,7 @@ module Esper.Components {
     maxDate: Date;
     period: Types.Period;
     updateFn: (period: Types.Period) => void;
+    hintDismissed: boolean;
     isLimited?: boolean;
     onLimitClick?: () => void;
     range?: boolean;          // Range mode -> select more than one instance
@@ -85,30 +86,36 @@ module Esper.Components {
                 onClick={() => this.props.updateFn(Period.add(period, -1))}>
             <i className="fa fa-fw fa-caret-left" />
           </span> }
-        <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
-          <div className="dropdown-toggle">
-            { Text.fmtPeriod(period) }
-            <i className="fa fa-fw fa-right fa-caret-down" />
-          </div>
-          <div className="dropdown-menu">
-            { intervals.length > 1 ?
-              <IntervalSelector
-                selected={period.interval}
-                intervals={intervals}
-                onUpdate={(i) => this.props.updateFn(Period.now(i))}
-              /> : null }
-            { this.props.isLimited ?
-              <div className={classNames("upgrade-alert", {
-                "action-block": !!this.props.onLimitClick
-              })} onClick={() => this.onLimitClick()}>
-                { Text.CalendarPeriodUpgradeMsg }
-              </div> : null
-            }
-            <div className="esper-select-menu">
-              { selector }
+        <Hint className="period-list"
+              text={Text.PeriodSelectorHintText}
+              dismissed={this.props.hintDismissed}
+              onDismiss={() => Stores.Hints.set('PeriodSelectorHint', true)}>
+          <Dropdown ref={(c) => this._dropdown = c} keepOpen={true}>
+            <div className="dropdown-toggle period-list-toggle">
+              { Text.fmtPeriod(period) }
+              <i id="period-selector"
+                 className="fa fa-fw fa-right fa-caret-down" />
             </div>
-          </div>
-        </Dropdown>
+            <div className="dropdown-menu">
+              { intervals.length > 1 ?
+                <IntervalSelector
+                  selected={period.interval}
+                  intervals={intervals}
+                  onUpdate={(i) => this.props.updateFn(Period.now(i))}
+                /> : null }
+              { this.props.isLimited ?
+                <div className={classNames("upgrade-alert", {
+                  "action-block": !!this.props.onLimitClick
+                })} onClick={() => this.onLimitClick()}>
+                  { Text.CalendarPeriodUpgradeMsg }
+                </div> : null
+              }
+              <div className="esper-select-menu">
+                { selector }
+              </div>
+            </div>
+          </Dropdown>
+        </Hint>
         { disableRight ? <span /> :
           <span className="action period-incr-action"
                 onClick={() => this.props.updateFn(Period.add(period, 1))}>

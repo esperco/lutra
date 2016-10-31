@@ -37,6 +37,7 @@ module Esper.Components {
     disabled?: boolean;
     keepOpen?: boolean;
     onOpen?: () => void;
+    onClose?: () => void;
   }
 
   interface State {
@@ -56,18 +57,18 @@ module Esper.Components {
     render() {
       // Get dropdown toggle handler
       var toggle = this.getToggle();
-      if (! toggle) { return; }
+      if (! toggle) { return null; }
 
       return <div className={classNames(this.props.className, {
                     dropdown: _.isUndefined(this.props.className)
                   })}
-                  onClick={() => this.open()}>
+                  onClick={this.open.bind(this)}>
         {toggle}
         { this.state.open ? this.getOverlay() : null }
       </div>;
     }
 
-    open() {
+    open(e: React.MouseEvent) {
       if (! this.props.disabled && !this.state.open) {
         this.setState({ open: true });
         if (this.props.onOpen) {
@@ -78,6 +79,9 @@ module Esper.Components {
 
     close() {
       this.setState({ open: false });
+      if (this.props.onClose) {
+        this.props.onClose();
+      }
     }
 
     /* Get specific toggle element from children */

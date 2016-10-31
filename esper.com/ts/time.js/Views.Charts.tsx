@@ -62,6 +62,7 @@ module Esper.Views {
                 "absolute-series", "percent-series"
               ], this.props.extra.type)}
               updateFn={(p) => this.updatePeriod(p)}
+              hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
             <div className="actions">
               <div className="esper-flex-list">
@@ -74,15 +75,21 @@ module Esper.Views {
                     onUpdate={(val) => this.updateExtra({ filterStr: val })}
                   />
                 </div>
-                <span className="action filter-action"
-                      onClick={() => this.toggleFilterMenu()}>
-                  <i className={classNames("fa fa-fw", {
-                    "fa-close": this.state.showFilterMenu,
-                    "fa-ellipsis-v": !this.state.showFilterMenu,
-                    "active": _.some(_.values(filterState)) &&
-                              !this.state.showFilterMenu
-                  })} />
-                </span>
+                <Components.Hint
+                  className="action filter-action"
+                  dismissed={Stores.Hints.get('FilterMenuHint')}
+                  onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
+                  text={Text.FilterActionHintText}>
+                  <span onClick={() => this.toggleFilterMenu()}>
+                    <i id="filter-menu-toggle"
+                       className={classNames("fa fa-fw", {
+                      "fa-close": this.state.showFilterMenu,
+                      "fa-ellipsis-v": !this.state.showFilterMenu,
+                      "active": _.some(_.values(filterState)) &&
+                                !this.state.showFilterMenu
+                    })} />
+                  </span>
+                </Components.Hint>
               </div>
             </div>
           </div>
