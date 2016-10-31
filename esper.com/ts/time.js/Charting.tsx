@@ -6,6 +6,12 @@
 
 module Esper.Charting {
 
+  /*
+    On "simplified" pie or pct charts, we cut off data labels when the value
+    gets too small. This is the threshold for cutoff.
+  */
+  const PIE_CHART_DATALABEL_CUTOFF = 0.05;
+
   /* Attributes to group by */
 
   // Group by (predicted) labels assigned to event
@@ -680,6 +686,7 @@ module Esper.Charting {
                         up this single datapoint */
       y: number;
       events: HighchartsPointEvents;
+      dataLabels?: HighchartsDataLabels;
     }[]
   }
 
@@ -783,6 +790,7 @@ module Esper.Charting {
       cursor: "pointer",
       data: _.map(keys, (key, kIndex) => {
         let value = group.some[key];
+        let pct = value.totalValue / group.all.totalValue;
         return {
           name: Util.escapeBrackets((
             groupBy.displayFn ?
@@ -794,7 +802,9 @@ module Esper.Charting {
           y: (opts.yFn || _.identity)(value ? value.totalValue : 0),
           events: {
             click: () => onSeriesClick(value ? value.events : [])
-          }
+          },
+          dataLabels: props.simplified && pct < PIE_CHART_DATALABEL_CUTOFF ?
+            { enabled: false } : null
         };
       })
     };
