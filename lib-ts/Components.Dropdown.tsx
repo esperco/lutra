@@ -168,8 +168,18 @@ module Esper.Components {
       let anchor = $(this.props.anchor);
       let offset = anchor.offset() || { left: 0, top: 0 };
       let style = {
-        left: offset.left - $(window).scrollLeft(),
-        top: offset.top - $(window).scrollTop(),
+        /*
+          In addition to offset, we need to consider scroll position since
+          offset is relative to document, not window, but dropdown is
+          position: fixed (which is relative to window)
+
+          Math.floor because it's possible for 1px rounding errors to cause
+          our wrapper to extend just slightly past edge of window, which
+          triggers ugly scroll bars.
+        */
+        left: Math.floor(offset.left - $(window).scrollLeft()),
+        top: Math.floor(offset.top - $(window).scrollTop()),
+
         height: anchor.outerHeight(),
         width: anchor.outerWidth()
       };
