@@ -336,4 +336,17 @@ module Esper.Types {
   export interface LabelCount extends LabelBase {
     count: number;
   }
+
+
+  /* Billing Plans */
+
+  export interface PlanDetails {
+    id: ApiT.PlanId;
+    name: string;
+    price: string|JSX.Element;
+    discountedPrice?: string|JSX.Element;
+    freeTrial?: string|JSX.Element;
+    features: Array<string|JSX.Element>;
+    enterprise?: boolean; // Requires billing address
+  }
 }

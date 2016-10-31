@@ -1,147 +1,101 @@
 /*
   Component for displaying plan information
- */
+*/
+
+/// <reference path="./Text.tsx" />
+/// <reference path="./Types.ts" />
 
 module Esper.Components {
   interface Props {
-    subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
-    redirectTarget?: string|Paths.Path;
+    subscription: ApiT.TeamSubscription|ApiT.SubscriptionDetails;
+
+    // Which plans to show
+    plans: Types.PlanDetails[];
+
+    // Callback promise
+    onSelect: (plan: Types.PlanDetails) => JQueryPromise<any>;
   }
 
-  export class Plans extends ReactHelpers.Component<Props, {}> {
-    render() {
-      let subscription = this.props.subscription;
-      return <div className="esper-flex-list esper-section">
-        <div className="esper-section">
-          <PlanInfo planid="Basic_20161019" subscription={subscription}
-            redirectTarget={this.props.redirectTarget} />
-        </div>
-        <div className="esper-section">
-          <PlanInfo planid="Executive_20161019" subscription={subscription}
-            redirectTarget={this.props.redirectTarget} />
-        </div>
-      </div>;
-    }
-  }
-
-
-  interface PlanInfoProps {
-    subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
-    planid: ApiT.PlanId;
-    redirectTarget?: string|Paths.Path;
-  }
-
-  class PlanInfo extends ReactHelpers.Component<PlanInfoProps, {
+  interface State {
     busy: boolean;
-  }> {
-    constructor(props: PlanInfoProps) {
+  }
+
+  export class Plans extends ReactHelpers.Component<Props, State> {
+    constructor(props: Props) {
       super(props);
       this.state = { busy: false };
     }
 
-    onToken(token: StripeTokenResponse) {
-      this.setState({ busy: true });
-
-      let cusId = this.props.subscription.cusid;
-      let planId = this.props.planid;
-
-      // Run in parallel with actual actions
-      Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
-        `for ${Text.getPlanName(planId)}`);
-
-      Actions.Subscriptions.addCard(cusId, token.id).then(() =>
-        Actions.Subscriptions.set(cusId, planId, this.props.redirectTarget)
-      ).always(() => this.setState({ busy: false }));
-    }
-
-    changePlan() {
-      this.setState({ busy: true });
-
-      Actions.Subscriptions.set(
-        this.props.subscription.cusid,
-        this.props.planid,
-        this.props.redirectTarget
-      ).always(() => this.setState({ busy: false }));
-    }
-
     render() {
-      let description = (() => {
-        switch (this.props.planid) {
-          case "Basic_20161019":
-            return "Basic Plan";
-          case "Executive_20161019":
-            return "Executive Plan";
-          case "Enterprise_20160923":
-            return "Enterprise Plan";
-          default:
-            return "Esper";
-        }
-      })();
+      if (this.state.busy)
+        return <div className="esper-spinner" />;
 
-      if (_.isEmpty((this.props.subscription as ApiT.SubscriptionDetails).cards)) {
-        return <Components.Stripe stripeKey={Config.STRIPE_KEY}
-          description={description} label="Submit"
-          onToken={(token) => this.onToken(token)}>
-          { this.renderContent(false) }
-        </Components.Stripe>;
-      }
-      return this.renderContent(true);
-    }
-
-    renderContent(useOnClick=false) {
-      var planInfo: JSX.Element;
-      var pricing: string|JSX.Element;
-      if (this.props.planid === "Basic_20161019") {
-        planInfo = <ul>
-          { _.map(Text.BasicPlanFeatures, (feature, i) =>
-              <li key={this.getId(`basic-feat-${i}`)}>{feature}</li>)}
-        </ul>;
-        pricing = Text.BasicPlanPrice;
-      }
-      else if (this.props.planid === "Executive_20161019") {
-        planInfo = <ul>
-          { _.map(Text.AdvancedPlanFeatures, (feature, i) =>
-              <li key={this.getId(`advanced-feat-${i}`)}>{feature}</li>)}
-        </ul>;
-        pricing = Text.AdvancedPlanPrice;
-
-        // TODO: This is a hack. We should fix this later and implement
-        // proper coupon-entering.
-        let showDiscount = _.includes(location.href, "coupon");
-        if (showDiscount) {
-          pricing = <span>
-            <span className="old-price">{ Text.AdvancedPlanPrice }</span>
-            <span>{ Text.AdvancedDiscountPlanPrice }</span>
-          </span>
-        }
-      }
-
-      let selected = this.props.subscription.plan === this.props.planid;
-      return <div className={classNames("sub-plan-box", {selected})}
-                  onClick={(e) => useOnClick ? this.changePlan() : null}>
-        <h4 className="sub-plan-heading">
-          { Text.getPlanName(this.props.planid) }
-        </h4>
-        <div className="sub-plan-body">
-          <div className="free-trial">{Text.FreeTrialMsg}</div>
-          <div className="pricing">{ pricing }</div>
-          { planInfo }
-        </div>
-        <div className="sub-plan-footer">
-          {
-            this.state.busy ?
-            <span><span className="esper-spinner" /></span> :
-            <button className={classNames("btn form-control", {
-              "btn-success": !selected,
-              "btn-default": selected
-            })} disabled={selected}>
-              { selected ? Text.ActivePlan :
-              ( this.props.subscription.plan ?
-                Text.SelectPlan : Text.StartPlan )}
-            </button>
-          }
-        </div>
+      let subscription = this.props.subscription;
+      return <div className="esper-flex-list esper-section">
+        { _.map(this.props.plans, (plan) =>
+          <div key={plan.id} className="esper-section">
+            <div onClick={() => this.onClick(plan)}>
+              <PlanInfo {...{plan, subscription}} />
+            </div>
+          </div>) }
       </div>;
     }
+
+    onClick(plan: Types.PlanDetails) {
+      this.mutateState((s) => s.busy = true);
+      let cusId = this.props.subscription.cusid;
+      this.props.onSelect(plan)
+        .always(() => this.mutateState((s) => s.busy = false));
+    }
+  }
+
+
+  function PlanInfo({plan, subscription} : {
+    plan: Types.PlanDetails;
+    subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
+  }) {
+    let selected = subscription.plan === plan.id;
+
+    // TODO: This is a hack. We should fix this later and implement
+    // proper coupon-entering.
+    let showDiscount = plan.discountedPrice &&
+      _.includes(location.href, "coupon");
+    let pricing = showDiscount ? <span>
+      <span className="old-price">{ plan.price }</span>
+      <span>{ plan.discountedPrice }</span>
+    </span> : <span>{ plan.price }</span>;
+
+    let canStartFreeTrial = plan.freeTrial &&
+        !subscription.plan &&
+        subscription.status !== "Past_due" &&
+        subscription.status !== "Unpaid" &&
+        subscription.status !== "Canceled";
+
+    return <div className={classNames("sub-plan-box", {selected})}>
+      <h4 className="sub-plan-heading">
+        { plan.name }
+      </h4>
+      <div className="sub-plan-body">
+        <div className="pricing">
+          { plan.freeTrial ?
+            <div className="free-trial">{ plan.freeTrial }</div> : null }
+          { pricing }
+        </div>
+        <ul className="features">
+          { _.map(plan.features, (f, i) => <li key={i}>
+            { f }
+          </li>) }
+        </ul>
+      </div>
+      <div className="sub-plan-footer">
+        <button className={classNames("btn form-control", {
+          "btn-success": !selected,
+          "btn-default": selected
+        })} disabled={selected}>
+          { selected ? Text.ActivePlan :
+          ( canStartFreeTrial ? Text.StartFreeTrial : Text.SelectPlan )}
+        </button>
+      </div>
+    </div>;
   }
 }

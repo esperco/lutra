@@ -12,24 +12,38 @@ module Esper.Actions.Subscriptions {
     so let's just refresh everything for now
   */
 
-  export function set(cusId: string, planId: ApiT.PlanId,
-                      redirectTarget?: string|Paths.Path) {
-    let p = Api.setSubscription(cusId, planId).then(
+  export function set({cusId, planId, redirectTarget, cardToken}: {
+    cusId: string;
+    planId: ApiT.PlanId;
+    cardToken?: string;
+    redirectTarget?: string|Paths.Path
+  }) {
+    // Run in parallel with actual actions
+    Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
+      `for ${Text.getPlanName(planId)}`);
+
+    // Add card first if provided
+    let p1 = cardToken ?
+      addCard(cusId, cardToken) :
+      $.Deferred().resolve().promise();
+
+    let p2 = p1.then(() => Api.setSubscription(cusId, planId)).then(
       () => {
         if (_.isEmpty(redirectTarget))
           location.reload(false);
         else
           Route.nav.go(redirectTarget);
       });
-    Save.monitorStr(p, "setSubscription");
-    return p;
+
+    Save.monitorStr(p2, "setSubscription");
+    return p2;
   }
 
   export function setDefault(cusId: string) {
     let customer = Stores.Customers.require(cusId);
     let defaultPlan: ApiT.PlanId = !!customer.teamid ?
       "Basic_20161019" : "Enterprise_20160923";
-    return set(cusId, defaultPlan);
+    return set({cusId, planId: defaultPlan});
   }
 
   export function cancel(cusId: string) {
@@ -52,7 +66,7 @@ module Esper.Actions.Subscriptions {
       })
     );
     Stores.Subscriptions.SubscriptionStore.pushFetch(cusId, p);
-    return p;
+    return p.then(() => null);
   }
 
   export function deleteCard(cusId: string, cardId: string) {

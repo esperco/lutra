@@ -25,6 +25,7 @@ module Esper.Main {
     Login.promise.done(function() {
       Stores.Profiles.init();
       Stores.TeamPreferences.init();
+      Stripe.init(Config.STRIPE_KEY);
     });
   }
 }

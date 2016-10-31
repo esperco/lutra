@@ -84,11 +84,8 @@ module Esper.Views {
       let planId = DEFAULT_PLAN;
 
       // Run in parallel with actual actions
-      Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
-        `for ${Text.getPlanName(planId)}`);
-      Actions.Subscriptions.addCard(cusId, token.id).then(() =>
-        Actions.Subscriptions.set(cusId, planId)
-      ).always(() => this.setState({ busy: false }));
+      Actions.Subscriptions.set({cusId, planId, cardToken: token.id})
+        .always(() => this.setState({ busy: false }));
     }
   }
 }

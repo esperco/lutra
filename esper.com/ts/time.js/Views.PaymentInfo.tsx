@@ -21,14 +21,13 @@ module Esper.Views {
         .unwrapOr(null);
 
       return <div className="container">
-        <div className="alert msg alert-info">
-          { Text.PaymentDescription }
-        </div>
         <Components.PaymentInfo
+          stripeKey={Config.STRIPE_KEY}
+          description={Text.PaymentDescription}
           team={team}
           customers={Stores.Customers.all()}
           details={details}
-          redirect={Paths.Time.charts()}
+          redirect={Paths.Time.charts({ teamId: team.teamid })}
         />
       </div>;
     }
