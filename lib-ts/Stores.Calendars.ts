@@ -58,6 +58,7 @@ module Esper.Stores.Calendars {
     return UserStore.get(userId).flatMap((storeData) => storeData.data);
   }
 
+  // Return promise when done
   export function fetchAvailable(teamId: string, force=false) {
     if (force || listAvailable(teamId).isNone()) {
       var apiP = Api.getGenericCalendarList(teamId)
@@ -68,7 +69,12 @@ module Esper.Stores.Calendars {
       if (ListStore.get(teamId).isNone()) {
         ListStore.set(teamId, Option.some([]));
       }
+
+      return apiP.then(() => null);
     }
+
+    // Return empty promise if already done
+    return $.Deferred<void>().resolve().progress();
   }
 
   // Like get, but throw an error if not found
