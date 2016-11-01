@@ -168,8 +168,18 @@ module Esper.Components {
       let anchor = $(this.props.anchor);
       let offset = anchor.offset() || { left: 0, top: 0 };
       let style = {
-        left: offset.left - $(window).scrollLeft(),
-        top: offset.top - $(window).scrollTop(),
+        /*
+          In addition to offset, we need to consider scroll position since
+          offset is relative to document, not window, but dropdown is
+          position: fixed (which is relative to window)
+
+          Math.floor because it's possible for 1px rounding errors to cause
+          our wrapper to extend just slightly past edge of window, which
+          triggers ugly scroll bars.
+        */
+        left: Math.floor(offset.left - $(window).scrollLeft()),
+        top: Math.floor(offset.top - $(window).scrollTop()),
+
         height: anchor.outerHeight(),
         width: anchor.outerWidth()
       };
@@ -217,8 +227,13 @@ module Esper.Components {
       let menu = this.find('.dropdown-menu');
       if (_.isEmpty(menu)) { return; }
 
-      // Apply max-height
-      let maxHeight = $(window).height() - menu.offset().top;
+      /*
+        Apply max-height -- calculated as the difference between the offset
+        of the menu (calculated in the same manner the wrapper) and the window
+        height.
+      */
+      let maxHeight = $(window).height() - menu.offset().top
+                      + $(window).scrollTop();
       menu.css({
         "max-height": maxHeight * 0.9, // Buffer slightly
         "overflow": "auto"
