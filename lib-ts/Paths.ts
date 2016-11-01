@@ -303,8 +303,8 @@ module Esper.Paths {
       return optPath(prefix, "");
     }
 
-    export function event() {
-      return optPath(prefix, "event");
+    export function event({eventId} : { eventId?: string }) {
+      return optPath(prefix, "event", eventId);
     }
 
     export function date({date, teamId} : {

@@ -131,7 +131,7 @@ module Esper.Actions.Feedback {
     };
     var eventPromise = Stores.Events.EventStore.get(storeId)
       .match({
-        none: () => Stores.Events.fetchOne(eventId),
+        none: () => Stores.Events.fetchExact(storeId),
         some: (e) => $.Deferred().resolve(e.data).promise()
       });
     var actionPromise = Api.postEventFeedbackAction(
