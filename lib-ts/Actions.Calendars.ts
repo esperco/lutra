@@ -5,6 +5,7 @@
 /// <reference path="./Analytics.Web.ts" />
 /// <reference path="./Queue2.ts" />
 /// <reference path="./Stores.Calendars.ts" />
+/// <reference path="./Stores.Teams.ts" />
 
 module Esper.Actions.Calendars {
 
@@ -23,17 +24,38 @@ module Esper.Actions.Calendars {
   export function add(teamId: string, cal: ApiT.GenericCalendar) {
     var calendars = cloneCalList(teamId);
     calendars.push(_.cloneDeep(cal));
-    update(teamId, calendars);
+    return update(teamId, calendars);
   }
 
   export function remove(teamId: string, cal: ApiT.GenericCalendar) {
     var calendars = cloneCalList(teamId);
     _.remove(calendars, (c) => c.id === cal.id);
-    update(teamId, calendars);
+    return update(teamId, calendars);
   }
 
   export function update(teamId: string, cals: ApiT.GenericCalendar[]) {
-    queueUpdate(teamId, cals);
+    return queueUpdate(teamId, cals);
+  }
+
+  // Used with Onboarding skip
+  export function setDefaultCalendars() {
+    let teams = Stores.Teams.all();
+    teams = _.filter(teams, (t) => _.isEmpty(t.team_timestats_calendars));
+
+    let promises = _.map(teams, (t) => setDefaultCalForTeam(t));
+    return Util.when(promises);
+  }
+
+  export function setDefaultCalForTeam(team: ApiT.Team) {
+    return Stores.Calendars.fetchAvailable(team.teamid).then(() => {
+      let email = team.team_api.team_exec_email;
+      let cals = Stores.Calendars.listAvailable(team.teamid).unwrapOr([]);
+      let cal = _.find(cals, (c) => c.id === email) || cals[0];
+
+      return cal ?
+        update(team.teamid, [cal]).then(() => null) :
+        $.Deferred<void>().resolve().promise();
+    });
   }
 
   // Queues update to server to match calendars on a given team object
@@ -62,6 +84,8 @@ module Esper.Actions.Calendars {
         team_timestats_calendars property.
       */
     }
+
+    return p;
   }
 
 

@@ -67,7 +67,8 @@ module Esper.Components {
       this.props.onSkip ?
         this.props.onSkip() :
         Actions.Teams.createDefaultTeam()
-          .then(() => Route.nav.home())
+          .then(() => Actions.Calendars.setDefaultCalendars())
+          .then(() => Route.nav.home());
     }
   }
 
