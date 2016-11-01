@@ -227,8 +227,13 @@ module Esper.Components {
       let menu = this.find('.dropdown-menu');
       if (_.isEmpty(menu)) { return; }
 
-      // Apply max-height
-      let maxHeight = $(window).height() - menu.offset().top;
+      /*
+        Apply max-height -- calculated as the difference between the offset
+        of the menu (calculated in the same manner the wrapper) and the window
+        height.
+      */
+      let maxHeight = $(window).height() - menu.offset().top
+                      + $(window).scrollTop();
       menu.css({
         "max-height": maxHeight * 0.9, // Buffer slightly
         "overflow": "auto"
