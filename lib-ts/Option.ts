@@ -38,18 +38,39 @@ module Esper.Option {
       return this.some ? this.value : e;
     }
 
+    /*
+      If this Option is none, do nothing. Otherwise, apply f to the inner value
+      and wrap the output.
+      The difference between map and flatMap below is that the former does not
+      expect the f closure to return an Option.T, and if f returns null or
+      undefined, map automatically converts it to Option.none().
+     */
+    map<B>(f : (x : E) => B) : T<B> {
+      return this.match({
+        some : (x) => Option.wrap(f(x)),
+        none : () => Option.none<B>()
+      });
+    }
+
+    /*
+      If this Option is none, return fallback. Otherwise, return the result
+      of applying f to the inner value.
+      Convenience function over doing map(f).unwrapOr(fallback).
+     */
+    mapOr<B>(fallback: B, f: (x: E) => B): B {
+      return this.match({
+        some: (x) => f(x),
+        none: () => fallback
+      });
+    }
     /** Monadic bind for Option.T, but `bind' is already used in the
      *  JavaScript standard library for something else, so I called
      *  this flatMap à la Scala to avoid confusion.
      */
     flatMap<B>(f : (x : E) => T<B>) : T<B> {
       return this.match({
-        some : function (x) {
-          return f(x);
-        },
-        none : function () {
-          return Option.none<B>();
-        }
+        some : (x) => f(x),
+        none : () => Option.none<B>()
       });
     }
 
