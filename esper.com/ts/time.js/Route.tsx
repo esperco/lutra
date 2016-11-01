@@ -189,7 +189,7 @@ module Esper.Route {
   route("/calendar-manage", redirectPath(Paths.Manage.Team.calendars()));
 
   // Redirect old post-meeting feedback links
-  route("/event", redirectPath(Paths.Now.event()));
+  route("/event", redirectPath(Paths.Now.event({})));
 
   // Redirect old charts to new
   route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",

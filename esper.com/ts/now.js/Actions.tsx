@@ -204,10 +204,9 @@ module Esper.Actions {
         (e) => e.start && e.start.getTime() < now);
 
       if (currentEvent) {
-        renderEvent({
+        renderEvent(currentEvent.id, {
           teamId: currentEvent.teamId,
-          calId: currentEvent.calendarId,
-          eventId: currentEvent.id
+          calId: currentEvent.calendarId
         });
       }
 
@@ -222,11 +221,10 @@ module Esper.Actions {
 
   // Go to a specific event
   export function goToEvent(event: Stores.Events.TeamEvent) {
-    Route.nav.go(Paths.Now.event(), {
+    Route.nav.go(Paths.Now.event({eventId: event.id}), {
       queryStr: $.param({
         team: event.teamId,
-        cal: event.calendarId,
-        event: event.id
+        cal: event.calendarId
       })
     });
   }
@@ -234,36 +232,43 @@ module Esper.Actions {
   /*
     Known event ID => fetch and render, optionally post action
   */
-  export function renderEvent({teamId, calId, eventId, action}: {
+  export function renderEvent(eventId: string, {teamId, calId, action}: {
     teamId: string;
     calId: string;
-    eventId: string;
     action?: ApiT.EventFeedbackAction;
   }) {
-    if (!eventId || !teamId || !calId) {
-      Log.e(`Missing params - ${eventId} - ${teamId} - ${calId}`);
+    if (!eventId) {
+      Log.e("Missing eventId");
       Route.nav.go("/not-found");
     }
 
     // Bad team => try using a default team
-    if (Stores.Teams.get(teamId).isNone()) {
+    if (teamId && Stores.Teams.get(teamId).isNone()) {
       var team = getTeam();
       if (team.teamid !== teamId) {
         teamId = team.teamid;
       }
     }
 
-    var p = action ?
-      Feedback.postActionAndFetch({
+    var p: JQueryPromise<Option.T<Types.TeamEvent>>;
+    if (teamId && calId) {
+      p = action ? Feedback.postActionAndFetch({
         teamId: teamId,
         calId: calId,
         eventId: eventId,
         action: action
-      }) : Stores.Events.fetchOne({
-        teamId: teamId,
-        calId: calId,
-        eventId: eventId
+      }) : Stores.Events.fetchExact({teamId, calId, eventId});
+    } else {
+      p = Stores.Events.fetchFuzzy(eventId).then((r) => {
+        if (!r) {
+          return Option.none();
+        }
+
+        teamId = r.teamid;
+        calId = r.event.calendar_id;
+        return Option.wrap(Stores.Events.asTeamEvent(teamId, r.event));
       });
+    }
 
     render(<Components.PromiseSpinner promise={p} />);
 
@@ -282,7 +287,7 @@ module Esper.Actions {
       }
     }).fail(function() {
       Route.nav.go("/not-found");
-    })
+    });
 
     Analytics.page(Analytics.Page.EventFeedback, {
       teamId: teamId,

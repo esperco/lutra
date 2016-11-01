@@ -426,23 +426,36 @@ module Esper.Stores.Events {
 
   //////
 
-  export function fetch1(fullEventId: FullEventId, forceRefresh=false) {
-    if (forceRefresh || EventStore.get(fullEventId).isNone()) {
-      var p = Api.getGenericEvent(
-        fullEventId.teamId,
-        fullEventId.calId,
-        fullEventId.eventId
-      ).then((e: ApiT.GenericCalendarEvent) =>
-        Option.wrap(asTeamEvent(fullEventId.teamId, e))
-      );
-      EventStore.fetch(fullEventId, p);
-      return p;
-    } else {
-      return $.Deferred().resolve(EventStore.get(fullEventId).unwrap().data)
-    }
+  export function fetchFuzzy(eventId: string):
+  JQueryPromise<ApiT.EventLookupResult> {
+    return Api.getEventFuzzy(eventId).then((e) => {
+      if (!e.result) {
+        return null;
+      }
+
+      let teamId = e.result.teamid;
+      let calId = e.result.event.calendar_id;
+      let event = Option.wrap(asTeamEvent(teamId, e.result.event));
+      EventStore.set({ teamId, calId, eventId }, event);
+      return e.result;
+    });
   }
 
-  export var fetchOne = fetch1;
+  export function fetchExact({teamId, calId, eventId}: {
+    teamId: string;
+    calId: string;
+    eventId: string;
+  }): JQueryPromise<Option.T<Types.TeamEvent>> {
+    return EventStore.get({teamId, calId, eventId}).match({
+      none: () => Api.getEventExact(teamId, calId, eventId)
+        .then((e) => {
+          let event = Option.wrap(asTeamEvent(teamId, e));
+          EventStore.set({teamId, calId, eventId}, event);
+          return event;
+        }),
+      some: (e) => $.Deferred().resolve(e.data).promise()
+    })
+  }
 
 
   /* Helpers */
