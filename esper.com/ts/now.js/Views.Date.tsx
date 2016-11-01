@@ -4,7 +4,7 @@
 
 module Esper.Views {
 
-  export function DateView({date}: {date: Date}) {
+  export function DateView({date, teamId}: {date: Date, teamId: string}) {
     var mDate = moment(date).startOf('day');
     var nextDate = mDate.clone().add(1, 'day').toDate();
     var prevDate = mDate.clone().subtract(1, 'day').toDate();
@@ -26,6 +26,12 @@ module Esper.Views {
           </div>
         </div>
       </div>
+
+      <Components.TeamSelector
+        teams={Stores.Teams.all()}
+        selectedId={teamId}
+        onUpdate={(teamId) => Actions.goToDate(date, { teamId })}
+      />
     </div>
   }
 }

@@ -99,8 +99,6 @@ module Esper.Text {
   export const AllGuests = `Show All`;
   export const NoGuests = `No Guests`;
   export const HideNoGuests = `Only Events with Guests`;
-  export const NoTeam = `Select ${TeamExec}`;
-  export const ManageTeams = `Manage ${TeamExecs}`;
 
   export const AllRatings = `Show All`;
   export const NoRating = `No Rating`;
