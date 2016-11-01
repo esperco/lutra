@@ -204,9 +204,10 @@ module Esper.Actions {
         (e) => e.start && e.start.getTime() < now);
 
       if (currentEvent) {
-        renderEvent(currentEvent.id, {
+        renderEvent({
           teamId: currentEvent.teamId,
-          calId: currentEvent.calendarId
+          calId: currentEvent.calendarId,
+          eventId: currentEvent.id
         });
       }
 
@@ -232,9 +233,10 @@ module Esper.Actions {
   /*
     Known event ID => fetch and render, optionally post action
   */
-  export function renderEvent(eventId: string, {teamId, calId, action}: {
+  export function renderEvent({teamId, calId, eventId, action}: {
     teamId: string;
     calId: string;
+    eventId: string;
     action?: ApiT.EventFeedbackAction;
   }) {
     if (!eventId) {
