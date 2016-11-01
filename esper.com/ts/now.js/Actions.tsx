@@ -259,11 +259,7 @@ module Esper.Actions {
         calId: calId,
         eventId: eventId,
         action: action
-      }) : Stores.Events.fetchOne({
-        teamId: teamId,
-        calId: calId,
-        eventId: eventId
-      });
+      }) : Stores.Events.fetchOne(eventId);
 
     render(<Components.PromiseSpinner promise={p} />);
 

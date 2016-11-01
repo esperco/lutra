@@ -426,20 +426,18 @@ module Esper.Stores.Events {
 
   //////
 
-  export function fetch1(fullEventId: FullEventId, forceRefresh=false) {
-    if (forceRefresh || EventStore.get(fullEventId).isNone()) {
-      var p = Api.getGenericEvent(
-        fullEventId.teamId,
-        fullEventId.calId,
-        fullEventId.eventId
-      ).then((e: ApiT.GenericCalendarEvent) =>
-        Option.wrap(asTeamEvent(fullEventId.teamId, e))
-      );
-      EventStore.fetch(fullEventId, p);
-      return p;
-    } else {
-      return $.Deferred().resolve(EventStore.get(fullEventId).unwrap().data)
-    }
+  export function fetch1(eventId: string):
+  JQueryPromise<Option.T<Types.TeamEvent>> {
+    return Api.getGenericEvent(eventId).then((e: ApiT.EventLookupResponse) => {
+      if (e.result) {
+        let teamId = e.result.teamid;
+        let calId = e.result.event.calendar_id;
+        let event = Option.wrap(asTeamEvent(teamId, e.result.event));
+        EventStore.set({ teamId, calId, eventId }, event);
+        return $.Deferred().resolve(event);
+      }
+      return $.Deferred().reject();
+    });
   }
 
   export var fetchOne = fetch1;

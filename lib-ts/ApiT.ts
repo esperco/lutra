@@ -205,6 +205,15 @@ module Esper.ApiT {
     calendars: GenericCalendar[];
   }
 
+  export interface EventLookupResult {
+    teamid: string;
+    event: GenericCalendarEvent;
+  }
+
+  export interface EventLookupResponse {
+    result?: EventLookupResult;
+  }
+
   export interface EventFeedbackUpdate {
     notes?: string;
     attended?: boolean;
