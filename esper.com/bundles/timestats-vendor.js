@@ -9,7 +9,6 @@ var inject        = require("../../build-helpers/depends").inject;
 var autosize      = require("autosize"),
     classNames    = require("classnames"),
     EventEmitter  = require("eventemitter3"),
-    fullCalendar  = require("fullcalendar"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
     moment        = require("moment"),
@@ -28,7 +27,6 @@ var highcharts;
 inject({jQuery: jQuery, $: jQuery}, function() {
   require("bootstrap/js/modal");
   require("bootstrap/js/transition");
-  require("bootstrap/js/tooltip"); // For full-calendar only ...
 
   highcharts = require("highcharts");
   require("highcharts/modules/exporting")(highcharts);
@@ -51,7 +49,6 @@ window.Esper = Esper = (function(esperObj) {
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
     EventEmitter: EventEmitter,
-    fullCalendar: fullCalendar,
     Highcharts:   highcharts,
     moment:       moment,
     momentTz:     momentTz,
