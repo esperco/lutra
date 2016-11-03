@@ -451,6 +451,7 @@ module Esper.ApiT {
   // This is used for API setting only
   export interface GeneralPrefsOpts {
     current_timezone?: string;
+    event_link?: boolean;
   }
 
   export interface GeneralPrefs extends GeneralPrefsOpts {
