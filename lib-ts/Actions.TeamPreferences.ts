@@ -47,6 +47,16 @@ module Esper.Actions.TeamPreferences {
     }
   }
 
+  /*
+    Toggles hyperlinks in calendar event descriptions
+  */
+  export function toggleEsperEventLink(prefs: ApiT.Preferences) {
+    var generalPrefs = _.cloneDeep(prefs.general);
+    generalPrefs.event_link = !generalPrefs.event_link;
+
+    setGeneral(prefs.teamid, generalPrefs);
+  }
+
   // Enable or disable label reminder email
   export function toggleLabelReminders(prefs: ApiT.Preferences) {
     var labelReminder  = _.cloneDeep(prefs.label_reminder) || {};

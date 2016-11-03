@@ -120,6 +120,8 @@ module Esper.Text {
     "Which calendars do you want to connect to Esper?"
   export const CalendarSettingsExecDescription =
     "Pick which calendars Esper should use for the person you're supporting.";
+  export const EsperEventLink =
+    "Add an Esper link to my calendar event descriptions";
 
   // Notification Settings
   export const GeneralPrefsHeading = "Subscriptions";
