@@ -19,9 +19,14 @@ module Esper.Components {
     }
 
     componentWillUpdate(nextProps: P) {
-      if (this.props !== nextProps) {
+      if (this.props !== nextProps && this.shouldCalcUpdate(nextProps)) {
         this.setCalcSources(nextProps);
       }
+    }
+
+    // Override in where we might want to update component but keep same calc
+    shouldCalcUpdate(nextProps: P) {
+      return true;
     }
 
     setCalcSources(props: P) {

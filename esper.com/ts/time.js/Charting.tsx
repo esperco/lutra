@@ -378,6 +378,19 @@ module Esper.Charting {
 
   /* Compare props, used to minimize excessive chart updates */
   export function eqProps(p1: Types.ChartProps, p2: Types.ChartProps): boolean {
+    // Whitelist props that get type-checked
+    p1 = {
+      eventsForRanges: p1.eventsForRanges,
+      hasError: p1.hasError,
+      isBusy: p1.isBusy,
+      period: p1.period,
+      team: p1.team,
+      calendars: p1.calendars,
+      groupBy: p1.groupBy,
+      extra: p1.extra,
+      simplified: p1.simplified
+    };
+
     // Do shallow comparison of all keys with some exceptions
     for (let key in p1) {
       switch(key) {
