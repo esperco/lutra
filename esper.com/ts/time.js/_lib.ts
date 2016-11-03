@@ -53,6 +53,7 @@
 /// <reference path="../lib/Components.Stripe.tsx" />
 /// <reference path="../lib/Components.TeamSelector.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
+/// <reference path="../lib/Components.WeekView.tsx" />
 
 /// <reference path="../lib/Views.App.tsx" />
 /// <reference path="../lib/Views.NotFound.tsx" />

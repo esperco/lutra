@@ -1,0 +1,73 @@
+@import "./_bootstrap-variables.less";
+
+@tick-labels-width: 6em;
+@hour-height: 2.5em;
+
+.week-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  > div {
+    flex: 0 0 auto;
+  }
+
+  > .week-scrollable {
+    flex: 1 1 auto;
+  }
+
+  .week-tick-labels {
+    width: @tick-labels-width;
+    float: left;
+
+    .hour-tick {
+      text-align: right;
+      padding-right: @padding-xs-horizontal;
+    }
+  }
+
+  .week-headings, .week-all-days, .week-stacked-events {
+    margin-left: @tick-labels-width;
+    display: flex;
+    > div {
+      flex: 1 0 0;
+    }
+  }
+
+  // Not ideal, but force always scrollable to ensure heading and rest
+  // of content lines up on Windows
+  .week-headings, .week-scrollable {
+    overflow-y: scroll;
+  }
+
+  .week-headings .week-date {
+    font-size: @font-size-small;
+    color: @brand-text-muted;
+    text-align: center;
+  }
+
+  .week-all-days {
+    border-top: 1px solid @brand-border;
+    min-height: 1em;
+  }
+
+  .hour-tick {
+    height: @hour-height;
+    border-top: 1px solid @brand-border;
+  }
+  .hour-label {
+    font-size: @font-size-small;
+    color: @brand-text-muted;
+  }
+
+  .week-all-day, .week-date-events {
+    border-left: 1px solid @brand-border;
+  }
+
+  .week-date-events {
+    position: relative;
+
+    .hour-label { display: none; }
+    .stacked-event { position: absolute; }
+  }
+}
