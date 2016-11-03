@@ -559,11 +559,12 @@ module Esper.EventStats {
   }
 
   /*
-    Returns a filtered lsit of events
+    Returns a filtered list of events
   */
   export function simpleCounterCalc(
     eventsForRanges: Types.EventsForRange[],
-    filterFns: Types.FilterFn[]
+    filterFns: Types.FilterFn[],
+    ignoreRecurring=true
   ) {
     return new Calc<Types.CounterState>({
       eventsForRanges,
@@ -576,9 +577,9 @@ module Esper.EventStats {
       let { events, rangeIndex, eventIndex } = batchFixed(s);
       events = filterEvents(events, filterFns.concat([
 
-        // Uniqueness check function takes into accont recurring events
+        // Uniqueness check function takes into account recurring events
         (e) => {
-          let strId = Stores.Events.strId(e, true);
+          let strId = Stores.Events.strId(e, ignoreRecurring);
           if (s.eventMap.hasOwnProperty(strId)) {
             return false;
           }
@@ -595,5 +596,13 @@ module Esper.EventStats {
         total: s.total += events.length
       });
     });
+  }
+
+  // Filtering is like counter calc, but include recurring
+  export function simpleFilterCalc(
+    eventsForRanges: Types.EventsForRange[],
+    filterFns: Types.FilterFn[]
+  ) {
+    return simpleCounterCalc(eventsForRanges, filterFns, false);
   }
 }

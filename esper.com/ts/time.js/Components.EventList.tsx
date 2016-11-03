@@ -1,12 +1,14 @@
 /*
   Basic component for rendering a list of events
+
+  TODO: Modify to take Types.EventsForRange[] data / calc.
 */
 
 module Esper.Components {
   export module EventList_ {
     export interface Props {
       events: Types.TeamEvent[];
-      selectedEvents?: Types.TeamEvent[];
+      isSelected?: (event: Types.TeamEvent) => boolean;
       teams: ApiT.Team[];
       onEventToggle?: (event: Types.TeamEvent) => void;
       onEventClick?: (event: Types.TeamEvent) => void;
@@ -88,7 +90,7 @@ module Esper.Components {
           this.props.onEventToggle ?
           <div className="event-checkbox"
                onClick={() => this.props.onEventToggle(event)}>
-            { this.isSelected(event) ?
+            { this.props.isSelected(event) ?
               <i className="fa fa-fw fa-check-square-o" /> :
               <i className="fa fa-fw fa-square-o" />
             }
@@ -97,8 +99,7 @@ module Esper.Components {
         <div className={"title" +
                (this.props.onEventClick ? " esper-link" : "") +
                (Stores.Events.isActive(event) ? "": " no-attend")}
-             onClick={() => this.props.onEventClick &&
-                            this.props.onEventClick(event)}>
+             onClick={(e) => this.onEventClick(e, event)}>
           { event.title ||
             <span className="no-title">{Text.NoEventTitle}</span> }
         </div>
@@ -132,6 +133,14 @@ module Esper.Components {
       </div>;
     }
 
+    onEventClick(e: __React.MouseEvent, event: Types.TeamEvent) {
+      if (this.props.onEventToggle && e.shiftKey) {
+        this.props.onEventToggle(event);
+        return;
+      }
+      this.props.onEventClick && this.props.onEventClick(event);
+    }
+
     getTeam(event: Stores.Events.TeamEvent) {
       return _.find(this.props.teams, (t) => t.teamid === event.teamId);
     }
@@ -140,18 +149,6 @@ module Esper.Components {
       if (this.props.onFeedbackClick) {
         this.props.onFeedbackClick(event);
       }
-    }
-
-    ////////
-
-    isSelected(event: Stores.Events.TeamEvent) {
-      return this.findIndex(event) >= 0;
-    }
-
-    findIndex(event: Stores.Events.TeamEvent) {
-      return _.findIndex(this.props.selectedEvents || [], (e) =>
-        Stores.Events.matchRecurring(e, event)
-      );
     }
   }
 

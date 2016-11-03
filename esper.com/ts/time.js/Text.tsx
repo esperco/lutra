@@ -231,6 +231,21 @@ module Esper.Text {
 
   /////
 
+  // Event list messages
+  export const ListNoData = ChartNoData;
+  export const ListFetching = ChartFetching;
+  export const ListFetchError = ChartFetchError;
+
+  // Event List Text
+  export const WeekView = "Week";
+  export const MonthView = "Month";
+  export const AgendaView = "Agenda";
+  export function eventsSelected(n: number) {
+    return `${events(n)} selected`;
+  }
+
+  /////
+
   function s(n: number) {
     return n != 1 ? 's' : '';
   }

@@ -90,11 +90,8 @@ module Esper.Views {
         <NavLink path={Paths.Time.charts({})}>
           <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
         </NavLink>
-        <NavLink path={Paths.Time.calendarLabeling({})} hiddenXs={true}>
-          <i className="fa fa-fw fa-calendar"></i>{" "}Calendar
-        </NavLink>
         <NavLink path={Paths.Time.list({})}>
-          <i className="fa fa-fw fa-th-list"></i>{" "}Event List
+          <i className="fa fa-fw fa-calendar"></i>{" "}Events
         </NavLink>
         { Login.data.is_sandbox_user ?
           <NavLink path={Paths.Login.home()} className="sandbox-sign-up">
