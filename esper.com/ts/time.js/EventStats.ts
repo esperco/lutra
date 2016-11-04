@@ -524,9 +524,16 @@ module Esper.EventStats {
     groupFn: (event: Types.TeamEvent) => Option.T<string[]>
   ) {
     return defaultGroupCalc(eventsForRanges, (s) => {
+      let eventsForRange = s.eventsForRanges[s.rangeIndex];
+      let [start, end] = eventsForRange ? eventsForRange.range : [null, null];
+
+      // Events to process plus *new* rangeIndex  eventIndex
       let { events, rangeIndex, eventIndex } = batchOverlap(s);
       events = filterEvents(events, filterFns);
-      let weights = weighDuration(events, groupFn);
+      let weights = weighDuration(events, groupFn, {
+        truncateStart: start,
+        truncateEnd: end
+      });
       let group = groupWeights(weights, s, s.group);
       return { eventsForRanges, rangeIndex, eventIndex, group };
     });
