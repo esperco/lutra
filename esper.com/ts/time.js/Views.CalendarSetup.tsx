@@ -23,10 +23,8 @@ module Esper.Views {
       var hasExec = !!_.find(Stores.Teams.all(),
         (t) => t.team_executive !== Login.myUid());
       var busy =  !!_.find(Stores.Teams.allIds(), (_id) =>
-        Stores.Calendars.ListStore.get(_id).match({
-          none: () => false,
-          some: (data) => data.dataStatus === Model2.DataStatus.INFLIGHT
-        })
+        Stores.Calendars.ListStore.get(_id).mapOr(false,
+          (data) => data.dataStatus === Model2.DataStatus.INFLIGHT)
       );
 
       // Call render form here so it's tracked by view's tracking system
@@ -64,9 +62,9 @@ module Esper.Views {
         (available, selected) => Option.cast({
           available: available, selected: selected
         })
-      ).match({
-        none: () => <div className="esper-spinner" />,
-        some: ({available, selected}) =>
+      ).mapOr(
+        <div className="esper-spinner" />,
+        ({available, selected}) =>
           <Components.CalendarList
             ref={(c) => this._teamForms[team.teamid] = c}
             team={team}
@@ -77,7 +75,7 @@ module Esper.Views {
             itemClasses="esper-selectable"
             selectedItemClasses="active"
           />
-      });
+      );
     }
 
     onNext() {

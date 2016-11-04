@@ -13,15 +13,15 @@ module Esper.Components {
       too much.
     */
     render() {
-      return this.getResult().match({
-        none: () => null,
-        some: (s) => {
+      return this.getResult().mapOr(
+        null,
+        (s) => {
           let noGuests = s.group.all.totalUnique === s.group.none.totalUnique;
           return <div>
             { noGuests ? <p>{ Text.ChartNoGuests }</p> : null }
           </div>;
         }
-      });
+      );
     }
   }
 }

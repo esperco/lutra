@@ -31,10 +31,10 @@ module Esper.Actions.TeamPreferences {
 
   // Alters general preferences and saves in store
   export function setGeneral(teamId: string, general: ApiT.GeneralPrefsOpts) {
-    var hasChanges = Stores.TeamPreferences.get(teamId).match({
-      none: () => true,
-      some: (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
-    });
+    var hasChanges = Stores.TeamPreferences.get(teamId).mapOr(
+      true,
+      (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
+    );
 
     if (hasChanges) {
       var promise = Api.setGeneralPreferences(teamId, general);

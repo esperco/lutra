@@ -52,11 +52,10 @@ module Esper.WeekHours {
     return _.sumBy(dates, (date) => {
       let m = moment(date);
       if (weekHours) {
-        return getDayHours(m, weekHours).match({
-          none: () => 0,
-          some: (dh) => m.clone().hour(dh.end.hour).minute(dh.end.minute)
+        return getDayHours(m, weekHours).mapOr(0,
+          (dh) => m.clone().hour(dh.end.hour).minute(dh.end.minute)
             .diff(m.clone().hour(dh.start.hour).minute(dh.start.minute)) / 1000
-        });
+        );
       }
 
       /*
@@ -75,9 +74,8 @@ module Esper.WeekHours {
     let endM = moment(event.end);
     while (startM.diff(endM) < 0) {
       let overlaps = getDayHours(startM, weekHours)
-        .match({
-          none: () => false,
-          some: (dh) => {
+        .mapOr(false,
+          (dh) => {
             // Hours for this day
             let dayStart = startM.clone().startOf('day');
             let dhStart = dayStart.clone().add(dh.start).valueOf();
@@ -92,7 +90,7 @@ module Esper.WeekHours {
 
             return Math.max(dhStart, eventStart) < Math.min(dhEnd, eventEnd);
           }
-        });
+        );
       if (overlaps) return true;
 
       // Go to next day

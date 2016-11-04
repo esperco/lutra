@@ -93,10 +93,10 @@ module Esper.Actions.EventLabels {
       );
       events = events.concat(
         _(Stores.Events.EventStore.all())
-          .filter((d) => d.data.match({
-            none: () => false,
-            some: (e) => _.includes(recurringEventIds, e.recurringEventId)
-          }))
+          .filter((d) => d.data.mapOr(
+            false,
+            (e) => _.includes(recurringEventIds, e.recurringEventId)
+          ))
           .map((d) => d.data.unwrap())
           .value()
       );
@@ -201,13 +201,13 @@ module Esper.Actions.EventLabels {
     return _.map(event.hashtags, (h) => ({
       hashtag: h.hashtag,
       label: h.label,
-      approved: event.labelScores.match({
-        none: () => false,
-        some: (labels) => _.some(labels,
-          (l) => h.label ? h.label.normalized == l.id
-                         : h.hashtag.normalized == l.id
+      approved: event.labelScores.mapOr(
+        false,
+        (labels) => _.some(labels,
+          (l) => h.label ? h.label.normalized === l.id
+                         : h.hashtag.normalized === l.id
         )
-      })
+      )
     }));
   }
 
@@ -225,13 +225,10 @@ module Esper.Actions.EventLabels {
         var promises =
         _(r.events)
           .filter(Stores.Events.isActive)
-          .map((e) => e.labelScores.match({
-            none: () => null,
-            some: (labels) => {
-              if (_.isEmpty(e.hashtags)) {
-                return null;
-              }
-              return Api.updateHashtagStates(e.teamId,
+          .map((e) => e.labelScores.mapOr(
+            null,
+            (labels) => _.isEmpty(e.hashtags) ? null :
+              Api.updateHashtagStates(e.teamId,
                 e.recurringEventId || e.id,
                 {
                   hashtag_states: _.map(e.hashtags, (h) => ({
@@ -239,9 +236,9 @@ module Esper.Actions.EventLabels {
                     approved: h.approved
                   }))
                 }
-              );
-            }
-          }))
+              )
+            )
+          )
           .compact()
           .value();
 
@@ -249,9 +246,8 @@ module Esper.Actions.EventLabels {
           set_labels: _.map(r.events, (e) => Stores.Events.isActive(e) ?
             {
               id: e.recurringEventId || e.id,
-              labels: e.labelScores.match({
-                none: (): string[] => [],
-                some: (scores) =>
+              labels: e.labelScores.mapOr([],
+                (scores) => 
                   _(scores)
                     .filter(
                       (s) => !_.some(e.hashtags,
@@ -259,7 +255,7 @@ module Esper.Actions.EventLabels {
                                        : h.hashtag.normalized === s.id))
                     .map((s) => s.displayAs)
                     .value()
-              }),
+              ),
               attended: true
             } : {
               id: e.recurringEventId || e.id,

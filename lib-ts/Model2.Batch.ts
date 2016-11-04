@@ -88,10 +88,8 @@ module Esper.Model2 {
       : Option.T<BatchStoreData<BatchKey, ItemKey, ItemData>>
     {
       return this.get(batchKey).flatMap((x) => {
-        var items = x.data.match({
-          none: (): Option.T<StoreData<ItemKey, ItemData>>[] => [],
-          some: (d) => _.map(d, (k) => this.itemStore.get(k))
-        });
+        var items = x.data.mapOr([],
+          (d) => _.map(d, (k) => this.itemStore.get(k)));
 
         // If store references missing item, this fetch is invalid. Mark
         // key as None.

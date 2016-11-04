@@ -151,10 +151,7 @@ module Esper.Option {
     Otherwise, `none: () => []` will return any
   */
   export function matchList<E>(opt: T<E[]>): E[] {
-    return opt.match({
-      none: (): E[] => [],
-      some: (s) => s
-    });
+    return opt.unwrapOr([]);
   }
 
   /*
@@ -164,10 +161,7 @@ module Esper.Option {
   export function eq<E>(a:T<E>, b:T<E>): boolean {
     return a.match({
       none: () => b.isNone(),
-      some: (v1) => b.match({
-        none: () => false,
-        some: (v2) => v1 === v2
-      })
+      some: (v1) => b.mapOr(false, (v2) => v1 === v2)
     });
   }
 }

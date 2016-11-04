@@ -31,10 +31,7 @@ module Esper.Params{
   }
 
   function dayHourJSON(o: Option.T<Types.DayHours>) {
-    return o.match({
-      none: () => null,
-      some: (dh) => _.isEqual(dh, allDay) ? {} : dh
-    });
+    return o.mapOr(null, (dh) => _.isEqual(dh, allDay) ? {} : dh);
   }
 
   export function cleanWeekHours(weekHours?: Types.WeekHours) {

@@ -109,17 +109,15 @@ module Esper.Views {
 
       if (eventData.length) {
         var heading = (eventData.length === 1 ?
-          eventData[0].data.match({
-            none: () => "",
-            some: (e) => e.title
-          }) || "1 Event Selected" :
+          eventData[0].data.mapOr("", (e) => e.title) || "1 Event Selected"
+          :
           eventData.length + " Events Selected"
         );
         var hasRecurring = false;
-        if (_.find(eventData, (e) => e.data.match({
-          none: () => false,
-          some: (e) => !!e.recurringEventId
-        }))) {
+        if (_.find(eventData, (e) => e.data.mapOr(
+          false,
+          (e) => !!e.recurringEventId
+        ))) {
           hasRecurring = true;
         }
 

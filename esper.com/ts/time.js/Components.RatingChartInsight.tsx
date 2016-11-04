@@ -9,14 +9,14 @@ module Esper.Components {
     getGroupBy() { return Charting.GroupByRating; }
 
     render() {
-      return this.getResult().match({
-        none: () => null,
+      return this.getResult().mapOr(
+        null,
 
         /*
           NB: We'd move more of this to Text namespace but given the complexity
           of the scenarios, leave alone for the time being
         */
-        some: (s) => {
+        (s) => {
           let totalSome = s.group.all.totalValue -
                           s.group.none.totalValue;
           let totalRating = 0;
@@ -95,7 +95,7 @@ module Esper.Components {
             }
           </div>;
         }
-      });
+      );
     }
   }
 }

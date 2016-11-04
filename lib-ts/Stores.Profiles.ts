@@ -30,10 +30,9 @@ module Esper.Stores.Profiles {
   }
 
   export function status() {
-    return ProfileStore.get(statusId).match({
-      none: () => Model2.DataStatus.FETCH_ERROR,
-      some: (s) => s.dataStatus
-    });
+    return ProfileStore.get(statusId).mapOr(
+      Model2.DataStatus.FETCH_ERROR,
+      (s) => s.dataStatus);
   }
 
   var profilesLoadedDfd: JQueryDeferred<void>;
