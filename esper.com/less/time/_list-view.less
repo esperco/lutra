@@ -1,5 +1,102 @@
 @import "../lib/_bootstrap-variables.less";
 
+#list-header {
+  @media screen and (max-width: @screen-xs-max) {
+    > .actions { display: none; }
+  }
+
+  @media screen and (min-width: @screen-sm-min) {
+    display: flex;
+    align-items: center;
+    > * { flex: 1 1 auto; }
+    > .actions { flex: 0 0 auto; }
+  }
+}
+
+#list-view {
+  .select-action {
+    text-align: center;
+    color: @shade-text-muted;
+  }
+
+  .select-action:hover {
+    color: @shade-text;
+  }
+
+  .unselect-action {
+    color: @shade-text-header;
+    text-transform: capitalize;
+    font-weight: bold;
+
+    .fa {
+      float: right;
+      line-height: @line-height-computed;
+      color: @shade-text-muted;
+    }
+
+    &:hover .fa { color: @shade-text-header; }
+  }
+
+  .aggregate-hours {
+    color: @shade-text-muted;
+  }
+}
+
+.month-view {
+  margin: @esper-base-padding;
+
+  @media screen and (min-width: @screen-sm-min) {
+    .calendar-grid {
+      // Same min-height as charts page
+      min-height: calc(~"100vh - "(@navbar-height + @content-header-height +
+        @input-height-base + @esper-base-padding));
+    }
+  }
+}
+
+.week-view, .month-view {
+  .event {
+    margin: 1px;
+    border: 1px solid @brand-border;
+    padding: 2px;
+    font-size: @font-size-small;
+    min-height: 100%;
+    background: @shade-bg;
+    border-radius: @border-radius-small;
+
+    .fa.check {
+      padding-right: @padding-xs-horizontal;
+      cursor: pointer;
+    }
+
+    &.selected {
+      font-weight: bold;
+      box-shadow: @default-box-shadow;
+    }
+  }
+
+  .stacked-event .event {
+    height: 100%;
+    min-height: @line-height-computed;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+
+  .esper-expanded & {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .today .day-number, .today.week-date {
+    font-weight: bold;
+    color: @brand-info;
+  }
+}
+
+
 @media screen and (max-width: @screen-xs-max) {
   .container.filter-list {
     /*

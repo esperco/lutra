@@ -14,6 +14,7 @@ module Esper.Components {
     teams: ApiT.Team[];
 
     minFeedback?: boolean;
+    forceBatch?: boolean;
     initAction?: boolean;
     focusOnLabels?: boolean;
     className?: string;
@@ -29,11 +30,11 @@ module Esper.Components {
     return props.eventData[0].data.mapOr(
       null,
       (firstEvent) => <div className={props.className}>
-        { props.eventData.length === 1 ?
+        { props.eventData.length === 1 && !props.forceBatch ?
           <EventDetails event={firstEvent} /> :
           null
         }
-        { props.eventData.length === 1 ?
+        { props.eventData.length === 1 && !props.forceBatch ?
           <EventFeedback event={firstEvent}
                          status={props.eventData[0].dataStatus}
                          initAction={props.initAction}
@@ -41,10 +42,10 @@ module Esper.Components {
                                   props.minFeedback} /> :
           null
         }
-        { props.eventData.length > 1 ||
+        { props.eventData.length > 1 || props.forceBatch ||
           Stores.Events.isActive(firstEvent) ?
           <div className="esper-panel-section">
-            { props.eventData.length === 1 ?
+            { props.eventData.length === 1 && !props.forceBatch ?
 
               /*
                 Only one event => use label list (same list as used with

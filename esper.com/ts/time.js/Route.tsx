@@ -59,7 +59,7 @@ module Esper.Route {
   /*
     Generic cleaning + routing function for our chart functions
   */
-  function routeChart<T>(
+  function routeChart(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
     cbFn: (o: Types.ChartParams) => void
   ) {
@@ -94,57 +94,38 @@ module Esper.Route {
   routeChart(Paths.Time.labelsChart, Actions.Charts.renderLabels);
   routeChart(Paths.Time.ratingsChart, Actions.Charts.renderRatings);
 
-  // Calendar labeling page
-  route(Paths.Time.calendarLabeling({
-    teamId: ":teamId?",
-    calIds: ":calIds?",
-    interval: ":interval?",
-    period: ":period?"
-  }).hash, checkOnboarding, function(ctx) {
-    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
-    var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
-    var interval = Params.cleanInterval(ctx.params["interval"], "month");
-    var period = Params.cleanPeriod(interval, ctx.params["period"]);
-    Actions.renderCalendarLabeling(_.map(calIds, (calId) => ({
-      teamId: teamId,
-      calId: calId
-    })), period);
-  });
 
-  route(Paths.Time.list({
-    teamId: ":teamId?",
-    calIds: ":calIds?",
-    interval: ":interval?",
-    period: ":period?"
-  }).hash, checkOnboarding, function(ctx) {
-    var q = Params.cleanFilterStrJSON(
-      getJSONQuery(ctx)
-    ) as Params.FilterListJSON;
-    q.labels = Params.cleanListSelectJSON(q.labels);
-    q.unconfirmed = Params.cleanBoolean(q.unconfirmed);
+  function routeList(
+    pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
+    cbFn: (o: Types.ChartParams) => void
+  ) {
+    route(pathFn({
+      teamId: ":teamId?",
+      calIds: ":calIds?",
+      interval: ":interval?",
+      period: ":period?"
+    }).hash, checkOnboarding, function(ctx) {
+      var teamId = Params.cleanTeamId(ctx.params["teamId"]);
+      var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
+      var interval = Params.cleanInterval(ctx.params["interval"], "week");
+      var period = Params.cleanPeriod(interval, ctx.params["period"]);
 
-    var teamId = Params.cleanTeamId(ctx.params["teamId"]);
-    var interval = Params.cleanInterval(ctx.params["interval"], "month");
-    var period = Params.cleanPeriod(interval, ctx.params["period"]);
-    Actions.renderFilterList({
-      cals: Params.cleanCalSelections(teamId, ctx.params["calIds"]),
-      period: period
-    }, q)
-  });
+      // CalIds not in querystring but actual path (for now)
+      var extra =  getJSONQuery(ctx) || {};
+      extra.calIds = ctx.params["calIds"];
 
-  // Alias for showing unconfirmed events only in list view
-  route(Paths.Time.listNew({
-    teamId: ":teamId?",
-    calIds: ":calIds?",
-    interval: ":interval?",
-    period: ":period?"
-  }).hash, function(ctx) {
-    Route.nav.go(Paths.Time.list(ctx.params), {
-      jsonQuery: {
-        unconfirmed: true
-      }
+      cbFn({
+        teamId: teamId,
+        period: period,
+        extra: Charting.cleanExtra(extra)
+      });
     });
-  });
+  }
+
+  routeList(Paths.Time.listWeek, Actions.renderWeek);
+  routeList(Paths.Time.listMonth, Actions.renderMonth);
+  routeList(Paths.Time.listAgenda, Actions.renderAgenda);
+  routeList(Paths.Time.list, Actions.renderAgenda); // Default
 
 
   /* Onboarding */
@@ -194,6 +175,14 @@ module Esper.Route {
   // Redirect old charts to new
   route("/charts/:chartId?/:teamId?/:calIds?/:interval?/:period?",
     redirectPath(Paths.Time.charts()));
+
+  // Redirect old unconfirmed link
+  route("/list-new/:teamId?/:calIds?/:interval?/:period?",
+    redirectPath(Paths.Time.report()));
+
+  // Redirect old calendar labeling page
+  route("/calendar-labeling/:teamId?/:calIds?/:interval?/:period?",
+    redirectPath(Paths.Time.list()));
 
   // 404 page
   routeNotFound(function(ctx) {

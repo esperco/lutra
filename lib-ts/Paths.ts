@@ -145,32 +145,32 @@ module Esper.Paths {
                      teamId, calIds, interval, period);
     }
 
-    export function calendarLabeling({teamId, calIds, interval, period}: {
-      teamId?: string;
-      calIds?: string;
-      interval?: string;
-      period?: string;
-    } = {}) {
-      return optPath(prefix, "calendar-labeling",
-                     teamId, calIds, interval, period);
-    }
+    export type listPathOpts = chartPathOpts;
 
-    export function list({teamId, calIds, interval, period}: {
-      teamId?: string;
-      calIds?: string;
-      interval?: string;
-      period?: string;
-    } = {}) {
+    // Old path (redirect to one of listWeek, listMonth, or listAgenda)
+    export function list({
+      teamId, calIds, interval, period
+    }: listPathOpts = {}) {
       return optPath(prefix, "list", teamId, calIds, interval, period);
     }
 
-    export function listNew({teamId, calIds, interval, period}: {
-      teamId?: string;
-      calIds?: string;
-      interval?: string;
-      period?: string;
-    } = {}) {
-      return optPath(prefix, "list-new", teamId, calIds, interval, period);
+    export function listWeek({
+      teamId, calIds, interval, period
+    }: listPathOpts = {}) {
+      return optPath(prefix, "list", "week", teamId, calIds, interval, period);
+    }
+
+    export function listMonth({
+      teamId, calIds, interval, period
+    }: listPathOpts = {}) {
+      return optPath(prefix, "list", "month", teamId, calIds, interval, period);
+    }
+
+    export function listAgenda({
+      teamId, calIds, interval, period
+    }: listPathOpts = {}) {
+      return optPath(prefix,
+        "list", "agenda", teamId, calIds, interval, period);
     }
 
     export function labelSetup({} = {}) {

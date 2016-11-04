@@ -72,7 +72,6 @@ module Esper.Analytics {
     TimeStats,             // /#!/
     Report,                // /#!/charts
     TimeStatsCharts,       // /#!/charts/<something>
-    CalendarLabeling,      // /#!/calendar-labeling
     CalendarSetup,         // /#!/calendar-setup
     EventFeedback,         // /#!/event
     EventList,             // /#!/list

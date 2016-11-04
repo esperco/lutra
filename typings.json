@@ -7,7 +7,6 @@
     "cryptojs": "github:esperco/DefinitelyTyped/cryptojs/cryptojs.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "es6-promise": "github:esperco/DefinitelyTyped/es6-promise/es6-promise.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
     "eventemitter3": "github:esperco/DefinitelyTyped/eventemitter3/eventemitter3.d.ts#f53108644c2f32b93de423d844650297fc415a8b",
-    "fullcalendar": "registry:dt/fullcalendar#1.6.1+20160317120654",
     "highcharts": "github:fongandrew/DefinitelyTyped/highcharts/highcharts.d.ts#333a3e05ae1f762b1ec068f0e508e4967c6119f4",
     "intercom": "github:esperco/intercom-typings/index.d.ts#dd5e97897b6434e761a2267672aeacc7af0f87b5",
     "jasmine": "github:esperco/DefinitelyTyped/jasmine/jasmine.d.ts#f53108644c2f32b93de423d844650297fc415a8b",

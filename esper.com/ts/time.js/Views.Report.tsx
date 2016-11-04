@@ -131,9 +131,8 @@ module Esper.Views {
       Don't update if props are mostly the same. This should be by-passed if
       calc is firing because it calls forceUpdate
     */
-    shouldComponentUpdate(newProps: ReportMainProps) {
-      return !Charting.eqProps(newProps, this.props) ||
-        this.props.seeMoreHintDismissed !== newProps.seeMoreHintDismissed;
+    shouldCalcUpdate(newProps: ReportMainProps) {
+      return !Charting.eqProps(newProps, this.props);
     }
 
     renderResult({group}: {group: Types.RangesGroup}) {
