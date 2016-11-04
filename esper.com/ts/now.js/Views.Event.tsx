@@ -89,10 +89,7 @@ module Esper.Views {
         teamId,
         calId: this.props.calId,
         eventId: this.props.eventId
-      }).match({
-        none: (): Types.TeamEvent => null,
-        some: (d) => d.data.unwrapOr(null)
-      });
+      }).flatMap((d) => d.data).unwrapOr(null);
 
       if (eventOrNull) {
         Actions.goToEvent(eventOrNull);
@@ -103,10 +100,7 @@ module Esper.Views {
           teamId: this.props.teamId,
           calId: this.props.calId,
           eventId: this.props.eventId
-        }).match({
-          none: (): Types.TeamEvent => null,
-          some: (d) => d.data.unwrapOr(null)
-        });
+        }).flatMap((d) => d.data).unwrapOr(null);
 
         if (currentEventOrNull) {
           // Go to start of event

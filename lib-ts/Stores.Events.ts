@@ -521,13 +521,12 @@ module Esper.Stores.Events {
       ));
 
     return _.filter(event.guests,
-      (g) => g.response !== 'Declined' && optEmails.match({
-        none: () => true,
-        some: (execEmails) => !_.includes(
+      (g) => g.response !== 'Declined' && optEmails.mapOr(true,
+        (execEmails) => !_.includes(
           _.map(execEmails, (e) => e.toLowerCase()),
           (g.email || "").toLowerCase()
         )
-      })
+      )
     );
   }
 
@@ -549,11 +548,10 @@ module Esper.Stores.Events {
   }
 
   export function getLabels(event: TeamEvent, includePredicted=true) {
-    return event.labelScores.match({
-      none: (): Labels.Label[] => [],
-      some: (scores) => includePredicted ?
+    return event.labelScores.mapOr([],
+      (scores) => includePredicted ?
         scores : _.filter(scores, (s) => s.score === 1)
-    });
+    );
   }
 
   export function getLabelIds(event: TeamEvent, includePredicted=true) {
@@ -564,10 +562,10 @@ module Esper.Stores.Events {
     Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
-    return event.attendScore > 0 && (event.labelScores.match({
+    return event.attendScore > 0 && (event.labelScores.mapOr(
 
       // None => no label or user action, so can confirm  empty
-      none: () => true,
+      true,
 
       /*
         Some => only confirm if score < 1 (don't need to confirm user labels)
@@ -576,9 +574,9 @@ module Esper.Stores.Events {
         should be buffered on the backend. If none of the predictions cross
         the threshold, then labelScores should be none.
       */
-      some: (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
-                        _.some(event.hashtags, (h) => !_.isBoolean(h.approved))
-    }) || (event.attendScore < 1));
+      (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
+                  _.some(event.hashtags, (h) => !_.isBoolean(h.approved))
+    ) || (event.attendScore < 1));
   }
 
   export function getTeams(events: TeamEvent[]) {
@@ -616,10 +614,8 @@ module Esper.Stores.Events {
     var guests = _.map(e.guests,
       (g) => g.display_name + " " + g.email
     );
-    var labels = e.labelScores.match({
-      none: (): string[] => [],
-      some: (scores) => _.map(scores, (l) => l.displayAs)
-    });
+    var labels = e.labelScores.mapOr([],
+      (scores) => _.map(scores, (l) => l.displayAs));
 
     var filterText = [title, description]
                       .concat(guests)

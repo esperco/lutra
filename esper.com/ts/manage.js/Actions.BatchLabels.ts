@@ -33,10 +33,7 @@ module Esper.Actions.BatchLabels {
 
   export function getStatus(teamId: string) {
     return Store.get(teamId)
-      .match({
-        none: () => Model2.DataStatus.READY,
-        some: (m) => m.dataStatus
-      });
+      .mapOr(Model2.DataStatus.READY, (m) => m.dataStatus);
   }
 
   function queueBatchLabelUpdate(teamId: string, label: string, opt: {

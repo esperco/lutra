@@ -25,14 +25,10 @@ module Esper.Views {
         </div>;
       }
 
-      var busy = Stores.Teams.status(this.props.teamId).match({
-        none: () => false,
-        some: (d) => d === Model2.DataStatus.INFLIGHT
-      });
-      var error = Stores.Teams.status(this.props.teamId).match({
-        none: () => true,
-        some: (d) => d === Model2.DataStatus.PUSH_ERROR
-      });
+      var busy = Stores.Teams.status(this.props.teamId)
+        .mapOr(false, (d) => d === Model2.DataStatus.INFLIGHT);
+      var error = Stores.Teams.status(this.props.teamId)
+        .mapOr(true, (d) => d === Model2.DataStatus.PUSH_ERROR);
 
       var members = Option.flatten(
         _.map(team.team_assistants,
@@ -93,14 +89,14 @@ module Esper.Views {
     render() {
       return this.props.exec.join(this.props.prefs,
         (exec, prefs) => Option.some({exec: exec, prefs: prefs})
-      ).match({
-        none: () => <div className="panel panel-default">
+      ).mapOr(
+        <div className="panel panel-default">
           <div className="panel-body">
             <div className="esper-spinner" />
           </div>
         </div>,
 
-        some: ({exec, prefs}) => <div className="panel panel-default">
+        ({exec, prefs}) => <div className="panel panel-default">
           <div className="panel-body">
             <Components.TeamForm ref={(c) => this._form = c}
               name={this.props.team.team_name}
@@ -119,7 +115,7 @@ module Esper.Views {
             onOK={() => this.save()} okText="Save"
           />
         </div>
-      });
+      );
     }
 
     // Save after inactivity

@@ -24,13 +24,13 @@ module Esper.Components {
         return <div className="esper-spinner"></div>;
       }
 
-      return this.props.loginInfo.match({
-        none: () => <button className="btn btn-default navbar-btn"
+      return this.props.loginInfo.mapOr(
+        <button className="btn btn-default navbar-btn"
           onClick={() => Login.goToLogin()}>
           Login / Signup
         </button>,
 
-        some: (info) => <Dropdown className="dropdown">
+        (info) => <Dropdown className="dropdown">
           <a className="dropdown-toggle navbar-link">
             {info.email}{" "}
             <span className="caret"></span>
@@ -39,7 +39,7 @@ module Esper.Components {
             { this.props.children }
           </ul>
         </Dropdown>
-      })
+      )
     }
   }
 }

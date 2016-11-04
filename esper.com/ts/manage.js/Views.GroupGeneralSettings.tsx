@@ -10,14 +10,10 @@ module Esper.Views {
     pathFn = Paths.Manage.Group.general;
 
     renderMain(group: ApiT.Group) {
-      var busy = Stores.Groups.status(this.props.groupId).match({
-        none: () => false,
-        some: (d) => d === Model2.DataStatus.INFLIGHT
-      });
-      var error = Stores.Groups.status(this.props.groupId).match({
-        none: () => true,
-        some: (d) => d === Model2.DataStatus.PUSH_ERROR
-      });
+      var busy = Stores.Groups.status(this.props.groupId)
+        .mapOr(false, (d) => d === Model2.DataStatus.INFLIGHT);
+      var error = Stores.Groups.status(this.props.groupId)
+        .mapOr(true, (d) => d === Model2.DataStatus.PUSH_ERROR);
 
       var myself = _.find(group.group_individuals, function(gim) {
         return gim.uid === Login.me();

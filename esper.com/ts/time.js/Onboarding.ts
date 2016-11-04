@@ -21,10 +21,7 @@ module Esper.Onboarding {
   export function needsCalendars() {
     var teamWithoutCal = _.find(Stores.Teams.all(), (t) => {
       var cals = Stores.Calendars.list(t.teamid);
-      return cals.match({
-        none: () => true,
-        some: (s) => s.length === 0
-      });
+      return cals.mapOr(true, (s) => s.length === 0);
     });
     return needsTeam() || !!teamWithoutCal;
   }

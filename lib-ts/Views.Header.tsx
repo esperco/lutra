@@ -48,10 +48,10 @@ module Esper.Views {
             </div>
 
             <div className="hidden-xs">
-              { hasTeams ? loginInfo.match({
-                none: () => null,
-                some: () => this.navLinks("nav navbar-nav")
-              }) : null}
+              { hasTeams ? loginInfo.mapOr(null,
+                () => this.navLinks("nav navbar-nav"))
+                : null
+              }
 
               <div className="navbar-text pull-right">
                 <Components.LoginInfo loginInfo={loginInfo} busy={busy}>

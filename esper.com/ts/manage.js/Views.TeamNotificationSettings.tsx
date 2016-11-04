@@ -11,16 +11,13 @@ module Esper.Views {
 
     renderMain(team: ApiT.Team) {
       var teamId = team.teamid;
-      var calendars = Stores.Calendars.list(teamId).match({
-        none: (): ApiT.GenericCalendar[] => [],
-        some: (l) => l
-      });
+      var calendars = Stores.Calendars.list(teamId).unwrapOr([]);
 
       var prefs = Stores.TeamPreferences.get(team.teamid);
       var slackAuthorized = Stores.TeamPreferences.slackAuthorized(team.teamid);
-      return prefs.match({
-        none: () => <i className="esper-spinner" />,
-        some: (p) => {
+      return prefs.mapOr(
+        <i className="esper-spinner" />,
+        (p) => {
           let prefsWithDefaults = Stores.TeamPreferences.withDefaults(p);
 
           return <div>
@@ -30,7 +27,7 @@ module Esper.Views {
             />
           </div>;
         }
-      });
+      );
     }
   }
 
@@ -103,18 +100,14 @@ module Esper.Views {
   }) {
     var execTeam = team.team_executive !== Login.myUid();
     var email = execTeam ?
-      Stores.Profiles.get(team.team_executive).match({
-        none: () => Login.myEmail(),
-        some: (p) => p.email
-      }) :
-      Login.myEmail();
+      Stores.Profiles.get(team.team_executive)
+        .mapOr(Login.myEmail(), (p) => p.email)
+      : Login.myEmail();
 
     var sendEmail = prefs.timestats_notify.email_for_meeting_feedback;
     var sendSlack = prefs.timestats_notify.slack_for_meeting_feedback;
-    var showSlackError = sendSlack && !execTeam && !slackAuthorized.match({
-      none: () => true,
-      some: (d) => d
-    });
+    var showSlackError =
+      sendSlack && !execTeam && !slackAuthorized.unwrapOr(true);
 
     return <div className="panel panel-default">
       <div className="panel-heading">

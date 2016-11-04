@@ -9,14 +9,14 @@ module Esper.Components {
     getGroupBy() { return Charting.GroupByDomain; }
 
     render() {
-      return this.getResult().match({
-        none: () => null,
+      return this.getResult().mapOr(
+        null,
 
         /*
           NB: We'd move more of this to Text namespace but given the complexity
           of the scenarios, leave alone for the time being
         */
-        some: (s) => <div>{
+        (s) => <div>{
           Insights.matchScenario(s.group, {
             allNone: () => <p>{ Text.ChartNoGuests }</p>,
 
@@ -44,7 +44,7 @@ module Esper.Components {
             </p>
           })
         }</div>
-      });
+      );
     }
   }
 

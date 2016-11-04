@@ -4,7 +4,7 @@
 
 /// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.LabelList.tsx" />
-/// <reference path="./Components.TextArea.tsx" />
+/// <reference path="./Components.Textarea.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -27,9 +27,9 @@ module Esper.Components {
 
     let events = Option.flatten(_.map(props.eventData, (e) => e.data));
     let inputId = Util.randomString();
-    return props.eventData[0].data.match({
-      none: () => <div />,
-      some: (firstEvent) => <div className={props.className}>
+    return props.eventData[0].data.mapOr(
+      null,
+      (firstEvent) => <div className={props.className}>
         { props.eventData.length === 1 && !props.forceBatch ?
           <EventDetails event={firstEvent} /> :
           null
@@ -83,7 +83,7 @@ module Esper.Components {
 
           </div> : null }
       </div>
-    });
+    );
   }
 
   ////
@@ -96,16 +96,18 @@ module Esper.Components {
       extends Component<EventEditorModalProps, {}> {
     render() {
       var heading: JSX.Element|string = (this.props.eventData.length === 1 ?
-        this.props.eventData[0].data.match({
-          none: () => null,
-          some: (e) => e.title ? <span className={classNames("title", {
-            "no-attend": !Stores.Events.isActive(e)
-          })}>
-            {e.title}
-          </span> : <span className="no-title">
-            { Text.NoEventTitle }
-          </span>
-        }) || "1 Event Selected" :
+        this.props.eventData[0].data.mapOr(
+          null,
+          (e) => e.title ?
+            <span className={classNames("title", {
+              "no-attend": !Stores.Events.isActive(e)
+            })}>
+              {e.title}
+            </span> :
+            <span className="no-title">
+              { Text.NoEventTitle }
+            </span>
+        ) || "1 Event Selected" :
         this.props.eventData.length + " Events Selected"
       );
 

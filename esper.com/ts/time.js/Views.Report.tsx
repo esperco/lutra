@@ -383,27 +383,23 @@ module Esper.Views {
 
     // Button to manually launch
     render() {
-      return this.state.result.match({
-        none: () => null,
-        some: (counts) => {
-          if (counts.total > 0) {
-            return <div className="esper-panel-section">
-              <div className="esper-select-menu">
-                <div className="esper-selectable unconfirmed-link" onClick={
-                  () => this.launchModal(counts.events)
-                }>
-                  <i className="fa fa-fw fa-left fa-flash" />
-                  { Text.Unconfirmed }
-                  <Components.Badge
-                    text={counts.total.toString()}
-                  />
-                </div>
+      return this.state.result.mapOr(
+        null,
+        (counts) => counts.total > 0 ?
+          <div className="esper-panel-section">
+            <div className="esper-select-menu">
+              <div className="esper-selectable unconfirmed-link" onClick={
+                () => this.launchModal(counts.events)
+              }>
+                <i className="fa fa-fw fa-left fa-flash" />
+                { Text.Unconfirmed }
+                <Components.Badge
+                  text={counts.total.toString()}
+                />
               </div>
-            </div>;
-          }
-          return null;
-        }
-      });
+            </div>
+          </div> : null
+      );
     }
 
     launchModal(events: Types.TeamEvent[]) {

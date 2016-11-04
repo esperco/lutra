@@ -11,10 +11,8 @@ module Esper.Views {
 
     renderMain(team: ApiT.Team) {
       let subscription = team.team_api.team_subscription;
-      let subBusy = Stores.Subscriptions.status(subscription.cusid).match({
-        none: () => false,
-        some: (d) => d === Model2.DataStatus.FETCHING
-      });
+      let subBusy = Stores.Subscriptions.status(subscription.cusid)
+        .mapOr(false, (d) => d === Model2.DataStatus.FETCHING);
       let custBusy = !Stores.Customers.ready();
       if (subBusy || custBusy) {
         return <div className="esper-spinner" />;

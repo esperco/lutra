@@ -50,24 +50,14 @@ module Esper.Stores.Groups {
   }
 
   export function all(): ApiT.Group[] {
-    return GroupListStore.batchGet(batchKey).match({
-      none: (): ApiT.Group[] => [],
-      some: (d) => d.data.match({
-
-        none: (): ApiT.Group[] => [],
-        some: (items) => Option.flatten(_.map(items, (i) => i.data))
-      })
-    });
+    return GroupListStore.batchGet(batchKey).mapOr([],
+      (d) => d.data.mapOr([],
+        (items) => Option.flatten(_.map(items, (i) => i.data))));
   }
 
   export function allIds(): string[] {
-    return GroupListStore.get(batchKey).match({
-      none: () => [],
-      some: (d) => d.data.match({
-        none: () => [],
-        some: (ids) => ids
-      })
-    });
+    return GroupListStore.get(batchKey).mapOr([],
+      (d) => d.data.unwrapOr([]));
   }
 
   export function first(): ApiT.Group {

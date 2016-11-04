@@ -31,6 +31,11 @@ module Esper.Option {
         var mapped = this.option.flatMap((p: P) => Option.wrap(p.x));
         expect(mapped.unwrap()).toEqual(5);
       });
+
+      it("should run the closure given to mapOr", function() {
+        var value = this.option.mapOr("NONE", (p: P) => "SOME");
+        expect(value).toEqual("SOME");
+      })
     });
 
     describe("with null", function() {
@@ -60,6 +65,11 @@ module Esper.Option {
         var mapped = this.option.flatMap((p: P) => Option.wrap(p.x));
         expect(mapped.isNone()).toBe(true);
       });
+
+      it("should return the fallback value given to mapOr", function() {
+        var value = this.option.mapOr("NONE", (p: P) => "SOME");
+        expect(value).toEqual("NONE");
+      })
     });
 
     describe("with false", function() {

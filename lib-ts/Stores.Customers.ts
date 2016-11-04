@@ -49,23 +49,15 @@ module Esper.Stores.Customers {
   }
 
   export function all(): ApiT.Customer[] {
-    return CustomerListStore.batchGet(batchKey).match({
-      none: (): ApiT.Customer[] => [],
-      some: (d) => d.data.match({
-        none: (): ApiT.Customer[] => [],
-        some: (items) => Option.flatten(_.map(items, (i) => i.data))
-      })
-    });
+    return CustomerListStore.batchGet(batchKey).mapOr([],
+      (d) => d.data.mapOr([],
+        (items) => Option.flatten(_.map(items, (i) => i.data)))
+    );
   }
 
   export function allIds(): string[] {
-    return CustomerListStore.get(batchKey).match({
-      none: () => [],
-      some: (d) => d.data.match({
-        none: () => [],
-        some: (ids) => ids
-      })
-    });
+    return CustomerListStore.get(batchKey).mapOr([],
+      (d) => d.data.unwrapOr([]));
   }
 
   export function first(): ApiT.Customer {
@@ -91,10 +83,8 @@ module Esper.Stores.Customers {
   }
 
   export function ready() {
-    return CustomerListStore.batchGet("").match({
-      none: () => false,
-      some: (d) => d.dataStatus === Model2.DataStatus.READY
-    });
+    return CustomerListStore.batchGet("").mapOr(false,
+      (d) => d.dataStatus === Model2.DataStatus.READY);
   }
 
   export function remove(cusId: string) {

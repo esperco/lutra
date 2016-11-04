@@ -9,10 +9,8 @@ module Esper.Views {
     pathFn = Paths.Manage.Customer.pay;
 
     renderMain(cust: ApiT.Customer) {
-      var busy = Stores.Subscriptions.status(cust.id).match({
-        none: () => false,
-        some: (d) => d === Model2.DataStatus.FETCHING
-      });
+      var busy = Stores.Subscriptions.status(cust.id)
+        .mapOr(false, (d) => d === Model2.DataStatus.FETCHING);
       if (busy) {
         return <div className="esper-spinner" />;
       }

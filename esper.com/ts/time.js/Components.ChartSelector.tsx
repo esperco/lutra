@@ -42,11 +42,11 @@ module Esper.Components {
     }
 
     render() {
-      return this.state.result.match({
-        none: () => <div className="esper-no-content">
+      return this.state.result.mapOr(
+        <div className="esper-no-content">
           { Text.UICalculating }
         </div>,
-        some: (results) => {
+        (results) => {
           let groupBy = this.props.groupBy;
           let keys = groupBy.selectorKeysFn ?
             groupBy.selectorKeysFn(results.group, this.props) :
@@ -94,7 +94,7 @@ module Esper.Components {
             itemClasses="esper-selectable"
           />;
         }
-      });
+      );
     }
   }
 

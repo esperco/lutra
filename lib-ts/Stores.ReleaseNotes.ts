@@ -8,10 +8,9 @@ module Esper.Stores.ReleaseNotes {
   const storeKey: 'lastDismiss' = "lastDismiss";
 
   export function get(): number {
-    return DismissStore.get(storeKey).flatMap((p) => p.data).match({
-      some: (n) => n,
-      none: () => LocalStore.get(storeKey) || 0
-    });
+    return DismissStore.get(storeKey)
+      .flatMap((p) => p.data)
+      .unwrapOr(LocalStore.get(storeKey) || 0);
   }
 
   export function set(value: number) {

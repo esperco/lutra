@@ -31,10 +31,10 @@ module Esper.Actions.TeamPreferences {
 
   // Alters general preferences and saves in store
   export function setGeneral(teamId: string, general: ApiT.GeneralPrefsOpts) {
-    var hasChanges = Stores.TeamPreferences.get(teamId).match({
-      none: () => true,
-      some: (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
-    });
+    var hasChanges = Stores.TeamPreferences.get(teamId).mapOr(
+      true,
+      (p) => !_.isEqual(p.general, _.extend({}, p.general, general))
+    );
 
     if (hasChanges) {
       var promise = Api.setGeneralPreferences(teamId, general);
@@ -45,6 +45,16 @@ module Esper.Actions.TeamPreferences {
         return prefs;
       });
     }
+  }
+
+  /*
+    Toggles hyperlinks in calendar event descriptions
+  */
+  export function toggleEsperEventLink(prefs: ApiT.Preferences) {
+    var generalPrefs = _.cloneDeep(prefs.general);
+    generalPrefs.event_link = !generalPrefs.event_link;
+
+    setGeneral(prefs.teamid, generalPrefs);
   }
 
   // Enable or disable label reminder email

@@ -334,9 +334,9 @@ module Esper.EventStats {
   ): Types.Weight[] {
     let wrappers = durationWrappers(events, opts);
     let weights = _.map(wrappers,
-      (wrapper) => groupFn(wrapper.event).match({
-        none: (): Types.Weight[] => [],
-        some: (matches) => matches.length ?
+      (wrapper) => groupFn(wrapper.event).mapOr(
+        [],
+        (matches) => matches.length ?
 
           // Create annotation for each match
           _.map(matches, (match) => ({
@@ -351,7 +351,7 @@ module Esper.EventStats {
             value: wrapper.duration,
             group: null
           }]
-      }));
+      ));
     return _.flatten(weights);
   }
 
