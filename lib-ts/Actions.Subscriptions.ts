@@ -18,10 +18,6 @@ module Esper.Actions.Subscriptions {
     cardToken?: string;
     redirectTarget?: string|Paths.Path
   }) {
-    // Run in parallel with actual actions
-    Api.sendSupportEmail(`${Login.myEmail()} has just signed up ` +
-      `for ${Text.getPlanName(planId)}`);
-
     // Add card first if provided
     let p1 = cardToken ?
       addCard(cusId, cardToken) :
@@ -35,6 +31,7 @@ module Esper.Actions.Subscriptions {
           Route.nav.go(redirectTarget);
       });
 
+    Analytics.track(Analytics.Trackable.SelectPlan, { cusId, planId });
     Save.monitorStr(p2, "setSubscription");
     return p2;
   }
@@ -57,6 +54,10 @@ module Esper.Actions.Subscriptions {
   /* Card Management */
 
   export function addCard(cusId: string, cardToken: string) {
+    // Run in parallel with actual actions. Send email only if card.
+    Api.sendSupportEmail(`${Login.myEmail()} has added a credit card`);
+    Analytics.track(Analytics.Trackable.AddCard, { cusId });
+
     let p = Api.addNewCard(cusId, cardToken).then(
       (card) => Stores.Subscriptions.get(cusId).flatMap((sub) => {
         sub = _.cloneDeep(sub);
@@ -76,6 +77,8 @@ module Esper.Actions.Subscriptions {
       _.remove(sub.cards, (c) => c.id === cardId);
       return Option.some(sub);
     });
+
+    Analytics.track(Analytics.Trackable.DeleteCard, { cusId });
     Stores.Subscriptions.SubscriptionStore.push(cusId, p, newData);
   }
 

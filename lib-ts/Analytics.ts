@@ -40,7 +40,12 @@ module Esper.Analytics {
 
     // Preferences changes
     UpdateGeneralPrefs,       // Changes one of the general preferences
-    UpdateNotifications       // Changes one of the notification settings
+    UpdateNotifications,      // Changes one of the notification settings
+
+    // Plans + Billing
+    SelectPlan,               // Select a payment plan
+    AddCard,                  // Add a credit card
+    DeleteCard                // Remove a credit card
   };
 
   // Named pages to track
@@ -72,6 +77,7 @@ module Esper.Analytics {
     TimeStats,             // /#!/
     Report,                // /#!/charts
     TimeStatsCharts,       // /#!/charts/<something>
+    PaymentInfo,           // /#!/payment-info/...
     CalendarSetup,         // /#!/calendar-setup
     EventFeedback,         // /#!/event
     EventList,             // /#!/list
