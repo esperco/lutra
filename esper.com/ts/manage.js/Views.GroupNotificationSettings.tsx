@@ -11,16 +11,10 @@ module Esper.Views {
 
     renderMain(group: ApiT.Group) {
       var groupId = group.groupid;
-      var calendars = Stores.Calendars.list(groupId).match({
-        none: (): ApiT.GenericCalendar[] => [],
-        some: (l) => l
-      });
+      var calendars = Stores.Calendars.list(groupId).unwrapOr([]);
 
-      var prefsOpt = Stores.GroupPreferences.get(groupId);
-      var prefs = prefsOpt.match({
-        none: () => Stores.GroupPreferences.makeNewPreferences(groupId),
-        some: (p) => p
-      });
+      var prefs = Stores.GroupPreferences.get(groupId)
+        .unwrapOr(Stores.GroupPreferences.makeNewPreferences(groupId));
       return <div>
         <GeneralPrefs prefs={prefs} group={group} />
         { /* <BadMeetingPrefs prefs={prefs} group={group} /> */ }

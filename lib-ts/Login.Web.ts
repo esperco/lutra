@@ -199,10 +199,8 @@ module Esper.Login {
   }
 
   export function getStatus() {
-    return InfoStore.get("").match({
-      none: () => Model2.DataStatus.FETCH_ERROR,
-      some: (d) => d.dataStatus
-    });
+    return InfoStore.get("")
+      .mapOr(Model2.DataStatus.FETCH_ERROR, (d) => d.dataStatus);
   }
 
   function onLoginSuccess(loginInfo: ApiT.LoginResponse) {

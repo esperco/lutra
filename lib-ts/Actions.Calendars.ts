@@ -11,10 +11,8 @@ module Esper.Actions.Calendars {
 
   // Helper function that clones a list of calendars for update purposes
   function cloneCalList(teamId: string) {
-    return Stores.Calendars.list(teamId).match({
-      none: (): ApiT.GenericCalendar[] => [],
-      some: (cals) => _.cloneDeep(cals)
-    });
+    return Stores.Calendars.list(teamId)
+      .mapOr([], (cals) => _.cloneDeep(cals));
   }
 
   /*

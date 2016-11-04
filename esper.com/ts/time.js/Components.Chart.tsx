@@ -54,14 +54,14 @@ module Esper.Components {
         </ChartMsg>;
       }
 
-      return this.getResult().match({
-        none: () => <ChartMsg>
+      return this.getResult().mapOr(
+        <ChartMsg>
           <span className="esper-spinner" />
           <span>{ Text.ChartCalculating }</span>
         </ChartMsg>,
 
-        some: (r) => this.renderResult(r)
-      });
+        (r) => this.renderResult(r)
+      );
     }
 
     abstract renderResult(r: R): JSX.Element;

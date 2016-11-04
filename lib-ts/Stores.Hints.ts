@@ -6,10 +6,9 @@ module Esper.Stores.Hints {
   export var HintsStore = new Model2.Store<Types.Hints, boolean>();
 
   export function get(hint: Types.Hints): boolean {
-    return HintsStore.get(hint).flatMap((p) => p.data).match({
-      some: (n) => n,
-      none: () => !!LocalStore.get(hint)
-    });
+    return HintsStore.get(hint)
+      .flatMap((p) => p.data)
+      .unwrapOr(!!LocalStore.get(hint));
   }
 
   export function set(hint: Types.Hints, value: boolean) {

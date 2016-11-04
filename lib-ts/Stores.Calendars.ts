@@ -113,12 +113,10 @@ module Esper.Stores.Calendars {
       }
 
       // Pre-populate calendar list store with _ids while we're fetching
-      var calendars = calendarsOpt.match({
-        none: () => _.map(t.team_timestats_calendars,
+      var calendars = calendarsOpt.unwrapOr(
+        _.map(t.team_timestats_calendars,
           (calId) => ({ id: calId, title: "" })
-        ),
-        some: (c) => c
-      });
+        ));
       var p = Api.getTimestatsCalendarList(t.teamid);
 
       ListStore.pushFetch(t.teamid,

@@ -54,10 +54,9 @@ module Esper.Views {
             bodyClasses="esper-panel-section"
           >
             <div>
-              { Stores.Profiles.get(Login.myUid()).match({
-                none: () =>
-                  <span className="esper-spinner" />,
-                some: (p) => <div>
+              { Stores.Profiles.get(Login.myUid()).mapOr(
+                <span className="esper-spinner" />,
+                (p) => <div>
                   <p>{ Text.TeamSelfDescription }</p>
                   <Components.NewTeamForm
                     ref={(c) => this._selfForm = c}
@@ -65,7 +64,7 @@ module Esper.Views {
                     email={Login.myEmail()}
                     supportsExec={false} />
                 </div>
-              })}
+              )}
             </div>
           </Components.Expando>
         </div>

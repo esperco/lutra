@@ -158,13 +158,8 @@ module Esper.ReactHelpers {
   class StoreComponent extends Component<{ prop: string }, { val: string }> {
     render() {
       return React.createElement("div", {},
-        stringStore.get(this.props.prop).match({
-          none: () => "",
-          some: (s) => s.data.match({
-            none: () => "",
-            some: (v) => v
-          })
-        }));
+        stringStore.get(this.props.prop)
+          .mapOr("", (s) => s.data.unwrapOr("")));
     }
 
     componentDidMount(): void {
@@ -215,13 +210,8 @@ module Esper.ReactHelpers {
 
   class StatelessStoreComponent extends Component<{}, {}> {
     render() {
-      return React.createElement("div", {}, stringStore.get("myVal").match({
-        none: () => "",
-        some: (s) => s.data.match({
-          none: () => "",
-          some: (v) => v
-        })
-      }));
+      return React.createElement("div", {}, stringStore.get("myVal").mapOr(
+        "", (s) => s.data.unwrapOr("")));
     }
 
     componentDidMount(): void {
@@ -263,10 +253,7 @@ module Esper.ReactHelpers {
         .flatMap((v1) => v1.data)
         .flatMap((v2) => storeMany.get(v2))
         .flatMap((v3) => v3.data)
-        .match({
-          none: () => "",
-          some: (s) => s
-        });
+        .unwrapOr("");
       return React.createElement('span', {}, value);
     }
   }

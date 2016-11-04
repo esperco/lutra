@@ -173,10 +173,8 @@ module Esper.Actions.Groups {
 
     if (! _.find(group.group_teams, (t) => t.email === email)) {
       let team = _.find(Stores.Teams.all(), (t) => {
-        return Stores.Profiles.get(t.team_executive).match({
-          none: () => false,
-          some: (exec) => exec.email === email
-        });
+        return Stores.Profiles.get(t.team_executive).mapOr(
+          false, (exec) => exec.email === email);
       });
 
       if (team) {
@@ -280,10 +278,8 @@ module Esper.Actions.Groups {
     // Create new group team
     else {
       let team = _.find(Stores.Teams.all(), (t) =>
-        Stores.Profiles.get(t.team_executive).match({
-          none: () => false,
-          some: (e) => e.email === email
-        })
+        Stores.Profiles.get(t.team_executive).mapOr(
+          false, (e) => e.email === email)
       );
       if (team) {
         let newMember = {

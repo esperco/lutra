@@ -10,9 +10,9 @@ module Esper.Components {
     getGroupBy() { return Charting.GroupByDuration; }
 
     render() {
-      return this.getResult().match({
-        none: () => null,
-        some: (s) => {
+      return this.getResult().mapOr(
+        null,
+        (s) => {
 
           /*
             Sort annotations by bucket, then duration (event in long bucket may
@@ -64,7 +64,7 @@ module Esper.Components {
             </p>
           </div>;
         }
-      });
+      );
     }
   }
 }

@@ -16,9 +16,9 @@ module Esper.Components {
     }
 
     render() {
-      return this.getResult().match({
-        none: () => null,
-        some: (s) => {
+      return this.getResult().mapOr(
+        null,
+        (s) => {
           // Get median count -- ignore empty events
           let sorted = _(s.values)
             .filter((d) => d[1] > 1)
@@ -60,7 +60,7 @@ module Esper.Components {
             }</p>
           </div>;
         }
-      });
+      );
     }
   }
 }

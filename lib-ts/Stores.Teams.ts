@@ -56,24 +56,14 @@ module Esper.Stores.Teams {
   }
 
   export function all(): ApiT.Team[] {
-    return TeamListStore.batchGet(batchKey).match({
-      none: (): ApiT.Team[] => [],
-      some: (d) => d.data.match({
-
-        none: (): ApiT.Team[] => [],
-        some: (items) => Option.flatten(_.map(items, (i) => i.data))
-      })
-    });
+    return TeamListStore.batchGet(batchKey).mapOr([],
+      (d) => d.data.mapOr([],
+        (items) => Option.flatten(_.map(items, (i) => i.data))));
   }
 
   export function allIds(): string[] {
-    return TeamListStore.get(batchKey).match({
-      none: () => [],
-      some: (d) => d.data.match({
-        none: () => [],
-        some: (ids) => ids
-      })
-    });
+    return TeamListStore.get(batchKey).mapOr([],
+      (d) => d.data.unwrapOr([]));
   }
 
   export function first(): ApiT.Team {

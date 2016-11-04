@@ -200,20 +200,20 @@ module Esper.Model2 {
 
     // Shorcut to determine if data at key has an error status
     hasError(_id: TKey): boolean {
-      return this.get(_id).match({
-        none: () => false,
-        some: (d) => (d.dataStatus === DataStatus.FETCH_ERROR ||
-                      d.dataStatus === DataStatus.PUSH_ERROR)
-      });
+      return this.get(_id).mapOr(
+        false,
+        (d) => (d.dataStatus === DataStatus.FETCH_ERROR ||
+                d.dataStatus === DataStatus.PUSH_ERROR)
+      );
     }
 
     // Shorcut to determine if data at key is busy (fetching, saving, etc.)
     isBusy(_id: TKey) {
-      return this.get(_id).match({
-        none: () => false,
-        some: (d) => (d.dataStatus === DataStatus.INFLIGHT ||
-                      d.dataStatus === DataStatus.FETCHING)
-      });
+      return this.get(_id).mapOr(
+        false,
+        (d) => (d.dataStatus === DataStatus.INFLIGHT ||
+                d.dataStatus === DataStatus.FETCHING)
+      );
     }
 
     all(): StoreData<TKey, TData>[] {
@@ -262,18 +262,13 @@ module Esper.Model2 {
 
       // Compute final list of aliases based on existing data
       var existing = Option.wrap(allExisting[0]);
-      aliases = aliases.concat(existing.match({
-        none: () => [],
-        some: (d) => d.aliases
-      }));
+      aliases = aliases.concat(existing.mapOr([], (d) => d.aliases));
       aliases = _.uniqBy(aliases, Util.cmpStringify);
 
       // Create and freeze wrapper around data
       var storeData: StoreData<TKey, TData> = {
-        dataStatus: Util.some(opts.dataStatus, existing.match({
-          none: () => DataStatus.READY,
-          some: (d) => d.dataStatus
-        })),
+        dataStatus: Util.some(opts.dataStatus, existing.mapOr(
+          DataStatus.READY, (d) => d.dataStatus)),
         lastUpdate: new Date(),
         data: data,
         aliases: aliases,
@@ -402,10 +397,8 @@ module Esper.Model2 {
         want to clobber UNSAVED data only (i.e. data that was changed in
         between us initiating a push to server and us receiving a response)
       */
-      var canSave = () => this.get(_id).match({
-        none: () => true,
-        some: (d) => d.dataStatus !== Model2.DataStatus.UNSAVED
-      });
+      var canSave = () => this.get(_id).mapOr(
+        true, (d) => d.dataStatus !== Model2.DataStatus.UNSAVED);
 
       promise.then((optData: Option.T<TData>) => {
         // On success, update store
