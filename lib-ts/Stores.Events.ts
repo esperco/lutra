@@ -426,9 +426,9 @@ module Esper.Stores.Events {
 
   //////
 
-  export function fetchFuzzy(eventId: string):
+  export function fetchFuzzy(eventId: string, teamid?: string):
   JQueryPromise<ApiT.EventLookupResult> {
-    return Api.getEventFuzzy(eventId).then((e) => {
+    return Api.getEventFuzzy(eventId, teamid).then((e) => {
       if (!e.result) {
         return null;
       }
