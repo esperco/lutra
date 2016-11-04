@@ -192,9 +192,8 @@ module Esper.Views {
           teamId: e.teamId,
           calId: e.calendarId,
           eventId: e.id
-        }))
-        .filter((e) => e.isSome())
-        .map((e) => e.unwrap())
+        }).unwrapOr(null))
+        .compact()
         .value();
 
       return <div className="esper-section">

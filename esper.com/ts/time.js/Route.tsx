@@ -59,7 +59,7 @@ module Esper.Route {
   /*
     Generic cleaning + routing function for our chart functions
   */
-  function routeChart<T>(
+  function routeChart(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
     cbFn: (o: Types.ChartParams) => void
   ) {
@@ -95,7 +95,7 @@ module Esper.Route {
   routeChart(Paths.Time.ratingsChart, Actions.Charts.renderRatings);
 
 
-  function routeList<T>(
+  function routeList(
     pathFn: (o: Paths.Time.chartPathOpts) => Paths.Path,
     cbFn: (o: Types.ChartParams) => void
   ) {

@@ -90,7 +90,7 @@ module Esper.Components {
           this.props.onEventToggle ?
           <div className="event-checkbox"
                onClick={() => this.props.onEventToggle(event)}>
-            { this.props.isSelected(event) ?
+            { this.props.isSelected && this.props.isSelected(event) ?
               <i className="fa fa-fw fa-check-square-o" /> :
               <i className="fa fa-fw fa-square-o" />
             }
