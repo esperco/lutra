@@ -521,12 +521,21 @@ module Esper.EventStats {
   export function defaultGroupDurationCalc(
     eventsForRanges: Types.EventsForRange[],
     filterFns: Types.FilterFn[],
-    groupFn: (event: Types.TeamEvent) => Option.T<string[]>
+    groupFn: (event: Types.TeamEvent) => Option.T<string[]>,
+    weekHours?: Types.WeekHours
   ) {
     return defaultGroupCalc(eventsForRanges, (s) => {
+      let eventsForRange = s.eventsForRanges[s.rangeIndex];
+      let [start, end] = eventsForRange ? eventsForRange.range : [null, null];
+
+      // Events to process plus *new* rangeIndex  eventIndex
       let { events, rangeIndex, eventIndex } = batchOverlap(s);
       events = filterEvents(events, filterFns);
-      let weights = weighDuration(events, groupFn);
+      let weights = weighDuration(events, groupFn, {
+        truncateStart: start,
+        truncateEnd: end,
+        weekHours
+      });
       let group = groupWeights(weights, s, s.group);
       return { eventsForRanges, rangeIndex, eventIndex, group };
     });

@@ -88,7 +88,8 @@ module Esper.Components {
       return EventStats.defaultGroupDurationCalc(
         props.eventsForRanges,
         Charting.getFilterFns(props),
-        (e) => props.groupBy.keyFn(e, props)
+        (e) => props.groupBy.keyFn(e, props),
+        props.extra.weekHours
       )
     }
 

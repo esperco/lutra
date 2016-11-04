@@ -412,9 +412,10 @@ module Esper.Views {
       style.color = Colors.colorForText(baseColor);
       tooltip = label.displayAs;
     }
+    let inactive = !Stores.Events.isActive(event);
 
     return <div key={Stores.Events.strId(event)}
-      className={classNames("event", { selected })}
+      className={classNames("event", { selected, inactive })}
       style={style}>
       <Components.Tooltip style={{display: "block"}} title={tooltip}>
         <i className={classNames("fa fa-fw check", {
