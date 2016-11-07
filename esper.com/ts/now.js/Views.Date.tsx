@@ -14,8 +14,8 @@ module Esper.Views {
         <div className="col-md-6 col-md-offset-3">
           <Components.EventHeader
             title={mDate.format(Text.EventDateHeadingFormat)}
-            onBack={() => Actions.goToDate(prevDate)}
-            onNext={() => Actions.goToDate(nextDate)}
+            onBack={() => Actions.goToDate(prevDate, { teamId })}
+            onNext={() => Actions.goToDate(nextDate, { teamId })}
           />
           <div className="panel panel-default">
             <div className="panel-body">

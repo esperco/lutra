@@ -551,8 +551,8 @@ module Esper.Api {
   }
 
   export function getEventExact(teamid: string,
-                                         calid: string,
-                                         eventid: string):
+                                calid: string,
+                                eventid: string):
   JsonPromise<ApiT.GenericCalendarEvent> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
@@ -561,9 +561,11 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  export function getEventFuzzy(eventid: string):
+  export function getEventFuzzy(eventid: string, teamid?: string):
   JsonPromise<ApiT.EventLookupResponse> {
-    var url = `${prefix}/api/ts/event/${string(Login.me())}/${string(eventid)}`;
+    var url = `${prefix}/api/ts/event/${string(Login.me())}`
+      + `/${encodeURIComponent(string(eventid))}`
+      + (teamid ? `?teamid=${string(teamid)}` : "");
     return JsonHttp.get(url);
   }
 

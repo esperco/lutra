@@ -70,6 +70,21 @@ module Esper.Actions {
     ]);
   }
 
+  export function getEventFromOtherTeam(teamId: string,
+                                        calId: string,
+                                        eventId: string):
+  JQueryPromise<Option.T<Types.TeamEvent>> {
+    return Stores.Events.EventStore.get({teamId, calId, eventId}).match({
+      some: (d) => $.Deferred().resolve(d.data).promise(),
+      none: () =>
+        Stores.Events.fetchFuzzy(eventId, teamId).then((r) => {
+          if (!r) return Option.none();
+
+          return Option.wrap(Stores.Events.asTeamEvent(r.teamid, r.event));
+        })
+    })
+  }
+
 
   ////
 
@@ -82,7 +97,7 @@ module Esper.Actions {
     reverse?: boolean;
 
     /*
-      If event if set, go to first event after this one. Or before if reverse
+      If event is set, go to first event after this one. Or before if reverse
       is set. This param is here to help manage events that overlap date
       boundaries.
     */
@@ -255,10 +270,7 @@ module Esper.Actions {
     var p: JQueryPromise<Option.T<Types.TeamEvent>>;
     if (teamId && calId) {
       p = action ? Feedback.postActionAndFetch({
-        teamId: teamId,
-        calId: calId,
-        eventId: eventId,
-        action: action
+        teamId, calId, eventId, action
       }) : Stores.Events.fetchExact({teamId, calId, eventId});
     } else {
       p = Stores.Events.fetchFuzzy(eventId).then((r) => {

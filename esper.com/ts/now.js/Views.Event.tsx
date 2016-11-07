@@ -85,32 +85,23 @@ module Esper.Views {
     }
 
     updateTeam(teamId: string) {
-      let eventOrNull = Stores.Events.EventStore.get({
-        teamId,
-        calId: this.props.calId,
-        eventId: this.props.eventId
-      }).flatMap((d) => d.data).unwrapOr(null);
-
-      if (eventOrNull) {
-        Actions.goToEvent(eventOrNull);
-      }
-
-      else {
-        let currentEventOrNull = Stores.Events.EventStore.get({
-          teamId: this.props.teamId,
-          calId: this.props.calId,
-          eventId: this.props.eventId
-        }).flatMap((d) => d.data).unwrapOr(null);
-
-        if (currentEventOrNull) {
-          // Go to start of event
-          Actions.goToDate(currentEventOrNull.start, { teamId });
-        } else {
-
-          // Go
-          Actions.goToDate(new Date(), { teamId });
-        }
-      }
+      Actions.getEventFromOtherTeam(teamId,
+        this.props.calId, this.props.eventId).then((e) => {
+          e.match({
+            some: (event) => Actions.goToEvent(event),
+            none: () =>
+              Stores.Events.EventStore.get({
+                teamId: this.props.teamId,
+                calId: this.props.calId,
+                eventId: this.props.eventId
+              }).flatMap((d) => d.data).match({
+                // Go to start of event
+                some: (event) => Actions.goToDate(event.start, { teamId }),
+                // Go
+                none: () => Actions.goToDate(new Date(), { teamId })
+              })
+          });
+      });
     }
   }
 }
