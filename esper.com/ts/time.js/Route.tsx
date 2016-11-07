@@ -22,6 +22,45 @@ module Esper.Route {
     }
   }
 
+  // Helper to check whether user is active (in Stripe)
+  function checkActive(teamId: string, next: () => any) {
+    teamId = Params.cleanTeamId(teamId);
+    let team = Stores.Teams.require(teamId);
+    if (team) {
+      let teamSub = team.team_api.team_subscription;
+      if (teamSub.active) {
+        next(); return;
+      }
+
+      // No status => no plan => subscribe to default + start free trial
+      else if (! teamSub.status) {
+        // This should also refresh page
+        Actions.Subscriptions.set({
+          cusId: teamSub.cusid,
+          planId: Config.DEFAULT_PLAN
+        }).then(() => next());
+      }
+
+      // Else, has bad status (need payment)
+      else {
+        Route.nav.go(Paths.Time.paymentInfo({ teamId }));
+      }
+    }
+  }
+
+  // Helper to check whether user is active AND has a card
+  function checkHasCard(teamId: string, next: () => any) {
+    checkActive(teamId, function() {
+      // TODO - Check for card existence
+      teamId = Params.cleanTeamId(teamId);
+      let team = Stores.Teams.require(teamId);
+      let teamSub = team.team_api.team_subscription;
+
+      next();
+    });
+  }
+
+
   ////////
 
   /*
@@ -42,7 +81,9 @@ module Esper.Route {
     teamId: ":teamId?",
     interval: ":interval?",
     period: ":period?"
-  }).hash, checkOnboarding, function(ctx) {
+  }).hash, checkOnboarding,
+  function(ctx, next) { checkActive(ctx.params[":teamId"], next); },
+  function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "week");
     var period = Params.cleanPeriod(interval, ctx.params["period"]);
@@ -68,7 +109,13 @@ module Esper.Route {
       calIds: ":calIds?",
       interval: ":interval?",
       period: ":period?"
-    }).hash, checkOnboarding, function(ctx) {
+    }).hash, checkOnboarding,
+
+    // Require active status for charts page
+    function(ctx, next) { checkHasCard(ctx.params[":teamId"], next); },
+
+    // Actual chart page
+    function(ctx) {
       var teamId = Params.cleanTeamId(ctx.params["teamId"]);
       var calIds = Params.cleanCalIds(teamId, ctx.params["calIds"]);
       var interval = Params.cleanInterval(ctx.params["interval"], "week");

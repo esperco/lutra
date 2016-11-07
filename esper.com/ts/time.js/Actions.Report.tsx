@@ -64,13 +64,7 @@ module Esper.Actions {
     calc.onceChange((result) => {
       if (!confirmationLaunched && result.total > 0) {
         confirmationLaunched = true;
-        Layout.renderModal(Containers.confirmListModal(result.events, 0, () => {
-          // Redirect to payment view
-          if (!subscription.active)
-            Route.nav.go(Paths.Time.paymentInfo({teamId}));
-        }));
-      } else if (!subscription.active) {
-        Route.nav.go(Paths.Time.paymentInfo({teamId}));
+        Layout.renderModal(Containers.confirmListModal(result.events));
       }
     });
 
