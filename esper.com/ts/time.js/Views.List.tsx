@@ -14,6 +14,8 @@ module Esper.Views {
   }
 
   export class List extends ReactHelpers.Component<Props, State> {
+    _main: ListMain;
+
     constructor(props: Props) {
       super(props);
       this.state = { selected: {} };
@@ -119,7 +121,7 @@ module Esper.Views {
 
     renderContent(props: Types.ChartProps) {
       if (this.props.view === "week") {
-        return <WeekMain
+        return <WeekMain ref={(c) => this._main = c}
           {...props}
           {...this.state}
           toggleEvent={this.toggleEvent}
@@ -127,14 +129,14 @@ module Esper.Views {
       }
 
       else if (this.props.view === "month") {
-        return <MonthMain
+        return <MonthMain ref={(c) => this._main = c}
           {...props}
           {...this.state}
           toggleEvent={this.toggleEvent}
         />;
       }
 
-      return <AgendaMain
+      return <AgendaMain ref={(c) => this._main = c}
         {...props}
         {...this.state}
         toggleEvent={this.toggleEvent}
@@ -144,7 +146,7 @@ module Esper.Views {
     renderFilters(props: Types.ChartProps) {
       return <div>
         <div className="action select-action esper-panel-section"
-             onClick={() => this.selectAll(props.eventsForRanges)}>
+             onClick={() => this.selectAll()}>
           { Text.SelectAll }
         </div>
 
@@ -236,13 +238,17 @@ module Esper.Views {
       this.setState({ selected: {} });
     }
 
-    selectAll(eventsForRanges: Types.EventsForRange[]) {
+    selectAll() {
       let selected: {[index: string]: Types.TeamEvent} = {};
-      _.each(eventsForRanges,
-        (er) => _.each(er.events,
-          (ev) => selected[Stores.Events.strId(ev, true)] = ev
-        )
-      );
+
+      // Get visible events from current "main" view -- then convert
+      // IDs to recurring form
+      let eventMap = this._main
+        .getResult()
+        .map((r) => r.eventMap)
+        .unwrapOr({});
+      _.each(eventMap, (ev) => selected[Stores.Events.strId(ev, true)] = ev);
+
       this.setState({ selected });
     }
 
