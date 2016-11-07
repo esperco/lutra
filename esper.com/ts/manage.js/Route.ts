@@ -139,8 +139,28 @@ module Esper.Route {
   ) {
     route(pathFn({cusId: ":cusId?"}).hash,
       demoCheck,
+
+      // Make sure customer has default plan
+      function(ctx, next) {
+        let cusId = Params.cleanCustomerId(ctx.params["cusId"]);
+        Stores.Customers.getLoadPromise().done(function() {
+          let cust = Stores.Customers.require(cusId);
+          if (! cust.subscription.plan) {
+            // Set default plan for enterprise users
+            if (! cust.teamid) {
+              Actions.Subscriptions.set({
+                cusId, planId: Config.DEFAULT_ENTERPRISE_PLAN
+              }).then(() => next());
+            }
+          } else {
+            next();
+          }
+        });
+      },
+
+      // Actual view
       function(ctx) {
-        let cusId = Params.cleanCustomerId(ctx.params["cusId"])
+        let cusId = Params.cleanCustomerId(ctx.params["cusId"]);
         let msgCode = Util.getParamByName("msg", ctx.querystring);
         let msg = ManageMsg.get(msgCode);
         let errCode = Util.getParamByName("err", ctx.querystring);

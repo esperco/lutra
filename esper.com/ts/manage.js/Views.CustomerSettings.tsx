@@ -47,8 +47,6 @@ module Esper.Views {
   }
 
 
-  const DEFAULT_PLAN: ApiT.PlanId = "Enterprise_20160923";
-
   interface AddCardProps {
     cust: ApiT.Customer;
   }
@@ -68,7 +66,7 @@ module Esper.Views {
         { this.state.busy ?
           <span><span className="esper-spinner" /></span>:
           <Components.Stripe
-            description={Text.getPlanName(DEFAULT_PLAN)}
+            description={Text.getPlanName(Config.DEFAULT_ENTERPRISE_PLAN)}
             label="Submit" stripeKey={Config.STRIPE_KEY}
             onToken={(token) => this.onToken(token)}
           >
@@ -81,7 +79,7 @@ module Esper.Views {
     onToken(token: StripeTokenResponse) {
       this.setState({ busy: true });
       let cusId = this.props.cust.id;
-      let planId = DEFAULT_PLAN;
+      let planId = Config.DEFAULT_ENTERPRISE_PLAN;
 
       // Run in parallel with actual actions
       Actions.Subscriptions.set({cusId, planId, cardToken: token.id})
