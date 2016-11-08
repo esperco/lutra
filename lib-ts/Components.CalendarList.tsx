@@ -102,6 +102,7 @@ module Esper.Components {
     update(ids: string[]) {
       if (this.props.limit !== undefined &&
           ids.length > this.props.limit &&
+          ids.length > this.props.selectedCalendars.length &&
           this.props.onCalendarLimit) {
         this.props.onCalendarLimit();
         return;
