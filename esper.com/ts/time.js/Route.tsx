@@ -28,13 +28,13 @@ module Esper.Route {
     let team = Stores.Teams.require(teamId);
     if (team) {
       let teamSub = team.team_api.team_subscription;
+      console.info(teamSub);
       if (teamSub.active) {
         next(); return;
       }
 
       // No status => no plan => subscribe to default + start free trial
       else if (! teamSub.status) {
-        // This should also refresh page
         Actions.Subscriptions.set({
           cusId: teamSub.cusid,
           planId: Config.DEFAULT_PLAN
@@ -51,11 +51,11 @@ module Esper.Route {
   // Helper to check whether user is active AND has a card
   function checkHasCard(teamId: string, next: () => any) {
     checkActive(teamId, function() {
-      // TODO - Check for card existence
+      // TODO - Check for card existence -- this is temporarily done in Action
+      // module
       teamId = Params.cleanTeamId(teamId);
       let team = Stores.Teams.require(teamId);
       let teamSub = team.team_api.team_subscription;
-
       next();
     });
   }

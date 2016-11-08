@@ -211,7 +211,7 @@ module Esper.Components {
         cusId: this.props.details.cusid,
         planId: plan.id,
         redirectTarget: this.props.redirect
-      });
+      }).then(() => null);
     }
   }
 }

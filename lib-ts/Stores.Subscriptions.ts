@@ -50,7 +50,8 @@ module Esper.Stores.Subscriptions {
 
   export function fetch(cusId: string, forceRefresh=false) {
     let shouldFetch = forceRefresh || SubscriptionStore.get(cusId).mapOr(
-      true, (d) => d.dataStatus === Model2.DataStatus.FETCH_ERROR);
+      true, (d) => d.dataStatus !== Model2.DataStatus.FETCHING &&
+                   d.data.isNone());
 
     if (shouldFetch) {
       let p = Api.getSubscriptionStatusLong(cusId).then(
