@@ -428,6 +428,22 @@ module Esper.Charting {
     return true;
   }
 
+  /*
+    Like eqProps, but focuses only on props relevant to filtering criteria,
+    as opposed to the actual events themselves. Used to determine whether
+    to re-run a filtering calculation (as opposed to not re-run the
+    calculation and only update a single event or datapoint within a view)
+  */
+  export function eqFilterProps(p1: Types.ChartProps, p2: Types.ChartProps) {
+    return _.isEqual(p1.period, p2.period) &&
+           _.isEqual(p1.extra, p2.extra) &&
+           p1.calendars === p2.calendars &&
+           p1.groupBy === p2.groupBy &&
+
+           // TeamID only -> don't refresh if new labels
+           p1.team.teamid === p2.team.teamid;
+  }
+
 
   /* Filtering helpers */
 
