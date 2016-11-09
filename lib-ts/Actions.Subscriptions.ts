@@ -28,8 +28,13 @@ module Esper.Actions.Subscriptions {
     let cardP = p1.then(() => p2).then((card) =>
       Stores.Subscriptions.get(cusId).map((details) => {
         details = _.cloneDeep(details);
-        details.cards.push(card)
-        details.cards = _.uniqBy(details.cards, (c) => c.id);
+        if (planId) {
+          details.plan = planId;
+        }
+        if (card) {
+          details.cards.push(card)
+          details.cards = _.uniqBy(details.cards, (c) => c.id);
+        }
         return details;
       })
     );
