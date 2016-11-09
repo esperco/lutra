@@ -37,7 +37,8 @@ module Esper.Route {
         Actions.Subscriptions.set({
           cusId: teamSub.cusid,
           planId: Config.DEFAULT_PLAN
-        }).then(() => next());
+        });
+        next();
       }
 
       // Else, has bad status (need payment)
