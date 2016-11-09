@@ -45,7 +45,7 @@ module Esper.Components {
       this.mutateState((s) => s.busy = true);
       let cusId = this.props.subscription.cusid;
       this.props.onSelect(plan)
-        .always(() => this.mutateState((s) => s.busy = false));
+        .fail(() => this.mutateState((s) => s.busy = false));
     }
   }
 
@@ -88,10 +88,7 @@ module Esper.Components {
         </ul>
       </div>
       <div className="sub-plan-footer">
-        <button className={classNames("btn form-control", {
-          "btn-success": !selected,
-          "btn-default": selected
-        })} disabled={selected}>
+        <button className="btn form-control btn-success">
           { selected ? Text.ActivePlan :
           ( canStartFreeTrial ? Text.StartFreeTrial : Text.SelectPlan )}
         </button>

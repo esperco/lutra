@@ -192,16 +192,22 @@ module Esper.Components {
         _.isEmpty(this.props.details.cards);
       if (needStripe) {
         let dfd = $.Deferred<void>();
+        let hasToken = false; // So we can distinguish between closing without
+                              // successful Stripe token and closing after
+                              // entering in Stripe CC
         Esper.Stripe.getHandler().then((handler) => handler.open({
           panelLabel: "Submit",
           description: plan.name,
-          token: (token) => Actions.Subscriptions.set({
-            cusId: this.props.details.cusid,
-            planId: plan.id,
-            cardToken: token.id,
-            redirectTarget: this.props.redirect
-          }).then(() => dfd.resolve()),
-          closed: () => { dfd.state() === "pending" ? dfd.reject() : null }
+          token: (token) => {
+            hasToken = true;
+            Actions.Subscriptions.set({
+              cusId: this.props.details.cusid,
+              planId: plan.id,
+              cardToken: token.id,
+              redirectTarget: this.props.redirect
+            }).then(() => dfd.resolve())
+          },
+          closed: () => { hasToken ? null : dfd.reject() }
         }));
         return dfd.promise();
       }

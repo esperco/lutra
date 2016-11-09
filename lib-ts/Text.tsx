@@ -90,7 +90,7 @@ module Esper.Text {
   }
   export const StartFreeTrial = "Start Free Trial";
   export const SelectPlan = "Select Plan";
-  export const ActivePlan = "Current Plan";
+  export const ActivePlan = "Keep Current Plan";
 
   export const AddToEnterpriseLink =
     "Does your company already have an Enterprise Plan? " +
