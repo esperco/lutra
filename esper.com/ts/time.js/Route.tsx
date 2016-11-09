@@ -81,7 +81,7 @@ module Esper.Route {
     interval: ":interval?",
     period: ":period?"
   }).hash, checkOnboarding,
-  function(ctx, next) { checkActive(ctx.params[":teamId"], next); },
+  function(ctx, next) { checkActive(ctx.params["teamId"], next); },
   function(ctx) {
     var teamId = Params.cleanTeamId(ctx.params["teamId"]);
     var interval = Params.cleanInterval(ctx.params["interval"], "week");
@@ -111,7 +111,7 @@ module Esper.Route {
     }).hash, checkOnboarding,
 
     // Require active status for charts page
-    function(ctx, next) { checkHasCard(ctx.params[":teamId"], next); },
+    function(ctx, next) { checkHasCard(ctx.params["teamId"], next); },
 
     // Actual chart page
     function(ctx) {
