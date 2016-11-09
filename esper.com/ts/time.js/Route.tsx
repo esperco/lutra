@@ -28,7 +28,6 @@ module Esper.Route {
     let team = Stores.Teams.require(teamId);
     if (team) {
       let teamSub = team.team_api.team_subscription;
-      console.info(teamSub);
       if (teamSub.active) {
         next(); return;
       }

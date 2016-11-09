@@ -10,7 +10,7 @@ module Esper.Views {
 
     renderMain(cust: ApiT.Customer) {
       var busy = Stores.Subscriptions.status(cust.id)
-        .mapOr(true, (d) => d === Model2.DataStatus.FETCHING);
+        .mapOr(false, (d) => d === Model2.DataStatus.FETCHING);
       if (busy) {
         return <div className="esper-spinner" />;
       }
