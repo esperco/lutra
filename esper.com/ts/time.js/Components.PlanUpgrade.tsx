@@ -29,7 +29,8 @@ module Esper.Components {
     // Callback for selection, returns promise since we may need to wait on
     // Stripe
     onSelect(plan: Types.PlanDetails) {
-      if (! this.props.subscription) return; // Sanity check
+      if (! this.props.subscription)
+        return $.Deferred().resolve().reject(); // Sanity check
 
       // Check if we need to ask for stripe CC
       let needStripe = _.isEmpty(this.props.subscription.cards);
@@ -52,7 +53,7 @@ module Esper.Components {
       return Actions.Subscriptions.set({
         cusId: this.props.subscription.cusid,
         planId: plan.id
-      });
+      }).then(() => null);
     }
   }
 }

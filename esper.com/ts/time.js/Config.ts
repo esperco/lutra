@@ -7,6 +7,10 @@ module Esper.Config {
     'pk_live_ntMF09YuECJYPD6A9c4sfdHG' :
     'pk_test_tDzGbpaybyFQ3A7XGF6ctE3f';
 
+  // Default plan should not apply to enterprise users -- this should only be
+  // set if no existing plan
+  export const DEFAULT_PLAN: ApiT.PlanId = "Basic_20161019";
+
   /* Config for period selectors */
 
   export function getMinDate(planid: ApiT.PlanId): Date {

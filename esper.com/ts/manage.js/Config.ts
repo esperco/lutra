@@ -20,6 +20,8 @@ module Esper.Config {
     return true;
   }
 
+  export const DEFAULT_ENTERPRISE_PLAN: ApiT.PlanId = "Enterprise_20160923";
+
   export function getMinDate(planid: ApiT.PlanId): Date {
     if (!planid) return moment()
       .subtract(2, 'month')

@@ -100,6 +100,12 @@ module Esper.Stores.Customers {
     return cust.name || cust.primary_contact.email;
   }
 
+  // Promise for tracking customer load status
+  var loadDfd = $.Deferred<void>();
+  export function getLoadPromise() {
+    return loadDfd.promise();
+  }
+
   /* Init helpers */
   export function init() {
     if (Login.data && Login.data.is_sandbox_user) return;
@@ -110,7 +116,10 @@ module Esper.Stores.Customers {
         data: Option.some(cust)
       }))
     ));
-    CustomerListStore.batchFetch("", p)
+    CustomerListStore.batchFetch("", p);
+
+    p.done(() => loadDfd.resolve()).fail(() => loadDfd.reject());
+    return p;
   }
 
   export var refresh = init;

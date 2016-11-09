@@ -73,6 +73,15 @@ module Esper.Actions.Charts {
     // Fetching
     initChart(o);
 
+    /*
+      Check subscription status -- this code isn't great since it's
+      relies on our server making a call to Stripe, but use this for now
+      until we have cached card data to check
+    */
+    let team = Stores.Teams.require(o.teamId);
+    let cusId = team.team_api.team_subscription.cusid;
+    Stores.Subscriptions.fetch(cusId);
+
     render(ReactHelpers.contain(function() {
       getEvents(o);
       let { eventsForRanges, hasError, isBusy } = getEvents(o);
@@ -84,6 +93,13 @@ module Esper.Actions.Charts {
         calendars: Stores.Calendars.list(o.teamId).unwrapOr([]),
         eventsForRanges, hasError, isBusy
       };
+
+      // Redirect to payment if no cards
+      Stores.Subscriptions.get(cusId).match({
+        none: () => null,
+        some: (s) => _.isEmpty(s.cards) ?
+          Route.nav.go(Paths.Time.paymentInfo({ teamId: o.teamId })) : null
+      });
 
       return <Views.Charts { ...props } />
     }));

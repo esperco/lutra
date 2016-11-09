@@ -17,5 +17,7 @@ module Esper.Actions {
     Stores.Subscriptions.fetch(team.team_api.team_subscription.cusid);
     Stores.Customers.refresh();
     render(<Views.PaymentInfo teamId={teamId} />);
+
+    Analytics.page(Analytics.Page.PaymentInfo, { teamId });
   }
 }
