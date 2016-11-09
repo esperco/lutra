@@ -340,7 +340,7 @@ module Esper.Views {
       calc is firing because it calls forceUpdate
     */
     shouldCalcUpdate(newProps: ListProps) {
-      return !Charting.eqProps(this.props, newProps);
+      return !Charting.eqFilterProps(this.props, newProps);
     }
 
     isSelected(event: Types.TeamEvent) {
@@ -438,7 +438,11 @@ module Esper.Views {
 
   // Render an agenda
   class AgendaMain extends ListMain {
-    renderResult({ events, total } : Types.CounterState) {
+    renderResult({ eventMap } : Types.CounterState) {
+      // Use eventMap to filter out prop events
+      let events = Stores.Events.uniqueEvents(this.props.eventsForRanges);
+      events = _.filter(events, (e) => !!eventMap[Stores.Events.strId(e)]);
+
       return <div className="esper-container">
         <Components.EventList
           events={events}
