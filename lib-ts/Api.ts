@@ -37,10 +37,12 @@ module Esper.Api {
     We call this to avoid making URLs containing "undefined" or "null".
     This prevents making a bogus API request, and hopefully makes bug
     detection and prevention easier.
+
+    This URL-encodes the string, as needed.
   */
   function string(x: string) {
     Log.assert(x !== undefined && x !== null);
-    return x;
+    return encodeURIComponent(x);
   }
 
   function number(x: number): string {
@@ -247,7 +249,7 @@ module Esper.Api {
     JsonPromise<ApiT.Group>
   {
     var url = `${prefix}/api/group/timezone/${string(Login.me())}/`
-      + `${string(groupid)}/${encodeURIComponent(string(timezone))}`;
+      + `${string(groupid)}/${string(timezone)}`;
     return JsonHttp.put(url);
   }
 
@@ -349,22 +351,22 @@ module Esper.Api {
 
   export function getToken(token: string): JsonPromise<ApiT.TokenInfo> {
     return JsonHttp.get(prefix + "/api/token/" +
-      encodeURIComponent(string(token)));
+      string(token));
   }
 
   export function postToken(token: string): JsonPromise<ApiT.TokenResponse> {
     return JsonHttp.noWarn(function() {
       return JsonHttp.post(prefix + "/api/token/"
-                           + encodeURIComponent(string(token)));
+                           + string(token));
     });
   }
 
   export function postTokenEmail(token: string, email: string, name: string):
     JsonPromise<ApiT.TokenResponse> {
     var path = prefix +
-      "/api/token-email/" + encodeURIComponent(string(token))
-      + "/" + encodeURIComponent(string(email))
-      + "/" + encodeURIComponent(string(name));
+      "/api/token-email/" + string(token)
+      + "/" + string(email)
+      + "/" + string(name);
     return JsonHttp.post(path);
   }
 
@@ -430,9 +432,9 @@ module Esper.Api {
                                    invite?: string):
     JsonPromise<ApiT.UrlResult> {
       var inviteParam = invite ? "&invite=" + invite : "";
-      var url = prefix + "/api/nylas/login/" + encodeURIComponent(email) +
-        "?nonce=" + encodeURIComponent(nonce) +
-        "&landing_url=" + encodeURIComponent(landing_url) +
+      var url = prefix + "/api/nylas/login/" + string(email) +
+        "?nonce=" + string(nonce) +
+        "&landing_url=" + string(landing_url) +
         inviteParam;
     return JsonHttp.get(url);
   }
@@ -441,7 +443,7 @@ module Esper.Api {
   export function getSlackAuthInfo(teamid: string):
   JsonPromise<ApiT.SlackAuthInfo> {
     var url = prefix + "/api/slack/auth-info/" + string(Login.me())
-            + "/" + encodeURIComponent(string(teamid));
+            + "/" + string(teamid);
     return JsonHttp.get(url);
   }
 
@@ -538,7 +540,7 @@ module Esper.Api {
     JsonPromise<ApiT.GenericCalendarEvents> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
-            + "/" + encodeURIComponent(string(calid));
+            + "/" + string(calid);
     return JsonHttp.post(url, q);
   }
 
@@ -556,15 +558,15 @@ module Esper.Api {
   JsonPromise<ApiT.GenericCalendarEvent> {
     var url = prefix + "/api/ts/events/" + string(Login.myUid())
             + "/" + string(teamid)
-            + "/" + encodeURIComponent(string(calid))
-            + "/" + encodeURIComponent(string(eventid));
+            + "/" + string(calid)
+            + "/" + string(eventid);
     return JsonHttp.get(url);
   }
 
   export function getEventFuzzy(eventid: string, teamid?: string):
   JsonPromise<ApiT.EventLookupResponse> {
     var url = `${prefix}/api/ts/event/${string(Login.me())}`
-      + `/${encodeURIComponent(string(eventid))}`
+      + `/${string(eventid)}`
       + (teamid ? `?teamid=${string(teamid)}` : "");
     return JsonHttp.get(url);
   }
@@ -586,7 +588,7 @@ module Esper.Api {
   export function postForCalendarStats(teamid: string, calid: string,
     q: ApiT.CalendarStatsRequest): JsonPromise<ApiT.CalendarStatsResult> {
     var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + encodeURIComponent(string(calid));
+      + "/" + string(teamid) + "/" + string(calid);
     return JsonHttp.post(url, q);
   }
 
@@ -601,8 +603,8 @@ module Esper.Api {
     feedback: ApiT.EventFeedbackUpdate): JsonPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
-            + "/" + encodeURIComponent(string(teamid))
-            + "/" + encodeURIComponent(string(eventid));
+            + "/" + string(teamid)
+            + "/" + string(eventid);
     return JsonHttp.post(url, feedback);
   }
 
@@ -611,10 +613,10 @@ module Esper.Api {
     : JsonPromise<ApiT.EventFeedback>
   {
     var url = prefix + "/api/event/feedback/" + string(Login.myUid())
-            + "/" + encodeURIComponent(string(teamid))
-            + "/" + encodeURIComponent(string(calid))
-            + "/" + encodeURIComponent(string(eventid))
-            + "/" + encodeURIComponent(string(action));
+            + "/" + string(teamid)
+            + "/" + string(calid)
+            + "/" + string(eventid)
+            + "/" + string(action);
     return JsonHttp.post(url);
   }
 
@@ -685,7 +687,7 @@ module Esper.Api {
   {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
-            + "/" + encodeURIComponent(event_id);
+            + "/" + string(event_id);
     return JsonHttp.get(url).then(forceLabels);
   }
 
@@ -694,7 +696,7 @@ module Esper.Api {
   JsonPromise<void> {
     var url = prefix + "/api/event/labels/" + string(Login.myUid())
             + "/" + string(team_id)
-            + "/" + encodeURIComponent(event_id);
+            + "/" + string(event_id);
     return JsonHttp.post(url, {labels:labels});
   }
 
@@ -702,7 +704,7 @@ module Esper.Api {
                                       hashtagRequest: ApiT.HashtagRequest):
   JsonPromise<void> {
     var url = `${prefix}/api/event/hashtags/${string(Login.myUid())}`
-      + `/${string(teamId)}/${encodeURIComponent(eventId)}`;
+      + `/${string(teamId)}/${string(eventId)}`;
     return JsonHttp.post(url, hashtagRequest);
   }
 
@@ -881,7 +883,7 @@ module Esper.Api {
     JsonPromise<ApiT.PaymentCard> {
     var url = prefix + "/api/pay/new-card/" + string(Login.me())
       + "/" + string(cusid)
-      + "/" + encodeURIComponent(string(cardToken));
+      + "/" + string(cardToken);
     return JsonHttp.post(url);
   }
 
