@@ -203,6 +203,8 @@ module Esper.Text {
     "Please wait until calendars are available.";
   export const MustSelectCalendar =
     "Please select at least one calendar";
+  export const EsperEventLink =
+    "Add an Esper link to my calendar event descriptions";
 
   // Event Editor
   export const FeedbackTitle  = "Meeting Feedback"
