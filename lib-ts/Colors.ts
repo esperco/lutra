@@ -210,7 +210,9 @@ module Esper.Colors {
   var calColorMap: ColorMap = {};
 
   export function getNewColorForLabel(): string {
-    return presets[Math.floor(Math.random() * presets.length)];
+    // Ignore lightest colors when randomly picking
+    let limit = Math.min(50, presets.length);
+    return presets[Math.floor(Math.random() * limit)];
   }
 
   export function getColorForHashtag(hashtagNorm: string): string {
