@@ -78,10 +78,6 @@ module Esper.Stores.TeamPreferences {
       slack_for_meeting_feedback: false
     };
 
-    if (typeof prefs.general.event_link !== 'boolean') {
-      prefs.general.event_link = true;
-    }
-
     return (<PrefsWithDefaults> prefs);
   }
 

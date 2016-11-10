@@ -64,7 +64,7 @@ module Esper.Views {
         })
       ).mapOr(
         <div className="esper-spinner" />,
-        ({available, selected}) =>
+        ({available, selected}) => <div>
           <Components.CalendarList
             ref={(c) => this._teamForms[team.teamid] = c}
             team={team}
@@ -75,7 +75,37 @@ module Esper.Views {
             itemClasses="esper-selectable"
             selectedItemClasses="active"
           />
+
+          { Stores.TeamPreferences.get(team.teamid).mapOr(
+              <div className="esper-spinner" />,
+              (prefs) => this.renderOptions(prefs))
+          }
+        </div>
       );
+    }
+
+    renderOptions(prefs: ApiT.Preferences) {
+      if (prefs.event_link === undefined) {
+        prefs = _.cloneDeep(prefs);
+        prefs.event_link = true;
+      }
+
+      return <div className="esper-panel-section">
+        <div className="esper-select-menu">
+          <div className="esper-selectable" onClick={() =>
+              this.toggleEventLink(prefs)}>
+            <i className={classNames("fa fa-fw", {
+              "fa-check-square-o": prefs.event_link,
+              "fa-square-o": !prefs.event_link
+            })} />
+            { Text.EsperEventLink }
+          </div>
+        </div>
+      </div>;
+    }
+
+    toggleEventLink(prefs: ApiT.Preferences) {
+      Actions.TeamPreferences.toggleEsperEventLink(prefs);
     }
 
     onNext() {
@@ -85,6 +115,14 @@ module Esper.Views {
         if (f) {
           if (f.validate().isNone()) {
             badTeamIds.push(_id);
+          } else {
+            let prefs = Stores.TeamPreferences.get(_id).unwrap();
+
+            if (prefs.event_link === undefined) {
+              prefs = _.cloneDeep(prefs);
+              prefs.event_link = true;
+            }
+            Actions.TeamPreferences.setGeneral(_id, prefs);
           }
         }
       });

@@ -374,6 +374,7 @@ module Esper.ApiT {
     label_reminder?: SimpleEmailPref;
     slack_address?: SlackAddress;
     timestats_notify?: TimestatsNotifyPrefs;
+    event_link?: boolean;
     general: GeneralPrefs;
     notes: string;
   }
@@ -451,7 +452,6 @@ module Esper.ApiT {
   // This is used for API setting only
   export interface GeneralPrefsOpts {
     current_timezone?: string;
-    event_link?: boolean;
   }
 
   export interface GeneralPrefs extends GeneralPrefsOpts {

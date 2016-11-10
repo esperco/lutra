@@ -51,10 +51,14 @@ module Esper.Actions.TeamPreferences {
     Toggles hyperlinks in calendar event descriptions
   */
   export function toggleEsperEventLink(prefs: ApiT.Preferences) {
-    var generalPrefs = _.cloneDeep(prefs.general);
-    generalPrefs.event_link = !generalPrefs.event_link;
+    prefs.event_link = !prefs.event_link;
 
-    setGeneral(prefs.teamid, generalPrefs);
+    var promise = Api.setPreferences(prefs.teamid, prefs);
+
+    update(prefs.teamid, promise, (newPrefs) => {
+      newPrefs.event_link = prefs.event_link;
+      return newPrefs;
+    });
   }
 
   // Enable or disable label reminder email
