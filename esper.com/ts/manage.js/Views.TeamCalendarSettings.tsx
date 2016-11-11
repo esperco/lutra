@@ -79,8 +79,8 @@ module Esper.Views {
           <div className="esper-selectable" onClick={() =>
               this.toggleEventLink(prefs)}>
             <i className={classNames("fa fa-fw", {
-              "fa-check-square-o": prefsWithDefaults.general.event_link,
-              "fa-square-o": !prefsWithDefaults.general.event_link
+              "fa-check-square-o": prefsWithDefaults.event_link,
+              "fa-square-o": !prefsWithDefaults.event_link
             })} />
             { Text.EsperEventLink }
           </div>
