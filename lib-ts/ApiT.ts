@@ -79,21 +79,6 @@ module Esper.ApiT {
     team_email_aliases?: string[];
   }
 
-  export type PlanId =
-    "Basic_20161019"|"Executive_20161019"|"Enterprise_20160923"|
-    "Employee_20150304";
-
-  export type SubscriptionStatus =
-    "Trialing"|"Active"|"Past_due"|"Canceled"|"Unpaid";
-
-  export interface TeamSubscription {
-    teamid: string;
-    cusid: string;
-    active: boolean;
-    plan?: PlanId;
-    status?: SubscriptionStatus;
-  }
-
   export interface TeamApi {
     team_exec_email: string;
     team_labels: LabelInfo[];
@@ -575,9 +560,17 @@ module Esper.ApiT {
     description_text: string;
   }
 
+  export type PlanId =
+    "Basic_20161019"|"Executive_20161019"|"Enterprise_20160923"|
+    "Employee_20150304";
+
+  export type SubscriptionStatus =
+    "Trialing"|"Active"|"Past_due"|"Canceled"|"Unpaid";
+
   export interface SubscriptionSummary {
     cusid: string;
     active: boolean;
+    valid_payment_source: boolean;
     plan?: PlanId;
     status?: SubscriptionStatus;
   }
@@ -594,6 +587,10 @@ module Esper.ApiT {
     ended_at?: string;
 
     cards: PaymentCard[];
+  }
+
+  export interface TeamSubscription extends SubscriptionSummary {
+    teamid: string;
   }
 
   export type CardBrand =

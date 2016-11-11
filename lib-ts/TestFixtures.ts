@@ -186,7 +186,8 @@ module Esper.TestFixtures {
           cusid: props.cusid || "customer-id",
           active: true,
           plan: "Basic_20161019",
-          status: "Active"
+          status: "Active",
+          valid_payment_source: true
         }
       },
       team_name: props.team_name || "Team Name",
