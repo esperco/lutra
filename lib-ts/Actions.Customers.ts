@@ -26,11 +26,13 @@ module Esper.Actions.Customers {
       none: () => null,
       some: (t) => {
         t = _.cloneDeep(t);
-        let { active, plan, status } = customer.subscription;
+        let {
+          active, plan, status, valid_payment_source
+        } = customer.subscription;
         t.team_api.team_subscription = {
           teamid: teamId,
           cusid: cusId,
-          active, plan, status
+          active, plan, status, valid_payment_source
         }
         Stores.Teams.TeamStore.push(teamId, p, Option.some(t));
       }

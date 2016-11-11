@@ -51,12 +51,14 @@ module Esper.Route {
   // Helper to check whether user is active AND has a card
   function checkHasCard(teamId: string, next: () => any) {
     checkActive(teamId, function() {
-      // TODO - Check for card existence -- this is temporarily done in Action
-      // module
       teamId = Params.cleanTeamId(teamId);
       let team = Stores.Teams.require(teamId);
       let teamSub = team.team_api.team_subscription;
-      next();
+      if (teamSub.valid_payment_source) {
+        next();
+      } else {
+        Route.nav.go(Paths.Time.paymentInfo({ teamId }));
+      }
     });
   }
 

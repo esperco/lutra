@@ -40,17 +40,24 @@ module Esper.Actions.Subscriptions {
     );
     Stores.Subscriptions.SubscriptionStore.pushFetch(cusId, cardP);
 
+    function editNewSub<T extends ApiT.SubscriptionSummary>(sub: T) {
+      sub.status = (
+        sub.status === "Trialing" || !!sub.status
+      ) ? "Trialing" : "Active";
+      sub.active = true;
+      sub.plan = planId;
+      if (cardToken) {
+        sub.valid_payment_source = true;
+      }
+      return sub;
+    }
+
     // Update team stores
     let teams = Stores.Teams.all();
     _.each(teams, (team) => {
       if (team.team_api.team_subscription.cusid === cusId) {
         let newTeam = _.cloneDeep(team);
-        let newSub = newTeam.team_api.team_subscription;
-        newSub.status = (
-          newSub.status === "Trialing" || !!newSub.status
-        ) ? "Trialing" : "Active";
-        newSub.active = true;
-        newSub.plan = planId;
+        editNewSub(newTeam.team_api.team_subscription);
         Stores.Teams.TeamStore.push(newTeam.teamid, p1, Option.some(newTeam));
       }
     });
@@ -58,12 +65,7 @@ module Esper.Actions.Subscriptions {
     // Update customer store
     let newCustOpt = Stores.Customers.get(cusId).map((cust) => {
       let newCust = _.cloneDeep(cust);
-      let newSub = newCust.subscription;
-      newSub.status = (
-        newSub.status === "Trialing" || !!newSub.status
-      ) ? "Trialing" : "Active";
-      newSub.active = true;
-      newSub.plan = planId;
+      editNewSub(newCust.subscription);
       return newCust;
     });
     Stores.Customers.CustomerStore.push(cusId, p1, newCustOpt);

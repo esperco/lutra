@@ -108,7 +108,8 @@ module Esper.Stores.Teams {
           cusid: "fake-cust-id",
           active: true,
           plan: "Executive_20161019",
-          status: "Active"
+          status: "Active",
+          valid_payment_source: true
         };
 
         return {
