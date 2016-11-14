@@ -51,6 +51,7 @@ module Esper.Actions.TeamPreferences {
     Toggles hyperlinks in calendar event descriptions
   */
   export function toggleEsperEventLink(prefs: ApiT.Preferences) {
+    prefs = _.cloneDeep(prefs);
     prefs.event_link = !prefs.event_link;
 
     var promise = Api.setPreferences(prefs.teamid, prefs);
