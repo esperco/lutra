@@ -193,6 +193,7 @@ module Esper.TestFixtures {
       team_name: props.team_name || "Team Name",
       team_approved: _.isUndefined(props.team_approved) ?
         true : props.team_approved,
+      groups_only: false,
       team_owner: props.team_owner || uid,
       team_cal_user: props.team_cal_user || uid,
       team_assistants: props.team_assistants || [uid],

@@ -68,6 +68,7 @@ module Esper.ApiT {
 
   export interface TeamCreationRequest {
     chrome_extension?: boolean;
+    groups_only?: boolean;
     executive_email?: string;
     executive_name: string;
     executive_timezone: string;
@@ -90,6 +91,7 @@ module Esper.ApiT {
     team_api: TeamApi;
     team_name: string;
     team_approved: boolean;
+    groups_only: boolean;
     team_active_until?: string; // timestamp
     team_executive: string;
     team_assistants: string[];

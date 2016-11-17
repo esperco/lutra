@@ -171,31 +171,14 @@ module Esper.Actions.Groups {
       delGIMs: []
     };
 
-    if (! _.find(group.group_teams, (t) => t.email === email)) {
-      let team = _.find(Stores.Teams.all(), (t) => {
-        return Stores.Profiles.get(t.team_executive).mapOr(
-          false, (exec) => exec.email === email);
-      });
-
-      if (team) {
-        let newMember = {
-          email,
-          teamid: team.teamid,
-          name: team.team_name
-        };
-        group.group_teams.push(newMember);
-        update.putMembers.push(newMember);
-      }
-
-      else if (! _.find(group.group_individuals, (i) => i.email === email)) {
-        let newGIM = { email, role: "Member" as ApiT.GroupRole };
-        group.group_individuals.push(newGIM);
-        update.putGIMs.push(newGIM);
-      }
-
-      let p = MemberUpdateQueue.enqueue(groupId, update);
-      Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
+    if (! _.find(group.group_individuals, (i) => i.email === email)) {
+      let newGIM = { email, role: "Member" as ApiT.GroupRole };
+      group.group_individuals.push(newGIM);
+      update.putGIMs.push(newGIM);
     }
+
+    let p = MemberUpdateQueue.enqueue(groupId, update);
+    Stores.Groups.GroupStore.push(groupId, p, Option.wrap(group));
   }
 
   export function removeEmail(groupId: string, email: string) {
