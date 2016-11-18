@@ -40,6 +40,7 @@ module Esper.Analytics {
             analytics.identify({
               sandbox: true
             }, cb);
+            track(Trackable.SandboxSignup);
 
           } else {
 
