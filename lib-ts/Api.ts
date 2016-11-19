@@ -302,7 +302,7 @@ module Esper.Api {
     role?: string,
     resendNotif?: boolean
   } = {}):
-    JsonPromise<ApiT.GroupIndividual>
+    JsonPromise<ApiT.GroupInviteResponse>
   {
     var query = opts.role || opts.resendNotif ? "?" : "";
     var roleParam = opts.role ? "role=" + opts.role : "";
