@@ -32,6 +32,13 @@ module Esper.Text {
   export const SeeMoreHintText =
     "Click here to see more details about how you spend your time.";
 
+  // Misc help
+  export const EsperLinkDescription =
+    "Enable the Esper link on your calendar. Esper places a unique link on " +
+    "each event description so you can review your tags and notes. This " +
+    "link is private to you or your organization, so you're informed before " +
+    "or after your meetings!";
+
   // Payments
   export const BasicPlan: Types.PlanDetails = {
     id: "Basic_20161019",
