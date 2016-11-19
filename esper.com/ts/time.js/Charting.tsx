@@ -439,6 +439,8 @@ module Esper.Charting {
            _.isEqual(p1.extra, p2.extra) &&
            p1.calendars === p2.calendars &&
            p1.groupBy === p2.groupBy &&
+           p1.isBusy === p2.isBusy &&
+           p1.hasError === p2.hasError &&
 
            // TeamID only -> don't refresh if new labels
            p1.team.teamid === p2.team.teamid;
