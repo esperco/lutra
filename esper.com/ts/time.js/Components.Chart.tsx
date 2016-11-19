@@ -126,6 +126,9 @@ module Esper.Components {
         return true;
       };
 
+      // Hide 0s in pie chart (avoids phantom labels)
+      series.data = _.filter(series.data, (d) => d.y > 0);
+
       return <div className="chart-content">
         { simplified ? null : <TotalsBar {...result.group.all} /> }
         <PieChart
