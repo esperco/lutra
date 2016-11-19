@@ -317,6 +317,14 @@ module Esper.Api {
     return JsonHttp.put(url);
   }
 
+  export function postGroupResendNotification(their_uid: string, groupid: string):
+    JsonPromise<void>
+  {
+    var url = `${prefix}/api/group/resend-notification/${Login.me()}/`
+      + `${string(their_uid)}/${string(groupid)}`;
+    return JsonHttp.post(url);
+  }
+
   export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
     JsonPromise<void>
   {
