@@ -94,11 +94,16 @@ module Esper.Views {
         <div className="esper-select-menu">
           <div className="esper-selectable" onClick={() =>
               this.toggleEventLink(prefs)}>
-            <i className={classNames("fa fa-fw", {
-              "fa-check-square-o": prefs.event_link,
-              "fa-square-o": !prefs.event_link
-            })} />
-            { Text.EsperEventLink }
+            <Components.Tooltip title={Text.EsperLinkDescription}>
+              <i className={classNames("fa fa-fw fa-left", {
+                "fa-check-square-o": prefs.event_link,
+                "fa-square-o": !prefs.event_link
+              })} />
+              { Text.EsperEventLink }
+              <span className="pull-right">
+                <i className="fa fa-fw fa-question-circle" />
+              </span>
+            </Components.Tooltip>
           </div>
         </div>
       </div>;
