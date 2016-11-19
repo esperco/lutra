@@ -584,21 +584,6 @@ module Esper.Api {
     );
   }
 
-  // supports generic calendar
-  export function postForCalendarStats(teamid: string, calid: string,
-    q: ApiT.CalendarStatsRequest): JsonPromise<ApiT.CalendarStatsResult> {
-    var url = prefix + "/api/calendar/stats2/" + string(Login.myUid())
-      + "/" + string(teamid) + "/" + string(calid);
-    return JsonHttp.post(url, q);
-  }
-
-  export function postForDailyStats(q: ApiT.DailyStatsRequest)
-    : JsonPromise<ApiT.DailyStatsResponse>
-  {
-    var url = prefix + "/api/calendar/daily-stats/" + string(Login.myUid());
-    return JsonHttp.post(url, q);
-  }
-
   export function postEventFeedback(teamid: string, eventid: string,
     feedback: ApiT.EventFeedbackUpdate): JsonPromise<ApiT.EventFeedback>
   {
