@@ -137,6 +137,11 @@ module Esper.ApiT {
     invite_sent?: string;
   }
 
+  export interface GroupInviteResponse {
+    gim: GroupIndividual;
+    opt_gm?: GroupMember;
+  }
+
   export interface Customer {
     id: string;
     name?: string;

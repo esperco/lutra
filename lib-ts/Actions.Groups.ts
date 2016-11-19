@@ -95,10 +95,11 @@ module Esper.Actions.Groups {
               (old) => old.email === gim.email
             );
             if (oldGIM) {
-              oldGIM.uid = res.uid;
+              oldGIM.uid = res.gim.uid;
             } else {
-              group.group_individuals.push(res);
+              group.group_individuals.push(res.gim);
             }
+            if (res.opt_gm) group.group_teams.push(res.opt_gm);
             Stores.Groups.GroupStore.set(update.groupId, Option.some(group));
           });
       });

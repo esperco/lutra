@@ -302,7 +302,7 @@ module Esper.Api {
     role?: string,
     resendNotif?: boolean
   } = {}):
-    JsonPromise<ApiT.GroupIndividual>
+    JsonPromise<ApiT.GroupInviteResponse>
   {
     var query = opts.role || opts.resendNotif ? "?" : "";
     var roleParam = opts.role ? "role=" + opts.role : "";
@@ -315,6 +315,14 @@ module Esper.Api {
       + "/email/" + string(email)
       + paramString;
     return JsonHttp.put(url);
+  }
+
+  export function postGroupResendNotification(their_uid: string, groupid: string):
+    JsonPromise<void>
+  {
+    var url = `${prefix}/api/group/resend-notification/${Login.me()}/`
+      + `${string(their_uid)}/${string(groupid)}`;
+    return JsonHttp.post(url);
   }
 
   export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
