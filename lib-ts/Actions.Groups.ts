@@ -87,8 +87,9 @@ module Esper.Actions.Groups {
         return Api.removeGroupMember(update.groupId, member.teamid);
       });
       var p3 = _.map(update.putGIMs, function(gim) {
-        return Api.putGroupIndividualByEmail(update.groupId, gim.email)
-          .then((res) => {
+        return Api.putGroupIndividualByEmail(update.groupId, gim.email, {
+          role: gim.role
+        }).then((res) => {
             // Assign UID to temporarily created GIM
             let group = _.cloneDeep(Stores.Groups.require(update.groupId));
             let oldGIM = _.find(group.group_individuals,
