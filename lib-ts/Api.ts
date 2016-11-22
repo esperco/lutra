@@ -534,16 +534,6 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
-  // supports generic calendar
-  export function postForGenericCalendarEvents(teamid: string, calid: string,
-    q: ApiT.CalendarRequest):
-    JsonPromise<ApiT.GenericCalendarEvents> {
-    var url = prefix + "/api/ts/events/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + string(calid);
-    return JsonHttp.post(url, q);
-  }
-
   export function postForTeamEvents(teamId: string, q: ApiT.CalendarRequest):
     JsonPromise<ApiT.GenericCalendarEventsCollection>
   {
