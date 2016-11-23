@@ -17,11 +17,11 @@ module Esper.ApiT {
 
   /*
     One of the possible values for ErrorDetails,
-    tagged "unauthorized_team_member"
+    tagged "Login_required"
   */
-  interface UnauthorizedTeamMember {
-    unauthorized_uid: uid;
-    unauthorized_email: email;
+  interface LoginRequired {
+    uid: uid;
+    email: email;
   }
 
   interface ListResponse<T> {
