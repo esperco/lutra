@@ -215,8 +215,11 @@ module Esper.Text {
 
   // Event Editor
   export const FeedbackTitle  = "Meeting Feedback"
-  export const NoAttend     = "Ignored";
-  export const YesAttend    = "Ignore?"
+  export const NoAttend     = "Unhide";
+  export const YesAttend    = "Hide"
+  export const NoAttendLong = "This event is not included in charts. " +
+    "Click to unhide this event.";
+  export const YesAttendLong = "Click to hide this event from charts."
   export const NoEventTitle = `Untitled Event`;
   export const ManageLabels = `Manage ${_.capitalize(Labels)}`;
 

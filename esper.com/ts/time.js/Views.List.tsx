@@ -6,6 +6,7 @@ module Esper.Views {
     period: Types.Period;
     filterStr: string;
     view: "week"|"month"|"agenda";
+    hideInactive: boolean;
   }
 
   interface State {
@@ -124,6 +125,7 @@ module Esper.Views {
         return <WeekMain ref={(c) => this._main = c}
           {...props}
           {...this.state}
+          hideInactive={this.props.hideInactive}
           toggleEvent={this.toggleEvent}
         />;
       }
@@ -132,6 +134,7 @@ module Esper.Views {
         return <MonthMain ref={(c) => this._main = c}
           {...props}
           {...this.state}
+          hideInactive={this.props.hideInactive}
           toggleEvent={this.toggleEvent}
         />;
       }
@@ -139,6 +142,7 @@ module Esper.Views {
       return <AgendaMain ref={(c) => this._main = c}
         {...props}
         {...this.state}
+        hideInactive={this.props.hideInactive}
         toggleEvent={this.toggleEvent}
       />;
     }
@@ -184,6 +188,14 @@ module Esper.Views {
             updateFn={(extra) => this.update({ extra })}
           />
         </div>
+
+        <HiddenEventsToggle
+          eventsForRanges={props.eventsForRanges}
+          selected={!this.props.hideInactive}
+          onToggle={() => this.update({
+            extra: { hideInactive: !this.props.hideInactive }
+          })}
+        />
       </div>;
     }
 
@@ -261,7 +273,7 @@ module Esper.Views {
       teamId?: string;
       period?: Types.Period;
       view?: "week"|"month"|"agenda";
-      extra?: Types.ChartExtraOpt;
+      extra?: Types.ChartExtraOpt & {hideInactive?: boolean};
     }) {
       var newProps = _.extend({}, this.props, params) as Props;
       var periodStr = Params.periodStr(newProps.period);
@@ -287,9 +299,14 @@ module Esper.Views {
           newProps.labels = params.extra.labels;
         }
 
-        // Fitler str
+        // Filter str
         if (_.isString(params.extra.filterStr)) {
           newProps.filterStr = params.extra.filterStr;
+        }
+
+        // Toggle hidden events
+        if (_.isBoolean(params.extra.hideInactive)) {
+          newProps.hideInactive = params.extra.hideInactive;
         }
       }
 
@@ -300,7 +317,8 @@ module Esper.Views {
         period: periodStr.period
       }), { jsonQuery: {
         labels: newProps.labels,
-        filterStr: newProps.filterStr
+        filterStr: newProps.filterStr,
+        hideInactive: newProps.hideInactive
       } });
     }
   }
@@ -309,6 +327,7 @@ module Esper.Views {
   // List props combines props + state from parent element
   interface ListProps extends Types.ChartProps, State {
     toggleEvent: (event: Types.TeamEvent) => void;
+    hideInactive: boolean;
   }
 
   /*
@@ -320,6 +339,10 @@ module Esper.Views {
     getCalc(props: ListProps): Calc<Types.CounterState> {
       return EventStats.simpleFilterCalc(
         props.eventsForRanges, [
+          function filterActive(e) {
+            return props.hideInactive ? Stores.Events.isActive(e) : true;
+          },
+
           function filterCalendar(e) {
             return Charting.GroupByCalendar.keyFn(e, props).isSome()
           },
@@ -340,7 +363,8 @@ module Esper.Views {
       calc is firing because it calls forceUpdate
     */
     shouldCalcUpdate(newProps: ListProps) {
-      return !Charting.eqFilterProps(this.props, newProps);
+      return !Charting.eqFilterProps(this.props, newProps) ||
+             this.props.hideInactive !== newProps.hideInactive;
     }
 
     isSelected(event: Types.TeamEvent) {
@@ -483,6 +507,48 @@ module Esper.Views {
           </div>;
         }
       });
+    }
+  }
+
+
+  interface HiddenEventsToggleProps {
+    eventsForRanges: Types.EventsForRange[];
+    selected: boolean;
+    onToggle: () => void;
+  }
+
+  class HiddenEventsToggle extends
+    Components.CalcUI<Types.CounterState, HiddenEventsToggleProps>
+  {
+    getCalc(props: HiddenEventsToggleProps) {
+      let eventsForRanges = props.eventsForRanges;
+      return EventStats.simpleCounterCalc(eventsForRanges, [
+        (e) => !Stores.Events.isActive(e)
+      ]);
+    }
+
+    // Button to manually launch
+    render() {
+      return this.state.result.mapOr(
+        null,
+        (counts) => counts.total > 0 ?
+          <div className="esper-panel-section">
+            <div className="esper-select-menu">
+              <div className={classNames("esper-selectable hidden-link", {
+                active: this.props.selected
+              })} onClick={this.props.onToggle}>
+                <i className={classNames("fa fa-fw fa-left", {
+                  "fa-check-square-o": this.props.selected,
+                  "fa-square-o": !this.props.selected
+                })} />
+                { Text.HiddenEventsToggle }
+                <Components.BadgeLight
+                  text={counts.total.toString()}
+                />
+              </div>
+            </div>
+          </div> : null
+      );
     }
   }
 

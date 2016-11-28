@@ -57,6 +57,7 @@ module Esper.Views {
                 updateFn={(x) => Route.nav.query({ labels: x.labels })}
               />
             </div>
+            <HiddenLink eventsForRanges={eventsForRanges} />
           </div>
 
           <div className="sidebar-bottom-menu">
@@ -367,14 +368,14 @@ module Esper.Views {
   }
 
   // Link to launch auto-confirm modal
-  interface UnconfirmedLinkProps {
+  interface ModalLinkProps {
     eventsForRanges: Types.EventsForRange[];
   }
 
   class UnconfirmedLink extends
-    Components.CalcUI<Types.CounterState, UnconfirmedLinkProps>
+    Components.CalcUI<Types.CounterState, ModalLinkProps>
   {
-    getCalc(props: UnconfirmedLinkProps) {
+    getCalc(props: ModalLinkProps) {
       let eventsForRanges = props.eventsForRanges;
       return EventStats.simpleCounterCalc(eventsForRanges, [
         Stores.Events.needsConfirmation
@@ -394,6 +395,42 @@ module Esper.Views {
                 <i className="fa fa-fw fa-left fa-flash" />
                 { Text.Unconfirmed }
                 <Components.Badge
+                  text={counts.total.toString()}
+                />
+              </div>
+            </div>
+          </div> : null
+      );
+    }
+
+    launchModal(events: Types.TeamEvent[]) {
+      Layout.renderModal(Containers.confirmListModal(events));
+    }
+  }
+
+  class HiddenLink extends
+    Components.CalcUI<Types.CounterState, ModalLinkProps>
+  {
+    getCalc(props: ModalLinkProps) {
+      let eventsForRanges = props.eventsForRanges;
+      return EventStats.simpleCounterCalc(eventsForRanges, [
+        (e) => !Stores.Events.isActive(e)
+      ]);
+    }
+
+    // Button to manually launch
+    render() {
+      return this.state.result.mapOr(
+        null,
+        (counts) => counts.total > 0 ?
+          <div className="esper-panel-section">
+            <div className="esper-select-menu">
+              <div className="esper-selectable hidden-link" onClick={
+                () => this.launchModal(counts.events)
+              }>
+                <i className="fa fa-fw fa-left fa-eye-slash" />
+                { Text.HiddenEvents }
+                <Components.BadgeLight
                   text={counts.total.toString()}
                 />
               </div>
