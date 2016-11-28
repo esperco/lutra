@@ -300,8 +300,7 @@ module Esper.Actions {
           initAction={!!action}
         />);
       } else {
-        Log.e("Event not found", {teamId, calId, eventId});
-        Route.nav.go("/not-found");
+        goToDate(new Date(), { teamId });
       }
     }).fail(function() {
       Route.nav.go("/not-found");
