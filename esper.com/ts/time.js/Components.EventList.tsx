@@ -158,13 +158,13 @@ module Esper.Components {
 
     // Used in tooltip
     var isActive = Stores.Events.isActive(event);
-    var title = isActive ? Text.YesAttend : Text.NoAttend;
+    var title = isActive ? Text.YesAttendLong : Text.NoAttendLong;
 
     return <Tooltip className={classNames("action", "no-attend-action", {
                                 active: !isActive
                               })} title={title}
         onClick={(e) => toggleAttend(e, event)}>
-      <i className="fa fa-fw fa-eye-slash" />
+      { isActive ? Text.YesAttend : Text.NoAttend }
     </Tooltip>;
   }
 

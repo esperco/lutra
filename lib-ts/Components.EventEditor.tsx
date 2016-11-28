@@ -5,6 +5,7 @@
 /// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.LabelList.tsx" />
 /// <reference path="./Components.Textarea.tsx" />
+/// <reference path="./Components.Tooltip.tsx" />
 
 module Esper.Components {
   var Component = ReactHelpers.Component;
@@ -213,6 +214,8 @@ module Esper.Components {
         (this.props.initAction && !this.state.lastSavedEvent) ||
         _.isEqual(this.state.lastSavedEvent, event)
       );
+      var isActive = Stores.Events.isActive(event);
+      var title = isActive ? Text.YesAttendLong : Text.NoAttendLong;
 
       if (this.state.minimize) {
         return <div onClick={() => this.setState({ minimize: false })}
@@ -221,11 +224,11 @@ module Esper.Components {
             { this.renderMinFeedback(event) }{" "}
             <i className="fa fa-fw fa-caret-down" />
           </a>
-          <a className={classNames("pull-right no-attend-action action", {
-            active: !Stores.Events.isActive(event)
-          })} onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-eye-slash" />
-          </a>
+          <Tooltip className={classNames("action no-attend-action", {
+            active: !isActive
+          })} title={title} onClick={() => this.toggleAttended()}>
+            { isActive ? Text.YesAttend : Text.NoAttend }
+          </Tooltip>
         </div>;
       }
 
@@ -280,6 +283,9 @@ module Esper.Components {
     }
 
     renderRating(event: Stores.Events.TeamEvent) {
+      let isActive = Stores.Events.isActive(event);
+      let noAttendTitle = isActive ? Text.YesAttendLong : Text.NoAttendLong;
+
       return <div className="row">
         <div className="col-sm-8 pad-xs event-star-ratings">
           <StarRating
@@ -288,13 +294,16 @@ module Esper.Components {
             onChange={(i) => this.submitStarRating(i)} />
         </div>
         <div className="col-sm-4 pad-xs event-no-attend">
-          <button className={"form-control btn btn-default" +
-                    (Stores.Events.isActive(event) ? "" : " active")}
-                  onClick={() => this.toggleAttended()}>
-            <i className="fa fa-fw fa-eye-slash" />{" "}
-            { Stores.Events.isActive(event) ?
-              Text.YesAttend : Text.NoAttend }
-          </button>
+          <Tooltip className={classNames("action no-attend-action", {
+            active: !isActive
+          })} title={noAttendTitle}>
+            <button className={"form-control btn btn-default" +
+              (Stores.Events.isActive(event) ? "" : " active")}
+            onClick={() => this.toggleAttended()}>
+              { Stores.Events.isActive(event) ?
+                Text.YesAttend : Text.NoAttend }
+            </button>
+          </Tooltip>
         </div>
       </div>;
     }

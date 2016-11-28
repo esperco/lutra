@@ -13,8 +13,7 @@
 }
 
 .event-min-feedback {
-  font-style: italic;
-  font-size: 90%;
+  font-size: @font-size-small;
   padding: 0 @padding-base-horizontal;
 
   a.action {
@@ -27,6 +26,11 @@
     &:hover {
       color: @link-hover-color;
     }
+  }
+
+  .no-attend-action {
+    text-transform: uppercase;
+    float: right;
   }
 
   .esper-shade & {
