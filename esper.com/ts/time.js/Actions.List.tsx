@@ -43,6 +43,7 @@ module Esper.Actions {
     var labels = Params.cleanListSelectJSON(extra.labels);
     var calIds = Params.cleanCalIds(teamId, extra.calIds || "");
     var filterStr = Params.cleanFilterStrJSON(extra).filterStr;
+    var hideInactive = Params.cleanBoolean(extra.hideInactive);
     Stores.Events.fetchPredictions({ teamId, period })
 
     // Render view
@@ -52,6 +53,7 @@ module Esper.Actions {
       period={period}
       labels={labels}
       filterStr={filterStr}
+      hideInactive={hideInactive}
       view={view}
     />);
 

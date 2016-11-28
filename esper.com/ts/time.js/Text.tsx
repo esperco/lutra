@@ -91,7 +91,8 @@ module Esper.Text {
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const HideUnlabled = `Only ${_.capitalize(Labeled)} Events`;
   export const Unconfirmed = `New Events`;
-  export const HiddenEvents = `Hidden`;
+  export const HiddenEvents = `Hidden Events`;
+  export const HiddenEventsToggle = `Show Hidden Events`;
   export const SearchEventsPlaceholder = `Filter Events`;
 
   export const GuestDomains = `Organizations`;
