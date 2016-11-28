@@ -204,6 +204,10 @@ module Esper.Actions {
 
   // Render current event (or most recent event today if none ongoing)
   export function renderCurrent(teamId?: string) {
+    var team = teamId ? Stores.Teams.require(teamId) : getTeam();
+    if (! team) { return; }
+
+    teamId = teamId || team.teamid;
     var promise = fetchEvents({teamId});
 
     render(<Components.PromiseSpinner promise={promise} />);
