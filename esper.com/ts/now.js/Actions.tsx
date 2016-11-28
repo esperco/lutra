@@ -15,8 +15,8 @@ module Esper.Actions {
     var allTeams = Stores.Teams.all();
     var team = _.find(allTeams, (t) => t.team_executive === Login.myUid()) ||
                       allTeams[0];
-    if (! team) {
-      Log.e("Missing team for fetching current event");
+    if (! team) { // Go to onboarding
+      Route.nav.go(Paths.Time.teamSetup());
     }
     return team;
   }
@@ -27,7 +27,9 @@ module Esper.Actions {
     date?: Date;
   } = {}) {
     var team = teamId ? Stores.Teams.require(teamId) : getTeam();
-    if (! team) { return; }
+
+    // Spin forever -- should wait for redirect
+    if (! team) { return $.Deferred().promise(); }
 
     // Fetch all events on date +/- 1 day
     var mDate = moment(date).startOf('day');
@@ -46,7 +48,7 @@ module Esper.Actions {
     date?: Date;
   } = {}) {
     var team = teamId ? Stores.Teams.require(teamId) : getTeam();
-    if (! team) { return; }
+    if (! team) { return []; }
 
     // Fetch all events on date +/- 1 day
     var mDate = moment(date).startOf('day');
@@ -204,6 +206,10 @@ module Esper.Actions {
 
   // Render current event (or most recent event today if none ongoing)
   export function renderCurrent(teamId?: string) {
+    var team = teamId ? Stores.Teams.require(teamId) : getTeam();
+    if (! team) { return; }
+
+    teamId = teamId || team.teamid;
     var promise = fetchEvents({teamId});
 
     render(<Components.PromiseSpinner promise={promise} />);
@@ -296,8 +302,7 @@ module Esper.Actions {
           initAction={!!action}
         />);
       } else {
-        Log.e("Event not found", {teamId, calId, eventId});
-        Route.nav.go("/not-found");
+        goToDate(new Date(), { teamId });
       }
     }).fail(function() {
       Route.nav.go("/not-found");
