@@ -247,17 +247,6 @@ module Esper.Actions.Groups {
     if (existingTeam) {
       _.remove(group.group_teams, (t) => t.email === email);
       update.delMembers.push(existingTeam);
-
-      // Add GIM if necessary (and possible)
-      if (! _.find(group.group_individuals, (t) => t.email === email)) {
-        let selfGim = _.find(group.group_individuals,
-          (i) => i.uid === Login.me());
-        if (selfGim) {
-          let gim: ApiT.GroupIndividual = { email, role: "Member" };
-          group.group_individuals.push(gim);
-          update.putGIMs.push(gim);
-        }
-      }
     }
 
     // Create new group team
@@ -274,6 +263,17 @@ module Esper.Actions.Groups {
         };
         group.group_teams.push(newMember);
         update.putMembers.push(newMember);
+
+        // Add GIM if necessary (and possible)
+        if (! _.find(group.group_individuals, (t) => t.email === email)) {
+          let selfGim = _.find(group.group_individuals,
+            (i) => i.uid === Login.me());
+          if (selfGim) {
+            let gim: ApiT.GroupIndividual = { email, role: "Member" };
+            group.group_individuals.push(gim);
+            update.putGIMs.push(gim);
+          }
+        }
       } else {
         Log.e("Tried to toggle calendar for non-existent team - " + email);
       }
