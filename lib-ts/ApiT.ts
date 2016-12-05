@@ -453,62 +453,9 @@ module Esper.ApiT {
     window_end: string; // timestamp
   }
 
-  export interface CalendarStatsRequest {
-    window_starts: string[]; // timestamp sorted ascendingly
-    window_end: string; // timestamp
-  }
-
-  // calendar_stats2 in api.atd
-  export interface CalendarStats {
-    window_start: string; // timestamp
-    partition: CalendarStatEntry[];
-  }
-
-  export interface CalendarStatEntry {
-    event_labels: LabelInfo[];
-    event_count: number;    // integer
-    event_duration: number; // seconds
-  }
-
-  // calendar_stats_result2 in api.atd
-  export type CalendarStatsResult = ListResponse<CalendarStats>;
-
   export interface CalendarAndTeam {
     calid: string;
     teamid: string;
-  }
-
-  export interface DailyStatsRequest {
-    window_start: string; // timestamp
-    window_end: string; // timestamp
-    calendars: CalendarAndTeam[];
-  }
-
-  export interface DailyStatsResponse {
-    has_domain_analysis: boolean;
-    guest_stats: GuestStat[];
-    daily_stats: DailyStats[];
-  }
-
-  export interface GuestStat {
-    guests: Identity[];
-    count: number;
-    time: number;   // Seconds
-  }
-
-  export interface Identity {
-    email: string;
-    name?: string;
-  }
-
-  export interface DailyStats {
-    window_start: string;         // timestamp
-    scheduled: number[];          // Seconds list
-    with_guests: number[];        // Seconds list
-    internal?: number[];          // Seconds list
-    external?: number[];          // Seconds list
-    chunks: number[];             // Seconds list, alternating +/- (+ = busy)
-    chunks_with_guests: number[]; // Seconds list, alternating +/- (+ = busy)
   }
 
   export interface UrlResult {
