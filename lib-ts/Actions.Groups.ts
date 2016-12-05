@@ -317,7 +317,7 @@ module Esper.Actions.Groups {
       });
 
       return Api.putGroupLabels(update.groupId, {
-        items: _.map(update.labels, (l) => l.original)
+        labels: _.map(update.labels, (l) => l.original)
       });
     },
 

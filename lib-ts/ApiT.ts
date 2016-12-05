@@ -107,8 +107,6 @@ module Esper.ApiT {
 
   export type GroupList = ListResponse<Group>;
 
-  export type GroupLabels = ListResponse<string>;
-
   export type GroupRole = "Member"|"Manager"|"Owner";
 
   export interface Group extends GroupUpdate {
