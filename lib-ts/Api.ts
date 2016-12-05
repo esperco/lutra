@@ -325,14 +325,6 @@ module Esper.Api {
     return JsonHttp.post(url);
   }
 
-  export function putGroupLabels(groupid: string, labels: ApiT.GroupLabels):
-    JsonPromise<void>
-  {
-    var url = prefix + "/api/group/event-labels/" + string(Login.me())
-      + "/" + string(groupid);
-    return JsonHttp.put(url, labels);
-  }
-
   export function getAllGroupPrefs():
     JsonPromise<ApiT.GroupPreferencesList>
   {
@@ -468,6 +460,14 @@ module Esper.Api {
     JsonPromise<void> {
     var url = prefix + "/api/team/labels/" + string(Login.me()) +
       "/" + string(teamid);
+    return JsonHttp.put(url, labels);
+  }
+
+  export function putGroupLabels(groupid: string, labels: {labels: string[]}):
+    JsonPromise<void>
+  {
+    var url = prefix + "/api/group/labels/" + string(Login.me())
+      + "/" + string(groupid);
     return JsonHttp.put(url, labels);
   }
 
