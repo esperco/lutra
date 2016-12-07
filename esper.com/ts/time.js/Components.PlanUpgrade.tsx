@@ -42,7 +42,7 @@ module Esper.Components {
         Esper.Stripe.getHandler().then((handler) => handler.open({
           label: "Submit",
           description: plan.name,
-          token: (token) => Actions.Subscriptions.set({
+          token: (token) => Actions.Subscriptions.setExplicit({
             cusId: this.props.subscription.cusid,
             planId: plan.id,
             cardToken: token.id
@@ -59,7 +59,7 @@ module Esper.Components {
       }
 
       // Else, just change plan
-      return Actions.Subscriptions.set({
+      return Actions.Subscriptions.setExplicit({
         cusId: this.props.subscription.cusid,
         planId: plan.id
       }).then(() => {

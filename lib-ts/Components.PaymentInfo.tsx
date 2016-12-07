@@ -94,6 +94,10 @@ module Esper.Components {
         </div>
         <div className="panel-body">
           { this.renderStatus() }
+
+          <Redeem.ExtendedTrialMsg />
+          <Redeem.DiscountMessage />
+
           <Plans
             subscription={this.props.team.team_api.team_subscription}
             plans={Text.AllPlans}
@@ -200,7 +204,7 @@ module Esper.Components {
           description: plan.name,
           token: (token) => {
             hasToken = true;
-            Actions.Subscriptions.set({
+            Actions.Subscriptions.setExplicit({
               cusId: this.props.details.cusid,
               planId: plan.id,
               cardToken: token.id
@@ -219,7 +223,7 @@ module Esper.Components {
       }
 
       // Else, just change plan
-      return Actions.Subscriptions.set({
+      return Actions.Subscriptions.setExplicit({
         cusId: this.props.details.cusid,
         planId: plan.id
       }).then(() => {
