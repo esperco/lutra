@@ -25,10 +25,6 @@ module Esper.Redeem {
     return ret ? ret.code : null;
   }
 
-  export const ExtendedTrialHeading = "You're getting a free month of Esper";
-  export const ExtendedTrialDescription = "Select an option below to " +
-    "start your free trial.";
-
   export function ExtendedTrialMsg({}: {}) {
     if (checkExtendedTrial()) {
       return <div className="alert alert-success">
@@ -42,7 +38,7 @@ module Esper.Redeem {
     let ret = LocalStore.get("discount-code");
 
     // Expire after six months (in case we forget to remove this code later)
-    if (ret.redeemed &&
+    if (ret && ret.redeemed &&
         (new Date()).getTime() - ret.redeemed > 6 * 30 * 24 * 60 * 60 * 1000) {
       return null;
     }

@@ -101,6 +101,10 @@ module Esper.Text {
   export const SelectPlan = "Select Plan";
   export const ActivePlan = "Keep Current Plan";
 
+  export const ExtendedTrialHeading = "You're getting a free month of Esper";
+  export const ExtendedTrialDescription = "Select an option below to " +
+    "start your free trial.";
+
   export const AddToEnterpriseLink =
     "Does your company already have an Enterprise Plan? " +
     "Click here to request that they add you."

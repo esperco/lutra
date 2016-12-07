@@ -7,7 +7,6 @@ function redeemCode() {
   reset();
 
   var input = $('#redeem-code');
-  var btn = $('#redeem-code-btn');
   var code = input.val();
   var termsCheck = $('#terms-check');
 

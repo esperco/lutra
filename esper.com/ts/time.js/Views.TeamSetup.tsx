@@ -43,8 +43,8 @@ module Esper.Views {
       let heading = Text.TeamSetupHeading;
       let subheading = Text.TeamSetupDescription;
       if (Redeem.checkExtendedTrial()) {
-        heading = Redeem.ExtendedTrialHeading;
-        subheading += " " + Redeem.ExtendedTrialDescription;
+        heading = Text.ExtendedTrialHeading;
+        subheading += " " + Text.ExtendedTrialDescription;
       }
 
       return <Components.OnboardingPanel heading={ heading }
