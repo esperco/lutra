@@ -94,6 +94,10 @@ module Esper.Components {
         </div>
         <div className="panel-body">
           { this.renderStatus() }
+
+          <Redeem.ExtendedTrialMsg />
+          <Redeem.DiscountMessage />
+
           <Plans
             subscription={this.props.team.team_api.team_subscription}
             plans={Text.AllPlans}
@@ -200,12 +204,18 @@ module Esper.Components {
           description: plan.name,
           token: (token) => {
             hasToken = true;
-            Actions.Subscriptions.set({
+            Actions.Subscriptions.setExplicit({
               cusId: this.props.details.cusid,
               planId: plan.id,
-              cardToken: token.id,
-              redirectTarget: this.props.redirect
-            }).then(() => dfd.resolve())
+              cardToken: token.id
+            }).then(() => {
+              // Don't resolve if redirecting (keep spinner going)
+              if (this.props.redirect) {
+                Route.nav.go(this.props.redirect);
+              } else {
+                dfd.resolve();
+              }
+            })
           },
           closed: () => { hasToken ? null : dfd.reject() }
         }));
@@ -213,11 +223,17 @@ module Esper.Components {
       }
 
       // Else, just change plan
-      return Actions.Subscriptions.set({
+      return Actions.Subscriptions.setExplicit({
         cusId: this.props.details.cusid,
-        planId: plan.id,
-        redirectTarget: this.props.redirect
-      }).then(() => null);
+        planId: plan.id
+      }).then(() => {
+        // Don't resolve if redirecting (keep spinner going)
+        if (this.props.redirect) {
+          Route.nav.go(this.props.redirect);
+          return $.Deferred<void>().promise();
+        }
+        return null;
+      });
     }
   }
 }

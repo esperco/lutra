@@ -2,6 +2,7 @@
   Component for displaying plan information
 */
 
+/// <reference path="./Redeem.tsx" />
 /// <reference path="./Text.tsx" />
 /// <reference path="./Types.ts" />
 
@@ -45,7 +46,7 @@ module Esper.Components {
       this.mutateState((s) => s.busy = true);
       let cusId = this.props.subscription.cusid;
       this.props.onSelect(plan)
-        .fail(() => this.mutateState((s) => s.busy = false));
+        .always(() => this.mutateState((s) => s.busy = false));
     }
   }
 
@@ -55,11 +56,7 @@ module Esper.Components {
     subscription: ApiT.SubscriptionDetails|ApiT.TeamSubscription;
   }) {
     let selected = subscription.plan === plan.id;
-
-    // TODO: This is a hack. We should fix this later and implement
-    // proper coupon-entering.
-    let showDiscount = plan.discountedPrice &&
-      _.includes(location.href, "coupon");
+    let showDiscount = plan.discountedPrice && Redeem.checkDiscount();
     let pricing = showDiscount ? <span>
       <span className="old-price">{ plan.price }</span>
       <span>{ plan.discountedPrice }</span>
@@ -71,14 +68,17 @@ module Esper.Components {
         subscription.status !== "Unpaid" &&
         subscription.status !== "Canceled";
 
+    let trialText = (plan.extendedTrial && Redeem.checkExtendedTrial()) ?
+      plan.extendedTrial : plan.freeTrial;
+
     return <div className={classNames("sub-plan-box", {selected})}>
       <h4 className="sub-plan-heading">
         { plan.name }
       </h4>
       <div className="sub-plan-body">
         <div className="pricing">
-          { plan.freeTrial ?
-            <div className="free-trial">{ plan.freeTrial }</div> : null }
+          { trialText ?
+            <div className="free-trial">{ trialText }</div> : null }
           { pricing }
         </div>
         <ul className="features">

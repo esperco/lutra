@@ -350,6 +350,7 @@ module Esper.Types {
     price: string|JSX.Element;
     discountedPrice?: string|JSX.Element;
     freeTrial?: string|JSX.Element;
+    extendedTrial?: string|JSX.Element;
     features: Array<string|JSX.Element>;
     enterprise?: boolean; // Requires billing address
   }

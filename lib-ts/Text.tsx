@@ -44,6 +44,7 @@ module Esper.Text {
     id: "Basic_20161019",
     name: "Basic Plan",
     freeTrial: "14 Day Free Trial",
+    extendedTrial: "One Month Free Trial",
     price: "$25 / month",
     features: [
       "1 Calendar",
@@ -58,6 +59,7 @@ module Esper.Text {
     id: "Executive_20161019",
     name: "Executive Plan",
     freeTrial: BasicPlan.freeTrial,
+    extendedTrial: BasicPlan.extendedTrial,
     price: "$100 / month",
     discountedPrice: "$50 / month for first 6 months",
     features: [
@@ -98,6 +100,10 @@ module Esper.Text {
   export const StartFreeTrial = "Start Free Trial";
   export const SelectPlan = "Select Plan";
   export const ActivePlan = "Keep Current Plan";
+
+  export const ExtendedTrialHeading = "You're getting a free month of Esper";
+  export const ExtendedTrialDescription = "Select an option below to " +
+    "start your free trial.";
 
   export const AddToEnterpriseLink =
     "Does your company already have an Enterprise Plan? " +

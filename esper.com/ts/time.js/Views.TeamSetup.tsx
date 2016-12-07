@@ -40,8 +40,15 @@ module Esper.Views {
     }
 
     renderWithData() {
-      return <Components.OnboardingPanel heading={ Text.TeamSetupHeading }
-              subheading={ Text.TeamSetupDescription }
+      let heading = Text.TeamSetupHeading;
+      let subheading = Text.TeamSetupDescription;
+      if (Redeem.checkExtendedTrial()) {
+        heading = Text.ExtendedTrialHeading;
+        subheading += " " + Text.ExtendedTrialDescription;
+      }
+
+      return <Components.OnboardingPanel heading={ heading }
+              subheading={ subheading }
               progress={1/3} busy={this.state.busy}
               disableNext={!((this._selfForm && this.state.selfSelected) ||
                              this.state.execSelected)}
