@@ -45,7 +45,7 @@ module Esper.Components {
       this.mutateState((s) => s.busy = true);
       let cusId = this.props.subscription.cusid;
       this.props.onSelect(plan)
-        .fail(() => this.mutateState((s) => s.busy = false));
+        .always(() => this.mutateState((s) => s.busy = false));
     }
   }
 

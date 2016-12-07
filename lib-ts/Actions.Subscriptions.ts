@@ -8,11 +8,10 @@
 module Esper.Actions.Subscriptions {
 
   // Altering a plan requires changing team store, customer stores, etc.
-  export function set({cusId, planId, redirectTarget, cardToken}: {
+  export function set({cusId, planId, cardToken}: {
     cusId: string;
     planId?: ApiT.PlanId;
     cardToken?: string;
-    redirectTarget?: string|Paths.Path
   }) {
     // Set plan if applicable
     let p1: JQueryPromise<void> = planId ?
@@ -71,9 +70,6 @@ module Esper.Actions.Subscriptions {
     Stores.Customers.CustomerStore.push(cusId, p1, newCustOpt);
 
     Analytics.track(Analytics.Trackable.SelectPlan, { cusId, planId });
-    if (redirectTarget) {
-      cardP.done(() => Route.nav.go(redirectTarget));
-    }
 
     // Return and track card promise since it joins p1 and p2
     Save.monitorStr(cardP, "setSubscription");

@@ -203,9 +203,15 @@ module Esper.Components {
             Actions.Subscriptions.set({
               cusId: this.props.details.cusid,
               planId: plan.id,
-              cardToken: token.id,
-              redirectTarget: this.props.redirect
-            }).then(() => dfd.resolve())
+              cardToken: token.id
+            }).then(() => {
+              // Don't resolve if redirecting (keep spinner going)
+              if (this.props.redirect) {
+                Route.nav.go(this.props.redirect);
+              } else {
+                dfd.resolve();
+              }
+            })
           },
           closed: () => { hasToken ? null : dfd.reject() }
         }));
@@ -215,9 +221,15 @@ module Esper.Components {
       // Else, just change plan
       return Actions.Subscriptions.set({
         cusId: this.props.details.cusid,
-        planId: plan.id,
-        redirectTarget: this.props.redirect
-      }).then(() => null);
+        planId: plan.id
+      }).then(() => {
+        // Don't resolve if redirecting (keep spinner going)
+        if (this.props.redirect) {
+          Route.nav.go(this.props.redirect);
+          return $.Deferred<void>().promise();
+        }
+        return null;
+      });
     }
   }
 }

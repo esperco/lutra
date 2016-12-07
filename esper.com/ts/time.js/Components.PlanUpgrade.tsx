@@ -8,8 +8,11 @@ module Esper.Components {
   }
 
   export class PlanUpgradeModal extends ReactHelpers.Component<Props, {}> {
+    _modal: Modal;
+
     render() {
-      return <Modal title="Upgrade Your Plan" icon="fa-arrow-up">
+      return <Modal ref={(c) => this._modal = c}
+              title="Upgrade Your Plan" icon="fa-arrow-up">
         <div className="esper-section">
           <div className="alert alert-warning">
             { Text.PlanUpgradeText }
@@ -30,7 +33,7 @@ module Esper.Components {
     // Stripe
     onSelect(plan: Types.PlanDetails) {
       if (! this.props.subscription)
-        return $.Deferred().resolve().reject(); // Sanity check
+        return $.Deferred<void>().resolve().reject(); // Sanity check
 
       // Check if we need to ask for stripe CC
       let needStripe = _.isEmpty(this.props.subscription.cards);
@@ -43,7 +46,13 @@ module Esper.Components {
             cusId: this.props.subscription.cusid,
             planId: plan.id,
             cardToken: token.id
-          }).then(() => dfd.resolve()),
+          }).then(() => {
+            if (this._modal) {
+              Layout.closeModal();
+            } else {
+              dfd.resolve();
+            }
+          }),
           closed: () => { dfd.state() === "pending" ? dfd.reject() : null }
         }));
         return dfd.promise();
@@ -53,7 +62,13 @@ module Esper.Components {
       return Actions.Subscriptions.set({
         cusId: this.props.subscription.cusid,
         planId: plan.id
-      }).then(() => null);
+      }).then(() => {
+        if (this._modal) {
+          Layout.closeModal();
+          return $.Deferred<void>().promise();
+        }
+        return null;
+      });
     }
   }
 }
