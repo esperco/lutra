@@ -8,6 +8,10 @@ module Esper.Components {
     simplified?: boolean;
     yAxis?: string;
   }) {
+    // Hide 0s in pie chart (avoids phantom labels)
+    series = _.clone(series);
+    series.data = _.filter(series.data, (d) => d.y > 0);
+
     return <Highchart altExport={altExport} hideExport={simplified} opts={{
       chart: {
         type: 'pie'
