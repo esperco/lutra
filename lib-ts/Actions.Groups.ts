@@ -310,15 +310,24 @@ module Esper.Actions.Groups {
 
   export var LabelUpdateQueue = new Queue2.Processor(
     function(update: LabelUpdate) {
-      Analytics.track(Analytics.Trackable.SetTimeStatsLabels, {
+      Analytics.track(Analytics.Trackable.SetGroupLabels, {
         numLabels: update.labels.length,
         _id: update.groupId,
         labels: _.map(update.labels, (l) => l.original)
       });
 
-      return Api.putGroupLabels(update.groupId, {
+      let p = Api.putGroupLabels(update.groupId, {
         labels: _.map(update.labels, (l) => l.original)
       });
+
+      return p.then(() => Api.batch(() => {
+        var promises = _.map(update.labels, (l) =>
+          Api.setGroupLabelColor(update.groupId, {
+            label: l.original,
+            color: l.color || Colors.getNewColorForLabel()
+          }));
+        return Util.when(promises);
+      })).then(() => null);
     },
 
     // Always use last update (put operation)
@@ -359,6 +368,27 @@ module Esper.Actions.Groups {
     }));
 
     return setGroupLabels(_id, group, labelInfos);
+  }
+
+  export function setLabelColor(_id: string,
+                                labelInfo: ApiT.LabelInfo,
+                                newColor: string) {
+    var group = Stores.Groups.require(_id);
+    if (! group) return;
+
+    var oldLabelInfo = _.find(group.group_labels, labelInfo);
+    if (!oldLabelInfo || oldLabelInfo.color == newColor) return;
+
+    var groupCopy = _.cloneDeep(group);
+    _.find(groupCopy.group_labels, labelInfo).color = newColor;
+
+    var request = {
+      label: labelInfo.original,
+      color: newColor
+    };
+
+    var p = Api.setGroupLabelColor(group.groupid, request);
+    Stores.Groups.GroupStore.push(_id, p, Option.some(groupCopy));
   }
 
   function setGroupLabels(_id: string, group: ApiT.Group, labels: ApiT.LabelInfo[]) {

@@ -30,7 +30,7 @@ module Esper.Views {
 
     setLabelColor(group: ApiT.Group) {
       return function(oldInfo: ApiT.LabelInfo, newColor: string) {
-        // TODO: Add in functionality to change group label colors
+        return Actions.Groups.setLabelColor(group.groupid, oldInfo, newColor);
       };
     }
 

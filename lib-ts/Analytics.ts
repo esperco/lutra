@@ -32,6 +32,7 @@ module Esper.Analytics {
 
     SetTimeStatsLabels,       // Set labels for a team
     SetTimeStatsCalendars,    // Set calendars for a team
+    SetGroupLabels,           // Set labels for a group
 
     // Batch Label Changes
     RenameTimeStatsLabel,     // Rename label on team (and on all events)

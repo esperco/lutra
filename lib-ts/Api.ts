@@ -478,6 +478,15 @@ module Esper.Api {
     return JsonHttp.post(url, req);
   }
 
+  export function setGroupLabelColor(
+    groupid: string, req: ApiT.SetLabelColorRequest
+  ): JsonPromise<ApiT.LabelInfo> {
+    var url = `${prefix}/api/group-label/set-color/${string(Login.me())}`
+      + `/${string(groupid)}`;
+    return JsonHttp.post(url, req);
+  }
+
+
   /***** Google profile information *****/
 
   export function getGoogleEmail(myUID: string, theirUID: string,
