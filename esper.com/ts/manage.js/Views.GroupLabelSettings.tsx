@@ -56,22 +56,22 @@ module Esper.Views {
       var archive = this.archive(group);
       return function(label: Types.LabelBase) {
         archive(label);
-        // FIXME: Disable batch labelling until we properly figure this out
-        // Actions.BatchLabels.remove(this.props.group.groupid, label);
+        Actions.BatchGroupLabels.remove(
+          group.groupid,
+          label.displayAs
+        );
       };
     }
 
     renameLabel(group: ApiT.Group) {
       return function(orig: Types.LabelBase, val: Types.LabelBase) {
         Actions.Groups.renameLabel(group.groupid, orig, val);
-        // FIXME: Disable batch labelling until we properly figure this out
-        // Actions.BatchLabels.rename(this.props.group.groupid, orig, val);
+        Actions.BatchGroupLabels.rename(
+          group.groupid,
+          orig.displayAs,
+          val.displayAs
+        );
       };
     }
   }
 }
-
-
-
-
-

@@ -38,6 +38,9 @@ module Esper.Analytics {
     RenameTimeStatsLabel,     // Rename label on team (and on all events)
     DeleteTimeStatsLabel,     // Delete label from team (and remove from
                               // all events)
+    RenameGroupLabel,         // Rename label on group (and on all events)
+    DeleteGroupLabel,         // Delete label from group (and remove from
+                              // all events)
 
     // Preferences changes
     UpdateGeneralPrefs,       // Changes one of the general preferences

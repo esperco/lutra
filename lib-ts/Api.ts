@@ -708,6 +708,14 @@ module Esper.Api {
     return JsonHttp.post(url, req);
   }
 
+  export function changeGroupEventLabels(groupId: string,
+    req: ApiT.LabelChangeRequest): JsonPromise<void>
+  {
+    var url = prefix + "/api/group/event/label-change/" + string(Login.myUid())
+            + "/" + string(groupId);
+    return JsonHttp.post(url, req);
+  }
+
   export function setPredictLabels(teamId: string,
     req: ApiT.LabelsSetPredictRequest)
     : JsonPromise<ApiT.GenericCalendarEvents>
