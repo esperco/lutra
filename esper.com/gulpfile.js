@@ -35,7 +35,6 @@ var config = {
     "ts/lib/**/*.{ts,tsx}"
   ],
   tsProjects: [
-    "ts/groups.js/tsconfig.json",
     "ts/login.js/tsconfig.json",
     "ts/manage.js/tsconfig.json",
     "ts/now.js/tsconfig.json",
