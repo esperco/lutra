@@ -478,6 +478,15 @@ module Esper.Api {
     return JsonHttp.post(url, req);
   }
 
+  export function setGroupLabelColor(
+    groupid: string, req: ApiT.SetLabelColorRequest
+  ): JsonPromise<ApiT.LabelInfo> {
+    var url = `${prefix}/api/group-label/set-color/${string(Login.me())}`
+      + `/${string(groupid)}`;
+    return JsonHttp.post(url, req);
+  }
+
+
   /***** Google profile information *****/
 
   export function getGoogleEmail(myUID: string, theirUID: string,
@@ -696,6 +705,14 @@ module Esper.Api {
   {
     var url = prefix + "/api/event/label-change/" + string(Login.myUid())
             + "/" + string(team_id);
+    return JsonHttp.post(url, req);
+  }
+
+  export function changeGroupEventLabels(groupId: string,
+    req: ApiT.LabelChangeRequest): JsonPromise<void>
+  {
+    var url = prefix + "/api/group/event/label-change/" + string(Login.myUid())
+            + "/" + string(groupId);
     return JsonHttp.post(url, req);
   }
 
