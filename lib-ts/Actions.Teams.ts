@@ -120,6 +120,16 @@ module Esper.Actions.Teams {
     });
   }
 
+  // Fetch a team
+  export function fetchTeam(teamId: string) {
+    return Stores.Teams.get(teamId).match({
+      some: (team) => $.Deferred().resolve(Option.some(team)),
+      none: () => {
+        let p = Api.getTeam(teamId).then((team) => Option.wrap(team));
+        return Stores.Teams.TeamStore.fetch(teamId, p);
+      }
+    })
+  }
 
   /* Team label management */
 

@@ -4,6 +4,7 @@
 
 /// <reference path="./Actions.Calendars.ts" />
 /// <reference path="./Components.ListSelector.tsx" />
+/// <reference path="./Components.Modal.tsx" />
 
 module Esper.Components {
   interface Props {
@@ -132,6 +133,18 @@ module Esper.Components {
         this.mutateState((s) => s.hasError = true);
         return Option.none<ApiT.GenericCalendar[]>();
       }
+    }
+  }
+
+  ///
+
+  export class CalendarListModal extends ReactHelpers.Component<Props & {
+    title: string;
+  }, {}> {
+    render() {
+      return <Modal icon="fa-calendar-o" title={this.props.title}>
+        { React.createElement(CalendarList, this.props) }
+      </Modal>;
     }
   }
 

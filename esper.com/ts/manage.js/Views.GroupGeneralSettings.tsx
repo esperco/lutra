@@ -160,12 +160,19 @@ module Esper.Views {
           onRoleChange={
             (email, role) => Actions.Groups.changeRole(groupId, email, role)
           }
+          onEditCalendar={renderCalendarListModal}
           onToggleCalendar={
             (email) => Actions.Groups.toggleCalendar(groupId, email)
           }
         />
       </div>
     </div>;
+  }
+
+  function renderCalendarListModal(teamid: string) {
+    Actions.Teams.fetchTeam(teamid);
+    Stores.Calendars.fetchAvailable(teamid);
+    Layout.renderModal(Containers.calendarListModal(teamid));
   }
 
   export function RemoveGroup({group} : {group: ApiT.Group}) {
