@@ -65,6 +65,9 @@ module Esper.Text {
     `This ${GroupMember} is sharing their calendars with the group`;
   export const AddGroupIndividualLink = "Invite Someone Else";
   export const RemoveGroupMember = "Remove";
+  export const EditGroupTeam = "Edit Calendars";
+  export const EditGroupTeamDescription =
+    `Edit the calendars shared by this ${TeamExec}`;
   export const AddGroupTeam = "Share Calendars";
   export const AddGroupTeamDescription =
     `Share this ${TeamExec}'s calendar data with people who have ` +
