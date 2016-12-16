@@ -128,7 +128,14 @@ module Esper.Actions.Teams {
         let p = Api.getTeam(teamId).then((team) => Option.wrap(team));
         return Stores.Teams.TeamStore.fetch(teamId, p);
       }
-    })
+    });
+  }
+
+  // Fetch group-only teams for user
+  export function fetchGroupOnlyTeams() {
+    return Api.getTeamsForUser(true).then(
+      (teams) => _.each(teams,
+        (team) => Stores.Teams.TeamStore.set(team.teamid, Option.wrap(team))));
   }
 
   /* Team label management */

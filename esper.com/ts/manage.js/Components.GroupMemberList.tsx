@@ -106,9 +106,9 @@ module Esper.Components {
       || (hasGIM(person) ? person.gim.uid === Login.myUid() : false)
       || partOfTeam;
     let canRemoveCals = partOfTeam || (hasTeam(person) && props.isSuper);
-    let canAddCals = !hasTeam(person) && !!_.find(
+    let canAddCals = (!hasTeam(person) && !!_.find(
       props.teams, (t) => t.team_executive === person.gim.uid
-    );
+    )) || (hasTeam(person) && Stores.Teams.get(person.team.teamid).isSome());
 
     // Don't allow change role or removal if last admin
     let numAdmins = _.filter(props.group.group_individuals,
@@ -165,7 +165,7 @@ module Esper.Components {
 
             { (canRemoveCals || canAddCals) ?
               <div className="esper-select-menu">
-                { teamid ?
+                { canAddCals ?
                   <div className="esper-selectable"
                        onClick={() => props.onEditCalendar((person as HasTeam).team.teamid)}>
                     <i className="fa fa-fw fa-calendar" />{" "}

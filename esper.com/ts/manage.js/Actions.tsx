@@ -80,6 +80,7 @@ module Esper.Actions {
   }
 
   export function renderGroupGeneralSettings(props: GroupSettingProps) {
+    Actions.Teams.fetchGroupOnlyTeams();
     render(<Views.GroupGeneralSettings {...props} />);
     Analytics.page(Analytics.Page.GroupManage);
   }

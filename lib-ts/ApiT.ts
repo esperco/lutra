@@ -101,6 +101,8 @@ module Esper.ApiT {
     team_email_aliases: string[];
   }
 
+  export type TeamList = ListResponse<Team>;
+
   export interface TeamOption {
     team?: Team;
   }
