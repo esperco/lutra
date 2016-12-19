@@ -8,8 +8,8 @@ module Esper.Components {
     teams: ApiT.Team[];
     onRoleChange: (email: string, role: ApiT.GroupRole) => void;
     onRemove: (email: string) => void;
-    onEditCalendar: (teamid: string) => void;
-    onToggleCalendar: (email: string) => void;
+    onEditCalendar: (team: ApiT.GroupMember, email: string) => void;
+    onToggleCalendar: (team: ApiT.GroupMember, email: string) => void;
   }
 
   export function GroupMemberList(props: Props & {
@@ -108,7 +108,11 @@ module Esper.Components {
     let canRemoveCals = partOfTeam || (hasTeam(person) && props.isSuper);
     let canAddCals = (!hasTeam(person) && !!_.find(
       props.teams, (t) => t.team_executive === person.gim.uid
-    )) || (hasTeam(person) && Stores.Teams.get(person.team.teamid).isSome());
+    ))
+    || !!_.find(props.teams, (t) => hasTeam(person) ?
+                t.teamid === person.team.teamid :
+                t.team_executive === person.gim.uid)
+    || person.email === Login.myEmail();
 
     // Don't allow change role or removal if last admin
     let numAdmins = _.filter(props.group.group_individuals,
@@ -120,8 +124,7 @@ module Esper.Components {
 
     let name = hasTeam(person) ? person.team.name : person.gim.email;
     let team = hasTeam(person) ? person.team : _.find(props.teams,
-        (t) => hasGIM(person) && t.team_executive === person.gim.uid);
-    let teamid = team ? team.teamid : null;
+      (t) => t.team_executive === person.gim.uid);
     let role = hasGIM(person) ? person.gim.role : "Member" as ApiT.GroupRole;
     let sharing = hasTeam(person);
 
@@ -165,9 +168,9 @@ module Esper.Components {
 
             { (canRemoveCals || canAddCals) ?
               <div className="esper-select-menu">
-                { canAddCals ?
+                { canAddCals && canRemoveCals ?
                   <div className="esper-selectable"
-                       onClick={() => props.onEditCalendar((person as HasTeam).team.teamid)}>
+                       onClick={() => props.onEditCalendar(team, person.email)}>
                     <i className="fa fa-fw fa-calendar" />{" "}
                     <div>
                       <div className="title">
@@ -180,7 +183,7 @@ module Esper.Components {
                   </div> : null
                 }
                 <div className="esper-selectable"
-                     onClick={() => props.onToggleCalendar(person.email)}>
+                     onClick={() => props.onToggleCalendar(team, person.email)}>
                   <i className={classNames("fa fa-fw", {
                     "fa-calendar-times-o": canRemoveCals,
                     "fa-calendar-plus-o": canAddCals

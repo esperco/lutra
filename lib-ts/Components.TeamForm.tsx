@@ -24,7 +24,8 @@ module Esper.Components {
       this.state = {
         name: props.name,
         email: props.email,
-        timezone: props.timezone
+        timezone: props.timezone,
+        groups_only: props.groups_only
       };
     }
 
@@ -34,7 +35,8 @@ module Esper.Components {
          this.state = {
           name: props.name,
           email: props.email,
-          timezone: props.timezone
+          timezone: props.timezone,
+          groups_only: props.groups_only
         };
       }
     }

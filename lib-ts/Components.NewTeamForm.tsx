@@ -25,6 +25,7 @@ module Esper.Components {
         timezone={moment.tz.guess()}
         showEmail={this.props.supportsExec}
         editableEmail={this.props.supportsExec}
+        groups_only={false}
       />
     }
 

@@ -162,17 +162,40 @@ module Esper.Views {
           }
           onEditCalendar={renderCalendarListModal}
           onToggleCalendar={
-            (email) => Actions.Groups.toggleCalendar(groupId, email)
+            (team, email) => {
+              if (!team && Login.myEmail() == email) {
+                createSelfTeam(email).then(
+                  (_) => Actions.Groups.toggleCalendar(groupId, email));
+                return;
+              }
+              Actions.Groups.toggleCalendar(groupId, email);
+            }
           }
         />
       </div>
     </div>;
   }
 
-  function renderCalendarListModal(teamid: string) {
-    Actions.Teams.fetchTeam(teamid);
-    Stores.Calendars.fetchAvailable(teamid);
-    Layout.renderModal(Containers.calendarListModal(teamid));
+  function createSelfTeam(email: string): JsonHttp.Promise<ApiT.Team> {
+    return Actions.Teams.createSelfTeam({
+      name: email,
+      timezone: moment.tz.guess(),
+      groups_only: true
+    });
+  }
+
+  function renderCalendarListModal(team: ApiT.GroupMember, email: string) {
+    if (!team && Login.myEmail() == email) {
+      createSelfTeam(email).then((team) => {
+        Stores.Calendars.fetchAvailable(team.teamid);
+        Layout.renderModal(Containers.calendarListModal(team.teamid))
+      });
+      return;
+    }
+
+    Actions.Teams.fetchTeam(team.teamid);
+    Stores.Calendars.fetchAvailable(team.teamid);
+    Layout.renderModal(Containers.calendarListModal(team.teamid));
   }
 
   export function RemoveGroup({group} : {group: ApiT.Group}) {
