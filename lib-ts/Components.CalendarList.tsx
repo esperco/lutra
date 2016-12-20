@@ -140,9 +140,15 @@ module Esper.Components {
 
   export class CalendarListModal extends ReactHelpers.Component<Props & {
     title: string;
+    isBusy?: boolean;
+    hasError?: boolean;
   }, {}> {
     render() {
       return <Modal icon="fa-calendar-o" title={this.props.title}>
+        { this.props.isBusy ? <div className="esper-spinner" /> : null }
+
+        { this.props.hasError ? <ErrorMsg /> : null }
+
         { React.createElement(CalendarList, this.props) }
       </Modal>;
     }

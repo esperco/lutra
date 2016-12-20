@@ -16,6 +16,7 @@ module Esper.Actions.Teams {
   export interface SelfTeamData {
     name: string;
     timezone: string;
+    groups_only: boolean;
   }
 
   export interface ExecTeamData extends SelfTeamData {
@@ -41,7 +42,8 @@ module Esper.Actions.Teams {
         */
         updateTeam(t.teamid, {
           name: req.executive_name,
-          timezone: req.executive_timezone
+          timezone: req.executive_timezone,
+          groups_only: req.groups_only
         });
       }
       return t;
@@ -86,7 +88,8 @@ module Esper.Actions.Teams {
     return create({
       executive_name: data.name || Login.myEmail(),
       executive_email: Login.myEmail(),
-      executive_timezone: data.timezone
+      executive_timezone: data.timezone,
+      groups_only: data.groups_only
     });
   }
 
@@ -94,7 +97,8 @@ module Esper.Actions.Teams {
     return create({
       executive_name: data.name || data.email,
       executive_email: data.email,
-      executive_timezone: data.timezone
+      executive_timezone: data.timezone,
+      groups_only: data.groups_only
     });
   }
 
@@ -107,7 +111,8 @@ module Esper.Actions.Teams {
     }
     return createSelfTeam({
       name: "",
-      timezone: moment.tz.guess()
+      timezone: moment.tz.guess(),
+      groups_only: false
     });
   }
 
@@ -128,7 +133,17 @@ module Esper.Actions.Teams {
         let p = Api.getTeam(teamId).then((team) => Option.wrap(team));
         return Stores.Teams.TeamStore.fetch(teamId, p);
       }
-    })
+    });
+  }
+
+  // Fetch group-only teams for user
+  export function fetchGroupOnlyTeams() {
+    return Api.getTeamsForUser(true).then(
+      (teams) => Stores.Teams.TeamStore.transact(() => {
+        _.each(teams, (team) =>
+          Stores.Teams.TeamStore.set(team.teamid, Option.wrap(team)))
+      })
+    );
   }
 
   /* Team label management */

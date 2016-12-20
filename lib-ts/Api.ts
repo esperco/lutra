@@ -111,6 +111,14 @@ module Esper.Api {
       + "/" + string(teamId));
   }
 
+  export function getTeamsForUser(groupsOnly?: boolean):
+    JsonPromise<ApiT.TeamList> {
+    var filterGroupsOnly = _.isUndefined(groupsOnly) ? "" :
+      `?filter_groups_only=${groupsOnly}`;
+    return JsonHttp.get(`${prefix}/api/teams/${string(Login.me())}`
+      + `${filterGroupsOnly}`);
+  }
+
   export function deactivateTeam(teamId: string): JsonPromise<void> {
     return JsonHttp.post(prefix + "/api/deactivate-team/" +
       string(Login.myUid()) + "/" + string(teamId));

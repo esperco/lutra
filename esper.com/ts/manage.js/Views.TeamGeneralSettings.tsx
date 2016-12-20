@@ -102,6 +102,7 @@ module Esper.Views {
               name={this.props.team.team_name}
               email={exec.email}
               timezone={prefs.current_timezone}
+              groups_only={false}
               showEmail={true}
               editableEmail={false}
               onUpdate={() => this.delayedSave()}
@@ -132,7 +133,8 @@ module Esper.Views {
             this.setState({ didSave: true });
             Actions.Teams.updateTeam(this.props.team.teamid, {
               name: d.name,
-              timezone: d.timezone
+              timezone: d.timezone,
+              groups_only: d.groups_only
             });
           }
         });

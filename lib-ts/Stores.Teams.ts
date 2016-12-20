@@ -55,10 +55,18 @@ module Esper.Stores.Teams {
     return TeamStore.get(teamId).flatMap((t) => Option.wrap(t.dataStatus));
   }
 
-  export function all(): ApiT.Team[] {
+  export function all(groups_only?: boolean): ApiT.Team[] {
     return TeamListStore.batchGet(batchKey).mapOr([],
       (d) => d.data.mapOr([],
-        (items) => Option.flatten(_.map(items, (i) => i.data))));
+        (items) => {
+          var teams = Option.flatten(_.map(items, (i) => i.data));
+          if (groups_only === true) {
+            teams = _.filter(teams, (team) => team.groups_only);
+          } else if (groups_only === false) {
+            teams = _.filter(teams, (team) => !team.groups_only);
+          }
+          return teams;
+        }));
   }
 
   export function allIds(): string[] {
