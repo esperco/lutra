@@ -14,6 +14,7 @@ module Esper.Views {
     // Which expando is open?
     selfSelected: boolean;
     execSelected: boolean;
+    groupSelected: boolean;
 
     // List of temporary identifiers that React can use to identify components
     newTeamIds: string[];
@@ -35,6 +36,7 @@ module Esper.Views {
         execErrorIds: [],
         selfSelected: false,
         execSelected: false,
+        groupSelected: false,
         newTeamIds: [Util.randomString()]
       };
     }
@@ -109,6 +111,19 @@ module Esper.Views {
             </div>
           </Components.Expando>
         </div>
+
+        <div className="esper-section">
+          <Components.Expando onOpen={() => this.onOpenGroup()}
+            group={this._expandos}
+            header="Team"
+            headerClasses="esper-panel-section"
+            bodyClasses="esper-panel-section"
+          >
+            <div>
+              { Text.GroupOnboardingDescription }
+            </div>
+          </Components.Expando>
+        </div>
       </Components.OnboardingPanel>
     }
 
@@ -119,6 +134,7 @@ module Esper.Views {
       this.mutateState((state) => {
         state.selfSelected = true;
         state.execSelected = false;
+        state.groupSelected = false;
       });
     }
 
@@ -127,6 +143,17 @@ module Esper.Views {
       this.mutateState((state) => {
         state.selfSelected = false;
         state.execSelected = true;
+        state.groupSelected = false;
+      });
+    }
+
+    // On open the support team expando
+    onOpenGroup() {
+      Api.sendSupportEmail(`${Login.myEmail()} has indicated interest in groups.`);
+      this.mutateState((state) => {
+        state.selfSelected = false;
+        state.execSelected = false;
+        state.groupSelected = true;
       });
     }
 
