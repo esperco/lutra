@@ -18,6 +18,11 @@ module Esper.Text {
     "for? We'll invite that person to Esper and set things up " +
     "so that person can retain access to his or her Esper data if you " +
     "decide to hand off calendar duties to someone else."
+  export const GroupOnboardingDescription = <p>
+    Esper for Teams is coming soon. An Esper member will contact you within
+    the next 12 hours. Or you can email Andrew directly at {" "}
+    <a href="mailto:andrew@esper.com">andrew@esper.com</a>.
+  </p>;
 
   export const LabelSetupHeading = `Pick Some ${_.capitalize(Labels)}`;
   export const LabelSetupSelfDescription = "What do you want to prioritize? " +
