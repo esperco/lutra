@@ -155,7 +155,11 @@ button, .btn {
 .splash-content {
   min-height: 500px;
   color: white;
-  h1, h2, h3, h4, h5, h6 { color: white; }
+  h1, h2, h3, h4, h5, h6 {
+    color: white;
+    text-shadow: 2px 2px rgba(0, 0, 0, 0.5);
+  }
+
 
   // Set actual image in HTML style tag with background-image
   background-size: cover;
@@ -187,6 +191,23 @@ button, .btn {
         -ms-transition:.2s;
          -o-transition:.2s;
             transition:.2s;
+  }
+
+  form {
+    label {
+      color: white;
+      margin-top: @esper-lg-padding;
+    }
+
+   .btn-primary {
+     background-color: fadeout(white, 5%);
+    }
+
+    .has-error .control-label {
+      color: white;
+      background: @brand-danger;
+      padding: @padding-xs-vertical @padding-xs-horizontal;
+    }
   }
 }
 
@@ -361,8 +382,13 @@ button, .btn {
 
 /* Request Demo */
 
-.signup-form {
+.signup-form, .redeem-form {
   max-width: 623px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.signup-form {
   margin: 40px auto;
 
   &.section-content {
