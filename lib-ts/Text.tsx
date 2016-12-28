@@ -84,7 +84,20 @@ module Esper.Text {
       10 users minimum
     </span>,
     enterprise: true,
-    features: ExecPlan.features
+    features: [
+      "Unlimited calendars",
+      "5 YEARS of calendar history",
+      "Slack integration",
+      "#Hashtag event labeling",
+      "Weekly label reminder emails",
+      // "Customizable reports page", // Not supported yet
+      "Advanced reporting",
+      "Time series reports",
+      "Chart downloading",
+      "CSV exports",
+      "Coordinate time for multiple users",
+      "Find time-consuming meetings"
+    ]
   };
 
   export const AllPlans = [
@@ -109,9 +122,13 @@ module Esper.Text {
     "Does your company already have an Enterprise Plan? " +
     "Click here to request that they add you."
   export const AddToEnterpriseHeading = `Enterprise Plan`;
-  export const AddToEnterpriseDescription =
-    `To link this account to an Enterprise Plan, provide ` +
-    `the email address of your billing contact below.`;
+  export const AddToEnterpriseDescription = <div className="description">
+    To link this account to an Enterprise Plan, provide
+    the email address of your billing contact below.
+    <br />
+    Alternatively, you may contact Andrew directly at {" "}
+    <a href="mailto:andrew@esper.com">andrew@esper.com</a>.
+  </div>;
   export const AddToExistingEnterpriseDescription =
     `You can also add this account to your existing plan.`;
   export const OnlyOneEnterpriseCustomer = `Existing Enterprise Plan`;

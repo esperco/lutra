@@ -126,9 +126,7 @@ module Esper.Components {
             </a>
             { Text.AddToEnterpriseHeading }
           </h4>
-          <div className="description">
-            { Text.AddToEnterpriseDescription }
-          </div>
+          { Text.AddToEnterpriseDescription }
         </div>
         <div className="panel-body">
           { _.isEmpty(enterpriseCustomers) ? null :

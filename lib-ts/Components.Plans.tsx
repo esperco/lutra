@@ -45,6 +45,8 @@ module Esper.Components {
     onClick(plan: Types.PlanDetails) {
       this.mutateState((s) => s.busy = true);
       let cusId = this.props.subscription.cusid;
+      if (plan.enterprise) Api.sendSupportEmail(
+        `${Login.myEmail()} has indicated interest in groups.`);
       this.props.onSelect(plan)
         .always(() => this.mutateState((s) => s.busy = false));
     }
@@ -86,6 +88,9 @@ module Esper.Components {
             { f }
           </li>) }
         </ul>
+        { plan.enterprise ?
+          <p className="sub-enterprise-subtext">AND MORE...</p> : null
+        }
       </div>
       <div className="sub-plan-footer">
         <button className="btn form-control btn-success">
@@ -93,6 +98,7 @@ module Esper.Components {
           ( canStartFreeTrial ? Text.StartFreeTrial : Text.SelectPlan )}
         </button>
       </div>
+
     </div>;
   }
 }
