@@ -287,15 +287,15 @@ module Esper.Actions.Groups {
   /* Group label management */
 
   // Add and remove exact, display versions of labels
-  export function addLabel(_id: string, label: Types.LabelBase) {
+  export function addLabel(_id: string, label: Types.Label) {
     return applyLabels(_id, [], [label]);
   }
 
-  export function rmLabel(_id: string, label: Types.LabelBase) {
+  export function rmLabel(_id: string, label: Types.Label) {
     return applyLabels(_id, [label], []);
   }
 
-  export function renameLabel(_id: string, oldLabel: Types.LabelBase, newLabel: Types.LabelBase)
+  export function renameLabel(_id: string, oldLabel: Types.Label, newLabel: Types.Label)
   {
     return applyLabels(_id, [oldLabel], [newLabel]);
   }
@@ -335,7 +335,7 @@ module Esper.Actions.Groups {
       return [updates[updates.length - 1]];
     });
 
-  function applyLabels(_id: string, rmLabels: Types.LabelBase[], addLabels: Types.LabelBase[]) {
+  function applyLabels(_id: string, rmLabels: Types.Label[], addLabels: Types.Label[]) {
     var group = Stores.Groups.require(_id);
     if (! group) return;
 
@@ -353,7 +353,7 @@ module Esper.Actions.Groups {
     return setGroupLabels(_id, group, newLabels);
   }
 
-  export function putLabels(_id: string, labels: Types.LabelBase[]) {
+  export function putLabels(_id: string, labels: Types.Label[]) {
     var group = Stores.Groups.require(_id);
     if (! group) return;
 

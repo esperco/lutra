@@ -7,10 +7,10 @@ module Esper.Components {
 
   interface Props {
     getLabelInfos: () => ApiT.LabelInfo[];
-    addLabel: (label: Types.LabelBase) => any;
-    archiveFn: (label: Types.LabelBase) => any;
-    removeLabel: (label: Types.LabelBase) => any;
-    renameLabel: (orig: Types.LabelBase, val: Types.LabelBase) => any;
+    addLabel: (label: Types.Label) => any;
+    archiveFn: (label: Types.Label) => any;
+    removeLabel: (label: Types.Label) => any;
+    renameLabel: (orig: Types.Label, val: Types.Label) => any;
     setLabelColor: (oldInfo: ApiT.LabelInfo, newColor: string) => any;
     addPermission: boolean;
   }

@@ -6,7 +6,6 @@
 /// <reference path="./Types.ts" />
 
 module Esper.Labels {
-  export type LabelBase = Types.LabelBase;
   export type Label = Types.Label;
   export type LabelCount = Types.LabelCount;
 
@@ -66,16 +65,16 @@ module Esper.Labels {
       }));
     });
 
-    _.each(events, (e) => e.labelScores.match({
+    _.each(events, (e) => e.labels.match({
       none: () => null,
-      some: (scores) => _.each(scores, (s) => {
-        displayAsMap[s.id] = displayAsMap[s.id] || s.displayAs;
-        counts[s.id] = counts[s.id] || 0;
-        counts[s.id] += 1;
+      some: (eventLabels) => _.each(eventLabels, (l) => {
+        displayAsMap[l.id] = displayAsMap[l.id] || l.displayAs;
+        counts[l.id] = counts[l.id] || 0;
+        counts[l.id] += 1;
         labels.push({
-          id: s.id,
-          displayAs: s.displayAs,
-          color: s.color,
+          id: l.id,
+          displayAs: l.displayAs,
+          color: l.color,
           count: 0
         });
       })
@@ -104,7 +103,7 @@ module Esper.Labels {
     Sort a list of labels by normalized version of display text -- note
     that this is distinct from
   */
-  export function sortLabels<T extends LabelBase>(labels: T[]): T[] {
+  export function sortLabels<T extends Label>(labels: T[]): T[] {
     return _.sortBy(labels, (l) => normalizeForSort(l.displayAs));
   }
 

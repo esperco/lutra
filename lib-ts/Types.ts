@@ -48,8 +48,8 @@ module Esper.Types {
     title: string;
     description: string;
 
-    labelScores: Option.T<Label[]>;
-    hashtags: ApiT.HashtagState[];
+    labels: Option.T<Label[]>;
+    confirmed: boolean;
     attendScore: number;
 
     feedback: ApiT.EventFeedback;
@@ -326,18 +326,13 @@ module Esper.Types {
 
   /* Labels */
 
-  export interface LabelBase {
+  export interface Label {
     id: string;        // Normalized form
     displayAs: string; // Display form
     color: string;     // Color associated with this label
   }
 
-  // Either a predicted or user-predicted label
-  export interface Label extends LabelBase {
-    score: number;     // 0 - 1 (1 = user-selected label)
-  }
-
-  export interface LabelCount extends LabelBase {
+  export interface LabelCount extends Label {
     count: number;
   }
 

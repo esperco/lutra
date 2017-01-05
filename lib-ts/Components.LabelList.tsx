@@ -23,7 +23,7 @@ module Esper.Components {
 
     render() {
       var labels = _.sortBy(
-        Option.matchList(this.props.event.labelScores),
+        Option.matchList(this.props.event.labels),
         (l) => l.displayAs
       );
       return <div className="label-list">
@@ -66,7 +66,7 @@ module Esper.Components {
     }
 
     editEventLabel(
-      label: Types.LabelBase,
+      label: Types.Label,
       active: boolean,
       method: "click"|"type"
     ) {
@@ -83,7 +83,7 @@ module Esper.Components {
       }
     }
 
-    rmEventLabel(label: Types.LabelBase) {
+    rmEventLabel(label: Types.Label) {
       Actions.EventLabels.remove([this.props.event], label)
     }
   }
@@ -102,10 +102,7 @@ module Esper.Components {
       color: Colors.colorForText(label.color)
     };
 
-    // Title isn't for real tooltip, just debugging predictions really
-    var title = label.score < 1 ?
-      Text.predictionTooltip(label.score) : label.displayAs;
-    return <span style={style} title={title} className="event-label">
+    return <span style={style} className="event-label">
       { label.displayAs }{" "}
       { onRemove ?
         <span className="action rm-action hidden-xs"

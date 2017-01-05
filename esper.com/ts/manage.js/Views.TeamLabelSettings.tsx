@@ -34,27 +34,27 @@ module Esper.Views {
     }
 
     addLabel(team: ApiT.Team) {
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         Actions.Teams.addLabel(team.teamid, label);
       };
     }
 
     archive(team: ApiT.Team) {
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         Actions.Teams.rmLabel(team.teamid, label);
       };
     }
 
     removeLabel(team: ApiT.Team) {
       var archive = this.archive(team);
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         archive(label);
         Actions.BatchLabels.remove(team.teamid, label.displayAs);
       };
     }
 
     renameLabel(team: ApiT.Team) {
-      return function(orig: Types.LabelBase, val: Types.LabelBase) {
+      return function(orig: Types.Label, val: Types.Label) {
           Actions.Teams.renameLabel(team.teamid, orig, val);
           Actions.BatchLabels.rename(team.teamid, orig.displayAs, val.displayAs);
       };

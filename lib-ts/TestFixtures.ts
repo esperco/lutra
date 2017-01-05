@@ -209,13 +209,12 @@ module Esper.TestFixtures {
     id?: string;
     calendar_id?: string;
     guests?: ApiT.Attendee[];
-    hashtags?: ApiT.HashtagState[];
-    labels?: string[];
-    labels_norm?: string[];
+    labels?: ApiT.LabelInfo[];
+    labels_confirmed?: boolean;
     predicted_attended?: number;
-    predicted_labels?: ApiT.PredictedLabel[];
     recurring_event_id?: string;
     transparent?: boolean;
+    has_recurring_labels?: boolean;
     feedback?: ApiT.EventFeedback;
   } = {}): ApiT.GenericCalendarEvent {
     var defaultEvent: ApiT.GenericCalendarEvent = {
@@ -225,9 +224,10 @@ module Esper.TestFixtures {
       end: "2016-03-02T13:14:17.000-08:00",
       title: "Event",
       all_day: false,
-      hashtags: [],
       guests: [],
       transparent: false,
+      has_recurring_labels: false,
+      labels_confirmed: false,
       description_messageids: []
     };
     return _.extend(defaultEvent, props) as ApiT.GenericCalendarEvent;
