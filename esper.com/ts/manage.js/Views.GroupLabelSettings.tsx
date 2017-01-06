@@ -41,20 +41,20 @@ module Esper.Views {
     }
 
     addLabel(group: ApiT.Group) {
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         Actions.Groups.addLabel(group.groupid, label);
       };
     }
 
     archive(group: ApiT.Group) {
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         Actions.Groups.rmLabel(group.groupid, label);
       };
     }
 
     removeLabel(group: ApiT.Group) {
       var archive = this.archive(group);
-      return function(label: Types.LabelBase) {
+      return function(label: Types.Label) {
         archive(label);
         Actions.BatchGroupLabels.remove(
           group.groupid,
@@ -64,7 +64,7 @@ module Esper.Views {
     }
 
     renameLabel(group: ApiT.Group) {
-      return function(orig: Types.LabelBase, val: Types.LabelBase) {
+      return function(orig: Types.Label, val: Types.Label) {
         Actions.Groups.renameLabel(group.groupid, orig, val);
         Actions.BatchGroupLabels.rename(
           group.groupid,

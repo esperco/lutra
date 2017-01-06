@@ -235,15 +235,6 @@ module Esper.ApiT {
     approved?: boolean;
   }
 
-  export interface HashtagRequestItem {
-    hashtag: string;
-    approved: boolean;
-  }
-
-  export interface HashtagRequest {
-    hashtag_states: HashtagRequestItem[];
-  }
-
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
@@ -254,13 +245,15 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     labels?: LabelInfo[];
+    labels_confirmed?: boolean;
+    labels_predicted?: boolean;
     predicted_attended?: number;         // Floating score
-    predicted_labels?: PredictedLabel[]; // Sorted by score desc
-    hashtags: HashtagState[];
+    // hashtags: HashtagState[];         // Exists, but deprecate
     feedback?: EventFeedback;
     location?: string;
     all_day: boolean;
     guests: Attendee[];
+    has_recurring_labels: boolean;
     transparent: boolean;
     recurrence?: Recurrence;
     recurring_event_id?: string;

@@ -18,81 +18,13 @@ module Esper.Stores.Events {
 
   /* Type modification */
 
-  const PREDICTED_LABEL_PERCENT_CUTOFF = 0.5;
   const PREDICTED_ATTENDED_CUTOFF = 0.5;
-  const PREDICTED_LABEL_MODIFIER = 0.95;
 
   export type TeamEvent = Types.TeamEvent;
 
   export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent)
     : TeamEvent
   {
-    var labelScores = (() => {
-      var hashtags =
-        _(e.hashtags)
-          .filter((h) => h.approved !== false)
-          .map((h) => ({
-            id: h.label ? h.label.normalized : h.hashtag.normalized,
-            displayAs: h.label ? h.label.original : h.hashtag.original,
-            color: h.label ?
-              (h.label.color || Colors.getColorForHashtag(h.hashtag.normalized))
-              : Colors.getColorForHashtag(h.hashtag.normalized),
-            score: 1
-          }))
-          .value();
-
-      if (e.labels) {
-        let labels = _(e.labels)
-          .map((l) => {
-            Labels.storeMapping({
-              norm: l.normalized,
-              display: l.original
-            });
-            return {
-              id: l.normalized,
-              displayAs: l.original,
-              color: l.color,
-              score: 1
-            };
-          })
-          .unionBy(hashtags, (l) => l.id)
-          .value();
-        return Option.some(labels);
-      } else if (!_.isEmpty(hashtags)) {
-        return Option.some(hashtags);
-      } else if (!_.isEmpty(e.predicted_labels)) {
-        let team = Teams.require(teamId);
-        if (team) {
-          let teamLabels = _.map(team.team_api.team_labels,
-            (l) => l.normalized
-          );
-          let labels = _.filter(e.predicted_labels,
-            (l) => _.includes(teamLabels, l.label.normalized)
-          );
-          if (labels.length) {
-            let labelsAboveThreshold = _(labels)
-              .filter((l) => l.score >= PREDICTED_LABEL_PERCENT_CUTOFF)
-              .map((l) => ({
-                id: l.label.normalized,
-                displayAs: l.label.original,
-                color: l.label.color,
-                score: l.score * PREDICTED_LABEL_MODIFIER
-              })).value();
-
-            /*
-              Only return Option.some if we have predicted labels above
-              threshold. This helps us distinguish between an intentional
-              user-selected empty set (Option.some([])) and a lack of
-              predictions (Option.none).
-            */
-            if (labelsAboveThreshold.length)
-              return Option.some(labelsAboveThreshold);
-          }
-        }
-      }
-      return Option.none<Labels.Label[]>();
-    })();
-
     /*
       Use predicted_attended number if available. Else look to transparency.
       Presence of user labels should imply attended.
@@ -100,12 +32,19 @@ module Esper.Stores.Events {
     */
     let attendScore = _.isNumber(e.predicted_attended) ?
       e.predicted_attended : (e.transparent ? 0.1 : 0.9);
-    if (e.labels || _.some(e.hashtags, (h) => h.approved || !!h.label)) {
+    if (e.labels_confirmed) {
       attendScore = 1;
     }
     if (e.feedback && _.isBoolean(e.feedback.attended)) {
       attendScore = e.feedback.attended ? 1 : 0;
     }
+
+    let labels = Option.wrap(e.labels).map(
+      (labels) => _.map(labels, (l) => ({
+        id: l.normalized,
+        displayAs: l.original,
+        color: l.color || Colors.getColorForHashtag(l.color)
+      })));
 
     return {
       id: e.id,
@@ -116,8 +55,8 @@ module Esper.Stores.Events {
       timezone: e.timezone || moment.tz.guess(),
       title: e.title || "",
       description: e.description || "",
-      labelScores: labelScores,
-      hashtags: e.hashtags,
+      labels,
+      confirmed: !!e.labels_confirmed,
       feedback: e.feedback || {
         notes: "", // Optional, but since we don't ever treat null notes
                    // differently than empty notes, default to blank string
@@ -547,14 +486,11 @@ module Esper.Stores.Events {
     );
   }
 
-  export function getLabels(event: TeamEvent, includePredicted=true) {
-    return event.labelScores.mapOr([],
-      (scores) => includePredicted ?
-        scores : _.filter(scores, (s) => s.score === 1)
-    );
+  export function getLabels(event: TeamEvent) {
+    return event.labels.unwrapOr([]);
   }
 
-  export function getLabelIds(event: TeamEvent, includePredicted=true) {
+  export function getLabelIds(event: TeamEvent) {
     return _.map(getLabels(event), (l) => l.id);
   }
 
@@ -562,21 +498,9 @@ module Esper.Stores.Events {
     Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
-    return event.attendScore > 0 && (event.labelScores.mapOr(
-
-      // None => no label or user action, so can confirm  empty
-      true,
-
-      /*
-        Some => only confirm if score < 1 (don't need to confirm user labels)
-        or if this is an unapproved hashtag. If labelScores is some([]), this
-        means user has already explicitly set labels to empty and the event
-        should be buffered on the backend. If none of the predictions cross
-        the threshold, then labelScores should be none.
-      */
-      (labels) => _.some(labels, (l) => l.score > 0 && l.score < 1) ||
-                  _.some(event.hashtags, (h) => !_.isBoolean(h.approved))
-    ) || (event.attendScore < 1));
+    return event.attendScore > 0 && (
+      !event.confirmed || event.attendScore < 1
+    );
   }
 
   export function getTeams(events: TeamEvent[]) {
@@ -614,8 +538,8 @@ module Esper.Stores.Events {
     var guests = _.map(e.guests,
       (g) => g.display_name + " " + g.email
     );
-    var labels = e.labelScores.mapOr([],
-      (scores) => _.map(scores, (l) => l.displayAs));
+    var labels = e.labels.mapOr([],
+      (labels) => _.map(labels, (l) => l.displayAs));
 
     var filterText = [title, description]
                       .concat(guests)
@@ -660,10 +584,10 @@ module Esper.Stores.Events {
         if (!opts.deepCompare || !e1 || !e2) return false;
         if (opts.ignoreLabelScores) {
           e1 = _.clone(e1);
-          reviseScores(e1);
+          e1.confirmed = true;
 
           e2 = _.clone(e2);
-          reviseScores(e2);
+          e2.confirmed = true;
         }
         if (! _.isEqual(e1, e2)) {
           return false;
@@ -671,18 +595,6 @@ module Esper.Stores.Events {
       }
     }
     return true;
-  }
-
-  // Bumps all predictions up to 1
-  function reviseScores(event: TeamEvent) {
-    event.labelScores = event.labelScores && event.labelScores.flatMap(
-      (scores) => Option.some(_.map(scores, (s) => ({
-        id: s.id,
-        displayAs: s.displayAs,
-        color: s.color,
-        score: 1
-      })))
-    );
   }
 
   export function eqRanges(range1: Types.EventsForRange[],

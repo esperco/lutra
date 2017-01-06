@@ -9,14 +9,14 @@
 module Esper.Actions.EventLabels {
 
   export function add(events: Stores.Events.TeamEvent[],
-                      label: Types.LabelBase) {
+                      label: Types.Label) {
     apply(events, {
       addLabels: [label]
     });
   }
 
   export function remove(events: Stores.Events.TeamEvent[],
-                         label: Types.LabelBase) {
+                         label: Types.Label) {
     apply(events, {
       removeLabels: [label],
     });
@@ -37,8 +37,8 @@ module Esper.Actions.EventLabels {
   // For paginated prediction, confirm and fetch new
 
   function apply(events: Stores.Events.TeamEvent[], opts: {
-    addLabels?: Types.LabelBase[];
-    removeLabels?: Types.LabelBase[];
+    addLabels?: Types.Label[];
+    removeLabels?: Types.Label[];
     fetchEvents?: Types.TeamEvent[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
@@ -75,8 +75,8 @@ module Esper.Actions.EventLabels {
 
   function applyForTeam(teamId: string, events: Stores.Events.TeamEvent[],
     opts: {
-      addLabels?: Types.LabelBase[];
-      removeLabels?: Types.LabelBase[];
+      addLabels?: Types.Label[];
+      removeLabels?: Types.Label[];
       fetchEvents?: Types.TeamEvent[];
     })
   {
@@ -105,11 +105,11 @@ module Esper.Actions.EventLabels {
     // Modify events
     var newEvents = _.map(events, (e) => {
       var newEvent = _.cloneDeep(e);
+      newEvent.confirmed = true;
 
       // Event labeling of any kind implies attendance
       if (Stores.Events.isActive(e) || opts.addLabels || opts.removeLabels) {
-        newEvent.labelScores = Option.some(getNewLabels(e, opts));
-        newEvent.hashtags = getNewHashtags(newEvent);
+        newEvent.labels = Option.some(getNewLabels(e, opts));
         newEvent.attendScore = 1;
         newEvent.feedback = newEvent.feedback || {
           eventid: e.id,
@@ -169,8 +169,8 @@ module Esper.Actions.EventLabels {
   }
 
   function getNewLabels(event: Stores.Events.TeamEvent, opts: {
-    addLabels?: Types.LabelBase[];
-    removeLabels?: Types.LabelBase[];
+    addLabels?: Types.Label[];
+    removeLabels?: Types.Label[];
   }) {
     var labels = _.cloneDeep(Stores.Events.getLabels(event));
     var team = Stores.Teams.require(event.teamId);
@@ -179,8 +179,7 @@ module Esper.Actions.EventLabels {
         labels.push({
           id: label.id,
           displayAs: label.displayAs,
-          color: label.color,
-          score: 1
+          color: label.color
         });
       }
     });
@@ -190,25 +189,7 @@ module Esper.Actions.EventLabels {
       _.remove(labels, (l) => l.id === normalized);
     });
 
-    // Predicted labels are now confirmed
-    _.each(labels, (l) => l.score = 1);
-
     return labels;
-  }
-
-  // Returns updated hashtags object for event
-  function getNewHashtags(event: Stores.Events.TeamEvent): ApiT.HashtagState[] {
-    return _.map(event.hashtags, (h) => ({
-      hashtag: h.hashtag,
-      label: h.label,
-      approved: event.labelScores.mapOr(
-        false,
-        (labels) => _.some(labels,
-          (l) => h.label ? h.label.normalized === l.id
-                         : h.hashtag.normalized === l.id
-        )
-      )
-    }));
   }
 
 
@@ -221,50 +202,19 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      return Api.batch(function() {
-        var promises =
-        _(r.events)
-          .filter(Stores.Events.isActive)
-          .map((e) => e.labelScores.mapOr(
-            null,
-            (labels) => _.isEmpty(e.hashtags) ? null :
-              Api.updateHashtagStates(e.teamId,
-                e.recurringEventId || e.id,
-                {
-                  hashtag_states: _.map(e.hashtags, (h) => ({
-                    hashtag: h.hashtag.original,
-                    approved: h.approved
-                  }))
-                }
-              )
-            )
-          )
-          .compact()
-          .value();
-
-        var p = Api.setPredictLabels(r.teamId, {
-          set_labels: _.map(r.events, (e) => Stores.Events.isActive(e) ?
-            {
-              id: e.recurringEventId || e.id,
-              labels: e.labelScores.mapOr([],
-                (scores) => 
-                  _(scores)
-                    .filter(
-                      (s) => !_.some(e.hashtags,
-                        (h) => h.label ? h.label.normalized === s.id
-                                       : h.hashtag.normalized === s.id))
-                    .map((s) => s.displayAs)
-                    .value()
-              ),
-              attended: true
-            } : {
-              id: e.recurringEventId || e.id,
-              attended: false
-            }),
-          predict_labels: r.fetchEventIds
-        });
-
-        return Util.when(promises).then(() => p);
+      return Api.setPredictLabels(r.teamId, {
+        set_labels: _.map(r.events, (e) => Stores.Events.isActive(e) ?
+          {
+            id: e.recurringEventId || e.id,
+            labels: e.labels.mapOr([],
+              (labels) => _.map(labels, (l) => l.displayAs)
+            ),
+            attended: true
+          } : {
+            id: e.recurringEventId || e.id,
+            attended: false
+          }),
+        predict_labels: r.fetchEventIds
       });
     },
 

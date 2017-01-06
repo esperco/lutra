@@ -700,14 +700,6 @@ module Esper.Api {
     return JsonHttp.post(url, {labels:labels});
   }
 
-  export function updateHashtagStates(teamId: string, eventId: string,
-                                      hashtagRequest: ApiT.HashtagRequest):
-  JsonPromise<void> {
-    var url = `${prefix}/api/event/hashtags/${string(Login.myUid())}`
-      + `/${string(teamId)}/${string(eventId)}`;
-    return JsonHttp.post(url, hashtagRequest);
-  }
-
   export function changeEventLabels(team_id: string,
     req: ApiT.LabelChangeRequest): JsonPromise<void>
   {

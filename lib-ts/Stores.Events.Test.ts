@@ -27,73 +27,12 @@ module Esper.Stores.Events {
       });
     });
 
-    describe("asTeamEvent", function() {
-      it("should convert hashtags to labels", function() {
-        let event = TestFixtures.makeGenericCalendarEvent({
-          hashtags: [{
-            hashtag: { original: "#Floats", normalized: "#floats" }
-          }, {
-            hashtag: { original: "#Sinks", normalized: "#sinks"}
-          }]
-        });
-        let teamEvent = asTeamEvent("team-id", event);
-        expect(teamEvent.labelScores.isSome()).toBe(true);
-
-        let labelScores = teamEvent.labelScores.unwrap();
-        expect(labelScores.length).toEqual(2);
-
-        let floats = _.find(labelScores, (l) => l.id === "#floats");
-        expect(floats.displayAs).toBe("#Floats");
-        expect(floats.score).toBe(1);
-
-        let sinks = _.find(labelScores, (l) => l.id === "#sinks");
-        expect(sinks.displayAs).toBe("#Sinks");
-        expect(sinks.score).toBe(1);
-      });
-
-      it("should filter out predictions that are above the score of 0.5",
-         function() {
-        let event = TestFixtures.makeGenericCalendarEvent({
-          predicted_labels: [{
-            label: TestFixtures.team1LabelInfos[0],
-            score: 0.8
-          }, {
-            label: TestFixtures.team1LabelInfos[1],
-            score: 0.4
-          }, {
-            label: TestFixtures.team1LabelInfos[2],
-            score: 0.5
-          }]
-        });
-
-        let teamEvent = asTeamEvent(TestFixtures.teamId1, event);
-        expect(teamEvent.labelScores.isSome()).toBe(true);
-
-        let labelScores = teamEvent.labelScores.unwrap();
-        expect(labelScores.length).toEqual(2);
-
-        let l0 = _.find(labelScores,
-          (l) => l.id === TestFixtures.team1LabelInfos[0].normalized
-        );
-        expect(l0.displayAs).toBe(TestFixtures.team1LabelInfos[0].original);
-
-        // 0.8 * 0.95 (PREDICTED_LABEL_MODIFIER)
-        expect(l0.score).toEqual(0.76);
-
-        let l2 = _.find(labelScores,
-          (l) => l.id === TestFixtures.team1LabelInfos[2].normalized
-        );
-        expect(l2.displayAs).toBe(TestFixtures.team1LabelInfos[2].original);
-
-        // 0.5 * 0.95 (PREDICTED_LABEL_MODIFIER)
-        expect(l2.score).toEqual(0.475);
-      });
-    });
-
     describe("isActive", function() {
-      it("should return true by default", function() {
+      it("should return true if labels confirmed", function() {
         var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({})
+          TestFixtures.makeGenericCalendarEvent({
+            labels_confirmed: true
+          })
         );
         expect(isActive(e)).toBe(true);
       });
@@ -111,11 +50,7 @@ module Esper.Stores.Events {
       it("should return false if event's predicted_attend < 0.5", function() {
         var e = asTeamEvent(TestFixtures.teamId1,
           TestFixtures.makeGenericCalendarEvent({
-            predicted_attended: 0.4,
-            predicted_labels: [{ // Label gets ignored
-              label: { original: "Label", normalized: "label" },
-              score: 0.9
-            }]
+            predicted_attended: 0.4
           })
         );
         expect(isActive(e)).toBe(false);
@@ -137,51 +72,11 @@ module Esper.Stores.Events {
           TestFixtures.makeGenericCalendarEvent({
             predicted_attended: 0.4,
             transparent: true,
-            labels: ["Label"],
-            labels_norm: ["label"]
-          })
-        );
-        expect(isActive(e)).toBe(true);
-      });
-
-      it("should return true if event has hashtag-labels assigned",
-      function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            predicted_attended: 0.4,
-            transparent: true,
-            hashtags: [{
-              hashtag: { original: "#Label", normalized: "#label" },
-              label: { original: "Label", normalized: "label" }
-            }]
-          })
-        );
-        expect(isActive(e)).toBe(true);
-      });
-
-      it("shouldn't necessarily return true if event has only hashtags that " +
-         "aren't labels", function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            predicted_attended: 0.4,
-            transparent: true,
-            hashtags: [{
-              hashtag: { original: "#Label", normalized: "#label" }
-            }]
-          })
-        );
-        expect(isActive(e)).toBe(false);
-      });
-
-      it("should return true if event has approved hashtag", function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            predicted_attended: 0.4,
-            transparent: true,
-            hashtags: [{
-              hashtag: { original: "#Label", normalized: "#label" },
-              approved: true
-            }]
+            labels: [{
+              original: "Label",
+              normalized: "label"
+            }],
+            labels_confirmed: true
           })
         );
         expect(isActive(e)).toBe(true);
@@ -209,10 +104,9 @@ module Esper.Stores.Events {
             id: "e",
             predicted_attended: 0.01,
             transparent: true,
-            labels: ["Label"],
-            hashtags: [{
-              hashtag: { original: "#Label2", normalized: "#label2" },
-              approved: true
+            labels: [{
+              original: "Label",
+              normalized: "label"
             }],
             feedback: {
               teamid: TestFixtures.teamId1,
@@ -226,29 +120,11 @@ module Esper.Stores.Events {
     });
 
     describe("needsConfirmation", function() {
-      it("should return true if there are predicted labels to confirm",
+      it("should return true if labels_confirmed is true",
       function() {
         var e = asTeamEvent(TestFixtures.teamId1,
           TestFixtures.makeGenericCalendarEvent({
-            predicted_labels: [{ // Label gets ignored
-              label: { original: "Label", normalized: "label" },
-              score: 0.9
-            }],
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: true
-            }
-          })
-        );
-        expect(needsConfirmation(e)).toBe(true);
-      });
-
-      it("should return true if there were no predictions at all",
-      function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            predicted_labels: [],
+            labels_confirmed: false,
             feedback: {
               teamid: TestFixtures.teamId1,
               eventid: "e",
@@ -263,49 +139,9 @@ module Esper.Stores.Events {
          "are already confirmed", function() {
         var e = asTeamEvent(TestFixtures.teamId1,
           TestFixtures.makeGenericCalendarEvent({
-            labels: ["Label"],
-            labels_norm: ["label"],
+            labels: [],
+            labels_confirmed: true,
             predicted_attended: 0.9
-          })
-        );
-        expect(needsConfirmation(e)).toBe(false);
-      });
-
-      it("should return true if there are hashtags to approve", function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            id: "e",
-            labels: ["Label"],
-            labels_norm: ["label"],
-            hashtags: [{
-              hashtag: { original: "#Label2", normalized: "#label2" }
-            }],
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: true
-            }
-          })
-        );
-        expect(needsConfirmation(e)).toBe(true);
-      });
-
-      it("should return false if all labels + hashtags + attendance confirmed",
-      function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            id: "e",
-            labels: ["Label"],
-            labels_norm: ["label"],
-            hashtags: [{
-              hashtag: { original: "#Label2", normalized: "#label2" },
-              approved: true
-            }],
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: true
-            }
           })
         );
         expect(needsConfirmation(e)).toBe(false);

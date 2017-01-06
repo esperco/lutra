@@ -14,7 +14,7 @@ module Esper.Components {
     inputId?: string;
     events: Types.TeamEvent[];
     teams: ApiT.Team[];
-    onSelect: (label: Types.LabelBase,
+    onSelect: (label: Types.Label,
                active: boolean,
                method: "click"|"type") => void;
     onEsc?: () => void;
@@ -155,7 +155,7 @@ module Esper.Components {
     }
 
     // New label
-    toggle(labelStr: string, label?: Types.LabelBase, click=false) {
+    toggle(labelStr: string, label?: Types.Label, click=false) {
       if (!label) {
         label = _.find(this.state.labels, {id: Labels.getNorm(labelStr)}) || {
           id: Labels.getNorm(labelStr),
@@ -192,7 +192,7 @@ module Esper.Components {
   ///////
 
   function Label({label, selected, highlight, onClick}: {
-    label: Types.LabelBase;
+    label: Types.Label;
     selected: Types.Fuzzy;
     highlight?: boolean;
     onClick?: () => void;
@@ -217,7 +217,7 @@ module Esper.Components {
   }
 
   function NewLabel({label, highlight, onClick}: {
-    label: Types.LabelBase;
+    label: Types.Label;
     highlight?: boolean;
     onClick?: () => void;
   }) {
