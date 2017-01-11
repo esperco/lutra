@@ -140,6 +140,13 @@ module Esper.Route {
     route(pathFn({cusId: ":cusId?"}).hash,
       demoCheck,
 
+      // Make sure the logged in user matches the email parameter
+      function(ctx, next) {
+        let cusEmail = Util.getParamByName("email", ctx.querystring);
+        if (_.isEmpty(cusEmail) || Login.myEmail() === cusEmail) next();
+        else Actions.renderErrorPage(Text.wrongCustomerEmail(cusEmail));
+      },
+
       // Make sure customer has default plan
       function(ctx, next) {
         let cusId = Params.cleanCustomerId(ctx.params["cusId"]);

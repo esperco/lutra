@@ -9,7 +9,7 @@ module Esper.Types {
 
   // Used for settings page related props, mostly in sidebar
   export interface SettingsPageProps extends SettingsId {
-    pathFn: (x: {
+    pathFn?: (x: {
       teamId?: string,
       cusId?: string,
       groupId?: string
