@@ -132,6 +132,10 @@ module Esper.Actions {
 
   /* Misc */
 
+  export function renderErrorPage(err: string) {
+    render(<Views.SettingsError err={err} />);
+  }
+
   export function renderSandbox() {
     render(<Views.Sandbox />);
     Analytics.page(Analytics.Page.Sandbox);

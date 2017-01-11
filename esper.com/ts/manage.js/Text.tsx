@@ -185,6 +185,9 @@ module Esper.Text {
   export const CustomerDomainDescription = `Add a comma-separated list of ` +
     `domain names (e.g. example.com) to automatically approve any accounts ` +
     `from that domain (e.g. name@example.com)`;
+  export function wrongCustomerEmail(email: string) {
+    return `You must be logged in as ${email} to perform this operation.`;
+  }
 
   // Export CSV
   export const ExportCSVDescription =
