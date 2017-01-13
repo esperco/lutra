@@ -15,11 +15,6 @@ module Esper.Components {
   }
 
   export class Stripe extends ReactHelpers.Component<Props, {}> {
-    constructor(props: Props) {
-      super(props);
-      Esper.Stripe.init(this.props.stripeKey);
-    }
-
     componentWillUnmount() {
       super.componentWillUnmount();
       if (Esper.Stripe.handler) {

@@ -8,6 +8,18 @@ module Esper.Components {
   }
 
   export class CreditCardList extends ReactHelpers.Component<Props, {}> {
+    componentDidMount() {
+      let sub = this.props.subscription;
+      if (_.isEmpty(sub.cards) && sub.plan) {
+        Esper.Stripe.getHandler().then((handler) => handler.open({
+          name: 'Esper',
+          description: Text.getPlanName(sub.plan),
+          panelLabel: "Submit",
+          token: (token) => this.addCard(token)
+        }));
+      }
+    }
+
     getCardIcon(brand: ApiT.CardBrand) {
       if (brand === "Visa")
         return "fa-cc-visa";
@@ -75,9 +87,7 @@ module Esper.Components {
       }
 
       return <div className="list-group esper-section">
-        { _.map(this.props.subscription.cards,
-          (c) => this.renderCreditCard(c)
-        ) }
+        { _.map(cards, (c) => this.renderCreditCard(c)) }
       </div>;
     }
   }
