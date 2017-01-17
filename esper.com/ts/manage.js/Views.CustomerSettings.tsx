@@ -38,7 +38,7 @@ module Esper.Views {
       if (! cust) return <span />;
 
       return <Views.Settings {...this.props} subMenu={subMenu}>
-        { cust.subscription.active ? null : <AddCard cust={cust} /> }
+        <AddCard cust={cust} />
         { this.renderMain(cust) }
       </Views.Settings>
     }
@@ -58,10 +58,10 @@ module Esper.Views {
     }
 
     render() {
-      let canceled = this.props.cust.subscription.status === "Canceled";
+      let expired = this.props.cust.subscription.status === "Past_due";
       return <div className={classNames("alert msg action-block", {
-        "alert-warning": !canceled,
-        "alert-danger": canceled
+        "alert-warning": !expired,
+        "alert-danger": expired
       })}>
         { this.state.busy ?
           <span><span className="esper-spinner" /></span>:
@@ -70,8 +70,8 @@ module Esper.Views {
             label="Submit" stripeKey={Config.STRIPE_KEY}
             onToken={(token) => this.onToken(token)}
           >
-            { canceled ? Text.SubscriptionExpired : Text.NoPlan }
-            {" "}{ Text.UpdateCreditCard }
+            { expired ? `${Text.SubscriptionExpired} ${Text.EnsureCreditCard}`
+                      : `${Text.NoPlan} ${Text.UpdateCreditCard}` }
           </Components.Stripe> }
       </div>
     }
