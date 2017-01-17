@@ -160,15 +160,24 @@ module Esper.Components {
     renderStatus() {
       let team = this.props.team;
       let subscription = team.team_api.team_subscription;
-      if (subscription.active) {
+      if (subscription.active ||
+          (subscription.status === "Past_due" && subscription.valid_payment_source)
+         ) {
         return <div className="alert alert-info">
           { Text.SubscribedToPlan(team.team_name, subscription.plan) }
         </div>;
       }
 
+      if (subscription.status === "Past_due"
+          && !subscription.valid_payment_source) {
+        return <div className="alert alert-danger">
+          { `${Text.SubscriptionExpired} ${Text.EnsureCreditCard}` }
+        </div>;
+      }
+
       if (subscription.status === "Canceled") {
         return <div className="alert alert-danger">
-          { Text.SubscriptionExpired }{" "}{ Text.SelectToRenew }
+          { `${Text.SubscriptionCanceled} ${Text.SelectToRenew}` }
         </div>;
       }
 
