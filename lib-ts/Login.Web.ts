@@ -275,7 +275,6 @@ module Esper.Login {
   export const emailParam = "email";
   export const inviteParam = "invite";
   export const tokenParam = "token";
-  export const extParam = "ext";
   export const platformParam = "platform"; // Google / Exchange / Nylas
 
   // Redirects
@@ -313,14 +312,6 @@ module Esper.Login {
     var params: {[index: string]: string} = {};
     if (message) { params[messageParam] = message; }
     params[logoutParam] = "1";
-    goToLoginParams(params);
-  }
-
-  // For Google extension users only
-  export function extLogin(email: string) {
-    var params: {[index: string]: string} = {};
-    params[emailParam] = email;
-    params[extParam] = "1";
     goToLoginParams(params);
   }
 

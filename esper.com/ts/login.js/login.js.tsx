@@ -11,8 +11,8 @@
 
 module Esper {
   // Where to redirect
-  var DEFAULT_REDIRECT = "time";
-  var EXT_REDIRECT = "chrome-ext";
+  const TIME_REDIRECT = "time";
+  const GROUPS_REDIRECT = "groups";
 
   export function init() {
     showSpinner();
@@ -20,50 +20,17 @@ module Esper {
     var uid = Util.getParamByName(Login.uidParam);
     var message = LoginMsg.get(Util.getParamByName(Login.messageParam));
     var error = ErrMsg.get(Util.getParamByName(Login.errorParam));
-    var extLogin = Util.getParamByName(Login.extParam);
     var token = Util.getParamByName(Login.tokenParam);
     var platform = Util.getParamByName(Login.platformParam).toLowerCase();
     var email = getEmail();
 
+    // Log out
     if (Util.getParamByName(Login.logoutParam)) {
       Login.logout();
       message = message || "You have been logged out.";
     }
 
-    if (extLogin) {
-      if (email) {
-        Login.loginWithGoogle({
-          landingUrl: getLandingUrl(),
-          email: email,
-          inviteCode: getInviteCode(),
-          extension: true
-        });
-      } else {
-        Log.e("Extension login requires e-mail address");
-        renderLogin(message, error);
-      }
-    }
-
-    else if (platform === "google") {
-      Login.loginWithGoogle({
-        landingUrl: getLandingUrl(),
-        email: email,
-        inviteCode: getInviteCode()
-      });
-    }
-
-    else if (platform) {
-      if (email) {
-        Login.loginWithNylas({
-          landingUrl: getLandingUrl(),
-          email: email,
-          inviteCode: getInviteCode()
-        });
-      } else {
-        renderLogin(message, error);
-      }
-    }
-
+    // UID => try to login with nonce
     else if (uid) {
       try {
         handleLoginInfo(Login.loginOnce(uid));
@@ -82,6 +49,7 @@ module Esper {
       }
     }
 
+    // Token - pass to server and try logging in with that
     else if (token) {
       Token.consume(token, handleLoginInfo, function(message, error) {
         var r = Util.getParamByName(Login.redirectParam);
@@ -93,6 +61,28 @@ module Esper {
           renderLogin(message, error);
         }
       });
+    }
+
+    // Google login prompt
+    else if (platform === "google") {
+      Login.loginWithGoogle({
+        landingUrl: getLandingUrl(),
+        email: email,
+        inviteCode: getInviteCode()
+      });
+    }
+
+    // Nylas login prompt
+    else if (platform) {
+      if (email) {
+        Login.loginWithNylas({
+          landingUrl: getLandingUrl(),
+          email: email,
+          inviteCode: getInviteCode()
+        });
+      } else {
+        renderLogin(message, error);
+      }
     }
 
     else {
@@ -111,13 +101,13 @@ module Esper {
 
   // Go to post-login redirect
   export function redirect(landingUrl?: string) {
-    var landingUrl = landingUrl ? landingUrl : getLandingUrl();
-    location.href = "/" + getLandingUrl();
+    landingUrl = landingUrl || getLandingUrl() || getDefaultLandingUrl();
+    location.href = "/" + landingUrl;
   }
 
+  // Extract landing URL from params -- returns null otherwise
   function getLandingUrl() {
     var r = Util.getParamByName(Login.redirectParam);
-    var ext = Util.getParamByName(Login.extParam);
     if (r) {
       r = Util.hexDecode(r);
 
@@ -137,10 +127,16 @@ module Esper {
       }
 
       return r;
-    } else if (ext) {
-      return EXT_REDIRECT;
+    }
+    return null;
+  }
+
+  // Landing URL to use when none specified
+  function getDefaultLandingUrl() {
+    if (Login.data && Login.data.groups && Login.data.groups.length) {
+      return GROUPS_REDIRECT;
     } else {
-      return DEFAULT_REDIRECT;
+      return TIME_REDIRECT;
     }
   }
 
@@ -153,7 +149,6 @@ module Esper {
   }
 
   function renderLogin(message?: string, error?: string) {
-    var ext = Util.getParamByName(Login.extParam);
     var platform = Util.getParamByName(Login.platformParam);
     var defaultEmail = Util.nullify(getEmail());
     var inviteCode = Util.nullify(getInviteCode());
@@ -166,11 +161,11 @@ module Esper {
             inviteCode: inviteCode,
             email: defaultEmail
           })}
-          onNylasLogin={!ext ? (email) => Login.loginWithNylas({
+          onNylasLogin={(email) => Login.loginWithNylas({
             landingUrl: landingUrl,
             inviteCode: inviteCode,
             email: email
-          }) : null}
+          })}
           email={defaultEmail}
           platform={platform}
         >
