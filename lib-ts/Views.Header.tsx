@@ -19,9 +19,21 @@ module Esper.Views {
     _navSidebar: Components.Sidebar;
 
     renderWithData() {
-      var loginInfo = Login.getLoginInfo();
-      var busy = Login.getStatus() !== Model2.DataStatus.READY;
-      var hasTeams = Stores.Teams.all().length > 0;
+      let loginInfo = Login.getLoginInfo();
+      let busy = Login.getStatus() !== Model2.DataStatus.READY;
+      let hasTeams = Stores.Teams.all().length > 0;
+      let hasGroups = loginInfo.mapOr(false, (l) => l.groups.length > 0);
+      let isSettingsPage = Route.nav.isActive(Paths.Manage.home());
+
+      let showTeamHeaders = (() => {
+        if (! hasTeams) return false;
+        if (! hasGroups) return true;
+        if (! isSettingsPage) return true;
+        if (Route.nav.isActive(Paths.Manage.Team.base()) ||
+            Route.nav.isActive(Paths.Manage.newTeam())) return true;
+        return false;
+      })();
+      let showGroupHeaders = hasGroups && isSettingsPage && !showTeamHeaders;
 
       return <div className="navbar-fixed-top">
         <nav className="navbar navbar-default navbar-shadow">
@@ -36,7 +48,7 @@ module Esper.Views {
                 })} href="#!/">
                   <img alt="Esper" src="/img/esper-logo-purple.svg" />
                 </a>
-                { hasTeams ? null :
+                { (showTeamHeaders || showGroupHeaders) ? null :
                   <a href="/" className="navbar-brand word-mark hidden-xs">
                     <img className="logo-name" src="img/word-mark.svg" />
                   </a>
@@ -48,11 +60,10 @@ module Esper.Views {
             </div>
 
             <div className="hidden-xs">
-              { hasTeams ? loginInfo.mapOr(null,
-                () => this.navLinks("nav navbar-nav"))
-                : null
-              }
-
+              { showTeamHeaders ?
+                this.navLinks("nav navbar-nav") : null }
+              { showGroupHeaders ?
+                this.groupLinks("nav navbar-nav") : null }
               <div className="navbar-text pull-right">
                 <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
                   { this.loginLinks("esper-select-menu") }
@@ -66,9 +77,12 @@ module Esper.Views {
               side="right"
             >
               <div className="esper-section">
-                { this.navLinks(
+                { showTeamHeaders ? this.navLinks(
                   "nav navbar-nav esper-panel-section esper-full-width"
-                ) }
+                ) : null }
+                { showGroupHeaders ? this.groupLinks(
+                  "nav navbar-nav esper-panel-section esper-full-width"
+                ) : null }
                 { this.loginLinks(
                   "nav navbar-nav esper-panel-section esper-full-width"
                 ) }
@@ -103,8 +117,35 @@ module Esper.Views {
       </ul>;
     }
 
+    /*
+      Temporary header for group user that hides the individual navlinks
+      so users don't edit their individual Espers when we really want
+      them to use groups instead. Once we move group settings into the
+      Enterprise product, we'll remove this.
+    */
+    groupLinks(className?: string) {
+      return <ul className={className} onClick={() => this.toggleNavSidebar()}>
+        <NavLink path={Paths.Groups.home()}>
+          <i className="fa fa-fw fa-list"></i>{" "}Events
+        </NavLink>
+        { Login.data.is_sandbox_user ?
+          <NavLink path={Paths.Login.home()} className="sandbox-sign-up">
+            <i className="fa fa-fw fa-arrow-right"></i>{" "}Sign Up
+          </NavLink> :
+          <NavLink path={Paths.Manage.home()}>
+            <i className="fa fa-fw fa-cog"></i>{" "}Settings
+          </NavLink> }
+      </ul>;
+    }
+
     loginLinks(className?: string) {
+      let hasGroups = Login.data && Login.data.groups.length > 0;
       return <ul className={className}>
+        { hasGroups ? <li><a href={Paths.Groups.home().href} target="_blank">
+            <i className="fa fa-fw fa-users"></i>{" "}
+            { Text.GroupsLink }
+          </a></li> : null }
+        { hasGroups ? <li className="divider" /> : null }
         <li><a href={Paths.Landing.home().href} target="_blank">
           <i className="fa fa-fw fa-home"></i>{" "}
           Home

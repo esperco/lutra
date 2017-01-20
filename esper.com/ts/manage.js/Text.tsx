@@ -32,22 +32,22 @@ module Esper.Text {
   export const PaySettings = "Billing";
 
   // Groups
-  export const Group = "group";
-  export const Groups = "groups";
+  export const Group = "enterprise team";
+  export const Groups = "enterprise teams";
   export const GroupDescription =
-    `Create a ${_.capitalize(Group)} to combine calendar data for ` +
-    `multiple Esper ${TeamExecs} and see how others are spending ` +
+    `Create an Enterprise Team to aggregate calendar data across ` +
+    `multiple team members and see how others are spending ` +
     `their time.`
 
-  export const GroupMember = "group member";
-  export const GroupMembers = "group members";
+  export const GroupMember = "team member";
+  export const GroupMembers = "team members";
 
   export const GroupIndividual = "individual";
   export const GroupIndividuals = "individuals";
 
   // Add group
-  export const AddGroupLink = `New ${Group}`;
-  export const AddGroupHeading = "Create a new group";
+  export const AddGroupLink = `New Enterprise Team`;
+  export const AddGroupHeading = "Create a new enterprise team";
 
   // Group roles
   export const GroupRoleOwner = "Administrator";
