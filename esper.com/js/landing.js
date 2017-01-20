@@ -66,11 +66,31 @@ function toggleNavMenu() {
   }
 }
 
+// If user is already logged in, update sign in links depending on whether
+// they're a groups user or not
+function updateLoginLinks() {
+  try {
+    let login = JSON.parse(localStorage.getItem('login'));
+    if (login && login.uid) {
+      let signInLinks = $("a.esper-sign-in");
+      if (localStorage.getItem('groups') === 'true') {
+        signInLinks.attr('href', 'groups');
+      } else {
+        signInLinks.attr('href', 'time');
+      }
+    }
+  } catch (err) {
+    // Ignore - probably either no localStorage or stored login isn't
+    // valid JSON.
+  }
+}
+
 function loadElements() {
   $(".nav-menu").click(function() { toggleNavMenu(); });
   $(".navbar-toggle").click(function() { toggleNavMenu(); });
   $(".slack-btn").click(function() { slackSignIn(); });
   $(".try-esper-btn").click(function() { sandboxSignup(); });
+  updateLoginLinks();
 }
 
 function main() {
