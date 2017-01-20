@@ -123,7 +123,7 @@ module Esper.Views {
     let teamCals = _.flatten(
       _.map(teams, (t) => t.team_timestats_calendars)
     );
-    let current = _.concat(gimEmails, teamEmails, teamCals);
+    let current = _.compact(_.concat(gimEmails, teamEmails, teamCals));
     current = _.map(current, (c) => c.trim().toLowerCase());
 
     // Use team e-mails as sources of e-mail addresses

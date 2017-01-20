@@ -100,7 +100,19 @@ module Esper.Actions.Groups {
             } else {
               group.group_individuals.push(res.gim);
             }
-            if (res.opt_gm) group.group_teams.push(res.opt_gm);
+            if (res.opt_gm) {
+              let gm = _.clone(res.opt_gm);
+              if (! gm.email) {
+                gm.email = res.gim.email;
+              }
+              Stores.Teams.get(gm.teamid).match({
+                none: () => null,
+                some: (t) => {
+                  gm.name = t.team_name;
+                }
+              })
+              group.group_teams.push(gm);
+            }
             Stores.Groups.GroupStore.set(update.groupId, Option.some(group));
           });
       });
