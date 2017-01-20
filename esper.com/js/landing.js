@@ -70,9 +70,9 @@ function toggleNavMenu() {
 // they're a groups user or not
 function updateLoginLinks() {
   try {
-    let login = JSON.parse(localStorage.getItem('login'));
+    var login = JSON.parse(localStorage.getItem('login'));
     if (login && login.uid) {
-      let signInLinks = $("a.esper-sign-in");
+      var signInLinks = $("a.esper-sign-in");
       if (localStorage.getItem('groups') === 'true') {
         signInLinks.attr('href', 'groups');
       } else {
