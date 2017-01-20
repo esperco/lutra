@@ -76,6 +76,10 @@ module Esper.Paths {
   export module Time {
     export const prefix = "/time";
 
+    export function home({} = {}) {
+      return optPath(prefix, "charts");
+    }
+
     // Doubles as nav for all the charts
     export function report({ teamId, interval, period } : {
       teamId?: string;
@@ -223,6 +227,10 @@ module Esper.Paths {
     export module Team {
       export const subprefix = "team";
 
+      export function base({} = {}) {
+        return optPath(prefix, subprefix);
+      }
+
       export function general({teamId} : {teamId?: string} = {}) {
         return optPath(prefix, subprefix, "general", teamId);
       }
@@ -250,6 +258,10 @@ module Esper.Paths {
 
     export module Group {
       export const subprefix = "group";
+
+      export function base({} = {}) {
+        return optPath(prefix, subprefix);
+      }
 
       export function general({groupId} : {groupId?: string} = {}) {
         return optPath(prefix, subprefix, "general", groupId);
@@ -288,10 +300,6 @@ module Esper.Paths {
 
     export function home() {
       return optPath(prefix, "");
-    }
-
-    export function list({groupId} : {groupId?: string} = {}) {
-      return optPath(prefix, "list");
     }
   }
 

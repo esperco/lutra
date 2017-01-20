@@ -94,6 +94,8 @@ module Esper.Route {
             Actions.renderTeamNotificationSettings);
   routeTeam(Paths.Manage.Team.pay, Actions.renderTeamPaySettings);
   routeTeam(Paths.Manage.Team.exportCSV, Actions.renderTeamExport);
+  route(Paths.Manage.Team.base().hash,
+        redirectPath(Paths.Manage.Team.general()));
 
 
   /* Render group-specifi settings pages */
@@ -124,6 +126,8 @@ module Esper.Route {
   routeGroup(Paths.Manage.Group.labels, Actions.renderGroupLabelSettings);
   routeGroup(Paths.Manage.Group.notifications,
              Actions.renderGroupNotificationSettings);
+  route(Paths.Manage.Group.base().hash,
+        redirectPath(Paths.Manage.Group.general()));
 
 
   /* Render customer-specific settings pages */

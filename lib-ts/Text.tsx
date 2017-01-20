@@ -16,6 +16,9 @@ module Esper.Text {
   export const ReleaseNotes = ReleaseNotesAugust2016;
   export const DismissNotes = "Click to Dismiss";
 
+  // Links
+  export const GroupsLink = "Esper for Enterprise";
+
   // Hints
   export const FilterActionHintText = <div>
     <p>
