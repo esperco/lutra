@@ -58,7 +58,7 @@ module Esper.Login {
   export function loginWithGoogle(opts?: LoginOpts)
   {
     opts = opts || {};
-    var landingUrl = opts.landingUrl || getPath();
+    var landingUrl = opts.landingUrl;
 
     var analyticsP1 = Util.timeoutP(analyticsTimeout);
     if (opts.email) {
@@ -109,7 +109,7 @@ module Esper.Login {
   // Redirect to Nylas OAuth
   export function loginWithNylas(opts?: LoginOpts) {
     opts = opts || {};
-    var landingUrl = opts.landingUrl || getPath();
+    var landingUrl = opts.landingUrl;
 
     var analyticsP1 = Util.timeoutP(analyticsTimeout);
     if (opts.email) {
@@ -145,15 +145,6 @@ module Esper.Login {
           return err;
         }
       });
-  }
-
-  // Use current pathname as default
-  function getPath() {
-    var path = location.pathname;
-    if (path[0] === "/") {
-      path = path.slice(1);
-    }
-    return path;
   }
 
   export var MISSING_NONCE = "Login nonce missing";
