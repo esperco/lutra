@@ -31,7 +31,7 @@ module Esper {
     }
 
     // UID => try to login with nonce
-    else if (uid) {
+    if (uid) {
       try {
         handleLoginInfo(Login.loginOnce(uid));
       } catch (err) {
