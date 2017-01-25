@@ -75,7 +75,8 @@ module Esper.Api {
 
   export function getLoginInfo():
   JsonPromise<ApiT.LoginResponse> {
-    var url = prefix + "/api/login/" + string(Login.myUid()) + "/info";
+    var url = prefix + "/api/login/" + string(Login.myUid()) + "/info" +
+      "?filter_groups_only=false";
     return JsonHttp.get(url);
   }
 
