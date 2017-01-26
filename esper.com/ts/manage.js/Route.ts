@@ -94,6 +94,7 @@ module Esper.Route {
             Actions.renderTeamNotificationSettings);
   routeTeam(Paths.Manage.Team.pay, Actions.renderTeamPaySettings);
   routeTeam(Paths.Manage.Team.exportCSV, Actions.renderTeamExport);
+  routeTeam(Paths.Manage.Team.misc, Actions.renderTeamMisc);
   route(Paths.Manage.Team.base().hash,
         redirectPath(Paths.Manage.Team.general()));
 
