@@ -54,8 +54,6 @@ module Esper.Views {
         />
 
         <SharingSettings team={team} profiles={members} />
-
-        <RemoveTeam team={team} />
       </div>;
     }
   }
@@ -208,28 +206,6 @@ module Esper.Views {
       successMsg={Text.InviteAssistantSuccess}
       onSubmit={(email) => Actions.Assistants.add(team.teamid, email)}
     />
-  }
-
-
-  /* Deactivate Account */
-
-  function RemoveTeam({team} : {team: ApiT.Team}) {
-    return <div className="panel panel-default">
-      <div className="panel-body clearfix">
-        <span className="control-label esper-input-align">
-          { Text.removeTeamDescription(team.team_name) }
-        </span>
-        <button className="pull-right btn btn-danger"
-          onClick={() => removeTeam(team)}>
-          { Text.RemoveTeamBtn }
-        </button>
-      </div>
-    </div>;
-  }
-
-  function removeTeam(team: ApiT.Team) {
-    Actions.Teams.removeTeam(team.teamid);
-    Route.nav.go(Paths.Manage.Team.general());
   }
 }
 

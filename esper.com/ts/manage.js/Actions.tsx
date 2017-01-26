@@ -66,6 +66,11 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamExport);
   }
 
+  export function renderTeamMisc(props: TeamSettingProps) {
+    render(<Views.TeamMiscSettings {...props} />);
+    Analytics.page(Analytics.Page.TeamMisc);
+  }
+
   export function renderNewTeam(props: {pathFn?: () => Paths.Path}) {
     render(<Views.NewTeam {...props} />);
     Analytics.page(Analytics.Page.NewTeam);

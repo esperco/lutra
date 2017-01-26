@@ -2,6 +2,9 @@ module Esper.Text {
   // Personal (non-team) settings
   export const PersonalSettings = "Other Settings";
 
+  // Misc settings
+  export const MiscSettings = "Miscellaneous";
+
   // Deactivate account?
   export const DeactivateDescription = `Deactivating your account ` +
     `will revoke Esper's access to your calendar service. If you are ` +
