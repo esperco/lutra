@@ -165,8 +165,8 @@ module Esper.Text {
   export const NoPlan = "You are not subscribed to any plan.";
   export const SelectToRenew = "Please select a plan below to continue.";
   export const UpdateCreditCard = "Please provide a credit card to continue.";
-  export const EnsureCreditCard = "Please ensure that you have added at least "
-                                + "one non-expired credit card to continue.";
+  export const EnsureCreditCard = "Please add at least one non-expired " +
+                                  "credit card.";
   export const AddCard = "Add Credit Card";
 
   // Content restrictions

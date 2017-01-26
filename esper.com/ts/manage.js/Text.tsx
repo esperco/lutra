@@ -188,6 +188,8 @@ module Esper.Text {
   export const CustomerDomainDescription = `Add a comma-separated list of ` +
     `domain names (e.g. example.com) to automatically approve any accounts ` +
     `from that domain (e.g. name@example.com)`;
+  export const EnterpriseBillingDescription = `Your organization will be ` +
+    `billed based on the number of accounts listed below.`;
   export function wrongCustomerEmail(email: string) {
     return `You must be logged in as ${email} to perform this operation.`;
   }
