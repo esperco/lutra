@@ -37,5 +37,25 @@ module Esper.Views {
          </div> : null }
       </div>;
     }
+
+    componentDidMount() {
+      this.maybeRedirect();
+    }
+
+    componentDidUpdate() {
+      super.componentDidUpdate();
+      this.maybeRedirect();
+    }
+
+    maybeRedirect() {
+      let team = Stores.Teams.get(this.props.teamId).unwrapOr(null);
+      if (! team) return;
+
+      let subscription = team.team_api.team_subscription;
+      let customer = Stores.Customers.get(subscription.cusid).unwrapOr(null);
+      if (customer && !customer.teamid) {
+        Route.nav.go(Paths.Manage.Customer.pay({ cusId: customer.id }));
+      }
+    }
   }
 }
