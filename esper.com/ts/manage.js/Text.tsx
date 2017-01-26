@@ -190,7 +190,7 @@ module Esper.Text {
     `from that domain (e.g. name@example.com)`;
   export const EnterpriseBillingDescription = `Your organization will be ` +
     `billed on a per-account basis, regardless of how many calendars each ` +
-    `account is using or how teams those accounts are a part of.`;
+    `account is using or how many teams those accounts are a part of.`;
   export function wrongCustomerEmail(email: string) {
     return `You must be logged in as ${email} to perform this operation.`;
   }
