@@ -36,12 +36,21 @@ module Esper.Views {
       </div>
       <div className="panel-body">
         {
-          details.active ?
-          <div className="alert alert-info">
-            { Text.SubscribedToPlan(
-              Text.ThisCustomer,
-              cust.subscription.plan
-             ) }
+          details.valid_payment_source ? null :
+          <div className="alert alert-warning">
+            { Text.EnsureCreditCard }
+          </div>
+        }
+        {
+          details.status === "Past_Due" ?
+          <div className="alert alert-warning">
+            { Text.SubscriptionExpired }
+          </div> : null
+        }
+        {
+          details.status === "Canceled" ?
+          <div className="alert alert-warning">
+            { Text.SubscriptionCanceled }
           </div> : null
         }
         <Components.CreditCardList subscription={details} />
