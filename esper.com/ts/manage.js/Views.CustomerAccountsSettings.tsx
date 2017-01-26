@@ -9,8 +9,16 @@ module Esper.Views {
     pathFn = Paths.Manage.Customer.accounts;
 
     renderMain(cust: ApiT.Customer) {
+      let busy = Stores.Subscriptions.status(cust.id)
+        .mapOr(false, (d) => d === Model2.DataStatus.FETCHING);
+      if (busy) {
+        return <div className="esper-spinner" />;
+      }
+
+      let details = Stores.Subscriptions.require(cust.id);
       let teams = Stores.Teams.all();
       return <div>
+        <Payments cust={cust} details={details} />
         <SeatRequestList cust={cust} teams={teams} />
         <SeatList cust={cust} teams={teams} />
         <DomainFilterInput cust={cust} />
@@ -18,12 +26,40 @@ module Esper.Views {
     }
   }
 
+  function Payments({ details, cust }: {
+    details: ApiT.SubscriptionDetails;
+    cust: ApiT.Customer;
+  }) {
+    return <div className="panel panel-default">
+      <div className="panel-heading">
+        <h4 className="description-header">{ Text.PaySettings }</h4>
+      </div>
+      <div className="panel-body">
+        {
+          details.active ?
+          <div className="alert alert-info">
+            { Text.SubscribedToPlan(
+              Text.ThisCustomer,
+              cust.subscription.plan
+             ) }
+          </div> : null
+        }
+        <Components.CreditCardList subscription={details} />
+      </div>
+    </div>;
+  }
+
   function SeatList(props: {
     cust: ApiT.Customer,
     teams: ApiT.Team[]
   }) {
     return <div className="panel panel-default">
-      <div className="panel-heading">{ Text.CustomerSeatHeading }</div>
+      <div className="panel-heading">
+        <h4 className="description-header">{ Text.CustomerSeatHeading }</h4>
+        <p className="description">
+          { Text.EnterpriseBillingDescription }
+        </p>
+      </div>
       <div className="panel-body">
         <div className="list-group">
           { _.map(props.cust.seats,
@@ -67,7 +103,9 @@ module Esper.Views {
 
     return <div className="panel panel-default">
       <div className="panel-heading">
-        { Text.CustomerPendingSeatHeading }
+        <h4 className="description-header">
+          { Text.CustomerPendingSeatHeading }
+        </h4>
       </div>
       <div className="panel-body">
         <div className="list-group">
@@ -131,12 +169,12 @@ module Esper.Views {
     render() {
       return <div className="panel panel-default">
         <div className="panel-heading">
-          { Text.CustomerDomainHeading }
-        </div>
-        <div className="panel-body">
+          <h4 className="description-header">{ Text.CustomerDomainHeading }</h4>
           <p className="description">
             { Text.CustomerDomainDescription }
           </p>
+        </div>
+        <div className="panel-body">
           <Components.TextArea
             className="form-control"
             placeholder="company.com, mail.company.com"

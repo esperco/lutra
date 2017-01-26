@@ -15,12 +15,14 @@ module Esper.Views {
     pathFn: (p: {cusId: string}) => Paths.Path;
 
     renderWithData() {
-      let subMenu = <Components.SettingsMenu>
-        { /* Nothing on general page yet -- so remove link */
-          /* <Components.SettingsMenuLink {...this.props}
+      /*
+        Currently only one page, so no menu
+      */
+      /* let subMenu = <Components.SettingsMenu>
+        <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Customer.general}>
           { Text.CustomerGeneral }
-        </Components.SettingsMenuLink> */ }
+        </Components.SettingsMenuLink>
         <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Customer.accounts}>
           { Text.CustomerAccounts }
@@ -29,7 +31,7 @@ module Esper.Views {
             href={Paths.Manage.Customer.pay}>
           { Text.CustomerPay }
         </Components.SettingsMenuLink>
-      </Components.SettingsMenu>;
+      </Components.SettingsMenu>; */
 
       let ready = Stores.Customers.ready();
       if (! ready) return <div className="esper-spinner" />;
@@ -37,8 +39,10 @@ module Esper.Views {
       let cust = Stores.Customers.require(this.props.cusId);
       if (! cust) return <span />;
 
-      return <Views.Settings {...this.props} subMenu={subMenu}>
-        <AddCard cust={cust} />
+      return <Views.Settings {...this.props}>
+        {/* Payments added to accounts page -- don't need this
+            <AddCard cust={cust} />
+        */}
         { this.renderMain(cust) }
       </Views.Settings>
     }

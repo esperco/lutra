@@ -114,19 +114,22 @@ module Esper.Actions {
   }
 
   export function renderCustomerGeneralSettings(props: CustomerSettingProps) {
-    render(<Views.CustomerGeneralSettings {...props} />);
-    Analytics.page(Analytics.Page.CustomerManage);
+    Route.nav.go(Paths.Manage.Customer.accounts(props));
+    // render(<Views.CustomerGeneralSettings {...props} />);
+    // Analytics.page(Analytics.Page.CustomerManage);
   }
 
   export function renderCustomerAccountsSettings(props: CustomerSettingProps) {
+    Stores.Subscriptions.fetch(props.cusId);
     render(<Views.CustomerAccountsSettings {...props} />);
     Analytics.page(Analytics.Page.CustomerAccounts);
   }
 
   export function renderCustomerPaySettings(props: CustomerSettingProps) {
-    Stores.Subscriptions.fetch(props.cusId);
-    render(<Views.CustomerPaySettings {...props} />);
-    Analytics.page(Analytics.Page.CustomerPay);
+    Route.nav.go(Paths.Manage.Customer.accounts(props));
+    // Stores.Subscriptions.fetch(props.cusId);
+    // render(<Views.CustomerPaySettings {...props} />);
+    // Analytics.page(Analytics.Page.CustomerPay);
   }
 
   export function renderNewCustomer(props: {pathFn?: () => Paths.Path}) {
