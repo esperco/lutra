@@ -44,7 +44,7 @@ module Esper.Stores.GroupPreferences {
   ///////////
 
   export function makeNewPreferences(groupid: string): ApiT.GroupPreferences {
-    var prefs = {
+    return {
       groupid,
       uid: Login.me(),
       daily_breakdown: false,
@@ -53,9 +53,6 @@ module Esper.Stores.GroupPreferences {
       bad_duration: 20,
       bad_attendees: 4
     };
-
-    PrefsStore.set(groupid, Option.some(prefs));
-    return prefs;
   }
 
   /*
