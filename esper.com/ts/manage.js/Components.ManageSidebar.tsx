@@ -44,26 +44,6 @@ module Esper.Components {
           </ul>
         </div>
 
-        <div className="esper-panel-section">
-          <label className="esper-header">
-            { Text.Groups }
-          </label>
-          <ul className="esper-select-menu">
-            { _.map(this.props.groups, (g) => this.renderGroup(g))}
-          </ul>
-          <ul className="esper-select-menu">
-            <li>
-              <a className={classNames({
-                active: this.props.pathFn === Paths.Manage.newGroup
-              })}
-              href={Paths.Manage.newGroup().href}>
-                <i className="fa fa-fw fa-left fa-user-plus" />
-                { Text.AddGroupLink }
-              </a>
-            </li>
-          </ul>
-        </div>
-
         { this.renderCustomerList() }
 
         <div className="esper-panel-section">
@@ -91,21 +71,6 @@ module Esper.Components {
         href={pathFn({teamId: team.teamid}).href}>
           <i className="fa fa-fw fa-left fa-user" />
           { team.team_name }
-        </a>
-      </li>;
-    }
-
-    renderGroup(group: ApiT.Group) {
-      var pathFn = this.props.groupId ? this.props.pathFn
-                                      : Paths.Manage.Group.general;
-
-      return <li key={group.groupid}>
-        <a className={classNames({
-          active: group.groupid === this.props.groupId
-        })}
-        href={pathFn({groupId: group.groupid}).href}>
-          <i className="fa fa-fw fa-left fa-users" />
-          { group.group_name }
         </a>
       </li>;
     }
