@@ -522,7 +522,11 @@ module Esper.ApiT {
     status?: SubscriptionStatus;
   }
 
-  export interface SubscriptionDetails extends SubscriptionSummary {
+  export interface SubscriptionDetails {
+    cusid: string;
+    active: boolean;
+    plan?: PlanId;
+    status?: SubscriptionStatus;
     quantity?: number;
 
     /* timestamps */

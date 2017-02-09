@@ -36,7 +36,7 @@ module Esper.Views {
       </div>
       <div className="panel-body">
         {
-          details.valid_payment_source ? null :
+          cust.subscription.valid_payment_source ? null :
           <div className="alert alert-warning">
             { Text.EnsureCreditCard }
           </div>
