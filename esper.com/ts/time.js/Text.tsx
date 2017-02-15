@@ -10,19 +10,14 @@ module Esper.Text {
   // Onboarding
   export const TeamSetupHeading = "Let's Get Started";
   export const TeamSetupDescription = "Welcome to Esper! Are you managing " +
-    "time for just yourself or someone else (for instance, as an " +
-    "assistant or supervisor)?";
+    "time for just yourself, as an assistant for someone else, or for " +
+    "a team or organization?";
   export const TeamSelfDescription = "Great! We need a little more info to " +
     "continue.";
   export const TeamExecDescription = "Fantastic. Who are you managing time " +
     "for? We'll invite that person to Esper and set things up " +
     "so that person can retain access to his or her Esper data if you " +
     "decide to hand off calendar duties to someone else."
-  export const GroupOnboardingDescription = <p>
-    Esper for Teams is coming soon. An Esper member will contact you within
-    the next 12 hours. Or you can email Andrew directly at {" "}
-    <a href="mailto:andrew@esper.com">andrew@esper.com</a>.
-  </p>;
 
   export const LabelSetupHeading = `Pick Some ${_.capitalize(Labels)}`;
   export const LabelSetupSelfDescription = "What do you want to prioritize? " +

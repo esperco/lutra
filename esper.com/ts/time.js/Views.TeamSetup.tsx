@@ -58,7 +58,7 @@ module Esper.Views {
         <div className="esper-section">
           <Components.Expando onOpen={() => this.onOpenSelf()}
             group={this._expandos}
-            header="Just Myself"
+            header="Personal Use"
             headerClasses="esper-panel-section"
             bodyClasses="esper-panel-section"
           >
@@ -81,7 +81,7 @@ module Esper.Views {
         <div className="esper-section">
           <Components.Expando onOpen={() => this.onOpenExec()}
             group={this._expandos}
-            header="Someone Else"
+            header="Assistant to Someone Else"
             headerClasses="esper-panel-section"
             bodyClasses="esper-panel-section"
           >
@@ -115,13 +115,11 @@ module Esper.Views {
         <div className="esper-section">
           <Components.Expando onOpen={() => this.onOpenGroup()}
             group={this._expandos}
-            header="Team"
+            header="Organization or Team"
             headerClasses="esper-panel-section"
             bodyClasses="esper-panel-section"
           >
-            <div>
-              { Text.GroupOnboardingDescription }
-            </div>
+            <div>Redirecting &hellip;</div>
           </Components.Expando>
         </div>
       </Components.OnboardingPanel>
@@ -149,7 +147,10 @@ module Esper.Views {
 
     // On open the support team expando
     onOpenGroup() {
-      Api.sendSupportEmail(`${Login.myEmail()} has indicated interest in groups.`);
+      Api.sendSupportEmail(
+        `${Login.myEmail()} has indicated interest in groups.`
+      );
+      location.href = "/groups";
       this.mutateState((state) => {
         state.selfSelected = false;
         state.execSelected = false;
