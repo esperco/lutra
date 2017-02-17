@@ -48,6 +48,9 @@ module Esper.Token {
           var loginInfo: ApiT.LoginResponse = Variant.value(x);
           handleLoginInfo($.Deferred().resolve(loginInfo));
           break;
+        case "Confirm_timebomb_event":
+          renderLogin("Meeting confirmed.");
+          break;
         case "Unsub_daily_agenda":
           renderLogin("You've been unsubscribed from these emails.");
           break;
