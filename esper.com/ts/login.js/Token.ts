@@ -51,6 +51,9 @@ module Esper.Token {
         case "Confirm_timebomb_event":
           renderLogin("Meeting confirmed.");
           break;
+        case "Unconfirm_timebomb_event":
+          renderLogin("Meeting will be canceled if no one else confirms.");
+          break;
         case "Unsub_daily_agenda":
           renderLogin("You've been unsubscribed from these emails.");
           break;
