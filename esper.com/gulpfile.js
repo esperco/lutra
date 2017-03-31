@@ -21,7 +21,6 @@ var config = {
 
   jsGlobs: ["js/**/*.js"],
   jsBundles: [
-    "bundles/landing-vendor.js",
     "bundles/react-page-vendor.js",
     "bundles/react-simple-vendor.js",
     "bundles/test-vendor.js",
