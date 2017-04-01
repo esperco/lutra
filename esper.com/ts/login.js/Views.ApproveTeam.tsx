@@ -43,7 +43,7 @@ module Esper.Views {
                      this.state.error);
       }
 
-      return <div>
+      return <div className="panel approve-team">
         { this.renderMain() }
         { this.renderFooter() }
       </div>;
@@ -76,7 +76,7 @@ module Esper.Views {
       }
 
       return <div>
-        <div className="alert alert-warning">
+        <div className="alert warning">
           <p>
             Someone's created a team for you on Esper. We need you to approve
             the members on your team before we can continue. Please check the
@@ -94,11 +94,11 @@ module Esper.Views {
         <div>
           { error ? <Components.ErrorMsg /> : null }
           { loading ?
-            <span className="esper-spinner" /> :
+            <span className="spinner" /> :
             _.map(this.getUnapprovedTeams(this.props.info), (team) =>
-              <ul className="list-group" key={team.teamid}>
+              <ul className="panel" key={team.teamid}>
                 { _.map(team.team_assistants, (asst) =>
-                  <li className="list-group-item" key={asst}>
+                  <li key={asst}>
                     <i className="fa fa-fw fa-user"></i>{" "}
                     { this.getName(asst) }
                   </li>
@@ -111,21 +111,21 @@ module Esper.Views {
     }
 
     renderFooter() {
-      return <div className="clearfix modal-footer">
+      return <div className="clearfix modal-footer action-buttons panel">
         { this.state.saving ?
-          <div className="esper-spinner" /> :
-          null
-        }
-        <button className="btn btn-danger"
-                disabled={this.state.saving}
-                onClick={this.reject.bind(this)}>
-          Reject
-        </button>
-        <button className="btn btn-success"
-                disabled={this.state.saving}
-                onClick={this.approve.bind(this)}>
-          Approve
-        </button>
+          <span>
+            <span className="spinner" /> Saving &hellip;
+          </span> :
+          <span>
+            <button className="danger"
+                    onClick={this.reject.bind(this)}>
+              Reject
+            </button>
+            <button className="success"
+                    onClick={this.approve.bind(this)}>
+              Approve
+            </button>
+          </span> }
       </div>;
     }
 

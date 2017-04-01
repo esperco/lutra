@@ -153,7 +153,7 @@ module Esper {
     var defaultEmail = Util.nullify(getEmail());
     var inviteCode = Util.nullify(getInviteCode());
     var landingUrl = Util.nullify(getLandingUrl());
-    Layout.render(<div id="esper-login-container" className="container">
+    Layout.render(<div id="esper-login-container">
       <div className="panel panel-default"><div className="panel-body">
         <Components.LoginPrompt
           onGoogleLogin={() => Login.loginWithGoogle({
@@ -170,13 +170,12 @@ module Esper {
           platform={platform}
         >
           <div className={
-            "alert text-center alert-" + (error ? "danger" : "info")
+            "alert " + (error ? "danger" : "info")
           }>{ error || message || (inviteCode && <span>
               Log in to continue.
             </span>) || <span>
-              Esper uses data from your calendar and other sources to provide
-              you insight into how you spend your time. Please log in with your
-              calendar provider to continue.
+              Please log in with your calendar
+              provider&nbsp;to&nbsp;continue.
             </span>
            }{
             error ? <span>
@@ -205,7 +204,7 @@ module Esper {
       var dfd = $.Deferred<ApiT.LoginResponse>();
       if (Login.needApproval(response)) {
         Stores.Profiles.init();
-        Layout.renderModal(<Views.ApproveTeamsModal info={response}
+        Layout.render(<Views.ApproveTeams info={response}
           callback={(info, rejected) => {
             var teamIds = _.map(rejected, (t) => t.teamid);
             Login.ignoreTeamIds(teamIds);
@@ -259,7 +258,7 @@ module Esper {
     _apiSecret: HTMLInputElement;
 
     render() {
-      return <div style={{textAlign: "left"}}>
+      return <div className="panel" style={{textAlign: "left"}}>
         <div className="form-group">
           <label htmlFor={this.getId("eMail")}>E-mail</label>
           <input id={this.getId("eMail")} type="text"
@@ -282,7 +281,7 @@ module Esper {
             className="form-control" />
         </div>
         <div className="form-group">
-          <button className="btn btn-primary" style={{width: "100%"}}
+          <button className="btn primary" style={{width: "100%"}}
                   onClick={() => this.handleLogin()}>
             Login
           </button>
