@@ -11,7 +11,7 @@ module Esper.Components {
     msg?: string|JSX.Element|JSX.Element[];
   }, {}> {
     render() {
-      return <div className="alert compact alert-danger" role="alert">
+      return <div className="alert compact danger alert-danger" role="alert">
         <i className="fa fa-fw fa-left fa-warning"></i>
         { this.props.msg || <span>
             Whoops. Something broke.{" "}

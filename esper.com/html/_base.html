@@ -10,17 +10,9 @@
   <title>{% block title %}Esper{% endblock %}</title>
   {% block head %}
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="js/landing-vendor.js"></script>
-
-    {# Optimizely should go after vendor ensure jQuery loaded #}
-    {# NB: 2016-05-02 - Disabling Optimizely since no experiment running
-      {% include "_optimizely.html" %}
-    #}
-
     <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" />
+          href="https://fonts.googleapis.com/css?family=Open+Sans:400,700">
     <link rel="stylesheet" href="css/vendor.css" media="screen">
-    <link rel="stylesheet" href="css/default.css" media="screen">
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     <link rel="icon" href="img/favicon.ico" type="image/x-icon">
   {% endblock %}
@@ -35,23 +27,30 @@
 </head>
 
 <body class="esper {{ BODY_CLASS }}">{% block body %}
-  {% block header %}
-    {% include "_navbar.html" %}
-  {% endblock %}
+  {% block header %}{% endblock %}
 
   {% block main %}
+    <div id="esper-main">
+      {# This should get cleared after initial render #}
+      <div id="esper-loading">
+        <div class="esper-center">
+          <div class="esper-spinner"></div>
+        </div>
+      </div>
+    </div>
   {% endblock %}
 
-  {% block footer %}
-    {% include "_footer.html" %}
-  {% endblock %}
+  {% block footer %}{% endblock %}
 
-  {% block postfooter %}{% endblock %}
+  {% block postfooter %}
+    {% block modal %}
+      <div id="esper-modal"></div>
+    {% endblock %}
+  {% endblock %}
 
   {% block postscripts %}
     {% include "_segment.html" %}
     {% include "_raven.html" %}
-    <script src="js/landing.js"></script>
   {% endblock %}
 {% endblock %}</body>
 </html>

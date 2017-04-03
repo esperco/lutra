@@ -54,9 +54,9 @@ module Esper.Components {
     render() {
       return <div id="esper-login">
         { this.state.busy ?
-          <div className="esper-spinner" /> :
+          <div className="spinner" /> :
           ( this.state.serverError ?
-            <div className="alert alert-danger text-center">
+            <div className="alert danger text-center">
               We were unable to log you in. Please
               {" "}<a href="https://esper.com/contact">contact us</a>{" "}
               for support.
@@ -65,29 +65,29 @@ module Esper.Components {
           )
         }
 
-        <div className={"buttons-container" +
-                        (this.state.showNylasInput ? " shifted" : "")}>
-          { this.props.onGoogleLogin ? this.renderGoogleButton() : null }
-          { this.props.onNylasLogin ? this.renderExchangeButton() : null }
-          { this.props.onNylasLogin ? this.renderNylasButton() : null }
-          { this.renderNylasInput() }
-        </div>
+        { this.state.showNylasInput ?
+          this.renderNylasInput() :
+          <div className="buttons-container">
+            { this.props.onGoogleLogin ? this.renderGoogleButton() : null }
+            { this.props.onNylasLogin ? this.renderExchangeButton() : null }
+            { this.props.onNylasLogin ? this.renderNylasButton() : null }
+          </div> }
 
-        <div className="esper-note text-center"><p>
-          By signing in, you agree to Esper&apos;s{" "}
-          <a href="https://esper.com/terms-of-use">Terms of Use.</a>
+        <div className="note"><p>
+          By signing in, you agree to Esper&apos;s&nbsp;
+          <a href="/terms-of-use">Terms&nbsp;of&nbsp;Use.</a>
         </p></div>
       </div>;
     }
 
     renderGoogleButton() {
-      return <button className="btn btn-primary sign-in-btn google-btn"
+      return <button className="cta primary sign-in-btn google-btn"
                      disabled={this.state.busy}
                      onClick={this.loginToGoogle.bind(this)}>
         <div className="sign-in-icon">
           <i className="fa fa-fw fa-google" />
         </div>
-        <div className="sign-in-text">Google Account</div>
+        <div className="sign-in-text">Google Calendar</div>
       </button>;
     }
 
@@ -98,7 +98,7 @@ module Esper.Components {
     }
 
     renderExchangeButton() {
-      return <button className="btn btn-primary sign-in-btn exchange-btn"
+      return <button className="cta primary sign-in-btn exchange-btn"
                      onClick={this.showNylasInput.bind(this)}
                      disabled={this.state.busy}>
         <div className="sign-in-icon">
@@ -109,13 +109,13 @@ module Esper.Components {
     }
 
     renderNylasButton() {
-      return <button className="btn btn-primary sign-in-btn"
+      return <button className="cta primary sign-in-btn"
                      onClick={this.showNylasInput.bind(this)}
                      disabled={this.state.busy}>
         <div className="sign-in-icon">
-          <i className="fa fa-fw fa-envelope" />
+          <i className="fa fa-fw fa-calendar-o" />
         </div>
-        <div className="sign-in-text">Other Provider</div>
+        <div className="sign-in-text">Other Calendar</div>
       </button>;
     }
 
@@ -125,9 +125,9 @@ module Esper.Components {
       return <div className="nylas-form">
         <div className={"form-group" + (
              this.state.inputError ? " has-error" : "")}>
-          <a onClick={this.hideNylasInput.bind(this)}>
+          <button onClick={this.hideNylasInput.bind(this)}>
             <i className="fa fa-fw fa-arrow-circle-left" />
-          </a>{" "}
+          </button>{" "}
           <label id={inputId} className="control-label">
             What's Your Email Address?
           </label>
@@ -138,7 +138,7 @@ module Esper.Components {
                  defaultValue={this.props.email}
                  placeholder="name@email.com" />
         </div>
-        <button className="btn btn-primary" disabled={this.state.busy}
+        <button className="cta primary" disabled={this.state.busy}
                 onClick={this.submitNylas.bind(this)}>
           Continue{" "}
           <i className="fa fa-fw fa-arrow-circle-right" />
