@@ -307,7 +307,7 @@ module Esper.Paths {
     }
   }
 
-  // Paths for /today
+  // Paths for /now
   export module Now {
     export const prefix = "/now";
 
@@ -326,6 +326,15 @@ module Esper.Paths {
       var dateStr = typeof date === "string" ?
        date : moment(date).format("YYYY-MM-DD");
       return optPath(prefix, "date", dateStr, teamId);
+    }
+  }
+
+  // Paths for /tb
+  export module Timebomb {
+    export const prefix = "/tb";
+
+    export function home() {
+      return optPath(prefix, "");
     }
   }
 }
