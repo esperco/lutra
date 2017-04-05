@@ -20,6 +20,8 @@ module Esper.ErrMsg {
         return "There was an error logging you in. Please try again.";
       case "slack_auth_failure":
         return "Slack authentication failed. Please try again.";
+      case "preexisting_slack_user":
+        return "That Slack account is tied to another user.";
       default:
         return "An error has occurred.";
       }
