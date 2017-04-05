@@ -13,6 +13,7 @@ module Esper {
   // Where to redirect
   const TIME_REDIRECT = "time";
   const GROUPS_REDIRECT = "groups";
+  const SWEEP_REDIRECT = "tb"
 
   export function init() {
     showSpinner();
@@ -133,11 +134,18 @@ module Esper {
 
   // Landing URL to use when none specified
   function getDefaultLandingUrl() {
-    if (Login.data && Login.data.groups && Login.data.groups.length) {
-      return GROUPS_REDIRECT;
-    } else {
-      return TIME_REDIRECT;
+    if (Login.data) {
+      if (Login.data.groups && Login.data.groups.length) {
+        return GROUPS_REDIRECT;
+      } else if (Login.data.teams && !!_.find(Login.data.teams,
+                  (t) => t.team_executive !== Login.myUid() ||
+                         t.team_api.team_labels.length))
+      {
+        // Redirect to charts if labels or non-exec team
+        return TIME_REDIRECT;
+      }
     }
+    return SWEEP_REDIRECT;
   }
 
   function getEmail() {
