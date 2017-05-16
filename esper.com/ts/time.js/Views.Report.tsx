@@ -155,8 +155,8 @@ module Esper.Views {
         <DomainsReport {...props} />
         <GuestCountReport {...props} />
         <DurationReport {...props} />
-        <RatingsReport {...props} />
-        <NotesReport {...props} />
+        {/* <RatingsReport {...props} /> */}
+        {/* <NotesReport {...props} /> */}
       </div>;
     }
   }
@@ -307,7 +307,7 @@ module Esper.Views {
     </div>
   }
 
-  function RatingsReport(props: Types.ChartProps) {
+  /*function RatingsReport(props: Types.ChartProps) {
     props = _.clone(props);
     props.groupBy = Charting.GroupByRating;
     props.extra = Charting.defaultExtras(props.team.teamid, props.groupBy);
@@ -354,7 +354,7 @@ module Esper.Views {
     Layout.renderModal(Containers.eventEditorModal([event], {
       minFeedback: false
     }));
-  }
+  }*/
 
   function SeeMoreLink(props: Types.ChartProps) {
     let {path, opts} = Charting.updateChartPath(props, {});

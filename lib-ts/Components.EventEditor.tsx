@@ -14,9 +14,7 @@ module Esper.Components {
     eventData: Model2.StoreData<Types.FullEventId, Types.TeamEvent>[];
     teams: ApiT.Team[];
 
-    minFeedback?: boolean;
     forceBatch?: boolean;
-    initAction?: boolean;
     focusOnLabels?: boolean;
     className?: string;
   }
@@ -33,14 +31,6 @@ module Esper.Components {
       (firstEvent) => <div className={props.className}>
         { props.eventData.length === 1 && !props.forceBatch ?
           <EventDetails event={firstEvent} /> :
-          null
-        }
-        { props.eventData.length === 1 && !props.forceBatch ?
-          <EventFeedback event={firstEvent}
-                         status={props.eventData[0].dataStatus}
-                         initAction={props.initAction}
-                         initMin={Stores.Events.isActive(firstEvent) &&
-                                  props.minFeedback} /> :
           null
         }
         { props.eventData.length > 1 || props.forceBatch ||
@@ -117,8 +107,7 @@ module Esper.Components {
         <EventEditor className="esper-section"
                      eventData={this.props.eventData}
                      teams={this.props.teams}
-                     focusOnLabels={this.props.focusOnLabels}
-                     minFeedback={this.props.minFeedback} />
+                     focusOnLabels={this.props.focusOnLabels} />
       </Modal>;
     }
   }
@@ -165,185 +154,5 @@ module Esper.Components {
         : null
       }
     </div>;
-  }
-
-  ////
-
-  interface OneEventProps {
-    event: Stores.Events.TeamEvent;
-    status: Model2.DataStatus;
-    initAction?: boolean;
-    initMin?: boolean;
-  }
-
-  export class EventFeedback extends Component<OneEventProps, {
-    // Track last saved event so we only show success on save
-    lastSavedEvent?: Stores.Events.TeamEvent;
-
-    // Current state of event notes (not yet committed, saved yet)
-    notes?: string;
-
-    minimize?: boolean;
-  }> {
-    inputNotes: TextArea;
-    inputSaveTimeout: number;
-
-    constructor(props: OneEventProps) {
-      super(props);
-      this.state = {
-        notes: this.props.event.feedback.notes,
-        minimize: this.props.initMin
-      };
-    }
-
-    componentWillReceiveProps(newProps: OneEventProps) {
-      if (this.props.event.id !== newProps.event.id) {
-        this.setState({ notes: newProps.event.feedback.notes });
-      }
-    }
-
-    render() {
-      var event = this.props.event;
-      var status = this.props.status;
-      var busy = status === Model2.DataStatus.INFLIGHT;
-      var error = status === Model2.DataStatus.FETCH_ERROR ||
-                  status === Model2.DataStatus.PUSH_ERROR;
-      var hasChanges = this.state.notes !== event.feedback.notes;
-      var disableOk = busy || !hasChanges;
-      var success = !busy && !hasChanges && (
-        (this.props.initAction && !this.state.lastSavedEvent) ||
-        _.isEqual(this.state.lastSavedEvent, event)
-      );
-      var isActive = Stores.Events.isActive(event);
-      var title = isActive ? Text.YesAttendLong : Text.NoAttendLong;
-
-      if (this.state.minimize) {
-        return <div onClick={() => this.setState({ minimize: false })}
-          className="event-min-feedback esper-panel-section action clearfix">
-          <a className="event-rating action pull-left">
-            { this.renderMinFeedback(event) }{" "}
-            <i className="fa fa-fw fa-caret-down" />
-          </a>
-          <Tooltip className={classNames("action no-attend-action", {
-            active: !isActive
-          })} title={title} onClick={() => this.toggleAttended()}>
-            { isActive ? Text.YesAttend : Text.NoAttend }
-          </Tooltip>
-        </div>;
-      }
-
-      return <div className="event-notes esper-panel-section">
-        <div className="action"
-             onClick={() => this.setState({ minimize: true })}>
-          <label htmlFor={this.getId("notes")}>
-            { Text.FeedbackTitle }
-          </label>
-          <a className="pull-right action min-feedback-action">
-            <i className="fa fa-fw fa-caret-up" />
-          </a>
-        </div>
-        <p className="text-muted">
-          Don't worry! Ratings and notes are NOT shared with other
-          meeting guests.
-        </p>
-        <div className="esper-section">
-          { this.renderRating(event) }
-        </div>
-        <div className="esper-section esper-full-width">
-          <TextArea id={this.getId("notes")} placeholder="Notes"
-            ref={(ref) => this.inputNotes = ref}
-            className="form-control esper-modal-focus"
-            value={this.state.notes}
-            onChange={(v) => this.notesChange(v)}
-          />
-        </div>
-        <ModalPanelFooter
-          busy={busy} error={error} success={success}
-          okText="Save" onOK={() => this.submitNotes()} disableOK={disableOk}
-        />
-      </div>;
-    }
-
-    renderMinFeedback(event: Stores.Events.TeamEvent): JSX.Element|string {
-     if (! Stores.Events.isActive(event)) {
-       return Text.NoAttend;
-     }
-
-     if (event.feedback.rating) {
-      return <span>{
-         _.times(event.feedback.rating || 0, (i) =>
-          <i key={i.toString()} className="fa fa-fw fa-star" />
-        )
-       }</span>
-     }
-
-     return <span className="esper-link">
-       { Text.FeedbackTitle }
-     </span>;
-    }
-
-    renderRating(event: Stores.Events.TeamEvent) {
-      let isActive = Stores.Events.isActive(event);
-      let noAttendTitle = isActive ? Text.YesAttendLong : Text.NoAttendLong;
-
-      return <div className="row">
-        <div className="col-sm-8 pad-xs event-star-ratings">
-          <StarRating
-            value={(Stores.Events.isActive(event)
-                    && event.feedback.rating) || 0}
-            onChange={(i) => this.submitStarRating(i)} />
-        </div>
-        <div className="col-sm-4 pad-xs event-no-attend">
-          <Tooltip className={classNames("action no-attend-action", {
-            active: !isActive
-          })} title={noAttendTitle}>
-            <button className={"form-control btn btn-default" +
-              (Stores.Events.isActive(event) ? "" : " active")}
-            onClick={() => this.toggleAttended()}>
-              { Stores.Events.isActive(event) ?
-                Text.YesAttend : Text.NoAttend }
-            </button>
-          </Tooltip>
-        </div>
-      </div>;
-    }
-
-    notesChange(value: string) {
-      clearTimeout(this.inputSaveTimeout);
-      this.inputSaveTimeout = setTimeout(() => this.submitNotes(), 2000);
-      this.setState({notes: value});
-    }
-
-    submitNotes() {
-      var event = this.props.event;
-      if (event.feedback.notes !== this.state.notes) {
-        this.submitFeedback({ notes: this.state.notes });
-      }
-    }
-
-    toggleAttended() {
-      var event = this.props.event;
-      this.submitFeedback({
-        attended: !Stores.Events.isActive(event)
-      });
-    }
-
-    submitStarRating(rating: number) {
-      var event = this.props.event;
-      this.submitFeedback({
-        rating: rating,
-        attended: true
-      });
-    }
-
-    submitFeedback(feedback: ApiT.EventFeedbackUpdate) {
-      var newEvent = Actions.Feedback.post(this.props.event, feedback);
-      this.setState({lastSavedEvent: newEvent});
-    }
-
-    componentWillUnmount() {
-      super.componentWillUnmount();
-      clearTimeout(this.inputSaveTimeout);
-    }
   }
 }

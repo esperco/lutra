@@ -473,7 +473,6 @@ module Esper.Views {
           teams={[this.props.team]}
           isSelected={(event) => this.isSelected(event)}
           onEventClick={(event) => editEvent(event)}
-          onFeedbackClick={(event) => editEvent(event, false)}
           onEventToggle={(event) => this.props.toggleEvent(event)}
         />
       </div>;
@@ -554,10 +553,8 @@ module Esper.Views {
 
 
   // Misc actions
-  function editEvent(event: Types.TeamEvent, minFeedback=true) {
+  function editEvent(event: Types.TeamEvent) {
     Actions.EventLabels.confirm([event]);
-    Layout.renderModal(Containers.eventEditorModal([event], {
-      minFeedback
-    }));
+    Layout.renderModal(Containers.eventEditorModal([event]));
   }
 }

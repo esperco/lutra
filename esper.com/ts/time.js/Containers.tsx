@@ -13,10 +13,9 @@ module Esper.Containers {
   }
 
   export function eventEditorModal(events: Stores.Events.TeamEvent[], opts?: {
-    minFeedback?: boolean;
     onHidden?: () => void;
   }) {
-    opts = opts || { minFeedback: true };
+    opts = opts || {};
     return ReactHelpers.contain(function() {
       // Refresh data from store before rendering modal
       var eventData = _(events)
@@ -32,8 +31,7 @@ module Esper.Containers {
       return <Components.EventEditorModal
         eventData={eventData}
         teams={Stores.Events.getTeams(events)}
-        focusOnLabels={opts.minFeedback}
-        minFeedback={opts.minFeedback}
+        focusOnLabels={true}
         onHidden={opts.onHidden}
       />;
     })
@@ -61,23 +59,14 @@ module Esper.Containers {
 
         Layout.renderModal(
           eventEditorModal([event], {
-            minFeedback: true,
             onHidden: backFn
           })
         );
       };
-      var feedbackFn = (event: Stores.Events.TeamEvent) =>
-        Layout.renderModal(
-          eventEditorModal([event], {
-            minFeedback: false,
-            onHidden: backFn
-          })
-        );
 
       return <Components.FilteredEventListModal
         events={events} teams={teams}
         onEventClick={labelFn}
-        onFeedbackClick={feedbackFn}
       />;
     });
   }
@@ -129,7 +118,6 @@ module Esper.Containers {
 
         Layout.renderModal(
           eventEditorModal([event], {
-            minFeedback: true,
             onHidden: backFn
           })
         );

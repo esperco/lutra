@@ -12,9 +12,7 @@ module Esper.Components {
       teams: ApiT.Team[];
       onEventToggle?: (event: Types.TeamEvent) => void;
       onEventClick?: (event: Types.TeamEvent) => void;
-      onFeedbackClick?: (event: Types.TeamEvent) => void;
       showLabels?: boolean; // => default true
-      showFeedback?: boolean; // => default true
       showAttendToggle?: boolean; // => default true
     }
   }
@@ -75,7 +73,6 @@ module Esper.Components {
       var isActive = Stores.Events.isActive(event);
       var actionRequired = !!Stores.Events.needsConfirmation(event);
       var showLabels = this.props.showLabels !== false;
-      var showFeedback = this.props.showFeedback !== false;
       var showAttendToggle = this.props.showAttendToggle !== false;
 
       return <div key={[event.teamId, event.calendarId, event.id].join(",")}
@@ -122,14 +119,6 @@ module Esper.Components {
           </div> :
           null
         }
-        {
-          showFeedback && event.feedback && (event.feedback.notes ||
-            (Stores.Events.isActive(event) && event.feedback.rating)) ?
-          <div className="action-block event-feedback"
-               onClick={() => this.handleFeedbackClick(event)}>
-            <EventFeedback event={event} />
-          </div> : null
-        }
       </div>;
     }
 
@@ -143,12 +132,6 @@ module Esper.Components {
 
     getTeam(event: Stores.Events.TeamEvent) {
       return _.find(this.props.teams, (t) => t.teamid === event.teamId);
-    }
-
-    handleFeedbackClick(event: Stores.Events.TeamEvent) {
-      if (this.props.onFeedbackClick) {
-        this.props.onFeedbackClick(event);
-      }
     }
   }
 

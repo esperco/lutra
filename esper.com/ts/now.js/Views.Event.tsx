@@ -10,7 +10,6 @@ module Esper.Views {
     calId: string;
     eventId: string;
     teamId: string;
-    initAction?: boolean;
   }
 
   export class EventView extends Component<Property, {}> {
@@ -76,7 +75,6 @@ module Esper.Views {
                 className="esper-section"
                 eventData={[eventData]}
                 teams={team ? [team] : []}
-                initAction={this.props.initAction}
               />
             </div>
           </div>
