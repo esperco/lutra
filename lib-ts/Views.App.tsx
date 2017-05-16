@@ -29,7 +29,7 @@ module Esper.Views {
 
   class ReleaseNotes extends Component<{ lastDismiss: number }, {}> {
     render() {
-      if (this.props.lastDismiss < Text.LatestRelease) {
+      if (Text.LatestRelease && this.props.lastDismiss < Text.LatestRelease) {
         return <div className="esper-release-notes esper-inverse pinned">
           <a className="action rm-action pull-right"
              title={Text.DismissNotes}

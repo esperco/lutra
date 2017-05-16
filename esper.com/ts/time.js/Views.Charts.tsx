@@ -171,7 +171,7 @@ module Esper.Views {
               Charting.GroupByCalendar,
               Charting.GroupByDomain,
               Charting.GroupByGuest,
-              Charting.GroupByRating,
+              // Charting.GroupByRating,
               Charting.GroupByDuration,
               Charting.GroupByGuestCount
             ], (g, i) => <li key={i}>
@@ -281,11 +281,11 @@ module Esper.Views {
           active={active.guestCounts}
           groupBy={Charting.GroupByGuestCount}
         />
-        <FilterGroupBy
+        {/*<FilterGroupBy
           props={props}
           active={active.ratings}
           groupBy={Charting.GroupByRating}
-        />
+        />*/}
 
         <FilterItem id={idPrefix + "weekHours"}
                     active={active.weekHours || active.incUnscheduled}

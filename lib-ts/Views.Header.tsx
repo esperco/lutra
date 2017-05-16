@@ -142,7 +142,7 @@ module Esper.Views {
       let hasGroups = Login.data && Login.data.groups.length > 0;
       return <ul className={className}>
         <li><a href={Paths.Timebomb.home().href}>
-          <i className="fa fa-fw fa-calendar-check-o"></i> Esper Sweep
+          <i className="fa fa-fw fa-check"></i> Agenda Check
         </a></li>
         { hasGroups ? <li><a href={Paths.Groups.home().href} target="_blank">
             <i className="fa fa-fw fa-users"></i>{" "}

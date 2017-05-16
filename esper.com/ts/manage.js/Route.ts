@@ -24,17 +24,6 @@ module Esper.Route {
     });
   }
 
-  // Check if we have a group -- implies demo check
-  var groupCheck: PageJS.Callback = function(ctx, next) {
-    demoCheck(ctx, function() {
-      if (Stores.Groups.all().length) {
-        next();
-      } else {
-        Route.nav.go(Paths.Manage.newGroup());
-      }
-    });
-  }
-
   routeHome(
     redirectPath(Paths.Manage.Team.general())
   );
@@ -58,7 +47,6 @@ module Esper.Route {
   }
 
   routeSettings(Paths.Manage.newTeam, Actions.renderNewTeam);
-  routeSettings(Paths.Manage.newGroup, Actions.renderNewGroup);
   routeSettings(Paths.Manage.newCustomer, Actions.renderNewCustomer);
   routeSettings(Paths.Manage.personal, Actions.renderPersonalSettings);
 
@@ -97,38 +85,6 @@ module Esper.Route {
   routeTeam(Paths.Manage.Team.misc, Actions.renderTeamMisc);
   route(Paths.Manage.Team.base().hash,
         redirectPath(Paths.Manage.Team.general()));
-
-
-  /* Render group-specifi settings pages */
-
-  function routeGroup(
-    pathFn: (x: {groupId?: string}) => Paths.Path,
-    cb: (x: {
-      groupId: string,
-      pathFn: (x: {groupId?: string}) => Paths.Path,
-      msg?: string,
-      err?: string
-    }) => void
-  ) {
-    route(pathFn({groupId: ":groupId?"}).hash,
-      groupCheck,
-      function(ctx) {
-        let groupId = Params.cleanGroupId(ctx.params["groupId"])
-        let msgCode = Util.getParamByName("msg", ctx.querystring);
-        let msg = ManageMsg.get(msgCode);
-        let errCode = Util.getParamByName("err", ctx.querystring);
-        let err = ManageMsg.get(errCode);
-        cb({groupId, pathFn, msg, err});
-      }
-    )
-  }
-
-  routeGroup(Paths.Manage.Group.general, Actions.renderGroupGeneralSettings);
-  routeGroup(Paths.Manage.Group.labels, Actions.renderGroupLabelSettings);
-  routeGroup(Paths.Manage.Group.notifications,
-             Actions.renderGroupNotificationSettings);
-  route(Paths.Manage.Group.base().hash,
-        redirectPath(Paths.Manage.Group.general()));
 
 
   /* Render customer-specific settings pages */

@@ -77,35 +77,6 @@ module Esper.Actions {
   }
 
 
-  /* Group Settings */
-
-  interface GroupSettingProps extends SettingProps {
-    groupId: string;
-    pathFn: (x: {groupId?: string}) => Paths.Path;
-  }
-
-  export function renderGroupGeneralSettings(props: GroupSettingProps) {
-    Actions.Teams.fetchGroupOnlyTeams();
-    render(<Views.GroupGeneralSettings {...props} />);
-    Analytics.page(Analytics.Page.GroupManage);
-  }
-
-  export function renderGroupLabelSettings(props: GroupSettingProps) {
-    render(<Views.GroupLabelSettings {...props} />);
-    Analytics.page(Analytics.Page.GroupLabels);
-  }
-
-  export function renderGroupNotificationSettings(props: GroupSettingProps) {
-    render(<Views.GroupNotificationSettings {...props} />);
-    Analytics.page(Analytics.Page.GroupNotifications);
-  }
-
-  export function renderNewGroup(props: {pathFn?: () => Paths.Path}) {
-    render(<Views.NewGroup {...props} />);
-    Analytics.page(Analytics.Page.NewGroup);
-  }
-
-
   /* Customer Settings*/
 
   interface CustomerSettingProps extends SettingProps {

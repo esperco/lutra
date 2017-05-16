@@ -4,16 +4,16 @@
 
 module Esper.Text {
   // Release Notes
-  export const ReleaseNotesAugust2016 =
+  /*export const ReleaseNotesAugust2016 =
     <a
       href="https://blog.esper.com/2016/08/05/track-olympics-time-with-hashtags"
       target="_blank">
       Esper now supports hashtags!
       Read more about it here.
     </a>;
-  export const August2016Release = 1470009600;
-  export const LatestRelease = August2016Release;
-  export const ReleaseNotes = ReleaseNotesAugust2016;
+  export const August2016Release = 1470009600;*/
+  export const LatestRelease: number|void = null;
+  export const ReleaseNotes: JSX.Element|void = null;
   export const DismissNotes = "Click to Dismiss";
 
   // Links
