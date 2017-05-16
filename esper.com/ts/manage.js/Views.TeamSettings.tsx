@@ -31,10 +31,10 @@ module Esper.Views {
             href={Paths.Manage.Team.labels}>
           { Text.Labels }
         </Components.SettingsMenuLink>
-        <Components.SettingsMenuLink {...this.props}
+        {/*<Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Team.notifications}>
           { Text.NotificationSettings }
-        </Components.SettingsMenuLink>
+        </Components.SettingsMenuLink>*/}
         <Components.SettingsMenuLink {...this.props}
             href={Paths.Manage.Team.pay}>
           { Text.PaySettings }

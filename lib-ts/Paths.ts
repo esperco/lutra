@@ -212,10 +212,6 @@ module Esper.Paths {
       return optPath(prefix, "personal");
     }
 
-    export function newGroup() {
-      return optPath(prefix, "new-group");
-    }
-
     export function newCustomer() {
       return optPath(prefix, "new-customer");
     }
@@ -257,26 +253,6 @@ module Esper.Paths {
 
       export function exportCSV({teamId} : {teamId?: string} = {}) {
         return optPath(prefix, subprefix, "export", teamId);
-      }
-    }
-
-    export module Group {
-      export const subprefix = "group";
-
-      export function base({} = {}) {
-        return optPath(prefix, subprefix);
-      }
-
-      export function general({groupId} : {groupId?: string} = {}) {
-        return optPath(prefix, subprefix, "general", groupId);
-      }
-
-      export function labels({groupId} : {groupId?: string} = {}) {
-        return optPath(prefix, subprefix, "labels", groupId);
-      }
-
-      export function notifications({groupId} : {groupId?: string} = {}) {
-        return optPath(prefix, subprefix, "notifications", groupId);
       }
     }
 

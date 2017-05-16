@@ -299,7 +299,6 @@ module Esper.Actions {
           teamId={teamId}
           calId={calId}
           eventId={eventId}
-          initAction={!!action}
         />);
       } else {
         goToDate(new Date(), { teamId });
