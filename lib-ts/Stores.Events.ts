@@ -46,9 +46,12 @@ module Esper.Stores.Events {
         color: l.color || Colors.getColorForHashtag(l.color)
       })));
 
+    let calendarIds = [e.calendar_id];
+    e.duplicates.forEach((d) => calendarIds.push(d.calendar_id));
+
     return {
       id: e.id,
-      calendarId: e.calendar_id,
+      calendarIds: _.uniq(calendarIds),
       teamId: teamId,
       start: moment(e.start).toDate(),
       end: moment(e.end).toDate(),
@@ -108,9 +111,9 @@ module Esper.Stores.Events {
   */
   interface TeamEventsByDate {
     /*
-      Event map by calendarId to date as stringified integer time
+      Event map from date as stringified integer time to list of events
     */
-    [index: string]: { [index: string]: TeamEvent[] }
+    [index: string]: TeamEvent[];
   }
 
   const FETCH_BATCH_SIZE = 10; // How many to process per loop
@@ -136,14 +139,12 @@ module Esper.Stores.Events {
       index += events.length;
       _.each(events, (e) => {
         let teamEvent = asTeamEvent(teamId, e);
-        let calMap = eventMap[teamEvent.calendarId];
-        if (! calMap) return;
 
         let dates = datesFromBounds(teamEvent.start, teamEvent.end);
         _.each(dates, (d) => {
           let key = d.getTime().toString();
-          calMap[key] = calMap[key] || [];
-          calMap[key].push(teamEvent);
+          eventMap[key] = eventMap[key] || [];
+          eventMap[key].push(teamEvent);
         });
       });
 
@@ -155,11 +156,8 @@ module Esper.Stores.Events {
     }
 
     // Make API call, then trigger batch function
-    Api.postForTeamEvents(teamId, q).then((eventCollection) => {
-      _.each(eventCollection, (events, calId) => {
-        eventMap[calId] = {};
-        calendarEvents = calendarEvents.concat(events.events);
-      });
+    Api.postForTeamEvents(teamId, q).then((resp) => {
+      calendarEvents = resp.events;
       processEvents();
     }, (err) => dfd.reject(err));
 
@@ -172,10 +170,6 @@ module Esper.Stores.Events {
   interface TeamQ {
     teamId: string;
     force?: boolean;
-  }
-
-  interface CalsQ {
-    cals: Stores.Calendars.CalSelection[];
   }
 
   interface PeriodQ {
@@ -197,13 +191,10 @@ module Esper.Stores.Events {
     var team = Stores.Teams.require(teamId);
     if (! team) return;
 
-    var calIds = team.team_timestats_calendars;
-    var doFetch = force || !!_.find(calIds, (calId) =>
-      _.find(dates, (date) =>
-        EventsForDateStore.get({
-          calId: calId, teamId: teamId, date: date
-        }).isNone()
-      )
+    var doFetch = force || !!_.find(dates,
+      (date) => EventsForDateStore.get({
+        teamId: teamId, date: date
+      }).isNone()
     );
 
     if (doFetch) {
@@ -215,15 +206,13 @@ module Esper.Stores.Events {
       EventsForDateStore.transact(() =>
         EventsForDateStore.transactP(apiP, (apiP2) =>
           EventStore.transactP(apiP2, (apiP3) => {
-            _.each(calIds, (calId) => _.each(dates, (d) => {
+            _.each(dates, (d) => {
               var dateP = apiP3.then((eventMap) => {
-                let calMap = eventMap[calId] || {};
-                let events = calMap[d.getTime().toString()] || [];
+                let events = eventMap[d.getTime().toString()] || [];
                 return Option.wrap(_.map(events,
                   (e): Model2.BatchVal<FullEventId, TeamEvent> => ({
                     itemKey: {
                       teamId: teamId,
-                      calId: e.calendarId,
                       eventId: e.id
                     },
                     data: Option.some(e)
@@ -231,9 +220,9 @@ module Esper.Stores.Events {
               });
 
               EventsForDateStore.batchFetch({
-                teamId: teamId, calId: calId, date: d
+                teamId: teamId, date: d
               }, dateP);
-            }))
+            });
           })
         )
       );
@@ -247,7 +236,7 @@ module Esper.Stores.Events {
 
   /* Get from store */
 
-  export function get({period, cals}: PeriodQ & CalsQ)
+  export function get({period, teamId}: PeriodQ & TeamQ)
     : Option.T<Types.EventsForRangesData>
   {
     let range = _.range(period.start, period.end + 1); // +1 for inclusive
@@ -262,17 +251,9 @@ module Esper.Stores.Events {
         start: index, end: index
       });
       let dates = Period.datesFromBounds(start, end);
-      var eventsByDate = _.flatten(
-        _.map(cals, (c) =>
-          _.map(dates, (d) =>
-            EventsForDateStore.batchGet({
-              teamId: c.teamId,
-              calId: c.calId,
-              date: d
-            })
-          )
-        )
-      );
+      var eventsByDate = _.map(dates, (d) =>
+        EventsForDateStore.batchGet({ teamId, date: d })
+      )
 
       // If any none, then all none
       if (_.find(eventsByDate, (e) => e.isNone())) {
@@ -320,7 +301,7 @@ module Esper.Stores.Events {
     return Option.some({ eventsForRanges, hasError, isBusy });
   }
 
-  export function require(q: {period: Types.Period} & CalsQ)
+  export function require(q: PeriodQ & TeamQ)
     : Types.EventsForRangesData
   {
     // Assume start and end exist
@@ -373,9 +354,8 @@ module Esper.Stores.Events {
       }
 
       let teamId = e.result.teamid;
-      let calId = e.result.event.calendar_id;
       let event = Option.wrap(asTeamEvent(teamId, e.result.event));
-      EventStore.set({ teamId, calId, eventId }, event);
+      EventStore.set({ teamId, eventId }, event);
       return e.result;
     });
   }
@@ -385,11 +365,11 @@ module Esper.Stores.Events {
     calId: string;
     eventId: string;
   }): JQueryPromise<Option.T<Types.TeamEvent>> {
-    return EventStore.get({teamId, calId, eventId}).match({
+    return EventStore.get({teamId, eventId}).match({
       none: () => Api.getEventExact(teamId, calId, eventId)
         .then((e) => {
           let event = Option.wrap(asTeamEvent(teamId, e));
-          EventStore.set({teamId, calId, eventId}, event);
+          EventStore.set({teamId, eventId}, event);
           return event;
         }),
       some: (e) => $.Deferred().resolve(e.data).promise()
@@ -414,8 +394,7 @@ module Esper.Stores.Events {
 
   // Returns true if two events are part of the same recurring event
   export function matchRecurring(e1: TeamEvent, e2: TeamEvent) {
-    return e1.calendarId === e2.calendarId &&
-      e1.teamId === e2.teamId &&
+    return e1.teamId === e2.teamId &&
       (e1.recurringEventId ?
        e1.recurringEventId === e2.recurringEventId :
        e1.id === e2.id);
@@ -424,20 +403,18 @@ module Esper.Stores.Events {
   export function storeId(event: TeamEvent): FullEventId {
     return {
       teamId: event.teamId,
-      calId: event.calendarId,
       eventId: event.id
     }
   }
 
   export function strId(event: TeamEvent, useRecurring = false): string {
     let id = useRecurring ? event.recurringEventId || event.id : event.id;
-    return [event.teamId, event.calendarId, id].join("|");
+    return [event.teamId, id].join("|");
   }
 
   export function matchId(event: TeamEvent, storeId: FullEventId) {
     return event && storeId &&
       event.id === storeId.eventId &&
-      event.calendarId === storeId.calId &&
       event.teamId === storeId.teamId;
   }
 

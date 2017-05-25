@@ -150,8 +150,11 @@ module Esper.Charting {
   export const GroupByCalendar: Types.GroupBy = {
     name: Text.ChartCalendars,
     icon: "fa-calendar-o",
-    keyFn: (event, props) => _.includes(props.extra.calIds, event.calendarId) ?
-      Option.some([event.calendarId]) : Option.none<string[]>(),
+    keyFn: (event, props) => {
+      let ids = event.calendarIds.filter(
+        (id) => _.includes(props.extra.calIds, id));
+      return ids.length ? Option.some(ids) : Option.none<string[]>();
+    },
     colorMapFn: (keys) => _.map(keys, Colors.getColorForCal),
     displayFn: (key, prop) => {
       let cal = _.find(prop.calendars, (c) => c.id === key);

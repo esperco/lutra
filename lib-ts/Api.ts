@@ -562,7 +562,7 @@ module Esper.Api {
   }
 
   export function postForTeamEvents(teamId: string, q: ApiT.CalendarRequest):
-    JsonPromise<ApiT.GenericCalendarEventsCollection>
+    JsonPromise<ApiT.GenericCalendarEvents>
   {
     var url = prefix + "/api/ts/events-team/" + string(Login.myUid())
             + "/" + string(teamId);

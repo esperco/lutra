@@ -40,7 +40,7 @@ module Esper.Types {
   */
   export interface TeamEvent {
     id: string;
-    calendarId: string;
+    calendarIds: string[];
     teamId: string;
     start: Date;
     end: Date;
@@ -59,17 +59,15 @@ module Esper.Types {
     recurringEventId?: string;
   }
 
-  // Identifies an event on a team alendar
+  // Identifies an event on a team calendar
   export interface FullEventId {
     teamId: string;
-    calId: string;
     eventId: string;
   }
 
   // Identifies a date on a team calendar
   export interface FullCalDateId {
     teamId: string;
-    calId: string;
     date: Date;  // Start of date
   }
 

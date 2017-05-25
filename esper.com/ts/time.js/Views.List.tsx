@@ -37,10 +37,7 @@ module Esper.Views {
       let dayPeriod = Period.fromDates("day", start, end);
       let eventData = Stores.Events.require({
         period: dayPeriod,
-
-        // Get all calendars -> filter below
-        cals: _.map(team.team_timestats_calendars,
-          (calId) => ({ teamId, calId }))
+        teamId
       });
 
       let { eventsForRanges, hasError, isBusy } = eventData;
@@ -204,7 +201,6 @@ module Esper.Views {
         .values<Types.TeamEvent>()
         .map((e) => Stores.Events.EventStore.get({
           teamId: e.teamId,
-          calId: e.calendarId,
           eventId: e.id
         }).unwrapOr(null))
         .compact()

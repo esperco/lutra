@@ -12,17 +12,13 @@ module Esper.Views {
 
   export class Report extends ReactHelpers.Component<Props, {}> {
     renderWithData() {
-      let team = Stores.Teams.require(this.props.teamId);
-      let { period, labels } = this.props;
-      let cals = _.map(team.team_timestats_calendars, (calId) => ({
-        calId: calId,
-        teamId: this.props.teamId
-      }));
+      let { period, labels, teamId } = this.props;
+      let team = Stores.Teams.require(teamId);
       let { eventsForRanges, hasError, isBusy } =
-        Stores.Events.require({ cals, period });
+        Stores.Events.require({ teamId, period });
 
       // If calendars not ready yet, treat as "isBusy"
-      let calOpt = Stores.Calendars.list(this.props.teamId);
+      let calOpt = Stores.Calendars.list(teamId);
       if (calOpt.isNone()) { isBusy = true; }
       let calendars = calOpt.unwrapOr([]);
 

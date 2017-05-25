@@ -53,10 +53,7 @@ module Esper.Actions {
     // Fetch all events on date +/- 1 day
     var mDate = moment(date).startOf('day');
     var events = Stores.Events.get({
-      cals: _.map(team.team_timestats_calendars, (c) => ({
-        teamId: team.teamid,
-        calId: c
-      })),
+      teamId,
       period: Period.fromDates(
         "day",
         mDate.clone().subtract(1, 'day').toDate(),
@@ -73,10 +70,9 @@ module Esper.Actions {
   }
 
   export function getEventFromOtherTeam(teamId: string,
-                                        calId: string,
                                         eventId: string):
   JQueryPromise<Option.T<Types.TeamEvent>> {
-    return Stores.Events.EventStore.get({teamId, calId, eventId}).match({
+    return Stores.Events.EventStore.get({teamId, eventId}).match({
       some: (d) => $.Deferred().resolve(d.data).promise(),
       none: () =>
         Stores.Events.fetchFuzzy(eventId, teamId).then((r) => {
@@ -152,7 +148,6 @@ module Esper.Actions {
 
       var index = _.findIndex(events, (e) =>
         e.id === current.id &&
-        e.calendarId === current.calendarId &&
         e.teamId === current.teamId
       );
       var nextEvent = events[index + 1];
@@ -185,7 +180,6 @@ module Esper.Actions {
 
       var index = _.findIndex(events, (e) =>
         e.id === current.id &&
-        e.calendarId === current.calendarId &&
         e.teamId === current.teamId
       );
 
@@ -227,7 +221,7 @@ module Esper.Actions {
       if (currentEvent) {
         renderEvent({
           teamId: currentEvent.teamId,
-          calId: currentEvent.calendarId,
+          calId: currentEvent.calendarIds[0],
           eventId: currentEvent.id
         });
       }
@@ -246,7 +240,7 @@ module Esper.Actions {
     Route.nav.go(Paths.Now.event({eventId: event.id}), {
       queryStr: $.param({
         team: event.teamId,
-        cal: event.calendarId
+        cal: event.calendarIds[0]
       })
     });
   }

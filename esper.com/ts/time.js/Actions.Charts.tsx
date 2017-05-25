@@ -11,12 +11,7 @@ module Esper.Actions.Charts {
 
   // Get events from store
   function getEvents(o: Types.ChartParams): Types.EventsForRangesData {
-    return Stores.Events.require({
-      period: o.period,
-      cals: _.map(o.extra.calIds, (calId) => ({
-        teamId: o.teamId, calId
-      }))
-    });
+    return Stores.Events.require({ period: o.period, teamId: o.teamId });
   }
 
   // Called before each chart path funciton
@@ -74,7 +69,6 @@ module Esper.Actions.Charts {
     initChart(o);
 
     render(ReactHelpers.contain(function() {
-      getEvents(o);
       let { eventsForRanges, hasError, isBusy } = getEvents(o);
       let props: Types.ChartProps = {
         groupBy: groupBy,

@@ -75,7 +75,7 @@ module Esper.Components {
       var showLabels = this.props.showLabels !== false;
       var showAttendToggle = this.props.showAttendToggle !== false;
 
-      return <div key={[event.teamId, event.calendarId, event.id].join(",")}
+      return <div key={[event.teamId, event.id].join(",")}
                   className={classNames("event", {
                     "has-labels": !!Stores.Events.getLabels(event).length,
                     "needs-confirmation": actionRequired,

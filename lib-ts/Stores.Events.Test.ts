@@ -244,7 +244,7 @@ module Esper.Stores.Events {
 
     describe("fetchPredictions (period)", function() {
       var apiSpy: jasmine.Spy;
-      var dfd: JQueryDeferred<ApiT.GenericCalendarEventsCollection>;
+      var dfd: JQueryDeferred<ApiT.GenericCalendarEvents>;
 
       beforeEach(function() {
         /*
@@ -283,9 +283,7 @@ module Esper.Stores.Events {
 
       it("should fetch if any missing date in period", function() {
         apiSpy.calls.reset();
-        EventsForDateStore.remove({
-          teamId: teamId, calId: calId, date: new Date(2016, 0, 15)
-        });
+        EventsForDateStore.remove({ teamId, date: new Date(2016, 0, 15) });
         testFetch();
         expect(apiSpy).toHaveBeenCalledWith(teamId, {
           window_start: XDate.toString(new Date(2016, 0, 1)),
@@ -295,25 +293,16 @@ module Esper.Stores.Events {
 
       describe("on promise resolution", function() {
         beforeEach(function() {
-          var x: ApiT.GenericCalendarEventsCollection = {};
-          x[calId] = { events: [e1, e2, e3] }
+          var x: ApiT.GenericCalendarEvents = { events: [e1, e2, e3] };
           dfd.resolve(x);
         });
 
         function getForDate(date: Date) {
-          return EventsForDateStore.batchGet({
-            teamId: teamId,
-            calId: calId,
-            date: date
-          }).unwrap();
+          return EventsForDateStore.batchGet({ teamId, date }).unwrap();
         }
 
         function getForId(eventId: string) {
-          return EventStore.get({
-            teamId: teamId,
-            calId: calId,
-            eventId: eventId
-          }).unwrap();
+          return EventStore.get({ teamId, eventId }).unwrap();
         }
 
         it("should store events under their respective dates", function() {
@@ -347,15 +336,11 @@ module Esper.Stores.Events {
         var dates = datesFromBounds(new Date(2016, 0, 1),
                                     new Date(2016, 1, 1));
         _.each(dates, (d) => EventsForDateStore.batchSet({
-          teamId: teamId,
-          calId: calId,
-          date: d
+          teamId, date: d
         }, Option.none<any>()))
 
         EventsForDateStore.batchSet({
-          teamId: teamId,
-          calId: calId,
-          date: new Date(2016, 0, 1)
+          teamId, date: new Date(2016, 0, 1)
         }, Option.wrap([{
           itemKey: {
             teamId: teamId,
@@ -373,9 +358,7 @@ module Esper.Stores.Events {
         }]));
 
         EventsForDateStore.batchSet({
-          teamId: teamId,
-          calId: calId,
-          date: new Date(2016, 0, 2)
+          teamId, date: new Date(2016, 0, 2)
         }, Option.wrap([{
           itemKey: {
             teamId: teamId,
@@ -393,9 +376,7 @@ module Esper.Stores.Events {
         }]));
 
         EventsForDateStore.batchSet({
-          teamId: teamId,
-          calId: calId,
-          date: new Date(2016, 1, 1)
+          teamId, date: new Date(2016, 1, 1)
         }, Option.wrap([{
           itemKey: {
             teamId: teamId,
@@ -408,10 +389,7 @@ module Esper.Stores.Events {
 
       function getVal() {
         return get({
-          cals: [{
-            teamId: teamId,
-            calId: calId
-          }],
+          teamId,
           period: Period.fromDates("day",
             new Date(2016, 0, 1),
             new Date(2016, 0, 2)
@@ -438,9 +416,7 @@ module Esper.Stores.Events {
       it("should set hasError if errored on fetching for any date",
       function() {
         EventsForDateStore.setOpt({
-          teamId: teamId,
-          calId: calId,
-          date: new Date(2016, 0, 2)
+          teamId, date: new Date(2016, 0, 2)
         }, {
           dataStatus: Model2.DataStatus.FETCH_ERROR
         });
@@ -449,9 +425,7 @@ module Esper.Stores.Events {
 
       it("should set isBusy if busy fetching for any date", function() {
         EventsForDateStore.setOpt({
-          teamId: teamId,
-          calId: calId,
-          date: new Date(2016, 0, 2)
+          teamId, date: new Date(2016, 0, 2)
         }, {
           dataStatus: Model2.DataStatus.FETCHING
         });

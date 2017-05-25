@@ -156,9 +156,7 @@ module Esper.Actions.EventLabels {
         _.each(opts.fetchEvents, (e) => {
           let storeId = Stores.Events.storeId(e);
           Stores.Events.EventStore.fetch(storeId, tP.then((p) => {
-            var match = _.find(p.events,
-              (newEvent) => newEvent.id === e.id &&
-                            newEvent.calendar_id === e.calendarId);
+            var match = _.find(p.events, (newEvent) => newEvent.id === e.id);
             return match ?
               Option.some(Stores.Events.asTeamEvent(e.teamId, match)) :
               Option.none<Stores.Events.TeamEvent>();
