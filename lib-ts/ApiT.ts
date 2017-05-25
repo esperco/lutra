@@ -235,9 +235,15 @@ module Esper.ApiT {
     approved?: boolean;
   }
 
+  export interface MatchingEvent {
+    id: string;
+    calendar_id: string;
+  }
+
   export interface GenericCalendarEvent {
     id: string;
     calendar_id: string;
+    duplicates: MatchingEvent[];
     start: string; // timestamp;
     end: string;   // timestamp;
     timezone?: string;
@@ -261,10 +267,6 @@ module Esper.ApiT {
 
   export interface GenericCalendarEvents {
     events: GenericCalendarEvent[];
-  }
-
-  export interface GenericCalendarEventsCollection {
-    [calId: string]: GenericCalendarEvents;
   }
 
   export interface Profile {

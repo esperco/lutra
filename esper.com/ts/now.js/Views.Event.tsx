@@ -16,7 +16,6 @@ module Esper.Views {
     renderWithData() {
       var eventData = Stores.Events.EventStore.get({
         teamId: this.props.teamId,
-        calId: this.props.calId,
         eventId: this.props.eventId
       });
       return <div className="container event-content">
@@ -83,14 +82,12 @@ module Esper.Views {
     }
 
     updateTeam(teamId: string) {
-      Actions.getEventFromOtherTeam(teamId,
-        this.props.calId, this.props.eventId).then((e) => {
+      Actions.getEventFromOtherTeam(teamId, this.props.eventId).then((e) => {
           e.match({
             some: (event) => Actions.goToEvent(event),
             none: () =>
               Stores.Events.EventStore.get({
                 teamId: this.props.teamId,
-                calId: this.props.calId,
                 eventId: this.props.eventId
               }).flatMap((d) => d.data).match({
                 // Go to start of event

@@ -21,7 +21,6 @@ module Esper.Containers {
       var eventData = _(events)
         .map((e) => Stores.Events.EventStore.get({
           teamId: e.teamId,
-          calId: e.calendarId,
           eventId: e.id
         }))
         .filter((e) => e.isSome())

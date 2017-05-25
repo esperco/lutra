@@ -49,11 +49,7 @@ module Esper.Actions {
 
     let team = Stores.Teams.require(teamId);
     let subscription = team.team_api.team_subscription;
-    let cals = _.map(team.team_timestats_calendars, (calId) => ({
-      calId: calId,
-      teamId: teamId
-    }));
-    let { eventsForRanges } = Stores.Events.require({ cals, period });
+    let { eventsForRanges } = Stores.Events.require({ period, teamId });
 
     // Calculate unconfirmed events
     let calc = EventStats.simpleCounterCalc(eventsForRanges, [

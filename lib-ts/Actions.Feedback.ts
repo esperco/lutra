@@ -49,7 +49,7 @@ module Esper.Actions.Feedback {
     });
 
     var p = Api.postEventFeedbackAction(
-      event.teamId, event.calendarId, event.id, action
+      event.teamId, event.calendarIds[0], event.id, action
     ).then((feedback: ApiT.EventFeedback) => {
       var newEvent = _.cloneDeep(event);
       newEvent.feedback = feedback;
@@ -103,7 +103,6 @@ module Esper.Actions.Feedback {
 
     Stores.Events.EventStore.pushFetch({
       teamId: event.teamId,
-      calId: event.calendarId,
       eventId: event.id
     }, p, Option.some(initNewData));
 
