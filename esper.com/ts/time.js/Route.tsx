@@ -208,12 +208,6 @@ module Esper.Route {
     redirectPath(Paths.Time.charts())
   );
 
-  // Alias for old references to calendar-settings
-  route("/calendar-settings",
-    redirectPath(Paths.Manage.Team.notifications()));
-  route("/notification-settings",
-    redirectPath(Paths.Manage.Team.notifications()));
-
   // Redirect old settings pages
   route("/labels", redirectPath(Paths.Manage.Team.labels()));
   route("/calendar-manage", redirectPath(Paths.Manage.Team.calendars()));

@@ -198,33 +198,8 @@ module Esper.Text {
   export const ChartRemainder = "Unscheduled Time";
 
   /* Reports Misc */
-  export const NotesHeading = "Meeting Notes";
-  export const NotesDescription =
-    `These are are the meeting notes you've taken during this time period.`;
-  export const NoNotesMessage = <span>
-    You don't have any meeting notes for this time period. You can add notes to
-    events by clicking on them in the{" "}
-    <a href={Paths.Time.list().href}>event list</a>.
-
-    You can also take notes on your most recent event by visiting
-    {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
-    <a href={Paths.Manage.Team.notifications().href}>
-      enabling email and Slack notifications
-      in the settings page
-    </a>.
-  </span>;
-
   export const NoRatingsMessage = <span>
-    You don't have any ratings for this time period. You can rate events
-    by clicking on them in the{" "}
-    <a href={Paths.Time.list().href}>event list</a>.
-
-    You can also rate your most recent event by visiting
-    {" "}<a href={Paths.Now.home().href}>esper.com/now</a>{" or "}
-    <a href={Paths.Manage.Team.notifications().href}>
-      enabling email and Slack notifications
-      in the settings page
-    </a>.
+    You don't have any ratings for this time period.
   </span>;
 
   export const SeeMoreLinkText = "See More Details";

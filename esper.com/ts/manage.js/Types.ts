@@ -4,7 +4,6 @@ module Esper.Types {
   export interface SettingsId {
     teamId?: string;
     cusId?: string;
-    groupId?: string;
   }
 
   // Used for settings page related props, mostly in sidebar
@@ -12,7 +11,6 @@ module Esper.Types {
     pathFn?: (x: {
       teamId?: string,
       cusId?: string,
-      groupId?: string
     }) => Paths.Path;
   }
 }

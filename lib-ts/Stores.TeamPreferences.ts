@@ -52,7 +52,6 @@ module Esper.Stores.TeamPreferences {
       tasks_update: ApiT.EmailPref;
       feedback_summary: ApiT.EmailPref;
     };
-    timestats_notify: ApiT.TimestatsNotifyPrefs;
   }
 
   /*
@@ -73,52 +72,6 @@ module Esper.Stores.TeamPreferences {
       prefs.email_types.feedback_summary.recipients = [];
     }
 
-    prefs.timestats_notify = prefs.timestats_notify || {
-      email_for_meeting_feedback: false,
-      slack_for_meeting_feedback: false
-    };
-
     return (<PrefsWithDefaults> prefs);
-  }
-
-
-  /* Slack Prefs */
-
-  // Key by teamId
-  export var SlackInfoStore = new Model2.Store<string, ApiT.SlackAuthInfo>();
-
-  /*
-    Call when loading things like notification settings page to check if we
-    need Slack auth.
-  */
-  export function checkSlack(teamId: string) {
-    Stores.TeamPreferences.getInitPromise().then(function() {
-      Stores.TeamPreferences.get(teamId).match({
-        none: () => null,
-        some: (prefs) => {
-          if (needSlack(prefs)) {
-            var p = Api.getSlackAuthInfo(prefs.teamid)
-              .then((x) => Option.some(x));
-            SlackInfoStore.fetch(prefs.teamid, p);
-          }
-        }
-      });
-    });
-  }
-
-  /*
-    Returns option for whether Slack is authorized, either some true, some
-    false, or none if we don't know (yet)
-  */
-  export function slackAuthorized(teamId: string) {
-    return SlackInfoStore.get(teamId)
-      .flatMap((i) => i.data)
-      .flatMap((d) => Option.some(d.slack_authorized))
-  }
-
-  // Do we need to check Slack authorization for a given set of prefs?
-  function needSlack(prefs: ApiT.Preferences) {
-    return prefs.timestats_notify &&
-      prefs.timestats_notify.slack_for_meeting_feedback;
   }
 }

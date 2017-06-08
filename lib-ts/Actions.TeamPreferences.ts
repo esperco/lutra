@@ -93,21 +93,6 @@ module Esper.Actions.TeamPreferences {
     setEmailTypes(prefs.teamid, emailTypes);
   }
 
-  // Enable or disable feedback summary eail
-  export function toggleFeedbackSummary(prefs: ApiT.Preferences) {
-    var emailTypes = _.cloneDeep(prefs.email_types);
-    if (! emailTypes.feedback_summary) {
-      emailTypes.feedback_summary = _.cloneDeep(emailTypes.daily_agenda);
-      emailTypes.feedback_summary.recipients = [];
-    }
-
-    var active = toggleEmail(emailTypes.feedback_summary.recipients);
-    Analytics.track(Analytics.Trackable.UpdateNotifications, {
-      feedbackSummary: active
-    });
-    setEmailTypes(prefs.teamid, emailTypes);
-  }
-
   // Set email type prefs
   export function setEmailTypes(teamId: string,
                                 emailTypes: ApiT.EmailTypes) {
@@ -130,78 +115,5 @@ module Esper.Actions.TeamPreferences {
       recipients.push(Login.myEmail());
       return true;
     }
-  }
-
-  /*
-    Toggles post-meeting feedback e-mails
-  */
-  export function toggleEmailFeedback(prefs: ApiT.Preferences) {
-    prefs.timestats_notify.email_for_meeting_feedback =
-      !prefs.timestats_notify.email_for_meeting_feedback;
-
-    var promise = Api.setTimestatsNotifyPrefs(
-      prefs.teamid,
-      prefs.timestats_notify
-    );
-    update(prefs.teamid, promise, (newPrefs) => {
-      newPrefs.timestats_notify = prefs.timestats_notify;
-      return newPrefs;
-    });
-
-    Analytics.track(Analytics.Trackable.UpdateNotifications, {
-      feedbackEmail: prefs.timestats_notify.email_for_meeting_feedback
-    });
-  }
-
-  /*
-    Toggles Slack setting -- also checks if Slack authorization is required
-    and redirects as appropriate
-  */
-  export function toggleSlackFeedback(prefs: ApiT.Preferences) {
-    prefs.timestats_notify.slack_for_meeting_feedback =
-      !prefs.timestats_notify.slack_for_meeting_feedback;
-
-    var promise = Api.setTimestatsNotifyPrefs(
-      prefs.teamid, prefs.timestats_notify);
-
-    // Check if we need Slack authorization
-    if (prefs.timestats_notify.slack_for_meeting_feedback) {
-      promise = promise.then(function() {
-        return Api.getSlackAuthInfo(prefs.teamid)
-      }).then(function(x: ApiT.SlackAuthInfo) {
-        if (! x.slack_authorized) {
-          location.href = x.slack_auth_url;
-        }
-      });
-    }
-
-    update(prefs.teamid, promise, (newPrefs) => {
-      newPrefs.timestats_notify = prefs.timestats_notify;
-      return newPrefs;
-    });
-
-    Analytics.track(Analytics.Trackable.UpdateNotifications, {
-      feedbackSlack: prefs.timestats_notify.slack_for_meeting_feedback
-    });
-  }
-
-  /*
-    Toggles post-meeting feedback e-mails
-  */
-  export function updateNotifTiming(prefs: ApiT.Preferences, val: number) {
-    prefs.timestats_notify.time_to_notify_since_meeting_start = val;
-
-    var promise = Api.setTimestatsNotifyPrefs(
-      prefs.teamid,
-      prefs.timestats_notify
-    );
-    update(prefs.teamid, promise, (newPrefs) => {
-      newPrefs.timestats_notify = prefs.timestats_notify;
-      return newPrefs;
-    });
-
-    Analytics.track(Analytics.Trackable.UpdateNotifications, {
-      timeToNotify: val
-    });
   }
 }

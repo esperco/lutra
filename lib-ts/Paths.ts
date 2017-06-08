@@ -243,10 +243,6 @@ module Esper.Paths {
         return optPath(prefix, subprefix, "misc", teamId);
       }
 
-      export function notifications({teamId} : {teamId?: string} = {}) {
-        return optPath(prefix, subprefix, "notifications", teamId);
-      }
-
       export function pay({teamId} : {teamId?: string} = {}) {
         return optPath(prefix, subprefix, "pay", teamId);
       }

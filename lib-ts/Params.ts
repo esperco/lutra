@@ -4,7 +4,6 @@
 
 /// <reference path="./LocalStore.ts" />
 /// <reference path="./Stores.Calendars.ts" />
-/// <reference path="./Stores.Groups.ts"/>
 /// <reference path="./Stores.Teams.ts"/>
 
 module Esper.Params {
@@ -12,12 +11,10 @@ module Esper.Params {
 
   // Remember last cleaned items to use as defaults
   var lastTeamId: string;
-  var lastGroupId: string;
   var lastCalIds: string;
 
   // Remember last teamID, groupId, cals in memory too
   const lastTeamIdKey = "lastTeamId";
-  const lastGroupIdKey = "lastGroupId";
   const lastCalIdsKey = "lastCalIds";
 
   // Clean team ID
@@ -47,34 +44,6 @@ module Esper.Params {
     var team = _.find(teams, (t) => t.team_timestats_calendars.length > 0)
       || teams[0];
     return team.teamid;
-  }
-
-  // Clean group ID
-  export function cleanGroupId(groupId: string) {
-    if (groupId && Stores.Groups.get(groupId).isSome()) {
-      lastGroupId = groupId;
-      LocalStore.set(lastGroupIdKey, groupId);
-      return groupId;
-    }
-
-    else if (lastGroupId && Stores.Groups.get(lastGroupId).isSome()) {
-      return lastGroupId;
-    }
-
-    else {
-      var storedGroupId = LocalStore.get(lastGroupIdKey);
-      if (typeof storedGroupId === "string" &&
-          Stores.Groups.get(storedGroupId).isSome()) {
-        return storedGroupId;
-      }
-    }
-
-    var groups = Stores.Groups.all();
-    Log.assert(groups.length > 0, "No groups loaded");
-
-    // Default to first group
-    var group = groups[0];
-    return group.groupid;
   }
 
   // Assumes calendar IDs never have commas in them. Use something else

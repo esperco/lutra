@@ -360,7 +360,6 @@ module Esper.ApiT {
     email_types: EmailTypes;
     label_reminder?: SimpleEmailPref;
     slack_address?: SlackAddress;
-    timestats_notify?: TimestatsNotifyPrefs;
     event_link?: boolean;
     general: GeneralPrefs;
     notes: string;
@@ -383,16 +382,6 @@ module Esper.ApiT {
   export interface SlackAddress {
     slack_teamid: string;
     slack_username: string;
-  }
-
-  export interface TimestatsNotifyPrefs {
-    email_for_meeting_feedback: boolean;
-    slack_for_meeting_feedback: boolean;
-    time_to_notify_since_meeting_start?: number;
-      // sliding scale
-      // 0.  -> at the start of meeting
-      // 0.5 -> in the middle of meeting
-      // 1.  -> at the end of meeting
   }
 
   export interface SlackAuthInfo {
