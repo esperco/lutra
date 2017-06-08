@@ -1,5 +1,5 @@
 /*
-  New Group page
+  New customer page
 */
 
 module Esper.Views {

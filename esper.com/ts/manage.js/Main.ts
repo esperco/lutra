@@ -15,12 +15,10 @@ module Esper.Main {
   export function initAll() {
     Stores.Teams.init();
     Stores.Calendars.init();
-    Stores.Groups.init();
     Labels.init();
     Login.init();
     Login.promise.done(function() {
       Stores.TeamPreferences.init();
-      Stores.GroupPreferences.init();
       Stores.Profiles.init();
       Stores.Customers.init();
       Stripe.init(Config.STRIPE_KEY);

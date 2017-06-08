@@ -1,5 +1,5 @@
 /*
-  New Group page
+  Sandbox user message
 */
 
 module Esper.Views {

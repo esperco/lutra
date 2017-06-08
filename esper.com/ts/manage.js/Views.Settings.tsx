@@ -42,7 +42,6 @@ module Esper.Views {
     return ReactHelpers.contain(function() {
       return <Components.ManageSidebar
         teams={Stores.Teams.all(false)}
-        groups={Stores.Groups.all()}
         customers={Stores.Customers.all()}
         {...props}
       />

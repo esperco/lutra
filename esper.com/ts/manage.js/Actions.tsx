@@ -48,12 +48,6 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.TeamLabels);
   }
 
-  export function renderTeamNotificationSettings(props: TeamSettingProps) {
-    Stores.TeamPreferences.checkSlack(props.teamId);
-    render(<Views.TeamNotificationSettings {...props} />);
-    Analytics.page(Analytics.Page.TeamNotifications);
-  }
-
   export function renderTeamPaySettings(props: TeamSettingProps) {
     let team = Stores.Teams.require(props.teamId);
     Stores.Subscriptions.fetch(team.team_api.team_subscription.cusid);

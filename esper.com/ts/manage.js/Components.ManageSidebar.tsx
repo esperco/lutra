@@ -1,22 +1,19 @@
 /*
-  A sidebar for managing teams, groups and personal preferences
+  A sidebar for managing teams and personal preferences
 */
 module Esper.Components {
 
   interface Props {
-    // Active team, group, or customer
+    // Active team or customer
     teamId?: string;
-    groupId?: string;
     cusId?: string;
 
     // Current path
     pathFn: (p: {
       teamId?: string,
-      groupId?: string,
       cusId?: string
     }) => Paths.Path;
     teams: ApiT.Team[];
-    groups: ApiT.Group[];
     customers: ApiT.Customer[];
   }
 
