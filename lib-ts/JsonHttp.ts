@@ -137,6 +137,10 @@ module Esper.JsonHttp {
       } else if (ignoreError(details)) {
         Log.w("Ignored error", details)
       } else {
+        if (details.errorDetails &&
+            Variant.tag(details.errorDetails) === "Login_required") {
+          Login.goToLogin({ error: "login_again" });
+        }
         let errorMsg = details.errorDetails ?
           Variant.tag(details.errorDetails) : details.respBody;
         Log.e(`${details.code} ${errorMsg}`, details);
