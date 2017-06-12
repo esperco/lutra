@@ -94,6 +94,9 @@ module Esper.Route {
       period: period,
       extra: getJSONQuery(ctx)
     });
+
+    // Set feature flag for charts
+    Actions.FeatureFlags.set({ team_charts: true });
   });
 
 
