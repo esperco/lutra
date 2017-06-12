@@ -80,6 +80,14 @@ module Esper.Api {
     return JsonHttp.get(url);
   }
 
+  export function patchFeatureFlags(flags: ApiT.FeatureFlagsPatch)
+    : JsonPromise<ApiT.FeatureFlags>
+  {
+    var uid = string(Login.myUid());
+    var url = prefix + "/api/feature-flags/" + uid + "/" + uid;
+    return JsonHttp.patch(url, flags);
+  }
+
   export function loginAs(theirEmail: string):
     JsonPromise<ApiT.LoginResponse> {
     return JsonHttp.get(prefix + "/api/login-as/" + string(Login.me())

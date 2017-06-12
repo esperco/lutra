@@ -335,6 +335,11 @@ module Esper.JsonHttp {
     return jsonHttp("POST", path, body);
   }
 
+  export function patch(path: string,
+                       body?: any) {
+    return jsonHttp("PATCH", path, body);
+  }
+
   export function put(path: string,
                       body?: any) {
     return jsonHttp("PUT", path, body);

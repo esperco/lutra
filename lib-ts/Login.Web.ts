@@ -186,7 +186,11 @@ module Esper.Login {
         }
       }, 10000);
     }
+    setLoginInfoData(loginInfo);
+  }
 
+  // Update login info store without the other context stuff
+  export function setLoginInfoData(loginInfo: ApiT.LoginResponse) {
     InfoStore.set("", Option.wrap(loginInfo), {
       dataStatus: Model2.DataStatus.READY
     });

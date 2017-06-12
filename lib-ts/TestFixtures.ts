@@ -158,7 +158,14 @@ module Esper.TestFixtures {
           member_uid: uid
         }
       ],
-      landing_url: "moon/base"
+      landing_url: "moon/base",
+      feature_flags: {
+        uid: uid,
+        team_charts: false,
+        group_charts: false,
+        tb: false,
+        fb: false
+      }
     };
   }
 
