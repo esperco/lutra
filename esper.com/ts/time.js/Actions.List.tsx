@@ -55,7 +55,7 @@ module Esper.Actions {
       filterStr={filterStr}
       hideInactive={hideInactive}
       view={view}
-    />);
+    />, teamId);
 
     /////
 

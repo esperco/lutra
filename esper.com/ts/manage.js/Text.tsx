@@ -22,7 +22,6 @@ module Esper.Text {
   export const ExportCSV = "Export";
 
   // Add team
-  export const AddTeamLink = `New ${TeamExec}`;
   export const AddTeamHeading = "Who are you managing time for?";
 
   // Remove team

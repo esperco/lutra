@@ -16,7 +16,7 @@ module Esper.Actions {
     let team = Stores.Teams.require(teamId);
     Stores.Subscriptions.fetch(team.team_api.team_subscription.cusid);
     Stores.Customers.refresh();
-    render(<Views.PaymentInfo teamId={teamId} />);
+    render(<Views.PaymentInfo teamId={teamId} />, teamId);
 
     Analytics.page(Analytics.Page.PaymentInfo, { teamId });
   }

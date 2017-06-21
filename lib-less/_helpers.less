@@ -691,6 +691,16 @@ flexibility with non-UL elements */
     }
   }
 
+  .esper-selectable a {
+    color: @text-color;
+
+    &.highlight,
+    &:hover,
+    &:focus {
+      color: @link-hover-color;
+    }
+  }
+
   .esper-selectable, li > a {
     display: block;
     cursor: pointer;

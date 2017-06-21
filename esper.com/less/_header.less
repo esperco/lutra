@@ -4,12 +4,25 @@
 @nav-menu-link-vertical: 2 * @padding-large-vertical;
 @nav-menu-link-horizontal: 2 * @padding-large-horizontal;
 
-.navbar-header {
-  float: left;
+.navbar-container {
+  display: flex;
 
-  + * {
-    float: right;
-    display: flex;
+  .navbar-header {
+    float: none;
+
+    * { display: inline-block; }
+
+    h1 {
+      margin: 0;
+      font-size: @font-size-large;
+      color: @text-color;
+    }
+
+    + * {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
   }
 }
 
@@ -53,10 +66,6 @@ li.login-info {
 }
 
 .navbar-brand.word-mark {
-  line-height: @navbar-height;
-  padding-top: (@navbar-height - @word-mark-height) / 2;
-  padding-bottom: (@navbar-height - @word-mark-height) / 2;
-
   img {
     height: @word-mark-height;
   }

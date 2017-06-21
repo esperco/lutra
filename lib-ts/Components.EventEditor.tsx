@@ -4,6 +4,7 @@
 
 /// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.LabelList.tsx" />
+/// <reference path="./Components.Modal.tsx" />
 /// <reference path="./Components.Textarea.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
 

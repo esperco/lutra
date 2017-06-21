@@ -5,8 +5,8 @@
 
 module Esper.Actions {
   // Render with App container
-  export function render(main: React.ReactElement<any>) {
-    Layout.render(<Views.App>
+  export function render(main: React.ReactElement<any>, teamId?: string) {
+    Layout.render(<Views.App teamId={teamId}>
       { main }
     </Views.App>);
   }

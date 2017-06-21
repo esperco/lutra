@@ -15,41 +15,28 @@ module Esper.Views {
   // Shorten references to React Component class
   var Component = ReactHelpers.Component;
 
-  export class Header extends Component<{}, {}> {
-    _navSidebar: Components.Sidebar;
-
+  export class Header extends Component<{
+    teamId?: string;
+  }, {}> {
     renderWithData() {
-      let loginInfo = Login.getLoginInfo();
-      let busy = Login.getStatus() !== Model2.DataStatus.READY;
       let hasTeams = Stores.Teams.all().length > 0;
-      let hasGroups = loginInfo.mapOr(false, (l) => l.groups.length > 0);
-      let isSettingsPage = Route.nav.isActive(Paths.Manage.home());
-
-      let showTeamHeaders = (() => {
-        if (! hasTeams) return false;
-        if (! hasGroups) return true;
-        if (! isSettingsPage) return true;
-        if (Route.nav.isActive(Paths.Manage.Team.base()) ||
-            Route.nav.isActive(Paths.Manage.newTeam())) return true;
-        return false;
-      })();
-      let showGroupHeaders = hasGroups && isSettingsPage && !showTeamHeaders;
-
       return <header className="navbar-fixed-top">
         <nav className="navbar navbar-default navbar-shadow">
-          <div className="container-fluid">
+          <div className="container-fluid navbar-container">
             <div className="navbar-header">
               <SaveIndicator>
                 <a className={classNames("navbar-brand lg", {
-                  "navbar-square": hasTeams
+                  "navbar-square": !!(hasTeams && this.props.teamId)
                 })} href="#!/">
                   <img alt="Esper" src="/img/esper-logo-purple.svg" />
                 </a>
-                { (showTeamHeaders || showGroupHeaders) ? null :
+
+                {/* Show team switcher always if applicable */}
+                { hasTeams && this.props.teamId ?
+                  this.teamSwitcher() :
                   <a href="/" className="navbar-brand word-mark hidden-xs">
                     <img className="logo-name" src="img/word-mark.svg" />
-                  </a>
-                }
+                  </a> }
               </SaveIndicator>
             </div>
             <div>
@@ -61,10 +48,45 @@ module Esper.Views {
       </header>;
     }
 
-    toggleNavSidebar() {
-      if (this._navSidebar) {
-        this._navSidebar.toggle();
-      }
+    teamSwitcher() {
+      let teams = Stores.Teams.all();
+      let teamId = this.props.teamId || "";
+      let selectedTeam = _.find(teams, (t) => t.teamid === teamId);
+      let displayName = selectedTeam ? selectedTeam.team_name : Text.NoTeam;
+      return <Components.Dropdown className="dropdown team-switcher">
+        <h1 className="dropdown-toggle">
+          { displayName }{" "}
+          <i className="fa fa-fw fa-caret-down" />
+        </h1>
+        <div className="dropdown-menu">
+          <div className="esper-select-menu">
+            { _.map(teams,
+              (t) => <span key={t.teamid} className="esper-selectable">
+                <a href={ Paths.Time.charts({ teamId: t.teamid }).href }>
+                  { t.team_name }
+                </a>{" "}
+                <a className="pull-right"
+                  href={ Paths.Manage.Team.general({ teamId: t.teamid }).href }>
+                  <i className="fa fa-fw fa-cog" />
+                </a>
+              </span>) }
+          </div>
+          <div className="esper-select-menu">
+            <a className="esper-selectable"
+               href={ Paths.Manage.newTeam().href }>
+              <i className="fa fa-fw fa-plus" />{" "}
+              { Text.AddTeamLink }
+            </a>
+          </div>
+          <div className="esper-select-menu">
+            <a className="esper-selectable"
+               href={ Paths.Groups.home().href }>
+              <i className="fa fa-fw fa-users" />{" "}
+              { Text.GroupsLink }
+            </a>
+          </div>
+        </div>
+      </Components.Dropdown>;
     }
 
     navLinks(className?: string) {

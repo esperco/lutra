@@ -80,7 +80,7 @@ module Esper.Actions.Charts {
       };
 
       return <Views.Charts { ...props } />
-    }));
+    }), o.teamId);
   }
 
   /* Plan upgrade modal */
