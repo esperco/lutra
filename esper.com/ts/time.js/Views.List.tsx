@@ -57,18 +57,10 @@ module Esper.Views {
 
       return <div id="list-view" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <div className="sidebar-minus-bottom-menu">
+          <div className="sidebar">
             { _.isEmpty(this.state.selected) ?
               this.renderFilters(chartProps) :
               this.renderBatchLabeling(chartProps) }
-          </div>
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.update({teamId})}
-            />
           </div>
         </Components.Sidebar>
 

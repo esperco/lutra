@@ -38,14 +38,6 @@ module Esper.Views {
       return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           { this.renderSidebarContent() }
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.team.teamid}
-              onUpdate={(teamId) => this.updateTeamId(teamId)}
-            />
-          </div>
         </Components.Sidebar>
 
         <div className="esper-content">
@@ -103,7 +95,7 @@ module Esper.Views {
     }
 
     renderSidebarContent() {
-      return <div className="sidebar-minus-bottom-menu">
+      return <div className="sidebar">
         <div className="esper-panel-section">
           { this.renderChartSelector() }
         </div>

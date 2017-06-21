@@ -31,7 +31,6 @@
 /// <reference path="../lib/Components.SidebarWithToggle.tsx" />
 /// <reference path="../lib/Components.SignalStrength.tsx" />
 /// <reference path="../lib/Components.StarRating.tsx" />
-/// <reference path="../lib/Components.TeamSelector.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 
 /// <reference path="../lib/Views.App.tsx" />

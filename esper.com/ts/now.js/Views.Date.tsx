@@ -26,12 +26,6 @@ module Esper.Views {
           </div>
         </div>
       </div>
-
-      <Components.TeamSelector
-        teams={Stores.Teams.all()}
-        selectedId={teamId}
-        onUpdate={(teamId) => Actions.goToDate(date, { teamId })}
-      />
     </div>
   }
 }

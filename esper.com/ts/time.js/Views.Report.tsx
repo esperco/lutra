@@ -41,7 +41,7 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <div className="sidebar-minus-bottom-menu">
+          <div className="sidebar">
             <UnconfirmedLink eventsForRanges={eventsForRanges} />
             <div className="esper-panel-section">
               <div className="esper-header">
@@ -54,15 +54,6 @@ module Esper.Views {
               />
             </div>
             <HiddenLink eventsForRanges={eventsForRanges} />
-          </div>
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.update({
-                teamId: teamId
-              })} />
           </div>
         </Components.Sidebar>
 
