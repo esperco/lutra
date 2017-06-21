@@ -59,10 +59,15 @@ module Esper.Views {
           <i className="fa fa-fw fa-caret-down" />
         </h1>
         <div className="dropdown-menu">
-          <div className="esper-select-menu">
+          <div className="esper-select-menu team-list">
             { _.map(teams,
-              (t) => <span key={t.teamid} className="esper-selectable">
+              (t) => <span key={t.teamid} className={classNames(
+                "esper-selectable", { active: this.props.teamId === t.teamid }
+              )}>
                 <a href={ Paths.Time.charts({ teamId: t.teamid }).href }>
+                  { t.teamid === this.props.teamId ?
+                    <i className="fa fa-fw fa-left fa-check" /> :
+                    <i className="fa fa-fw fa-left fa-user" /> }
                   { t.team_name }
                 </a>{" "}
                 <a className="pull-right"
@@ -74,14 +79,14 @@ module Esper.Views {
           <div className="esper-select-menu">
             <a className="esper-selectable"
                href={ Paths.Manage.newTeam().href }>
-              <i className="fa fa-fw fa-plus" />{" "}
+              <i className="fa fa-fw fa-left fa-plus" />
               { Text.AddTeamLink }
             </a>
           </div>
           <div className="esper-select-menu">
             <a className="esper-selectable"
                href={ Paths.Groups.home().href }>
-              <i className="fa fa-fw fa-users" />{" "}
+              <i className="fa fa-fw fa-left fa-users" />
               { Text.GroupsLink }
             </a>
           </div>
