@@ -46,10 +46,12 @@
         flex: 1 (100% - @report-chart-width);
       }
 
-      .esper-no-content {
+      .chart-msg {
         flex: 1 100%;
         margin: @line-height-computed 0 0 @line-height-computed * 2;
-        line-height: @report-chart-height;
+        padding: 150px 10px;
+        border: 1px solid @brand-border;
+        border-radius: @border-radius-base;
       }
 
       .chart-content {
@@ -70,9 +72,9 @@
           .chart-holder { height: auto; }
         }
 
-        .esper-no-content {
+        .chart-msg {
           margin: 0;
-          line-height: @line-height-base;
+          padding: 10px;
         }
       }
     }

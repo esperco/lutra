@@ -87,7 +87,7 @@ module Esper.Text {
 
   // Selector text
   export const SelectAll = `Select All`;
-  export const SelectNone = `Clear`;
+  export const SelectNone = `Unselect`;
   export const AllLabels = `Show All`;
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const HideUnlabled = `Only ${_.capitalize(Labeled)} Events`;
