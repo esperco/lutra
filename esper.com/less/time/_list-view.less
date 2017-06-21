@@ -14,13 +14,16 @@
 }
 
 #list-view {
-  .select-action {
-    text-align: center;
-    color: @shade-text-muted;
-  }
-
-  .select-action:hover {
-    color: @shade-text;
+  // Medium sized screens -> hide some text in header to fit stuff
+  @media screen and (max-width: @screen-sm-max) {
+    .esper-content-header {
+      button {
+        .fa ~ *, span ~ * {
+          display: none;
+        }
+        .fa-left { margin-right: 0; }
+      }
+    }
   }
 
   .unselect-action {

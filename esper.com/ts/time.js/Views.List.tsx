@@ -72,6 +72,7 @@ module Esper.Views {
 
         <div className="esper-content">
           <div id="list-header" className="esper-content-header">
+            { this.renderSelectAll() }
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -108,11 +109,30 @@ module Esper.Views {
 
     renderViewButton(view: "week"|"month"|"agenda",
                      title: string) {
+      let firstChar = title[0];
+      let rest = title.slice(1);
       return <button className={classNames("btn btn-default", {
         active: view === this.props.view
       })} onClick={() => this.update({ view })}>
-        { title }
+        <span>{ firstChar }</span><span>{ rest }</span>
       </button>
+    }
+
+    renderSelectAll() {
+      let selectAll = _.isEmpty(this.state.selected);
+      return <div className="actions">
+        { selectAll ?
+          <button className="btn btn-default select-btn"
+                  onClick={() => this.selectAll()}>
+            <i className="fa fa-fw fa-left fa-square-o" />
+            <span>{ Text.SelectAll }</span>
+          </button> :
+          <button className="btn btn-default select-btn"
+                  onClick={() => this.clearSelection()}>
+            <i className="fa fa-fw fa-left fa-check-square-o" />
+            <span>{ Text.SelectNone }</span>
+          </button> }
+      </div>;
     }
 
     renderContent(props: Types.ChartProps) {
@@ -144,11 +164,6 @@ module Esper.Views {
 
     renderFilters(props: Types.ChartProps) {
       return <div className="esper-panel-section">
-        <div className="action select-action esper-panel-section"
-             onClick={() => this.selectAll()}>
-          { Text.SelectAll }
-        </div>
-
         <div className="esper-panel-section">
           <Components.SearchBox
             icon="fa-search"
