@@ -215,7 +215,7 @@ module Esper.Text {
   // Event List Text
   export const WeekView = "Week";
   export const MonthView = "Month";
-  export const AgendaView = "Agenda";
+  export const AgendaView = "List";
   export function eventsSelected(n: number) {
     return `${events(n)} selected`;
   }
