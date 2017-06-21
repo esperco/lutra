@@ -39,12 +39,13 @@ module Esper.Components {
 
     // Render toggle only if sidebar exists
     render() {
-      return this.state.hasSidebar ? <div className={classNames(
-        "action esper-sidebar-toggle",
+      return this.state.hasSidebar ? <button className={classNames(
+        "btn btn-default esper-sidebar-toggle",
+        "visible-xs-block",
         this.props.className
       )} onClick={() => this.toggle()}>
         { this.props.children }
-      </div> : null;
+      </button> : null;
     }
 
     toggle() {
@@ -61,8 +62,16 @@ module Esper.Components {
     componentDidMount() {
       if (this.props.side === "right") {
         _sidebarRightToggle = Option.some(this);
+        _sidebarRight.match({
+          none: () => null,
+          some: (s) => this.setState({ hasSidebar: true })
+        });
       } else {
         _sidebarLeftToggle = Option.some(this);
+        _sidebarLeft.match({
+          none: () => null,
+          some: (s) => this.setState({ hasSidebar: true })
+        });
       }
     }
 
@@ -113,13 +122,13 @@ module Esper.Components {
         _sidebarRightToggle.match({
           none: () => null,
           some: (toggle) => toggle.setState({ hasSidebar: true })
-        })
+        });
       } else {
         _sidebarLeft = Option.some(this);
         _sidebarLeftToggle.match({
           none: () => null,
           some: (toggle) => toggle.setState({ hasSidebar: true })
-        })
+        });
       }
     }
 

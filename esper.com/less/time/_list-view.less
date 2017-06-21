@@ -1,19 +1,14 @@
 @import "../lib/_bootstrap-variables.less";
 
-#list-header {
-  @media screen and (max-width: @screen-xs-max) {
-    > .actions { display: none; }
-  }
-
-  @media screen and (min-width: @screen-sm-min) {
-    display: flex;
-    align-items: center;
-    > * { flex: 1 1 auto; }
-    > .actions { flex: 0 0 auto; }
-  }
-}
-
 #list-view {
+  // Small screen (no margin on container)
+  @media screen and (max-width: @screen-sm-max) {
+    .esper-container {
+      margin-top: 0;
+      padding: 0;
+    }
+  }
+
   // Medium sized screens -> hide some text in header to fit stuff
   @media screen and (max-width: @screen-sm-max) {
     .esper-content-header {

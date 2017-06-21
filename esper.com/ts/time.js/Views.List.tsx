@@ -72,7 +72,12 @@ module Esper.Views {
 
         <div className="esper-content">
           <div id="list-header" className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
+
             { this.renderSelectAll() }
+
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -85,17 +90,15 @@ module Esper.Views {
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
               show={["week", "month"]}
             />
-            <div className="actions">
+            <div className="btn-group hidden-xs">
               <div className="btn-group">
-                <div className="btn-group">
-                  { this.renderViewButton("week", Text.WeekView) }
-                </div>
-                <div className="btn-group">
-                  { this.renderViewButton("month", Text.MonthView) }
-                </div>
-                <div className="btn-group">
-                  { this.renderViewButton("agenda", Text.AgendaView) }
-                </div>
+                { this.renderViewButton("week", Text.WeekView) }
+              </div>
+              <div className="btn-group">
+                { this.renderViewButton("month", Text.MonthView) }
+              </div>
+              <div className="btn-group">
+                { this.renderViewButton("agenda", Text.AgendaView) }
               </div>
             </div>
           </div>
@@ -117,20 +120,17 @@ module Esper.Views {
     }
 
     renderSelectAll() {
-      let selectAll = _.isEmpty(this.state.selected);
-      return <div className="actions">
-        { selectAll ?
-          <button className="btn btn-default select-btn"
-                  onClick={() => this.selectAll()}>
-            <i className="fa fa-fw fa-left fa-square-o" />
-            <span>{ Text.SelectAll }</span>
-          </button> :
-          <button className="btn btn-default select-btn"
-                  onClick={() => this.clearSelection()}>
-            <i className="fa fa-fw fa-left fa-check-square-o" />
-            <span>{ Text.SelectNone }</span>
-          </button> }
-      </div>;
+      return _.isEmpty(this.state.selected) ?
+        <button className="btn btn-default select-btn"
+                onClick={() => this.selectAll()}>
+          <i className="fa fa-fw fa-left fa-square-o" />
+          <span>{ Text.SelectAll }</span>
+        </button> :
+        <button className="btn btn-default select-btn"
+                onClick={() => this.clearSelection()}>
+          <i className="fa fa-fw fa-left fa-check-square-o" />
+          <span>{ Text.SelectNone }</span>
+        </button>;
     }
 
     renderContent(props: Types.ChartProps) {

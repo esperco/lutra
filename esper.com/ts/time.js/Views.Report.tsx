@@ -65,6 +65,9 @@ module Esper.Views {
 
         <div className="esper-content">
           <div className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}

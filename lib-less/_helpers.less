@@ -259,6 +259,14 @@
     padding: 0 @esper-base-padding;
     line-height: @input-height-base;
     vertical-align: middle;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    > * { flex-grow: 1; }
+    > .btn-group, > .action, > button {
+      flex-grow: 0;
+    }
 
     .btn.btn-default {
       .action;
@@ -299,6 +307,7 @@
       height: @content-header-height;
       overflow: hidden;
       background: fadeout(@panel-bg, 10%);
+      flex-wrap: nowrap;
 
       > div {
         padding: 0;

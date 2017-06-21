@@ -42,6 +42,9 @@ module Esper.Views {
 
         <div className="esper-content">
           <div id="chart-header" className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -56,34 +59,32 @@ module Esper.Views {
               updateFn={(p) => this.updatePeriod(p)}
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
-            <div className="actions">
-              <div className="esper-flex-list">
-                <div className="search-box-container">
-                  <Components.SearchBox
-                    icon="fa-search"
-                    className="form-control"
-                    placeholder={Text.SearchEventsPlaceholder}
-                    value={this.props.extra.filterStr}
-                    onUpdate={(val) => this.updateExtra({ filterStr: val })}
-                  />
-                </div>
-                <Components.Hint
-                  className="action filter-action"
-                  dismissed={Stores.Hints.get('FilterMenuHint')}
-                  onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
-                  text={Text.FilterActionHintText}>
-                  <button className="btn btn-default"
-                          onClick={() => this.toggleFilterMenu()}>
-                    <i id="filter-menu-toggle"
-                       className={classNames("fa fa-fw", {
-                      "fa-close": this.state.showFilterMenu,
-                      "fa-ellipsis-v": !this.state.showFilterMenu,
-                      "active": _.some(_.values(filterState)) &&
-                                !this.state.showFilterMenu
-                    })} />
-                  </button>
-                </Components.Hint>
+            <div className="esper-flex-list">
+              <div className="search-box-container">
+                <Components.SearchBox
+                  icon="fa-search"
+                  className="form-control"
+                  placeholder={Text.SearchEventsPlaceholder}
+                  value={this.props.extra.filterStr}
+                  onUpdate={(val) => this.updateExtra({ filterStr: val })}
+                />
               </div>
+              <Components.Hint
+                className="action filter-action"
+                dismissed={Stores.Hints.get('FilterMenuHint')}
+                onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
+                text={Text.FilterActionHintText}>
+                <button className="btn btn-default"
+                        onClick={() => this.toggleFilterMenu()}>
+                  <i id="filter-menu-toggle"
+                      className={classNames("fa fa-fw", {
+                    "fa-close": this.state.showFilterMenu,
+                    "fa-ellipsis-v": !this.state.showFilterMenu,
+                    "active": _.some(_.values(filterState)) &&
+                              !this.state.showFilterMenu
+                  })} />
+                </button>
+              </Components.Hint>
             </div>
           </div>
           <div id="chart-expanded">
