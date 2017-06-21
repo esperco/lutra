@@ -58,6 +58,12 @@ module Esper.Views {
       return <div id="list-view" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar">
+            <div className="esper-panel-section">
+              <Components.SidebarNav
+                teamId={this.props.teamId}
+                active="list"
+              />
+            </div>
             { _.isEmpty(this.state.selected) ?
               this.renderFilters(chartProps) :
               this.renderBatchLabeling(chartProps) }
@@ -137,7 +143,7 @@ module Esper.Views {
     }
 
     renderFilters(props: Types.ChartProps) {
-      return <div>
+      return <div className="esper-panel-section">
         <div className="action select-action esper-panel-section"
              onClick={() => this.selectAll()}>
           { Text.SelectAll }
@@ -198,7 +204,7 @@ module Esper.Views {
         .compact()
         .value();
 
-      return <div className="esper-section">
+      return <div className="esper-panel-section">
         <div className="action unselect-action esper-panel-section"
              onClick={() => this.clearSelection()}>
           { Text.eventsSelected(eventData.length) }

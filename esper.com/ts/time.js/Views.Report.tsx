@@ -42,6 +42,12 @@ module Esper.Views {
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           <div className="sidebar">
+            <div className="esper-panel-section">
+              <Components.SidebarNav
+                teamId={this.props.teamId}
+                active="charts"
+              />
+            </div>
             <UnconfirmedLink eventsForRanges={eventsForRanges} />
             <div className="esper-panel-section">
               <div className="esper-header">
