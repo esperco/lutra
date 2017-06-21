@@ -72,7 +72,8 @@ module Esper.Views {
                   dismissed={Stores.Hints.get('FilterMenuHint')}
                   onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
                   text={Text.FilterActionHintText}>
-                  <span onClick={() => this.toggleFilterMenu()}>
+                  <button className="btn btn-default"
+                          onClick={() => this.toggleFilterMenu()}>
                     <i id="filter-menu-toggle"
                        className={classNames("fa fa-fw", {
                       "fa-close": this.state.showFilterMenu,
@@ -80,12 +81,12 @@ module Esper.Views {
                       "active": _.some(_.values(filterState)) &&
                                 !this.state.showFilterMenu
                     })} />
-                  </span>
+                  </button>
                 </Components.Hint>
               </div>
             </div>
           </div>
-          <div id="chart-expanded" className="esper-expanded">
+          <div id="chart-expanded">
             { this.state.showFilterMenu ?
               <FilterMenu props={this.props} active={filterState} /> : null }
             <ChartContent {...this.props} />

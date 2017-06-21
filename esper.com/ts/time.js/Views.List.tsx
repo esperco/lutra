@@ -100,9 +100,7 @@ module Esper.Views {
             </div>
           </div>
 
-          <div className="esper-expanded">
-            { this.renderContent(chartProps) }
-          </div>
+          { this.renderContent(chartProps) }
         </div>
       </div>;
     }

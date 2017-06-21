@@ -77,10 +77,11 @@ module Esper.Views {
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
           </div>
-          <div className="esper-expanded">
-            <ReportMain
-              { ..._.extend(chartProps, { seeMoreHintDismissed }) as ReportMainProps } />
-          </div>
+          <ReportMain {
+            ..._.extend(chartProps, {
+              seeMoreHintDismissed
+            }) as ReportMainProps
+          } />
         </div>
 
       </div>;

@@ -260,23 +260,52 @@
     line-height: @input-height-base;
     vertical-align: middle;
 
+    .btn.btn-default {
+      .action;
+      border: 0;
+      box-shadow: none;
+      border-radius: 0;
+
+      &:hover, &:focus {
+        border: 0;
+        box-shadow: none;
+      }
+
+      &.active {
+        background: transparent;
+        color: @link-color;
+        font-weight: bold;
+        border-bottom: 1px solid @link-color;
+      }
+
+      // Medium sized screens -> hide some text in header to fit stuff
+      @media screen and (max-width: @screen-sm-max) {
+        > *  ~ * {
+          display: none;
+        }
+        > .fa-left { margin-right: 0; }
+      }
+    }
+
     > div {
       padding: (@esper-base-padding / 2) 0;
     }
 
     @media screen and (min-width: @screen-sm-min) {
       line-height: @content-header-height;
-      position: absolute;
+      position: sticky;
       top: 0; left: 0; right: 0;
+      z-index: @zindex-navbar-fixed;
       height: @content-header-height;
       overflow: hidden;
+      background: fadeout(@panel-bg, 10%);
 
       > div {
         padding: 0;
       }
 
-      + * {
-        margin-top: @content-header-height;
+      + .esper-container {
+        margin-top: @esper-lg-padding;
       }
     }
   }
