@@ -5,9 +5,9 @@
 /// <reference path="./ReactHelpers.ts" />
 /// <reference path="./Save.ts" />
 /// <reference path="./Route.ts" />
-/// <reference path="./Components.LoginInfo.tsx" />
-/// <reference path="./Components.SidebarWithToggle.tsx" />
+/// <reference path="./Components.Dropdown.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
+/// <reference path="./Login.Web.ts" />
 /// <reference path="./Stores.Teams.ts" />
 /// <reference path="./Text.tsx" />
 
@@ -35,13 +35,10 @@ module Esper.Views {
       })();
       let showGroupHeaders = hasGroups && isSettingsPage && !showTeamHeaders;
 
-      return <div className="navbar-fixed-top">
+      return <header className="navbar-fixed-top">
         <nav className="navbar navbar-default navbar-shadow">
           <div className="container-fluid">
             <div className="navbar-header">
-              <Components.SidebarToggle side="left" className="navbar-toggle">
-                <i className="fa fa-fw fa-bars" />
-              </Components.SidebarToggle>
               <SaveIndicator>
                 <a className={classNames("navbar-brand lg", {
                   "navbar-square": hasTeams
@@ -54,43 +51,14 @@ module Esper.Views {
                   </a>
                 }
               </SaveIndicator>
-              <Components.SidebarToggle side="right" className="navbar-toggle">
-                <i className="fa fa-fw fa-ellipsis-h" />
-              </Components.SidebarToggle>
             </div>
-
-            <div className="hidden-xs">
-              { showTeamHeaders ?
-                this.navLinks("nav navbar-nav") : null }
-              { showGroupHeaders ?
-                this.groupLinks("nav navbar-nav") : null }
-              <div className="navbar-text pull-right">
-                <Components.LoginInfo loginInfo={loginInfo} busy={busy}>
-                  { this.loginLinks("esper-select-menu") }
-                </Components.LoginInfo>
-              </div>
+            <div>
+              { this.navLinks("nav navbar-nav") }
+              { this.dropdown() }
             </div>
-
-            <Components.Sidebar
-              ref={(c) => this._navSidebar = c}
-              className="visible-xs-block navbar-default"
-              side="right"
-            >
-              <div className="esper-section">
-                { showTeamHeaders ? this.navLinks(
-                  "nav navbar-nav esper-panel-section esper-full-width"
-                ) : null }
-                { showGroupHeaders ? this.groupLinks(
-                  "nav navbar-nav esper-panel-section esper-full-width"
-                ) : null }
-                { this.loginLinks(
-                  "nav navbar-nav esper-panel-section esper-full-width"
-                ) }
-              </div>
-            </Components.Sidebar>
           </div>
         </nav>
-      </div>;
+      </header>;
     }
 
     toggleNavSidebar() {
@@ -100,78 +68,57 @@ module Esper.Views {
     }
 
     navLinks(className?: string) {
-      return <ul className={className} onClick={() => this.toggleNavSidebar()}>
-        <NavLink path={Paths.Time.charts({})}>
-          <i className="fa fa-fw fa-bar-chart"></i>{" "}Charts
-        </NavLink>
-        <NavLink path={Paths.Time.list({})}>
-          <i className="fa fa-fw fa-calendar"></i>{" "}Events
-        </NavLink>
-        { Login.data.is_sandbox_user ?
+      if (Login.data.is_sandbox_user) {
+        return <ul className={className}>
           <NavLink path={Paths.Login.home()} className="sandbox-sign-up">
-            <i className="fa fa-fw fa-arrow-right"></i>{" "}Sign Up
-          </NavLink> :
-          <NavLink path={Paths.Manage.home()}>
-            <i className="fa fa-fw fa-cog"></i>{" "}Settings
-          </NavLink> }
-      </ul>;
-    }
+            <i className="fa fa-fw fa-arrow-right"></i>
+            <span>{" "}Sign Up</span>
+          </NavLink>
+        </ul>;
+      }
 
-    /*
-      Temporary header for group user that hides the individual navlinks
-      so users don't edit their individual Espers when we really want
-      them to use groups instead. Once we move group settings into the
-      Enterprise product, we'll remove this.
-    */
-    groupLinks(className?: string) {
-      return <ul className={className} onClick={() => this.toggleNavSidebar()}>
-        <NavLink path={Paths.Groups.home()}>
-          <i className="fa fa-fw fa-list"></i>{" "}Events
-        </NavLink>
-        { Login.data.is_sandbox_user ?
-          <NavLink path={Paths.Login.home()} className="sandbox-sign-up">
-            <i className="fa fa-fw fa-arrow-right"></i>{" "}Sign Up
-          </NavLink> :
-          <NavLink path={Paths.Manage.home()}>
-            <i className="fa fa-fw fa-cog"></i>{" "}Settings
-          </NavLink> }
-      </ul>;
-    }
-
-    loginLinks(className?: string) {
-      let hasGroups = Login.data && Login.data.groups.length > 0;
       return <ul className={className}>
-        <li><a href={Paths.Timebomb.home().href}>
-          <i className="fa fa-fw fa-check"></i> Agenda Check
-        </a></li>
-        { hasGroups ? <li><a href={Paths.Groups.home().href} target="_blank">
-            <i className="fa fa-fw fa-users"></i>{" "}
-            { Text.GroupsLink }
-          </a></li> : null }
+        <NavLink path={Paths.Time.home()}>
+          <i className="fa fa-fw fa-pie-chart"></i>
+          <span>{" "}Charts</span>
+        </NavLink>
+        <NavLink path={Paths.Timebomb.home()}>
+          <i className="fa fa-fw fa-check"></i>
+          <span>{" "}Agenda Check</span>
+        </NavLink>
+      </ul>;
+    }
+
+    dropdown() {
+      return <Components.Dropdown className="dropdown">
+        <a className="dropdown-toggle navbar-link">
+          <i className="fa fa-fw fa-ellipsis-v" />
+        </a>
+        <div className="dropdown-menu">
+          { this.menu("esper-select-menu") }
+        </div>
+      </Components.Dropdown>;
+    }
+
+    menu(className?: string) {
+      return <ul className={className}>
+        <li className="login-info">{
+          Login.data.is_sandbox_user ?
+          "Demo User" : Login.myEmail()
+        }</li>
         <li className="divider" />
-        <li><a href={Paths.Landing.home().href} target="_blank">
-          <i className="fa fa-fw fa-home"></i>{" "}
-          Home
-        </a></li>
+        { Login.data.is_sandbox_user ? null :
+          <li><a href={Paths.Settings.home().href} target="_blank">
+            <i className="fa fa-fw fa-cog"></i>{" "}
+            Settings
+          </a></li> }
         <li><a href={Paths.Landing.contact().href} target="_blank">
           <i className="fa fa-fw fa-envelope"></i>{" "}
           Contact Us
         </a></li>
-        <li><a href={Paths.Landing.privacy().href} target="_blank">
-          <i className="fa fa-fw fa-lock"></i>{" "}
-          Privacy
-        </a></li>
-        <li><a href={Paths.Landing.terms().href} target="_blank">
-          <i className="fa fa-fw fa-legal"></i>{" "}
-          Terms
-        </a></li>
-        <li className="divider" />
         <li><a onClick={() => Login.goToLogout()}>
           <i className="fa fa-fw fa-sign-out"></i>{" "}
-          Log out
-          <span className="visible-xs-inline">
-            {" of "}{Login.myEmail()}
-          </span>
+          Sign out
         </a></li>
       </ul>;
     }
@@ -190,10 +137,18 @@ module Esper.Views {
         active: Route.nav.isActive(this.props.path),
         "hidden-xs": this.props.hiddenXs
       })}>
-        <a href={this.props.path.href} className={this.props.className}>
+        <a href={this.props.path.href}
+          className={this.props.className}
+          onClick={this.onClick}
+        >
           {this.props.children}
         </a>
       </li>;
+    }
+
+    onClick = (e: __React.MouseEvent) => {
+      Route.nav.go(this.props.path);
+      e.preventDefault();
     }
   }
 
@@ -236,3 +191,4 @@ module Esper.Views {
     onChange = (status: Save.Status) => this.setState(status)
   }
 }
+
