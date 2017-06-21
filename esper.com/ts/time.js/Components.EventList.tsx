@@ -108,7 +108,7 @@ module Esper.Components {
           </span>{" "}
           { event.recurringEventId ?
             <span className="recurring" title="Recurring">
-              <i className="fa fa-fw fa-refresh" />
+              <i className="fa fa-fw fa-clone" />
             </span> :
             null
           }

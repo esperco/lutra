@@ -41,7 +41,13 @@ module Esper.Views {
 
       return <div id="reports-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <div className="sidebar-minus-bottom-menu">
+          <div className="sidebar">
+            <div className="esper-panel-section">
+              <Components.SidebarNav
+                teamId={this.props.teamId}
+                active="charts"
+              />
+            </div>
             <UnconfirmedLink eventsForRanges={eventsForRanges} />
             <div className="esper-panel-section">
               <div className="esper-header">
@@ -55,19 +61,13 @@ module Esper.Views {
             </div>
             <HiddenLink eventsForRanges={eventsForRanges} />
           </div>
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.update({
-                teamId: teamId
-              })} />
-          </div>
         </Components.Sidebar>
 
         <div className="esper-content">
           <div className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -80,10 +80,11 @@ module Esper.Views {
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
           </div>
-          <div className="esper-expanded">
-            <ReportMain
-              { ..._.extend(chartProps, { seeMoreHintDismissed }) as ReportMainProps } />
-          </div>
+          <ReportMain {
+            ..._.extend(chartProps, {
+              seeMoreHintDismissed
+            }) as ReportMainProps
+          } />
         </div>
 
       </div>;

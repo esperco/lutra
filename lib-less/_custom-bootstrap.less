@@ -44,11 +44,10 @@
 .btn:hover:enabled {
   outline: none;
   box-shadow: @plus-box-shadow;
-  transform: translateY(-1px);
 }
 
 .btn-primary {
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .btn-group .btn, .btn-group.btn.active, .btn-group.btn:active,
@@ -183,7 +182,7 @@ label {
 }
 
 h1, h2, h3, h4 {
-  font-weight: bold;
+  font-weight: 600;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -324,33 +323,11 @@ a {
   }
 }
 
-@media screen and (max-width: @screen-xs-max) {
-  .navbar .navbar-header {
-    display: flex;
-
-    > div, > span {
-      flex-grow: 1;
-      text-align: center;
-
-      &:first-child {
-        text-align: left;
-      }
-
-      &:last-child {
-        text-align: right;
-      }
-    }
-
-    .navbar-brand {
-      float: none;
-      display: inline-block;
-    }
-  }
-}
-
 .navbar-brand {
   line-height: @navbar-height - (@navbar-padding-vertical * 2);
   vertical-align: middle;
+  display: flex;
+  align-items: center;
 
   img {
     height: @navbar-height - (@navbar-padding-vertical * 2);
@@ -396,12 +373,6 @@ a {
     background: @navbar-default-border;
     color: white;
   }
-}
-
-.navbar-toggle {
-  padding: @padding-base-vertical @padding-base-horizontal;
-  margin-left: @padding-base-horizontal;
-  margin-right: @padding-base-horizontal;
 }
 
 
@@ -589,19 +560,8 @@ input.form-control.dropdown-toggle[readonly] {
   }
 }
 
-.navbar-default .navbar-toggle {
-  border: 0;
-  color: @navbar-default-link-color;
-  cursor: pointer;
-
-  &:hover, &:focus {
-    background-color: transparent;
-    color: @navbar-default-link-hover-color;
-  }
-}
-
 .alert a {
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .alert-success a {

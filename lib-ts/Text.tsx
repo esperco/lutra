@@ -232,6 +232,7 @@ module Esper.Text {
 
   // Team Selector
   export const NoTeam = `Select ${TeamExec}`;
+  export const AddTeamLink = `New ${TeamExec}`;
   export const ManageTeams = `Manage ${TeamExecs}`;
 
   // Calendar List

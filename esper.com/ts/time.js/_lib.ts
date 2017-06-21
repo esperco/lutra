@@ -52,7 +52,6 @@
 /// <reference path="../lib/Components.SimpleToggle.tsx" />
 /// <reference path="../lib/Components.StarRating.tsx" />
 /// <reference path="../lib/Components.Stripe.tsx" />
-/// <reference path="../lib/Components.TeamSelector.tsx" />
 /// <reference path="../lib/Components.Tooltip.tsx" />
 /// <reference path="../lib/Components.WeekView.tsx" />
 

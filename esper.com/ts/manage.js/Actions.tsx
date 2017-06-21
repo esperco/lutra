@@ -5,8 +5,8 @@
 
 module Esper.Actions {
   // Render with App container
-  export function render(main: React.ReactElement<any>) {
-    Layout.render(<Views.App>
+  export function render(main: React.ReactElement<any>, teamId?: string) {
+    Layout.render(<Views.App teamId={teamId}>
       { main }
     </Views.App>);
   }
@@ -33,35 +33,35 @@ module Esper.Actions {
 
   export function renderTeamGeneralSettings(props: TeamSettingProps)
   {
-    render(<Views.TeamGeneralSettings {...props} />);
+    render(<Views.TeamGeneralSettings {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamManage);
   }
 
   export function renderTeamCalendarSettings(props: TeamSettingProps) {
     Stores.Calendars.fetchAvailable(props.teamId);
-    render(<Views.TeamCalendarSettings {...props} />);
+    render(<Views.TeamCalendarSettings {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamCalendars);
   }
 
   export function renderTeamLabelSettings(props: TeamSettingProps) {
-    render(<Views.TeamLabelSettings {...props} />);
+    render(<Views.TeamLabelSettings {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamLabels);
   }
 
   export function renderTeamPaySettings(props: TeamSettingProps) {
     let team = Stores.Teams.require(props.teamId);
     Stores.Subscriptions.fetch(team.team_api.team_subscription.cusid);
-    render(<Views.TeamPaySettings {...props} />);
+    render(<Views.TeamPaySettings {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamPay);
   }
 
   export function renderTeamExport(props: TeamSettingProps) {
-    render(<Views.TeamExport {...props} />);
+    render(<Views.TeamExport {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamExport);
   }
 
   export function renderTeamMisc(props: TeamSettingProps) {
-    render(<Views.TeamMiscSettings {...props} />);
+    render(<Views.TeamMiscSettings {...props} />, props.teamId);
     Analytics.page(Analytics.Page.TeamMisc);
   }
 

@@ -77,7 +77,7 @@ module Esper.Paths {
     export const prefix = "/time";
 
     export function home({} = {}) {
-      return optPath(prefix, "charts");
+      return optPath(prefix);
     }
 
     // Doubles as nav for all the charts
@@ -304,6 +304,15 @@ module Esper.Paths {
   // Paths for /tb
   export module Timebomb {
     export const prefix = "/tb";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
+  }
+
+  // Personal settings page
+  export module Settings {
+    export const prefix = "/settings";
 
     export function home() {
       return optPath(prefix, "");

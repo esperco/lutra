@@ -210,13 +210,20 @@ module Esper.Components {
 
     select(index: number) {
       if (this.props.range) {
-        if (_.isNumber(this.state.lastSelected) &&
-            index > this.state.lastSelected) {
-          this.props.onUpdate({
-            interval: this.props.interval,
-            start: this.state.lastSelected,
-            end: index
-          });
+        if (_.isNumber(this.state.lastSelected)) {
+          if (index > this.state.lastSelected) {
+            this.props.onUpdate({
+              interval: this.props.interval,
+              start: this.state.lastSelected,
+              end: index
+            });
+          } else {
+            this.props.onUpdate({
+              interval: this.props.interval,
+              start: index,
+              end: this.state.lastSelected
+            });
+          }
         } else {
           this.setState({
             lastSelected: index,
@@ -233,11 +240,14 @@ module Esper.Components {
     }
 
     isHighlighted(index: number) {
-      // There's a previous selection, highlight if greater than last and less
-      // than hover
+      // There's a previous selection, highlight if between hover and
+      // last selected
       if (_.isNumber(this.state.lastSelected)) {
         if (_.isNumber(this.state.hover)) {
-          return index >= this.state.lastSelected && index <= this.state.hover;
+          return (
+            (index >= this.state.lastSelected && index <= this.state.hover) ||
+            (index <= this.state.lastSelected && index >= this.state.hover)
+          );
         }
         return index === this.state.lastSelected;
       }

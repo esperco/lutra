@@ -87,6 +87,7 @@ module Esper.Text {
 
   // Selector text
   export const SelectAll = `Select All`;
+  export const SelectNone = `Unselect`;
   export const AllLabels = `Show All`;
   export const Unlabeled = `No ${_.capitalize(Label)} Assigned`;
   export const HideUnlabled = `Only ${_.capitalize(Labeled)} Events`;
@@ -214,7 +215,7 @@ module Esper.Text {
   // Event List Text
   export const WeekView = "Week";
   export const MonthView = "Month";
-  export const AgendaView = "Agenda";
+  export const AgendaView = "List";
   export function eventsSelected(n: number) {
     return `${events(n)} selected`;
   }

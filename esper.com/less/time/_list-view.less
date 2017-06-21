@@ -1,26 +1,24 @@
 @import "../lib/_bootstrap-variables.less";
 
-#list-header {
-  @media screen and (max-width: @screen-xs-max) {
-    > .actions { display: none; }
-  }
-
-  @media screen and (min-width: @screen-sm-min) {
-    display: flex;
-    align-items: center;
-    > * { flex: 1 1 auto; }
-    > .actions { flex: 0 0 auto; }
-  }
-}
-
 #list-view {
-  .select-action {
-    text-align: center;
-    color: @shade-text-muted;
+  // Small screen (no margin on container)
+  @media screen and (max-width: @screen-sm-max) {
+    .esper-container {
+      margin-top: 0;
+      padding: 0;
+    }
   }
 
-  .select-action:hover {
-    color: @shade-text;
+  // Medium sized screens -> hide some text in header to fit stuff
+  @media screen and (max-width: @screen-sm-max) {
+    .esper-content-header {
+      .btn {
+        .fa-left ~ *, span ~ * {
+          display: none;
+        }
+        .fa-left { margin-right: 0; }
+      }
+    }
   }
 
   .unselect-action {
@@ -54,6 +52,35 @@
   }
 }
 
+// Override defaults for week-view since we're using position sticky
+.week-view {
+  height: auto;
+
+  .week-headings{
+    position: sticky;
+    top: @content-header-height;
+    background: fadeout(@panel-bg, 10%);
+    z-index: @zindex-navbar;
+  }
+
+  .week-headings, .week-scrollable {
+    overflow: auto;
+  }
+}
+
+// Same for month view
+.month-view {
+  th {
+    position: sticky;
+    top: @content-header-height;
+    z-index: @zindex-navbar;
+  }
+
+  th, td {
+    background: fadeout(@panel-bg, 10%);
+  }
+}
+
 .week-view, .month-view {
   .event {
     margin: 1px;
@@ -84,14 +111,6 @@
     min-height: @line-height-computed;
     text-overflow: ellipsis;
     overflow: hidden;
-  }
-
-  .esper-expanded & {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
   }
 
   .today .day-number, .today.week-date {

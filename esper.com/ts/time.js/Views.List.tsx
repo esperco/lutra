@@ -57,23 +57,27 @@ module Esper.Views {
 
       return <div id="list-view" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
-          <div className="sidebar-minus-bottom-menu">
+          <div className="sidebar">
+            <div className="esper-panel-section">
+              <Components.SidebarNav
+                teamId={this.props.teamId}
+                active="list"
+              />
+            </div>
             { _.isEmpty(this.state.selected) ?
               this.renderFilters(chartProps) :
               this.renderBatchLabeling(chartProps) }
-          </div>
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.teamId}
-              onUpdate={(teamId) => this.update({teamId})}
-            />
           </div>
         </Components.Sidebar>
 
         <div className="esper-content">
           <div id="list-header" className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
+
+            { this.renderSelectAll() }
+
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -86,35 +90,47 @@ module Esper.Views {
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
               show={["week", "month"]}
             />
-            <div className="actions">
+            <div className="btn-group hidden-xs">
               <div className="btn-group">
-                <div className="btn-group">
-                  { this.renderViewButton("week", Text.WeekView) }
-                </div>
-                <div className="btn-group">
-                  { this.renderViewButton("month", Text.MonthView) }
-                </div>
-                <div className="btn-group">
-                  { this.renderViewButton("agenda", Text.AgendaView) }
-                </div>
+                { this.renderViewButton("week", Text.WeekView) }
+              </div>
+              <div className="btn-group">
+                { this.renderViewButton("month", Text.MonthView) }
+              </div>
+              <div className="btn-group">
+                { this.renderViewButton("agenda", Text.AgendaView) }
               </div>
             </div>
           </div>
 
-          <div className="esper-expanded">
-            { this.renderContent(chartProps) }
-          </div>
+          { this.renderContent(chartProps) }
         </div>
       </div>;
     }
 
     renderViewButton(view: "week"|"month"|"agenda",
                      title: string) {
+      let firstChar = title[0];
+      let rest = title.slice(1);
       return <button className={classNames("btn btn-default", {
         active: view === this.props.view
       })} onClick={() => this.update({ view })}>
-        { title }
+        <span>{ firstChar }</span><span>{ rest }</span>
       </button>
+    }
+
+    renderSelectAll() {
+      return _.isEmpty(this.state.selected) ?
+        <button className="btn btn-default select-btn"
+                onClick={() => this.selectAll()}>
+          <i className="fa fa-fw fa-left fa-square-o" />
+          <span>{ Text.SelectAll }</span>
+        </button> :
+        <button className="btn btn-default select-btn"
+                onClick={() => this.clearSelection()}>
+          <i className="fa fa-fw fa-left fa-check-square-o" />
+          <span>{ Text.SelectNone }</span>
+        </button>;
     }
 
     renderContent(props: Types.ChartProps) {
@@ -145,12 +161,7 @@ module Esper.Views {
     }
 
     renderFilters(props: Types.ChartProps) {
-      return <div>
-        <div className="action select-action esper-panel-section"
-             onClick={() => this.selectAll()}>
-          { Text.SelectAll }
-        </div>
-
+      return <div className="esper-panel-section">
         <div className="esper-panel-section">
           <Components.SearchBox
             icon="fa-search"
@@ -206,7 +217,7 @@ module Esper.Views {
         .compact()
         .value();
 
-      return <div className="esper-section">
+      return <div className="esper-panel-section">
         <div className="action unselect-action esper-panel-section"
              onClick={() => this.clearSelection()}>
           { Text.eventsSelected(eventData.length) }

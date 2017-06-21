@@ -11,6 +11,7 @@ module Esper.Views {
   var Component = ReactHelpers.Component;
 
   export class App extends Component<{
+    teamId?: string;
     children?: JSX.Element|JSX.Element[];
   }, {}> {
     render() {
@@ -21,7 +22,7 @@ module Esper.Views {
           </div>
           : <ReleaseNotes lastDismiss={Stores.ReleaseNotes.get()} />
         }
-        <Views.Header />
+        <Views.Header teamId={this.props.teamId} />
         { this.props.children }
       </div>
     }

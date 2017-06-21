@@ -47,7 +47,7 @@ module Esper.Components {
           <ul className="esper-header esper-select-menu"><li>
             <a className={classNames({
               active: this.props.pathFn === Paths.Manage.personal
-            })} href={Paths.Manage.personal().href}>
+            })} href={Paths.Settings.home().href}>
               <i className="fa fa-fw fa-left fa-cog" />
               { Text.PersonalSettings }
             </a>

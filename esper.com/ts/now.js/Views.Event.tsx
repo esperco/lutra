@@ -30,11 +30,6 @@ module Esper.Views {
             })
           }
         </div></div>
-        <Components.TeamSelector
-          teams={Stores.Teams.all()}
-          selectedId={this.props.teamId}
-          onUpdate={(teamId) => this.updateTeam(teamId)}
-        />
       </div>;
     }
 

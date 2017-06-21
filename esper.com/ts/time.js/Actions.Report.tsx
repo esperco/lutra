@@ -25,7 +25,10 @@ module Esper.Actions {
     period = Period.toSingle(period);
 
     // Render view
-    render(<Views.Report teamId={teamId} period={period} labels={labels} />);
+    render(
+      <Views.Report teamId={teamId} period={period} labels={labels} />,
+      teamId
+    );
 
     // Delay tracking by 2 seconds to ensure user is actually looking at list
     Util.delayOne(analyticsId, function() {

@@ -75,7 +75,7 @@ module Esper.Components {
   export function ChartMsg({children}: {
     children?: string|JSX.Element|JSX.Element[]
   }) {
-    return <div className="esper-no-content">
+    return <div className="chart-msg">
       <span>{children}</span>
     </div>;
   }

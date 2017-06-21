@@ -4,6 +4,7 @@
 
 /// <reference path="./Components.LabelEditor.tsx" />
 /// <reference path="./Components.LabelList.tsx" />
+/// <reference path="./Components.Modal.tsx" />
 /// <reference path="./Components.Textarea.tsx" />
 /// <reference path="./Components.Tooltip.tsx" />
 
@@ -127,7 +128,7 @@ module Esper.Components {
         </span>{" "}
         { event.recurringEventId ?
           <span className="recurring" title="Recurring">
-            <i className="fa fa-fw fa-refresh" />
+            <i className="fa fa-fw fa-clone" />
           </span> :
           null
         }

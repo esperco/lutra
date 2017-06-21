@@ -4,8 +4,8 @@
 
 module Esper.Actions {
   // Render with App container
-  export function render(main: React.ReactElement<any>) {
-    Layout.render(<Views.App>
+  export function render(main: React.ReactElement<any>, teamId?: string) {
+    Layout.render(<Views.App teamId={teamId}>
       { main }
     </Views.App>);
   }
@@ -111,7 +111,7 @@ module Esper.Actions {
       teamId, date: start
     });
 
-    render(<Components.PromiseSpinner promise={promise} />);
+    render(<Components.PromiseSpinner promise={promise} />, teamId);
 
     promise.done(function() {
       var events = getEvents({
@@ -139,7 +139,7 @@ module Esper.Actions {
       teamId: current.teamId, date: current.start
     });
 
-    render(<Components.PromiseSpinner promise={promise} />);
+    render(<Components.PromiseSpinner promise={promise} />, current.teamId);
 
     promise.done(function() {
       var events = getEvents({
@@ -171,7 +171,7 @@ module Esper.Actions {
       teamId: current.teamId, date: current.start
     });
 
-    render(<Components.PromiseSpinner promise={promise} />);
+    render(<Components.PromiseSpinner promise={promise} />, current.teamId);
 
     promise.done(function() {
       var events = getEvents({
@@ -206,7 +206,7 @@ module Esper.Actions {
     teamId = teamId || team.teamid;
     var promise = fetchEvents({teamId});
 
-    render(<Components.PromiseSpinner promise={promise} />);
+    render(<Components.PromiseSpinner promise={promise} />, teamId);
 
     promise.done(function() {
       var events = getEvents({teamId});
@@ -284,7 +284,7 @@ module Esper.Actions {
       });
     }
 
-    render(<Components.PromiseSpinner promise={p} />);
+    render(<Components.PromiseSpinner promise={p} />, teamId);
 
     // Handle bad event IDs gracefully
     p.done(function(e) {
@@ -293,7 +293,7 @@ module Esper.Actions {
           teamId={teamId}
           calId={calId}
           eventId={eventId}
-        />);
+        />, teamId);
       } else {
         goToDate(new Date(), { teamId });
       }
@@ -323,6 +323,6 @@ module Esper.Actions {
 
   // Render no-content view for a given date if no event on that date
   export function renderDatePage(date: Date, teamId: string) {
-    render(<Views.DateView date={date} teamId={teamId} />);
+    render(<Views.DateView date={date} teamId={teamId} />, teamId);
   }
 }

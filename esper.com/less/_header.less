@@ -4,15 +4,75 @@
 @nav-menu-link-vertical: 2 * @padding-large-vertical;
 @nav-menu-link-horizontal: 2 * @padding-large-horizontal;
 
+.navbar-container {
+  display: flex;
+
+  .navbar-header {
+    float: none;
+
+    * { display: inline-block; }
+    .navbar-brand { display: flex; }
+
+    h1 {
+      margin: 0;
+      font-size: @font-size-large;
+      color: @text-color;
+      display: flex;
+      align-items: center;
+
+      .fa-caret-down {
+        font-size: @font-size-base;
+      }
+    }
+
+    + * {
+      flex-grow: 1;
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}
+
+.navbar-nav {
+  margin: 0;
+  display: flex;
+
+  li.active a {
+    border-bottom: 1px solid @link-color;
+  }
+
+  li a {
+    height: @navbar-height;
+    line-height: @navbar-height;
+    vertical-align: middle;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  // Icon only on mobile
+  @media screen and (max-width: @screen-xs-max) {
+    li .fa ~ * {
+      display: none;
+    }
+  }
+}
+
+.navbar .dropdown-toggle {
+  padding: @nav-link-padding;
+  height: @navbar-height;
+  line-height: @navbar-height;
+  vertical-align: middle;
+}
+
+li.login-info {
+  padding: @padding-xs-vertical @padding-large-horizontal;
+}
+
 .navbar-fixed-top + * {
   margin-top: @navbar-height + @navbar-margin-bottom;
 }
 
 .navbar-brand.word-mark {
-  line-height: @navbar-height;
-  padding-top: (@navbar-height - @word-mark-height) / 2;
-  padding-bottom: (@navbar-height - @word-mark-height) / 2;
-
   img {
     height: @word-mark-height;
   }
@@ -27,13 +87,13 @@
   a, .navbar-nav > li > a {
     &.sandbox-sign-up {
       color: @brand-primary;
-      font-weight: bold;
+      font-weight: 600;
       font-size: @font-size-large;
       text-transform: uppercase;
     }
 
     &.loud, &.primary {
-      font-weight: bold;
+      font-weight: 600;
     }
 
     &.primary {
@@ -44,50 +104,6 @@
       opacity: 0.8;
     }
   }
-}
-
-.nav-menu {
-  display: none;
-  position: fixed;
-  z-index: @zindex-modal-background;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: rgba(62,37,74,0.9);
-  overflow-y: auto;
-  li {
-    display: block;
-    margin: @nav-menu-link-vertical @nav-menu-link-horizontal;
-    text-align: right;
-    font-size: 18px;
-    font-weight: 600;
-    button { font-size: 18px; }
-    a {
-      text-decoration: none;
-      color: white;
-      &:hover { opacity: 0.5; }
-      &:active { opacity: 0.5; }
-
-      &.primary {
-        color: @brand-primary-alt;
-        &:hover { color: @brand-primary-alt-hover; }
-      }
-    }
-  }
-}
-
-.nav-menu-close {
-  position: fixed;
-  top: 0; left: 0;
-  margin: @nav-menu-link-vertical @nav-menu-link-horizontal;
-  cursor: pointer;
-  color: white;
-  font-size: @font-size-large;
-
-  &:hover, &:active { opacity: 0.5; }
 }
 
 .navbar-square {
@@ -109,3 +125,10 @@
   }
 }
 
+.team-list .esper-selectable {
+  display: flex;
+  a { flex-grow: 1; }
+  a:last-child {
+    flex-grow: 0;
+  }
+}

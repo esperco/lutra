@@ -38,18 +38,13 @@ module Esper.Views {
       return <div id="charts-page" className="esper-expanded">
         <Components.Sidebar side="left" className="esper-shade">
           { this.renderSidebarContent() }
-
-          <div className="sidebar-bottom-menu">
-            <Components.TeamSelector
-              teams={Stores.Teams.all()}
-              selectedId={this.props.team.teamid}
-              onUpdate={(teamId) => this.updateTeamId(teamId)}
-            />
-          </div>
         </Components.Sidebar>
 
         <div className="esper-content">
           <div id="chart-header" className="esper-content-header">
+            <Components.SidebarToggle side="left">
+              <i className="fa fa-fw fa-bars" />
+            </Components.SidebarToggle>
             <Components.PeriodSelector
               minDate={Config.getMinDate(subscription.plan)}
               maxDate={Config.MAX_DATE}
@@ -64,36 +59,35 @@ module Esper.Views {
               updateFn={(p) => this.updatePeriod(p)}
               hintDismissed={Stores.Hints.get('PeriodSelectorHint')}
             />
-            <div className="actions">
-              <div className="esper-flex-list">
-                <div className="search-box-container">
-                  <Components.SearchBox
-                    icon="fa-search"
-                    className="form-control"
-                    placeholder={Text.SearchEventsPlaceholder}
-                    value={this.props.extra.filterStr}
-                    onUpdate={(val) => this.updateExtra({ filterStr: val })}
-                  />
-                </div>
-                <Components.Hint
-                  className="action filter-action"
-                  dismissed={Stores.Hints.get('FilterMenuHint')}
-                  onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
-                  text={Text.FilterActionHintText}>
-                  <span onClick={() => this.toggleFilterMenu()}>
-                    <i id="filter-menu-toggle"
-                       className={classNames("fa fa-fw", {
-                      "fa-close": this.state.showFilterMenu,
-                      "fa-ellipsis-v": !this.state.showFilterMenu,
-                      "active": _.some(_.values(filterState)) &&
-                                !this.state.showFilterMenu
-                    })} />
-                  </span>
-                </Components.Hint>
+            <div className="esper-flex-list">
+              <div className="search-box-container">
+                <Components.SearchBox
+                  icon="fa-search"
+                  className="form-control"
+                  placeholder={Text.SearchEventsPlaceholder}
+                  value={this.props.extra.filterStr}
+                  onUpdate={(val) => this.updateExtra({ filterStr: val })}
+                />
               </div>
+              <Components.Hint
+                className="action filter-action"
+                dismissed={Stores.Hints.get('FilterMenuHint')}
+                onDismiss={() => Stores.Hints.set('FilterMenuHint', true)}
+                text={Text.FilterActionHintText}>
+                <button className="btn btn-default"
+                        onClick={() => this.toggleFilterMenu()}>
+                  <i id="filter-menu-toggle"
+                      className={classNames("fa fa-fw", {
+                    "fa-close": this.state.showFilterMenu,
+                    "fa-ellipsis-v": !this.state.showFilterMenu,
+                    "active": _.some(_.values(filterState)) &&
+                              !this.state.showFilterMenu
+                  })} />
+                </button>
+              </Components.Hint>
             </div>
           </div>
-          <div id="chart-expanded" className="esper-expanded">
+          <div id="chart-expanded">
             { this.state.showFilterMenu ?
               <FilterMenu props={this.props} active={filterState} /> : null }
             <ChartContent {...this.props} />
@@ -103,7 +97,7 @@ module Esper.Views {
     }
 
     renderSidebarContent() {
-      return <div className="sidebar-minus-bottom-menu">
+      return <div className="sidebar">
         <div className="esper-panel-section">
           { this.renderChartSelector() }
         </div>
