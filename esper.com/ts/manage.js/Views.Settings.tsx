@@ -15,7 +15,7 @@ module Esper.Views {
       <SidebarContainer { ...props } />
       <div className="esper-content">
         { props.subMenu }
-        <div className="esper-expanded">
+        <div className="esper-container">
           {
             props.msg ?
             <div className="alert msg alert-info">{ props.msg }</div> :
