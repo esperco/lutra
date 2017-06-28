@@ -271,8 +271,9 @@ module Esper.JsonHttp {
               method: method,
               url: path,
               reqBody: body,
-              respBody: JSON.stringify(response.response_body)
-            })
+              respBody: response ?
+                JSON.stringify(response.response_body) : "undefined"
+            });
             logError(error);
             return $.Deferred().reject(error);
           }
@@ -304,6 +305,7 @@ module Esper.JsonHttp {
       batchDfd = $.Deferred();
     }
 
+    var thisBatchDfd = batchDfd;
     var ret = fn();
     try {
       if (topLevel) {
@@ -311,13 +313,13 @@ module Esper.JsonHttp {
         jsonHttp("POST", batchPath, {
           requests: batchQueue
         }).then(
-          (r) => batchDfd.resolve(r),
-          (e) => batchDfd.reject(e)
+          (r) => thisBatchDfd.resolve(r),
+          (e) => thisBatchDfd.reject(e)
         );
       }
-      return batchDfd.then(() => ret);
+      return thisBatchDfd.then(() => ret);
     } catch(e) {
-      return batchDfd.reject(e).then(() => ret);
+      return thisBatchDfd.reject(e).then(() => ret);
     } finally {
       if (topLevel) {
         insideBatch = false;
