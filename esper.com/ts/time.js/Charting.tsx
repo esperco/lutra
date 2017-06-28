@@ -321,8 +321,8 @@ module Esper.Charting {
 
   // Group by user-provided event rating
   function getStrRatings(event: Types.TeamEvent): string[] {
-    return event.feedback && _.isNumber(event.feedback.rating) ?
-           [event.feedback.rating.toString()] : [];
+    return event.feedback && _.isNumber(event.feedback.stars) ?
+           [event.feedback.stars.toString()] : [];
   }
 
   const MAX_RATING = 5;

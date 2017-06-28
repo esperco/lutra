@@ -439,27 +439,6 @@ module Esper.Api {
     );
   }
 
-  export function postEventFeedback(teamid: string, eventid: string,
-    feedback: ApiT.EventFeedbackUpdate): JsonPromise<ApiT.EventFeedback>
-  {
-    var url = prefix + "/api/event/feedback/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + string(eventid);
-    return JsonHttp.post(url, feedback);
-  }
-
-  export function postEventFeedbackAction(teamid: string, calid: string,
-    eventid: string, action: ApiT.EventFeedbackAction)
-    : JsonPromise<ApiT.EventFeedback>
-  {
-    var url = prefix + "/api/event/feedback/" + string(Login.myUid())
-            + "/" + string(teamid)
-            + "/" + string(calid)
-            + "/" + string(eventid)
-            + "/" + string(action);
-    return JsonHttp.post(url);
-  }
-
   export function getAllPreferences():
   JsonPromise<ApiT.PreferencesList> {
     var url =

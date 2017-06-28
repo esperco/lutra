@@ -22,6 +22,14 @@ module Esper.Actions.EventLabels {
     });
   }
 
+  // Hide labels
+  export function hide(events: Stores.Events.TeamEvent[],
+                       value: boolean) {
+    apply(events, {
+      hidden: value,
+    });
+  }
+
   // Confirm any predicted labels
   export function confirm(events: Stores.Events.TeamEvent[],
                           fetchEvents: Stores.Events.TeamEvent[] = [])
@@ -39,6 +47,7 @@ module Esper.Actions.EventLabels {
   function apply(events: Stores.Events.TeamEvent[], opts: {
     addLabels?: Types.Label[];
     removeLabels?: Types.Label[];
+    hidden?: boolean;
     fetchEvents?: Types.TeamEvent[];
   }) {
     var eventsByTeamId = _.groupBy(events, (e) => e.teamId);
@@ -55,7 +64,8 @@ module Esper.Actions.EventLabels {
       applyForTeam(teamId, teamEvents, {
         addLabels: opts.addLabels,
         removeLabels: opts.removeLabels,
-        fetchEvents: teamFetchEvents
+        fetchEvents: teamFetchEvents,
+        hidden: opts.hidden
       });
 
       // Fire different analytics calls if add/remove vs. confirming
@@ -78,6 +88,7 @@ module Esper.Actions.EventLabels {
       addLabels?: Types.Label[];
       removeLabels?: Types.Label[];
       fetchEvents?: Types.TeamEvent[];
+      hidden?: boolean;
     })
   {
     // Include recurring events
@@ -106,26 +117,15 @@ module Esper.Actions.EventLabels {
     var newEvents = _.map(events, (e) => {
       var newEvent = _.cloneDeep(e);
       newEvent.confirmed = true;
-
-      // Event labeling of any kind implies attendance
-      if (Stores.Events.isActive(e) || opts.addLabels || opts.removeLabels) {
-        newEvent.labels = Option.some(getNewLabels(e, opts));
-        newEvent.attendScore = 1;
-        newEvent.feedback = newEvent.feedback || {
-          eventid: e.id,
-          teamid: e.teamId
-        };
-        newEvent.feedback.attended = true;
+      if (! _.isUndefined(opts.hidden)) {
+        newEvent.hidden = opts.hidden;
+        if (opts.hidden) newEvent.labels = Option.some([]);
       }
 
-      // Not active -> confirm not attended
-      else {
-        newEvent.attendScore = 0;
-        newEvent.feedback = newEvent.feedback || {
-          eventid: e.id,
-          teamid: e.teamId
-        };
-        newEvent.feedback.attended = false;
+      // Event labeling of any kind implies not hidden
+      if (opts.addLabels || opts.removeLabels) {
+        newEvent.labels = Option.some(getNewLabels(e, opts));
+        newEvent.hidden = false;
       }
 
       return newEvent;
@@ -200,20 +200,17 @@ module Esper.Actions.EventLabels {
   var TeamLabelQueue = new Queue2.Processor(
     // Processor
     function(r: QueueRequest) {
-      return Api.setPredictLabels(r.teamId, {
-        set_labels: _.map(r.events, (e) => Stores.Events.isActive(e) ?
-          {
-            id: e.recurringEventId || e.id,
-            labels: e.labels.mapOr([],
-              (labels) => _.map(labels, (l) => l.displayAs)
-            ),
-            attended: true
-          } : {
-            id: e.recurringEventId || e.id,
-            attended: false
-          }),
+      let ret = {
+        set_labels: _.map(r.events, (e) => ({
+          id: e.recurringEventId || e.id,
+          labels: e.labels.mapOr([],
+            (labels) => _.map(labels, (l) => l.displayAs)
+          ),
+          hidden: !Stores.Events.isActive(e)
+        })),
         predict_labels: r.fetchEventIds
-      });
+      };
+      return Api.setPredictLabels(r.teamId, ret);
     },
 
     // Pre-processor

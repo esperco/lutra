@@ -27,8 +27,7 @@ module Esper.Route {
     Actions.renderEvent({
       teamId  : Util.getParamByName("team", q),
       calId   : Util.getParamByName("cal", q),
-      eventId : ctx.params["eventId"] || Util.getParamByName("event", q),
-      action  : Util.getParamByName("action", q)
+      eventId : ctx.params["eventId"] || Util.getParamByName("event", q)
     });
   });
 

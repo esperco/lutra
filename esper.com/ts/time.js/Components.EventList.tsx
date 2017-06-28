@@ -136,51 +136,22 @@ module Esper.Components {
   }
 
   function NoAttend({event}: {event: Stores.Events.TeamEvent}) {
-    // Check if no feedback
-    var feedback = event.feedback || {}
-
     // Used in tooltip
     var isActive = Stores.Events.isActive(event);
-    var title = isActive ? Text.YesAttendLong : Text.NoAttendLong;
+    var title = isActive ? Text.HideLong : Text.UnhideLong;
 
     return <Tooltip className={classNames("action", "no-attend-action", {
                                 active: !isActive
                               })} title={title}
         onClick={(e) => toggleAttend(e, event)}>
-      { isActive ? Text.YesAttend : Text.NoAttend }
+      { isActive ? Text.Hide : Text.Unhide }
     </Tooltip>;
   }
 
   function toggleAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
     e.stopPropagation();
-    Actions.Feedback.post(event, {
-      attended: !Stores.Events.isActive(event)
-    });
+    Actions.EventLabels.hide([event], Stores.Events.isActive(event))
   }
-
-  function EventFeedback({event}: {event: Stores.Events.TeamEvent}) {
-    /*
-      Use text-overflow: ellipsis in CSS to truncate exactly at end of line but
-      use JS to do a sanity-check too, and to keep DOM a little less cluttered.
-    */
-    var notes = (event.feedback.notes || "").slice(0, 250);
-
-    // Format feedback
-    return <span>
-      <i className="fa fa-left fa-fw fa-comment-o" />
-      <span className="star-rating">
-        { Stores.Events.isActive(event) ?
-          _.times(event.feedback.rating || 0, (i) =>
-            <i key={i.toString()} className="fa fa-fw fa-star" />
-          ) : null
-        }
-      </span>
-      <span className="notes">
-        { notes }
-      </span>
-    </span>;
-  }
-
 
   /////
 

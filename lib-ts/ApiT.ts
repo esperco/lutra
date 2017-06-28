@@ -206,18 +206,19 @@ module Esper.ApiT {
     result?: EventLookupResult;
   }
 
-  export interface EventFeedbackUpdate {
+  export interface GuestEventFeedback  {
+    uid: uid;
+    stars?: number; // 1 - 5
+    is_organizer?: boolean;
+    didnt_attend?: boolean;
     notes?: string;
-    attended?: boolean;
-    rating?: number;
+    agenda?: boolean;
+    on_time?: boolean;
+    good_time_mgmt?: boolean;
+    contributed?: boolean;
+    presence_useful?: boolean;
+    action_items?: boolean;
   }
-
-  export interface EventFeedback extends EventFeedbackUpdate {
-    teamid: string;
-    eventid: string;
-  }
-
-  export type EventFeedbackAction = string;
 
   export interface PredictedLabel {
     label: LabelInfo;
@@ -251,11 +252,12 @@ module Esper.ApiT {
     description?: string;
     description_messageids: string[];
     labels?: LabelInfo[];
+    hidden?: boolean;
     labels_confirmed?: boolean;
     labels_predicted?: boolean;
-    predicted_attended?: number;         // Floating score
+    // predicted_attended?: number;      // Exists, but deprecate
     // hashtags: HashtagState[];         // Exists, but deprecate
-    feedback?: EventFeedback;
+    feedback?: GuestEventFeedback;
     location?: string;
     all_day: boolean;
     guests: Attendee[];
@@ -492,7 +494,7 @@ module Esper.ApiT {
     set_labels: {
       id: string;
       labels?: string[];
-      attended?: boolean;
+      hidden?: boolean;
     }[];
     predict_labels: string[]; // Event IDs
   }

@@ -81,60 +81,9 @@ module Esper.Stores.Events {
         );
         expect(isActive(e)).toBe(true);
       });
-
-      it("should return false if attended is false", function() {
-         var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            id: "e",
-            predicted_attended: 0.99,
-            transparent: false,
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: false
-            }
-          })
-        );
-        expect(isActive(e)).toBe(false);
-      });
-
-      it("should return true if attended is true", function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            id: "e",
-            predicted_attended: 0.01,
-            transparent: true,
-            labels: [{
-              original: "Label",
-              normalized: "label"
-            }],
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: true
-            }
-          })
-        );
-        expect(isActive(e)).toBe(true);
-      });
     });
 
     describe("needsConfirmation", function() {
-      it("should return true if labels_confirmed is true",
-      function() {
-        var e = asTeamEvent(TestFixtures.teamId1,
-          TestFixtures.makeGenericCalendarEvent({
-            labels_confirmed: false,
-            feedback: {
-              teamid: TestFixtures.teamId1,
-              eventid: "e",
-              attended: true
-            }
-          })
-        );
-        expect(needsConfirmation(e)).toBe(true);
-      });
-
       it("should return false if attendance needs confirmation but labels " +
          "are already confirmed", function() {
         var e = asTeamEvent(TestFixtures.teamId1,
