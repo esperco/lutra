@@ -8,7 +8,6 @@
 /// <reference path="./Log.ts" />
 /// <reference path="./Model2.Batch.ts" />
 /// <reference path="./Model2.ts" />
-/// <reference path="./Stores.Profiles.ts" />
 /// <reference path="./Stores.Teams.ts" />
 /// <reference path="./Types.ts" />
 /// <reference path="./XDate.ts" />
@@ -406,21 +405,10 @@ module Esper.Stores.Events {
 
   export function getGuests(event: TeamEvent) {
     // Ignore exec on team
-    var execId = Stores.Teams.require(event.teamId).team_executive;
-
-    // Need profiles to get exec email
-    var optEmails = Stores.Profiles.get(execId)
-      .flatMap((execProfile) => Option.some(
-        [execProfile.email].concat(execProfile.other_emails || [])
-      ));
-
+    var teamApi = Stores.Teams.require(event.teamId).team_api;
+    var execEmail = teamApi && teamApi.team_exec_email;
     return _.filter(event.guests,
-      (g) => g.response !== 'Declined' && optEmails.mapOr(true,
-        (execEmails) => !_.includes(
-          _.map(execEmails, (e) => e.toLowerCase()),
-          (g.email || "").toLowerCase()
-        )
-      )
+      (g) => g.response !== 'Declined' && g.email !== execEmail
     );
   }
 
@@ -450,10 +438,21 @@ module Esper.Stores.Events {
   }
 
   /*
+    Did the exec on this team declined this event?
+  */
+  export function declined(event: TeamEvent) {
+    var teamApi = Stores.Teams.require(event.teamId).team_api;
+    var execEmail = teamApi && teamApi.team_exec_email;
+    return execEmail ? !!_.find(event.guests,
+      (g) => g.response === "Declined" && g.email === execEmail
+    ) : false;
+  }
+
+  /*
     Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
-    return !event.confirmed;
+    return !declined(event) && !event.confirmed;
   }
 
   export function getTeams(events: TeamEvent[]) {
@@ -466,13 +465,10 @@ module Esper.Stores.Events {
   }
 
   /*
-    "Active" event means we count it in time-stats. If the event's predicted
-    active score is less than the thresholdb, we require explicit user
-    action to make it active. Otherwise, it defaults to "active" unless
-    the user marks it otherwise.
+    "Active" event means we count it in time-stats.
   */
   export function isActive(event: TeamEvent) {
-    return !event.hidden;
+    return !declined(event) && !event.hidden;
   }
 
   /*

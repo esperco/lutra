@@ -17,10 +17,6 @@ module Esper.Main {
     Stores.Calendars.init();
     Labels.init();
     Login.init(true);
-    Login.promise.done(function() {
-      Stores.TeamPreferences.init();
-      Stores.Profiles.init();
-    });
   }
 }
 
