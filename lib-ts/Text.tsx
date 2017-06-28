@@ -244,9 +244,12 @@ module Esper.Text {
     "Add an Esper link to my calendar event descriptions";
 
   // Event Editor
-  export const FeedbackTitle  = "Meeting Feedback"
+  export const FeedbackTitle  = "Meeting Feedback";
+  export const Declined     = "Declined";
+  export const DeclinedTooltip = "This event is not included in charts " +
+    "because it was declined."
   export const Unhide       = "Unhide";
-  export const Hide         = "Hide"
+  export const Hide         = "Hide";
   export const UnhideLong   = "This event is not included in charts. " +
     "Click to unhide this event.";
   export const HideLong     = "Click to hide this event from charts."

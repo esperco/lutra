@@ -136,6 +136,13 @@ module Esper.Components {
   }
 
   function NoAttend({event}: {event: Stores.Events.TeamEvent}) {
+    // Declined -> indicate to user
+    if (Stores.Events.declined(event)) {
+      return <Tooltip className="declined" title={Text.DeclinedTooltip}>
+        { Text.Declined }
+      </Tooltip>;
+    }
+
     // Used in tooltip
     var isActive = Stores.Events.isActive(event);
     var title = isActive ? Text.HideLong : Text.UnhideLong;
@@ -150,7 +157,7 @@ module Esper.Components {
 
   function toggleAttend(e: React.MouseEvent, event: Stores.Events.TeamEvent) {
     e.stopPropagation();
-    Actions.EventLabels.hide([event], Stores.Events.isActive(event))
+    Actions.EventLabels.hide([event], !event.hidden);
   }
 
   /////

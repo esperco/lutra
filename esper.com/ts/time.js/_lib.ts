@@ -22,6 +22,7 @@
 /// <reference path="../lib/Stores.Customers.ts" />
 /// <reference path="../lib/Stores.Events.ts" />
 /// <reference path="../lib/Stores.Hints.ts" />
+/// <reference path="../lib/Stores.Profiles.ts" />
 /// <reference path="../lib/Stores.TeamPreferences.ts" />
 /// <reference path="../lib/Stores.Teams.ts" />
 /// <reference path="../lib/Text.tsx" />
