@@ -50,9 +50,9 @@ module Esper.Types {
 
     labels: Option.T<Label[]>;
     confirmed: boolean;
-    attendScore: number;
+    hidden: boolean;
+    feedback?: ApiT.GuestEventFeedback;
 
-    feedback: ApiT.EventFeedback;
     location: string;
     allDay: boolean;
     guests: ApiT.Attendee[];

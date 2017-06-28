@@ -18,27 +18,11 @@ module Esper.Stores.Events {
 
   /* Type modification */
 
-  const PREDICTED_ATTENDED_CUTOFF = 0.5;
-
   export type TeamEvent = Types.TeamEvent;
 
   export function asTeamEvent(teamId: string, e: ApiT.GenericCalendarEvent)
     : TeamEvent
   {
-    /*
-      Use predicted_attended number if available. Else look to transparency.
-      Presence of user labels should imply attended.
-      Always override with direct user feedback.
-    */
-    let attendScore = _.isNumber(e.predicted_attended) ?
-      e.predicted_attended : (e.transparent ? 0.1 : 0.9);
-    if (e.labels_confirmed) {
-      attendScore = 1;
-    }
-    if (e.feedback && _.isBoolean(e.feedback.attended)) {
-      attendScore = e.feedback.attended ? 1 : 0;
-    }
-
     let labels = Option.wrap(e.labels).map(
       (labels) => _.map(labels, (l) => ({
         id: l.normalized,
@@ -60,17 +44,11 @@ module Esper.Stores.Events {
       description: e.description || "",
       labels,
       confirmed: !!e.labels_confirmed,
-      feedback: e.feedback || {
-        notes: "", // Optional, but since we don't ever treat null notes
-                   // differently than empty notes, default to blank string
-                   // to avoid possible type errors
-        teamid: teamId,
-        eventid: e.id
-      },
+
       location: e.location || "",
       allDay: e.all_day,
       guests: e.guests,
-      attendScore: attendScore,
+      hidden: e.hidden,
       recurringEventId: e.recurring_event_id
     };
   }
@@ -475,9 +453,7 @@ module Esper.Stores.Events {
     Does event count as a "new event" that user should confirm state of?
   */
   export function needsConfirmation(event: TeamEvent) {
-    return event.attendScore > 0 && (
-      !event.confirmed || event.attendScore < 1
-    );
+    return !event.confirmed;
   }
 
   export function getTeams(events: TeamEvent[]) {
@@ -496,7 +472,7 @@ module Esper.Stores.Events {
     the user marks it otherwise.
   */
   export function isActive(event: TeamEvent) {
-    return event.attendScore >= PREDICTED_ATTENDED_CUTOFF;
+    return !event.hidden;
   }
 
   /*

@@ -246,13 +246,12 @@ module Esper.Actions {
   }
 
   /*
-    Known event ID => fetch and render, optionally post action
+    Known event ID => fetch and render
   */
-  export function renderEvent({teamId, calId, eventId, action}: {
+  export function renderEvent({teamId, calId, eventId}: {
     teamId: string;
     calId: string;
     eventId: string;
-    action?: ApiT.EventFeedbackAction;
   }) {
     if (!eventId) {
       Log.e("Missing eventId");
@@ -269,9 +268,7 @@ module Esper.Actions {
 
     var p: JQueryPromise<Option.T<Types.TeamEvent>>;
     if (teamId && calId) {
-      p = action ? Feedback.postActionAndFetch({
-        teamId, calId, eventId, action
-      }) : Stores.Events.fetchExact({teamId, calId, eventId});
+      p = Stores.Events.fetchExact({teamId, calId, eventId});
     } else {
       p = Stores.Events.fetchFuzzy(eventId).then((r) => {
         if (!r) {
@@ -304,8 +301,7 @@ module Esper.Actions {
     Analytics.page(Analytics.Page.EventFeedback, {
       teamId: teamId,
       calId: calId,
-      eventId: eventId,
-      action: action
+      eventId: eventId
     });
   }
 

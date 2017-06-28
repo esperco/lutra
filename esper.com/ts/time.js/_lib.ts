@@ -5,7 +5,6 @@
 /// <reference path="../../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Actions.EventLabels.ts" />
 /// <reference path="../lib/Actions.FeatureFlags.ts" />
-/// <reference path="../lib/Actions.Feedback.ts" />
 /// <reference path="../lib/Actions.Subscriptions.ts" />
 /// <reference path="../lib/Actions.Teams.ts" />
 /// <reference path="../lib/Actions.TeamPreferences.ts" />
