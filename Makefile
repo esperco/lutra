@@ -8,7 +8,7 @@ export PATH := node_modules/.bin:$(PATH)
 setup: vendor
 
 vendor:
-	npm install
+	yarn
 	typings install
 
 # Remove derived files

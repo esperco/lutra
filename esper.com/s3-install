@@ -24,11 +24,13 @@ s3_bucket="$2"
       --recursive * s3://$s3_bucket )
 
 # Do remainder with guessed mime, defaulting to HTML (because of blanks)
+# Ignore manifest files (revision control only)
 (cd $target && \
     s3cmd put \
       --guess-mime-type \
       --exclude="*.css" \
       --exclude="*.svg" \
+      --exclude="*.manifest.json" \
       --default-mime-type=text/html \
       --add-header="Cache-Control:max-age=60" \
       --recursive * s3://$s3_bucket )
