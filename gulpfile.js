@@ -6,6 +6,7 @@ var _ = require("lodash"),
     argv = require('yargs').argv,
     gulp = require("gulp"),
     helpers = require("./build-helpers/gulp"),
+    production = require("./build-helpers/production"),
     watch = helpers.watch(gulp);
 
 /* Config vars */
@@ -35,7 +36,7 @@ var config = {
   tsProjects: [
     "ts/manage.js/tsconfig.json",
     "ts/now.js/tsconfig.json",
-    "ts/test.js/tsconfig.json",
+    // "ts/test.js/tsconfig.json", // Disable -> use ts var to run
     "ts/time.js/tsconfig.json"
   ],
 
@@ -84,7 +85,11 @@ gulp.task("build-assets", function() {
 gulp.task("watch-assets", watch(_.keys(config.assetMap), "build-assets"));
 
 gulp.task("build-html", function() {
-  return helpers.html(config.htmlGlobs, config.htmlOut);
+  let globs = config.htmlGlobs;
+  if (production.isSet()) {
+    globs = globs.concat(["!html/**/test*"]);
+  }
+  return helpers.html(globs, config.htmlOut);
 });
 
 gulp.task("watch-html", watch(config.htmlGlobs, "build-html"));
