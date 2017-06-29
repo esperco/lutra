@@ -31,12 +31,6 @@ module Esper.Components {
       var value = (e.target as HTMLTextAreaElement).value;
       this.props.onChange && this.props.onChange(value);
     }
-
-    componentDidMount() {
-      if (this._ref) {
-        autosize($(this._ref));
-      }
-    }
   }
 
 }

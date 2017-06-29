@@ -6,8 +6,7 @@
 // Helpers
 var inject        = require("../build-helpers/depends").inject;
 
-var autosize      = require("autosize"),
-    classNames    = require("classnames"),
+var classNames    = require("classnames"),
     EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),
     jQuery        = require("jquery"),
@@ -38,7 +37,6 @@ Esper = (function(esperObj) {
   var assignments = {
     _:            lodash.noConflict(),
     $:            jQuery,
-    autosize:     autosize,
     classNames:   classNames,
     jQuery:       jQuery,
     CryptoJS:     { SHA1: SHA1 },
