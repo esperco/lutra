@@ -3,3 +3,7 @@ node_js:
         - 6
 install: make
 script: make -C esper.com
+cache:
+  yarn: true
+  directories:
+    - node_modules
