@@ -16,6 +16,7 @@ vendor:
 
 # Remove old files + setup
 clean:
+	rm -rf esper.com
 	rm -rf typings
 	rm -f *~ */*~
 	gulp clean
