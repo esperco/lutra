@@ -107,13 +107,28 @@ gulp.task("server", function(cb) {
   });
 });
 
-gulp.task("build", gulp.parallel("build-html",
-                                 "build-assets",
-                                 "build-jasmine",
-                                 "build-js",
-                                 "build-bundles",
-                                 "build-ts",
-                                 "build-less"));
+/*
+  Build tasks that involve revisioning with MD5 hashes before the other stuff
+  so that we can replace as appropriate.
+
+  Note that we're currently not MD5-hashing assets, only JS and CSS, since
+  our assets don't change that often and additional hashing would require
+  that we also update references to those assets within our JS and CSS
+  files before hashing those files and replacing those references in HTML.
+*/
+gulp.task("build", gulp.series(
+  gulp.parallel(
+    "build-js",
+    "build-bundles",
+    "build-ts",
+    "build-less"
+  ),
+  gulp.parallel(
+    "build-assets",
+    "build-jasmine",
+    "build-html"
+  )
+));
 
 gulp.task("clean", function() {
   return helpers.clean(config.pubDir);
@@ -121,7 +136,7 @@ gulp.task("clean", function() {
 
 gulp.task("production", helpers.setProduction);
 
-gulp.task("build-production", gulp.series("production", "clean", "build"))
+gulp.task("build-production", gulp.series("production", "clean", "build"));
 
 gulp.task("watch", gulp.series("build",
   gulp.parallel(

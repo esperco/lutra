@@ -8,7 +8,9 @@ var _             = require('lodash'),
     minimatch     = require('minimatch'),
     path          = require('path'),
     production    = require('./production'),
+    randomstring = require("randomstring"),
     remember      = require('gulp-remember'),
+    rev           = require('gulp-rev'),
     sourcemaps    = require('gulp-sourcemaps'),
     ts            = require('gulp-typescript'),
     typescript    = require('typescript'),
@@ -150,8 +152,16 @@ var buildOne = function(tsConfigPath, commonGlobs, outDir) {
           "ascii_only": true
         }
       }))
+
+      // For prod, MD5 hash final file and write to manifest
+      .pipe(rev())
+
       // External sourcemaps so we don't defeat the purpose of uglifying
-      .pipe(sourcemaps.write("./"));
+      .pipe(sourcemaps.write("./"))
+      .pipe(gulp.dest(outDir))
+      .pipe(rev.manifest(
+        "ts-" + randomstring.generate(7) + ".manifest.json"
+      ));
   } else {
     // Inline sourcemaps for dev because it often doesn't work if
     // it's external and we care more about proper sourcemaps and less
