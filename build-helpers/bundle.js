@@ -9,6 +9,8 @@ var _ = require("lodash"),
     merge = require("merge-stream"),
     path = require("path"),
     production = require("./production"),
+    randomstring = require("randomstring"),
+    rev = require("gulp-rev"),
     source = require("vinyl-source-stream"),
     sourcemaps = require("gulp-sourcemaps"),
     uglify = require("gulp-uglify"),
@@ -87,8 +89,16 @@ var createBundle = function(entryFile, outDir, watch) {
           }
         }))
 
+        // For prod, MD5 hash final file and write to manifest
+        .pipe(rev())
+
         // Write sourcemap to external file
         .pipe(sourcemaps.write("./"))
+
+        .pipe(gulp.dest(outDir))
+        .pipe(rev.manifest(
+          "css-" + randomstring.generate(7) + ".manifest.json"
+        ));
     }
 
     return stream.pipe(gulp.dest(outDir));

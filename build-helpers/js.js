@@ -3,6 +3,8 @@ var cached = require("gulp-cached"),
     gulp = require("gulp"),
     gutil = require("gulp-util"),
     production = require("./production"),
+    randomstring = require("randomstring"),
+    rev = require("gulp-rev"),
     uglify = require("gulp-uglify");
 
 /*
@@ -26,7 +28,15 @@ module.exports = function(src, dest) {
         // Messing with unicode isn't fun
         "ascii_only": true
       }
-    })).on("error", gutil.log)
+    })).on("error", gutil.log);
+
+    // For prod, MD5 hash final file and write to manifest
+    ret = ret
+      .pipe(rev())
+      .pipe(gulp.dest(dest))
+      .pipe(rev.manifest(
+        "js-" + randomstring.generate(7) + ".manifest.json"
+      ))
   }
 
   return ret.pipe(gulp.dest(dest))

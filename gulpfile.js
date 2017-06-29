@@ -5,7 +5,8 @@
 var _ = require("lodash"),
     argv = require('yargs').argv,
     gulp = require("gulp"),
-    helpers = require("../build-helpers/gulp"),
+    helpers = require("./build-helpers/gulp"),
+    production = require("./build-helpers/production"),
     watch = helpers.watch(gulp);
 
 /* Config vars */
@@ -16,7 +17,7 @@ var config = {
   assetMap: {
     "img/**/*.*": "pub/img",
     "img/favicon.ico": "pub",
-    "../node_modules/font-awesome/fonts/*.*": "pub/fonts"
+    "./node_modules/font-awesome/fonts/*.*": "pub/fonts"
   },
 
   jsGlobs: ["js/**/*.js"],
@@ -35,14 +36,13 @@ var config = {
   tsProjects: [
     "ts/manage.js/tsconfig.json",
     "ts/now.js/tsconfig.json",
-    "ts/test.js/tsconfig.json",
+    // "ts/test.js/tsconfig.json", // Disable -> use ts var to run
     "ts/time.js/tsconfig.json"
   ],
 
   lessGlobs: [
     "less/**/*.{css,less}",
-    "../lib-less/**/*.{css,less}",
-    "../node_modules/font-awesome/css/font-awesome.css"
+    "./node_modules/font-awesome/css/font-awesome.css"
   ],
   lessOut: "pub/css",
 
@@ -85,7 +85,11 @@ gulp.task("build-assets", function() {
 gulp.task("watch-assets", watch(_.keys(config.assetMap), "build-assets"));
 
 gulp.task("build-html", function() {
-  return helpers.html(config.htmlGlobs, config.htmlOut);
+  let globs = config.htmlGlobs;
+  if (production.isSet()) {
+    globs = globs.concat(["!html/**/test*"]);
+  }
+  return helpers.html(globs, config.htmlOut);
 });
 
 gulp.task("watch-html", watch(config.htmlGlobs, "build-html"));
@@ -107,13 +111,28 @@ gulp.task("server", function(cb) {
   });
 });
 
-gulp.task("build", gulp.parallel("build-html",
-                                 "build-assets",
-                                 "build-jasmine",
-                                 "build-js",
-                                 "build-bundles",
-                                 "build-ts",
-                                 "build-less"));
+/*
+  Build tasks that involve revisioning with MD5 hashes before the other stuff
+  so that we can replace as appropriate.
+
+  Note that we're currently not MD5-hashing assets, only JS and CSS, since
+  our assets don't change that often and additional hashing would require
+  that we also update references to those assets within our JS and CSS
+  files before hashing those files and replacing those references in HTML.
+*/
+gulp.task("build", gulp.series(
+  gulp.parallel(
+    "build-js",
+    "build-bundles",
+    "build-ts",
+    "build-less"
+  ),
+  gulp.parallel(
+    "build-assets",
+    "build-jasmine",
+    "build-html"
+  )
+));
 
 gulp.task("clean", function() {
   return helpers.clean(config.pubDir);
@@ -121,7 +140,7 @@ gulp.task("clean", function() {
 
 gulp.task("production", helpers.setProduction);
 
-gulp.task("build-production", gulp.series("production", "clean", "build"))
+gulp.task("build-production", gulp.series("production", "clean", "build"));
 
 gulp.task("watch", gulp.series("build",
   gulp.parallel(

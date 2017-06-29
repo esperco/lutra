@@ -9,6 +9,7 @@ var data = require("gulp-data"),
     nunjucksRender = require("gulp-nunjucks-render"),
     production = require("./production"),
     rename = require("gulp-rename"),
+    revReplace = require("gulp-rev-replace"),
     version = require("./version"),
     watch = require("./watch");
 /*
@@ -18,7 +19,7 @@ var data = require("gulp-data"),
   out: string - Pub dir
   context: any - Data to pass to nunjucks
 */
-module.exports = function(globs, out, context) {
+module.exports = function(globs, out, context, manifestsDir) {
   if (! globs instanceof Array) {
     globs = [globs];
   }
@@ -51,10 +52,15 @@ module.exports = function(globs, out, context) {
     });
 
   if (production.isSet()) {
-    ret = ret.pipe(minify({
-      collapseWhitespace: true,
-      conservativeCollapse: true
-    }));
+    // By convention, assumes name ends with ".manifest.json" and that
+    // manifest is stored somewhere in pub dir.
+    var manifest = gulp.src(out + "/**/*.manifest.json");
+    ret = ret
+      .pipe(revReplace({manifest: manifest}))
+      .pipe(minify({
+        collapseWhitespace: true,
+        conservativeCollapse: true
+      }));
   }
 
   /*

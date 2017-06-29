@@ -4,7 +4,7 @@
 */
 
 // Helpers
-var inject        = require("../../build-helpers/depends").inject;
+var inject        = require("../build-helpers/depends").inject;
 
 var EventEmitter  = require("eventemitter3"),
     lodash        = require("lodash"),

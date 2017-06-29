@@ -2,7 +2,7 @@
   Stick references to lib here -- makes managing all the refs easier
 */
 
-/// <reference path="../../../typings/browser/index.d.ts" />
+/// <reference path="../../typings/browser/index.d.ts" />
 /// <reference path="../lib/Actions.EventLabels.ts" />
 /// <reference path="../lib/Analytics.Web.ts" />
 /// <reference path="../lib/Api.ts" />

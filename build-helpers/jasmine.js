@@ -1,7 +1,8 @@
 "use strict";
 var _ = require("lodash"),
     gulp = require("gulp"),
-    path = require("path");
+    path = require("path"),
+    production = require('./production');
 
 // Absolute path of vendor (NPM or Bower)
 var VENDOR_DIR = path.resolve(__dirname, "../node_modules");
@@ -22,6 +23,11 @@ module.exports = function(outDir) {
   ], function(fn) {
     return path.join(jasmineRoot, fn);
   });
+
+  // Don't release test files during prod
+  if (production.isSet()) {
+    return gulp.src("*.empty-stream");
+  }
 
   return gulp.src(jasmineFiles)
     .pipe(gulp.dest(outDir));

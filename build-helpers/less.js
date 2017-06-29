@@ -8,6 +8,8 @@ var _ = require("lodash"),
     minifyCss = require("gulp-cssnano"),
     path = require("path"),
     production = require("./production"),
+    randomstring = require("randomstring"),
+    rev = require("gulp-rev"),
     sourcemaps = require("gulp-sourcemaps");
 
 /*
@@ -36,13 +38,20 @@ module.exports = function(globs, out) {
     }));
 
   if (production.isSet()) {
-    // External source maps + minimize
+    // External source maps + minimize + MD5 revision
     ret = ret.pipe(minifyCss({ zindex: false }))
-             .pipe(sourcemaps.write("./"));
+             .pipe(rev())
+             .pipe(sourcemaps.write("./"))
+             .pipe(gulp.dest(out))
+             .pipe(rev.manifest(
+               "css-" + randomstring.generate(7) + ".manifest.json"
+              ))
+             .pipe(gulp.dest(out));
   } else {
     // Inline source maps
-    ret = ret.pipe(sourcemaps.write());
+    ret = ret
+      .pipe(sourcemaps.write())
+      .pipe(gulp.dest(out));
   }
-
-  return ret.pipe(gulp.dest(out));
+  return ret;
 };

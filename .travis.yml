@@ -1,5 +1,9 @@
 language: node_js
 node_js:
         - 6
-install: make
-script: make -C esper.com
+install: make setup
+script: make
+cache:
+  yarn: true
+  directories:
+    - node_modules
