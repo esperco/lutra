@@ -36,7 +36,7 @@
     "randomstring": "^1.1.5",
     "sync-exec": "^0.6.2",
     "typescript": "^1.8.10",
-    "typings": "^1.1.0",
+    "typings": "2.1.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.7.0",
@@ -48,20 +48,16 @@
     "classnames": "^2.2.4",
     "crypto-js": "^3.1.6",
     "eventemitter3": "^1.2.0",
-    "filepicker-js": "^2.4.8",
     "font-awesome": "^4.6.1",
     "gmail.js": "git://github.com/esperco/gmail.js.git",
     "highcharts": "^4.2.5",
     "jasmine-core": "^2.4.1",
     "jquery": "^2.2.3",
-    "jquery-ui": "^1.10.5",
     "lodash": "^4.11.1",
     "moment": "^2.13.0",
     "moment-timezone": "^0.5.3",
     "page": "^1.7.1",
-    "quill": "^0.20.1",
     "react": "^15.3.2",
-    "react-dom": "^15.3.2",
-    "typeahead.js": "^0.11.1"
+    "react-dom": "^15.3.2"
   }
 }
