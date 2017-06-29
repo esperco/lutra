@@ -4,8 +4,11 @@ default: build
 # Put tsc and typings in path
 export PATH := node_modules/.bin:$(PATH)
 
-# Fetch libraries
+# Fetch libraries, then symlink pub dir for lutra-redux
 setup: vendor
+	mkdir -p esper.com
+	rm -f esper.com/pub
+	ln -s ../pub esper.com/pub
 
 vendor:
 	yarn
