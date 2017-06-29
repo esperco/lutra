@@ -5,7 +5,7 @@
 var _ = require("lodash"),
     argv = require('yargs').argv,
     gulp = require("gulp"),
-    helpers = require("../build-helpers/gulp"),
+    helpers = require("./build-helpers/gulp"),
     watch = helpers.watch(gulp);
 
 /* Config vars */
@@ -16,7 +16,7 @@ var config = {
   assetMap: {
     "img/**/*.*": "pub/img",
     "img/favicon.ico": "pub",
-    "../node_modules/font-awesome/fonts/*.*": "pub/fonts"
+    "./node_modules/font-awesome/fonts/*.*": "pub/fonts"
   },
 
   jsGlobs: ["js/**/*.js"],
@@ -41,8 +41,7 @@ var config = {
 
   lessGlobs: [
     "less/**/*.{css,less}",
-    "../lib-less/**/*.{css,less}",
-    "../node_modules/font-awesome/css/font-awesome.css"
+    "./node_modules/font-awesome/css/font-awesome.css"
   ],
   lessOut: "pub/css",
 

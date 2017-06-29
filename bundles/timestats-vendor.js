@@ -4,7 +4,7 @@
 */
 
 // Helpers
-var inject        = require("../../build-helpers/depends").inject;
+var inject        = require("../build-helpers/depends").inject;
 
 var autosize      = require("autosize"),
     classNames    = require("classnames"),

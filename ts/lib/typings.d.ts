@@ -3,4 +3,4 @@
   code
 */
 
-/// <reference path="../typings/browser/index.d.ts" />
+/// <reference path="../../typings/browser/index.d.ts" />
