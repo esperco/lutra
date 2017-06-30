@@ -23,7 +23,6 @@ var config = {
   jsGlobs: ["js/**/*.js"],
   jsBundles: [
     "bundles/react-page-vendor.js",
-    "bundles/test-vendor.js",
     "bundles/timestats-vendor.js"
   ],
   jsOut: "pub/js",
@@ -51,6 +50,12 @@ var config = {
   serverPort: 5001,
   liveReloadPort: 35729
 };
+
+// Test-related targets
+if (argv.ts && argv.ts === "ts/test.js/tsconfig.json") {
+  config.jsBundles.push("bundles/test-vendor.js");
+}
+
 
 /* Gulp tasks */
 
