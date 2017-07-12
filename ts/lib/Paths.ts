@@ -301,6 +301,15 @@ module Esper.Paths {
     }
   }
 
+  // Paths for /fb
+  export module Feedback {
+    export const prefix = "/fb";
+
+    export function home() {
+      return optPath(prefix, "");
+    }
+  }
+
   // Paths for /tb
   export module Timebomb {
     export const prefix = "/tb";
