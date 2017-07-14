@@ -2,7 +2,10 @@
 default: build
 
 # Put tsc and typings in path
-export PATH := node_modules/.bin:$(PATH)
+#
+# Gotcha: for the directory below to be correct, `make` should be called from
+# the same directory as this Makefile.
+export PATH := $(shell pwd)/node_modules/.bin:$(PATH)
 
 # Fetch libraries, then symlink pub dir for lutra-redux
 setup: vendor
