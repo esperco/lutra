@@ -799,6 +799,7 @@ module Esper.Charting {
           }
         }))
       });
+      keys.push(groupBy.noneText);
     }
 
     return { categories: keys, series };
@@ -934,6 +935,7 @@ module Esper.Charting {
           }
         }))
       };
+      series.push(s);
     }
 
     // Handle remainders
