@@ -87,7 +87,7 @@ module Esper.Views {
     renderOptions(prefs: ApiT.Preferences) {
       if (prefs.event_link === undefined) {
         prefs = _.cloneDeep(prefs);
-        prefs.event_link = true;
+        prefs.event_link = false;
       }
 
       return <div className="esper-panel-section">
