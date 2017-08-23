@@ -105,10 +105,6 @@ module Esper.Views {
       }
 
       return <ul className={className}>
-        <NavLink path={Paths.Time.home()}>
-          <i className="fa fa-fw fa-pie-chart"></i>
-          <span>{" "}Charts</span>
-        </NavLink>
         <NavLink path={Paths.Feedback.home()}>
           <i className="fa fa-fw fa-star"></i>
           <span>{" "}Ratings</span>
@@ -116,6 +112,10 @@ module Esper.Views {
         <NavLink path={Paths.Timebomb.home()}>
           <i className="fa fa-fw fa-check"></i>
           <span>{" "}Agenda Check</span>
+        </NavLink>
+        <NavLink path={Paths.Time.home()}>
+          <i className="fa fa-fw fa-pie-chart"></i>
+          <span>{" "}Charts</span>
         </NavLink>
       </ul>;
     }
