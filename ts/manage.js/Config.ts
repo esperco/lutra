@@ -4,34 +4,40 @@ module Esper.Config {
     'pk_test_tDzGbpaybyFQ3A7XGF6ctE3f' ;
 
   export function getCalendarLimit(planid: ApiT.PlanId) {
-    if (!planid) return 0;
-    switch (planid) {
-      case "Basic_20161019":
-        return 1;
-      case "Executive_20161019":
-      case "Enterprise_20160923":
-      default:
-        return Number.MAX_VALUE;
-    }
+    return Number.MAX_VALUE;
+    
+    // Shutdown
+    // 
+    // if (!planid) return 0;
+    // switch (planid) {
+    //   case "Basic_20161019":
+    //     return 1;
+    //   case "Executive_20161019":
+    //   case "Enterprise_20160923":
+    //   default:
+    //     return Number.MAX_VALUE;
+    // }
   }
 
   export function allowCSV(planid: ApiT.PlanId) {
-    if (!planid || _.startsWith(planid, "Basic")) return false;
+    // Allow all features (shutdown)
+    // if (!planid || _.startsWith(planid, "Basic")) return false;
     return true;
   }
 
   export const DEFAULT_ENTERPRISE_PLAN: ApiT.PlanId = "Enterprise_20160923";
 
+  // Allow all plans (shutdown)
   export function getMinDate(planid: ApiT.PlanId): Date {
-    if (!planid) return moment()
-      .subtract(2, 'month')
-      .startOf('month')
-      .toDate();
+    // if (!planid) return moment()
+    //   .subtract(2, 'month')
+    //   .startOf('month')
+    //   .toDate();
     switch (planid) {
       case "Basic_20161019":
-        return moment().subtract(2, 'month')
-                       .startOf('month')
-                       .toDate();
+      //   return moment().subtract(2, 'month')
+      //                  .startOf('month')
+      //                  .toDate();
       case "Executive_20161019":
       case "Enterprise_20160923":
       case "Employee_20150304":
