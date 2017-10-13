@@ -5,6 +5,7 @@ default: build
 #
 # Gotcha: for the directory below to be correct, `make` should be called from
 # the same directory as this Makefile.
+export SHELL := /bin/bash
 export PATH := $(shell pwd)/node_modules/.bin:$(PATH)
 
 # Fetch libraries, then symlink pub dir for lutra-redux

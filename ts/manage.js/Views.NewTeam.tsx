@@ -50,8 +50,12 @@ module Esper.Views {
               // Refresh customer object associated with team
               Stores.Customers.refresh();
 
-              // Go to payment
-              Route.nav.go(Paths.Manage.Team.pay({
+              // Don't go to payment (shutdown, go to calendar page instead)
+              // Route.nav.go(Paths.Manage.Team.pay({
+              //   teamId: t.teamid
+              // }));
+
+              Route.nav.go(Paths.Manage.Team.calendars({
                 teamId: t.teamid
               }));
             })

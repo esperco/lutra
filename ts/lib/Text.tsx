@@ -21,10 +21,10 @@ module Esper.Text {
 
   // Hints
   export const FilterActionHintText = <div>
-    <p>
+    {/* <p>
       This is the Advanced Filtering feature available only to
       Executive plan users or Enterprise plan users.
-    </p>
+    </p> */}
     <p>
       Click here to display a menu containing options that you can
       adjust to more accurately display how you spend your time.

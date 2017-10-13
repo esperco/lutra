@@ -27,24 +27,28 @@ module Esper.Route {
     teamId = Params.cleanTeamId(teamId);
     let team = Stores.Teams.require(teamId);
     if (team) {
-      let teamSub = team.team_api.team_subscription;
-      if (teamSub.active) {
-        next(); return;
-      }
+      next();
 
-      // No status => no plan => subscribe to default + start free trial
-      else if (! teamSub.status) {
-        Actions.Subscriptions.set({
-          cusId: teamSub.cusid,
-          planId: Config.DEFAULT_PLAN
-        });
-        next();
-      }
+      // Disable subscription checking code (shutdown)
+      // 
+      // let teamSub = team.team_api.team_subscription;
+      // if (teamSub.active) {
+      //   next(); return;
+      // }
 
-      // Else, has bad status (need payment)
-      else {
-        Route.nav.go(Paths.Time.paymentInfo({ teamId }));
-      }
+      // // No status => no plan => subscribe to default + start free trial
+      // else if (! teamSub.status) {
+      //   Actions.Subscriptions.set({
+      //     cusId: teamSub.cusid,
+      //     planId: Config.DEFAULT_PLAN
+      //   });
+      //   next();
+      // }
+
+      // // Else, has bad status (need payment)
+      // else {
+      //   Route.nav.go(Paths.Time.paymentInfo({ teamId }));
+      // }
     }
   }
 
@@ -53,12 +57,15 @@ module Esper.Route {
     checkActive(teamId, function() {
       teamId = Params.cleanTeamId(teamId);
       let team = Stores.Teams.require(teamId);
-      let teamSub = team.team_api.team_subscription;
-      if (teamSub.valid_payment_source) {
-        next();
-      } else {
-        Route.nav.go(Paths.Time.paymentInfo({ teamId }));
-      }
+      next();
+
+      // Ignore card status (shutdown)
+      // let teamSub = team.team_api.team_subscription;
+      // if (teamSub.valid_payment_source) {
+      //   next();
+      // } else {
+      //   Route.nav.go(Paths.Time.paymentInfo({ teamId }));
+      // }
     });
   }
 
